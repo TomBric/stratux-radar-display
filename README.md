@@ -19,9 +19,12 @@ Find below a photo of the current supported displays
 
 ## Hardware-List
 - Raspberry Hardware: Since the code is pure python, no special hardware is required. I recommend a current raspbian lite as operating system. Performance requirements are not so high, so I recommend a "Rasperry Zero WH 512MByte RAM". Normal Raspberry 3B or 4 are also possible (but not tested by me). The Raspi Zero has the smallest form factor and best battery consumption. 
-- Epaper-Display: Waveshare 18057 3.7inch e-Paper HAT: Directly mountable on the Raspi as a HAT (my setup)
+- Epaper-Display: Waveshare 18057 3.7inch e-Paper HAT: Directly mountable on the Raspi as a HAT (my setup).
+
     Alternatively Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Paper Raw Panel Driver HAT 1351
-    ![Epaper photo](https://github.com/TomBric/stratux-radar-display/blob/main/Epaper_3in7.jpg)
+
+![Epaper photo](https://github.com/TomBric/stratux-radar-display/blob/main/Epaper_3in7.jpg)
+
 - Oled-Display: Waveshare 14747, 128x128, General 1.5inch RGB OLED display Module
    ![Oled photo](https://github.com/TomBric/stratux-radar-display/blob/main/Oled_1in5.jpg)
    
