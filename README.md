@@ -15,4 +15,4 @@ Usage:
 Find below a photo of the current supported displays
 - the oled display is relatively small, but can be build into a 2 1/4" or larger instrument mounting hole
 - the epaper display is larger and has optimal readability in sunlight. As e-paper it has a slower update of approx. once per second
-![Display photo](http://https://github.com/TomBric/stratux-radar-display/StratuxRadar.jpg)
+![Display photo](https://github.com/TomBric/stratux-radar-display/blob/main/StratuxRadar.jpg)
