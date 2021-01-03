@@ -109,6 +109,10 @@ def is_busy():
     # oled is never busy, no refresh
     return False
 
+def next_arcposition(old_arcposition):
+    # defines next position of height indicator on circle. Can be used to exclude several ranges or
+    # be used to define the next angle on the circle
+    return (old_arcposition + 210) % 360
 
 def clear(draw):
     draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="black")
