@@ -17,5 +17,5 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-python3 /root/stratux-radar/src/radar.py -d Epaper_3in7 -s -c 192.168.10.1 &
+python3 /root/stratux-radar-display/main/radar.py -d Epaper_3in7 -s -c 192.168.10.1 &
 exit 0

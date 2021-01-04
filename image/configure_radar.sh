@@ -9,7 +9,9 @@
 #apt-get dist-update
 
 #luma files and more
-apt-get install python3-pip python3-pil libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
+apt-get update
+apt-get install python3-pip python3-pil
+apt-get install libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
 pip3 install luma.oled
 apt-get install git
 
