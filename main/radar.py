@@ -379,7 +379,7 @@ if __name__ == "__main__":
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     args = vars(ap.parse_args())
-    display_control = importlib.import_module('..displays.' + args['device'] + '.controller')
+    display_control = importlib.import_module('..displays', args['device'] + '.controller')
     speak = args['speak']
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
