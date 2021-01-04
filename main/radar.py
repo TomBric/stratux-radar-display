@@ -357,21 +357,19 @@ def main():
     try:
         asyncio.run(courotines())
     except asyncio.CancelledError:
-        print("Main cancelled")
+        logging.debug("Main cancelled")
 
 
 def quit_gracefully(*args):
     global quit_display_task
 
     print("Keyboard interrupt. Quitting ...")
-    print("Stop Coroutines running")
     quit_display_task = True
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
     print("CleanUp Epaper ...")
     display_control.cleanup()
-    print("Epaper clean.")
 
 
 if __name__ == "__main__":
@@ -381,7 +379,7 @@ if __name__ == "__main__":
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     args = vars(ap.parse_args())
-    display_control = importlib.import_module('displays.' + args['device'] + '.controller')
+    display_control = importlib.import_module('..displays.' + args['device'] + '.controller')
     speak = args['speak']
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
