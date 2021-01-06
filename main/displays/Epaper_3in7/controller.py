@@ -44,6 +44,8 @@ SMALL = 24      # size of information indications on top and bottom
 VERYSMALL = 18
 AIRCRAFT_SIZE = 6        # size of aircraft arrow
 MINIMAL_CIRCLE = 20     # minimal size of mode-s circle
+ARCPOSITION_EXCLUDE_FROM = 130
+ARCPOSITION_EXCLUDE_TO = 230
 # end definitions
 
 # global device properties
@@ -82,6 +84,15 @@ def is_busy():
     return device.async_is_busy()
 
 
+def next_arcposition(old_arcposition):
+    # defines next position of height indicator on circle. Can be used to exclude several ranges or
+    # be used to define the next angle on the circle
+    new_arcposition = (old_arcposition + 210) % 360
+    if ARCPOSITION_EXCLUDE_TO >= new_arcposition >= ARCPOSITION_EXCLUDE_FROM:
+        new_arcposition = (old_arcposition + 210) % 360
+    return new_arcposition
+
+
 def init():
     global sizex
     global sizey
@@ -116,7 +127,7 @@ def init():
     device.display_1Gray(device.getbuffer(epaper_image))
     end = time.time()
     display_refresh = (end-start) / 2
-    logging.info("Measured Display Refresh Time: "+ str(display_refresh)+ " seconds")
+    logging.info("Measured Display Refresh Time: " + str(display_refresh) + " seconds")
     return draw, max_pixel, zerox, zeroy, display_refresh
 
 
@@ -126,6 +137,10 @@ def cleanup():
     device.sleep()
     device.Dev_exit()
     logging.debug("Epaper cleaned up.")
+
+
+def clear(draw):
+    draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
 
 
 def centered_text(draw, y, text, font, fill):
@@ -138,7 +153,7 @@ def startup(draw, target_ip, seconds):
     logo = Image.open(logopath)
     draw.bitmap((zerox-192/2, 0), logo, fill="black")
     centered_text(draw, 193, "EPaper-Radar 1.0", largefont, fill="black")
-    centered_text(draw, sizey - VERYSMALL - 2, "Waiting for " + target_ip, verysmallfont, fill="black")
+    centered_text(draw, sizey - VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
     display()
     time.sleep(seconds)
 
@@ -183,7 +198,6 @@ def modesaircraft(draw, radius, height, arcposition):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference):
-    draw.rectangle((0, 0, sizex-1, sizey-1), fill="white")  # for now, clear everything in image
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")

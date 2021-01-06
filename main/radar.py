@@ -51,7 +51,7 @@ logging.basicConfig(
 
 # constant definitions
 RETRY_TIMEOUT = 1
-LOST_CONNECTION_TIMEOUT = 0.2
+LOST_CONNECTION_TIMEOUT = 1.0
 RADAR_CUTOFF = 29
 ARCPOSITION_EXCLUDE_FROM = 130
 ARCPOSITION_EXCLUDE_TO = 230
@@ -357,21 +357,19 @@ def main():
     try:
         asyncio.run(courotines())
     except asyncio.CancelledError:
-        print("Main cancelled")
+        logging.debug("Main cancelled")
 
 
 def quit_gracefully(*args):
     global quit_display_task
 
     print("Keyboard interrupt. Quitting ...")
-    print("Stop Coroutines running")
     quit_display_task = True
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
     print("CleanUp Epaper ...")
     display_control.cleanup()
-    print("Epaper clean.")
 
 
 if __name__ == "__main__":
