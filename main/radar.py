@@ -295,7 +295,7 @@ async def listen_forever(path, name, callback):
                     try:
                         message = await ws.recv()
                     except websockets.exceptions.ConnectionClosed:
-                        logging.debug(name + "lost connection or timeout. Retrying connect... ")
+                        logging.debug(name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                         await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                         break
                     except asyncio.CancelledError:
@@ -305,8 +305,10 @@ async def listen_forever(path, name, callback):
                     callback(message)
 
         except (socket.error, websockets.exceptions.WebSocketException):
-            logging.debug(name + 'no connection retrying connection in {} sec '.format(RETRY_TIMEOUT))
-            situation['connected'] = False
+            logging.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
+            if name == 'SituationHandler' and situation['connected']:
+                    situation['connected'] = False
+                    situation['was_changed'] = True
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
 
