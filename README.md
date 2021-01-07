@@ -40,7 +40,7 @@ Alternatively Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Pa
 | RST | 22 | white |
 
    
-   ## Software Installation Instructions (will follow)
+   ## Software Installation Instructions
    ### Expert setup 
    1. Configure a clean Raspbian buster installation on your SD card. E.g. using Raspberry Pi Imager. Recommended image is "Raspbian Pi OS 32 lite"
    2. For network configuration: Create empty file "ssh" on the boot partition. Copy "wpa_supplicant.conf" on the boot partition as well. This well enable the Pi to connect to the Stratux and also enable ssh connection. The file "wpa_supplicant.conf" is configured for the network "stratux". If you want a different network setup please modify "wpa_supplicant.conf" accordingly.
@@ -50,3 +50,8 @@ Alternatively Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Pa
    6. Copy the configuration script (under github/image) onto the radar-raspberry:  scp configure_radar.sh pi@192.168.10.10:/home/pi
    7. Execute the configuration script as root. "/bin/bash configure_radar.sh".  This will take some time since it does an update on the pi. It will also clone a version of the radar into /root/stratux-radar-display
    8. Depending on your display copy from /root/stratux-radar-display/image:  "rc.local.Oled_1in5" or "rc.local.Epaper_3in7"to /etc/rc.local. This will make the pi to automatically startup the radar software.
+   
+   ### Standard setup
+   1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Epaper-Versions will follow.
+   2. Flash the image using Balena/Etcher or Win32DiskImager or Raspberry Pi Imager to your SD card (at least 8GB)
+   3. Insert the SD into you raspberry and let it boot. It should automatically startup and connect to the Stratux-Europe edition. Remark: Current configuration is for Stratux-Europe on IP address 192.168.10.1. If you have a different configuration please update /etc/rc.local accordingly.
