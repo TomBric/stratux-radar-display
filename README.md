@@ -47,6 +47,6 @@ Alternatively Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Pa
    3. Startup your Stratux and boot your new raspberry. The new raspberry should connect as 192.168.10.10 or .11 or .12 to the stratux network.
    4. From your workstation open a remote shell on the new raspberry:  ssh pi@192.168.10.x. Password is standard for the pi.
    5. On the raspberry modify the following settings via "sudo raspi-config":   "-> Interface Options -> Enable SPI"
-   6. Copy the configuration script onto the radar-raspberry:  scp configure-radar.sh pi@192.168.10.10:/home/pi
-   7. Execute the configuration script as root. "/bin/bash configure-radar.sh".  This will take some time since it does an update on the pi. It will also clone a version of the radar into /root/stratux-radar-display
-   8. Depending on your display copy "rc.Oled_1in5" or "rc.Epaper_3in7"to /etc/rc.local. This will make the pi to automatically startup the radar software.-
+   6. Copy the configuration script (under github/image) onto the radar-raspberry:  scp configure_radar.sh pi@192.168.10.10:/home/pi
+   7. Execute the configuration script as root. "/bin/bash configure_radar.sh".  This will take some time since it does an update on the pi. It will also clone a version of the radar into /root/stratux-radar-display
+   8. Depending on your display copy from /root/stratux-radar-display/image:  "rc.local.Oled_1in5" or "rc.local.Epaper_3in7"to /etc/rc.local. This will make the pi to automatically startup the radar software.
