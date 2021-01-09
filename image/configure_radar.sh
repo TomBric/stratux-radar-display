@@ -19,7 +19,8 @@ apt-get install git -y
 pip3 install websockets
 
 # espeak-ng for sound output
-apt install espeak-ng espeak-ng-data libespeak-ng-dev -y
+apt-get update
+apt-get install espeak-ng espeak-ng-data libespeak-ng-dev -y
 pip3 install py-espeak-ng
 
 # get files from repo
