@@ -50,6 +50,7 @@ Alternatively Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Pa
    6. Copy the configuration script (under github/image) onto the radar-raspberry:  scp configure_radar.sh pi@192.168.10.10:/home/pi
    7. Execute the configuration script as root. "/bin/bash configure_radar.sh".  This will take some time since it does an update on the pi. It will also clone a version of the radar into /root/stratux-radar-display
    8. Depending on your display copy from /root/stratux-radar-display/image:  "rc.local.Oled_1in5" or "rc.local.Epaper_3in7"to /etc/rc.local. This will make the pi to automatically startup the radar software.
+   Remark: Raspbian Buster on the Pi Zero has problems with IPV6. So if you connect it to some network with IPV6 devices, make sure IPV6 is disabled (append ipv6.disable=1 on the first line in cmdline.txt in the image before booting)
    
    ### Standard setup
    1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Epaper-Versions will follow.
