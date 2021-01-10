@@ -8,7 +8,7 @@
 
 
 #luma files and more
-apt update && apt full-upgrade -y
+apt-get update
 apt-get install python3-pip python3-pil -y
 apt-get install libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
 pip3 install luma.oled
@@ -28,3 +28,7 @@ cd /root && git clone https://github.com/TomBric/stratux-radar-display.git
 # cp /root/stratux-radar-display/image/rc.local.Oled_1in5 /etc/rc.local
 # cp /root/stratux-radar-display/image/rc.local.Epaper_3in7 /etc/rc.local
 #reboot
+
+
+# apt purge piwiz
+# necessary to disable bluetoothmessage "To turn on ..."

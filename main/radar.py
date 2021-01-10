@@ -81,6 +81,9 @@ def init_espeak():
     global esng
     if speak:
         esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
+        if esng:
+            esng.say("Stratux Radar connected")
+            print("SPEAK: Stratux Radar connected")
 
 
 def draw_all_ac(draw, allac):
