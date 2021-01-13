@@ -40,6 +40,7 @@ import websockets
 import logging
 import math
 import time
+import radarbluez
 
 from espeakng import ESpeakNG
 import importlib
@@ -310,10 +311,22 @@ async def listen_forever(path, name, callback):
         except (socket.error, websockets.exceptions.WebSocketException):
             logging.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
-                    situation['connected'] = False
-                    situation['was_changed'] = True
+                situation['connected'] = False
+                situation['was_changed'] = True
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
+
+
+async def user_interface():
+    while True:
+        if quit_display_task:
+            logging.debug("User interface task terminating ...")
+            return
+        await asyncio.sleep(5.0)
+        devno, devnames = radarbluez.connected_devices()
+        print("User Interface: Bluetooth " + str(devno) + " devices connected.")
+        for i in devnames:
+            print("   " + devnames[i])
 
 
 async def display_and_cutoff():
@@ -321,7 +334,7 @@ async def display_and_cutoff():
 
     while True:
         if quit_display_task:
-            print("Display task terminating ...")
+            logging.debug("Display task terminating ...")
             return
 
         if display_control.is_busy():
@@ -346,7 +359,8 @@ async def display_and_cutoff():
 
 async def courotines():
     await asyncio.wait([listen_forever(url_radar_ws, "TrafficHandler", new_traffic),
-                        listen_forever(url_situation_ws, "SituationHandler", new_situation), display_and_cutoff()])
+                        listen_forever(url_situation_ws, "SituationHandler", new_situation),
+                        display_and_cutoff(), user_interface()])
 
 
 def main():
@@ -373,7 +387,7 @@ def quit_gracefully(*args):
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
-    print("CleanUp Epaper ...")
+    print("CleanUp Display ...")
     display_control.cleanup()
 
 
