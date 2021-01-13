@@ -31,7 +31,9 @@ sudo apt purge piwiz -y
 cd /home/pi && git clone https://github.com/TomBric/stratux-radar-display.git
 
 # include autostart into crontab, so that radar starts on every boot
-crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
+echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
+# only works if crontab is empty, otherwise use
+# crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
 
 # cp /root/stratux-radar-display/image/rc.local.Oled_1in5 /etc/rc.local
 # cp /root/stratux-radar-display/image/rc.local.Epaper_3in7 /etc/rc.local
