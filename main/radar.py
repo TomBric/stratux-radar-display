@@ -81,6 +81,7 @@ speak = False
 def init_espeak():
     global esng
     if speak:
+        radarbluez.bluez_init()
         esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
         if esng:
             esng.say("Stratux Radar connected")
