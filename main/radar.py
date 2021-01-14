@@ -339,7 +339,8 @@ async def user_interface():
         logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
         if new_devices != bt_devices:
             if new_devices > bt_devices and speak and esng!=None:  # new or additional device
-                esng.say("Stratux new device connected")
+                esng.say("Radar connected")
+                print("SPEAK: Radar connected")
             bt_devices = new_devices
             ui_changed = True
 
