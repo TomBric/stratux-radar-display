@@ -51,6 +51,7 @@ zerox = 0
 zeroy = 0
 largefont = ""
 smallfont = ""
+webfont = ""
 device = None
 image = None
 # end device globals
@@ -74,6 +75,7 @@ def init():
     global zeroy
     global largefont
     global smallfont
+    global webfont
     global device
     global image
 
@@ -88,6 +90,7 @@ def init():
     device.contrast(255)  # set full contrast
     largefont = make_font("miscfs_.ttf", LARGE)               # font for height indications
     smallfont = make_font("miscfs_.ttf", SMALL)     # font for information indications
+    webfont = make_font("fontawesome-webfont.ttf", SMALL)   # font for Bluetooth indications
     display_refresh = 0.3    # oled has no busy flag, so take this as update value
     return draw, sizex, zerox, zeroy, display_refresh
 
@@ -170,7 +173,7 @@ def modesaircraft(draw, radius, height, arcposition):
     draw.text(tposition, t, font=largefont, fill="white")
 
 
-def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference):
+def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0):
     draw.ellipse((0, 0, sizex-1, sizey-1), outline="blue")
     draw.ellipse((sizex/4, sizey/4, zerox + sizex/4, zeroy + sizey/4), outline="blue")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="blue")
@@ -193,6 +196,11 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     text = str(course) + '°'
     textsize = draw.textsize(text, smallfont)
     draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="orange", align="right")
+
+    if bt_devices > 0:
+        text = '\uf293'   # bluetooth symbol + no
+        textsize = draw.textsize(text, webfont)
+        draw.text((sizex - textsize[0], sizey - 2*SMALL), text, font=webfont, fill="blue", align="right")
 
     if not gpsconnected:
         centered_text(draw, 0, "No GPS", smallfont, fill="red")

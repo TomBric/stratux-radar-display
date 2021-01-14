@@ -46,7 +46,7 @@ from espeakng import ESpeakNG
 import importlib
 
 logging.basicConfig(
-    level=logging.ERROR,
+    level=logging.INFO,
     format='%(asctime)-15s > %(message)s'
 )
 
@@ -65,6 +65,7 @@ device = ""
 draw = None
 all_ac = {}
 aircraft_changed = True
+ui_changed = True
 situation = {'was_changed': True, 'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
              'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000}
 max_pixel = 0
@@ -76,6 +77,7 @@ quit_display_task = False
 esng = None
 display_control = None
 speak = False
+bt_devices = 0
 
 
 def init_espeak():
@@ -83,7 +85,10 @@ def init_espeak():
     if speak:
         radarbluez.bluez_init()
         esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-        if esng:
+        if !esng:
+            logging.info("INFO: espeak-ng not initialized")
+            return
+        if bt_devices > 0:
             esng.say("Stratux Radar connected")
             print("SPEAK: Stratux Radar connected")
 
@@ -110,15 +115,16 @@ def draw_display(draw):
     global aircraft_changed
 
     logging.debug("List of all aircraft > " + json.dumps(all_ac))
-    if situation['was_changed'] or aircraft_changed:
+    if situation['was_changed'] or aircraft_changed or ui_changed
         # display is only triggered if there was a change
         display_control.clear(draw)
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
-                                  situation['course'], situation['RadarRange'], situation['RadarLimits'])
+                                  situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices)
         draw_all_ac(draw, all_ac)
         display_control.display()
         situation['was_changed'] = False
         aircraft_changed = False
+        ui_changed = False
 
 
 def radians_rel(angle):
@@ -148,6 +154,8 @@ def speaktraffic(hdiff, direction=None):
     global esng
     global speak
 
+    if esng == None or not speak or bt_devices == 0:
+        return
     feet = hdiff * 100
     sign = 'plus'
     if hdiff < 0:
@@ -157,8 +165,7 @@ def speaktraffic(hdiff, direction=None):
         txt += str(direction) + ' o\'clock '
     txt += sign + ' ' + str(abs(feet)) + ' feet'
     print("SPEAK: " + txt)
-    if speak:
-        esng.say(txt)
+    esng.say(txt)
 
 
 def new_traffic(json_str):
@@ -319,15 +326,21 @@ async def listen_forever(path, name, callback):
 
 
 async def user_interface():
+    global bt_devices
+    global ui_changed
+
     while True:
         if quit_display_task:
             logging.debug("User interface task terminating ...")
             return
         await asyncio.sleep(5.0)
-        devno, devnames = radarbluez.connected_devices()
-        print("User Interface: Bluetooth " + str(devno) + " devices connected.")
-        for i in devnames:
-            print("   " + devnames[i])
+        new_devices, devnames = radarbluez.connected_devices()
+        logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
+        if new_devices != bt_devices:
+            if new_devices > bt_devices and speak and esng!=None:  # new or additional device
+                esng.say("Stratux new device connected")
+            bt_devices = new_devices
+            ui_changed = True
 
 
 async def display_and_cutoff():
