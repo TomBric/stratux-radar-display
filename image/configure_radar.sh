@@ -24,6 +24,10 @@ sudo apt-get update
 sudo apt-get install espeak-ng espeak-ng-data libespeak-ng-dev -y
 sudo pip3 install py-espeak-ng
 
+# bluetooth configs
+sudo apt-get install libbluetooth-dev
+sudo pip3 install pybluez
+sudo pip3 install pydbus
 sudo apt purge piwiz -y
 # necessary to disable bluetoothmessage "To turn on ..."
 
