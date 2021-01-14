@@ -85,7 +85,7 @@ def init_espeak():
     if speak:
         radarbluez.bluez_init()
         esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-        if !esng:
+        if esng==None :
             logging.info("INFO: espeak-ng not initialized")
             return
         if bt_devices > 0:
@@ -113,9 +113,10 @@ def draw_display(draw):
     global all_ac
     global situation
     global aircraft_changed
+    global ui_changed
 
     logging.debug("List of all aircraft > " + json.dumps(all_ac))
-    if situation['was_changed'] or aircraft_changed or ui_changed
+    if situation['was_changed'] or aircraft_changed or ui_changed:
         # display is only triggered if there was a change
         display_control.clear(draw)
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
