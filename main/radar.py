@@ -41,6 +41,7 @@ import logging
 import math
 import time
 import radarbluez
+import radarui
 import importlib
 
 logging.basicConfig(
@@ -54,6 +55,8 @@ LOST_CONNECTION_TIMEOUT = 1.0
 RADAR_CUTOFF = 29
 ARCPOSITION_EXCLUDE_FROM = 130
 ARCPOSITION_EXCLUDE_TO = 230
+UI_REACTION_TIME = 0.1
+BLUEZ_CHECK_TIME = 3.0
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -307,13 +310,16 @@ async def listen_forever(path, name, callback):
 async def user_interface():
     global bt_devices
     global ui_changed
-
+    last_bt_checktime = 0.0
     while True:
         if quit_display_task:
             logging.debug("User interface task terminating ...")
             return
-        await asyncio.sleep(5.0)
-        if speak:
+        await asyncio.sleep(UI_REACTION_TIME)
+        radarui.check_user_input()
+        current_time = time.time()
+        if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
+            last_bt_checktime = current_time
             new_devices, devnames = radarbluez.connected_devices()
             logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
             if new_devices != bt_devices:
@@ -364,6 +370,7 @@ def main():
     global draw
     global display_refresh_time
 
+    radarui.init()
     if speak:
         radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
