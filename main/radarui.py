@@ -65,6 +65,7 @@ def init():
     global middle
     global right
 
+    print("UI-Init")
     left = Button(26)
     middle = Button(20)
     right = Button(21)
