@@ -42,6 +42,7 @@ from pathlib import Path
 LARGE = 32           # size of height indications of aircraft
 SMALL = 24      # size of information indications on top and bottom
 VERYSMALL = 18
+AWESOME_FONTSIZE = 18   # bluetooth indicator
 AIRCRAFT_SIZE = 6        # size of aircraft arrow
 MINIMAL_CIRCLE = 20     # minimal size of mode-s circle
 ARCPOSITION_EXCLUDE_FROM = 130
@@ -57,6 +58,7 @@ max_pixel = 0
 largefont = ""
 smallfont = ""
 verysmallfont = ""
+awesomefont = ""
 device = None
 epaper_image = None
 # end device globals
@@ -102,6 +104,7 @@ def init():
     global largefont
     global smallfont
     global verysmallfont
+    global awesomefont
     global device
     global epaper_image
 
@@ -120,6 +123,7 @@ def init():
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
     smallfont = make_font("Font.ttc", SMALL)            # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
+    awesomefont = make_font("fontawesome-webfont.ttf", AWESOME_FONTSIZE)  # for bluetooth indicator
     # measure time for refresh
     start = time.time()
     # do sync version of display to measure time
@@ -197,7 +201,7 @@ def modesaircraft(draw, radius, height, arcposition):
     draw.text(tposition, t, font=largefont, fill="black")
 
 
-def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference):
+def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
@@ -218,3 +222,8 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         centered_text(draw, 70, "No GPS", smallfont, fill="black")
     if not connected:
         centered_text(draw, 30, "No Connection!", smallfont, fill="black")
+
+    if bt_devices > 0:
+        t = "\uf293"  # bluetooth symbol
+        textsize = draw.textsize(t, awesomefont)
+        draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")

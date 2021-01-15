@@ -40,12 +40,11 @@ import websockets
 import logging
 import math
 import time
-
-from espeakng import ESpeakNG
+import radarbluez
 import importlib
 
 logging.basicConfig(
-    level=logging.ERROR,
+    level=logging.INFO,
     format='%(asctime)-15s > %(message)s'
 )
 
@@ -64,6 +63,7 @@ device = ""
 draw = None
 all_ac = {}
 aircraft_changed = True
+ui_changed = True
 situation = {'was_changed': True, 'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
              'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000}
 max_pixel = 0
@@ -72,15 +72,9 @@ zeroy = 0
 last_arcposition = 0
 display_refresh_time = 0
 quit_display_task = False
-esng = None
 display_control = None
 speak = False
-
-
-def init_espeak():
-    global esng
-    if speak:
-        esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
+bt_devices = 0
 
 
 def draw_all_ac(draw, allac):
@@ -103,17 +97,19 @@ def draw_display(draw):
     global all_ac
     global situation
     global aircraft_changed
+    global ui_changed
 
     logging.debug("List of all aircraft > " + json.dumps(all_ac))
-    if situation['was_changed'] or aircraft_changed:
+    if situation['was_changed'] or aircraft_changed or ui_changed:
         # display is only triggered if there was a change
         display_control.clear(draw)
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
-                                  situation['course'], situation['RadarRange'], situation['RadarLimits'])
+                                  situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices)
         draw_all_ac(draw, all_ac)
         display_control.display()
         situation['was_changed'] = False
         aircraft_changed = False
+        ui_changed = False
 
 
 def radians_rel(angle):
@@ -140,9 +136,6 @@ def calc_gps_distance(lat, lng):
 
 
 def speaktraffic(hdiff, direction=None):
-    global esng
-    global speak
-
     feet = hdiff * 100
     sign = 'plus'
     if hdiff < 0:
@@ -151,9 +144,7 @@ def speaktraffic(hdiff, direction=None):
     if direction:
         txt += str(direction) + ' o\'clock '
     txt += sign + ' ' + str(abs(feet)) + ' feet'
-    print("SPEAK: " + txt)
-    if speak:
-        esng.say(txt)
+    radarbluez.speak(txt)
 
 
 def new_traffic(json_str):
@@ -307,10 +298,29 @@ async def listen_forever(path, name, callback):
         except (socket.error, websockets.exceptions.WebSocketException):
             logging.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
-                    situation['connected'] = False
-                    situation['was_changed'] = True
+                situation['connected'] = False
+                situation['was_changed'] = True
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
+
+
+async def user_interface():
+    global bt_devices
+    global ui_changed
+
+    while True:
+        if quit_display_task:
+            logging.debug("User interface task terminating ...")
+            return
+        await asyncio.sleep(5.0)
+        if speak:
+            new_devices, devnames = radarbluez.connected_devices()
+            logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
+            if new_devices != bt_devices:
+                if new_devices > bt_devices:  # new or additional device
+                    radarbluez.speak("Radar connected")
+                bt_devices = new_devices
+                ui_changed = True
 
 
 async def display_and_cutoff():
@@ -318,7 +328,7 @@ async def display_and_cutoff():
 
     while True:
         if quit_display_task:
-            print("Display task terminating ...")
+            logging.debug("Display task terminating ...")
             return
 
         if display_control.is_busy():
@@ -343,7 +353,8 @@ async def display_and_cutoff():
 
 async def courotines():
     await asyncio.wait([listen_forever(url_radar_ws, "TrafficHandler", new_traffic),
-                        listen_forever(url_situation_ws, "SituationHandler", new_situation), display_and_cutoff()])
+                        listen_forever(url_situation_ws, "SituationHandler", new_situation),
+                        display_and_cutoff(), user_interface()])
 
 
 def main():
@@ -353,7 +364,8 @@ def main():
     global draw
     global display_refresh_time
 
-    init_espeak()
+    if speak:
+        radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     display_control.startup(draw, url_host_base, 4)
     try:
@@ -370,7 +382,7 @@ def quit_gracefully(*args):
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
-    print("CleanUp Epaper ...")
+    print("CleanUp Display ...")
     display_control.cleanup()
 
 
