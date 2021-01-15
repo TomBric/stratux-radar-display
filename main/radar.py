@@ -41,8 +41,6 @@ import logging
 import math
 import time
 import radarbluez
-
-from espeakng import ESpeakNG
 import importlib
 
 logging.basicConfig(
@@ -74,23 +72,9 @@ zeroy = 0
 last_arcposition = 0
 display_refresh_time = 0
 quit_display_task = False
-esng = None
 display_control = None
 speak = False
 bt_devices = 0
-
-
-def init_espeak():
-    global esng
-    if speak:
-        radarbluez.bluez_init()
-        esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-        if esng==None :
-            logging.info("INFO: espeak-ng not initialized")
-            return
-        if bt_devices > 0:
-            esng.say("Stratux Radar connected")
-            print("SPEAK: Stratux Radar connected")
 
 
 def draw_all_ac(draw, allac):
@@ -152,11 +136,6 @@ def calc_gps_distance(lat, lng):
 
 
 def speaktraffic(hdiff, direction=None):
-    global esng
-    global speak
-
-    if esng == None or not speak or bt_devices == 0:
-        return
     feet = hdiff * 100
     sign = 'plus'
     if hdiff < 0:
@@ -165,8 +144,7 @@ def speaktraffic(hdiff, direction=None):
     if direction:
         txt += str(direction) + ' o\'clock '
     txt += sign + ' ' + str(abs(feet)) + ' feet'
-    print("SPEAK: " + txt)
-    esng.say(txt)
+    radarbluez.speak(txt)
 
 
 def new_traffic(json_str):
@@ -335,14 +313,14 @@ async def user_interface():
             logging.debug("User interface task terminating ...")
             return
         await asyncio.sleep(5.0)
-        new_devices, devnames = radarbluez.connected_devices()
-        logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
-        if new_devices != bt_devices:
-            if new_devices > bt_devices and speak and esng!=None:  # new or additional device
-                esng.say("Radar connected")
-                print("SPEAK: Radar connected")
-            bt_devices = new_devices
-            ui_changed = True
+        if speak:
+            new_devices, devnames = radarbluez.connected_devices()
+            logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
+            if new_devices != bt_devices:
+                if new_devices > bt_devices:  # new or additional device
+                    radarbluez.speak("Radar connected")
+                bt_devices = new_devices
+                ui_changed = True
 
 
 async def display_and_cutoff():
@@ -386,7 +364,8 @@ def main():
     global draw
     global display_refresh_time
 
-    init_espeak()
+    if speak:
+        radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     display_control.startup(draw, url_host_base, 4)
     try:
