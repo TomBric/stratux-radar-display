@@ -99,15 +99,15 @@ def check_user_input():
     print(".")
     if mode == 1:  # radar mode
 
-        if left.is_pressed():
+        if left.is_pressed:
             radius += 1 if radius < len(display_radius) else 0
             communicate_limits(display_radius[radius], height_diff[height])
 
-        if right.is_pressed():
+        if right.is_pressed:
             radius += 1 if radius < len(display_radius) else 0
             communicate_limits(display_radius[radius], height_diff[height])
 
-        if middle.is_pressed():
+        if middle.is_pressed:
             if not status_middle:
                 time_middle = current_time
                 status_middle = True
