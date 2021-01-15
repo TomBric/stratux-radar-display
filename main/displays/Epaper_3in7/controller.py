@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 import logging
-from . import epd3in7
+import epd3in7
 from PIL import Image, ImageDraw, ImageFont
 import math
 import time
@@ -104,6 +104,7 @@ def init():
     global largefont
     global smallfont
     global verysmallfont
+    global awesomefont
     global device
     global epaper_image
 
@@ -122,7 +123,7 @@ def init():
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
     smallfont = make_font("Font.ttc", SMALL)            # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
-    awesomefont = make_font("fontawesome-webfont.ttf", AWESOME_FONTSIZE) # for bluetooth indicator
+    awesomefont = make_font("fontawesome-webfont.ttf", AWESOME_FONTSIZE)  # for bluetooth indicator
     # measure time for refresh
     start = time.time()
     # do sync version of display to measure time
@@ -223,6 +224,6 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         centered_text(draw, 30, "No Connection!", smallfont, fill="black")
 
     if bt_devices > 0:
-        text = '\uf293'   # bluetooth symbol + no
-        textsize = draw.textsize(text, awesomefont)
-        draw.text((sizex - textsize[0], sizey - SMALL), text, font=awesomefont, fill="black")
+        t = "\uf293"  # bluetooth symbol
+        textsize = draw.textsize(t, awesomefont)
+        draw.text((sizex - textsize[0], sizey - SMALL), t, font=awesomefont, fill="black")
