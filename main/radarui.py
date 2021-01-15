@@ -55,7 +55,7 @@ display_mode = ('init', 'radar', 'setup', 'ahrs', 'clock')
 display_radius = (2, 5, 10, 20, 40)
 height_diff = (10, 20, 50, 100, 500)
 sound_on = True
-mode = 0      # index in display mode
+mode = 1      # index in radar mode
 radius = 0    # index in display_radius
 height = 0    # index in height_diff
 
