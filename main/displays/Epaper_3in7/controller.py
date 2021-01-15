@@ -226,4 +226,4 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     if bt_devices > 0:
         t = "\uf293"  # bluetooth symbol
         textsize = draw.textsize(t, awesomefont)
-        draw.text((sizex - textsize[0], sizey - SMALL), t, font=awesomefont, fill="black")
+        draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
