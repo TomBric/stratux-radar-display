@@ -40,9 +40,9 @@ HOLD_TIME = 1.0   # time to trigger the hold activity if one button is pressed l
 
 
 # global variables
-left = Button(0)
-middle = Button(0)
-right = Button(0)
+left = None
+middle = None
+right = None
 time_left = 0.0
 status_left = False
 time_right = 0.0
