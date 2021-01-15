@@ -28,9 +28,10 @@ def bluez_init():
     if bus is None:
         logging.debug("Systembus not received")
         return
-    manager = bus.get(BLUEZ_SERVICE, '/')
-    adapter = bus.get(BLUEZ_SERVICE, ADAPTER_PATH)
-    if manager is None or adapter is None:
+    try:
+        manager = bus.get(BLUEZ_SERVICE, '/')
+        adapter = bus.get(BLUEZ_SERVICE, ADAPTER_PATH)
+    except (KeyError, TypeError):
         logging.debug("BLUEZ-SERVICE not initialised")
         return
     esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
