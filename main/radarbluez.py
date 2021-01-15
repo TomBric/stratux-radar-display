@@ -1,6 +1,5 @@
 import re
 import pydbus
-from gi.repository import GLib
 import logging
 from espeakng import ESpeakNG
 
@@ -32,7 +31,7 @@ def bluez_init():
     try:
         manager = bus.get(BLUEZ_SERVICE, '/')
         adapter = bus.get(BLUEZ_SERVICE, ADAPTER_PATH)
-    except (KeyError, TypeError, gi.repository.GLib.Error):
+    except (KeyError, TypeError):
         logging.debug("BLUEZ-SERVICE not initialised")
         return
     esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
