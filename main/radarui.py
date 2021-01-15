@@ -96,6 +96,7 @@ def check_user_input():
     radius = 0
     height = 0
     current_time = time.time()
+    print(".")
     if mode == 1:  # radar mode
 
         if left.is_pressed():
