@@ -83,9 +83,6 @@ def check_user_input():
     global height
     global status_middle
 
-    radius = 0
-    height = 0
-
     current_time = time.time()
     if mode == 1:  # radar mode
         if GPIO.event_detected(LEFT):
