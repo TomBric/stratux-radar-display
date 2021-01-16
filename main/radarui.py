@@ -86,11 +86,15 @@ def check_user_input():
     current_time = time.time()
     if mode == 1:  # radar mode
         if GPIO.event_detected(LEFT):
-            radius = radius + 1 if radius < len(display_radius)-1 else 0
+            radius += 1
+            if radius >= len(display_radius):
+                radius = 0
             communicate_limits(display_radius[radius], height_diff[height])
 
         if GPIO.event_detected(RIGHT):
-            height = height + 1 if height < len(display_radius)-1 else 0
+            height += 1
+            if height >= len(height_diff):
+                height = 0
             communicate_limits(display_radius[radius], height_diff[height])
 
         if GPIO.event_detected(MIDDLE):
