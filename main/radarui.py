@@ -63,9 +63,9 @@ def init():
     GPIO.setup(MIDDLE, GPIO.IN, GPIO.PUD_UP)  # middle
     GPIO.setup(RIGHT, GPIO.IN, GPIO.PUD_UP)  # right
 
-    GPIO.add_event_detect(LEFT, GPIO.RISING, callback = None, bouncetime = 100)  # toggle
-    GPIO.add_event_detect(RIGHT, GPIO.RISING, callback = None, bouncetime = 100)  # toggle
-    GPIO.add_event_detect(MIDDLE, GPIO.BOTH, callback = None, bouncetime = 100)   # short press and long press needed
+    GPIO.add_event_detect(LEFT, GPIO.RISING, bouncetime = 100)  # toggle
+    GPIO.add_event_detect(RIGHT, GPIO.RISING, bouncetime = 100)  # toggle
+    GPIO.add_event_detect(MIDDLE, GPIO.BOTH, bouncetime = 100)   # short press and long press needed
 
 
 def start_radar_mode():
