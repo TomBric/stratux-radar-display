@@ -93,7 +93,7 @@ def check_user_input():
             communicate_limits(display_radius[radius], height_diff[height])
 
         if GPIO.event_detected(RIGHT):
-            height += 1 if height < 0 len(display_radius) else 0
+            height += 1 if height < len(display_radius) else 0
             communicate_limits(display_radius[radius], height_diff[height])
 
         if GPIO.event_detected(MIDDLE):
