@@ -117,11 +117,10 @@ def check_user_input():
             else:
                 if current_time - time_middle > HOLD_TIME:  # pressed for a long time
                     status_middle = False  # reset
-                    print("Starting AHRS MODE")
+                    print("Starting NEXT MODE")
         else:
             if status_middle: # it was only a short press, toggle sound on/off
                 status_middle = False
-                print("Toggle Sound")
                 return True
             status_middle = False
     return False
