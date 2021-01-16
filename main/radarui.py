@@ -107,6 +107,7 @@ def check_user_input():
                 print("W-")
                 if current_time - time_middle > HOLD_TIME:   # pressed for a long time
                         print("Starting AHRS MODE")
+                        status_middle = False   # reset
         else:
             print("-")
             status_middle = False
