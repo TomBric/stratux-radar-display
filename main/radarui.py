@@ -120,6 +120,7 @@ def check_user_input():
                     print("Starting AHRS MODE")
         else:
             if status_middle: # it was only a short press, toggle sound on/off
+                status_middle = False
                 print("Toggle Sound")
                 return True
             status_middle = False
