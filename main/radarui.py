@@ -33,20 +33,15 @@
 
 import logging
 import time
-from gpiozero import Button
+import RPi.GPIO as GPIO
 
 # global constants
 HOLD_TIME = 1.0   # time to trigger the hold activity if one button is pressed longer
+LEFT = 26
+MIDDLE = 20
+RIGHT = 21
 
-
-# global variables
-left = None
-middle = None
-right = None
-time_left = 0.0
-status_left = False
-time_right = 0.0
-status_right = False
+# status
 time_middle = 0.0
 status_middle = False
 
@@ -61,14 +56,16 @@ height = 0    # index in height_diff
 
 
 def init():
-    global left
-    global middle
-    global right
-
     print("UI-Init")
-    left = Button(26)
-    middle = Button(20)
-    right = Button(21)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    GPIO.setup(LEFT, GPIO.IN, GPIO.PUD_UP)   # left
+    GPIO.setup(MIDDLE, GPIO.IN, GPIO.PUD_UP)  # middle
+    GPIO.setup(RIGHT, GPIO.IN, GPIO.PUD_UP)  # right
+
+    GPIO.add_event_detect(LEFT, GPIO.RISING)  # toggle
+    GPIO.add_event_detect(RIGHT, GPIO.RISING)  # toggle
+    GPIO.add_event_detect(MIDDLE, GPIO.BOTH)   # short press and long press needed
 
 
 def start_radar_mode():
@@ -81,38 +78,31 @@ def communicate_limits(r, h):
 
 
 def check_user_input():
-    global left
-    global middle
-    global right
-    global status_middle
-    global status_right
-    global status_left
     global time_middle
-    global time_right
-    global time_left
     global radius
     global height
+    global status_middle
 
     radius = 0
     height = 0
+
     current_time = time.time()
-    print(".")
     if mode == 1:  # radar mode
-
-        if left.is_pressed:
+        if GPIO.event_detected(LEFT):
             radius += 1 if radius < len(display_radius) else 0
             communicate_limits(display_radius[radius], height_diff[height])
 
-        if right.is_pressed:
-            radius += 1 if radius < len(display_radius) else 0
+        if GPIO.event_detected(RIGHT):
+            radius -= 1 if radius >= 0 else len(display_radius)-1
             communicate_limits(display_radius[radius], height_diff[height])
 
-        if middle.is_pressed:
-            if not status_middle:
-                time_middle = current_time
-                status_middle = True
+        if GPIO.event_detected(MIDDLE):
+            if GPIO.input(MIDDLE):
+                if not status_middle:   # now it is pressed
+                    time_middle = current_time
+                    status_middle = True
             else:
-                if current_time - time_middle > HOLD_TIME:   # pressed for a long time
-                    print("Starting AHRS MODE")
-        else:
-            status_middle = False
+                if status_middle:
+                    status_middle = False
+                    if current_time - time_middle > HOLD_TIME:   # pressed for a long time
+                        print("Starting AHRS MODE")
