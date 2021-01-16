@@ -112,10 +112,12 @@ def is_busy():
     # oled is never busy, no refresh
     return False
 
+
 def next_arcposition(old_arcposition):
     # defines next position of height indicator on circle. Can be used to exclude several ranges or
     # be used to define the next angle on the circle
     return (old_arcposition + 210) % 360
+
 
 def clear(draw):
     draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="black")
@@ -173,7 +175,7 @@ def modesaircraft(draw, radius, height, arcposition):
     draw.text(tposition, t, font=largefont, fill="white")
 
 
-def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0):
+def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0, sound_active=True):
     draw.ellipse((0, 0, sizex-1, sizey-1), outline="blue")
     draw.ellipse((sizex/4, sizey/4, zerox + sizex/4, zeroy + sizey/4), outline="blue")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="blue")
@@ -198,9 +200,14 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="orange", align="right")
 
     if bt_devices > 0:
-        text = '\uf293'   # bluetooth symbol + no
+        if sound_active:
+            btcolor = "blue"
+            text = '\uf293'  # bluetooth symbol + no
+        else:
+            btcolor = "red"
+            text = '\uf1f6'  # bell off symbol
         textsize = draw.textsize(text, webfont)
-        draw.text((sizex - textsize[0], sizey - 2*SMALL), text, font=webfont, fill="blue", align="right")
+        draw.text((sizex - textsize[0], sizey - 2*SMALL), text, font=webfont, fill=btcolor, align="right")
 
     if not gpsconnected:
         centered_text(draw, 0, "No GPS", smallfont, fill="red")

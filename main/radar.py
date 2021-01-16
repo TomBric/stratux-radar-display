@@ -77,8 +77,9 @@ last_arcposition = 0
 display_refresh_time = 0
 quit_display_task = False
 display_control = None
-speak = False
+speak = False  # BT is generally enabled
 bt_devices = 0
+sound_on = True   # user may toogle sound off by UI
 
 
 def draw_all_ac(draw, allac):
@@ -108,7 +109,8 @@ def draw_display(draw):
         # display is only triggered if there was a change
         display_control.clear(draw)
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
-                                  situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices)
+                                  situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
+                                  sound_on)
         draw_all_ac(draw, all_ac)
         display_control.display()
         situation['was_changed'] = False
@@ -310,14 +312,23 @@ async def listen_forever(path, name, callback):
 
 async def user_interface():
     global bt_devices
+    global sound_on
     global ui_changed
     last_bt_checktime = 0.0
+
     while True:
         if quit_display_task:
             logging.debug("User interface task terminating ...")
             return
         await asyncio.sleep(UI_REACTION_TIME)
-        radarui.check_user_input()
+        toggle_sound = radarui.check_user_input()
+        if toggle_sound:
+            if sound_on:
+                logging.debug("Sound off toggled by UI")
+                sound_on = False
+            else:
+                logging.debug("Sound on toggled by UI")
+                sound_on = True
         current_time = time.time()
         if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
             last_bt_checktime = current_time
@@ -406,7 +417,7 @@ if __name__ == "__main__":
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
-    url_settings_set ="http://" + url_host_base + "/setSettings"
+    url_settings_set = "http://" + url_host_base + "/setSettings"
 
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
