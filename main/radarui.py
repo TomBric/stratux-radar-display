@@ -63,8 +63,8 @@ def init():
     GPIO.setup(MIDDLE, GPIO.IN, GPIO.PUD_UP)  # middle
     GPIO.setup(RIGHT, GPIO.IN, GPIO.PUD_UP)  # right
 
-    GPIO.add_event_detect(LEFT, GPIO.RISING, bouncetime = 300)  # toggle
-    GPIO.add_event_detect(RIGHT, GPIO.RISING, bouncetime = 300)  # toggle
+    GPIO.add_event_detect(LEFT, GPIO.FALLING, bouncetime = 300)  # toggle
+    GPIO.add_event_detect(RIGHT, GPIO.FALLING, bouncetime = 300)  # toggle
     # GPIO.add_event_detect(MIDDLE, GPIO.BOTH, bouncetime = 300)   # short press and long press needed
 
 
@@ -97,7 +97,7 @@ def check_user_input():
                 height = 0
             communicate_limits(display_radius[radius], height_diff[height])
 
-        if GPIO.input(MIDDLE):
+        if GPIO.input(MIDDLE) == GPIO.LOW:
             print('M')
             if not status_middle:   # now it is pressed
                 print("WM")
