@@ -34,9 +34,10 @@
 import logging
 import time
 import RPi.GPIO as GPIO
+import requests
 
 # global constants
-HOLD_TIME = 1.0   # time to trigger the hold activity if one button is pressed longer
+HOLD_TIME = 1.0  # time to trigger the hold activity if one button is pressed longer
 LEFT = 26
 MIDDLE = 20
 RIGHT = 21
@@ -50,22 +51,28 @@ display_mode = ('init', 'radar', 'setup', 'ahrs', 'clock')
 display_radius = (2, 5, 10, 20, 40)
 height_diff = (10, 20, 50, 100, 500)
 sound_on = True
-mode = 1      # index in radar mode
-radius = 0    # index in display_radius
-height = 0    # index in height_diff
+mode = 1  # index in radar mode
+radius = 0  # index in display_radius
+height = 0  # index in height_diff
+
+url_settings_set = ""
 
 
-def init():
+def init(url):
+    global url_settings_set
+
     print("UI-Init")
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    GPIO.setup(LEFT, GPIO.IN, GPIO.PUD_UP)   # left
+    GPIO.setup(LEFT, GPIO.IN, GPIO.PUD_UP)  # left
     GPIO.setup(MIDDLE, GPIO.IN, GPIO.PUD_UP)  # middle
     GPIO.setup(RIGHT, GPIO.IN, GPIO.PUD_UP)  # right
 
-    GPIO.add_event_detect(LEFT, GPIO.FALLING, bouncetime = 300)  # toggle
-    GPIO.add_event_detect(RIGHT, GPIO.FALLING, bouncetime = 300)  # toggle
-    # GPIO.add_event_detect(MIDDLE, GPIO.BOTH, bouncetime = 300)   # short press and long press needed
+    GPIO.add_event_detect(LEFT, GPIO.FALLING, bouncetime=300)  # toggle
+    GPIO.add_event_detect(RIGHT, GPIO.FALLING, bouncetime=300)  # toggle
+
+    url_settings_set = url
+    logging.debug("Radar UI: Initialized POST settings to " + url_settings_set)
 
 
 def start_radar_mode():
@@ -73,8 +80,14 @@ def start_radar_mode():
     mode = 1
 
 
-def communicate_limits(r, h):
-    print("COMMUNICATE LIMITS: Radius " + str(r) + " Height " + str(h))
+def communicate_limits(radarrange, threshold):
+    global url_settings_set
+
+    print("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
+    try:
+        requests.post(url_settings_set, data={'RadarLimits': threshold*100, 'RadarRange': radarrange})
+    except requests.exceptions.RequestException as e:
+        logging.debug("Posting limits exception", e)
 
 
 def check_user_input():
@@ -98,16 +111,13 @@ def check_user_input():
             communicate_limits(display_radius[radius], height_diff[height])
 
         if GPIO.input(MIDDLE) == GPIO.LOW:
-            print('M')
-            if not status_middle:   # now it is pressed
-                print("WM")
+            if not status_middle:  # now it is pressed
                 time_middle = current_time
                 status_middle = True
             else:
-                print("W-")
-                if current_time - time_middle > HOLD_TIME:   # pressed for a long time
-                        print("Starting AHRS MODE")
-                        status_middle = False   # reset
+                if current_time - time_middle > HOLD_TIME:  # pressed for a long time
+                    status_middle = False  # reset
+                    print("Starting AHRS MODE")
         else:
             print("-")
             status_middle = False

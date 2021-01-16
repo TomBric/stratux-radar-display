@@ -62,6 +62,7 @@ BLUEZ_CHECK_TIME = 3.0
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
 url_situation_ws = ""
 url_radar_ws = ""
+url_settings_set = ""
 device = ""
 draw = None
 all_ac = {}
@@ -370,7 +371,7 @@ def main():
     global draw
     global display_refresh_time
 
-    radarui.init()
+    radarui.init(url_settings_set)
     if speak:
         radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
@@ -405,6 +406,8 @@ if __name__ == "__main__":
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
+    url_settings_set ="http://" + url_host_base + "/setSettings"
+
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
         main()
