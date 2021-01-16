@@ -98,11 +98,15 @@ def check_user_input():
             communicate_limits(display_radius[radius], height_diff[height])
 
         if GPIO.input(MIDDLE):
+            print('M')
             if not status_middle:   # now it is pressed
+                print("WM")
                 time_middle = current_time
                 status_middle = True
             else:
+                print("W-")
                 if current_time - time_middle > HOLD_TIME:   # pressed for a long time
                         print("Starting AHRS MODE")
         else:
+            print("-")
             status_middle = False
