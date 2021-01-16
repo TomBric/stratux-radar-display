@@ -119,5 +119,4 @@ def check_user_input():
                     status_middle = False  # reset
                     print("Starting AHRS MODE")
         else:
-            print("-")
             status_middle = False
