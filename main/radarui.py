@@ -63,9 +63,9 @@ def init():
     GPIO.setup(MIDDLE, GPIO.IN, GPIO.PUD_UP)  # middle
     GPIO.setup(RIGHT, GPIO.IN, GPIO.PUD_UP)  # right
 
-    GPIO.add_event_detect(LEFT, GPIO.RISING, bouncetime = 200)  # toggle
-    GPIO.add_event_detect(RIGHT, GPIO.RISING, bouncetime = 200)  # toggle
-    GPIO.add_event_detect(MIDDLE, GPIO.BOTH, bouncetime = 200)   # short press and long press needed
+    GPIO.add_event_detect(LEFT, GPIO.RISING, bouncetime = 300)  # toggle
+    GPIO.add_event_detect(RIGHT, GPIO.RISING, bouncetime = 300)  # toggle
+    # GPIO.add_event_detect(MIDDLE, GPIO.BOTH, bouncetime = 300)   # short press and long press needed
 
 
 def start_radar_mode():
@@ -97,13 +97,12 @@ def check_user_input():
                 height = 0
             communicate_limits(display_radius[radius], height_diff[height])
 
-        if GPIO.event_detected(MIDDLE):
-            if GPIO.input(MIDDLE):
-                if not status_middle:   # now it is pressed
-                    time_middle = current_time
-                    status_middle = True
+        if GPIO.input(MIDDLE):
+            if not status_middle:   # now it is pressed
+                time_middle = current_time
+                status_middle = True
             else:
-                if status_middle:
-                    status_middle = False
-                    if current_time - time_middle > HOLD_TIME:   # pressed for a long time
+                if current_time - time_middle > HOLD_TIME:   # pressed for a long time
                         print("Starting AHRS MODE")
+        else:
+            status_middle = False
