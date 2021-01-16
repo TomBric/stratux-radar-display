@@ -83,7 +83,7 @@ def start_radar_mode():
 def communicate_limits(radarrange, threshold):
     global url_settings_set
 
-    print("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
+    logging.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
     try:
         requests.post(url_settings_set, json={'RadarLimits': threshold*100, 'RadarRange': radarrange})
     except requests.exceptions.RequestException as e:
