@@ -145,7 +145,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
 
     draw.polygon(((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
                  fill="red", outline="white")
-    draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[0]), fill="white", width=2)
+    draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill="white", width=2)
     if height >= 0:
         t = "+" + str(abs(height))
     else:

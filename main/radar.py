@@ -220,7 +220,7 @@ def new_traffic(json_str):
             if 'nspeed' in ac:
                 nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
                 ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
-                print("nspeed =" + str(ac['nspeed']) + " line length " + str(ac['nspeed_length']))
+                print("nspeed " + str(ac['nspeed']) + " line length " + str(ac['nspeed_length']))
             # speech output
             if gps_rad <= situation['RadarRange'] / 2:
                 oclock = round(res_angle / 30)
