@@ -38,7 +38,7 @@ from PIL import Image, ImageFont, ImageDraw
 from . import radar_opts
 
 # global constants
-LARGE = 20           # size of height indications of aircraft
+LARGE = 18           # size of height indications of aircraft
 SMALL = 12      # size of information indications on top and bottom
 AIRCRAFT_SIZE = 3        # size of aircraft arrow
 MINIMAL_CIRCLE = 10     # minimal size of mode-s circle
