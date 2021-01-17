@@ -39,7 +39,7 @@ import time
 from pathlib import Path
 
 # global constants
-LARGE = 32           # size of height indications of aircraft
+LARGE = 30           # size of height indications of aircraft
 SMALL = 24      # size of information indications on top and bottom
 VERYSMALL = 18
 AWESOME_FONTSIZE = 18   # bluetooth indicator
@@ -162,19 +162,24 @@ def startup(draw, target_ip, seconds):
     time.sleep(seconds)
 
 
-def aircraft(draw, x, y, direction, height, nspeed, vspeed):
+def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
     p1 = posn(direction, 2 * AIRCRAFT_SIZE)
     p2 = posn(direction + 150, 4 * AIRCRAFT_SIZE)
     p3 = posn(direction + 180, 2 * AIRCRAFT_SIZE)
     p4 = posn(direction + 210, 4 * AIRCRAFT_SIZE)
+    p5 = posn(270 + direction, nspeed_length)  # line for speed
 
     draw.polygon(((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
                  fill="black", outline="black")
+    draw.line((x + p1[0], y + p1[1]), (x + p5[0], y + p5[0]), fill="black", width=3)
     if height >= 0:
-        signchar = "+"
+        t = "+"
     else:
-        signchar = "-"
-    t = signchar + str(abs(height))
+        t = "-"
+    if vspeed > 0:
+        t = t + str(abs(height)) + '\u0173'
+    if vspeed < 0:
+        t = t + str(abs(height)) + '\u0175'
     tsize = draw.textsize(t, largefont)
     if tsize[0] + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
         # would draw text outside, move to the left
