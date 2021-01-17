@@ -57,7 +57,7 @@ ARCPOSITION_EXCLUDE_FROM = 130
 ARCPOSITION_EXCLUDE_TO = 230
 UI_REACTION_TIME = 0.2
 BLUEZ_CHECK_TIME = 3.0
-SPEED_ARROW_TIME = 30  # time in seconds for the line that displays the speed
+SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -96,8 +96,12 @@ def draw_all_ac(draw, allac):
         # then draw adsb
         if 'x' in ac:
             if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
+                if 'nspeed_length' in ac:
+                    line_length = ac['nspeed_length']
+                else:
+                    line_length = 0
                 display_control.aircraft(draw, ac['x'], ac['y'], ac['direction'], ac['height'], ac['vspeed'],
-                                         ac['nspeed_length'])
+                                         line_length)
 
 
 def draw_display(draw):
@@ -213,9 +217,10 @@ def new_traffic(json_str):
             gpsy = - math.cos(math.radians(res_angle)) * gps_rad
             ac['x'] = round(max_pixel / 2 * gpsx / situation['RadarRange'] + zerox)
             ac['y'] = round(max_pixel / 2 * gpsy / situation['RadarRange'] + zeroy)
-            nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
-            ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
-            print("nspeed =" + str(ac['nspeed']) + " line length " + str(ac['nspeed_length']))
+            if 'nspeed' in ac:
+                nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
+                ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
+                print("nspeed =" + str(ac['nspeed']) + " line length " + str(ac['nspeed_length']))
             # speech output
             if gps_rad <= situation['RadarRange'] / 2:
                 oclock = round(res_angle / 30)
