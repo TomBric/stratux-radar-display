@@ -177,9 +177,9 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
     else:
         t = "-"
     if vspeed > 0:
-        t = t + str(abs(height)) + '\u0173'
+        t = t + str(abs(height)) + '\u2191'
     if vspeed < 0:
-        t = t + str(abs(height)) + '\u0175'
+        t = t + str(abs(height)) + '\u2193'
     tsize = draw.textsize(t, largefont)
     if tsize[0] + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
         # would draw text outside, move to the left
