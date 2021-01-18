@@ -52,8 +52,6 @@ display_radius = (2, 5, 10, 20, 40)
 height_diff = (10, 20, 50, 100, 500)
 sound_on = True
 mode = 1  # index in radar mode
-radius = 0  # index in display_radius
-height = 0  # index in height_diff
 
 url_settings_set = ""
 
@@ -89,12 +87,16 @@ def communicate_limits(radarrange, threshold):
         logging.debug("Posting limits exception", e)
 
 
-def check_user_input():
+def check_user_input(rrange, rlimits):
     global time_middle
-    global radius
-    global height
     global status_middle
 
+    try:
+        radius = display_radius.index(rrange)
+        height = height_diff.index(rlimits)
+    except ValueError:
+        radius = 2   # set standard to 5nm, if error
+        height = 0   # set standard to 1000ft, if error
     current_time = time.time()
     if mode == 1:  # radar mode
         if GPIO.event_detected(LEFT):

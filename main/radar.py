@@ -335,7 +335,7 @@ async def user_interface():
             logging.debug("User interface task terminating ...")
             return
         await asyncio.sleep(UI_REACTION_TIME)
-        toggle_sound = radarui.check_user_input()
+        toggle_sound = radarui.check_user_input(situation['RadarRange'], situation['RadarLimits'])
         if toggle_sound:
             if sound_on:
                 logging.debug("Sound off toggled by UI")
