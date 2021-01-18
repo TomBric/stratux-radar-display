@@ -91,7 +91,6 @@ def check_user_input(rrange, rlimits):
     global time_middle
     global status_middle
 
-    print("rrange "+str(rrange)+" rlimits "+str(rlimits))
     try:
         radius = display_radius.index(rrange)
         height = height_diff.index(rlimits)
