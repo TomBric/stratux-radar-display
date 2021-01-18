@@ -91,10 +91,11 @@ def check_user_input(rrange, rlimits):
     global time_middle
     global status_middle
 
+    print("rrange "+rrange+" rlimits " rlimits)
     try:
         radius = display_radius.index(rrange)
         height = height_diff.index(rlimits)
-    except ValueError:
+    except ValueError:   # should not occure
         radius = 2   # set standard to 5nm, if error
         height = 0   # set standard to 1000ft, if error
     current_time = time.time()
