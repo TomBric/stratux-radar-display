@@ -82,7 +82,7 @@ def communicate_limits(radarrange, threshold):
 
     logging.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
     try:
-        requests.post(url_settings_set, json={'RadarLimits': threshold*100, 'RadarRange': radarrange})
+        requests.post(url_settings_set, json={'RadarLimits': threshold, 'RadarRange': radarrange})
     except requests.exceptions.RequestException as e:
         logging.debug("Posting limits exception", e)
 
