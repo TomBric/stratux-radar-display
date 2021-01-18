@@ -156,7 +156,7 @@ def startup(draw, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
     logo = Image.open(logopath)
     draw.bitmap((zerox-192/2, 0), logo, fill="black")
-    centered_text(draw, 193, "EPaper-Radar 1.0", largefont, fill="black")
+    centered_text(draw, 193, "EPaper-Radar 1.0a", largefont, fill="black")
     centered_text(draw, sizey - VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
     display()
     time.sleep(seconds)

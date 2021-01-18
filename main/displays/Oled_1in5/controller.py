@@ -129,7 +129,7 @@ def startup(draw, target_ip, seconds):
     draw.rectangle(((0, 0), (sizex, 64)), fill="blue")
     draw.bitmap((zerox-32, 0), logo, fill="white")
     centered_text(draw, 64, "Oled-Radar", largefont, fill="white")
-    centered_text(draw, 64 + LARGE, "Version 1.0", smallfont, fill="white")
+    centered_text(draw, 64 + LARGE, "Version 1.0a", smallfont, fill="white")
     centered_text(draw, sizey - 2 * SMALL, "Connecting to", smallfont, fill="white")
     centered_text(draw, sizey - SMALL, target_ip, smallfont, fill="white")
     display()
