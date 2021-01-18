@@ -61,7 +61,6 @@ url_settings_set = ""
 def init(url):
     global url_settings_set
 
-    print("UI-Init")
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
     GPIO.setup(LEFT, GPIO.IN, GPIO.PUD_UP)  # left
