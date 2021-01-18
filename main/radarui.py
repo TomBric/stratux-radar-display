@@ -49,7 +49,7 @@ status_middle = False
 # status variables for state machine
 display_mode = ('init', 'radar', 'setup', 'ahrs', 'clock')
 display_radius = (2, 5, 10, 20, 40)
-height_diff = (10, 20, 50, 100, 500)
+height_diff = (1000, 2000, 5000, 10000, 50000)
 sound_on = True
 mode = 1  # index in radar mode
 
