@@ -40,6 +40,7 @@ from . import radar_opts
 # global constants
 LARGE = 20           # size of height indications of aircraft
 SMALL = 12      # size of information indications on top and bottom
+VERYMSMALL = 10   # used for "nm" and "ft"
 AIRCRAFT_SIZE = 3        # size of aircraft arrow
 MINIMAL_CIRCLE = 10     # minimal size of mode-s circle
 # end definitions
@@ -51,6 +52,7 @@ zerox = 0
 zeroy = 0
 largefont = ""
 smallfont = ""
+verysmallfont = ""
 webfont = ""
 device = None
 image = None
@@ -75,6 +77,7 @@ def init():
     global zeroy
     global largefont
     global smallfont
+    global verysmallfont
     global webfont
     global device
     global image
@@ -90,6 +93,7 @@ def init():
     device.contrast(255)  # set full contrast
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
     smallfont = make_font("Font.ttc", SMALL)     # font for information indications
+    verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
     webfont = make_font("fontawesome-webfont.ttf", SMALL)   # font for Bluetooth indications
     display_refresh = 0.3    # oled has no busy flag, so take this as update value
     return draw, sizex, zerox, zeroy, display_refresh
@@ -187,7 +191,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     draw.text((0, sizey - SMALL), "FL" + str(round(ownalt/100)), font=smallfont, fill="orange")
 
     draw.text((0, 0), str(range), font=smallfont, fill="orange")
-    draw.text((0, SMALL), "nm", font=smallfont, fill="orange")
+    draw.text((0, SMALL), "nm", font=verysmallfont, fill="orange")
 
     if altdifference >= 10000:
         t = str(int(altdifference/1000))+"k"
@@ -198,7 +202,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
 
     text = "ft"
     textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0], SMALL), text, font=smallfont, fill="orange", align="right")
+    draw.text((sizex - textsize[0], SMALL), text, font=verysmallfont, fill="orange", align="right")
 
     text = str(course) + '°'
     textsize = draw.textsize(text, smallfont)
