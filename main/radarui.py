@@ -46,6 +46,7 @@ url_settings_set = ""
 def init(url):
     global url_settings_set
 
+    radarbuttons.init()
     url_settings_set = url
     logging.debug("Radar UI: Initialized POST settings to " + url_settings_set)
 
