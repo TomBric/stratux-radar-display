@@ -93,6 +93,7 @@ def user_input():
             left_text = "Reset"
         else:
             stoptime = time.time() - stoptime   # add time already on clock
+            laptime = 0
             timer_running = True
             right_text = "Stop"
             left_text = "Lap"
