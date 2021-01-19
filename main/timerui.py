@@ -53,14 +53,16 @@ def draw_timer(draw, display_control):
         utctimestr = time.strftime("%H:%M:%S", time.gmtime())
         if timer_running:
             stoptimestr = time.strftime("%H:%M:%S", time.gmtime(time.time()-stoptime))
-        elif stoptime != 0:
-            stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
+            laptimestr = time.strftime("%H:%M:%S", time.gmtime(time.time()-laptime))
         else:
-            stoptimestr = "--:--:--"
-        if laptime != 0:
-            laptimestr = time.strftime("%H:%M:%S", time.gmtime(laptime))
-        else:
-            laptimestr = "--:--:--"
+            if stoptime != 0:
+                stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
+            else:
+                stoptimestr = "--:--:--"
+            if laptime != 0:
+                laptimestr = time.strftime("%H:%M:%S", time.gmtime(laptime))
+            else:
+                laptimestr = "--:--:--"
         display_control.timer(draw, utctimestr, stoptimestr, laptimestr, left_text, middle_text, right_text,
                               timer_running)
         display_control.display()
@@ -84,6 +86,7 @@ def user_input():
     if button == 2:   # right
         if timer_running:   # timer already running
             stoptime = time.time() - stoptime
+            laptime = time.time() - laptime    # also stop lap time
             timer_running = False
             right_text = "Cont"
             left_text = "Reset"
