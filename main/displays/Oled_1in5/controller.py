@@ -38,6 +38,7 @@ from PIL import Image, ImageFont, ImageDraw
 from . import radar_opts
 
 # global constants
+VERYLARGE = 20
 LARGE = 18           # size of height indications of aircraft
 SMALL = 12      # size of information indications on top and bottom
 VERYSMALL = 10   # used for "nm" and "ft"
@@ -50,6 +51,7 @@ sizex = 0
 sizey = 0
 zerox = 0
 zeroy = 0
+verylargefont = ""
 largefont = ""
 smallfont = ""
 verysmallfont = ""
@@ -91,6 +93,7 @@ def init():
     zerox = sizex / 2
     zeroy = sizey / 2
     device.contrast(255)  # set full contrast
+    verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
     smallfont = make_font("Font.ttc", SMALL)     # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
@@ -233,10 +236,10 @@ def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, 
             color = "lime"
         else:
             color = "orangered"
-        centered_text(draw, 2*SMALL+LARGE, stoptime, largefont, fill=color)
+        centered_text(draw, 2*SMALL+LARGE, stoptime, verylargefont, fill=color)
         if laptime is not None:
-            draw.text((0, 2*SMALL + 2*LARGE), "Laptime", font=smallfont, fill="cyan")
-            centered_text(draw, 3 * SMALL + 2* LARGE, laptime, largefont, fill="powderblue")
+            draw.text((0, 2*SMALL + VERYLARGE + LARGE), "Laptime", font=smallfont, fill="cyan")
+            centered_text(draw, 3 * SMALL + VERYLARGE + LARGE, laptime, verylargefont, fill="powderblue")
 
     draw.text((0, sizey - SMALL), left_text, font=smallfont, fill="green")
     textsize = draw.textsize(right_text, smallfont)
