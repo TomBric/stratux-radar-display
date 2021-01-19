@@ -98,5 +98,6 @@ def user_input():
         else:
             stoptime = 0
             laptime = 0
+            right_text = "Start"
     timerui_changed = True
     return False   # no mode change
