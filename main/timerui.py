@@ -98,8 +98,7 @@ def user_input():
             left_text = "Lap"
     if button == 0:   # left
         if timer_running:
-            laptime = 0
-            left_text = "Lap"
+            laptime = time.time()
         else:
             stoptime = 0
             laptime = 0
