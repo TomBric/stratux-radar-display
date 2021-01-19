@@ -86,7 +86,7 @@ def user_input():
     if button == 2:   # right
         if timer_running:   # timer already running
             stoptime = time.time() - stoptime
-            laptime = time.time() - laptime    # also stop lap time
+            laptime = 0    # also stop lap time
             timer_running = False
             right_text = "Cont"
             left_text = "Reset"
