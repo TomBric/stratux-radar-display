@@ -85,10 +85,10 @@ def user_input():
         if timer_running:   # timer already running
             stoptime = time.time() - stoptime
             timer_running = False
-            right_text = "Start"
+            right_text = "Cont"
             left_text = "Reset"
         else:
-            stoptime = time.time()
+            stoptime = time.time() + stoptime   # add time already on clock
             timer_running = True
             right_text = "Stop"
             left_text = "Lap"
@@ -100,5 +100,6 @@ def user_input():
             stoptime = 0
             laptime = 0
             right_text = "Start"
+            left_text = ""
     timerui_changed = True
     return False   # no mode change
