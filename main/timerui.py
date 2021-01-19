@@ -61,7 +61,8 @@ def draw_timer(draw, display_control):
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(laptime))
         else:
             laptimestr = "--:--:--"
-        display_control.timer(draw, utctimestr, stoptimestr, laptimestr, left_text, middle_text, right_text)
+        display_control.timer(draw, utctimestr, stoptimestr, laptimestr, left_text, middle_text, right_text,
+                              timer_running)
         display_control.display()
 
 
@@ -93,7 +94,7 @@ def user_input():
             left_text = "Lap"
     if button == 0:   # left
         if timer_running:
-            laptime = time.time() - stoptime
+            laptime = time.time() - laptime
             left_text = "Lap"
         else:
             stoptime = 0
