@@ -86,6 +86,7 @@ def user_input():
             left_text = "Reset"
         else:
             stoptime = time.time()
+            timer_running = True
             right_text = "Stop"
             left_text = "Lap"
     if button == 0:   # left
