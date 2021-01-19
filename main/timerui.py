@@ -36,8 +36,8 @@ import radarbuttons
 
 # global variables
 left_text = ''
-middle_text = 'MODE'
-right_text = ''
+middle_text = 'Mode'
+right_text = 'Start'
 timerui_changed = True
 timer_changed = True
 
@@ -67,10 +67,10 @@ def user_input():
     global timerui_changed
 
     btime, button = radarbuttons.check_buttons()
-    if button == 2:
+    if button == 1:
         if btime == 2:  # middle and long
             return True   # next mode
-    if button == 3:   # right
+    if button == 2:   # right
         if timer_running:   # timer already running
             stoptime = time.time() - stoptime
             right_text = "Start"
@@ -79,7 +79,7 @@ def user_input():
             stoptime = time.time()
             right_text = "Stop"
             left_text = "Lap"
-    if button == 1:   # left
+    if button == 0:   # left
         if timer_running:
             laptime = time.time() - stoptime
             left_text = "Cont"
