@@ -75,6 +75,7 @@ def user_input():
     global timerui_changed
 
     btime, button = radarbuttons.check_buttons()
+    print("Buttons: btime "+ str(btime) + " button " + str(button))
     if btime == 0:
         timerui_changed = 0
         return False
