@@ -38,7 +38,7 @@ from PIL import Image, ImageFont, ImageDraw
 from . import radar_opts
 
 # global constants
-VERYLARGE = 20
+VERYLARGE = 24
 LARGE = 18           # size of height indications of aircraft
 SMALL = 12      # size of information indications on top and bottom
 VERYSMALL = 10   # used for "nm" and "ft"
