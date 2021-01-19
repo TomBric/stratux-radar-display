@@ -51,8 +51,14 @@ def draw_timer(draw, display_control):
         # display is only triggered if there was a change
         display_control.clear(draw)
         utctimestr = time.strftime("%H:%M:%S", time.gmtime())
-        stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
-        laptimestr = time.strftime("%H:%M:%S", time.gmtime(laptime))
+        if stoptime:
+            stoptimestr = time.strftime("%H:%M:%S", time.gmtime(time.time()-stoptime))
+        else:
+            stoptimestr = "--:--:--"
+        if laptime:
+            laptimestr = time.strftime("%H:%M:%S", time.gmtime(laptime))
+        else:
+            laptimestr = "--:--:--"
         display_control.timer(draw, utctimestr, stoptimestr, laptimestr, left_text, middle_text, right_text)
         display_control.display()
 
@@ -67,12 +73,15 @@ def user_input():
     global timerui_changed
 
     btime, button = radarbuttons.check_buttons()
-    if button == 1:
-        if btime == 2:  # middle and long
+    if btime == 0:
+        timerui_changed = 0
+        return False
+    if button == 1 and btime == 2:  # middle and long
             return True   # next mode
     if button == 2:   # right
         if timer_running:   # timer already running
             stoptime = time.time() - stoptime
+            timer_running = False
             right_text = "Start"
             left_text = "Reset"
         else:
@@ -84,9 +93,7 @@ def user_input():
             laptime = time.time() - stoptime
             left_text = "Cont"
         else:
+            stoptime = 0
             laptime = 0
-    if btime == 0:
-        timerui_changed = False
-    else:
-        timerui_changed = True
+    timerui_changed = True
     return False   # no mode change
