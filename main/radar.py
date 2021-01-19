@@ -46,7 +46,7 @@ import timerui
 import importlib
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='%(asctime)-15s > %(message)s'
 )
 
