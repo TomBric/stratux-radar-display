@@ -63,8 +63,10 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
     global status_middle
 
     if GPIO.event_detected(LEFT):
+        logging.debug("UI: Button press short left")
         return 1, 0   # short + left
     elif GPIO.event_detected(RIGHT):
+        logging.debug("UI: Button press short right")
         return 1, 2   # short + right
     if GPIO.input(MIDDLE) == GPIO.LOW:
         if not status_middle:  # now it is pressed
@@ -73,10 +75,12 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
         else:
             if time.time() - time_middle > HOLD_TIME:  # pressed for a long time
                 status_middle = False  # reset
+                logging.debug("UI: Button press long middle")
                 return 2, 1   # long + middle
     else:
         if status_middle:  # it was only a short press
             status_middle = False
+            logging.debug("UI: Button press short middle")
             return 1, 1
         status_middle = False
     return 0, 0
