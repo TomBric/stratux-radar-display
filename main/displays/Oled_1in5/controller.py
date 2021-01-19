@@ -77,6 +77,7 @@ def init():
     global sizey
     global zerox
     global zeroy
+    global verylargefont
     global largefont
     global smallfont
     global verysmallfont
