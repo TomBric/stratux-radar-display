@@ -70,17 +70,17 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
         height = 0   # set standard to 1000ft, if error
 
     btime, button = radarbuttons.check_buttons()
-    if button == 1:
+    if button == 0:
         radius += 1
         if radius >= len(display_radius):
             radius = 0
         communicate_limits(display_radius[radius], height_diff[height])
-    elif button == 3:
+    elif button == 2:
         height += 1
         if height >= len(height_diff):
             height = 0
         communicate_limits(display_radius[radius], height_diff[height])
-    elif button == 2:
+    elif button == 1:
         if btime == 2:    # middle and long
             return True, False
         else:          # middle and short
