@@ -31,58 +31,62 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import logging
-import requests
+import time
 import radarbuttons
 
-# status variables for state machine
-display_radius = (2, 5, 10, 20, 40)
-height_diff = (1000, 2000, 5000, 10000, 50000)
-sound_on = True
+# global variables
+left_text = ''
+middle_text = 'MODE'
+right_text = ''
+timerui_changed = True
+timer_changed = True
 
-url_settings_set = ""
-
-
-def init(url):
-    global url_settings_set
-
-    url_settings_set = url
-    logging.debug("Radar UI: Initialized POST settings to " + url_settings_set)
+stoptime = 0
+laptime = 0
+timer_running = False
 
 
-def communicate_limits(radarrange, threshold):
-    global url_settings_set
+def draw_timer(draw, display_control):
+    if timerui_changed or timer_changed:
+        # display is only triggered if there was a change
+        display_control.clear(draw)
+        utctimestr = time.strftime("%H:%M:%S", time.gmtime())
+        stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
+        laptimestr = time.strftime("%H:%M:%S", time.gmtime(laptime))
+        display_control.timer(draw, utctimestr, stoptimestr, laptimestr, left_text, middle_text, right_text)
+        display_control.display()
 
-    logging.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
-    try:
-        requests.post(url_settings_set, json={'RadarLimits': threshold, 'RadarRange': radarrange})
-    except requests.exceptions.RequestException as e:
-        logging.debug("Posting limits exception", e)
 
-
-def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
-    try:
-        radius = display_radius.index(rrange)
-        height = height_diff.index(rlimits)
-    except ValueError:   # should not occure
-        radius = 2   # set standard to 5nm, if error
-        height = 0   # set standard to 1000ft, if error
+def user_input():
+    global left_text
+    global right_text
+    global middle_text
+    global stoptime
+    global laptime
+    global timer_running
+    global timerui_changed
 
     btime, button = radarbuttons.check_buttons()
-    if button == 1:
-        radius += 1
-        if radius >= len(display_radius):
-            radius = 0
-        communicate_limits(display_radius[radius], height_diff[height])
-    elif button == 3:
-        height += 1
-        if height >= len(height_diff):
-            height = 0
-        communicate_limits(display_radius[radius], height_diff[height])
-    elif button == 2:
-        if btime == 2:    # middle and long
-            return True, False
-        else:          # middle and short
-            logging.debug("Sound  toggled by UI")
-            return False, True
-    return False, False
+    if button == 2:
+        if btime == 2:  # middle and long
+            return True   # next mode
+    if button == 3:   # right
+        if timer_running:   # timer already running
+            stoptime = time.time() - stoptime
+            right_text = "Start"
+            left_text = "Reset"
+        else:
+            stoptime = time.time()
+            right_text = "Stop"
+            left_text = "Lap"
+    if button == 1:   # left
+        if timer_running:
+            laptime = time.time() - stoptime
+            left_text = "Cont"
+        else:
+            laptime = 0
+    if button == 0:
+        timerui_changed = False
+    else:
+        timerui_changed = True
+    return False   # no mode change

@@ -222,3 +222,19 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         centered_text(draw, 0, "No GPS", smallfont, fill="red")
     if not connected:
         centered_text(draw, zeroy, "No Connection!", smallfont, fill="red")
+
+
+def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text):
+    draw.text((0, 0), "UTC", font=smallfont, fill="blue")
+    centered_text(draw, SMALL, utctime, largefont, fill="yellow")
+    if stoptime not none:
+        draw.text((0, SMALL+LARGE), "Timer", font=smallfont, fill="blue")
+        centered_text(draw, 2*SMALL+LARGE, stoptime, largefont, fill="yellow")
+        if laptime not none:
+            draw.text((0, 2*SMALL + 2*LARGE), "Laptime", font=smallfont, fill="blue")
+            centered_text(draw, 3 * SMALL + 2* LARGE, laptime, largefont, fill="yellow")
+
+    draw.text((0, sizey - SMALL), left_text, font=smallfont, fill="green")
+    textsize = draw.textsize(right_text, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL), right_text, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL, middle_text, smallfont, fill="green")

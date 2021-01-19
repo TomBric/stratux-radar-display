@@ -42,6 +42,7 @@ import math
 import time
 import radarbluez
 import radarui
+import timerui
 import importlib
 
 logging.basicConfig(
@@ -81,6 +82,8 @@ display_control = None
 speak = False  # BT is generally enabled
 bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
+global_mode = 1   # 1=Radar 2=Timer 0=Init
+LAST_MODE = 3    # to be never reached
 
 
 def draw_all_ac(draw, allac):
@@ -328,6 +331,8 @@ async def user_interface():
     global bt_devices
     global sound_on
     global ui_changed
+    global global_mode
+
     last_bt_checktime = 0.0
 
     while True:
@@ -335,14 +340,21 @@ async def user_interface():
             logging.debug("User interface task terminating ...")
             return
         await asyncio.sleep(UI_REACTION_TIME)
-        toggle_sound = radarui.check_user_input(situation['RadarRange'], situation['RadarLimits'])
-        if toggle_sound:
-            if sound_on:
-                logging.debug("Sound off toggled by UI")
-                sound_on = False
-            else:
-                logging.debug("Sound on toggled by UI")
-                sound_on = True
+        next_mode = False
+        if global_mode == 1:  # Radar mode
+            next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
+            if toggle_sound:
+                sound_on = not sound_on
+                ui_changed = True
+        elif global_mode == 2:  # Timer mode
+            next_mode = timerui.user_input()
+
+        if next_mode:
+            ui_changed = True
+            global_mode = global_mode + 1
+            if global_mode == LAST_MODE:
+                global_mode = 1
+
         current_time = time.time()
         if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
             last_bt_checktime = current_time
@@ -357,6 +369,7 @@ async def user_interface():
 
 async def display_and_cutoff():
     global aircraft_changed
+    global global_mode
 
     while True:
         if quit_display_task:
@@ -367,7 +380,10 @@ async def display_and_cutoff():
             await asyncio.sleep(display_refresh_time / 3)
             # try it several times to be as fast as possible
         else:
-            draw_display(draw)
+            if global_mode == 1:   # Radar
+                draw_display(draw)
+            elif global_mode == 2:   # Timer'
+                timerui.draw_timer(draw, display_control)
             # wait 300 ms in any case to make sure driver is ready for busy flag
             await asyncio.sleep(0.3)
 
