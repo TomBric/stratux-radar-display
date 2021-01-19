@@ -85,7 +85,7 @@ def user_input():
             left_text = "Cont"
         else:
             laptime = 0
-    if button == 0:
+    if btime == 0:
         timerui_changed = False
     else:
         timerui_changed = True
