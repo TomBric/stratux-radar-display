@@ -56,7 +56,7 @@ def init():
     GPIO.add_event_detect(LEFT, GPIO.FALLING, bouncetime=300)  # toggle
     GPIO.add_event_detect(RIGHT, GPIO.FALLING, bouncetime=300)  # toggle
 
-    logging.debug("Radarbuttons: Initialized.)
+    logging.debug("Radarbuttons: Initialized.")
 
 def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
     global time_middle
