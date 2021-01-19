@@ -51,11 +51,13 @@ def draw_timer(draw, display_control):
         # display is only triggered if there was a change
         display_control.clear(draw)
         utctimestr = time.strftime("%H:%M:%S", time.gmtime())
-        if stoptime:
+        if timer_running:
             stoptimestr = time.strftime("%H:%M:%S", time.gmtime(time.time()-stoptime))
+        elif stoptime != 0:
+            stoptimestr = time.strftime("%H:%M:%S", stoptime)
         else:
             stoptimestr = "--:--:--"
-        if laptime:
+        if laptime != 0:
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(laptime))
         else:
             laptimestr = "--:--:--"
