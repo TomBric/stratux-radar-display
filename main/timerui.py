@@ -75,12 +75,11 @@ def user_input():
     global timerui_changed
 
     btime, button = radarbuttons.check_buttons()
-    print("Buttons: btime "+ str(btime) + " button " + str(button))
     if btime == 0:
         timerui_changed = 0
         return False
     if button == 1 and btime == 2:  # middle and long
-            return True   # next mode
+        return True   # next mode
     if button == 2:   # right
         if timer_running:   # timer already running
             stoptime = time.time() - stoptime
@@ -88,14 +87,14 @@ def user_input():
             right_text = "Cont"
             left_text = "Reset"
         else:
-            stoptime = time.time() + stoptime   # add time already on clock
+            stoptime = time.time() - stoptime   # add time already on clock
             timer_running = True
             right_text = "Stop"
             left_text = "Lap"
     if button == 0:   # left
         if timer_running:
             laptime = time.time() - stoptime
-            left_text = "Cont"
+            left_text = "Lap"
         else:
             stoptime = 0
             laptime = 0
