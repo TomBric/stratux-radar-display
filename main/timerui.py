@@ -62,10 +62,7 @@ def draw_timer(draw, display_control):
                 stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
             else:
                 stoptimestr = "--:--:--"
-            if laptime != 0:
-                laptimestr = time.strftime("%H:%M:%S", time.gmtime(laptime))
-            else:
-                laptimestr = "--:--:--"
+            laptimestr = "--:--:--"
         display_control.timer(draw, utctimestr, stoptimestr, laptimestr, left_text, middle_text, right_text,
                               timer_running)
         display_control.display()
