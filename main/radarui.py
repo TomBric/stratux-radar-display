@@ -70,7 +70,6 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
         height = 0   # set standard to 1000ft, if error
 
     btime, button = radarbuttons.check_buttons()
-    print("CheckButtons: btime "+str(btime)+" button "+str(button))
     if btime == 0:
         return False, False
     if button == 0:
