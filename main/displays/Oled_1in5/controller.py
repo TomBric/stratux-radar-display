@@ -227,10 +227,10 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
 def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text):
     draw.text((0, 0), "UTC", font=smallfont, fill="blue")
     centered_text(draw, SMALL, utctime, largefont, fill="yellow")
-    if stoptime not none:
+    if stoptime is not None:
         draw.text((0, SMALL+LARGE), "Timer", font=smallfont, fill="blue")
         centered_text(draw, 2*SMALL+LARGE, stoptime, largefont, fill="yellow")
-        if laptime not none:
+        if laptime is not None:
             draw.text((0, 2*SMALL + 2*LARGE), "Laptime", font=smallfont, fill="blue")
             centered_text(draw, 3 * SMALL + 2* LARGE, laptime, largefont, fill="yellow")
 
