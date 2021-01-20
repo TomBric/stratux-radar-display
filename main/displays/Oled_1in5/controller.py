@@ -99,7 +99,7 @@ def init():
     smallfont = make_font("Font.ttc", SMALL)     # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
     webfont = make_font("fontawesome-webfont.ttf", SMALL)   # font for Bluetooth indications
-    display_refresh = 0.3    # oled has no busy flag, so take this as update value
+    display_refresh = 0.1    # oled has no busy flag, so take this as update value
     return draw, sizex, zerox, zeroy, display_refresh
 
 

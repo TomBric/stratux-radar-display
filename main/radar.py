@@ -390,7 +390,7 @@ async def display_and_cutoff():
                 already_used = time.time() - now
                 await asyncio.sleep(math.ceil(display_refresh_time - already_used))
                 # wait in full seconds that the display is capable of
-            else: # wait 300 ms in any case to make sure driver is ready for busy flag
+            else:  # wait 300 ms in any case to make sure driver is ready for busy flag
                 await asyncio.sleep(0.3)
 
         logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
