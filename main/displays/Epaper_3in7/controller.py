@@ -32,13 +32,14 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 import logging
-from . import epd3in7
+import epd3in7
 from PIL import Image, ImageDraw, ImageFont
 import math
 import time
 from pathlib import Path
 
 # global constants
+VERYLARGE = 36    # timer
 LARGE = 30           # size of height indications of aircraft
 SMALL = 24      # size of information indications on top and bottom
 VERYSMALL = 18
@@ -55,6 +56,7 @@ sizey = 0
 zerox = 0
 zeroy = 0
 max_pixel = 0
+verylargefont = ""
 largefont = ""
 smallfont = ""
 verysmallfont = ""
@@ -101,6 +103,7 @@ def init():
     global zerox
     global zeroy
     global max_pixel
+    global verylargefont
     global largefont
     global smallfont
     global verysmallfont
@@ -120,6 +123,7 @@ def init():
     zerox = sizex / 2
     zeroy = 200    # not centered
     max_pixel = 400
+    verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
     smallfont = make_font("Font.ttc", SMALL)            # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
@@ -235,3 +239,19 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
             t = "\uf1f6"  # bell off symbol
         textsize = draw.textsize(t, awesomefont)
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
+
+
+def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, timer_runs):
+    draw.text((0, 0), "UTC", font=smallfont, fill="cyan")
+    centered_text(draw, SMALL, utctime, verylargefont, fill="black")
+    if stoptime is not None:
+        draw.text((0, SMALL+VERYLARGE), "Timer", font=smallfont, fill="black")
+        centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill="black")
+        if laptime is not None:
+            draw.text((0, 2*SMALL + 2 * VERYLARGE), "Laptime", font=smallfont, fill="black")
+            centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="black")
+
+    draw.text((0, sizey - SMALL-3), left_text, font=smallfont, fill="black")
+    textsize = draw.textsize(right_text, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL-3), right_text, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL-3, middle_text, smallfont, fill="black")
