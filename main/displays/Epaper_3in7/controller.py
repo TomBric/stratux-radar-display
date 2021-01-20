@@ -39,7 +39,7 @@ import time
 from pathlib import Path
 
 # global constants
-VERYLARGE = 36    # timer
+VERYLARGE = 48    # timer
 LARGE = 30           # size of height indications of aircraft
 SMALL = 24      # size of information indications on top and bottom
 VERYSMALL = 18
@@ -242,7 +242,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
 
 
 def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, timer_runs):
-    draw.text((0, 0), "UTC", font=smallfont, fill="cyan")
+    draw.text((0,0), "UTC", font=smallfont, fill="black")
     centered_text(draw, SMALL, utctime, verylargefont, fill="black")
     if stoptime is not None:
         draw.text((0, SMALL+VERYLARGE), "Timer", font=smallfont, fill="black")

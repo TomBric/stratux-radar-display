@@ -58,6 +58,7 @@ def init():
 
     logging.debug("Radarbuttons: Initialized.")
 
+
 def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
     global time_middle
     global status_middle
