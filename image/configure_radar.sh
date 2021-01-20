@@ -8,8 +8,8 @@
 
 
 #luma files and more
-sudo apt-get update
-sudo apt-get upgrade
+sudo apt-get update -y
+sudo apt-get upgrade -y
 sudo apt-get install python3-pip python3-pil -y
 sudo apt-get install libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
 sudo pip3 install luma.oled
@@ -25,7 +25,7 @@ sudo apt-get install espeak-ng espeak-ng-data libespeak-ng-dev -y
 sudo pip3 install py-espeak-ng
 
 # bluetooth configs
-sudo apt-get install libbluetooth-dev
+sudo apt-get install libbluetooth-dev -y
 sudo pip3 install pybluez
 sudo pip3 install pydbus
 sudo apt purge piwiz -y
@@ -35,7 +35,7 @@ sudo apt purge piwiz -y
 cd /home/pi && git clone https://github.com/TomBric/stratux-radar-display.git
 
 # include autostart into crontab, so that radar starts on every boot
-echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
+echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -
 # only works if crontab is empty, otherwise use
 # crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
 

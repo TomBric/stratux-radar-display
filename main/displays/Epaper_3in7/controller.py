@@ -39,7 +39,8 @@ import time
 from pathlib import Path
 
 # global constants
-LARGE = 32           # size of height indications of aircraft
+VERYLARGE = 48    # timer
+LARGE = 30           # size of height indications of aircraft
 SMALL = 24      # size of information indications on top and bottom
 VERYSMALL = 18
 AWESOME_FONTSIZE = 18   # bluetooth indicator
@@ -55,6 +56,7 @@ sizey = 0
 zerox = 0
 zeroy = 0
 max_pixel = 0
+verylargefont = ""
 largefont = ""
 smallfont = ""
 verysmallfont = ""
@@ -101,6 +103,7 @@ def init():
     global zerox
     global zeroy
     global max_pixel
+    global verylargefont
     global largefont
     global smallfont
     global verysmallfont
@@ -120,6 +123,7 @@ def init():
     zerox = sizex / 2
     zeroy = 200    # not centered
     max_pixel = 400
+    verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
     smallfont = make_font("Font.ttc", SMALL)            # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
@@ -156,25 +160,30 @@ def startup(draw, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
     logo = Image.open(logopath)
     draw.bitmap((zerox-192/2, 0), logo, fill="black")
-    centered_text(draw, 193, "EPaper-Radar 1.0", largefont, fill="black")
+    centered_text(draw, 193, "EPaper-Radar 1.0b", largefont, fill="black")
     centered_text(draw, sizey - VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
     display()
     time.sleep(seconds)
 
 
-def aircraft(draw, x, y, direction, height):
+def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
     p1 = posn(direction, 2 * AIRCRAFT_SIZE)
     p2 = posn(direction + 150, 4 * AIRCRAFT_SIZE)
     p3 = posn(direction + 180, 2 * AIRCRAFT_SIZE)
     p4 = posn(direction + 210, 4 * AIRCRAFT_SIZE)
+    p5 = posn(direction, nspeed_length)  # line for speed
 
     draw.polygon(((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
                  fill="black", outline="black")
+    draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill="black", width=3)
     if height >= 0:
-        signchar = "+"
+        t = "+" + str(abs(height))
     else:
-        signchar = "-"
-    t = signchar + str(abs(height))
+        t = "-" + str(abs(height))
+    if vspeed > 0:
+        t = t + '\u2191'
+    if vspeed < 0:
+        t = t + '\u2193'
     tsize = draw.textsize(t, largefont)
     if tsize[0] + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
         # would draw text outside, move to the left
@@ -201,7 +210,7 @@ def modesaircraft(draw, radius, height, arcposition):
     draw.text(tposition, t, font=largefont, fill="black")
 
 
-def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0):
+def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0, sound_active=True):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
@@ -224,6 +233,25 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         centered_text(draw, 30, "No Connection!", smallfont, fill="black")
 
     if bt_devices > 0:
-        t = "\uf293"  # bluetooth symbol
+        if sound_active:
+            t = "\uf293"  # bluetooth symbol
+        else:
+            t = "\uf1f6"  # bell off symbol
         textsize = draw.textsize(t, awesomefont)
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
+
+
+def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, timer_runs):
+    draw.text((5, 0), "UTC", font=smallfont, fill="black")
+    centered_text(draw, SMALL, utctime, verylargefont, fill="black")
+    if stoptime is not None:
+        draw.text((5, SMALL+VERYLARGE), "Timer", font=smallfont, fill="black")
+        centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill="black")
+        if laptime is not None:
+            draw.text((5, 2*SMALL + 2 * VERYLARGE), "Laptime", font=smallfont, fill="black")
+            centered_text(draw, 3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
+
+    draw.text((5, sizey-SMALL-3), left_text, font=smallfont, fill="black")
+    textsize = draw.textsize(right_text, smallfont)
+    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_text, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")

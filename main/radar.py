@@ -41,6 +41,8 @@ import logging
 import math
 import time
 import radarbluez
+import radarui
+import timerui
 import importlib
 
 logging.basicConfig(
@@ -54,11 +56,15 @@ LOST_CONNECTION_TIMEOUT = 1.0
 RADAR_CUTOFF = 29
 ARCPOSITION_EXCLUDE_FROM = 130
 ARCPOSITION_EXCLUDE_TO = 230
+UI_REACTION_TIME = 0.2
+BLUEZ_CHECK_TIME = 3.0
+SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
 url_situation_ws = ""
 url_radar_ws = ""
+url_settings_set = ""
 device = ""
 draw = None
 all_ac = {}
@@ -73,8 +79,11 @@ last_arcposition = 0
 display_refresh_time = 0
 quit_display_task = False
 display_control = None
-speak = False
+speak = False  # BT is generally enabled
 bt_devices = 0
+sound_on = True  # user may toogle sound off by UI
+global_mode = 1   # 1=Radar 2=Timer 0=Init
+LAST_MODE = 3    # to be never reached
 
 
 def draw_all_ac(draw, allac):
@@ -90,7 +99,12 @@ def draw_all_ac(draw, allac):
         # then draw adsb
         if 'x' in ac:
             if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
-                display_control.aircraft(draw, ac['x'], ac['y'], ac['direction'], ac['height'])
+                if 'nspeed_length' in ac:
+                    line_length = ac['nspeed_length']
+                else:
+                    line_length = 0
+                display_control.aircraft(draw, ac['x'], ac['y'], ac['direction'], ac['height'], ac['vspeed'],
+                                         line_length)
 
 
 def draw_display(draw):
@@ -104,7 +118,8 @@ def draw_display(draw):
         # display is only triggered if there was a change
         display_control.clear(draw)
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
-                                  situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices)
+                                  situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
+                                  sound_on)
         draw_all_ac(draw, all_ac)
         display_control.display()
         situation['was_changed'] = False
@@ -184,6 +199,10 @@ def new_traffic(json_str):
         ac['last_contact_timestamp'] = time.time() - traffic['AgeLastAlt']
     ac['height'] = round((traffic['Alt'] - situation['own_altitude']) / 100)
 
+    if traffic['Speed_valid']:
+        ac['nspeed'] = traffic['Speed']
+    ac['vspeed'] = traffic['Vvel']
+
     if traffic['Position_valid'] and situation['gps_active']:
         # adsb traffic and stratux has valid gps signal
         logging.debug('RADAR: ADSB traffic ' + hex(traffic['Icao_addr']) + " at height " + str(ac['height']))
@@ -201,6 +220,9 @@ def new_traffic(json_str):
             gpsy = - math.cos(math.radians(res_angle)) * gps_rad
             ac['x'] = round(max_pixel / 2 * gpsx / situation['RadarRange'] + zerox)
             ac['y'] = round(max_pixel / 2 * gpsy / situation['RadarRange'] + zeroy)
+            if 'nspeed' in ac:
+                nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
+                ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
             # speech output
             if gps_rad <= situation['RadarRange'] / 2:
                 oclock = round(res_angle / 30)
@@ -286,7 +308,8 @@ async def listen_forever(path, name, callback):
                     try:
                         message = await ws.recv()
                     except websockets.exceptions.ConnectionClosed:
-                        logging.debug(name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
+                        logging.debug(
+                            name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                         await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                         break
                     except asyncio.CancelledError:
@@ -306,14 +329,35 @@ async def listen_forever(path, name, callback):
 
 async def user_interface():
     global bt_devices
+    global sound_on
     global ui_changed
+    global global_mode
+
+    last_bt_checktime = 0.0
 
     while True:
         if quit_display_task:
             logging.debug("User interface task terminating ...")
             return
-        await asyncio.sleep(5.0)
-        if speak:
+        await asyncio.sleep(UI_REACTION_TIME)
+        next_mode = False
+        if global_mode == 1:  # Radar mode
+            next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
+            if toggle_sound:
+                sound_on = not sound_on
+                ui_changed = True
+        elif global_mode == 2:  # Timer mode
+            next_mode = timerui.user_input()
+
+        if next_mode:
+            ui_changed = True
+            global_mode = global_mode + 1
+            if global_mode == LAST_MODE:
+                global_mode = 1
+
+        current_time = time.time()
+        if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
+            last_bt_checktime = current_time
             new_devices, devnames = radarbluez.connected_devices()
             logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
             if new_devices != bt_devices:
@@ -325,6 +369,7 @@ async def user_interface():
 
 async def display_and_cutoff():
     global aircraft_changed
+    global global_mode
 
     while True:
         if quit_display_task:
@@ -335,9 +380,18 @@ async def display_and_cutoff():
             await asyncio.sleep(display_refresh_time / 3)
             # try it several times to be as fast as possible
         else:
-            draw_display(draw)
-            # wait 300 ms in any case to make sure driver is ready for busy flag
-            await asyncio.sleep(0.3)
+            if global_mode == 1:   # Radar
+                draw_display(draw)
+                # wait 300 ms in any case to make sure driver is ready for busy flag
+                await asyncio.sleep(0.3)
+            elif global_mode == 2:   # Timer'
+                now = time.time()
+                timerui.draw_timer(draw, display_control)
+                already_used = time.time() - now
+                await asyncio.sleep(math.ceil(display_refresh_time - already_used))
+                # wait in full seconds that the display is capable of
+            else:  # wait 300 ms in any case to make sure driver is ready for busy flag
+                await asyncio.sleep(0.3)
 
         logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
         to_delete = []
@@ -364,6 +418,7 @@ def main():
     global draw
     global display_refresh_time
 
+    radarui.init(url_settings_set)
     if speak:
         radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
@@ -398,6 +453,8 @@ if __name__ == "__main__":
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
+    url_settings_set = "http://" + url_host_base + "/setSettings"
+
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
         main()
