@@ -385,8 +385,10 @@ async def display_and_cutoff():
                 # wait 300 ms in any case to make sure driver is ready for busy flag
                 await asyncio.sleep(0.3)
             elif global_mode == 2:   # Timer'
+                now = time.time()
                 timerui.draw_timer(draw, display_control)
-                await asyncio.sleep(math.ceil(display_refresh_time))
+                already_used = time.time() - now
+                await asyncio.sleep(math.ceil(display_refresh_time - already_used))
                 # wait in full seconds that the display is capable of
             else: # wait 300 ms in any case to make sure driver is ready for busy flag
                 await asyncio.sleep(0.3)
