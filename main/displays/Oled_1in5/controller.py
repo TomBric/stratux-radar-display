@@ -95,8 +95,8 @@ def init():
     zeroy = sizey / 2
     device.contrast(255)  # set full contrast
     verylargefont = make_font("Font.ttc", VERYLARGE)
-    largefont = make_font("Font.ttc", LARGE)               # font for height indications
-    smallfont = make_font("Font.ttc", SMALL)     # font for information indications
+    largefont = make_font("Font.ttc", LARGE)          # font for height indications
+    smallfont = make_font("Font.ttc", SMALL)          # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
     webfont = make_font("fontawesome-webfont.ttf", SMALL)   # font for Bluetooth indications
     display_refresh = 0.1    # oled has no busy flag, so take this as update value
