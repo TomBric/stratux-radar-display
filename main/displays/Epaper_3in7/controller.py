@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 import logging
-import epd3in7
+from . import epd3in7
 from PIL import Image, ImageDraw, ImageFont
 import math
 import time
