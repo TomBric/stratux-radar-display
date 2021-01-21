@@ -100,8 +100,8 @@ def check_one_button(button):
 def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
     global io_status
 
-    for button, val in io_status:
+    for button in io_status:
         stat = check_one_button(button)
         if stat > 0:
-            return stat, val['virtualno']
+            return stat, io_status[button]['virtualno']
     return 0, 0
