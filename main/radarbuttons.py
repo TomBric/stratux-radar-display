@@ -77,6 +77,7 @@ def check_one_button(button):
         if not io_status[button]['status']:  # was not pressed before
             return 0
         else:  # was pressed, but is now released
+            io_status[button]['status'] = False
             if time.time() - io_status[button]['starttime'] > HOLD_TIME:
                 return 2  # long press
             return 1  # short press
@@ -103,6 +104,6 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
     for button in io_status:
         stat = check_one_button(button)
         if stat > 0:
-            print("Out: ", stat, " " , io_status[button]['virtualno'])
+            print("Out: ", stat, " ", io_status[button]['virtualno'])
             return stat, io_status[button]['virtualno']
     return 0, 0
