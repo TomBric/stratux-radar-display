@@ -71,7 +71,7 @@ def init():
 def check_one_button(button):
     global io_status
 
-    print(str(GPIO.input(button)) + "  " + io_status[button])
+    print(str(GPIO.input(button)) + "  ", io_status[button])
     if GPIO.input(button) != GPIO.LOW:  # not pressed
         io_status[button]['already_triggered'] = False  # new game
         if not io_status[button]['status']:  # was not pressed before
