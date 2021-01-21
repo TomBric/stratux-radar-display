@@ -102,8 +102,7 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
 
     for button in io_status:
         stat = check_one_button(button)
-        print("Out: " + str(stat) + str(io_status[button]['virtualno']))
         if stat > 0:
-            print("Out: " + str(stat) + " " + str(io_status[button]['virtualno']))
+            print("Out: ", stat, " " , io_status[button]['virtualno'])
             return stat, io_status[button]['virtualno']
     return 0, 0
