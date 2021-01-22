@@ -38,8 +38,6 @@ import radarbuttons
 left_text = ''
 middle_text = 'Mode'
 right_text = 'Start'
-timerui_changed = True
-timer_changed = True
 
 stoptime = 0
 laptime = 0
@@ -47,25 +45,23 @@ timer_running = False
 
 
 def draw_timer(draw, display_control):
-    if timerui_changed or timer_changed:
-        # display is only triggered if there was a change
-        display_control.clear(draw)
-        utctimestr = time.strftime("%H:%M:%S", time.gmtime())
-        if timer_running:
-            stoptimestr = time.strftime("%H:%M:%S", time.gmtime(time.time()-stoptime))
-            if laptime != 0:
-                laptimestr = time.strftime("%H:%M:%S", time.gmtime(time.time()-laptime))
-            else:
-                laptimestr = "--:--:--"
+    display_control.clear(draw)
+    utctimestr = time.strftime("%H:%M:%S", time.gmtime())
+    if timer_running:
+        stoptimestr = time.strftime("%H:%M:%S", time.gmtime(time.time()-stoptime))
+        if laptime != 0:
+            laptimestr = time.strftime("%H:%M:%S", time.gmtime(time.time()-laptime))
         else:
-            if stoptime != 0:
-                stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
-            else:
-                stoptimestr = "--:--:--"
             laptimestr = "--:--:--"
-        display_control.timer(draw, utctimestr, stoptimestr, laptimestr, left_text, middle_text, right_text,
-                              timer_running)
-        display_control.display()
+    else:
+        if stoptime != 0:
+            stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
+        else:
+            stoptimestr = "--:--:--"
+        laptimestr = "--:--:--"
+    display_control.timer(draw, utctimestr, stoptimestr, laptimestr, left_text, middle_text, right_text,
+                          timer_running)
+    display_control.display()
 
 
 def user_input():
@@ -75,11 +71,9 @@ def user_input():
     global stoptime
     global laptime
     global timer_running
-    global timerui_changed
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        timerui_changed = 0
         return False
     if button == 1 and btime == 2:  # middle and long
         return True   # next mode
@@ -104,5 +98,4 @@ def user_input():
             laptime = 0
             right_text = "Start"
             left_text = ""
-    timerui_changed = True
     return False   # no mode change
