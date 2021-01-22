@@ -78,20 +78,17 @@ def check_one_button(button):
             return 0
         else:  # was pressed, but is now released
             io_status[button]['status'] = False
-            if time.time() - io_status[button]['starttime'] > HOLD_TIME:
-                io_status[button]['starttime'] = 0.0
-                if not io_status[button]['already_triggered']:
-                    return 2  # long press
-                else:
-                    return 0
-            return 1  # short press
+            if time.time() - io_status[button]['starttime'] < HOLD_TIME:
+                return 1  # short press
+            else:
+                return 0 # was long press, not trigger again
     else:  # button pressed
         if not io_status[button]['status']:  # first pressed, wait for release or timer
             io_status[button]['starttime'] = time.time()
             io_status[button]['status'] = True
             return 0
         else:  # pressed, but was already pressed
-            if time.time() - io_status[button]['starttime'] > HOLD_TIME:  # pressed for a long time
+            if time.time() - io_status[button]['starttime'] >= HOLD_TIME:  # pressed for a long time
                 if not io_status[button]['already_triggered']:  # long hold was not triggered yet
                     io_status[button]['already_triggered'] = True
                     return 2  # long
