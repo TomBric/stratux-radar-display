@@ -73,13 +73,17 @@ def check_one_button(button):
 
     print(str(GPIO.input(button)) + "  ", io_status[button])
     if GPIO.input(button) != GPIO.LOW:  # not pressed
-        io_status[button]['already_triggered'] = False  # new game
         if not io_status[button]['status']:  # was not pressed before
+            io_status[button]['already_triggered'] = False
             return 0
         else:  # was pressed, but is now released
             io_status[button]['status'] = False
             if time.time() - io_status[button]['starttime'] > HOLD_TIME:
-                return 2  # long press
+                io_status[button]['starttime'] = 0.0
+                if not io_status[button]['already_triggered']:
+                    return 2  # long press
+                else:
+                    return 0
             return 1  # short press
     else:  # button pressed
         if not io_status[button]['status']:  # first pressed, wait for release or timer
@@ -89,7 +93,6 @@ def check_one_button(button):
         else:  # pressed, but was already pressed
             if time.time() - io_status[button]['starttime'] > HOLD_TIME:  # pressed for a long time
                 if not io_status[button]['already_triggered']:  # long hold was not triggered yet
-                    logging.debug("UI: Button press long middle")
                     io_status[button]['already_triggered'] = True
                     return 2  # long
                 else:  # long press but already triggered
