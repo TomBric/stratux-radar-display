@@ -71,7 +71,7 @@ def init():
 def check_one_button(button):
     global io_status
 
-    print(str(GPIO.input(button)) + "  ", io_status[button])
+    # print(str(GPIO.input(button)) + "  ", io_status[button])
     if GPIO.input(button) != GPIO.LOW:  # not pressed
         if not io_status[button]['status']:  # was not pressed before
             io_status[button]['already_triggered'] = False
@@ -81,7 +81,7 @@ def check_one_button(button):
             if time.time() - io_status[button]['starttime'] < HOLD_TIME:
                 return 1  # short press
             else:
-                return 0 # was long press, not trigger again
+                return 0   # was long press, not trigger again
     else:  # button pressed
         if not io_status[button]['status']:  # first pressed, wait for release or timer
             io_status[button]['starttime'] = time.time()
@@ -104,6 +104,6 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
     for button in io_status:
         stat = check_one_button(button)
         if stat > 0:
-            print("Out: ", stat, " ", io_status[button]['virtualno'])
+            # print("Out: ", stat, " ", io_status[button]['virtualno'])
             return stat, io_status[button]['virtualno']
     return 0, 0
