@@ -70,9 +70,9 @@ def init():
 def check_one_button(button):
     global io_status
 
-    print(str(GPIO.input(button)) + "  ", io_status[button])
+    # print(str(GPIO.input(button)) + "  ", io_status[button])
     if GPIO.event_detected(button):   # triggers on pull down
-        print("Event on button ", button, "detected.")
+        # print("Event on button ", button, "detected.")
         if GPIO.input(button) != GPIO.LOW:  # not pressed anymore
             io_status[button]['status'] = False
             if not io_status[button]['already_triggered']:
@@ -109,6 +109,6 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
     for button in io_status:
         stat = check_one_button(button)
         if stat > 0:
-            print("Out: ", stat, " ", io_status[button]['virtualno'])
+            # print("Out: ", stat, " ", io_status[button]['virtualno'])
             return stat, io_status[button]['virtualno']
     return 0, 0
