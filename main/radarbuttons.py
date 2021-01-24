@@ -72,6 +72,7 @@ def check_one_button(button):
 
     print(str(GPIO.input(button)) + "  ", io_status[button])
     if GPIO.event_detected(button):   # triggers on pull down
+        print("Event on button ", button, "detected.")
         if GPIO.input(button) != GPIO.LOW:  # not pressed anymore
             io_status[button]['status'] = False
             return 1  # short press
