@@ -59,9 +59,9 @@ def draw_timer(draw, display_control, refresh_time):
     display_control.clear(draw)
     utctimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs))
     if timer_running:
-        stoptimestr = time.strftime("%H:%M:%S", time.gmtime(time.time(now_in_secs)-stoptime))
+        stoptimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs-stoptime))
         if laptime != 0:
-            laptimestr = time.strftime("%H:%M:%S", time.gmtime(time.time(now_in_secs)-laptime))
+            laptimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs-laptime))
         else:
             laptimestr = "--:--:--"
     else:
