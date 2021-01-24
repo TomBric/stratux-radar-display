@@ -56,9 +56,10 @@ Remark: If you have a barometric sensor or ahrs connected you may have conflict 
 You can also use PIN 16 (GPIO 23) for the RST line.
 
 To do that please modify in /home/pi/stratux-radar-display/main/displays/Epaper_3in7/epdconfig.py line 38/39:
-      \# RST_PIN         = 17    # if directly as hat
-      RST_PIN = 23  # for cable mounted in stratux on different GPIO 23, which is PIN 16
-
+```
+   # RST_PIN         = 17    # if directly as hat
+   RST_PIN = 23  # for cable mounted in stratux on different GPIO 23, which is PIN 16
+```
 
 # Hardware connection of the pushbuttons for the user interface
  
@@ -94,7 +95,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    Remark: Raspbian Buster on the Pi Zero has problems with IPV6. So if you connect it to some network with IPV6 devices, make sure IPV6 is disabled (append ipv6.disable=1 on the first line in cmdline.txt in the image before booting)
    
    ### Installation on a standard stratux device
-   stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. You can then start with step 5. from expert setup above. The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
+   stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. You can then start with step 5 from expert setup above. The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
    Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry ZeroWH.
    
    
