@@ -75,7 +75,11 @@ def check_one_button(button):
         print("Event on button ", button, "detected.")
         if GPIO.input(button) != GPIO.LOW:  # not pressed anymore
             io_status[button]['status'] = False
-            return 1  # short press
+            if not io_status[button]['already_triggered']:
+                return 1  # short press
+            else:
+                io_status[button]['already_triggered'] = False
+                return 0  # unfortunately falling edge is triggered again if a long press is finished
         else:   # event detected and still pressed
             io_status[button]['starttime'] = time.time()
             io_status[button]['status'] = True
