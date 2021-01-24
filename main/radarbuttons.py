@@ -89,7 +89,7 @@ def check_one_button(button):
                 return 0
         else:
             return 0  # press time shorter, but not yet released, nothing to do
-
+    return 0   # no event, nothing pressed anymore
 
 def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
     global io_status
