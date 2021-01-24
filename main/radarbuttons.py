@@ -90,6 +90,7 @@ def check_one_button(button):
         else:
             return 0  # press time shorter, but not yet released, nothing to do
     else:  # no more pressed
+        io_status[button]['already_triggered'] = False
         if io_status[button]['status']:    # but was pressed before
             io_status[button]['status'] = False
             return 1  # short press
