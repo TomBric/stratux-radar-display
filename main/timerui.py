@@ -44,15 +44,18 @@ stoptime = 0
 laptime = 0
 timer_running = False
 was_in_secs = 0.0       # last time displayed
+timer_ui_changed = True
 
 
 def draw_timer(draw, display_control, refresh_time):
     global was_in_secs
+    global timer_ui_changed
 
     now_in_secs = math.floor(time.time())
-    if now_in_secs < was_in_secs + math.ceil(refresh_time):
+    if not timer_ui_changed and now_in_secs < was_in_secs + math.ceil(refresh_time):
         return    # nothing to display if time has not changed or change would be quicker than display
     was_in_secs = now_in_secs
+    timer_ui_changed = False
     display_control.clear(draw)
     utctimestr = time.strftime("%H:%M:%S", time.gmtime())
     if timer_running:
@@ -79,10 +82,12 @@ def user_input():
     global stoptime
     global laptime
     global timer_running
+    global timer_ui_changed
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
         return False
+    timer_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
         return True   # next mode
     if button == 2 and btime == 1:   # short right
@@ -106,4 +111,5 @@ def user_input():
             laptime = 0
             right_text = "Start"
             left_text = ""
+    timer_ui_changed = True
     return False   # no mode change
