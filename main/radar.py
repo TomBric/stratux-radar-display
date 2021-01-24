@@ -382,16 +382,9 @@ async def display_and_cutoff():
         else:
             if global_mode == 1:   # Radar
                 draw_display(draw)
-                # wait 300 ms in any case to make sure driver is ready for busy flag
-                await asyncio.sleep(0.3)
             elif global_mode == 2:   # Timer'
-                now = time.time()
-                timerui.draw_timer(draw, display_control)
-                already_used = time.time() - now
-                await asyncio.sleep(math.ceil(display_refresh_time - already_used))
-                # wait in full seconds that the display is capable of
-            else:  # wait 300 ms in any case to make sure driver is ready for busy flag
-                await asyncio.sleep(0.3)
+                timerui.draw_timer(draw, display_control, display_refresh_time)
+            await asyncio.sleep(0.2)
 
         logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
         to_delete = []

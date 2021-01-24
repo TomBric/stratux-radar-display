@@ -33,6 +33,7 @@
 
 import time
 import radarbuttons
+import math
 
 # global variables
 left_text = ''
@@ -42,9 +43,16 @@ right_text = 'Start'
 stoptime = 0
 laptime = 0
 timer_running = False
+was_in_secs = 0.0       # last time displayed
 
 
-def draw_timer(draw, display_control):
+def draw_timer(draw, display_control, refresh_time):
+    global was_in_secs
+
+    now_in_secs = math.floor(time.time())
+    if now_in_secs < was_in_secs + math.ceil(refresh_time):
+        return    # nothing to display if time has not changed or change would be quicker than display
+    was_in_secs = now_in_secs
     display_control.clear(draw)
     utctimestr = time.strftime("%H:%M:%S", time.gmtime())
     if timer_running:
@@ -77,7 +85,7 @@ def user_input():
         return False
     if button == 1 and btime == 2:  # middle and long
         return True   # next mode
-    if button == 2:   # right
+    if button == 2 and btime == 1:   # short right
         if timer_running:   # timer already running
             stoptime = time.time() - stoptime
             laptime = 0    # also stop lap time
