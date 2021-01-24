@@ -92,20 +92,20 @@ def user_input():
         return True   # next mode
     if button == 2 and btime == 1:   # short right
         if timer_running:   # timer already running
-            stoptime = time.time() - stoptime
+            stoptime = math.floor(time.time()) - stoptime
             laptime = 0    # also stop lap time
             timer_running = False
             right_text = "Cont"
             left_text = "Reset"
         else:
-            stoptime = time.time() - stoptime   # add time already on clock
+            stoptime = math.floor(time.time()) - stoptime   # add time already on clock
             laptime = 0
             timer_running = True
             right_text = "Stop"
             left_text = "Lap"
     if button == 0:   # left
         if timer_running:
-            laptime = time.time()
+            laptime = math.floor(time.time())
         else:
             stoptime = 0
             laptime = 0
