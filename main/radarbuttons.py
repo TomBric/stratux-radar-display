@@ -59,11 +59,10 @@ def init():
 
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
+
     for iopin in io_status:
         GPIO.setup(iopin, GPIO.IN, GPIO.PUD_UP)
-
-        # GPIO.add_event_detect(LEFT, GPIO.FALLING, bouncetime=300)  # toggle
-    # GPIO.add_event_detect(RIGHT, GPIO.FALLING, bouncetime=300)  # toggle
+        GPIO.add_event_detect(iopin, GPIO.FALLING, bouncetime=300)
 
     logging.debug("Radarbuttons: Initialized.")
 
@@ -71,31 +70,25 @@ def init():
 def check_one_button(button):
     global io_status
 
-    # print(str(GPIO.input(button)) + "  ", io_status[button])
-    if GPIO.input(button) != GPIO.LOW:  # not pressed
-        if not io_status[button]['status']:  # was not pressed before
-            io_status[button]['already_triggered'] = False
-            return 0
-        else:  # was pressed, but is now released
+    print(str(GPIO.input(button)) + "  ", io_status[button])
+    if GPIO.event_detected(button):   # triggers on pull down
+        if GPIO.input(button) != GPIO.LOW:  # not pressed anymore
             io_status[button]['status'] = False
-            if time.time() - io_status[button]['starttime'] < HOLD_TIME:
-                return 1  # short press
-            else:
-                return 0   # was long press, not trigger again
-    else:  # button pressed
-        if not io_status[button]['status']:  # first pressed, wait for release or timer
+            return 1  # short press
+        else:   # event detected and still pressed
             io_status[button]['starttime'] = time.time()
             io_status[button]['status'] = True
             return 0
-        else:  # pressed, but was already pressed
-            if time.time() - io_status[button]['starttime'] >= HOLD_TIME:  # pressed for a long time
-                if not io_status[button]['already_triggered']:  # long hold was not triggered yet
-                    io_status[button]['already_triggered'] = True
-                    return 2  # long
-                else:  # long press but already triggered
-                    return 0
-            else:
-                return 0  # press time shorter, but not yet released, nothing to do
+    if GPIO.input(button) == GPIO.LOW:
+        # pressed, but was already pressed, since no event was detected
+        if time.time() - io_status[button]['starttime'] >= HOLD_TIME:  # pressed for a long time
+            if not io_status[button]['already_triggered']:  # long hold was not triggered yet
+                io_status[button]['already_triggered'] = True
+                return 2  # long
+            else:  # long press but already triggered
+                return 0
+        else:
+            return 0  # press time shorter, but not yet released, nothing to do
 
 
 def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
@@ -104,6 +97,6 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
     for button in io_status:
         stat = check_one_button(button)
         if stat > 0:
-            # print("Out: ", stat, " ", io_status[button]['virtualno'])
+            print("Out: ", stat, " ", io_status[button]['virtualno'])
             return stat, io_status[button]['virtualno']
     return 0, 0
