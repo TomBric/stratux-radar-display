@@ -86,10 +86,10 @@ def user_input():
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        return False
+        return 2  # stay in timer mode
     timer_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
-        return True   # next mode
+        return 1   # next mode to be radar
     if button == 2 and btime == 1:   # short right
         if timer_running:   # timer already running
             stoptime = math.floor(time.time()) - stoptime
@@ -112,4 +112,4 @@ def user_input():
             right_text = "Start"
             left_text = ""
     timer_ui_changed = True
-    return False   # no mode change
+    return 2   # no mode change

@@ -32,60 +32,33 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import logging
-import requests
+import os
 import radarbuttons
+import time
 
-# status variables for state machine
-display_radius = (2, 5, 10, 20, 40)
-height_diff = (1000, 2000, 5000, 10000, 50000)
-sound_on = True
-
-url_settings_set = ""
+SHUTDOWN_WAIT_TIME = 5
+shutdown_time = 0.0
 
 
-def init(url):
-    global url_settings_set
-
-    radarbuttons.init()
-    url_settings_set = url
-    logging.debug("Radar UI: Initialized POST settings to " + url_settings_set)
+def draw_shutdown(draw, display_control):
+    display_control.clear(draw)
+    display_control.shutdown(draw, round(shutdown_time - time.time()))
+    display_control.display()
 
 
-def communicate_limits(radarrange, threshold):
-    global url_settings_set
+def user_input():
+    global shutdown_time
 
-    logging.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
-    try:
-        requests.post(url_settings_set, json={'RadarLimits': threshold, 'RadarRange': radarrange})
-    except requests.exceptions.RequestException as e:
-        logging.debug("Posting limits exception", e)
-
-
-def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
-    try:
-        radius = display_radius.index(rrange)
-        height = height_diff.index(rlimits)
-    except ValueError:   # should not occure
-        radius = 2   # set standard to 5nm, if error
-        height = 0   # set standard to 1000ft, if error
-
+    if shutdown_time == 0.0:     # first time or after stopped shutdwon
+        shutdown_time = time.time() + SHUTDOWN_WAIT_TIME
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        return 1, False
-    if button == 0:
-        radius += 1
-        if radius >= len(display_radius):
-            radius = 0
-        communicate_limits(display_radius[radius], height_diff[height])
-    elif button == 2:
-        height += 1
-        if height >= len(height_diff):
-            height = 0
-        communicate_limits(display_radius[radius], height_diff[height])
-    elif button == 1:
-        if btime == 2:    # middle and long
-            return 2, False  # start next mode timer
-        else:          # middle and short
-            logging.debug("Sound  toggled by UI")
-            return 1, True
-    return 1, False
+        return 3  # keep shutdown mode
+    if shutdown_time > time.time():
+        logging.debug("Initiating shutdown ...")
+        print("Shutdown now")
+        # result = os.popen("sudo shutdown -h now").read()
+        return 0
+    # button pressed
+    shutdown_time = 0.0
+    return 1   # go back to radar mode

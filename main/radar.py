@@ -43,6 +43,7 @@ import time
 import radarbluez
 import radarui
 import timerui
+import shutdownui
 import importlib
 
 logging.basicConfig(
@@ -82,7 +83,7 @@ display_control = None
 speak = False  # BT is generally enabled
 bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
-global_mode = 1   # 1=Radar 2=Timer 0=Init
+global_mode = 1   # 1=Radar 2=Timer 3=Shutdown 0=Init
 LAST_MODE = 3    # to be never reached
 
 
@@ -340,7 +341,6 @@ async def user_interface():
             logging.debug("User interface task terminating ...")
             return
         await asyncio.sleep(UI_REACTION_TIME)
-        next_mode = False
         if global_mode == 1:  # Radar mode
             next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
             if toggle_sound:
@@ -348,12 +348,12 @@ async def user_interface():
                 ui_changed = True
         elif global_mode == 2:  # Timer mode
             next_mode = timerui.user_input()
+        elif global_mode == 3:  # shutdown mode
+            next_mode = shutdownui.user_input()
 
-        if next_mode:
+        if next_mode > 0:
             ui_changed = True
-            global_mode = global_mode + 1
-            if global_mode == LAST_MODE:
-                global_mode = 1
+            global_mode = next_mode
 
         current_time = time.time()
         if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
