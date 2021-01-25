@@ -262,6 +262,6 @@ def shutdown(draw, countdown):
     message = "in " +  str(countdown) + " seonds!"
     centered_text(draw, 40, message, largefont, fill="black")
     message = "Press any button"
-    centered_text(draw, 100, message, smallfont, fill="black")
+    centered_text(draw, 110, message, smallfont, fill="black")
     message = "to cancel ..."
-    centered_text(draw, 120, message, smallfont, fill="black")
+    centered_text(draw, 130, message, smallfont, fill="black")
