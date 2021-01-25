@@ -73,7 +73,8 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
     if btime == 0:
         return 1, False
     if button == 0:
-        if btime == 2:    # left and long
+        if btime == 2:    # left and lon
+            print("Next mode is shutdown")
             return 3, False  # start next mode shutdown!
         else:          # left and short
             radius += 1
