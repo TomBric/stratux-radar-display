@@ -35,31 +35,41 @@ import logging
 import os
 import radarbuttons
 import time
+import asyncio
 
 SHUTDOWN_WAIT_TIME = 6.0
 shutdown_time = 0.0
+clear_before_shutoff = False
 
 
 def draw_shutdown(draw, display_control):
+    global clear_before_shutoff
+
     if shutdown_time > 0:
         display_control.clear(draw)
         display_control.shutdown(draw, int(shutdown_time - time.time()))
         display_control.display()
+    if clear_before_shutoff:
+        display_control.cleanup(draw)
+        clear_before_shutoff = False
 
 
-def user_input():
+def user_input(display_time):
     global shutdown_time
+    global clear_before_shutoff
 
     if shutdown_time == 0.0:     # first time or after stopped shutdwon
         shutdown_time = time.time() + SHUTDOWN_WAIT_TIME
     btime, button = radarbuttons.check_buttons()
-    if btime > 0: # any button pressed
+    if btime > 0:   # any button pressed
         shutdown_time = 0.0
         return 1  # go back to radar mode
     if time.time() > shutdown_time:
         logging.debug("Initiating shutdown ...")
         print("Shutdown now")
-        os.popen("sudo shutdown -h now").read()
+        clear_before_shutoff = True   # enable display driver to shut off
+        await asyncio.sleep(display_time*3)  # time for the display to shut off
+        os.popen("sudo shutdown --poweroff now").read()
         shutdown_time = 0.0
         return 1  # go back to radar mode; but never reached normally
     return 3   # go back to shutdown mode
