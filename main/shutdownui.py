@@ -36,14 +36,15 @@ import os
 import radarbuttons
 import time
 
-SHUTDOWN_WAIT_TIME = 5
+SHUTDOWN_WAIT_TIME = 6.0
 shutdown_time = 0.0
 
 
 def draw_shutdown(draw, display_control):
-    display_control.clear(draw)
-    display_control.shutdown(draw, int(shutdown_time - time.time()))
-    display_control.display()
+    if shutdown_time > 0:
+        display_control.clear(draw)
+        display_control.shutdown(draw, int(shutdown_time - time.time()))
+        display_control.display()
 
 
 def user_input():
