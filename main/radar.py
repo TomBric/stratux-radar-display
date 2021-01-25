@@ -351,7 +351,6 @@ async def user_interface():
         elif global_mode == 2:  # Timer mode
             next_mode = timerui.user_input()
         elif global_mode == 3:  # shutdown mode
-            print("Entering shutdownui")
             next_mode = shutdownui.user_input()
 
         if next_mode > 0:
