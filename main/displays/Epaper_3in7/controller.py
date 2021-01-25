@@ -255,3 +255,13 @@ def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, 
     textsize = draw.textsize(right_text, smallfont)
     draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_text, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
+
+def shutdown(draw, countdown):
+    message = "Shutdown "
+    centered_text(draw, 10, message, largefont, fill="white")
+    message = "in " +  str(countdown) + " seonds!"
+    centered_text(draw, 40, message, largefont, fill="white")
+    message = "Press any button"
+    centered_text(draw, 100, message, smallfont, fill="white")
+    message = "to cancel ..."
+    centered_text(draw, 120, message, smallfont, fill="white")
