@@ -75,7 +75,7 @@ async def user_input(display_time):
         clear_before_shutoff = True   # enable display driver to shut off
         print("Await ", display_time*3, " secs")
         await asyncio.sleep(display_time*3)  # time for the display to shut off
-        os.popen("sudo shutdown --poweroff now").read()
+        # os.popen("sudo shutdown --poweroff now").read()
         shutdown_time = 0.0
         return 1  # go back to radar mode; but never reached normally
     return 3   # go back to shutdown mode
