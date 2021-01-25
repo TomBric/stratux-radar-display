@@ -52,12 +52,13 @@ def user_input():
     if shutdown_time == 0.0:     # first time or after stopped shutdwon
         shutdown_time = time.time() + SHUTDOWN_WAIT_TIME
     btime, button = radarbuttons.check_buttons()
-    if btime == 0:
-        return 3  # keep shutdown mode
+    if btime > 0: # any button pressed
+        shutdown_time = 0.0
+        return 1  # go back to radar mode
     if shutdown_time > time.time():
         logging.debug("Initiating shutdown ...")
         print("Shutdown now")
         # result = os.popen("sudo shutdown -h now").read()
-    # button pressed
-    shutdown_time = 0.0
-    return 1   # go back to radar mode
+        shutdown_time = 0.0
+        return 1  # go back to radar mode; but never reached normally
+    return 3   # go back to shutdown mode
