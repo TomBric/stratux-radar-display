@@ -88,9 +88,7 @@ LAST_MODE = 3    # to be never reached
 
 
 def draw_all_ac(draw, allac):
-    # print("List aircraft" + json.dumps(allac))
     dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
-    # print("dist_sorted" + json.dumps(dist_sorted))
     for icao, ac in dist_sorted:
         # first draw mode-s
         if 'circradius' in ac:
