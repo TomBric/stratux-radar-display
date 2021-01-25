@@ -49,7 +49,6 @@ def draw_shutdown(draw, display_control):
 def user_input():
     global shutdown_time
 
-    print("Shutdown User Input")
     if shutdown_time == 0.0:     # first time or after stopped shutdwon
         shutdown_time = time.time() + SHUTDOWN_WAIT_TIME
     btime, button = radarbuttons.check_buttons()
@@ -59,7 +58,6 @@ def user_input():
         logging.debug("Initiating shutdown ...")
         print("Shutdown now")
         # result = os.popen("sudo shutdown -h now").read()
-        return 1  # but should never be reached ....
     # button pressed
     shutdown_time = 0.0
     return 1   # go back to radar mode
