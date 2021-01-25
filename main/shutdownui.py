@@ -42,7 +42,7 @@ shutdown_time = 0.0
 
 def draw_shutdown(draw, display_control):
     display_control.clear(draw)
-    display_control.shutdown(draw, round(shutdown_time - time.time()))
+    display_control.shutdown(draw, int(shutdown_time - time.time()))
     display_control.display()
 
 
@@ -59,7 +59,7 @@ def user_input():
         logging.debug("Initiating shutdown ...")
         print("Shutdown now")
         # result = os.popen("sudo shutdown -h now").read()
-        return 0
+        return 1  # but should never be reached ....
     # button pressed
     shutdown_time = 0.0
     return 1   # go back to radar mode
