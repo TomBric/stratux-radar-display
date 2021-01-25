@@ -258,10 +258,10 @@ def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, 
 
 def shutdown(draw, countdown):
     message = "Shutdown "
-    centered_text(draw, 10, message, largefont, fill="white")
+    centered_text(draw, 10, message, largefont, fill="black")
     message = "in " +  str(countdown) + " seonds!"
-    centered_text(draw, 40, message, largefont, fill="white")
+    centered_text(draw, 40, message, largefont, fill="black")
     message = "Press any button"
-    centered_text(draw, 100, message, smallfont, fill="white")
+    centered_text(draw, 100, message, smallfont, fill="black")
     message = "to cancel ..."
-    centered_text(draw, 120, message, smallfont, fill="white")
+    centered_text(draw, 120, message, smallfont, fill="black")

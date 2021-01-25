@@ -240,7 +240,7 @@ def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, 
         centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill=color)
         if laptime is not None:
             draw.text((0, 2*SMALL + 2 * VERYLARGE), "Laptime", font=smallfont, fill="cyan")
-            centered_text(draw, 3 * SMALL + 2* VERYLARGE, laptime, verylargefont, fill="powderblue")
+            centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="powderblue")
 
     draw.text((0, sizey - SMALL-3), left_text, font=smallfont, fill="green")
     textsize = draw.textsize(right_text, smallfont)
@@ -251,7 +251,7 @@ def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, 
 def shutdown(draw, countdown):
     message = "Shutdown "
     centered_text(draw, 10, message, largefont, fill="white")
-    message = "in " +  str(countdown) + " seonds!"
+    message = "in " + str(countdown) + " seonds!"
     centered_text(draw, 30, message, largefont, fill="white")
     message = "Press any button"
     centered_text(draw, 60, message, smallfont, fill="white")
