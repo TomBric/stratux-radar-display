@@ -47,7 +47,10 @@ def draw_shutdown(draw, display_control):
 
     if shutdown_time > 0:
         display_control.clear(draw)
-        display_control.shutdown(draw, int(shutdown_time - time.time()))
+        rest_time = int(shutdown_time - time.time())
+        if rest_time < 0:
+            rest_time = 0   # if clear is too slow, so that not a minus is displayed
+        display_control.shutdown(draw, rest_time)
         display_control.display()
     if clear_before_shutoff:
         logging.debug("Cleaning display")
