@@ -49,6 +49,7 @@ def draw_shutdown(draw, display_control):
 def user_input():
     global shutdown_time
 
+    print("Shutdown User Input")
     if shutdown_time == 0.0:     # first time or after stopped shutdwon
         shutdown_time = time.time() + SHUTDOWN_WAIT_TIME
     btime, button = radarbuttons.check_buttons()
