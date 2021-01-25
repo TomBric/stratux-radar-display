@@ -55,7 +55,7 @@ def user_input():
     if btime > 0: # any button pressed
         shutdown_time = 0.0
         return 1  # go back to radar mode
-    if shutdown_time > time.time():
+    if time.time() > shutdown_time:
         logging.debug("Initiating shutdown ...")
         print("Shutdown now")
         # result = os.popen("sudo shutdown -h now").read()
