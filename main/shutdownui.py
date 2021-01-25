@@ -50,9 +50,9 @@ def draw_shutdown(draw, display_control):
         display_control.shutdown(draw, int(shutdown_time - time.time()))
         display_control.display()
     if clear_before_shutoff:
-        print("Cleaning display")
+        logging.debug("Cleaning display")
         display_control.cleanup()
-        print("Display driver: doing shutdown")
+        logging.debug("Display driver: doing shutdown")
         os.popen("sudo shutdown --poweroff now").read()
         clear_before_shutoff = False
         return True

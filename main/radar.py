@@ -387,7 +387,6 @@ async def display_and_cutoff():
             elif global_mode == 3:   # shutdown
                 final_shutdown = shutdownui.draw_shutdown(draw, display_control)
                 if final_shutdown:
-                    print("Diplay task terminating ...")
                     logging.debug("Shutdown triggered: Display task terminating ...")
                     return
             await asyncio.sleep(0.2)
