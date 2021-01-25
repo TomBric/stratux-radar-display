@@ -35,7 +35,6 @@ import logging
 import os
 import radarbuttons
 import time
-import asyncio
 
 SHUTDOWN_WAIT_TIME = 6.0
 shutdown_time = 0.0
