@@ -384,6 +384,8 @@ async def display_and_cutoff():
                 draw_display(draw)
             elif global_mode == 2:   # Timer'
                 timerui.draw_timer(draw, display_control, display_refresh_time)
+            elif global_mode == 3:   # shutdown
+                shutdownui.draw_shutdown(draw, display_control)
             await asyncio.sleep(0.2)
 
         logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
