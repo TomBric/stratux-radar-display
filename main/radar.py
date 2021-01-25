@@ -341,6 +341,7 @@ async def user_interface():
             logging.debug("User interface task terminating ...")
             return
         await asyncio.sleep(UI_REACTION_TIME)
+        next_mode = 1
         if global_mode == 1:  # Radar mode
             next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
             if toggle_sound:
@@ -385,7 +386,10 @@ async def display_and_cutoff():
             elif global_mode == 2:   # Timer'
                 timerui.draw_timer(draw, display_control, display_refresh_time)
             elif global_mode == 3:   # shutdown
-                shutdownui.draw_shutdown(draw, display_control)
+                final_shutdown = shutdownui.draw_shutdown(draw, display_control)
+                if final_shutdown:
+                    logging.debug("Shutdown triggered: Display task terminating ...")
+                    return
             await asyncio.sleep(0.2)
 
         logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
