@@ -50,6 +50,7 @@ def draw_shutdown(draw, display_control):
         display_control.shutdown(draw, int(shutdown_time - time.time()))
         display_control.display()
     if clear_before_shutoff:
+        print("Cleaning display")
         display_control.cleanup(draw)
         clear_before_shutoff = False
         return True
@@ -70,6 +71,7 @@ async def user_input(display_time):
         logging.debug("Initiating shutdown ...")
         print("Shutdown now")
         clear_before_shutoff = True   # enable display driver to shut off
+        print("Await ", display_time*3, " secs")
         await asyncio.sleep(display_time*3)  # time for the display to shut off
         os.popen("sudo shutdown --poweroff now").read()
         shutdown_time = 0.0

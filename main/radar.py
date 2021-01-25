@@ -333,6 +333,7 @@ async def user_interface():
     global sound_on
     global ui_changed
     global global_mode
+    global display_refresh_time
 
     last_bt_checktime = 0.0
 
@@ -388,6 +389,7 @@ async def display_and_cutoff():
             elif global_mode == 3:   # shutdown
                 final_shutdown = shutdownui.draw_shutdown(draw, display_control)
                 if final_shutdown:
+                    print("Diplay task terminating ...")
                     logging.debug("Shutdown triggered: Display task terminating ...")
                     return
             await asyncio.sleep(0.2)
