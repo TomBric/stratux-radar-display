@@ -54,7 +54,7 @@ def draw_shutdown(draw, display_control):
         clear_before_shutoff = False
 
 
-def user_input(display_time):
+async def user_input(display_time):
     global shutdown_time
     global clear_before_shutoff
 
