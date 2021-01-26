@@ -234,7 +234,7 @@ def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, 
     if stoptime is not None:
         draw.text((0, SMALL+VERYLARGE), "Timer", font=smallfont, fill="cyan")
         if timer_runs:
-            color = "lime"
+            color = "lavender"
         else:
             color = "orangered"
         centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill=color)
