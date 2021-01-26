@@ -104,12 +104,15 @@ def user_input():
             right_text = "Stop"
             left_text = "Lap"
     if button == 0:   # left
-        if timer_running:
-            laptime = math.floor(time.time())
+        if btime == 2:  # left and long
+            return 3    # start next mode shutdown!
         else:
-            stoptime = 0
-            laptime = 0
-            right_text = "Start"
-            left_text = ""
+            if timer_running:
+                laptime = math.floor(time.time())
+            else:
+                stoptime = 0
+                laptime = 0
+                right_text = "Start"
+                left_text = ""
     timer_ui_changed = True
     return 2   # no mode change
