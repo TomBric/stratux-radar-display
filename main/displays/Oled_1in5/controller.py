@@ -192,25 +192,25 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     draw.ellipse((0, 0, sizex-1, sizey-1), outline="floralwhite")
     draw.ellipse((sizex/4, sizey/4, zerox + sizex/4, zeroy + sizey/4), outline="floralwhite")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="floralwhite")
-    draw.text((0, sizey - SMALL), "FL" + str(round(ownalt/100)), font=smallfont, fill="orange")
+    draw.text((0, sizey - SMALL), "FL" + str(round(ownalt/100)), font=smallfont, fill="floralwhite")
 
-    draw.text((0, 0), str(range), font=smallfont, fill="orange")
-    draw.text((0, SMALL), "nm", font=verysmallfont, fill="orange")
+    draw.text((0, 0), str(range), font=smallfont, fill="floralwhite")
+    draw.text((0, SMALL), "nm", font=verysmallfont, fill="floralwhite")
 
     if altdifference >= 10000:
         t = str(int(altdifference/1000))+"k"
     else:
         t = str(altdifference)
     textsize = draw.textsize(t, smallfont)
-    draw.text((sizex - textsize[0], 0), t, font=smallfont, fill="orange", align="right")
+    draw.text((sizex - textsize[0], 0), t, font=smallfont, fill="floralwhite", align="right")
 
     text = "ft"
     textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0], SMALL), text, font=verysmallfont, fill="orange", align="right")
+    draw.text((sizex - textsize[0], SMALL), text, font=verysmallfont, fill="floralwhite", align="right")
 
     text = str(course) + '°'
     textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="orange", align="right")
+    draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="floralwhite", align="right")
 
     if bt_devices > 0:
         if sound_active:
