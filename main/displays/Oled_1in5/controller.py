@@ -175,7 +175,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
 def modesaircraft(draw, radius, height, arcposition):
     if radius < MINIMAL_CIRCLE:
         radius = MINIMAL_CIRCLE
-    draw.ellipse((64-radius, 64-radius, 64+radius, 64+radius), width=2, outline="white")
+    draw.ellipse((64-radius, 64-radius, 64+radius, 64+radius), width=3, outline="white")
     arctext = posn(arcposition, radius)
     if height > 0:
         signchar = "+"
