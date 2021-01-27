@@ -437,18 +437,20 @@ def main():
 async def shutdown_tasks():
     global quit_display_task
 
+    print("Keyboard interrupt. Quitting ...")
+    await(shutdown_tasks())
     quit_display_task = True
     asyncio.sleep(display_refresh_time * 2)  # give display some time to finish
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
+    print("CleanUp Display ...")
+    display_control.cleanup()
 
 
 def quit_gracefully(*args):
-    print("Keyboard interrupt. Quitting ...")
-    await(shutdown_tasks())
-    print("CleanUp Display ...")
-    display_control.cleanup()
+    asyncio.create_task(shutdown_tasks())
+    return 0
 
 
 if __name__ == "__main__":
