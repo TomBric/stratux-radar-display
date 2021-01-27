@@ -132,25 +132,27 @@ def init():
     start = time.time()
     # do sync version of display to measure time
     device.display_1Gray(device.getbuffer(epaper_image))
-    device.display_1Gray(device.getbuffer(epaper_image))
     end = time.time()
-    display_refresh = (end-start) / 2
+    display_refresh = end-start
     logging.info("Measured Display Refresh Time: " + str(display_refresh) + " seconds")
     return draw, max_pixel, zerox, zeroy, display_refresh
 
 
 def cleanup():
+    global device
+
     device.init(0)
     device.Clear(0xFF, 0)
     device.sleep()
     device.Dev_exit()
     logging.debug("Epaper cleaned up.")
 
+
 def refresh():
-    device.init(0)
-    device.Clear(0xFF, 0)  # necessary to overwrite everything
-    device.init(1)
-    device.Clear(0xFF, 1)
+    global device
+
+    device.display_4Gray(device.getbuffer(epaper_image))
+
 
 def clear(draw):
     draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
@@ -261,10 +263,11 @@ def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, 
     draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_text, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
 
+
 def shutdown(draw, countdown):
     message = "Shutdown "
     centered_text(draw, 10, message, largefont, fill="black")
-    message = "in " +  str(countdown) + " seonds!"
+    message = "in " + str(countdown) + " seonds!"
     centered_text(draw, 40, message, largefont, fill="black")
     message = "Press any button"
     centered_text(draw, 110, message, smallfont, fill="black")

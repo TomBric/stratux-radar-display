@@ -372,6 +372,7 @@ async def user_interface():
 async def display_and_cutoff():
     global aircraft_changed
     global global_mode
+    global display_control
 
     while True:
         if quit_display_task:
