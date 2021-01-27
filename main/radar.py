@@ -78,7 +78,6 @@ zerox = 0
 zeroy = 0
 last_arcposition = 0
 display_refresh_time = 0
-quit_display_task = False
 display_control = None
 speak = False  # BT is generally enabled
 bt_devices = 0
@@ -334,82 +333,80 @@ async def user_interface():
 
     last_bt_checktime = 0.0
 
-    while True:
-        if quit_display_task:
-            print("UI task terminating ...")
-            logging.debug("User interface task terminating ...")
-            return
-        await asyncio.sleep(UI_REACTION_TIME)
-        next_mode = 1
-        if global_mode == 1:  # Radar mode
-            next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
-            if toggle_sound:
-                sound_on = not sound_on
-                ui_changed = True
-        elif global_mode == 2:  # Timer mode
-            next_mode = timerui.user_input()
-        elif global_mode == 3:  # shutdown mode
-            next_mode = shutdownui.user_input()
-        elif global_mode == 4:  # refresh mode
-            await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
+    try:
+        while True:
+            await asyncio.sleep(UI_REACTION_TIME)
+            next_mode = 1
+            if global_mode == 1:  # Radar mode
+                next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
+                if toggle_sound:
+                    sound_on = not sound_on
+                    ui_changed = True
+            elif global_mode == 2:  # Timer mode
+                next_mode = timerui.user_input()
+            elif global_mode == 3:  # shutdown mode
+                next_mode = shutdownui.user_input()
+            elif global_mode == 4:  # refresh mode
+                await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
 
-        if next_mode > 0:
-            ui_changed = True
-            global_mode = next_mode
-
-        current_time = time.time()
-        if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
-            last_bt_checktime = current_time
-            new_devices, devnames = radarbluez.connected_devices()
-            logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
-            if new_devices != bt_devices:
-                if new_devices > bt_devices:  # new or additional device
-                    radarbluez.speak("Radar connected")
-                bt_devices = new_devices
+            if next_mode > 0:
                 ui_changed = True
+                global_mode = next_mode
+
+            current_time = time.time()
+            if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
+                last_bt_checktime = current_time
+                new_devices, devnames = radarbluez.connected_devices()
+                logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
+                if new_devices != bt_devices:
+                    if new_devices > bt_devices:  # new or additional device
+                        radarbluez.speak("Radar connected")
+                    bt_devices = new_devices
+                    ui_changed = True
+    except asyncio.CancelledError:
+        print("UI task terminating ...")
+        logging.debug("Display task terminating ...")
 
 
 async def display_and_cutoff():
     global aircraft_changed
     global global_mode
     global display_control
-    global quit_display_task
 
-    while True:
-        if quit_display_task:
-            print("Display task terminating ...")
-            logging.debug("Display task terminating ...")
-            return
+    try:
+        while True:
+            if display_control.is_busy():
+                await asyncio.sleep(display_refresh_time / 3)
+                # try it several times to be as fast as possible
+            else:
+                if global_mode == 1:   # Radar
+                    draw_display(draw)
+                elif global_mode == 2:   # Timer'
+                    timerui.draw_timer(draw, display_control, display_refresh_time)
+                elif global_mode == 3:   # shutdown
+                    final_shutdown = shutdownui.draw_shutdown(draw, display_control)
+                    if final_shutdown:
+                        logging.debug("Shutdown triggered: Display task terminating ...")
+                        return
+                elif global_mode == 4:   # refresh display, only relevant for epaper
+                    logging.debug("Display driver: Refreshing")
+                    display_control.refresh()
+                    global_mode = 1
+                await asyncio.sleep(0.2)
 
-        if display_control.is_busy():
-            await asyncio.sleep(display_refresh_time / 3)
-            # try it several times to be as fast as possible
-        else:
-            if global_mode == 1:   # Radar
-                draw_display(draw)
-            elif global_mode == 2:   # Timer'
-                timerui.draw_timer(draw, display_control, display_refresh_time)
-            elif global_mode == 3:   # shutdown
-                final_shutdown = shutdownui.draw_shutdown(draw, display_control)
-                if final_shutdown:
-                    logging.debug("Shutdown triggered: Display task terminating ...")
-                    return
-            elif global_mode == 4:   # refresh display, only relevant for epaper
-                logging.debug("Display driver: Refreshing")
-                display_control.refresh()
-                global_mode = 1
-            await asyncio.sleep(0.2)
-
-        logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
-        to_delete = []
-        cutoff = time.time() - RADAR_CUTOFF
-        for icao, ac in all_ac.items():
-            if ac['last_contact_timestamp'] < cutoff:
-                logging.debug("Cutting of " + str(icao))
-                to_delete.append(icao)
-                aircraft_changed = True
-        for i in to_delete:
-            del all_ac[i]
+            logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
+            to_delete = []
+            cutoff = time.time() - RADAR_CUTOFF
+            for icao, ac in all_ac.items():
+                if ac['last_contact_timestamp'] < cutoff:
+                    logging.debug("Cutting of " + str(icao))
+                    to_delete.append(icao)
+                    aircraft_changed = True
+            for i in to_delete:
+                del all_ac[i]
+    except asyncio.CancelledError:
+        print("Display task terminating ...")
+        logging.debug("Display task terminating ...")
 
 
 async def courotines():
@@ -436,17 +433,8 @@ def main():
         logging.debug("Main cancelled")
 
 
-async def shutdown_tasks():
-    global quit_display_task
-
-    quit_display_task = True
-    await asyncio.sleep(display_refresh_time * 2)  # give display some time to finish
-
-
 def quit_gracefully(*args):
     print("Keyboard interrupt. Quitting ...")
-    asyncio.create_task(shutdown_tasks())
-    print("Closing all tasks.")
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
