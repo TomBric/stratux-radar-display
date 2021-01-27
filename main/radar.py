@@ -391,7 +391,7 @@ async def display_and_cutoff():
                     return
             elif global_mode == 4:   # refresh display, only relevant for epaper
                 logging.debug("Refresh triggered")
-                print("Display drive: refreshing")
+                print("Display drive4: refreshing")
                 display_control.refresh()
                 global_mode = 1
             await asyncio.sleep(0.2)
