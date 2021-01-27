@@ -372,6 +372,7 @@ async def display_and_cutoff():
     global aircraft_changed
     global global_mode
     global display_control
+    global quit_display_task
 
     while True:
         if quit_display_task:
@@ -433,11 +434,12 @@ def main():
         logging.debug("Main cancelled")
 
 
-def quit_gracefully(*args):
+async def quit_gracefully(*args):
     global quit_display_task
 
     print("Keyboard interrupt. Quitting ...")
     quit_display_task = True
+    await asyncio.sleep(display_refresh_time*2)   # give display some time to finish
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
