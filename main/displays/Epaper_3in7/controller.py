@@ -151,6 +151,7 @@ def cleanup():
 def refresh():
     global device
 
+
     print("Refreshing display")
     device.Clear(0xFF, 1)
     device.display_4Gray(device.getbuffer(epaper_image))
