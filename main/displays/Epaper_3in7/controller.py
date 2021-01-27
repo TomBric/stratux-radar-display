@@ -150,7 +150,7 @@ def refresh():
     device.init(0)
     device.Clear(0xFF, 0)  # necessary to overwrite everything
     device.init(1)
-    # device.Clear(0xFF, 1)
+    device.Clear(0xFF, 1)
 
 def clear(draw):
     draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
