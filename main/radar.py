@@ -444,9 +444,8 @@ async def shutdown_tasks():
     display_control.cleanup()
 
 
-def quit_gracefully(*args):
-    shutdown = asyncio.create_task(shutdown_tasks())
-    await asyncio.wait({shutdown})
+async def quit_gracefully(*args):
+    await shutdown_tasks()
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
