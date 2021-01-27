@@ -389,7 +389,7 @@ async def display_and_cutoff():
                         logging.debug("Shutdown triggered: Display task terminating ...")
                         return
                 elif global_mode == 4:   # refresh display, only relevant for epaper
-                    logging.debug("Display driver: Refreshing")
+                    print("Radar: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 1
                 await asyncio.sleep(0.2)
