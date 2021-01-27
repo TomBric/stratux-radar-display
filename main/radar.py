@@ -439,8 +439,6 @@ async def shutdown_tasks():
 
     quit_display_task = True
     await asyncio.sleep(display_refresh_time * 2)  # give display some time to finish
-    print("CleanUp Display ...")
-    display_control.cleanup()
 
 
 def quit_gracefully(*args):
@@ -450,6 +448,8 @@ def quit_gracefully(*args):
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
+    print("CleanUp Display ...")
+    display_control.cleanup()
     return 0
 
 
