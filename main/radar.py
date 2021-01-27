@@ -350,7 +350,6 @@ async def user_interface():
         elif global_mode == 3:  # shutdown mode
             next_mode = shutdownui.user_input()
         elif global_mode == 4:  # refresh mode
-            print("UI driver: Refresh mode")
             await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
 
         if next_mode > 0:
@@ -393,8 +392,7 @@ async def display_and_cutoff():
                     logging.debug("Shutdown triggered: Display task terminating ...")
                     return
             elif global_mode == 4:   # refresh display, only relevant for epaper
-                logging.debug("Refresh triggered")
-                print("Display driver: refreshing")
+                logging.debug("Display driver: Refreshing")
                 display_control.refresh()
                 global_mode = 1
             await asyncio.sleep(0.2)
