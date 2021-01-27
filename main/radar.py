@@ -438,7 +438,6 @@ async def shutdown_tasks():
     global quit_display_task
 
     print("Keyboard interrupt. Quitting ...")
-    await(shutdown_tasks())
     quit_display_task = True
     asyncio.sleep(display_refresh_time * 2)  # give display some time to finish
     tasks = asyncio.all_tasks()
@@ -450,6 +449,7 @@ async def shutdown_tasks():
 
 def quit_gracefully(*args):
     asyncio.create_task(shutdown_tasks())
+    await(shutdown_tasks())
     return 0
 
 
