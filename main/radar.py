@@ -331,7 +331,6 @@ async def user_interface():
     global sound_on
     global ui_changed
     global global_mode
-    global display_refresh_time
 
     last_bt_checktime = 0.0
 
@@ -350,6 +349,8 @@ async def user_interface():
             next_mode = timerui.user_input()
         elif global_mode == 3:  # shutdown mode
             next_mode = shutdownui.user_input()
+        elif global_mode == 4:  # refresh mode
+            await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
 
         if next_mode > 0:
             ui_changed = True
@@ -391,7 +392,7 @@ async def display_and_cutoff():
                     return
             elif global_mode == 4:   # refresh display, only relevant for epaper
                 logging.debug("Refresh triggered")
-                print("Display drive4: refreshing")
+                print("Display driver: refreshing")
                 display_control.refresh()
                 global_mode = 1
             await asyncio.sleep(0.2)
