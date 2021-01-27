@@ -131,6 +131,10 @@ def clear(draw):
     draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="black")
 
 
+def refresh():
+    pass   # nothing to do for Oled, does not need a refresh function
+
+
 def startup(draw, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
     logo = Image.open(logopath)

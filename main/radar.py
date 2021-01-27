@@ -389,6 +389,10 @@ async def display_and_cutoff():
                 if final_shutdown:
                     logging.debug("Shutdown triggered: Display task terminating ...")
                     return
+            elif global_mode == 4:   # refresh display, only relevant for epaper
+                logging.debug("Refresh triggered")
+                display_control.refresh()
+                global_mode = 3
             await asyncio.sleep(0.2)
 
         logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")

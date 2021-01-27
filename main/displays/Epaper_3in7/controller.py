@@ -146,6 +146,8 @@ def cleanup():
     device.Dev_exit()
     logging.debug("Epaper cleaned up.")
 
+def refresh():
+    device.Clear(0xFF, 1)
 
 def clear(draw):
     draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
