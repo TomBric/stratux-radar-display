@@ -449,7 +449,6 @@ async def shutdown_tasks():
 
 def quit_gracefully(*args):
     asyncio.create_task(shutdown_tasks())
-    await(shutdown_tasks())
     return 0
 
 
