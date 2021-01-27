@@ -336,6 +336,7 @@ async def user_interface():
 
     while True:
         if quit_display_task:
+            print("UI task terminating ...")
             logging.debug("User interface task terminating ...")
             return
         await asyncio.sleep(UI_REACTION_TIME)
@@ -376,6 +377,7 @@ async def display_and_cutoff():
 
     while True:
         if quit_display_task:
+            print("Display task terminating ...")
             logging.debug("Display task terminating ...")
             return
 
