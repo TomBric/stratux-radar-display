@@ -445,7 +445,7 @@ async def shutdown_tasks():
 
 
 def quit_gracefully(*args):
-    await shutdown_tasks()
+    asyncio.run(shutdown_tasks())
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
