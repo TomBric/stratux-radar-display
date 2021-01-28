@@ -82,6 +82,7 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
             communicate_limits(display_radius[radius], height_diff[height])
     elif button == 2:
         if btime == 2:   # right and long- refresh
+            print("UI Refresh triggered")
             return 4, False   # start next mode for display driver: refresh
         else:
             height += 1
