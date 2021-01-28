@@ -137,8 +137,6 @@ def user_input():
                 else:
                     stoptime = 0
                     laptime = 0
-                    right_text = "Start"
-                    left_text = ""
         # set display
         if timer_mode == 1:  # next will be countdown-set
             lap_head = "Set Countdown"
@@ -172,5 +170,21 @@ def user_input():
             if cdown_time >= MAX_COUNTDOWN_TIME:
                 cdown_time = 0
 
+    # prepare display for next round
+    if timer_mode == 1:  # next will be countdown-set
+        lap_head = "Set Countdown"
+        right_text = "+1m"
+        left_text = "+10m"
+    else:  # next will be normal mode
+        if timer_running:
+            right_text = "Stop"
+            left_text = "Lap"
+        else:
+            if stoptime == 0.0:
+                right_text = "Start"
+                left_text = ""
+            else:
+                right_text = "Cont"
+                left_text = "Reset"
     timer_ui_changed = True
     return 2   # no mode change
