@@ -332,11 +332,11 @@ async def user_interface():
     global global_mode
 
     last_bt_checktime = 0.0
+    next_mode = 1
 
     try:
         while True:
             await asyncio.sleep(UI_REACTION_TIME)
-            next_mode = 1
             if global_mode == 1:  # Radar mode
                 next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
                 if toggle_sound:
