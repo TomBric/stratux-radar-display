@@ -153,7 +153,7 @@ def refresh():
     global epaper_image
 
     print("Refreshing display ...")
-    device.display_1Gray(device.getbuffer(epaper_image))
+    device.display_1Gray_FULL(device.getbuffer(epaper_image))
 
 
 def clear(draw):
