@@ -35,16 +35,22 @@ import time
 import radarbuttons
 import math
 
+# constants
+MAX_COUNTDOWN_TIME = 2 * 60 * 60   # maximum time for setting countdown in seconds
+
 # global variables
 left_text = ''
 middle_text = 'Mode'
 right_text = 'Start'
+lap_head = 'Laptimer'
 
 stoptime = 0
 laptime = 0
 timer_running = False
 was_in_secs = 0.0       # last time displayed
 timer_ui_changed = True
+cdown_time = 0.0     # count down time
+timer_mode = 0    # 0 = normal, 1 = countdown-set
 
 
 def draw_timer(draw, display_control, refresh_time):
@@ -63,14 +69,17 @@ def draw_timer(draw, display_control, refresh_time):
         if laptime != 0:
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs-laptime))
         else:
-            laptimestr = "--:--:--"
+            if cdown_time == 0.0:
+                laptimestr = "--:--:--"
+            else:
+                laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time - now_in_secs))
     else:
         if stoptime != 0:
             stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
         else:
             stoptimestr = "--:--:--"
         laptimestr = "--:--:--"
-    display_control.timer(draw, utctimestr, stoptimestr, laptimestr, left_text, middle_text, right_text,
+    display_control.timer(draw, utctimestr, stoptimestr, laptimestr, lap_head, left_text, middle_text, right_text,
                           timer_running)
     display_control.display()
 
@@ -83,36 +92,72 @@ def user_input():
     global laptime
     global timer_running
     global timer_ui_changed
+    global cdown_time
+    global lap_head
+    global timer_mode
 
     btime, button = radarbuttons.check_buttons()
+    # start of timer global behaviour
     if btime == 0:
         return 2  # stay in timer mode
     timer_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
-        return 1   # next mode to be radar
-    if button == 2 and btime == 1:   # short right
-        if timer_running:   # timer already running
-            stoptime = math.floor(time.time()) - stoptime
-            laptime = 0    # also stop lap time
-            timer_running = False
-            right_text = "Cont"
-            left_text = "Reset"
-        else:
-            stoptime = math.floor(time.time()) - stoptime   # add time already on clock
-            laptime = 0
-            timer_running = True
+        return 1  # next mode to be radar
+    if button == 0 and btime == 2:  # left and long
+        return 3  # start next mode shutdown!
+
+    # situation dependent behauvior
+    if timer_mode == 0:   # normal timer mode
+        if timer_running:
             right_text = "Stop"
             left_text = "Lap"
-    if button == 0:   # left
-        if btime == 2:  # left and long
-            return 3    # start next mode shutdown!
         else:
-            if timer_running:
-                laptime = math.floor(time.time())
-            else:
-                stoptime = 0
-                laptime = 0
+            if stoptime == 0.0:
                 right_text = "Start"
                 left_text = ""
+            else:
+                right_text = "Cont"
+                left_text = "Reset"
+        if button == 1 and btime == 1:   # middle and short
+            timer_mode = 1
+            cdown_time = 0
+        if button == 2 and btime == 1:   # short right
+            if timer_running:   # timer already running
+                stoptime = math.floor(time.time()) - stoptime
+                laptime = 0    # also stop lap time
+                timer_running = False
+            else:
+                stoptime = math.floor(time.time()) - stoptime   # add time already on clock
+                laptime = 0
+                timer_running = True
+                right_text = "Stop"
+                left_text = "Lap"
+        if button == 0:   # left
+            if btime == 2:  # left and long
+                return 3    # start next mode shutdown!
+            else:
+                if timer_running:
+                    laptime = math.floor(time.time())
+                else:
+                    stoptime = 0
+                    laptime = 0
+                    right_text = "Start"
+                    left_text = ""
+    elif timer_mode == 1:   # countdown set mode
+        lap_head = "Set Countdown"
+        right_text = "+1m"
+        left_text = "+10m"
+        if button == 1 and btime == 1:   # middle and short
+            if cdown_time > 0:
+                laptime = 0  # stop laptimer and do countdown
+                cdown_time = cdown_time + time.time()
+            timer_mode = 0
+        elif button == 2 and btime == 1:  # left short
+            cdown_time = cdown_time + 600   # ten more minutes
+            if cdown_time >= MAX_COUNTDOWN_TIME:
+                cdown_time = 0
+        elif button == 0 and btime == 1:  # right short
+            cdown_time = cdown_time + 60
+
     timer_ui_changed = True
     return 2   # no mode change
