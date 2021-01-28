@@ -78,7 +78,7 @@ def draw_timer(draw, display_control, refresh_time):
             stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
         else:
             stoptimestr = "--:--:--"
-        if cdown_time == 0.0:
+        if cdown_time <= 0.0:
             laptimestr = "--:--:--"
         else:
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time - now_in_secs))
@@ -118,10 +118,14 @@ def user_input():
         if button == 2 and btime == 1:   # short right
             if timer_running:   # timer already running
                 stoptime = math.floor(time.time()) - stoptime
+                if cdown_time > 0:
+                    cdown_time = cdown_time - math.floor(time.time())
                 laptime = 0    # also stop lap time
                 timer_running = False
             else:
                 stoptime = math.floor(time.time()) - stoptime   # add time already on clock
+                if cdown_time > 0:
+                    cdown_time = math.floor(time.time()) + cdown_time
                 laptime = 0
                 timer_running = True
         if button == 0:   # left
@@ -153,15 +157,18 @@ def user_input():
         if button == 1 and btime == 1:   # middle and short
             if cdown_time > 0:
                 laptime = 0  # stop laptimer and do countdown
-                cdown_time = cdown_time + time.time()
-            lap_head = "Countdown"
+                lap_head = "Countdown"
+            else:
+                lap_head = "Laptimer"
             timer_mode = 0
-        elif button == 2 and btime == 1:  # left short
+        elif button == 0 and btime == 1:  # left short
             cdown_time = cdown_time + 600   # ten more minutes
             if cdown_time >= MAX_COUNTDOWN_TIME:
                 cdown_time = 0
-        elif button == 0 and btime == 1:  # right short
+        elif button == 2 and btime == 1:  # right short
             cdown_time = cdown_time + 60
+            if cdown_time >= MAX_COUNTDOWN_TIME:
+                cdown_time = 0
 
     timer_ui_changed = True
     return 2   # no mode change
