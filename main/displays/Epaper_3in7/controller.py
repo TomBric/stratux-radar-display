@@ -150,11 +150,10 @@ def cleanup():
 
 def refresh():
     global device
+    global epaper_image
 
     print("Refreshing display ...")
-    Limage = Image.new('L', (device.width, device.height), 0xFF)  # 0xFF: clear the frame
-    draw = ImageDraw.Draw(Limage)
-    device.display_4Gray(device.getbuffer_4Gray(Limage))
+    device.display_4Gray(device.getbuffer(epaper_image))
 
 
 def clear(draw):
