@@ -72,7 +72,7 @@ def draw_timer(draw, display_control, refresh_time):
             if cdown_time == 0.0:
                 laptimestr = "--:--:--"
             else:
-                laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time))
+                laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time - now_in_secs))
     else:
         if stoptime != 0:
             stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
@@ -81,7 +81,7 @@ def draw_timer(draw, display_control, refresh_time):
         if cdown_time <= 0.0:
             laptimestr = "--:--:--"
         else:
-            laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time - now_in_secs))
+            laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time))
 
     display_control.timer(draw, utctimestr, stoptimestr, laptimestr, lap_head, left_text, middle_text, right_text,
                           timer_running)
@@ -110,11 +110,14 @@ def user_input():
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
 
-    # situation dependent behauvior
+    # situation dependent behavior
     if timer_mode == 0:   # normal timer mode
         if button == 1 and btime == 1:   # middle and short
             timer_mode = 1
             cdown_time = 0
+            lap_head = "Set Countdown"
+            right_text = "+1m"
+            left_text = "+10m"
         if button == 2 and btime == 1:   # short right
             if timer_running:   # timer already running
                 stoptime = math.floor(time.time()) - stoptime
@@ -151,9 +154,6 @@ def user_input():
                 right_text = "Cont"
                 left_text = "Reset"
     elif timer_mode == 1:   # countdown set mode
-        lap_head = "Set Countdown"
-        right_text = "+1m"
-        left_text = "+10m"
         if button == 1 and btime == 1:   # middle and short
             if cdown_time > 0:
                 laptime = 0  # stop laptimer and do countdown
