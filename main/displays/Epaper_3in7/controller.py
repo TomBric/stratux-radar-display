@@ -154,6 +154,7 @@ def refresh():
 
     print("Refreshing display ...")
     device.display_1Gray_FULL(device.getbuffer(epaper_image))
+    print("Done.")
 
 
 def clear(draw):
