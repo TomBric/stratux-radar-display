@@ -347,6 +347,7 @@ async def user_interface():
             elif global_mode == 3:  # shutdown mode
                 next_mode = shutdownui.user_input()
             elif global_mode == 4:  # refresh mode
+                next_mode = 0   # wait for display to change next mode
                 await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
 
             if next_mode > 0:
