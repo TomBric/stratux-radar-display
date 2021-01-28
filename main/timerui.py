@@ -115,9 +115,6 @@ def user_input():
         if button == 1 and btime == 1:   # middle and short
             timer_mode = 1
             cdown_time = 0
-            lap_head = "Set Countdown"
-            right_text = "+1m"
-            left_text = "+10m"
         if button == 2 and btime == 1:   # short right
             if timer_running:   # timer already running
                 stoptime = math.floor(time.time()) - stoptime
@@ -143,16 +140,21 @@ def user_input():
                     right_text = "Start"
                     left_text = ""
         # set display
-        if timer_running:
-            right_text = "Stop"
-            left_text = "Lap"
-        else:
-            if stoptime == 0.0:
-                right_text = "Start"
-                left_text = ""
+        if timer_mode == 1:  # next will be countdown-set
+            lap_head = "Set Countdown"
+            right_text = "+1m"
+            left_text = "+10m"
+        else:       # next will be normal mode
+            if timer_running:
+                right_text = "Stop"
+                left_text = "Lap"
             else:
-                right_text = "Cont"
-                left_text = "Reset"
+                if stoptime == 0.0:
+                    right_text = "Start"
+                    left_text = ""
+                else:
+                    right_text = "Cont"
+                    left_text = "Reset"
     elif timer_mode == 1:   # countdown set mode
         if button == 1 and btime == 1:   # middle and short
             if cdown_time > 0:
