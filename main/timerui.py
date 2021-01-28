@@ -130,8 +130,6 @@ def user_input():
                 stoptime = math.floor(time.time()) - stoptime   # add time already on clock
                 laptime = 0
                 timer_running = True
-                right_text = "Stop"
-                left_text = "Lap"
         if button == 0:   # left
             if btime == 2:  # left and long
                 return 3    # start next mode shutdown!
