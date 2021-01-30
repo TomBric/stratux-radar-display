@@ -69,7 +69,7 @@ def draw_timer(draw, display_control, refresh_time):
         if laptime != 0:
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs-laptime))
         else:
-            if cdown_time <= 0.0:
+            if cdown_time <= now_in_secs:    # Countdown Finished
                 laptimestr = "--:--:--"
             else:
                 laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time - now_in_secs))
@@ -78,7 +78,7 @@ def draw_timer(draw, display_control, refresh_time):
             stoptimestr = time.strftime("%H:%M:%S", time.gmtime(stoptime))
         else:
             stoptimestr = "--:--:--"
-        if cdown_time <= 0.0:
+        if cdown_time <= now_in_secs:
             laptimestr = "--:--:--"
         else:
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time))
