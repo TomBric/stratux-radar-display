@@ -142,11 +142,6 @@ def user_input():
         # set display
     elif timer_mode == 1:   # countdown set mode
         if button == 1 and btime == 1:   # middle and short
-            if cdown_time > 0:
-                laptime = 0  # stop laptimer and do countdown
-                lap_head = "Countdown"
-            else:
-                lap_head = "Laptimer"
             timer_mode = 0
         elif button == 0 and btime == 1:  # left short
             cdown_time = cdown_time + 600   # ten more minutes
@@ -163,6 +158,11 @@ def user_input():
         right_text = "+1m"
         left_text = "+10m"
     else:  # next will be normal mode
+        if cdown_time > 0:
+            laptime = 0  # stop laptimer and do countdown
+            lap_head = "Countdown"
+        else:
+            lap_head = "Laptimer"
         if timer_running:
             right_text = "Stop"
             left_text = "Lap"
