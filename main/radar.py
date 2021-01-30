@@ -453,6 +453,7 @@ if __name__ == "__main__":
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     args = vars(ap.parse_args())
+    print(args)
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     speak = args['speak']
     if args['timer']:
