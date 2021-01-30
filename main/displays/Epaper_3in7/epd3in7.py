@@ -313,7 +313,6 @@ class EPD:
         self.send_command(0x4F)
         self.send_data(0x00)
         self.send_data(0x00)
-
         self.send_command(0x24)
         for i in range(0, (int)(self.height*(self.width/8))):
             temp3=0
@@ -410,7 +409,31 @@ class EPD:
         # self.load_lut(self.lut_1Gray_DU)
         self.load_lut(self.lut_1Gray_A2)
         self.send_command(0x20)
-        self.ReadBusy()   
+        self.ReadBusy()
+
+
+    def display_1Gray_FULL(self, image):
+        if (image == None):
+            return
+
+        self.send_command(0x4E)
+        self.send_data(0x00)
+        self.send_data(0x00)
+        self.send_command(0x4F)
+        self.send_data(0x00)
+        self.send_data(0x00)
+
+        self.send_command(0x24)
+        self.send_data2(image)
+        # for j in range(0, self.height):
+        #    for i in range(0, int(self.width / 8)):
+        #     self.send_data(image[i + j * int(self.width / 8)])
+
+        self.load_lut(self.lut_1Gray_DU)
+        # self.load_lut(self.lut_1Gray_A2)
+        self.send_command(0x20)
+        self.ReadBusy()
+
 
     def async_display_1Gray(self, image):
         if (image == None):
@@ -450,8 +473,7 @@ class EPD:
         self.send_command(0x24)
         for j in range(0, self.height):
             for i in range(0, int(self.width / 8)):
-                self.send_data(0xff)   
-
+                self.send_data(0xff)
         if(mode == 0):              #4Gray
             self.send_command(0x26)
             for j in range(0, self.height):

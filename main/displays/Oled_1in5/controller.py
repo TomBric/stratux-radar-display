@@ -131,6 +131,10 @@ def clear(draw):
     draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="black")
 
 
+def refresh():
+    pass   # nothing to do for Oled, does not need a refresh function
+
+
 def startup(draw, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
     logo = Image.open(logopath)
@@ -175,7 +179,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
 def modesaircraft(draw, radius, height, arcposition):
     if radius < MINIMAL_CIRCLE:
         radius = MINIMAL_CIRCLE
-    draw.ellipse((64-radius, 64-radius, 64+radius, 64+radius), width=1, outline="white")
+    draw.ellipse((64-radius, 64-radius, 64+radius, 64+radius), width=3, outline="white")
     arctext = posn(arcposition, radius)
     if height > 0:
         signchar = "+"
@@ -189,28 +193,28 @@ def modesaircraft(draw, radius, height, arcposition):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0, sound_active=True):
-    draw.ellipse((0, 0, sizex-1, sizey-1), outline="blue")
-    draw.ellipse((sizex/4, sizey/4, zerox + sizex/4, zeroy + sizey/4), outline="blue")
-    draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="blue")
-    draw.text((0, sizey - SMALL), "FL" + str(round(ownalt/100)), font=smallfont, fill="orange")
+    draw.ellipse((0, 0, sizex-1, sizey-1), outline="floralwhite")
+    draw.ellipse((sizex/4, sizey/4, zerox + sizex/4, zeroy + sizey/4), outline="floralwhite")
+    draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="floralwhite")
+    draw.text((0, sizey - SMALL), "FL" + str(round(ownalt/100)), font=smallfont, fill="floralwhite")
 
-    draw.text((0, 0), str(range), font=smallfont, fill="orange")
-    draw.text((0, SMALL), "nm", font=verysmallfont, fill="orange")
+    draw.text((0, 0), str(range), font=smallfont, fill="floralwhite")
+    draw.text((0, SMALL), "nm", font=verysmallfont, fill="floralwhite")
 
     if altdifference >= 10000:
         t = str(int(altdifference/1000))+"k"
     else:
         t = str(altdifference)
     textsize = draw.textsize(t, smallfont)
-    draw.text((sizex - textsize[0], 0), t, font=smallfont, fill="orange", align="right")
+    draw.text((sizex - textsize[0], 0), t, font=smallfont, fill="floralwhite", align="right")
 
     text = "ft"
     textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0], SMALL), text, font=verysmallfont, fill="orange", align="right")
+    draw.text((sizex - textsize[0], SMALL), text, font=verysmallfont, fill="floralwhite", align="right")
 
     text = str(course) + '°'
     textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="orange", align="right")
+    draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="floralwhite", align="right")
 
     if bt_devices > 0:
         if sound_active:
@@ -228,21 +232,33 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         centered_text(draw, zeroy, "No Connection!", smallfont, fill="red")
 
 
-def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, timer_runs):
+def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs):
     draw.text((0, 0), "UTC", font=smallfont, fill="cyan")
     centered_text(draw, SMALL, utctime, verylargefont, fill="yellow")
-    if stoptime is not None:
-        draw.text((0, SMALL+VERYLARGE), "Timer", font=smallfont, fill="cyan")
-        if timer_runs:
-            color = "lime"
-        else:
-            color = "orangered"
-        centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill=color)
-        if laptime is not None:
-            draw.text((0, 2*SMALL + 2 * VERYLARGE), "Laptime", font=smallfont, fill="cyan")
-            centered_text(draw, 3 * SMALL + 2* VERYLARGE, laptime, verylargefont, fill="powderblue")
+    draw.text((0, SMALL+VERYLARGE), "Timer", font=smallfont, fill="cyan")
+    if timer_runs:
+        color = "lavender"
+    else:
+        color = "orangered"
+    centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill=color)
+    draw.text((0, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="cyan")
+    if laptime_head == "Laptimer":
+        centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="powderblue")
+    else:
+        centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="magenta")
 
     draw.text((0, sizey - SMALL-3), left_text, font=smallfont, fill="green")
     textsize = draw.textsize(right_text, smallfont)
     draw.text((sizex - textsize[0], sizey - SMALL-3), right_text, font=smallfont, fill="green", align="right")
     centered_text(draw, sizey - SMALL-3, middle_text, smallfont, fill="green")
+
+
+def shutdown(draw, countdown):
+    message = "Shutdown "
+    centered_text(draw, 10, message, largefont, fill="white")
+    message = "in " + str(countdown) + " seonds!"
+    centered_text(draw, 30, message, largefont, fill="white")
+    message = "Press any button"
+    centered_text(draw, 60, message, smallfont, fill="white")
+    message = "to cancel ..."
+    centered_text(draw, 80, message, smallfont, fill="white")

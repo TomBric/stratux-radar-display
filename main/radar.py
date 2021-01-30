@@ -43,12 +43,8 @@ import time
 import radarbluez
 import radarui
 import timerui
+import shutdownui
 import importlib
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)-15s > %(message)s'
-)
 
 # constant definitions
 RETRY_TIMEOUT = 1
@@ -56,7 +52,7 @@ LOST_CONNECTION_TIMEOUT = 1.0
 RADAR_CUTOFF = 29
 ARCPOSITION_EXCLUDE_FROM = 130
 ARCPOSITION_EXCLUDE_TO = 230
-UI_REACTION_TIME = 0.2
+UI_REACTION_TIME = 0.1
 BLUEZ_CHECK_TIME = 3.0
 SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 
@@ -77,19 +73,16 @@ zerox = 0
 zeroy = 0
 last_arcposition = 0
 display_refresh_time = 0
-quit_display_task = False
 display_control = None
 speak = False  # BT is generally enabled
 bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
-global_mode = 1   # 1=Radar 2=Timer 0=Init
+global_mode = 1   # 1=Radar 2=Timer 3=Shutdown 0=Init
 LAST_MODE = 3    # to be never reached
 
 
 def draw_all_ac(draw, allac):
-    # print("List aircraft" + json.dumps(allac))
     dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
-    # print("dist_sorted" + json.dumps(dist_sorted))
     for icao, ac in dist_sorted:
         # first draw mode-s
         if 'circradius' in ac:
@@ -334,75 +327,82 @@ async def user_interface():
     global global_mode
 
     last_bt_checktime = 0.0
+    next_mode = 1
 
-    while True:
-        if quit_display_task:
-            logging.debug("User interface task terminating ...")
-            return
-        await asyncio.sleep(UI_REACTION_TIME)
-        next_mode = False
-        if global_mode == 1:  # Radar mode
-            next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
-            if toggle_sound:
-                sound_on = not sound_on
+    try:
+        while True:
+            await asyncio.sleep(UI_REACTION_TIME)
+            if global_mode == 1:  # Radar mode
+                next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
+                if toggle_sound:
+                    sound_on = not sound_on
+                    ui_changed = True
+            elif global_mode == 2:  # Timer mode
+                next_mode = timerui.user_input()
+            elif global_mode == 3:  # shutdown mode
+                next_mode = shutdownui.user_input()
+            elif global_mode == 4:  # refresh mode
+                next_mode = 0   # wait for display to change next mode
+                await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
+
+            if next_mode > 0:
                 ui_changed = True
-        elif global_mode == 2:  # Timer mode
-            next_mode = timerui.user_input()
+                global_mode = next_mode
 
-        if next_mode:
-            ui_changed = True
-            global_mode = global_mode + 1
-            if global_mode == LAST_MODE:
-                global_mode = 1
-
-        current_time = time.time()
-        if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
-            last_bt_checktime = current_time
-            new_devices, devnames = radarbluez.connected_devices()
-            logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
-            if new_devices != bt_devices:
-                if new_devices > bt_devices:  # new or additional device
-                    radarbluez.speak("Radar connected")
-                bt_devices = new_devices
-                ui_changed = True
+            current_time = time.time()
+            if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
+                last_bt_checktime = current_time
+                new_devices, devnames = radarbluez.connected_devices()
+                logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
+                if new_devices != bt_devices:
+                    if new_devices > bt_devices:  # new or additional device
+                        radarbluez.speak("Radar connected")
+                    bt_devices = new_devices
+                    ui_changed = True
+    except asyncio.CancelledError:
+        print("UI task terminating ...")
+        logging.debug("Display task terminating ...")
 
 
 async def display_and_cutoff():
     global aircraft_changed
     global global_mode
+    global display_control
 
-    while True:
-        if quit_display_task:
-            logging.debug("Display task terminating ...")
-            return
+    try:
+        while True:
+            if display_control.is_busy():
+                await asyncio.sleep(display_refresh_time / 3)
+                # try it several times to be as fast as possible
+            else:
+                if global_mode == 1:   # Radar
+                    draw_display(draw)
+                elif global_mode == 2:   # Timer'
+                    timerui.draw_timer(draw, display_control, display_refresh_time)
+                elif global_mode == 3:   # shutdown
+                    final_shutdown = shutdownui.draw_shutdown(draw, display_control)
+                    if final_shutdown:
+                        logging.debug("Shutdown triggered: Display task terminating ...")
+                        return
+                elif global_mode == 4:   # refresh display, only relevant for epaper
+                    print("Radar: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 1
+                await asyncio.sleep(0.2)
 
-        if display_control.is_busy():
-            await asyncio.sleep(display_refresh_time / 3)
-            # try it several times to be as fast as possible
-        else:
-            if global_mode == 1:   # Radar
-                draw_display(draw)
-                # wait 300 ms in any case to make sure driver is ready for busy flag
-                await asyncio.sleep(0.3)
-            elif global_mode == 2:   # Timer'
-                now = time.time()
-                timerui.draw_timer(draw, display_control)
-                already_used = time.time() - now
-                await asyncio.sleep(math.ceil(display_refresh_time - already_used))
-                # wait in full seconds that the display is capable of
-            else:  # wait 300 ms in any case to make sure driver is ready for busy flag
-                await asyncio.sleep(0.3)
-
-        logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
-        to_delete = []
-        cutoff = time.time() - RADAR_CUTOFF
-        for icao, ac in all_ac.items():
-            if ac['last_contact_timestamp'] < cutoff:
-                logging.debug("Cutting of " + str(icao))
-                to_delete.append(icao)
-                aircraft_changed = True
-        for i in to_delete:
-            del all_ac[i]
+            logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
+            to_delete = []
+            cutoff = time.time() - RADAR_CUTOFF
+            for icao, ac in all_ac.items():
+                if ac['last_contact_timestamp'] < cutoff:
+                    logging.debug("Cutting of " + str(icao))
+                    to_delete.append(icao)
+                    aircraft_changed = True
+            for i in to_delete:
+                del all_ac[i]
+    except asyncio.CancelledError:
+        print("Display task terminating ...")
+        logging.debug("Display task terminating ...")
 
 
 async def courotines():
@@ -430,15 +430,13 @@ def main():
 
 
 def quit_gracefully(*args):
-    global quit_display_task
-
     print("Keyboard interrupt. Quitting ...")
-    quit_display_task = True
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
     print("CleanUp Display ...")
     display_control.cleanup()
+    return 0
 
 
 if __name__ == "__main__":
@@ -446,10 +444,19 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Stratux web radar for separate displays')
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
+    ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
+    ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     args = vars(ap.parse_args())
+    if args['verbose']:
+        logging.basicConfig(level=logging.DEBUG,format='%(asctime)-15s > %(message)s')
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
+    url_host_base = args['connect']
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     speak = args['speak']
+    if args['timer']:
+        global_mode = 2   # start_in_timer_mode
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"

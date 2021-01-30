@@ -132,19 +132,29 @@ def init():
     start = time.time()
     # do sync version of display to measure time
     device.display_1Gray(device.getbuffer(epaper_image))
-    device.display_1Gray(device.getbuffer(epaper_image))
     end = time.time()
-    display_refresh = (end-start) / 2
+    display_refresh = end-start
     logging.info("Measured Display Refresh Time: " + str(display_refresh) + " seconds")
     return draw, max_pixel, zerox, zeroy, display_refresh
 
 
 def cleanup():
+    global device
+
     device.init(0)
     device.Clear(0xFF, 0)
     device.sleep()
     device.Dev_exit()
     logging.debug("Epaper cleaned up.")
+
+
+def refresh():
+    global device
+    global epaper_image
+
+    print("Refreshing display ...")
+    device.display_1Gray_FULL(device.getbuffer(epaper_image))
+    print("Done.")
 
 
 def clear(draw):
@@ -255,3 +265,14 @@ def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, 
     textsize = draw.textsize(right_text, smallfont)
     draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_text, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
+
+
+def shutdown(draw, countdown):
+    message = "Shutdown "
+    centered_text(draw, 10, message, largefont, fill="black")
+    message = "in " + str(countdown) + " seonds!"
+    centered_text(draw, 40, message, largefont, fill="black")
+    message = "Press any button"
+    centered_text(draw, 110, message, smallfont, fill="black")
+    message = "to cancel ..."
+    centered_text(draw, 130, message, smallfont, fill="black")

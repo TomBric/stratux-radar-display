@@ -6,7 +6,6 @@
 #enable usermod
 # sudo usermod -a -G spi,gpio,i2c pi
 
-
 #luma files and more
 sudo apt-get update -y
 sudo apt-get upgrade -y

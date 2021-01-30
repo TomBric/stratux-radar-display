@@ -42,48 +42,72 @@ MIDDLE = 20
 RIGHT = 21
 
 # status
+time_left = 0.0
 time_middle = 0.0
+time_right = 0.0
+status_left = False
 status_middle = False
+status_right = False
+
+io_status = {LEFT: {'virtualno': 0, 'status': False, 'starttime': 0.0, 'already_triggered': False},
+             MIDDLE: {'virtualno': 1, 'status': False, 'starttime': 0.0, 'already_triggered': False},
+             RIGHT: {'virtualno': 2, 'status': False, 'starttime': 0.0, 'already_triggered': False}}
 
 
 def init():
+    global io_status
+
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    GPIO.setup(LEFT, GPIO.IN, GPIO.PUD_UP)  # left
-    GPIO.setup(MIDDLE, GPIO.IN, GPIO.PUD_UP)  # middle
-    GPIO.setup(RIGHT, GPIO.IN, GPIO.PUD_UP)  # right
 
-    GPIO.add_event_detect(LEFT, GPIO.FALLING, bouncetime=300)  # toggle
-    GPIO.add_event_detect(RIGHT, GPIO.FALLING, bouncetime=300)  # toggle
+    for iopin in io_status:
+        GPIO.setup(iopin, GPIO.IN, GPIO.PUD_UP)
+        GPIO.add_event_detect(iopin, GPIO.FALLING, bouncetime=300)
 
     logging.debug("Radarbuttons: Initialized.")
 
 
-def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
-    global time_middle
-    global status_middle
+def check_one_button(button):
+    global io_status
 
-    if GPIO.event_detected(LEFT):
-        logging.debug("UI: Button press short left")
-        return 1, 0   # short + left
-    elif GPIO.event_detected(RIGHT):
-        logging.debug("UI: Button press short right")
-        return 1, 2   # short + right
-    if GPIO.input(MIDDLE) == GPIO.LOW:
-        if not status_middle:  # now it is pressed
-            time_middle = time.time()
-            status_middle = True
+    if GPIO.event_detected(button):   # triggers on pull down
+        if GPIO.input(button) != GPIO.LOW:  # not pressed anymore
+            io_status[button]['status'] = False
+            if not io_status[button]['already_triggered']:
+                return 1  # short press
+            else:
+                io_status[button]['already_triggered'] = False
+                return 0  # unfortunately falling edge is triggered again if a long press is finished
+        else:   # event detected and still pressed
+            io_status[button]['starttime'] = time.time()
+            io_status[button]['status'] = True
+            return 0
+    if GPIO.input(button) == GPIO.LOW:
+        # pressed, but was already pressed, since no event was detected
+        if time.time() - io_status[button]['starttime'] >= HOLD_TIME:  # pressed for a long time
+            if not io_status[button]['already_triggered']:  # long hold was not triggered yet
+                io_status[button]['already_triggered'] = True
+                io_status[button]['status'] = False
+                return 2  # long
+            else:  # long press but already triggered
+                return 0
         else:
-            if time.time() - time_middle > HOLD_TIME:  # pressed for a long time
-                status_middle = False  # reset
-                logging.debug("UI: Button press long middle")
-                return 2, 1   # long + middle
-    else:
-        if status_middle:  # it was only a short press
-            status_middle = False
-            logging.debug("UI: Button press short middle")
-            return 1, 1
-        status_middle = False
+            return 0  # press time shorter, but not yet released, nothing to do
+    else:  # no more pressed
+        io_status[button]['already_triggered'] = False
+        if io_status[button]['status']:    # but was pressed before and did not trigger long press
+            io_status[button]['status'] = False
+            return 1  # short press
+    return 0   # no event, nothing pressed anymore
+
+
+def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
+    global io_status
+
+    for button in io_status:
+        stat = check_one_button(button)
+        if stat > 0:
+            logging.debug("Button press: button ", button, " presstime ",
+                          io_status[button]['virtualno'], "(1=short, 2=long)")
+            return stat, io_status[button]['virtualno']
     return 0, 0
-
-
