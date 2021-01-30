@@ -116,6 +116,8 @@ def user_input():
         if button == 1 and btime == 1:   # middle and short
             timer_mode = 1
             laptime = 0
+            if cdown_time <= math.floor(time.time()):    # Countdown was finished
+                cdown_time = 0.0
         if button == 2 and btime == 1:   # short right
             if timer_running:   # timer already running
                 stoptime = math.floor(time.time()) - stoptime
