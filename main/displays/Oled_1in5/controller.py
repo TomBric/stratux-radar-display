@@ -242,7 +242,7 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
         color = "orangered"
     centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill=color)
     draw.text((0, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="cyan")
-    if laptime_head == "Laptime":
+    if laptime_head == "Laptimer":
         centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="powderblue")
     else:
         centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="magenta")
