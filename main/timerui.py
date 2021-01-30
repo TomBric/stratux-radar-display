@@ -145,8 +145,8 @@ def user_input():
     elif timer_mode == 1:   # countdown set mode
         if button == 1 and btime == 1:   # middle and short
             timer_mode = 0
+            laptime = 0.0  # cdown-time is set, forget old laptime
         elif button == 0 and btime == 1:  # left short
-            laptime = 0.0   # cdown-time is set, forget old laptime
             cdown_time = cdown_time + 600  # ten more minutes
             if timer_running:
                 if cdown_time >= math.floor(time.time()) + MAX_COUNTDOWN_TIME:
@@ -155,7 +155,6 @@ def user_input():
                 if cdown_time >= MAX_COUNTDOWN_TIME:
                     cdown_time = 0
         elif button == 2 and btime == 1:  # right short
-            laptime = 0.0  # cdown-time is set, forget old laptime
             cdown_time = cdown_time + 60
             if timer_running:
                 if cdown_time >= math.floor(time.time()) + MAX_COUNTDOWN_TIME:
