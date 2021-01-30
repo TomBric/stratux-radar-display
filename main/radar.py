@@ -46,11 +46,6 @@ import timerui
 import shutdownui
 import importlib
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)-15s > %(message)s'
-)
-
 # constant definitions
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 1.0
@@ -453,13 +448,14 @@ if __name__ == "__main__":
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     args = vars(ap.parse_args())
-    print(args)
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     speak = args['speak']
     if args['timer']:
         global_mode = 2   # start_in_timer_mode
     if args['verbose']:
         logging.basicConfig(level=logging.DEBUG,format='%(asctime)-15s > %(message)s')
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
