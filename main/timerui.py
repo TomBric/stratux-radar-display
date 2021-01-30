@@ -142,8 +142,9 @@ def user_input():
                     stoptime = 0
                     laptime = 0
                     cdown_time = 0.0
-        # set display
     elif timer_mode == 1:   # countdown set mode
+        if timer_running and cdown_time == 0.0
+            cdown_time = math.floor(time.time())
         if button == 1 and btime == 1:   # middle and short
             timer_mode = 0
         elif button == 0 and btime == 1:  # left short
