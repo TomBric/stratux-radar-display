@@ -147,18 +147,27 @@ def user_input():
         if button == 1 and btime == 1:   # middle and short
             timer_mode = 0
         elif button == 0 and btime == 1:  # left short
-            cdown_time = cdown_time + 600   # ten more minutes
-            if cdown_time >= MAX_COUNTDOWN_TIME:
-                cdown_time = 0
+            cdown_time = cdown_time + 600  # ten more minutes
+            if timer_running:
+                if cdown_time >= math.floor(time.time()) + MAX_COUNTDOWN_TIME:
+                    cdown_time = 0
+            else:
+                if cdown_time >= MAX_COUNTDOWN_TIME:
+                    cdown_time = 0
         elif button == 2 and btime == 1:  # right short
             cdown_time = cdown_time + 60
-            if cdown_time >= MAX_COUNTDOWN_TIME:
-                cdown_time = 0
+            if timer_running:
+                if cdown_time >= math.floor(time.time()) + MAX_COUNTDOWN_TIME:
+                    cdown_time = 0.0
+            else:
+                if cdown_time >= MAX_COUNTDOWN_TIME:
+                    cdown_time = 0.0
 
     # prepare display for next round
     if timer_mode == 1:  # next will be countdown-set
         lap_head = "Set Countdown"
         right_text = "+1m"
+        middle_text = "Back"
         left_text = "+10m"
     else:  # next will be normal mode
         if cdown_time > 0:
@@ -168,13 +177,16 @@ def user_input():
             lap_head = "Laptimer"
         if timer_running:
             right_text = "Stop"
+            middle_text = "Mode"
             left_text = "Lap"
         else:
             if stoptime == 0.0:
                 right_text = "Start"
+                middle_text = "Mode"
                 left_text = ""
             else:
                 right_text = "Cont"
+                middle_text = "Mode"
                 left_text = "Reset"
     timer_ui_changed = True
     return 2   # no mode change
