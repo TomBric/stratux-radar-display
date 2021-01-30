@@ -451,14 +451,14 @@ if __name__ == "__main__":
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
     ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
-    ap.add_argument("-v", "--verbose", help="Debug output on", action="store_true")
+    ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     args = vars(ap.parse_args())
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     speak = args['speak']
     if args['timer']:
         global_mode = 2   # start_in_timer_mode
     if args['verbose']:
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.INFO,format='%(asctime)-15s > %(message)s')
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
