@@ -114,6 +114,7 @@ def user_input():
     # situation dependent behavior
     if timer_mode == 0:   # normal timer mode
         if button == 1 and btime == 1:   # middle and short
+            laptime = 0.0  # cdown-time is set, forget old laptime
             timer_mode = 1
             if timer_running and cdown_time <= math.floor(time.time()):    # Countdown was finished
                 cdown_time = 0.0
@@ -145,7 +146,6 @@ def user_input():
     elif timer_mode == 1:   # countdown set mode
         if button == 1 and btime == 1:   # middle and short
             timer_mode = 0
-            laptime = 0.0  # cdown-time is set, forget old laptime
         elif button == 0 and btime == 1:  # left short
             cdown_time = cdown_time + 600  # ten more minutes
             if timer_running:
