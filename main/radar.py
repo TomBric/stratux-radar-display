@@ -458,7 +458,7 @@ if __name__ == "__main__":
     if args['timer']:
         global_mode = 2   # start_in_timer_mode
     if args['verbose']:
-        logging.basicConfig(level=logging.INFO,format='%(asctime)-15s > %(message)s')
+        logging.basicConfig(level=logging.DEBUG,format='%(asctime)-15s > %(message)s')
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
