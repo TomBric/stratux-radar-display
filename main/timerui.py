@@ -69,7 +69,7 @@ def draw_timer(draw, display_control, refresh_time):
         if laptime != 0:
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs-laptime))
         else:
-            if cdown_time == 0.0:
+            if cdown_time <= 0.0:
                 laptimestr = "--:--:--"
             else:
                 laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time - now_in_secs))
@@ -134,25 +134,12 @@ def user_input():
             else:
                 if timer_running:
                     laptime = math.floor(time.time())
+                    cdown_time = 0.0     # now lap mode
                 else:
                     stoptime = 0
                     laptime = 0
+                    cdown_time = 0.0
         # set display
-        if timer_mode == 1:  # next will be countdown-set
-            lap_head = "Set Countdown"
-            right_text = "+1m"
-            left_text = "+10m"
-        else:       # next will be normal mode
-            if timer_running:
-                right_text = "Stop"
-                left_text = "Lap"
-            else:
-                if stoptime == 0.0:
-                    right_text = "Start"
-                    left_text = ""
-                else:
-                    right_text = "Cont"
-                    left_text = "Reset"
     elif timer_mode == 1:   # countdown set mode
         if button == 1 and btime == 1:   # middle and short
             if cdown_time > 0:

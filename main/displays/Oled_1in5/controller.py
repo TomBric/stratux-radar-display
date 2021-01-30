@@ -235,16 +235,17 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs):
     draw.text((0, 0), "UTC", font=smallfont, fill="cyan")
     centered_text(draw, SMALL, utctime, verylargefont, fill="yellow")
-    if stoptime is not None:
-        draw.text((0, SMALL+VERYLARGE), "Timer", font=smallfont, fill="cyan")
-        if timer_runs:
-            color = "lavender"
-        else:
-            color = "orangered"
-        centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill=color)
-        if laptime is not None:
-            draw.text((0, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="cyan")
-            centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="powderblue")
+    draw.text((0, SMALL+VERYLARGE), "Timer", font=smallfont, fill="cyan")
+    if timer_runs:
+        color = "lavender"
+    else:
+        color = "orangered"
+    centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill=color)
+    draw.text((0, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="cyan")
+    if laptime_head == "Laptime":
+        centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="powderblue")
+    else:
+        centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="magenta")
 
     draw.text((0, sizey - SMALL-3), left_text, font=smallfont, fill="green")
     textsize = draw.textsize(right_text, smallfont)
