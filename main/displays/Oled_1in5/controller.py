@@ -318,9 +318,9 @@ def ahrs(draw, pitch, roll, heading, slipskid):
 
     print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     # first do the translation on pitch
-    ahrs_image.rotate(0, translate=(0, round(-pitch * 16 / 10)))
+    temp_image = ahrs_image.rotate(0, translate=(0, round(-pitch * 16 / 10)))
     # rotate in roll rate
-    ahrs_image.rotate(roll)
+    temp_image = temp_image.rotate(roll)
     # crop middle part of ahrs image to display
     zero = device.width*3
-    image = ahrs_image.crop((zero-device.width/2, zero-device.width/2, zero+device.height/2, zero+device.height/2))
+    image = temp_image.crop((zero-device.width/2, zero-device.width/2, zero+device.height/2, zero+device.height/2))
