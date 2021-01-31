@@ -277,3 +277,11 @@ def shutdown(draw, countdown):
     centered_text(draw, 110, message, smallfont, fill="black")
     message = "to cancel ..."
     centered_text(draw, 130, message, smallfont, fill="black")
+
+
+def init_ahrs():
+    pass
+
+
+def ahrs(draw, pitch, roll, heading, slipskid):
+    pass

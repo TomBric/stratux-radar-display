@@ -44,6 +44,7 @@ SMALL = 12      # size of information indications on top and bottom
 VERYSMALL = 10   # used for "nm" and "ft"
 AIRCRAFT_SIZE = 3        # size of aircraft arrow
 MINIMAL_CIRCLE = 10     # minimal size of mode-s circle
+PITCH_SCALE = 0.5
 # end definitions
 
 # device properties
@@ -58,6 +59,8 @@ verysmallfont = ""
 webfont = ""
 device = None
 image = None
+ahrs_image = None
+ahrs_draw = None
 # end device globals
 
 
@@ -263,3 +266,60 @@ def shutdown(draw, countdown):
     centered_text(draw, 60, message, smallfont, fill="white")
     message = "to cancel ..."
     centered_text(draw, 80, message, smallfont, fill="white")
+
+
+def init_ahrs():
+    global ahrs_image
+    global ahrs_draw
+
+    ahrs_image = Image.new(device.mode, device.size * 6)
+    ahrs_draw = ImageDraw.Draw(ahrs_image)
+    zero = device.size*3
+    maxpix = device.size*6
+
+    ahrs_draw.rectangle((0, 0, maxpix, maxpix), outline="none", fill="blue")   # sky
+    ahrs_draw.rectangle((0, zero, maxpix, maxpix), outline="none", fill="brown")  # earth
+    ahrs_draw.line((0, zero, maxpix, zero), width=1, fill="white")  # horizon
+    # pitch marks up
+    i = 0
+    while i < maxpix/2:
+        i = i + 8
+        if i % 16 == 0:
+            ahrs_draw.line((zero-8, zero-i, zero+8, zero-i), width=1, fill="white")
+            if i != 0:
+                if i/8 <= 90:
+                    marktext = str(i/16*10)
+                else:
+                    marktext = "80"
+                ahrs_draw.text((zero-30, zero-i), marktext, font=verysmallfont, fill="white", align="right")
+                ahrs_draw.text((zero+10, zero-i), marktext, font=verysmallfont, fill="white", align="left")
+        else:
+            ahrs_draw.line((zero-3, zero-i, zero+3, zero-i), width=1, fill="white")
+    # pitch marks down
+    i = 0
+    while i < maxpix / 2:
+        i = i + 8
+        if i % 16 == 0:
+            ahrs_draw.line((zero-8, zero+i, zero+8, zero+i), width=1, fill="white")
+            if i != 0:
+                if i / 8 <= 90:
+                    marktext = str(i / 16 * 10)
+                else:
+                    marktext = "80"
+                ahrs_draw.text((zero-30, zero+i), marktext, font=verysmallfont, fill="white", align="right")
+                ahrs_draw.text((zero+10, zero+i), marktext, font=verysmallfont, fill="white", align="left")
+        else:
+            ahrs_draw.line((zero-3, zero+i, zero+3, zero+i), width=1, fill="white")
+
+
+def draw_ahrs(draw, pitch, roll, heading, slipskid):
+    global image
+    global ahrs_image
+
+    # first do the translation on pitch
+    ahrs_image.rotate(0, translate=(0, round(-pitch * 16 / 10)))
+    # rotate in roll rate
+    ahrs_image.rotate(roll)
+    # crop middle part of ahrs image to display
+    zero = device*3
+    image = ahrs_image.crop((zero-device.size/2, zero-device.size/2, zero+device.size/2, zero+device.size/2))

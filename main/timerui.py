@@ -107,7 +107,7 @@ def user_input():
         return 2  # stay in timer mode
     timer_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
-        return 1  # next mode to be radar
+        return 5  # next mode to be ahrs
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
 

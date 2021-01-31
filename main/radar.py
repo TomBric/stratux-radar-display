@@ -44,6 +44,7 @@ import radarbluez
 import radarui
 import timerui
 import shutdownui
+import ahrsui
 import importlib
 
 # constant definitions
@@ -70,6 +71,9 @@ aircraft_changed = True
 ui_changed = True
 situation = {'was_changed': True, 'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
              'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000}
+ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0}
+# ahrs information, values are all rounded to integer
+
 max_pixel = 0
 zerox = 0
 zeroy = 0
@@ -79,7 +83,7 @@ display_control = None
 speak = False  # BT is generally enabled
 bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
-global_mode = 1   # 1=Radar 2=Timer 3=Shutdown 0=Init
+global_mode = 1   # 1=Radar 2=Timer 3=Shutdown 4=refresh 5=ahrs 0=Init
 LAST_MODE = 3    # to be never reached
 
 
@@ -267,6 +271,8 @@ def new_traffic(json_str):
 
 def new_situation(json_str):
     global situation
+    global ahrs
+
     logging.debug("New Situation" + json_str)
     sit = json.loads(json_str)
     if not situation['connected']:
@@ -288,6 +294,18 @@ def new_situation(json_str):
     if situation['longitude'] != sit['GPSLongitude']:
         situation['longitude'] = sit['GPSLongitude']
         situation['was_changed'] = True
+    if ahrs['pitch'] != round(sit['AHRSPitch']):
+        ahrs['pitch'] = round(sit['AHRSPitch'])
+        ahrs['was_changed'] = True
+    if ahrs['roll'] != round(sit['AHRSRoll']):
+        ahrs['roll'] = round(sit['AHRSRoll'])
+        ahrs['was_changed'] = True
+    if ahrs['heading'] != round(sit['AHRSGyroHeading']):
+        ahrs['heading'] = round(sit['AHRSGyroHeading'])
+        ahrs['was_changed'] = True
+    if ahrs['slipskid'] != round(sit['AHRSSlipSkid']):
+        ahrs['heading'] = round(sit['AHRSSlipskid'])
+        ahrs['was_changed'] = True
 
 
 async def listen_forever(path, name, callback):
@@ -346,6 +364,8 @@ async def user_interface():
             elif global_mode == 4:  # refresh mode
                 next_mode = 0   # wait for display to change next mode
                 await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
+            elif global_mode == 5:  # ahrs
+                next_mode = ahrsui.user_input()
 
             if next_mode > 0:
                 ui_changed = True
@@ -390,7 +410,10 @@ async def display_and_cutoff():
                     print("Radar: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 1
-                await asyncio.sleep(0.2)
+                elif global_mode == 5:   # ahrs'
+                    ahrsui.draw_ahrs(draw, display_control, ahrs['was_changed'], ahrs['pitch'], ahrs['roll'],
+                                     ahrs['heading'], ahrs['slipskid'])
+                await asyncio.sleep(0.1)
 
             logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
             to_delete = []
@@ -424,6 +447,7 @@ def main():
     if speak:
         radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
+    ahrsui.init(display_control)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())
