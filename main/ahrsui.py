@@ -64,5 +64,4 @@ def user_input():
         return 1  # next mode to be radar
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
-
     return 5  # no mode change
