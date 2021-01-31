@@ -107,7 +107,7 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
     for button in io_status:
         stat = check_one_button(button)
         if stat > 0:
-            logging.debug("Button press: button " + str(button) + " presstime " +
-                          str(io_status[button]['virtualno']) + " (1=short, 2=long)")
+            logging.debug("Button press: button " + str(io_status[button]['virtualno'])
+                          + " presstime " + str(stat) + " (1=short, 2=long)")
             return stat, io_status[button]['virtualno']
     return 0, 0
