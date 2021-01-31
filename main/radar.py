@@ -116,6 +116,7 @@ def draw_display(draw):
     logging.debug("List of all aircraft > " + json.dumps(all_ac))
     if situation['was_changed'] or aircraft_changed or ui_changed:
         # display is only triggered if there was a change
+        print("Draw display: draw radar")
         display_control.clear(draw)
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
