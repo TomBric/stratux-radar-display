@@ -277,8 +277,8 @@ def init_ahrs():
     ahrs_image = Image.new(device.mode, (maxpix, maxpix))
     ahrs_draw = ImageDraw.Draw(ahrs_image)
 
-    ahrs_draw.rectangle((0, 0, maxpix, maxpix), outline="none", fill="blue")   # sky
-    ahrs_draw.rectangle((0, zero, maxpix, maxpix), outline="none", fill="brown")  # earth
+    ahrs_draw.rectangle((0, 0, maxpix, maxpix), fill="blue")   # sky
+    ahrs_draw.rectangle((0, zero, maxpix, maxpix), fill="brown")  # earth
     ahrs_draw.line((0, zero, maxpix, zero), width=1, fill="white")  # horizon
     # pitch marks up
     i = 0
