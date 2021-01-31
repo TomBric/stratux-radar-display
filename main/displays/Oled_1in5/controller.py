@@ -322,5 +322,5 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     # rotate in roll rate
     ahrs_image.rotate(roll)
     # crop middle part of ahrs image to display
-    zero = device*3
+    zero = device.width*3
     image = ahrs_image.crop((zero-device.width/2, zero-device.width/2, zero+device.height/2, zero+device.height/2))
