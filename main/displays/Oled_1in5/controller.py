@@ -312,10 +312,11 @@ def init_ahrs():
             ahrs_draw.line((zero-3, zero+i, zero+3, zero+i), width=1, fill="white")
 
 
-def draw_ahrs(draw, pitch, roll, heading, slipskid):
+def ahrs(draw, pitch, roll, heading, slipskid):
     global image
     global ahrs_image
 
+    print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     # first do the translation on pitch
     ahrs_image.rotate(0, translate=(0, round(-pitch * 16 / 10)))
     # rotate in roll rate
