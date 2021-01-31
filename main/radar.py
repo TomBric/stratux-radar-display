@@ -471,6 +471,7 @@ if __name__ == "__main__":
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
     ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
+    ap.add_argument("-a", "--ahrs", required=False, help="Start mode is ahrs", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     args = vars(ap.parse_args())
@@ -483,6 +484,8 @@ if __name__ == "__main__":
     speak = args['speak']
     if args['timer']:
         global_mode = 2   # start_in_timer_mode
+    if args['ahrs']:
+        global_mode = 5   # start_in_ahrs mode
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
