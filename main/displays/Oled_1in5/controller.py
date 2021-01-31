@@ -135,12 +135,13 @@ def refresh():
     pass   # nothing to do for Oled, does not need a refresh function
 
 
-def startup(draw, target_ip, seconds):
+def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
     logo = Image.open(logopath)
     draw.rectangle(((0, 0), (sizex, 64)), fill="blue")
     draw.bitmap((zerox-32, 0), logo, fill="white")
-    centered_text(draw, 64, "Oled-Radar", largefont, fill="white")
+    versionstr = "Oled-Radar " + version
+    centered_text(draw, 64, versionstr, largefont, fill="white")
     centered_text(draw, 64 + LARGE, "Version 1.0b", smallfont, fill="white")
     centered_text(draw, sizey - 2 * SMALL, "Connecting to", smallfont, fill="white")
     centered_text(draw, sizey - SMALL, target_ip, smallfont, fill="white")

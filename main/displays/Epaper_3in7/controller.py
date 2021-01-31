@@ -166,11 +166,12 @@ def centered_text(draw, y, text, font, fill):
     draw.text((zerox - ts[0] / 2, y), text, font=font, fill=fill)
 
 
-def startup(draw, target_ip, seconds):
+def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
     logo = Image.open(logopath)
     draw.bitmap((zerox-192/2, 0), logo, fill="black")
-    centered_text(draw, 193, "EPaper-Radar 1.0b", largefont, fill="black")
+    versionstr = "Epaper-Radar " + version
+    centered_text(draw, 193, versionstr, largefont, fill="black")
     centered_text(draw, sizey - VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
     display()
     time.sleep(seconds)

@@ -47,6 +47,8 @@ import shutdownui
 import importlib
 
 # constant definitions
+RADAR_VERSION = "1.0c"
+
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 1.0
 RADAR_CUTOFF = 29
@@ -422,7 +424,7 @@ def main():
     if speak:
         radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
-    display_control.startup(draw, url_host_base, 4)
+    display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())
     except asyncio.CancelledError:
@@ -449,7 +451,7 @@ if __name__ == "__main__":
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     args = vars(ap.parse_args())
     if args['verbose']:
-        logging.basicConfig(level=logging.DEBUG,format='%(asctime)-15s > %(message)s')
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)-15s > %(message)s')
     else:
         logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     url_host_base = args['connect']
