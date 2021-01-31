@@ -123,6 +123,8 @@ def user_input():
                 stoptime = math.floor(time.time()) - stoptime
                 if cdown_time >= math.floor(time.time()):
                     cdown_time = cdown_time - math.floor(time.time())
+                else:
+                    cdown_time = 0.0
                 laptime = 0    # also stop lap time
                 timer_running = False
             else:
