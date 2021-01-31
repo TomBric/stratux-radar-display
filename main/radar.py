@@ -401,6 +401,7 @@ async def display_and_cutoff():
                 await asyncio.sleep(display_refresh_time / 3)
                 # try it several times to be as fast as possible
             else:
+                print("Display driver: Global mode ", global_mode)
                 if global_mode == 1:   # Radar
                     draw_display(draw)
                 elif global_mode == 2:   # Timer'
