@@ -272,10 +272,10 @@ def init_ahrs():
     global ahrs_image
     global ahrs_draw
 
-    ahrs_image = Image.new(device.mode, device.size * 6)
+    maxpix = device.width * 6
+    zero = device.width * 3
+    ahrs_image = Image.new(device.mode, (maxpix, maxpix))
     ahrs_draw = ImageDraw.Draw(ahrs_image)
-    zero = device.size*3
-    maxpix = device.size*6
 
     ahrs_draw.rectangle((0, 0, maxpix, maxpix), outline="none", fill="blue")   # sky
     ahrs_draw.rectangle((0, zero, maxpix, maxpix), outline="none", fill="brown")  # earth
@@ -322,4 +322,4 @@ def draw_ahrs(draw, pitch, roll, heading, slipskid):
     ahrs_image.rotate(roll)
     # crop middle part of ahrs image to display
     zero = device*3
-    image = ahrs_image.crop((zero-device.size/2, zero-device.size/2, zero+device.size/2, zero+device.size/2))
+    image = ahrs_image.crop((zero-device.width/2, zero-device.width/2, zero+device.height/2, zero+device.height/2))
