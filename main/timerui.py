@@ -104,7 +104,7 @@ def user_input():
     btime, button = radarbuttons.check_buttons()
     # start of timer global behaviour
     if btime == 0:
-        return 2  # stay in timer mode
+        return 0  # stay in timer mode
     timer_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
         return 5  # next mode to be ahrs
@@ -192,4 +192,4 @@ def user_input():
                 middle_text = "Mode"
                 left_text = "Reset"
     timer_ui_changed = True
-    return 2   # no mode change
+    return 2   # no mode change, but refresh display
