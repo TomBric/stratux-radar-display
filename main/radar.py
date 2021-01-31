@@ -413,7 +413,7 @@ async def display_and_cutoff():
                 elif global_mode == 5:   # ahrs'
                     ahrsui.draw_ahrs(draw, display_control, ahrs['was_changed'], ahrs['pitch'], ahrs['roll'],
                                      ahrs['heading'], ahrs['slipskid'])
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.2)
 
             logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
             to_delete = []
