@@ -316,7 +316,7 @@ async def listen_forever(path, name, callback):
         # outer loop restarted every time the connection fails
         logging.debug(name + " active ...")
         try:
-            async with websockets.connect(path, ping_timeout=40) as ws:
+            async with websockets.connect(path, ping_timeout=None) as ws:
                 logging.debug(name + " connected on " + path)
                 while True:
                     # listener loop
