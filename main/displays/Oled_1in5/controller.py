@@ -328,7 +328,7 @@ def ahrs(draw, pitch, roll, heading, slipskid):
 
     # draw.polygon((0, 0, 0, zeroy-pitch * 2, device.width, zeroy-pitch * 2, device.width, 0), fill="blue")
     # draw.polygon((0, device.height, 0, zeroy - pitch * 2, device.width, zeroy - pitch * 2,
-                  device.width, device.height), fill="brown")
+    #              device.width, device.height), fill="brown")
     draw.line((x1, y1, x2, y2), fill="white", width=2)
 
 
