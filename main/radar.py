@@ -356,7 +356,6 @@ async def user_interface():
         while True:
             await asyncio.sleep(UI_REACTION_TIME)
             if global_mode == 1:  # Radar mode
-                print("Radar-UI active")
                 next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
                 if toggle_sound:
                     sound_on = not sound_on
@@ -375,7 +374,6 @@ async def user_interface():
                 ui_changed = True
                 global_mode = next_mode
 
-            print("Global mode. ", global_mode)
             current_time = time.time()
             if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
                 last_bt_checktime = current_time
@@ -402,7 +400,6 @@ async def display_and_cutoff():
                 await asyncio.sleep(display_refresh_time / 3)
                 # try it several times to be as fast as possible
             else:
-                print("Display driver: Global mode ", global_mode)
                 if global_mode == 1:   # Radar
                     draw_display(draw)
                 elif global_mode == 2:   # Timer'
