@@ -269,6 +269,7 @@ def shutdown(draw, countdown):
 
 
 def init_ahrs():
+    '''
     global ahrs_image
     global ahrs_draw
 
@@ -310,7 +311,7 @@ def init_ahrs():
                 ahrs_draw.text((zero+10, zero+i), marktext, font=verysmallfont, fill="white", align="left")
         else:
             ahrs_draw.line((zero-3, zero+i, zero+3, zero+i), width=1, fill="white")
-
+    '''
 
 def ahrs(draw, pitch, roll, heading, slipskid):
     global image
@@ -318,10 +319,17 @@ def ahrs(draw, pitch, roll, heading, slipskid):
 
     print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     # first do the translation on pitch
-    draw.polygon((0, 0, 0, zeroy-pitch * 2, device.width, zeroy-pitch * 2, device.width, 0), fill="blue")
-    draw.polygon((0, device.height, 0, zeroy - pitch * 2, device.width, zeroy - pitch * 2,
+    y_line = zeroy-pitch * 2
+    h = math.tan(math.radians(pitch)) * device.width / 2
+    x2 = device.width-1
+    y2 = y_line - h
+    x1 = 0
+    y1 = y_line + h
+
+    # draw.polygon((0, 0, 0, zeroy-pitch * 2, device.width, zeroy-pitch * 2, device.width, 0), fill="blue")
+    # draw.polygon((0, device.height, 0, zeroy - pitch * 2, device.width, zeroy - pitch * 2,
                   device.width, device.height), fill="brown")
-    draw.line((0, zeroy - pitch * 2, device.width, zeroy - pitch * 2), fill="white", width=2)
+    draw.line((x1, y1, x2, y2), fill="white", width=2)
 
 
 
