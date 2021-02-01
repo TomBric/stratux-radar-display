@@ -319,7 +319,7 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     # first do the translation on pitch
     draw.polygon((0, 0, 0, zeroy-pitch * 2, device.width, zeroy-pitch * 2, device.width, 0), fill="blue")
-    draw.polygon((device.height, 0, 0, zeroy - pitch * 2, device.width, zeroy - pitch * 2,
+    draw.polygon((0, device.height, 0, zeroy - pitch * 2, device.width, zeroy - pitch * 2,
                   device.width, device.height), fill="brown")
     draw.line((0, zeroy - pitch * 2, device.width, zeroy - pitch * 2), fill="white", width=2)
 
