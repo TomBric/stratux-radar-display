@@ -319,7 +319,7 @@ def ahrs(draw, pitch, roll, heading, slipskid):
 
     print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     # first do the translation on pitch
-    y_line = zeroy-pitch * 2
+    y_line = zeroy + pitch * 2
     h = math.tan(math.radians(roll)) * device.width / 2
     x2 = device.width-1
     y2 = y_line - h
