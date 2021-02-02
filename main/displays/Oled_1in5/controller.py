@@ -44,7 +44,7 @@ SMALL = 12      # size of information indications on top and bottom
 VERYSMALL = 10   # used for "nm" and "ft"
 AIRCRAFT_SIZE = 3        # size of aircraft arrow
 MINIMAL_CIRCLE = 10     # minimal size of mode-s circle
-PITCH_SCALE = 0.5
+PITCH_SCALE = 1.5
 # end definitions
 
 # device properties
@@ -330,12 +330,11 @@ def rollmarks(draw, roll):
 
 
 def pitchmarks(draw, pitch, roll):
-    pitchscale = 2
     pile = 15
     s = math.sin(math.radians(180 + roll))
     c = math.cos(math.radians(180 + roll))
     for pm in pitch_posmarks:
-        dist = pm * pitchscale
+        dist = pm * PITCH_SCALE
         move = (dist * s, dist * c)
         s1 = math.sin(math.radians(-90 - roll))
         c1 = math.cos(math.radians(-90 - roll))
@@ -352,7 +351,7 @@ def ahrs(draw, pitch, roll, heading, slipskid):
 
     # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     # first do the translation on pitch
-    y_line = zeroy + pitch * 2
+    y_line = zeroy + pitch * PITCH_SCALE
     h = math.tan(math.radians(roll)) * device.width / 2
     p1 = (0, y_line + h)
     p2 = (device.width-1, y_line-h)
