@@ -314,16 +314,19 @@ def init_ahrs():
             ahrs_draw.line((zero-3, zero+i, zero+3, zero+i), width=1, fill="white")
     '''
 
+
 def rollmarks(draw, roll):
-    draw.arc((0, 0, device.width, device.height), roll+180, roll, fill="white", width=1)
-    draw.arc((16, 16, device.width-16, device.height-16), roll + 180, roll, fill = "white", width = 1)
+    draw.arc((0, 0, device.width, device.height), -roll+180, -roll, fill="white", width=1)
+    draw.arc((16, 16, device.width-16, device.height-16), -roll + 180, -roll, fill = "white", width = 1)
     for rm in roll_posmarks:
-        s = math.sin(math.radians(rm + roll))
-        c = math.cos(math.radians(rm + roll))
-        draw.line((zerox * s, zerox * c, (zerox-16) * s, (zerox-16) * c), fill="white", width=1)
-    draw.polygon((16, 16, 16-8, 16+8, 16+8, 16-8), fill="white")
+        s = math.sin(math.radians(rm - roll))
+        c = math.cos(math.radians(rm - roll))
+        draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox-16) * c, zeroy - (zerox-16) * s),
+                  fill="white", width=1)
+    draw.polygon((zerox, 16, zerox-8, 16+8, zerox+8, 16-8), fill="white")
     rolltext = str(roll)
-    draw.text((20, 20), rolltext, font=smallfont, fill="white", align="right")
+    draw.text((zerox+4, 16+4), rolltext, font=smallfont, fill="white", align="right")
+
 
 def ahrs(draw, pitch, roll, heading, slipskid):
     global image
