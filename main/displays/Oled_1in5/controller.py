@@ -355,11 +355,11 @@ def ahrs(draw, pitch, roll, heading, slipskid):
 
     h1, h2 = linepoints(pitch, roll, 0, 200)  # horizon points
     print("h1: ", h1, " h2: ", h2)
-    draw.line((h1, h2), fill="white", width=2)  # horizon line
     h3, h4 = linepoints(pitch, roll, -180, 200)
     draw.polygon((h1, h2, h3, h4), fill="blue")  # sky
     h3, h4 = linepoints(pitch, roll, 180, 200)
     draw.polygon((h1, h2, h3, h4), fill="blue")  # earth
+    draw.line((h1, h2), fill="white", width=2)  # horizon line
 
     '''
     draw.line((ps, pe), fill="white", width=2)
