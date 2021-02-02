@@ -336,15 +336,16 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     draw.line((ps, pe), fill="white", width=2)
     draw.polygon((pe, (0, 0), (device.width - 1, 0), ps), fill="blue")
     draw.polygon((pe, (0, device.height - 1), (device.width - 1, device.height - 1), ps), fill="brown")
+    draw.line((ps, pe), fill="white", width=2)
 
-    y_line = zeroy + pitch * PITCH_SCALE
-    h = math.tan(math.radians(roll)) * device.width / 2
-    p1 = (0, y_line + h)
-    p2 = (device.width-1, y_line-h)
+    # y_line = zeroy + pitch * PITCH_SCALE
+    # h = math.tan(math.radians(roll)) * device.width / 2
+    # p1 = (0, y_line + h)
+    # p2 = (device.width-1, y_line-h)
     # horizon
     # draw.polygon((p1, (0, 0), (device.width-1, 0), p2), fill="blue")
     # draw.polygon((p1, (0, device.height-1), (device.width-1, device.height-1), p2), fill="brown")
-    draw.line((p1, p2), fill="white", width=2)
+    # draw.line((p1, p2), fill="white", width=2)
     pitchmarks(draw, pitch, roll)
 
     # pointer in the middle
