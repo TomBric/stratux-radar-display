@@ -62,7 +62,7 @@ image = None
 ahrs_image = None
 ahrs_draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
-pitch_posmarks = (-30, -20, -10, 0, 10, 20, 30)
+pitch_posmarks = (-30, -20, -10, 10, 20, 30)
 # end device globals
 
 
@@ -271,50 +271,7 @@ def shutdown(draw, countdown):
 
 
 def init_ahrs():
-    '''
-    global ahrs_image
-    global ahrs_draw
-
-    maxpix = device.width * 6
-    zero = device.width * 3
-    ahrs_image = Image.new(device.mode, (maxpix, maxpix))
-    ahrs_draw = ImageDraw.Draw(ahrs_image)
-
-    ahrs_draw.rectangle((0, 0, maxpix, maxpix), fill="blue")   # sky
-    ahrs_draw.rectangle((0, zero, maxpix, maxpix), fill="brown")  # earth
-    ahrs_draw.line((0, zero, maxpix, zero), width=1, fill="white")  # horizon
-    # pitch marks up
-    i = 0
-    while i < maxpix/2:
-        i = i + 8
-        if i % 16 == 0:
-            ahrs_draw.line((zero-8, zero-i, zero+8, zero-i), width=1, fill="white")
-            if i != 0:
-                if i/8 <= 90:
-                    marktext = str(i/16*10)
-                else:
-                    marktext = "80"
-                ahrs_draw.text((zero-30, zero-i), marktext, font=verysmallfont, fill="white", align="right")
-                ahrs_draw.text((zero+10, zero-i), marktext, font=verysmallfont, fill="white", align="left")
-        else:
-            ahrs_draw.line((zero-3, zero-i, zero+3, zero-i), width=1, fill="white")
-    # pitch marks down
-    i = 0
-    while i < maxpix / 2:
-        i = i + 8
-        if i % 16 == 0:
-            ahrs_draw.line((zero-8, zero+i, zero+8, zero+i), width=1, fill="white")
-            if i != 0:
-                if i / 8 <= 90:
-                    marktext = str(i / 16 * 10)
-                else:
-                    marktext = "80"
-                ahrs_draw.text((zero-30, zero+i), marktext, font=verysmallfont, fill="white", align="right")
-                ahrs_draw.text((zero+10, zero+i), marktext, font=verysmallfont, fill="white", align="left")
-        else:
-            ahrs_draw.line((zero-3, zero+i, zero+3, zero+i), width=1, fill="white")
-    '''
-
+    pass
 
 def rollmarks(draw, roll):
     for rm in roll_posmarks:
@@ -364,13 +321,29 @@ def ahrs(draw, pitch, roll, heading, slipskid):
 
     # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     # first do the translation on pitch
+
+    pile = 200
+    s = math.sin(math.radians(180 + roll))
+    c = math.cos(math.radians(180 + roll))
+    dist = -pitch * PITCH_SCALE
+    move = (dist * s, dist * c)
+    s1 = math.sin(math.radians(-90 - roll))
+    c1 = math.cos(math.radians(-90 - roll))
+    p1 = (zerox - pile * s1, zeroy + pile * c1)
+    p2 = (zerox + pile * s1, zeroy - pile * c1)
+    ps = (p1[0] + move[0], p1[1] + move[1])
+    pe = (p2[0] + move[0], p2[1] + move[1])
+    draw.line((ps, pe), fill="white", width=2)
+    raw.polygon((ps, (0, 0), (device.width - 1, 0), p3), fill="blue")
+    draw.polygon((ps, (0, device.height - 1), (device.width - 1, device.height - 1), p3), fill="brown")
+
     y_line = zeroy + pitch * PITCH_SCALE
     h = math.tan(math.radians(roll)) * device.width / 2
     p1 = (0, y_line + h)
     p2 = (device.width-1, y_line-h)
     # horizon
-    draw.polygon((p1, (0, 0), (device.width-1, 0), p2), fill="blue")
-    draw.polygon((p1, (0, device.height-1), (device.width-1, device.height-1), p2), fill="brown")
+    # draw.polygon((p1, (0, 0), (device.width-1, 0), p2), fill="blue")
+    # draw.polygon((p1, (0, device.height-1), (device.width-1, device.height-1), p2), fill="brown")
     draw.line((p1, p2), fill="white", width=2)
     pitchmarks(draw, pitch, roll)
 
