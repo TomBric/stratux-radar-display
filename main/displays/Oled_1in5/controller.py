@@ -303,23 +303,6 @@ def linepoints(pitch, roll, pitch_distance, length):
     return ps, pe
 
 
-def pitchmarks(draw, pitch, roll):
-    for pm in pitch_posmarks:
-        draw.line((linepoints(pitch, roll, pm, 10)), fill="white", width=1)
-
-        '''
-        dist = (-pitch + pm) * PITCH_SCALE
-        move = (dist * s, dist * c)
-        s1 = math.sin(math.radians(-90 - roll))
-        c1 = math.cos(math.radians(-90 - roll))
-        p1 = (zerox - pile * s1, zeroy + pile * c1)
-        p2 = (zerox + pile * s1, zeroy - pile * c1)
-        ps = (p1[0] + move[0], p1[1] + move[1])
-        pe = (p2[0] + move[0], p2[1] + move[1])
-        draw.line((ps, pe), fill="white", width=1)
-        '''
-
-
 def slip(draw, slipskid):
     slipsize = 5
     slipscale = 3
@@ -338,35 +321,14 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     global ahrs_image
 
     # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
-    # first do the translation on pitch
-    '''
-    pile = 200
-    s = math.sin(math.radians(180 + roll))
-    c = math.cos(math.radians(180 + roll))
-    dist = -pitch * PITCH_SCALE
-    move = (dist * s, dist * c)
-    s1 = math.sin(math.radians(-90 - roll))
-    c1 = math.cos(math.radians(-90 - roll))
-    p1 = (zerox - pile * s1, zeroy + pile * c1)
-    p2 = (zerox + pile * s1, zeroy - pile * c1)
-    ps = (p1[0] + move[0], p1[1] + move[1])
-    pe = (p2[0] + move[0], p2[1] + move[1])
-    '''
-
     h1, h2 = linepoints(pitch, roll, 0, 200)  # horizon points
     h3, h4 = linepoints(pitch, roll, -180, 200)
     draw.polygon((h1, h2, h4, h3), fill="brown")  # earth
     h3, h4 = linepoints(pitch, roll, 180, 200)
     draw.polygon((h1, h2, h4, h3), fill="blue")  # sky
     draw.line((h1, h2), fill="white", width=2)  # horizon line
-
-    '''
-    draw.line((ps, pe), fill="white", width=2)
-    draw.polygon((pe, (0, 0), (device.width - 1, 0), ps), fill="blue")
-    draw.polygon((pe, (0, device.height - 1), (device.width - 1, device.height - 1), ps), fill="brown")
-    draw.line((ps, pe), fill="white", width=2)
-    '''
-    pitchmarks(draw, pitch, roll)
+    for pm in pitch_posmarks:  # pitchmarks
+        draw.line((linepoints(pitch, roll, pm, 10)), fill="white", width=1)
 
     # pointer in the middle
     draw.line((zerox - 30, zeroy, zerox - 15, zeroy), width=4, fill="white")
@@ -378,5 +340,5 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     # slip indicator
     slip(draw, slipskid)
 
-    infotext = "P:" + str(pitch) + " R:" + str(roll)
-    draw.text((0, 100), infotext, font=smallfont, fill="white", align="right")
+    # infotext = "P:" + str(pitch) + " R:" + str(roll)
+    # draw.text((0, 100), infotext, font=smallfont, fill="white", align="right")
