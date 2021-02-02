@@ -311,7 +311,7 @@ def slip(draw, slipskid):
     elif slipskid > 10:
         slipskid = 10
 
-    draw.rectangle((zerox - 40, device.height - slipsize * 2, zerox + 40, device.height - 1))
+    draw.rectangle((zerox - 40, device.height - slipsize * 2, zerox + 40, device.height - 1), fill="black")
     draw.ellipse((zerox - slipskid * slipscale - slipsize, device.height - slipsize * 2,
                   zerox - slipskid * slipscale + slipsize, device.height - 1), fill="white")
 
