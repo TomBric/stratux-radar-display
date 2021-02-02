@@ -34,6 +34,7 @@
 import time
 import radarbuttons
 import math
+import radarbluez
 
 # constants
 MAX_COUNTDOWN_TIME = 2 * 60 * 60   # maximum time for setting countdown in seconds
@@ -50,12 +51,14 @@ timer_running = False
 was_in_secs = 0.0       # last time displayed
 timer_ui_changed = True
 cdown_time = 0.0     # count down time
+cdown_spoken = False  # to speak zero only once
 timer_mode = 0    # 0 = normal, 1 = countdown-set
 
 
 def draw_timer(draw, display_control, refresh_time):
     global was_in_secs
     global timer_ui_changed
+    global cdown_spoken
 
     now_in_secs = math.floor(time.time())
     if not timer_ui_changed and now_in_secs < was_in_secs + math.ceil(refresh_time):
@@ -69,6 +72,9 @@ def draw_timer(draw, display_control, refresh_time):
         if laptime != 0:
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs-laptime))
         else:
+            if cdown_time == now_in_secs and not cdown_spoken:
+                cdown_spoken = True
+                radarbluez.speak("Countdown finished")
             if cdown_time <= now_in_secs:    # Countdown Finished
                 laptimestr = "--:--:--"
             else:
@@ -100,6 +106,7 @@ def user_input():
     global cdown_time
     global lap_head
     global timer_mode
+    global cdown_spoken
 
     btime, button = radarbuttons.check_buttons()
     # start of timer global behaviour
@@ -151,6 +158,7 @@ def user_input():
             timer_mode = 0
         elif button == 0 and btime == 1:  # left short
             cdown_time = cdown_time + 600  # ten more minutes
+            cdown_spoken = False
             if timer_running:
                 if cdown_time >= math.floor(time.time()) + MAX_COUNTDOWN_TIME:
                     cdown_time = 0
@@ -159,6 +167,7 @@ def user_input():
                     cdown_time = 0
         elif button == 2 and btime == 1:  # right short
             cdown_time = cdown_time + 60
+            cdown_spoken = False
             if timer_running:
                 if cdown_time >= math.floor(time.time()) + MAX_COUNTDOWN_TIME:
                     cdown_time = 0.0
