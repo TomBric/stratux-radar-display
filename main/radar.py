@@ -297,7 +297,6 @@ def new_situation(json_str):
         situation['was_changed'] = True
     if ahrs['pitch'] != round(sit['AHRSPitch']):
         ahrs['pitch'] = round(sit['AHRSPitch'])
-        print("Situation: pitch ", ahrs['pitch'])
         ahrs['was_changed'] = True
     if ahrs['roll'] != round(sit['AHRSRoll']):
         ahrs['roll'] = round(sit['AHRSRoll'])
