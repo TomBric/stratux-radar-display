@@ -286,11 +286,28 @@ def rollmarks(draw, roll):
     draw.polygon((zerox, 10, zerox-5, 10+5, zerox+5, 10+5), fill="white")
 
 
+def linepoints(pitch, roll, pitch_distance, length):
+    s = math.sin(math.radians(180 + roll))
+    c = math.cos(math.radians(180 + roll))
+    dist = (-pitch + pitch_distance) * PITCH_SCALE
+    move = (dist * s, dist * c)
+    s1 = math.sin(math.radians(-90 - roll))
+    c1 = math.cos(math.radians(-90 - roll))
+    p1 = (zerox - length * s1, zeroy + length * c1)
+    p2 = (zerox + length * s1, zeroy - length * c1)
+    ps = (p1[0] + move[0], p1[1] + move[1])
+    pe = (p2[0] + move[0], p2[1] + move[1])
+    return ps, pe
+
+
 def pitchmarks(draw, pitch, roll):
     pile = 10
     s = math.sin(math.radians(180 + roll))
     c = math.cos(math.radians(180 + roll))
     for pm in pitch_posmarks:
+        draw.line((linepoints(pitch, roll, pm, 10)), fill="white", width=1)
+
+        '''
         dist = (-pitch + pm) * PITCH_SCALE
         move = (dist * s, dist * c)
         s1 = math.sin(math.radians(-90 - roll))
@@ -300,7 +317,7 @@ def pitchmarks(draw, pitch, roll):
         ps = (p1[0] + move[0], p1[1] + move[1])
         pe = (p2[0] + move[0], p2[1] + move[1])
         draw.line((ps, pe), fill="white", width=1)
-
+        '''
 
 def slip(draw, slipskid):
     slipsize = 5
@@ -321,7 +338,7 @@ def ahrs(draw, pitch, roll, heading, slipskid):
 
     # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     # first do the translation on pitch
-
+    '''
     pile = 200
     s = math.sin(math.radians(180 + roll))
     c = math.cos(math.radians(180 + roll))
@@ -333,19 +350,19 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     p2 = (zerox + pile * s1, zeroy - pile * c1)
     ps = (p1[0] + move[0], p1[1] + move[1])
     pe = (p2[0] + move[0], p2[1] + move[1])
+    '''
+
+    h1, h2 = linepoints(pitch, roll, 0, 200) # horizon points
+    draw.line((h1,h2), color="white", width=2)  # horizon line
+    draw.polygon((h1, h2, linepoints(pitch, roll, -180, 200)), fill="blue")  #sky
+    draw.polygon((h1, h2, linepoints(pitch, roll, 180, 200)), fill="blue")  # earth
+
+    '''
     draw.line((ps, pe), fill="white", width=2)
     draw.polygon((pe, (0, 0), (device.width - 1, 0), ps), fill="blue")
     draw.polygon((pe, (0, device.height - 1), (device.width - 1, device.height - 1), ps), fill="brown")
     draw.line((ps, pe), fill="white", width=2)
-
-    # y_line = zeroy + pitch * PITCH_SCALE
-    # h = math.tan(math.radians(roll)) * device.width / 2
-    # p1 = (0, y_line + h)
-    # p2 = (device.width-1, y_line-h)
-    # horizon
-    # draw.polygon((p1, (0, 0), (device.width-1, 0), p2), fill="blue")
-    # draw.polygon((p1, (0, device.height-1), (device.width-1, device.height-1), p2), fill="brown")
-    # draw.line((p1, p2), fill="white", width=2)
+    '''
     pitchmarks(draw, pitch, roll)
 
     # pointer in the middle
