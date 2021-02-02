@@ -316,8 +316,6 @@ def init_ahrs():
 
 
 def rollmarks(draw, roll):
-    # draw.arc((0, 0, device.width-1, device.height), -roll+180, -roll, fill="white", width=1)
-    # draw.arc((10, 10, device.width-10, device.height-10), -roll + 180, -roll, fill = "white", width = 1)
     for rm in roll_posmarks:
         s = math.sin(math.radians(rm - roll + 90))
         c = math.cos(math.radians(rm - roll + 90))
@@ -328,8 +326,6 @@ def rollmarks(draw, roll):
             draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox-5) * c, zeroy - (zerox-5) * s),
                   fill="white", width=1)
     draw.polygon((zerox, 10, zerox-5, 10+5, zerox+5, 10+5), fill="white")
-    rolltext = str(roll)
-    draw.text((zerox+6, 9), rolltext, font=smallfont, fill="white", align="right")
 
 
 def ahrs(draw, pitch, roll, heading, slipskid):
@@ -340,14 +336,12 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     # first do the translation on pitch
     y_line = zeroy + pitch * 2
     h = math.tan(math.radians(roll)) * device.width / 2
-    x2 = device.width-1
-    y2 = y_line - h
-    x1 = 0
-    y1 = y_line + h
+    p1 = (0, y_line + h)
+    p2 = (device.width-1, yline-h)
 
-    draw.polygon((x1, y1, 0, 0, device.width-1, 0, x2, y2), fill="blue")
-    draw.polygon((x1, y1, 0, device.height-1, device.width-1, device.height-1, x2,y2), fill="brown")
-    draw.line((x1, y1, x2, y2), fill="white", width=2)
+    draw.polygon((p1, (0, 0), (device.width-1, 0), p2), fill="blue")
+    draw.polygon((p1, (0, device.height-1), (device.width-1, device.height-1), p2), fill="brown")
+    draw.line((p1, p2), fill="white", width=3)
     # pointer in the middle
     draw.line((zerox-30, zeroy, zerox-15, zeroy), width=4, fill="yellow")
     draw.line((zerox + 30, zeroy, zerox + 15, zeroy), width=4, fill="yellow")
