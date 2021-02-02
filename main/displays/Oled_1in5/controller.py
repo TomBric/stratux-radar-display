@@ -358,13 +358,13 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     # horizon
     draw.polygon((p1, (0, 0), (device.width-1, 0), p2), fill="blue")
     draw.polygon((p1, (0, device.height-1), (device.width-1, device.height-1), p2), fill="brown")
-    draw.line((p1, p2), fill="white", width=3)
+    draw.line((p1, p2), fill="white", width=2)
     pitchmarks(draw, pitch, roll)
 
     # pointer in the middle
-    draw.line((zerox-30, zeroy, zerox-15, zeroy), width=4, fill="yellow")
-    draw.line((zerox + 30, zeroy, zerox + 15, zeroy), width=4, fill="yellow")
-    draw.polygon((zerox, zeroy+2, zerox-10, zeroy+8, zerox+10, zeroy+8), fill="yellow")
+    draw.line((zerox-30, zeroy, zerox-15, zeroy), width=4, fill="black")
+    draw.line((zerox + 30, zeroy, zerox + 15, zeroy), width=4, fill="black")
+    draw.polygon((zerox, zeroy+2, zerox-10, zeroy+8, zerox+10, zeroy+8), fill="black")
 
     # roll indicator
     rollmarks(draw, roll)
