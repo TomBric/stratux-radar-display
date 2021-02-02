@@ -331,7 +331,7 @@ def rollmarks(draw, roll):
 
 def pitchmarks(draw, pitch, roll):
     pitchscale = 1
-    pile = 30
+    pile = 15
     s = math.sin(math.radians(180 + roll))
     c = math.cos(math.radians(180 + roll))
     for pm in pitch_posmarks:
