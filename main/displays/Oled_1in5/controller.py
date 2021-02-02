@@ -61,7 +61,7 @@ device = None
 image = None
 ahrs_image = None
 ahrs_draw = None
-roll_posmarks = (-90, -45, -30, -20, -10, 0, 10, 20, 30, 45, 90)
+roll_posmarks = (-90, -60, -45, -30, -20, -10, 0, 10, 20, 30, 45, 60, 90)
 # end device globals
 
 
@@ -316,8 +316,8 @@ def init_ahrs():
 
 
 def rollmarks(draw, roll):
-    draw.arc((0, 0, device.width, device.height), -roll+180, -roll, fill="white", width=1)
-    draw.arc((10, 10, device.width-10, device.height-10), -roll + 180, -roll, fill = "white", width = 1)
+    draw.arc((0, 0, device.width-1, device.height), -roll+180, -roll, fill="white", width=1)
+    # draw.arc((10, 10, device.width-10, device.height-10), -roll + 180, -roll, fill = "white", width = 1)
     for rm in roll_posmarks:
         s = math.sin(math.radians(rm - roll + 90))
         c = math.cos(math.radians(rm - roll + 90))
