@@ -337,7 +337,7 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     y_line = zeroy + pitch * 2
     h = math.tan(math.radians(roll)) * device.width / 2
     p1 = (0, y_line + h)
-    p2 = (device.width-1, yline-h)
+    p2 = (device.width-1, y_line-h)
 
     draw.polygon((p1, (0, 0), (device.width-1, 0), p2), fill="blue")
     draw.polygon((p1, (0, device.height-1), (device.width-1, device.height-1), p2), fill="brown")
