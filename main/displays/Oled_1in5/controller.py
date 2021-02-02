@@ -330,7 +330,7 @@ def rollmarks(draw, roll):
 
 
 def pitchmarks(draw, pitch, roll):
-    pitchscale = 1.5
+    pitchscale = 2
     pile = 15
     s = math.sin(math.radians(180 + roll))
     c = math.cos(math.radians(180 + roll))
