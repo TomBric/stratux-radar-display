@@ -61,7 +61,7 @@ device = None
 image = None
 ahrs_image = None
 ahrs_draw = None
-roll_posmarks = (-90, -60, -45, -30, -20, -10, 0, 10, 20, 30, 45, 60, 90)
+roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 # end device globals
 
 
@@ -327,9 +327,9 @@ def rollmarks(draw, roll):
         else:
             draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox-5) * c, zeroy - (zerox-5) * s),
                   fill="white", width=1)
-    draw.polygon((zerox, 10, zerox-8, 10+8, zerox+8, 10+8), fill="white")
+    draw.polygon((zerox, 10, zerox-5, 10+5, zerox+5, 10+5), fill="white")
     rolltext = str(roll)
-    draw.text((zerox+4, 10+4), rolltext, font=smallfont, fill="white", align="right")
+    draw.text((zerox+6, 9), rolltext, font=smallfont, fill="white", align="right")
 
 
 def ahrs(draw, pitch, roll, heading, slipskid):
