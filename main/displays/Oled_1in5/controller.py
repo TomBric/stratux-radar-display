@@ -61,6 +61,7 @@ device = None
 image = None
 ahrs_image = None
 ahrs_draw = None
+roll_posmarks = (-90, -45, -30, -20, -10, 0, 10, 20, 30, 45, 90)
 # end device globals
 
 
@@ -313,6 +314,17 @@ def init_ahrs():
             ahrs_draw.line((zero-3, zero+i, zero+3, zero+i), width=1, fill="white")
     '''
 
+def rollmarks(draw, roll):
+    draw.arc((0, 0, device.width, device.height), roll+180, roll, fill="white", width=1)
+    draw.arc((16, 16, device.width-16, device.height-16), roll + 180, roll, fill = "white", width = 1)
+    for rm in roll_posmarks:
+        s = math.sin(math.radians(rm + roll))
+        c = math.cos(math.radians(rm + roll))
+        draw.line((zerox * s, zerox * c, (zerox-16) * s, (zerox-16) * c), fill="white", width=1)
+    draw.polygon((16, 16, 16-8, 16+8, 16+8, 16-8), fill="white")
+    rolltext = str(roll)
+    draw.text((20, 20), rolltext, font=smallfont, fill="white", align="right")
+
 def ahrs(draw, pitch, roll, heading, slipskid):
     global image
     global ahrs_image
@@ -334,16 +346,8 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     draw.line((zerox + 30, zeroy, zerox + 15, zeroy), width=4, fill="yellow")
     draw.polygon((zerox, zeroy+2, zerox-10, zeroy+8, zerox+10, zeroy+8), fill="yellow")
 
+    rollmarks(draw, roll)
 
-
-    '''
-    temp_image = ahrs_image.rotate(0, translate=(0, round(-pitch * 16 / 10)))
-    # rotate in roll rate
-    temp_image = temp_image.rotate(roll)
-    # crop middle part of ahrs image to display
-    zero = device.width*3
-    image = temp_image.crop((zero-device.width/2, zero-device.width/2, zero+device.height/2, zero+device.height/2))
-    '''
     infotext = "P:"+str(pitch)+" R:"+str(roll)
     draw.text((0, 100), infotext, font=smallfont, fill="white", align="right")
 
