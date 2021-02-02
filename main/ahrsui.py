@@ -61,7 +61,6 @@ def user_input():
         return 0  # stay in timer mode
     ahrs_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
-        print("AHRS UI: long middle pressed")
         return 1  # next mode to be radar
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
