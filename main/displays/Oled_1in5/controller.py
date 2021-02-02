@@ -39,11 +39,11 @@ from . import radar_opts
 
 # global constants
 VERYLARGE = 24
-LARGE = 18           # size of height indications of aircraft
-SMALL = 12      # size of information indications on top and bottom
-VERYSMALL = 10   # used for "nm" and "ft"
-AIRCRAFT_SIZE = 3        # size of aircraft arrow
-MINIMAL_CIRCLE = 10     # minimal size of mode-s circle
+LARGE = 18  # size of height indications of aircraft
+SMALL = 12  # size of information indications on top and bottom
+VERYSMALL = 10  # used for "nm" and "ft"
+AIRCRAFT_SIZE = 3  # size of aircraft arrow
+MINIMAL_CIRCLE = 10  # minimal size of mode-s circle
 PITCH_SCALE = 1.5
 # end definitions
 
@@ -63,6 +63,8 @@ ahrs_image = None
 ahrs_draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
+
+
 # end device globals
 
 
@@ -100,11 +102,11 @@ def init():
     zeroy = sizey / 2
     device.contrast(255)  # set full contrast
     verylargefont = make_font("Font.ttc", VERYLARGE)
-    largefont = make_font("Font.ttc", LARGE)          # font for height indications
-    smallfont = make_font("Font.ttc", SMALL)          # font for information indications
+    largefont = make_font("Font.ttc", LARGE)  # font for height indications
+    smallfont = make_font("Font.ttc", SMALL)  # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
-    webfont = make_font("fontawesome-webfont.ttf", SMALL)   # font for Bluetooth indications
-    display_refresh = 0.1    # oled has no busy flag, so take this as update value
+    webfont = make_font("fontawesome-webfont.ttf", SMALL)  # font for Bluetooth indications
+    display_refresh = 0.1  # oled has no busy flag, so take this as update value
     return draw, sizex, zerox, zeroy, display_refresh
 
 
@@ -137,14 +139,14 @@ def clear(draw):
 
 
 def refresh():
-    pass   # nothing to do for Oled, does not need a refresh function
+    pass  # nothing to do for Oled, does not need a refresh function
 
 
 def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
     logo = Image.open(logopath)
     draw.rectangle(((0, 0), (sizex, 64)), fill="blue")
-    draw.bitmap((zerox-32, 0), logo, fill="white")
+    draw.bitmap((zerox - 32, 0), logo, fill="white")
     centered_text(draw, 64, "Oled-Radar", largefont, fill="white")
     versionstr = "Version " + version
     centered_text(draw, 64 + LARGE, versionstr, smallfont, fill="white")
@@ -159,7 +161,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
     p2 = posn(270 + direction + 150, 4 * AIRCRAFT_SIZE)
     p3 = posn(270 + direction + 180, 2 * AIRCRAFT_SIZE)
     p4 = posn(270 + direction + 210, 4 * AIRCRAFT_SIZE)
-    p5 = posn(270 + direction, nspeed_length)   # line for speed
+    p5 = posn(270 + direction, nspeed_length)  # line for speed
 
     draw.polygon(((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
                  fill="red", outline="white")
@@ -185,30 +187,30 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
 def modesaircraft(draw, radius, height, arcposition):
     if radius < MINIMAL_CIRCLE:
         radius = MINIMAL_CIRCLE
-    draw.ellipse((64-radius, 64-radius, 64+radius, 64+radius), width=3, outline="white")
+    draw.ellipse((64 - radius, 64 - radius, 64 + radius, 64 + radius), width=3, outline="white")
     arctext = posn(arcposition, radius)
     if height > 0:
         signchar = "+"
     else:
         signchar = "-"
-    t = signchar+str(abs(height))
+    t = signchar + str(abs(height))
     tsize = draw.textsize(t, largefont)
-    tposition = (64+arctext[0]-tsize[0]/2, 64+arctext[1]-tsize[1]/2)
-    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+tsize[1])), fill="black")
+    tposition = (64 + arctext[0] - tsize[0] / 2, 64 + arctext[1] - tsize[1] / 2)
+    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + tsize[1])), fill="black")
     draw.text(tposition, t, font=largefont, fill="white")
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0, sound_active=True):
-    draw.ellipse((0, 0, sizex-1, sizey-1), outline="floralwhite")
-    draw.ellipse((sizex/4, sizey/4, zerox + sizex/4, zeroy + sizey/4), outline="floralwhite")
-    draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="floralwhite")
-    draw.text((0, sizey - SMALL), "FL" + str(round(ownalt/100)), font=smallfont, fill="floralwhite")
+    draw.ellipse((0, 0, sizex - 1, sizey - 1), outline="floralwhite")
+    draw.ellipse((sizex / 4, sizey / 4, zerox + sizex / 4, zeroy + sizey / 4), outline="floralwhite")
+    draw.ellipse((zerox - 2, zeroy - 2, zerox + 2, zeroy + 2), outline="floralwhite")
+    draw.text((0, sizey - SMALL), "FL" + str(round(ownalt / 100)), font=smallfont, fill="floralwhite")
 
     draw.text((0, 0), str(range), font=smallfont, fill="floralwhite")
     draw.text((0, SMALL), "nm", font=verysmallfont, fill="floralwhite")
 
     if altdifference >= 10000:
-        t = str(int(altdifference/1000))+"k"
+        t = str(int(altdifference / 1000)) + "k"
     else:
         t = str(altdifference)
     textsize = draw.textsize(t, smallfont)
@@ -230,7 +232,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
             btcolor = "red"
             text = '\uf1f6'  # bell off symbol
         textsize = draw.textsize(text, webfont)
-        draw.text((sizex - textsize[0], sizey - 2*SMALL), text, font=webfont, fill=btcolor, align="right")
+        draw.text((sizex - textsize[0], sizey - 2 * SMALL), text, font=webfont, fill=btcolor, align="right")
 
     if not gpsconnected:
         centered_text(draw, 0, "No GPS", smallfont, fill="red")
@@ -241,22 +243,22 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs):
     draw.text((0, 0), "UTC", font=smallfont, fill="cyan")
     centered_text(draw, SMALL, utctime, verylargefont, fill="yellow")
-    draw.text((0, SMALL+VERYLARGE), "Timer", font=smallfont, fill="cyan")
+    draw.text((0, SMALL + VERYLARGE), "Timer", font=smallfont, fill="cyan")
     if timer_runs:
         color = "lavender"
     else:
         color = "orangered"
-    centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill=color)
-    draw.text((0, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="cyan")
+    centered_text(draw, 2 * SMALL + VERYLARGE, stoptime, verylargefont, fill=color)
+    draw.text((0, 2 * SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="cyan")
     if laptime_head == "Laptimer":
         centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="powderblue")
     else:
         centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="magenta")
 
-    draw.text((0, sizey - SMALL-3), left_text, font=smallfont, fill="green")
+    draw.text((0, sizey - SMALL - 3), left_text, font=smallfont, fill="green")
     textsize = draw.textsize(right_text, smallfont)
-    draw.text((sizex - textsize[0], sizey - SMALL-3), right_text, font=smallfont, fill="green", align="right")
-    centered_text(draw, sizey - SMALL-3, middle_text, smallfont, fill="green")
+    draw.text((sizex - textsize[0], sizey - SMALL - 3), right_text, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="green")
 
 
 def shutdown(draw, countdown):
@@ -273,6 +275,7 @@ def shutdown(draw, countdown):
 def init_ahrs():
     pass
 
+
 def rollmarks(draw, roll):
     for rm in roll_posmarks:
         s = math.sin(math.radians(rm - roll + 90))
@@ -281,9 +284,9 @@ def rollmarks(draw, roll):
             draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox - 8) * c, zeroy - (zerox - 8) * s),
                       fill="white", width=2)
         else:
-            draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox-5) * c, zeroy - (zerox-5) * s),
-                  fill="white", width=1)
-    draw.polygon((zerox, 10, zerox-5, 10+5, zerox+5, 10+5), fill="white")
+            draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox - 5) * c, zeroy - (zerox - 5) * s),
+                      fill="white", width=1)
+    draw.polygon((zerox, 10, zerox - 5, 10 + 5, zerox + 5, 10 + 5), fill="white")
 
 
 def linepoints(pitch, roll, pitch_distance, length):
@@ -301,9 +304,6 @@ def linepoints(pitch, roll, pitch_distance, length):
 
 
 def pitchmarks(draw, pitch, roll):
-    pile = 10
-    s = math.sin(math.radians(180 + roll))
-    c = math.cos(math.radians(180 + roll))
     for pm in pitch_posmarks:
         draw.line((linepoints(pitch, roll, pm, 10)), fill="white", width=1)
 
@@ -319,17 +319,18 @@ def pitchmarks(draw, pitch, roll):
         draw.line((ps, pe), fill="white", width=1)
         '''
 
+
 def slip(draw, slipskid):
     slipsize = 5
     slipscale = 3
     if slipskid < -10:
-        slipSkid = -10
+        slipskid = -10
     elif slipskid > 10:
         slipskid = 10
 
-    draw.rectangle((zerox-40, device.height-slipsize*2, zerox+40, device.height-1))
-    draw.ellipse((zerox - slipskid * slipscale - slipsize, device.height-slipsize*2,
-                  zerox - slipskid * slipscale + slipsize, device.height-1), fill="white")
+    draw.rectangle((zerox - 40, device.height - slipsize * 2, zerox + 40, device.height - 1))
+    draw.ellipse((zerox - slipskid * slipscale - slipsize, device.height - slipsize * 2,
+                  zerox - slipskid * slipscale + slipsize, device.height - 1), fill="white")
 
 
 def ahrs(draw, pitch, roll, heading, slipskid):
@@ -352,9 +353,9 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     pe = (p2[0] + move[0], p2[1] + move[1])
     '''
 
-    h1, h2 = linepoints(pitch, roll, 0, 200) # horizon points
-    draw.line((h1,h2), color="white", width=2)  # horizon line
-    draw.polygon((h1, h2, linepoints(pitch, roll, -180, 200)), fill="blue")  #sky
+    h1, h2 = linepoints(pitch, roll, 0, 200)  # horizon points
+    draw.line((h1, h2), color="white", width=2)  # horizon line
+    draw.polygon((h1, h2, linepoints(pitch, roll, -180, 200)), fill="blue")  # sky
     draw.polygon((h1, h2, linepoints(pitch, roll, 180, 200)), fill="blue")  # earth
 
     '''
@@ -366,15 +367,14 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     pitchmarks(draw, pitch, roll)
 
     # pointer in the middle
-    draw.line((zerox-30, zeroy, zerox-15, zeroy), width=4, fill="white")
+    draw.line((zerox - 30, zeroy, zerox - 15, zeroy), width=4, fill="white")
     draw.line((zerox + 30, zeroy, zerox + 15, zeroy), width=4, fill="white")
-    draw.polygon((zerox, zeroy+2, zerox-10, zeroy+8, zerox+10, zeroy+8), fill="white")
+    draw.polygon((zerox, zeroy + 2, zerox - 10, zeroy + 8, zerox + 10, zeroy + 8), fill="white")
 
     # roll indicator
     rollmarks(draw, roll)
     # slip indicator
     slip(draw, slipskid)
 
-    infotext = "P:"+str(pitch)+" R:"+str(roll)
+    infotext = "P:" + str(pitch) + " R:" + str(roll)
     draw.text((0, 100), infotext, font=smallfont, fill="white", align="right")
-
