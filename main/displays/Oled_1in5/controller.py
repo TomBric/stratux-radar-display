@@ -62,6 +62,7 @@ image = None
 ahrs_image = None
 ahrs_draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
+pitch_posmarks = (-30, -20, -10, 0, 10, 20, 30)
 # end device globals
 
 
@@ -328,25 +329,43 @@ def rollmarks(draw, roll):
     draw.polygon((zerox, 10, zerox-5, 10+5, zerox+5, 10+5), fill="white")
 
 
+def pitchmarks(draw, pitch, roll):
+    pitchscale = 1
+    pile = 30
+    s = math.sin(math.radians(180 - roll))
+    c = math.cos(math.radians(180 - roll))
+    for pm in pitch_posmarks:
+        dist = pm * pitchscale
+        move = (zerox - dist * c, zeroy - dist * s)
+        p1 = (zerox - pile * c, zeroy + pile * s)
+        p2 = (zerox + pile * c, zeroy - pile * s)
+        ps = (p1[0] + move[0], p1[1] + move[1])
+        pe = (p2[0] + move[0], p2[1] + move[1])
+        draw.line((ps, pe), fill="white", width=2)
+
+
 def ahrs(draw, pitch, roll, heading, slipskid):
     global image
     global ahrs_image
 
-    print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
+    # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     # first do the translation on pitch
     y_line = zeroy + pitch * 2
     h = math.tan(math.radians(roll)) * device.width / 2
     p1 = (0, y_line + h)
     p2 = (device.width-1, y_line-h)
-
+    # horizon
     draw.polygon((p1, (0, 0), (device.width-1, 0), p2), fill="blue")
     draw.polygon((p1, (0, device.height-1), (device.width-1, device.height-1), p2), fill="brown")
     draw.line((p1, p2), fill="white", width=3)
+    pitchmarks(draw, pitch, roll)
+
     # pointer in the middle
     draw.line((zerox-30, zeroy, zerox-15, zeroy), width=4, fill="yellow")
     draw.line((zerox + 30, zeroy, zerox + 15, zeroy), width=4, fill="yellow")
     draw.polygon((zerox, zeroy+2, zerox-10, zeroy+8, zerox+10, zeroy+8), fill="yellow")
 
+    # roll indicator
     rollmarks(draw, roll)
 
     infotext = "P:"+str(pitch)+" R:"+str(roll)
