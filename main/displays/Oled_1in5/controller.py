@@ -326,7 +326,7 @@ def rollmarks(draw, roll):
         else:
             draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox-5) * c, zeroy - (zerox-5) * s),
                   fill="white", width=1)
-    draw.polygon((zerox, 10, zerox-5, 10+5, zerox+5, 10+5), fill="magenta")
+    draw.polygon((zerox, 10, zerox-5, 10+5, zerox+5, 10+5), fill="white")
 
 
 def pitchmarks(draw, pitch, roll):
@@ -342,7 +342,7 @@ def pitchmarks(draw, pitch, roll):
         p2 = (zerox + pile * s1, zeroy - pile * c1)
         ps = (p1[0] + move[0], p1[1] + move[1])
         pe = (p2[0] + move[0], p2[1] + move[1])
-        draw.line((ps, pe), fill="white", width=2)
+        draw.line((ps, pe), fill="white", width=1)
 
 
 def ahrs(draw, pitch, roll, heading, slipskid):
@@ -362,9 +362,9 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     pitchmarks(draw, pitch, roll)
 
     # pointer in the middle
-    draw.line((zerox-30, zeroy, zerox-15, zeroy), width=4, fill="magenta")
-    draw.line((zerox + 30, zeroy, zerox + 15, zeroy), width=4, fill="magenta")
-    draw.polygon((zerox, zeroy+2, zerox-10, zeroy+8, zerox+10, zeroy+8), fill="magenta")
+    draw.line((zerox-30, zeroy, zerox-15, zeroy), width=4, fill="white")
+    draw.line((zerox + 30, zeroy, zerox + 15, zeroy), width=4, fill="white")
+    draw.polygon((zerox, zeroy+2, zerox-10, zeroy+8, zerox+10, zeroy+8), fill="white")
 
     # roll indicator
     rollmarks(draw, roll)
