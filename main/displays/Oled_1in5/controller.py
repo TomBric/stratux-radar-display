@@ -345,6 +345,19 @@ def pitchmarks(draw, pitch, roll):
         draw.line((ps, pe), fill="white", width=1)
 
 
+def slip(draw, slipskid):
+    slipsize = 5
+    slipscale = 3
+    if slipskid < -10:
+        slipSkid = -10
+    elif slipskid > 10:
+        slipskid = 10
+
+    draw.rectangle((zerox-40, device.height-20, zerox+40, device.height-1))
+    draw.ellipse((zerox - slipskid * slipscale - slipsize, device.height-20,
+                  zerox - slipskid * slipscale + slipsize, device.height-1), fill="white")
+
+
 def ahrs(draw, pitch, roll, heading, slipskid):
     global image
     global ahrs_image
@@ -368,6 +381,8 @@ def ahrs(draw, pitch, roll, heading, slipskid):
 
     # roll indicator
     rollmarks(draw, roll)
+    # slip indicator
+    slip(draw, slipskid)
 
     infotext = "P:"+str(pitch)+" R:"+str(roll)
     draw.text((0, 100), infotext, font=smallfont, fill="white", align="right")
