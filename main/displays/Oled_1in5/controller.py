@@ -337,8 +337,8 @@ def pitchmarks(draw, pitch, roll):
     for pm in pitch_posmarks:
         dist = pm * pitchscale
         move = (dist * c, dist * s)
-        s1 = math.sin(math.radians(-90 -roll))
-        c1 = math.cos(math.radians(-90 -roll))
+        s1 = math.sin(math.radians(-90 + roll))
+        c1 = math.cos(math.radians(-90 + roll))
         p1 = (zerox - pile * c1, zeroy + pile * s1)
         p2 = (zerox + pile * c1, zeroy - pile * s1)
         ps = (p1[0] + move[0], p1[1] + move[1])
