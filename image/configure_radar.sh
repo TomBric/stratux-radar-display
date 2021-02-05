@@ -45,11 +45,14 @@ echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" |
 # configs in /etc/pulse/system.pa
 sudo sed -i '$ a load-module module-bluetooth-discover' /etc/pulse/system.pa
 sudo sed -i '$ a load-module module-bluetooth-policy' /etc/pulse/system.pa
+# configs in /etc/pulse/client.conf to disable client spawns
+sudo sed -i '$ a default-server = /var/run/pulse/native' /etc/pulse/client.conf
+sudo sed -i '$ a autospawn = no' /etc/pulse/client.conf
 
 # allow user pulse bluetooth access
 sudo addgroup pulse bluetooth
 
 # start pulseaudio system wide
-sudo cp pulseaudio.service /etc/systemd/system/
-systemctl --system enable pulseaudio.service
-systemctl --system start pulseaudio.service
+sudo cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
+sudo systemctl --system enable pulseaudio.service
+sudo systemctl --system start pulseaudio.service
