@@ -51,6 +51,7 @@ sudo sed -i '$ a autospawn = no' /etc/pulse/client.conf
 
 # allow user pulse bluetooth access
 sudo addgroup pulse bluetooth
+sudo addgroup pulse pulse-access
 
 # start pulseaudio system wide
 sudo cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
