@@ -51,7 +51,6 @@ sudo sed -i '$ a autospawn = no' /etc/pulse/client.conf
 
 # allow user pulse bluetooth access
 sudo addgroup pulse bluetooth
-sudo addgroup pulse pulse-access
 sudo addgroup pi pulse-access
 
 # start pulseaudio system wide
