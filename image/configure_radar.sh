@@ -6,7 +6,11 @@
 #enable usermod
 # sudo usermod -a -G spi,gpio,i2c pi
 
-#luma files and more
+# remove desktop packages
+sudo apt purge xserver* lightdm* vlc* lxde* chromium* desktop* gnome* gstreamer* gtk* hicolor-icon-theme* lx* mesa* -y
+sudo apt-get autoremove -y
+
+# luma files and more
 sudo apt-get update -y
 sudo apt-get upgrade -y
 sudo apt-get install python3-pip python3-pil -y
@@ -57,3 +61,6 @@ sudo addgroup pi pulse-access
 sudo cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
 sudo systemctl --system enable pulseaudio.service
 sudo systemctl --system start pulseaudio.service
+
+# enable spi
+sudo raspi-config nonint do_spi 0
