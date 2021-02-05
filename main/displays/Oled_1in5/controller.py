@@ -272,10 +272,6 @@ def shutdown(draw, countdown):
     centered_text(draw, 80, message, smallfont, fill="white")
 
 
-def init_ahrs():
-    pass
-
-
 def rollmarks(draw, roll):
     for rm in roll_posmarks:
         s = math.sin(math.radians(rm - roll + 90))

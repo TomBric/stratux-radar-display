@@ -39,7 +39,7 @@ ahrs_ui_changed = True
 
 
 def init(display_control):   # prepare everything
-    display_control.init_ahrs()
+    pass   # nothing to do in the setup now
 
 
 def draw_ahrs(draw, display_control, was_changed, pitch, roll, heading, slip):

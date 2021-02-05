@@ -38,6 +38,18 @@ echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" |
 # only works if crontab is empty, otherwise use
 # crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
 
-# cp /root/stratux-radar-display/image/rc.local.Oled_1in5 /etc/rc.local
-# cp /root/stratux-radar-display/image/rc.local.Epaper_3in7 /etc/rc.local
-# reboot
+
+# bluetooth configuration
+# Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
+#
+# configs in /etc/pulse/system.pa
+sudo sed -i '$ a load-module module-bluetooth-discover' /etc/pulse/system.pa
+sudo sed -i '$ a load-module module-bluetooth-policy' /etc/pulse/system.pa
+
+# allow user pulse bluetooth access
+sudo addgroup pulse bluetooth
+
+# start pulseaudio system wide
+sudo cp pulseaudio.service /etc/systemd/system/
+systemctl --system enable pulseaudio.service
+systemctl --system start pulseaudio.service

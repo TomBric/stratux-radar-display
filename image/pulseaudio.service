@@ -1,0 +1,12 @@
+# part of stratux-radar-display to enable bluetooth without user login
+# put this into file /etc/systemd/system/pulseaudio.service
+
+[Unit]
+Description=PulseAudio system server
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/pulseaudio --daemonize=no --system --realtime --log-target=syslog
+
+[Install]
+WantedBy=multi-user.target
