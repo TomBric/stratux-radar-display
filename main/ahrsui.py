@@ -52,11 +52,11 @@ def draw_ahrs(draw, display_control, was_changed, pitch, roll, heading, slip, gp
     if was_changed or ahrs_ui_changed:
         ahrs_ui_changed = False
         error_message = None
-        if gps_hor_accuracy > 30 and not ahrs_sensor:
+        if gps_hor_accuracy >= 30 and ahrs_sensor:
             error_message = MSG_GROUND_TEST
-        if gps_hor_accuracy > 30 and not ahrs_sensor:
+        if gps_hor_accuracy >= 30 and not ahrs_sensor:
             error_message = MSG_NO_AHRS
-        if gps_hor_accuracy <= 30 and not ahrs_sensor:
+        if gps_hor_accuracy < 30 and not ahrs_sensor:
             error_message = MSG_PSEUDO_AHRS
         display_control.clear(draw)
         display_control.ahrs(draw, pitch, roll, heading, slip, error_message)
