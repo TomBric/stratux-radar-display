@@ -252,14 +252,14 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
 
 
-def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, timer_runs):
+def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs):
     draw.text((5, 0), "UTC", font=smallfont, fill="black")
     centered_text(draw, SMALL, utctime, verylargefont, fill="black")
     if stoptime is not None:
         draw.text((5, SMALL+VERYLARGE), "Timer", font=smallfont, fill="black")
         centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill="black")
         if laptime is not None:
-            draw.text((5, 2*SMALL + 2 * VERYLARGE), "Laptime", font=smallfont, fill="black")
+            draw.text((5, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="black")
             centered_text(draw, 3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
 
     draw.text((5, sizey-SMALL-3), left_text, font=smallfont, fill="black")

@@ -72,7 +72,7 @@ aircraft_changed = True
 ui_changed = True
 situation = {'was_changed': True, 'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
              'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000}
-ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy':20000,
+ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
 # ahrs information, values are all rounded to integer
 
@@ -318,6 +318,7 @@ def new_situation(json_str):
     if ahrs['ahrs_sensor'] != ahrs_flag:
         ahrs['ahrs_sensor'] = ahrs_flag
         ahrs['was_changed'] = True
+
 
 async def listen_forever(path, name, callback):
     print(name + " waiting for " + path)
