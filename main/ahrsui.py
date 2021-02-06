@@ -37,7 +37,7 @@ import radarbuttons
 # globals
 ahrs_ui_changed = True
 
-MSG_GROUND_TEST = "NO GPS, GROUND ONLY!"
+MSG_GROUND_TEST = "No GPS,Ground ONLY!"
 MSG_PSEUDO_AHRS = "PSEUDO AHRS ONLY!"
 MSG_NO_AHRS = "NO IMU OR GPS!"
 
