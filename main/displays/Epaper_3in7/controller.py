@@ -282,5 +282,5 @@ def shutdown(draw, countdown):
 def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     centered_text(draw, 10, "AHRS not provided ", largefont, fill="black")
     centered_text(draw, 40, "on this display.", largefont, fill="black")
-    centered_text(draw, 80, "Long press on middle button", largefont, fill="black")
-    centered_text(draw, 120, "to continue ...", largefont, fill="black")
+    centered_text(draw, 120, "Long press on middle button", largefont, fill="black")
+    centered_text(draw, 150, "to continue ...", largefont, fill="black")
