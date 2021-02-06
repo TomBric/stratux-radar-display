@@ -119,7 +119,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    The bluetooth configuration is now ready and each time the radar has your device in reachability, it will connect. On the display the bluetooth symbol will be visible in the right corner.
    
  # Manual of stratux-radar-display (user interface with 3 pushbuttons) (thanks SiggiS)
- In all screen modes:
+### In all screen modes:
    - middle button (>1 sec): switch to next mode (radar -> timer -> ahrs -> radar)
    - left button (>1 sec): start shutdown, press any other button to cancel shutdown
    - after shutdown, display can be reactivated by switching on/off
