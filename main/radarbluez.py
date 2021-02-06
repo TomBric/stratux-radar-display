@@ -68,20 +68,29 @@ def bluez_init():
     except (KeyError, TypeError):
         logging.debug("Bluetooth: BLUEZ-SERVICE not initialised")
         return
-    esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-    if esng is None:
-        logging.info("Bluetooth: espeak-ng not initialized")
-        return
-    logging.info("Bluetooth: espeak-ng successfully initialized.")
     connected_devices()     # check if already devices are connected
     if bt_devices > 0:
+        if esng == None:
+            esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
+            if esng is None:
+                logging.info("Bluetooth: espeak-ng not initialized")
+                return
+            logging.info("Bluetooth: espeak-ng successfully initialized.")
         esng.say("Stratux Radar connected")
         print("SPEAK: Stratux Radar connected")
     bluetooth_active = True
 
 
 def speak(text):
+    global esng
+
     if bluetooth_active and bt_devices > 0:
+        if esng == None:   # first time to speak something
+            esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
+            if esng is None:
+                logging.info("Bluetooth: espeak-ng not initialized")
+                return
+            logging.info("Bluetooth: espeak-ng successfully initialized.")
         esng.say(text)
         logging.debug("Bluetooth speak: "+text)
 

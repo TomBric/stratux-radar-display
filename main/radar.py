@@ -44,15 +44,19 @@ import radarbluez
 import radarui
 import timerui
 import shutdownui
+import ahrsui
 import importlib
 
 # constant definitions
+RADAR_VERSION = "1.0c"
+
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 1.0
 RADAR_CUTOFF = 29
 ARCPOSITION_EXCLUDE_FROM = 130
 ARCPOSITION_EXCLUDE_TO = 230
 UI_REACTION_TIME = 0.1
+MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
 BLUEZ_CHECK_TIME = 3.0
 SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 
@@ -68,6 +72,10 @@ aircraft_changed = True
 ui_changed = True
 situation = {'was_changed': True, 'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
              'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000}
+ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
+        'ahrs_sensor': False}
+# ahrs information, values are all rounded to integer
+
 max_pixel = 0
 zerox = 0
 zeroy = 0
@@ -77,7 +85,7 @@ display_control = None
 speak = False  # BT is generally enabled
 bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
-global_mode = 1   # 1=Radar 2=Timer 3=Shutdown 0=Init
+global_mode = 1   # 1=Radar 2=Timer 3=Shutdown 4=refresh 5=ahrs 0=Init
 LAST_MODE = 3    # to be never reached
 
 
@@ -265,6 +273,8 @@ def new_traffic(json_str):
 
 def new_situation(json_str):
     global situation
+    global ahrs
+
     logging.debug("New Situation" + json_str)
     sit = json.loads(json_str)
     if not situation['connected']:
@@ -286,6 +296,28 @@ def new_situation(json_str):
     if situation['longitude'] != sit['GPSLongitude']:
         situation['longitude'] = sit['GPSLongitude']
         situation['was_changed'] = True
+    if ahrs['pitch'] != round(sit['AHRSPitch']):
+        ahrs['pitch'] = round(sit['AHRSPitch'])
+        ahrs['was_changed'] = True
+    if ahrs['roll'] != round(sit['AHRSRoll']):
+        ahrs['roll'] = round(sit['AHRSRoll'])
+        ahrs['was_changed'] = True
+    if ahrs['heading'] != round(sit['AHRSGyroHeading']):
+        ahrs['heading'] = round(sit['AHRSGyroHeading'])
+        ahrs['was_changed'] = True
+    if ahrs['slipskid'] != round(sit['AHRSSlipSkid']):
+        ahrs['heading'] = round(sit['AHRSSlipSkid'])
+        ahrs['was_changed'] = True
+    if ahrs['gps_hor_accuracy'] != round(sit['GPSHorizontalAccuracy']):
+        ahrs['gps_hor_accuracy'] = round(sit['GPSHorizontalAccuracy'])
+        ahrs['was_changed'] = True
+    if sit['AHRSStatus'] & 0x02:
+        ahrs_flag = True
+    else:
+        ahrs_flag = False
+    if ahrs['ahrs_sensor'] != ahrs_flag:
+        ahrs['ahrs_sensor'] = ahrs_flag
+        ahrs['was_changed'] = True
 
 
 async def listen_forever(path, name, callback):
@@ -294,7 +326,7 @@ async def listen_forever(path, name, callback):
         # outer loop restarted every time the connection fails
         logging.debug(name + " active ...")
         try:
-            async with websockets.connect(path) as ws:
+            async with websockets.connect(path, ping_timeout=100) as ws:
                 logging.debug(name + " connected on " + path)
                 while True:
                     # listener loop
@@ -310,6 +342,7 @@ async def listen_forever(path, name, callback):
                         return
 
                     callback(message)
+                    await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
         except (socket.error, websockets.exceptions.WebSocketException):
             logging.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
@@ -344,6 +377,8 @@ async def user_interface():
             elif global_mode == 4:  # refresh mode
                 next_mode = 0   # wait for display to change next mode
                 await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
+            elif global_mode == 5:  # ahrs
+                next_mode = ahrsui.user_input()
 
             if next_mode > 0:
                 ui_changed = True
@@ -388,6 +423,9 @@ async def display_and_cutoff():
                     print("Radar: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 1
+                elif global_mode == 5:   # ahrs'
+                    ahrsui.draw_ahrs(draw, display_control, ahrs['was_changed'], ahrs['pitch'], ahrs['roll'],
+                                     ahrs['heading'], ahrs['slipskid'], ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
                 await asyncio.sleep(0.2)
 
             logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
@@ -422,7 +460,8 @@ def main():
     if speak:
         radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
-    display_control.startup(draw, url_host_base, 4)
+    ahrsui.init(display_control)
+    display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())
     except asyncio.CancelledError:
@@ -445,11 +484,12 @@ if __name__ == "__main__":
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
     ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
+    ap.add_argument("-a", "--ahrs", required=False, help="Start mode is ahrs", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     args = vars(ap.parse_args())
     if args['verbose']:
-        logging.basicConfig(level=logging.DEBUG,format='%(asctime)-15s > %(message)s')
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)-15s > %(message)s')
     else:
         logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     url_host_base = args['connect']
@@ -457,6 +497,8 @@ if __name__ == "__main__":
     speak = args['speak']
     if args['timer']:
         global_mode = 2   # start_in_timer_mode
+    if args['ahrs']:
+        global_mode = 5   # start_in_ahrs mode
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"

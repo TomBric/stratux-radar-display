@@ -166,11 +166,12 @@ def centered_text(draw, y, text, font, fill):
     draw.text((zerox - ts[0] / 2, y), text, font=font, fill=fill)
 
 
-def startup(draw, target_ip, seconds):
+def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
     logo = Image.open(logopath)
     draw.bitmap((zerox-192/2, 0), logo, fill="black")
-    centered_text(draw, 193, "EPaper-Radar 1.0b", largefont, fill="black")
+    versionstr = "Epaper-Radar " + version
+    centered_text(draw, 193, versionstr, largefont, fill="black")
     centered_text(draw, sizey - VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
     display()
     time.sleep(seconds)
@@ -251,14 +252,14 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
 
 
-def timer(draw, utctime, stoptime, laptime, left_text, middle_text, right_text, timer_runs):
+def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs):
     draw.text((5, 0), "UTC", font=smallfont, fill="black")
     centered_text(draw, SMALL, utctime, verylargefont, fill="black")
     if stoptime is not None:
         draw.text((5, SMALL+VERYLARGE), "Timer", font=smallfont, fill="black")
         centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill="black")
         if laptime is not None:
-            draw.text((5, 2*SMALL + 2 * VERYLARGE), "Laptime", font=smallfont, fill="black")
+            draw.text((5, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="black")
             centered_text(draw, 3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
 
     draw.text((5, sizey-SMALL-3), left_text, font=smallfont, fill="black")
@@ -276,3 +277,10 @@ def shutdown(draw, countdown):
     centered_text(draw, 110, message, smallfont, fill="black")
     message = "to cancel ..."
     centered_text(draw, 130, message, smallfont, fill="black")
+
+
+def ahrs(draw, pitch, roll, heading, slipskid, error_message):
+    centered_text(draw, 10, "AHRS not provided ", largefont, fill="black")
+    centered_text(draw, 40, "on this display.", largefont, fill="black")
+    centered_text(draw, 120, "Long press on middle button", largefont, fill="black")
+    centered_text(draw, 150, "to continue ...", largefont, fill="black")
