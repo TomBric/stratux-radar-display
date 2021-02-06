@@ -72,7 +72,8 @@ aircraft_changed = True
 ui_changed = True
 situation = {'was_changed': True, 'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
              'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000}
-ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0}
+ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy':20000,
+        'ahrs_sensor': False}
 # ahrs information, values are all rounded to integer
 
 max_pixel = 0
@@ -307,7 +308,16 @@ def new_situation(json_str):
     if ahrs['slipskid'] != round(sit['AHRSSlipSkid']):
         ahrs['heading'] = round(sit['AHRSSlipSkid'])
         ahrs['was_changed'] = True
-
+    if ahrs['gps_hor_accuracy'] != round(sit['GPSHorizontalAccuracy']):
+        ahrs['gps_hor_accuracy'] = round(sit['GPSHorizontalAccuracy'])
+        ahrs['was_changed'] = True
+    if sit['AHRSStatus'] & 0x02:
+        ahrs = True
+    else:
+        ahrs = False
+    if ahrs['ahrs_sensor'] != ahrs:
+        ahrs['ahrs_sensor'] = ahrs
+        ahrs['was_changed'] = True
 
 async def listen_forever(path, name, callback):
     print(name + " waiting for " + path)
@@ -414,7 +424,7 @@ async def display_and_cutoff():
                     global_mode = 1
                 elif global_mode == 5:   # ahrs'
                     ahrsui.draw_ahrs(draw, display_control, ahrs['was_changed'], ahrs['pitch'], ahrs['roll'],
-                                     ahrs['heading'], ahrs['slipskid'])
+                                     ahrs['heading'], ahrs['slipskid'], ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
                 await asyncio.sleep(0.2)
 
             logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")

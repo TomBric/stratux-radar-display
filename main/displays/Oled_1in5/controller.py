@@ -312,7 +312,7 @@ def slip(draw, slipskid):
                   zerox - slipskid * slipscale + slipsize, device.height - 1), fill="white")
 
 
-def ahrs(draw, pitch, roll, heading, slipskid):
+def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     global image
     global ahrs_image
 
@@ -337,4 +337,5 @@ def ahrs(draw, pitch, roll, heading, slipskid):
     slip(draw, slipskid)
 
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
-    # draw.text((0, 100), infotext, font=smallfont, fill="white", align="right")
+    if error_message:
+        centered_text(draw, 30, error_message, smallfont, fill="red")

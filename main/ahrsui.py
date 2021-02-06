@@ -37,18 +37,29 @@ import radarbuttons
 # globals
 ahrs_ui_changed = True
 
+MSG_GROUND_TEST = "NO GPS - GROUND TEST MODE!"
+MSG_PSEUDO_AHRS = "GPS PSEUDO AHRS ONLY!"
+MSG_NO_AHRS = "NO IMU OR GPS!"
+
 
 def init(display_control):   # prepare everything
     pass   # nothing to do in the setup now
 
 
-def draw_ahrs(draw, display_control, was_changed, pitch, roll, heading, slip):
+def draw_ahrs(draw, display_control, was_changed, pitch, roll, heading, slip, gps_hor_accuracy, ahrs_sensor):
     global ahrs_ui_changed
 
     if was_changed or ahrs_ui_changed:
         ahrs_ui_changed = False
+        error_message = None
+        if gps_hor_accuracy > 30 and not ahrs_sensor:
+            error_message = MSG_GROUND_TEST
+        if gps_hor_accuracy > 30 and not ahrs_sensor:
+            error_message = MSG_NO_AHRS
+        if gps_hor_accuracy <= 30 and not ahrs_sensor:
+            error_message = MSG_PSEUDO_AHRS
         display_control.clear(draw)
-        display_control.ahrs(draw, pitch, roll, heading, slip)
+        display_control.ahrs(draw, pitch, roll, heading, slip, error_message)
         display_control.display()
 
 
