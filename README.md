@@ -84,15 +84,13 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    3. The file "wpa_supplicant.conf" is actually configured for the network "stratux". If you want a different network setup please modify "wpa_supplicant.conf" accordingly. To get the following configurations please setup network and keys in "wpa_supplicant.conf" so that you have internet connection.
    4. Startup your Stratux and boot your new raspberry. Figure out the IP-adress of your raspberry, e.g. by checking in the logs of your WLAN router (or use arp requests)
    5. From your workstation open a remote shell on the new raspberry:  ssh pi@192.168.x.x. Password is standard for the pi.
-   6. On the raspberry modify the following settings via "sudo raspi-config":   "-> Interface Options -> Enable SPI"
-   7. Copy the configuration script (under github/image) onto the radar-raspberry:  scp configure_radar.sh pi@192.168.x.x:/home/pi
-   8. Execute the configuration script as user pi. "/bin/bash configure_radar.sh".  This will take some time since it does an update on the pi. It will also clone a version of the radar into /home/pi/stratux-radar-display
-   9. Depending on your display modify /home/pi/stratux-radar-display/image/stratux_radar.sh. In paramater "-c"Enter the IP Adress of your stratux and in parameter "-d" the device. E.g.
+   6. Copy the configuration script (under github/image) onto the radar-raspberry:  scp configure_radar.sh pi@192.168.x.x:/home/pi
+   7. Execute the configuration script as user pi. "/bin/bash configure_radar.sh".  This will take some time since it does an update on the pi. It will also clone a version of the radar into /home/pi/stratux-radar-display
+   8. Depending on your display modify /home/pi/stratux-radar-display/image/stratux_radar.sh. In paramater "-c"Enter the IP Adress of your stratux and in parameter "-d" the device. E.g.
          - cd /home/pi/stratux-radar-display/main && python3 radar.py -s -d Oled_1in5 -c 192.168.10.1 &            
          - cd /home/pi/stratux-radar-display/main && python3 radar.py -s -d Epaper_3in7 -c 192.168.178.55 & 
-    10. The configuration skript will make an entry in crontab of user pi, so that radar will start automatically after reboot.
+   9. The configuration skript will make an entry in crontab of user pi, so that radar will start automatically after reboot.
 
-   Remark: Raspbian Buster on the Pi Zero has problems with IPV6. So if you connect it to some network with IPV6 devices, make sure IPV6 is disabled (append ipv6.disable=1 on the first line in cmdline.txt in the image before booting)
    
    ### Installation on a standard stratux device
    stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. You can then start with step 5 from expert setup above. The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
@@ -120,4 +118,30 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    
    The bluetooth configuration is now ready and each time the radar has your device in reachability, it will connect. On the display the bluetooth symbol will be visible in the right corner.
    
+ # Manual of stratux-radar-display (user interface with 3 pushbuttons) (thanks SiggiS)
+### In all screen modes:
+   - middle button (>1 sec): switch to next mode (radar -> timer -> ahrs -> radar)
+   - left button (>1 sec): start shutdown, press any other button to cancel shutdown
+   - after shutdown, display can be reactivated by switching on/off
    
+### Radar screen mode:
+   - left button short: change radar range (2nm -> 5nm -> 10nm -> 40nm)
+   - middle button short: enable/disable sound (if bluetooth speaker/headset is connected)
+   - right button short: change height difference for traffic (1000ft -> 2000 ft -> 5000 ft -> 10k ft -> 50k ft)
+   
+Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
+
+### Timer screen mode:
+   - right button short:  start or stop timer (displayed in the middle)
+   - left button short: start lap-timer (displayed on bottom)
+   - middle short: change to countdown-setting. Here a countdown timer can be set. If the countdown runs down to 0:00, this will also be signalled by sound output in your headset
+   - press middle short again to end countdown-setting. Countdown will be started, wenn timer is started. It timer is already running, countdown will start as soon as you leave the countdown setting mode
+   
+   - in countdown-setting mode:
+      - press middle short again to end countdown-setting. Countdown will be started, wenn timer is started. It timer is already running, countdown will start as soon as you leave the countdown setting mode
+      - press left button to increase countdown time by 10 mins
+      - press right button to increase countdown time by 1 mins
+      - max countdown time is 2 hours. If you set countdown time > 2 h, countdone timer will be cleared
+   
+ ### AHRS mode:
+ - no special interaction, press long middle for next mode
