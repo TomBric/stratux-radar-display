@@ -118,4 +118,30 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    
    The bluetooth configuration is now ready and each time the radar has your device in reachability, it will connect. On the display the bluetooth symbol will be visible in the right corner.
    
+ # Manual of stratux-radar-display (user interface with 3 pushbuttons) (thanks SiggiS)
+ In all screen modes:
+   - middle button (>1 sec): switch to next mode (radar -> timer -> ahrs -> radar)
+   - left button (>1 sec): start shutdown, press any other button to cancel shutdown
+   - after shutdown, display can be reactivated by switching on/off
    
+### Radar screen mode:
+   - left button short: change radar range (2nm -> 5nm -> 10nm -> 40nm)
+   - middle button short: enable/disable sound (if bluetooth speaker/headset is connected)
+   - right button short: change height difference for traffic (1000ft -> 2000 ft -> 5000 ft -> 10k ft -> 50k ft)
+   
+Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
+
+### Timer screen mode:
+   - right button short:  start or stop timer (displayed in the middle)
+   - left button short: start lap-timer (displayed on bottom)
+   - middle short: change to countdown-setting. Here a countdown timer can be set. If the countdown runs down to 0:00, this will also be signalled by sound output in your headset
+   - press middle short again to end countdown-setting. Countdown will be started, wenn timer is started. It timer is already running, countdown will start as soon as you leave the countdown setting mode
+   
+   - in countdown-setting mode:
+      - press middle short again to end countdown-setting. Countdown will be started, wenn timer is started. It timer is already running, countdown will start as soon as you leave the countdown setting mode
+      - press left button to increase countdown time by 10 mins
+      - press right button to increase countdown time by 1 mins
+      - max countdown time is 2 hours. If you set countdown time > 2 h, countdone timer will be cleared
+   
+ ### AHRS mode:
+ - no special interaction, press long middle for next mode
