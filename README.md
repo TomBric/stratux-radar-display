@@ -84,15 +84,13 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    3. The file "wpa_supplicant.conf" is actually configured for the network "stratux". If you want a different network setup please modify "wpa_supplicant.conf" accordingly. To get the following configurations please setup network and keys in "wpa_supplicant.conf" so that you have internet connection.
    4. Startup your Stratux and boot your new raspberry. Figure out the IP-adress of your raspberry, e.g. by checking in the logs of your WLAN router (or use arp requests)
    5. From your workstation open a remote shell on the new raspberry:  ssh pi@192.168.x.x. Password is standard for the pi.
-   6. On the raspberry modify the following settings via "sudo raspi-config":   "-> Interface Options -> Enable SPI"
-   7. Copy the configuration script (under github/image) onto the radar-raspberry:  scp configure_radar.sh pi@192.168.x.x:/home/pi
-   8. Execute the configuration script as user pi. "/bin/bash configure_radar.sh".  This will take some time since it does an update on the pi. It will also clone a version of the radar into /home/pi/stratux-radar-display
-   9. Depending on your display modify /home/pi/stratux-radar-display/image/stratux_radar.sh. In paramater "-c"Enter the IP Adress of your stratux and in parameter "-d" the device. E.g.
+   6. Copy the configuration script (under github/image) onto the radar-raspberry:  scp configure_radar.sh pi@192.168.x.x:/home/pi
+   7. Execute the configuration script as user pi. "/bin/bash configure_radar.sh".  This will take some time since it does an update on the pi. It will also clone a version of the radar into /home/pi/stratux-radar-display
+   8. Depending on your display modify /home/pi/stratux-radar-display/image/stratux_radar.sh. In paramater "-c"Enter the IP Adress of your stratux and in parameter "-d" the device. E.g.
          - cd /home/pi/stratux-radar-display/main && python3 radar.py -s -d Oled_1in5 -c 192.168.10.1 &            
          - cd /home/pi/stratux-radar-display/main && python3 radar.py -s -d Epaper_3in7 -c 192.168.178.55 & 
-    10. The configuration skript will make an entry in crontab of user pi, so that radar will start automatically after reboot.
+   9. The configuration skript will make an entry in crontab of user pi, so that radar will start automatically after reboot.
 
-   Remark: Raspbian Buster on the Pi Zero has problems with IPV6. So if you connect it to some network with IPV6 devices, make sure IPV6 is disabled (append ipv6.disable=1 on the first line in cmdline.txt in the image before booting)
    
    ### Installation on a standard stratux device
    stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. You can then start with step 5 from expert setup above. The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
