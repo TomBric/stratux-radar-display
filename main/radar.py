@@ -312,11 +312,11 @@ def new_situation(json_str):
         ahrs['gps_hor_accuracy'] = round(sit['GPSHorizontalAccuracy'])
         ahrs['was_changed'] = True
     if sit['AHRSStatus'] & 0x02:
-        ahrs = True
+        ahrs_flag = True
     else:
-        ahrs = False
-    if ahrs['ahrs_sensor'] != ahrs:
-        ahrs['ahrs_sensor'] = ahrs
+        ahrs_flag = False
+    if ahrs['ahrs_sensor'] != ahrs_flag:
+        ahrs['ahrs_sensor'] = ahrs_flag
         ahrs['was_changed'] = True
 
 async def listen_forever(path, name, callback):
