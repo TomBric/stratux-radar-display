@@ -49,6 +49,8 @@ echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" |
 # configs in /etc/pulse/system.pa
 sudo sed -i '$ a load-module module-bluetooth-discover' /etc/pulse/system.pa
 sudo sed -i '$ a load-module module-bluetooth-policy' /etc/pulse/system.pa
+sudo sed -i '$ a load-module module-switch-on-connect' /etc/pulse/system.pa
+
 # configs in /etc/pulse/client.conf to disable client spawns
 sudo sed -i '$ a default-server = /var/run/pulse/native' /etc/pulse/client.conf
 sudo sed -i '$ a autospawn = no' /etc/pulse/client.conf

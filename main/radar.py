@@ -152,15 +152,16 @@ def calc_gps_distance(lat, lng):
 
 
 def speaktraffic(hdiff, direction=None):
-    feet = hdiff * 100
-    sign = 'plus'
-    if hdiff < 0:
-        sign = 'minus'
-    txt = 'Traffic '
-    if direction:
-        txt += str(direction) + ' o\'clock '
-    txt += sign + ' ' + str(abs(feet)) + ' feet'
-    radarbluez.speak(txt)
+    if sound_on:
+        feet = hdiff * 100
+        sign = 'plus'
+        if hdiff < 0:
+            sign = 'minus'
+        txt = 'Traffic '
+        if direction:
+            txt += str(direction) + ' o\'clock '
+        txt += sign + ' ' + str(abs(feet)) + ' feet'
+        radarbluez.speak(txt)
 
 
 def new_traffic(json_str):
@@ -369,6 +370,10 @@ async def user_interface():
                 next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
                 if toggle_sound:
                     sound_on = not sound_on
+                    if sound_on:
+                        radarbluez.speak("Radar sound on")
+                    else:
+                        radarbluez.speak("Radar sound off")
                     ui_changed = True
             elif global_mode == 2:  # Timer mode
                 next_mode = timerui.user_input()
