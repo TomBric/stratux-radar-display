@@ -237,7 +237,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     elif gps_quality == 1:
         t = "3D-GPS\n" + str(round(gps_h_accuracy, 1)) +"m"
     elif gps_quality == 2:
-        t = "3D-GPS+SBAS\n" + str(round(gps_h_accuracy, 1)) +"m"
+        t = "3DGps+SB\n" + str(round(gps_h_accuracy, 1)) +"m"
     else:
         t = ""
     draw.text((5, SMALL+10), t, font=verysmallfont, fill="black")
