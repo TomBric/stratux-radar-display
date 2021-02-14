@@ -153,7 +153,10 @@ def refresh():
     global epaper_image
 
     print("Refreshing display ...")
-    device.display_1Gray_FULL(device.getbuffer(epaper_image))
+    device.init(0)
+    device.Clear(0xFF, 0)  # necessary to overwrite everything
+    device.init(1)
+    # device.Clear(0xFF, 1)
     print("Done.")
 
 
