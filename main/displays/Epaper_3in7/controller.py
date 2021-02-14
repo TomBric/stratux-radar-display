@@ -224,12 +224,25 @@ def modesaircraft(draw, radius, height, arcposition):
     draw.text(tposition, t, font=largefont, fill="black")
 
 
-def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0, sound_active=True):
+def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
+              gps_quality, gps_h_accuracy):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
 
     draw.text((5, 1), str(range)+" nm", font=smallfont, fill="black")
+
+    if gps_quality == 0:
+        t = "GPS-NoFix"
+    elif gps_quality == 1:
+        t = "3D-GPS\n" + str(round(gps_h_accuracy, 1)) +"m"
+    elif gps_quality == 2:
+        t = "3D-GPS+SBAS\n" + str(round(gps_h_accuracy, 1)) +"m"
+    else:
+        t = ""
+    draw.text((5, SMALL+10), t, font=verysmallfont, fill="black")
+
+
     t = "FL"+str(round(ownalt / 100))
     textsize = draw.textsize(t, verysmallfont)
     draw.text((sizex - textsize[0] - 5, SMALL+10), t, font=verysmallfont, fill="black")

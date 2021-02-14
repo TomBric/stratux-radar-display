@@ -71,7 +71,8 @@ all_ac = {}
 aircraft_changed = True
 ui_changed = True
 situation = {'was_changed': True, 'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
-             'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000}
+             'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000, 'gps_quality': 0,
+             'gps_h_accuracy': 20000}
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
 # ahrs information, values are all rounded to integer
@@ -120,7 +121,7 @@ def draw_display(draw):
         display_control.clear(draw)
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
-                                  sound_on)
+                                  sound_on, situation['gps_quality'], situation['gps_h_accuracy'])
         draw_all_ac(draw, all_ac)
         display_control.display()
         situation['was_changed'] = False
@@ -297,6 +298,13 @@ def new_situation(json_str):
     if situation['longitude'] != sit['GPSLongitude']:
         situation['longitude'] = sit['GPSLongitude']
         situation['was_changed'] = True
+    if situation['gps_quality'] != sit['GPSFixQuality']:
+        situation['gps_quality'] = sit['GPSFixQuality']
+        situation['was_changed'] = True
+    if situation['gps_h_accuracy'] != sit['GPSHorizontalAccuracy']:
+        situation['gps_h_accuracy'] = sit['GPSHorizontalAccuracy']
+        situation['was_changed'] = True
+
     if ahrs['pitch'] != round(sit['AHRSPitch']):
         ahrs['pitch'] = round(sit['AHRSPitch'])
         ahrs['was_changed'] = True
