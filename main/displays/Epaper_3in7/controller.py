@@ -81,7 +81,7 @@ def make_font(name, size):
 def display():
     global device
     global epaper_image
-    device.async_display_1Gray(device.getbuffer(epaper_image))
+    device.async_display_1Gray(device.getbuffer_optimized(epaper_image))
 
 
 def is_busy():
@@ -133,7 +133,7 @@ def init():
     # measure time for refresh
     start = time.time()
     # do sync version of display to measure time
-    device.display_1Gray(device.getbuffer(epaper_image))
+    device.display_1Gray(device.getbuffer_optimized(epaper_image))
     end = time.time()
     display_refresh = end-start
     logging.info("Measured Display Refresh Time: " + str(display_refresh) + " seconds")
@@ -239,9 +239,9 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     if gps_quality == 0:
         t = "GPS-NoFix"
     elif gps_quality == 1:
-        t = "3DGPS\n" + str(round(gps_h_accuracy, 1)) +"m"
+        t = "3D GPS\n" + str(round(gps_h_accuracy, 1)) +"m"
     elif gps_quality == 2:
-        t = "DGPS\n" + str(round(gps_h_accuracy, 1)) +"m"
+        t = "DGNSS\n" + str(round(gps_h_accuracy, 1)) +"m"
     else:
         t = ""
     draw.text((5, SMALL+10), t, font=verysmallfont, fill="black")
