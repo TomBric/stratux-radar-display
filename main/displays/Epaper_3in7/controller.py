@@ -63,6 +63,7 @@ verysmallfont = ""
 awesomefont = ""
 device = None
 epaper_image = None
+draw = None
 # end device globals
 
 
@@ -110,6 +111,7 @@ def init():
     global awesomefont
     global device
     global epaper_image
+    global draw
 
     device = epd3in7.EPD()
     device.init(0)
