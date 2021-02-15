@@ -406,8 +406,8 @@ class EPD:
         #    for i in range(0, int(self.width / 8)):
         #     self.send_data(image[i + j * int(self.width / 8)])   
 
-        # self.load_lut(self.lut_1Gray_DU)
-        self.load_lut(self.lut_1Gray_A2)
+        self.load_lut(self.lut_1Gray_DU)
+        # self.load_lut(self.lut_1Gray_A2)
         self.send_command(0x20)
         self.ReadBusy()
 
@@ -452,8 +452,8 @@ class EPD:
         #    for i in range(0, int(self.width / 8)):
         #     self.send_data(image[i + j * int(self.width / 8)])
 
-        # self.load_lut(self.lut_1Gray_DU)
-        self.load_lut(self.lut_1Gray_A2)
+        self.load_lut(self.lut_1Gray_DU)
+        # self.load_lut(self.lut_1Gray_A2)
         self.send_command(0x20)
         # self.ReadBusy()
 
