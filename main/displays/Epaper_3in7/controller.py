@@ -165,7 +165,7 @@ def refresh():
 
 
 def clear(draw):
-    draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
+    draw.rectangle((0, 0, sizex - 1, sizey - 1), fill=0x01)  # clear everything in image
 
 
 def centered_text(draw, y, text, font, fill):
@@ -208,7 +208,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
         tposition = (x - 4 * AIRCRAFT_SIZE - tsize[0], int(y - tsize[1] / 2))
     else:
         tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - tsize[1] / 2))
-    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + tsize[1])), fill="white")
+    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + tsize[1])), fill=0x01)
     draw.text(tposition, t, font=largefont, fill="black")
 
 
@@ -224,7 +224,7 @@ def modesaircraft(draw, radius, height, arcposition):
     t = signchar+str(abs(height))
     tsize = draw.textsize(t, largefont)
     tposition = (zerox+arctext[0]-tsize[0]/2, zeroy+arctext[1]-tsize[1]/2)
-    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+tsize[1])), fill="white")
+    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+tsize[1])), fill=0x01)
     draw.text(tposition, t, font=largefont, fill="black")
 
 
