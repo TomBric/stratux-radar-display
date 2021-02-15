@@ -52,7 +52,7 @@ class EPD:
         self.GRAY2  = GRAY2
         self.GRAY3  = GRAY3 #gray
         self.GRAY4  = GRAY4 #Blackest
-        self.image_0xff = Image.new('1', (self.height, self.width), 0x01)
+        self.image_0xff = Image.new('L', (self.height, self.width), 0x01)
 
     lut_4Gray_GC = [
         0x2A,0x06,0x15,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
