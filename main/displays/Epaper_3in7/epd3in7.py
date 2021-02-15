@@ -246,6 +246,8 @@ class EPD:
 
     def getbuffer_optimized(self, image):
         print("Width:", self.width, " Height ", self.height)
+        for x in range(32):
+            print("%x ",image.tobytes()[x])
         ba = bitarray(image.tobytes())
         return ba
         '''
