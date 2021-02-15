@@ -30,7 +30,6 @@
 import logging
 from . import epdconfig
 from PIL import Image
-from bitarray import bitarray
 
 # Display resolution
 EPD_WIDTH       = 280
@@ -52,7 +51,7 @@ class EPD:
         self.GRAY2  = GRAY2
         self.GRAY3  = GRAY3 #gray
         self.GRAY4  = GRAY4 #Blackest
-        self.image_0xff = Image.new('1', (self.height, self.width), 0xff)
+        self.image_0xff = Image.new('L', (self.height, self.width), 0xff)
 
     lut_4Gray_GC = [
         0x2A,0x06,0x15,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -245,9 +244,8 @@ class EPD:
 
 
     def getbuffer_optimized(self, image):
-        print("Width:", self.width, " Height ", self.height)
-        ba = bitarray(image.tobytes())
-        return ba
+        # print("Width:", self.width, " Height ", self.height)
+        return image.tobytes()
         '''
         # logging.debug("bufsiz = ",int(self.width/8) * self.height)
         buf = [0xFF] * (int(self.width/8) * self.height)
