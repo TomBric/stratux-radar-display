@@ -116,7 +116,7 @@ def init():
     device = epd3in7.EPD()
     device.init(0)
     device.Clear(0xFF, 0)   # necessary to overwrite everything
-    epaper_image = Image.new('L', (device.height, device.width), 255)
+    epaper_image = Image.new('1', (device.height, device.width), 1)
     draw = ImageDraw.Draw(epaper_image)
     device.init(1)
     device.Clear(0xFF, 1)
