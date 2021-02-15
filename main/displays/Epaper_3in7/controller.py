@@ -117,7 +117,12 @@ def init():
     device.init(0)
     device.Clear(0x01, 0)   # necessary to overwrite everything
     epaper_image = Image.new('1', (device.height, device.width), 0x01)
+    for x in range(32):
+        print("%x ", epaper_image.tobytes()[x])
     draw = ImageDraw.Draw(epaper_image)
+    print("Second:")
+    for x in range(32):
+        print("%x ", epaper_image.tobytes()[x])
     device.init(1)
     device.Clear(0x01, 1)
     sizex = device.height
