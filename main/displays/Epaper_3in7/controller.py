@@ -156,10 +156,9 @@ def refresh():
     global draw
 
     print("Refreshing display ...")
-    centered_text(draw, 50, "Starting Display refresh ...", largefont, fill="black")
     # device.init(0)
     # device.Clear(0x00, 0)  # necessary to overwrite everything
-    device.Clear(0xFF, 0)  # necessary to overwrite everything
+    # device.Clear(0xFF, 0)  # necessary to overwrite everything
     device.init(1)
     # device.Clear(0xFF, 1)
     print("Done.")
