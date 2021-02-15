@@ -30,6 +30,7 @@
 import logging
 from . import epdconfig
 from PIL import Image
+from bitarray import bitarray
 
 # Display resolution
 EPD_WIDTH       = 280
@@ -245,7 +246,8 @@ class EPD:
 
     def getbuffer_optimized(self, image):
         # print("Width:", self.width, " Height ", self.height)
-        return image.tobytes()
+        ba = bitarray(image.tobytes())
+        return ba
         '''
         # logging.debug("bufsiz = ",int(self.width/8) * self.height)
         buf = [0xFF] * (int(self.width/8) * self.height)
