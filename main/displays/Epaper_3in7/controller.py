@@ -154,6 +154,7 @@ def refresh():
 
     print("Refreshing display ...")
     # device.init(0)
+    device.Clear(0x00, 1)  # necessary to overwrite everything
     device.Clear(0xFF, 1)  # necessary to overwrite everything
     # device.init(1)
     # device.Clear(0xFF, 1)

@@ -458,7 +458,6 @@ class EPD:
         # self.ReadBusy()
 
     def async_is_busy(self):
-        logging.debug("check async busy")
         return epdconfig.digital_read(self.busy_pin)
         # 0: idle, 1: busy
 
