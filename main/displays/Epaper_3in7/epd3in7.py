@@ -30,7 +30,7 @@
 import logging
 from . import epdconfig
 from PIL import Image
-import bitarray
+from bitarray import bitarray
 
 # Display resolution
 EPD_WIDTH       = 280
