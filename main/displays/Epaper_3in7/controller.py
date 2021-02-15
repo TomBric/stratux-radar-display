@@ -115,11 +115,11 @@ def init():
 
     device = epd3in7.EPD()
     device.init(0)
-    device.Clear(0xFF, 0)   # necessary to overwrite everything
+    device.Clear(0x01, 0)   # necessary to overwrite everything
     epaper_image = Image.new('1', (device.height, device.width), 1)
     draw = ImageDraw.Draw(epaper_image)
     device.init(1)
-    device.Clear(0xFF, 1)
+    device.Clear(0x01, 1)
     sizex = device.height
     sizey = device.width
     zerox = sizex / 2
@@ -144,7 +144,7 @@ def cleanup():
     global device
 
     device.init(0)
-    device.Clear(0xFF, 0)
+    device.Clear(0x01, 0)
     device.sleep()
     device.Dev_exit()
     logging.debug("Epaper cleaned up.")
@@ -158,9 +158,9 @@ def refresh():
     print("Refreshing display ...")
     # device.init(0)
     # device.Clear(0x00, 0)  # necessary to overwrite everything
-    device.Clear(0xFF, 0)  # necessary to overwrite everything
+    device.Clear(0x01, 0)  # necessary to overwrite everything
     device.init(1)
-    # device.Clear(0xFF, 1)
+    # device.Clear(0x01, 1)
     print("Done.")
 
 
