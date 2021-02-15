@@ -472,13 +472,13 @@ class EPD:
         self.send_data(0x00)
 
         self.send_command(0x24)
-        self.send_data2(self.image_0xff)
+        self.send_data2(self.getbuffer(self.image_0xff))
         # for j in range(0, self.height):
         #    for i in range(0, int(self.width / 8)):
         #        self.send_data(0xff)
         if(mode == 0):              #4Gray
             self.send_command(0x26)
-            self.send_data2(self.image_0xff)
+            self.send_data2(self.getbuffer(self.image_0xff))
             # for j in range(0, self.height):
             #    for i in range(0, int(self.width / 8)):
             #        self.send_data(0xff)
