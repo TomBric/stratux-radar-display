@@ -81,7 +81,7 @@ def make_font(name, size):
 def display():
     global device
     global epaper_image
-    device.async_display_1Gray(device.getbuffer_optimized(epaper_image))
+    device.async_display_1Gray(device.getbuffer(epaper_image))
 
 
 def is_busy():
@@ -115,8 +115,8 @@ def init():
 
     device = epd3in7.EPD()
     device.init(0)
-    device.Clear(0x01, 0)   # necessary to overwrite everything
-    epaper_image = Image.new('1', (device.height, device.width), 0x01)
+    device.Clear(0xFF, 0)   # necessary to overwrite everything
+    epaper_image = Image.new('1', (device.height, device.width), 0xFF)
     for x in range(32):
         print("%x ", epaper_image.tobytes()[x])
     draw = ImageDraw.Draw(epaper_image)
@@ -124,7 +124,7 @@ def init():
     for x in range(32):
         print("%x ", epaper_image.tobytes()[x])
     device.init(1)
-    device.Clear(0x01, 1)
+    device.Clear(0xFF, 1)
     sizex = device.height
     sizey = device.width
     zerox = sizex / 2
@@ -138,7 +138,7 @@ def init():
     # measure time for refresh
     start = time.time()
     # do sync version of display to measure time
-    device.display_1Gray(device.getbuffer_optimized(epaper_image))
+    device.display_1Gray(device.getbuffer(epaper_image))
     end = time.time()
     display_refresh = end-start
     logging.info("Measured Display Refresh Time: " + str(display_refresh) + " seconds")
@@ -149,7 +149,7 @@ def cleanup():
     global device
 
     device.init(0)
-    device.Clear(0x01, 0)
+    device.Clear(0xFF, 0)
     device.sleep()
     device.Dev_exit()
     logging.debug("Epaper cleaned up.")
@@ -163,14 +163,14 @@ def refresh():
     print("Refreshing display ...")
     # device.init(0)
     # device.Clear(0x00, 0)  # necessary to overwrite everything
-    device.Clear(0x01, 0)  # necessary to overwrite everything
+    device.Clear(0xFF, 0)  # necessary to overwrite everything
     device.init(1)
-    # device.Clear(0x01, 1)
+    # device.Clear(0xFF, 1)
     print("Done.")
 
 
 def clear(draw):
-    draw.rectangle((0, 0, sizex - 1, sizey - 1), fill=0x01)  # clear everything in image
+    draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
 
 
 def centered_text(draw, y, text, font, fill):
@@ -213,7 +213,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
         tposition = (x - 4 * AIRCRAFT_SIZE - tsize[0], int(y - tsize[1] / 2))
     else:
         tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - tsize[1] / 2))
-    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + tsize[1])), fill=0x01)
+    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + tsize[1])), fill="white")
     draw.text(tposition, t, font=largefont, fill="black")
 
 
@@ -229,7 +229,7 @@ def modesaircraft(draw, radius, height, arcposition):
     t = signchar+str(abs(height))
     tsize = draw.textsize(t, largefont)
     tposition = (zerox+arctext[0]-tsize[0]/2, zeroy+arctext[1]-tsize[1]/2)
-    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+tsize[1])), fill=0x01)
+    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+tsize[1])), fill="white")
     draw.text(tposition, t, font=largefont, fill="black")
 
 

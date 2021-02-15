@@ -36,7 +36,7 @@ from bitarray import bitarray
 EPD_WIDTH       = 280
 EPD_HEIGHT      = 480
 
-GRAY1  = 0x01 #white
+GRAY1  = 0xFF #white
 GRAY2  = 0xC0 #Close to white
 GRAY3  = 0x80 #Close to balck
 GRAY4  = 0x00 #balck
@@ -52,7 +52,7 @@ class EPD:
         self.GRAY2  = GRAY2
         self.GRAY3  = GRAY3 #gray
         self.GRAY4  = GRAY4 #Blackest
-        self.image_0xff = Image.new('1', (self.height, self.width), 0x01)
+        self.image_0xff = Image.new('1', (self.height, self.width), 0xFF)
 
     lut_4Gray_GC = [
         0x2A,0x06,0x15,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
