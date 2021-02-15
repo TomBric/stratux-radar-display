@@ -36,7 +36,7 @@ from bitarray import bitarray
 EPD_WIDTH       = 280
 EPD_HEIGHT      = 480
 
-GRAY1  = 0xff #white
+GRAY1  = 0x01 #white
 GRAY2  = 0xC0 #Close to white
 GRAY3  = 0x80 #Close to balck
 GRAY4  = 0x00 #balck
