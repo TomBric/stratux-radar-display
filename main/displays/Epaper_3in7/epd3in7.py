@@ -29,6 +29,7 @@
 
 import logging
 from . import epdconfig
+from PIL import Image
 
 # Display resolution
 EPD_WIDTH       = 280
@@ -50,6 +51,7 @@ class EPD:
         self.GRAY2  = GRAY2
         self.GRAY3  = GRAY3 #gray
         self.GRAY4  = GRAY4 #Blackest
+        self.image_0xff = Image.new('1', (self.height, self.width), 0xff)
 
     lut_4Gray_GC = [
         0x2A,0x06,0x15,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -470,14 +472,16 @@ class EPD:
         self.send_data(0x00)
 
         self.send_command(0x24)
-        for j in range(0, self.height):
-            for i in range(0, int(self.width / 8)):
-                self.send_data(0xff)
+        self.send_data2(self.image_0xff)
+        # for j in range(0, self.height):
+        #    for i in range(0, int(self.width / 8)):
+        #        self.send_data(0xff)
         if(mode == 0):              #4Gray
             self.send_command(0x26)
-            for j in range(0, self.height):
-                for i in range(0, int(self.width / 8)):
-                    self.send_data(0xff) 
+            self.send_data2(self.image_0xff)
+            # for j in range(0, self.height):
+            #    for i in range(0, int(self.width / 8)):
+            #        self.send_data(0xff)
             self.load_lut(self.lut_4Gray_GC)
             self.send_command(0x22)
             self.send_data(0xC7)
