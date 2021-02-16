@@ -322,7 +322,7 @@ def rollmarks(draw, roll):
         else:
             draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 16) * c,
                        ah_zeroy - (di - 16) * s), fill="black", width=4)
-    draw.polygon((ah_zerox, 24, ah_zerox - 20, 24 + 16, ah_zerox + 20, 24 + 16), fill="black")
+    draw.polygon((ah_zerox, 24, ah_zerox - 16, 24 + 12, ah_zerox + 16, 24 + 12), fill="black")
 
 
 def linepoints(pitch, roll, pitch_distance, length):
@@ -361,6 +361,12 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     h3, h4 = linepoints(pitch, roll, 180, 600)
     draw.polygon((h1, h2, h4, h3), fill="white")  # sky
     draw.line((h1, h2), fill="black", width=4)  # horizon line
+
+    earthfill = 0;
+    while earthfill < 180:
+        earthfill += 3
+        draw.line((linepoints(pitch, roll, earthfill, 600)), fill="black", width=1)
+
     for pm in pitch_posmarks:  # pitchmarks
         draw.line((linepoints(pitch, roll, pm, 30)), fill="black", width=4)
 
