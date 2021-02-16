@@ -317,12 +317,12 @@ def rollmarks(draw, roll):
         s = math.sin(math.radians(rm - roll + 90))
         c = math.cos(math.radians(rm - roll + 90))
         if rm % 30 == 0:
-            draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 16) * c,
-                       ah_zeroy - (di - 16) * s), fill="black", width=2)
+            draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 24) * c,
+                       ah_zeroy - (di - 24) * s), fill="black", width=4)
         else:
-            draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 10) * c,
-                       ah_zeroy - (di - 10) * s), fill="black", width=2)
-    draw.polygon((ah_zerox, 20, ah_zerox - 15, 20 + 10, ah_zerox + 15, 20 + 10), fill="black")
+            draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 16) * c,
+                       ah_zeroy - (di - 16) * s), fill="black", width=4)
+    draw.polygon((ah_zerox, 24, ah_zerox - 20, 24 + 16, ah_zerox + 20, 20 + 16), fill="black")
 
 
 def linepoints(pitch, roll, pitch_distance, length):
