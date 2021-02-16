@@ -132,7 +132,7 @@ def init():
     zerox = sizex / 2
     zeroy = 200    # not centered
     ah_zeroy = sizey / 2   # zero line for ahrs
-    ah_zeroy = sizex /2
+    ah_zerox = sizex /2
     max_pixel = 400
     verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
