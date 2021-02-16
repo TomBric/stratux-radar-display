@@ -108,6 +108,8 @@ def init():
     global sizey
     global zerox
     global zeroy
+    global ah_zerox
+    global ah_zeroy
     global max_pixel
     global verylargefont
     global largefont
