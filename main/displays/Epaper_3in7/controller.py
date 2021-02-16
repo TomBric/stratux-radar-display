@@ -360,13 +360,13 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     draw.polygon((h1, h2, h4, h3), fill="white")  # earth
     h3, h4 = linepoints(pitch, roll, 180, 600)
     draw.polygon((h1, h2, h4, h3), fill="white")  # sky
-    draw.line((h1, h2), fill="black", width=5)  # horizon line
+    draw.line((h1, h2), fill="black", width=4)  # horizon line
     for pm in pitch_posmarks:  # pitchmarks
-        draw.line((linepoints(pitch, roll, pm, 30)), fill="black", width=2)
+        draw.line((linepoints(pitch, roll, pm, 30)), fill="black", width=4)
 
     # pointer in the middle
-    draw.line((ah_zerox - 60, ah_zeroy, ah_zerox - 30, ah_zeroy), width=4, fill="black")
-    draw.line((ah_zerox + 60, ah_zeroy, ah_zerox + 30, ah_zeroy), width=4, fill="black")
+    draw.line((ah_zerox - 60, ah_zeroy, ah_zerox - 30, ah_zeroy), width=6, fill="black")
+    draw.line((ah_zerox + 60, ah_zeroy, ah_zerox + 30, ah_zeroy), width=6, fill="black")
     draw.polygon((ah_zerox, ah_zeroy + 4, ah_zerox - 20, ah_zeroy + 16, ah_zerox + 20, ah_zeroy + 16),
                  fill="black")
 
