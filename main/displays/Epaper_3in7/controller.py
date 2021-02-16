@@ -349,10 +349,10 @@ def slip(draw, slipskid):
 
     draw.rectangle((ah_zerox - 150, sizey - slipsize * 2, ah_zerox + 150, sizey - 1),
                    fill="black")
-    draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey-1), fill="white", width=2))
+    draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey-1), fill="white", width=2)
     draw.ellipse((ah_zerox - slipskid * slipscale - slipsize, sizey - slipsize * 2,
                   ah_zerox - slipskid * slipscale + slipsize, sizey - 1), fill="white")
-    draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey - 1), fill="black", width=4))
+    draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey - 1), fill="black", width=4)
 
 
 def ahrs(draw, pitch, roll, heading, slipskid, error_message):
