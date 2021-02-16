@@ -351,7 +351,7 @@ def slip(draw, slipskid):
                    fill="black")
     draw.ellipse((ah_zerox - slipskid * slipscale - slipsize, sizey - slipsize * 2,
                   ah_zerox - slipskid * slipscale + slipsize, sizey - 1), fill="white")
-    draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey - 1), fill="black", width=4)
+    draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey - 1), fill="black", width=6)
     draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey - 1), fill="white", width=2)
 
 
