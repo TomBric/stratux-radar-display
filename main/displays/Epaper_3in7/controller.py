@@ -55,6 +55,8 @@ sizex = 0
 sizey = 0
 zerox = 0
 zeroy = 0
+ah_zerox = 0  # zero point for ahrs
+ah_zeroy = 0
 max_pixel = 0
 verylargefont = ""
 largefont = ""
@@ -63,6 +65,10 @@ verysmallfont = ""
 awesomefont = ""
 device = None
 epaper_image = None
+draw = None
+roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
+pitch_posmarks = (-30, -20, -10, 10, 20, 30)
+PITCH_SCALE = 4.0
 # end device globals
 
 
@@ -80,7 +86,7 @@ def make_font(name, size):
 def display():
     global device
     global epaper_image
-    device.async_display_1Gray(device.getbuffer(epaper_image))
+    device.async_display_1Gray(device.getbuffer_optimized(epaper_image))
 
 
 def is_busy():
@@ -102,6 +108,8 @@ def init():
     global sizey
     global zerox
     global zeroy
+    global ah_zerox
+    global ah_zeroy
     global max_pixel
     global verylargefont
     global largefont
@@ -110,11 +118,12 @@ def init():
     global awesomefont
     global device
     global epaper_image
+    global draw
 
     device = epd3in7.EPD()
     device.init(0)
     device.Clear(0xFF, 0)   # necessary to overwrite everything
-    epaper_image = Image.new('1', (device.height, device.width), 255)
+    epaper_image = Image.new('1', (device.height, device.width), 0xFF)
     draw = ImageDraw.Draw(epaper_image)
     device.init(1)
     device.Clear(0xFF, 1)
@@ -122,6 +131,8 @@ def init():
     sizey = device.width
     zerox = sizex / 2
     zeroy = 200    # not centered
+    ah_zeroy = sizey / 2   # zero line for ahrs
+    ah_zerox = sizex /2
     max_pixel = 400
     verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
@@ -131,7 +142,7 @@ def init():
     # measure time for refresh
     start = time.time()
     # do sync version of display to measure time
-    device.display_1Gray(device.getbuffer(epaper_image))
+    device.display_1Gray(device.getbuffer_optimized(epaper_image))
     end = time.time()
     display_refresh = end-start
     logging.info("Measured Display Refresh Time: " + str(display_refresh) + " seconds")
@@ -150,11 +161,9 @@ def cleanup():
 
 def refresh():
     global device
-    global epaper_image
 
-    print("Refreshing display ...")
-    device.display_1Gray_FULL(device.getbuffer(epaper_image))
-    print("Done.")
+    device.Clear(0xFF, 0)  # necessary to overwrite everything
+    device.init(1)
 
 
 def clear(draw):
@@ -221,12 +230,24 @@ def modesaircraft(draw, radius, height, arcposition):
     draw.text(tposition, t, font=largefont, fill="black")
 
 
-def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0, sound_active=True):
+def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
+              gps_quality, gps_h_accuracy):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
 
     draw.text((5, 1), str(range)+" nm", font=smallfont, fill="black")
+
+    if gps_quality == 0:
+        t = "GPS-NoFix"
+    elif gps_quality == 1:
+        t = "3D GPS\n" + str(round(gps_h_accuracy, 1)) + "m"
+    elif gps_quality == 2:
+        t = "DGNSS\n" + str(round(gps_h_accuracy, 1)) + "m"
+    else:
+        t = ""
+    draw.text((5, SMALL+10), t, font=verysmallfont, fill="black")
+
     t = "FL"+str(round(ownalt / 100))
     textsize = draw.textsize(t, verysmallfont)
     draw.text((sizex - textsize[0] - 5, SMALL+10), t, font=verysmallfont, fill="black")
@@ -278,9 +299,90 @@ def shutdown(draw, countdown):
     message = "to cancel ..."
     centered_text(draw, 130, message, smallfont, fill="black")
 
-
+'''
 def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     centered_text(draw, 10, "AHRS not provided ", largefont, fill="black")
     centered_text(draw, 40, "on this display.", largefont, fill="black")
     centered_text(draw, 120, "Long press on middle button", largefont, fill="black")
     centered_text(draw, 150, "to continue ...", largefont, fill="black")
+'''
+
+def rollmarks(draw, roll):
+    if ah_zerox > ah_zeroy:
+        di = ah_zeroy
+    else:
+        di = ah_zerox
+
+    for rm in roll_posmarks:
+        s = math.sin(math.radians(rm - roll + 90))
+        c = math.cos(math.radians(rm - roll + 90))
+        if rm % 30 == 0:
+            draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 24) * c,
+                       ah_zeroy - (di - 24) * s), fill="black", width=4)
+        else:
+            draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 16) * c,
+                       ah_zeroy - (di - 16) * s), fill="black", width=4)
+    draw.polygon((ah_zerox, 24, ah_zerox - 16, 24 + 12, ah_zerox + 16, 24 + 12), fill="black")
+
+
+def linepoints(pitch, roll, pitch_distance, length):
+    s = math.sin(math.radians(180 + roll))
+    c = math.cos(math.radians(180 + roll))
+    dist = (-pitch + pitch_distance) * PITCH_SCALE
+    move = (dist * s, dist * c)
+    s1 = math.sin(math.radians(-90 - roll))
+    c1 = math.cos(math.radians(-90 - roll))
+    p1 = (ah_zerox - length * s1, ah_zeroy + length * c1)
+    p2 = (ah_zerox + length * s1, ah_zeroy - length * c1)
+    ps = (p1[0] + move[0], p1[1] + move[1])
+    pe = (p2[0] + move[0], p2[1] + move[1])
+    return ps, pe
+
+
+def slip(draw, slipskid):
+    slipsize = 12
+    slipscale = 15
+    if slipskid < -10:
+        slipskid = -10
+    elif slipskid > 10:
+        slipskid = 10
+
+    draw.rectangle((ah_zerox - 150, sizey - slipsize * 2, ah_zerox + 150, sizey - 1),
+                   fill="black")
+    draw.ellipse((ah_zerox - slipskid * slipscale - slipsize, sizey - slipsize * 2,
+                  ah_zerox - slipskid * slipscale + slipsize, sizey - 1), fill="white")
+    draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey - 1), fill="black", width=6)
+    draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey - 1), fill="white", width=2)
+
+
+def ahrs(draw, pitch, roll, heading, slipskid, error_message):
+    # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
+    h1, h2 = linepoints(pitch, roll, 0, 600)  # horizon points
+    h3, h4 = linepoints(pitch, roll, -180, 600)
+    draw.polygon((h1, h2, h4, h3), fill="white")  # earth
+    h3, h4 = linepoints(pitch, roll, 180, 600)
+    draw.polygon((h1, h2, h4, h3), fill="white")  # sky
+    draw.line((h1, h2), fill="black", width=4)  # horizon line
+
+    earthfill = 0;
+    while earthfill > -180:
+        earthfill -= 3
+        draw.line((linepoints(pitch, roll, earthfill, 600)), fill="black", width=1)
+
+    for pm in pitch_posmarks:  # pitchmarks
+        draw.line((linepoints(pitch, roll, pm, 30)), fill="black", width=4)
+
+    # pointer in the middle
+    draw.line((ah_zerox - 90, ah_zeroy, ah_zerox - 30, ah_zeroy), width=6, fill="black")
+    draw.line((ah_zerox + 90, ah_zeroy, ah_zerox + 30, ah_zeroy), width=6, fill="black")
+    draw.polygon((ah_zerox, ah_zeroy + 4, ah_zerox - 20, ah_zeroy + 16, ah_zerox + 20, ah_zeroy + 16),
+                 fill="black")
+
+    # roll indicator
+    rollmarks(draw, roll)
+    # slip indicator
+    slip(draw, slipskid)
+
+    # infotext = "P:" + str(pitch) + " R:" + str(roll)
+    if error_message:
+        centered_text(draw, 80, error_message, smallfont, fill="black")

@@ -29,12 +29,14 @@
 
 import logging
 from . import epdconfig
+from PIL import Image
+import numpy
 
 # Display resolution
 EPD_WIDTH       = 280
 EPD_HEIGHT      = 480
 
-GRAY1  = 0xff #white
+GRAY1  = 0xFF #white
 GRAY2  = 0xC0 #Close to white
 GRAY3  = 0x80 #Close to balck
 GRAY4  = 0x00 #balck
@@ -50,6 +52,7 @@ class EPD:
         self.GRAY2  = GRAY2
         self.GRAY3  = GRAY3 #gray
         self.GRAY4  = GRAY4 #Blackest
+        self.image_0xff = Image.new('1', (self.height, self.width), 0xFF)
 
     lut_4Gray_GC = [
         0x2A,0x06,0x15,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -241,6 +244,11 @@ class EPD:
         self.send_data2(lut)
 
 
+    def getbuffer_optimized(self, image):
+        pb = numpy.packbits(numpy.rot90(numpy.asarray(image)))
+        return pb
+        # works only for horizontal image
+
     def getbuffer(self, image):
         # logging.debug("bufsiz = ",int(self.width/8) * self.height)
         buf = [0xFF] * (int(self.width/8) * self.height)
@@ -390,8 +398,8 @@ class EPD:
 
 
     def display_1Gray(self, image):
-        if (image == None):
-            return            
+        # if (image == None):
+        #    return
 
         self.send_command(0x4E)
         self.send_data(0x00)
@@ -402,11 +410,6 @@ class EPD:
 
         self.send_command(0x24)
         self.send_data2(image)
-        # for j in range(0, self.height):
-        #    for i in range(0, int(self.width / 8)):
-        #     self.send_data(image[i + j * int(self.width / 8)])   
-
-        # self.load_lut(self.lut_1Gray_DU)
         self.load_lut(self.lut_1Gray_A2)
         self.send_command(0x20)
         self.ReadBusy()
@@ -425,9 +428,6 @@ class EPD:
 
         self.send_command(0x24)
         self.send_data2(image)
-        # for j in range(0, self.height):
-        #    for i in range(0, int(self.width / 8)):
-        #     self.send_data(image[i + j * int(self.width / 8)])
 
         self.load_lut(self.lut_1Gray_DU)
         # self.load_lut(self.lut_1Gray_A2)
@@ -436,8 +436,8 @@ class EPD:
 
 
     def async_display_1Gray(self, image):
-        if (image == None):
-            return
+        # if (image == None):
+        #    return
 
         self.send_command(0x4E)
         self.send_data(0x00)
@@ -448,9 +448,6 @@ class EPD:
 
         self.send_command(0x24)
         self.send_data2(image)
-        # for j in range(0, self.height):
-        #    for i in range(0, int(self.width / 8)):
-        #     self.send_data(image[i + j * int(self.width / 8)])
 
         # self.load_lut(self.lut_1Gray_DU)
         self.load_lut(self.lut_1Gray_A2)
@@ -458,7 +455,6 @@ class EPD:
         # self.ReadBusy()
 
     def async_is_busy(self):
-        logging.debug("check async busy")
         return epdconfig.digital_read(self.busy_pin)
         # 0: idle, 1: busy
 
@@ -471,14 +467,13 @@ class EPD:
         self.send_data(0x00)
 
         self.send_command(0x24)
-        for j in range(0, self.height):
-            for i in range(0, int(self.width / 8)):
-                self.send_data(0xff)
+        self.send_data2(self.getbuffer(self.image_0xff))
+        # for j in range(0, self.height):
+        #    for i in range(0, int(self.width / 8)):
+        #        self.send_data(0xff)
         if(mode == 0):              #4Gray
             self.send_command(0x26)
-            for j in range(0, self.height):
-                for i in range(0, int(self.width / 8)):
-                    self.send_data(0xff) 
+            self.send_data2(self.getbuffer_optimized(self.image_0xff))
             self.load_lut(self.lut_4Gray_GC)
             self.send_command(0x22)
             self.send_data(0xC7)

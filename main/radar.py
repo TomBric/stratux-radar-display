@@ -71,7 +71,8 @@ all_ac = {}
 aircraft_changed = True
 ui_changed = True
 situation = {'was_changed': True, 'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
-             'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000}
+             'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000, 'gps_quality': 0,
+             'gps_h_accuracy': 20000}
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
 # ahrs information, values are all rounded to integer
@@ -120,7 +121,7 @@ def draw_display(draw):
         display_control.clear(draw)
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
-                                  sound_on)
+                                  sound_on, situation['gps_quality'], situation['gps_h_accuracy'])
         draw_all_ac(draw, all_ac)
         display_control.display()
         situation['was_changed'] = False
@@ -297,6 +298,13 @@ def new_situation(json_str):
     if situation['longitude'] != sit['GPSLongitude']:
         situation['longitude'] = sit['GPSLongitude']
         situation['was_changed'] = True
+    if situation['gps_quality'] != sit['GPSFixQuality']:
+        situation['gps_quality'] = sit['GPSFixQuality']
+        situation['was_changed'] = True
+    if situation['gps_h_accuracy'] != sit['GPSHorizontalAccuracy']:
+        situation['gps_h_accuracy'] = sit['GPSHorizontalAccuracy']
+        situation['was_changed'] = True
+
     if ahrs['pitch'] != round(sit['AHRSPitch']):
         ahrs['pitch'] = round(sit['AHRSPitch'])
         ahrs['was_changed'] = True
@@ -424,14 +432,18 @@ async def display_and_cutoff():
                     if final_shutdown:
                         logging.debug("Shutdown triggered: Display task terminating ...")
                         return
-                elif global_mode == 4:   # refresh display, only relevant for epaper
-                    print("Radar: Display driver - Refreshing")
+                elif global_mode == 4:   # refresh display, only relevant for epaper, mode was radar
+                    logging.debug("Radar: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 1
                 elif global_mode == 5:   # ahrs'
                     ahrsui.draw_ahrs(draw, display_control, ahrs['was_changed'], ahrs['pitch'], ahrs['roll'],
                                      ahrs['heading'], ahrs['slipskid'], ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
-                await asyncio.sleep(0.2)
+                elif global_mode == 6:   # refresh display, only relevant for epaper, mode was radar
+                    logging.debug("AHRS: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 5
+                await asyncio.sleep(0.1)
 
             logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
             to_delete = []
@@ -443,7 +455,7 @@ async def display_and_cutoff():
                     aircraft_changed = True
             for i in to_delete:
                 del all_ac[i]
-    except asyncio.CancelledError:
+    except (asyncio.CancelledError, RuntimeError):
         print("Display task terminating ...")
         logging.debug("Display task terminating ...")
 

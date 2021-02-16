@@ -59,7 +59,6 @@ verysmallfont = ""
 webfont = ""
 device = None
 image = None
-ahrs_image = None
 ahrs_draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
@@ -200,7 +199,8 @@ def modesaircraft(draw, radius, height, arcposition):
     draw.text(tposition, t, font=largefont, fill="white")
 
 
-def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices=0, sound_active=True):
+def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
+              gps_quality, gps_h_accuracy):
     draw.ellipse((0, 0, sizex - 1, sizey - 1), outline="floralwhite")
     draw.ellipse((sizex / 4, sizey / 4, zerox + sizex / 4, zeroy + sizey / 4), outline="floralwhite")
     draw.ellipse((zerox - 2, zeroy - 2, zerox + 2, zeroy + 2), outline="floralwhite")
@@ -313,9 +313,6 @@ def slip(draw, slipskid):
 
 
 def ahrs(draw, pitch, roll, heading, slipskid, error_message):
-    global image
-    global ahrs_image
-
     # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     h1, h2 = linepoints(pitch, roll, 0, 200)  # horizon points
     h3, h4 = linepoints(pitch, roll, -180, 200)
