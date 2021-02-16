@@ -55,6 +55,8 @@ sizex = 0
 sizey = 0
 zerox = 0
 zeroy = 0
+ah_zerox = 0  # zero point for ahrs
+ah_zeroy = 0
 max_pixel = 0
 verylargefont = ""
 largefont = ""
@@ -127,6 +129,8 @@ def init():
     sizey = device.width
     zerox = sizex / 2
     zeroy = 200    # not centered
+    ah_zeroy = sizey / 2   # zero line for ahrs
+    ah_zeroy = sizex /2
     max_pixel = 400
     verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
@@ -306,12 +310,12 @@ def rollmarks(draw, roll):
         s = math.sin(math.radians(rm - roll + 90))
         c = math.cos(math.radians(rm - roll + 90))
         if rm % 30 == 0:
-            draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox - 8) * c, zeroy - (zerox - 8) * s),
-                      fill="black", width=2)
+            draw.line((ah_zerox - ah_zerox * c, ah_zeroy - ah_zerox * s, ah_zerox - (ah_zerox - 16) * c,
+                       ah_zeroy - (ah_zerox - 16) * s), fill="black", width=2)
         else:
-            draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox - 5) * c, zeroy - (zerox - 5) * s),
-                      fill="black", width=1)
-    draw.polygon((zerox, 10, zerox - 5, 10 + 5, zerox + 5, 10 + 5), fill="white")
+            draw.line((ah_zerox - ah_zerox * c, ah_zeroy - ah_zerox * s, ah_zerox - (ah_zerox - 10) * c,
+                       ah_zeroy - (ah_zerox - 10) * s), fill="black", width=2)
+    draw.polygon((ah_zerox, 20, ah_zerox - 10, 20 + 5, ah_zerox + 5, 20 + 5), fill="black")
 
 
 def linepoints(pitch, roll, pitch_distance, length):
@@ -321,8 +325,8 @@ def linepoints(pitch, roll, pitch_distance, length):
     move = (dist * s, dist * c)
     s1 = math.sin(math.radians(-90 - roll))
     c1 = math.cos(math.radians(-90 - roll))
-    p1 = (zerox - length * s1, zeroy + length * c1)
-    p2 = (zerox + length * s1, zeroy - length * c1)
+    p1 = (ah_zerox - length * s1, ah_zeroy + length * c1)
+    p2 = (ah_zerox + length * s1, ah_zeroy - length * c1)
     ps = (p1[0] + move[0], p1[1] + move[1])
     pe = (p2[0] + move[0], p2[1] + move[1])
     return ps, pe
@@ -336,10 +340,10 @@ def slip(draw, slipskid):
     elif slipskid > 10:
         slipskid = 10
 
-    draw.rectangle((zerox - 60, device.height - slipsize * 2, zerox + 60, device.height - 1),
+    draw.rectangle((ah_zerox - 60, device.height - slipsize * 2, ah_zerox + 60, device.height - 1),
                    fill="white", outline="black")
-    draw.ellipse((zerox - slipskid * slipscale - slipsize, device.height - slipsize * 2,
-                  zerox - slipskid * slipscale + slipsize, device.height - 1), fill="black")
+    draw.ellipse((ah_zerox - slipskid * slipscale - slipsize, device.height - slipsize * 2,
+                  ah_zerox - slipskid * slipscale + slipsize, device.height - 1), fill="black")
 
 
 def ahrs(draw, pitch, roll, heading, slipskid, error_message):
@@ -354,9 +358,10 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
         draw.line((linepoints(pitch, roll, pm, 30)), fill="black", width=2)
 
     # pointer in the middle
-    draw.line((zerox - 30, zeroy, zerox - 15, zeroy), width=4, fill="black")
-    draw.line((zerox + 30, zeroy, zerox + 15, zeroy), width=4, fill="black")
-    draw.polygon((zerox, zeroy + 2, zerox - 10, zeroy + 8, zerox + 10, zeroy + 8), fill="black")
+    draw.line((ah_zerox - 60, ah_zeroy, ah_zerox - 30, ah_zeroy), width=4, fill="black")
+    draw.line((ah_zerox + 60, ah_zeroy, ah_zerox + 30, ah_zeroy), width=4, fill="black")
+    draw.polygon((ah_zerox, ah_zeroy + 4, ah_zerox - 20, ah_zeroy + 16, ah_zerox + 20, ah_zeroy + 16),
+                 fill="black")
 
     # roll indicator
     rollmarks(draw, roll)
@@ -365,4 +370,4 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
 
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
-        centered_text(draw, 100, error_message, largefont, fill="black")
+        centered_text(draw, 80, error_message, largefont, fill="black")
