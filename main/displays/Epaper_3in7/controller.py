@@ -341,13 +341,13 @@ def linepoints(pitch, roll, pitch_distance, length):
 
 def slip(draw, slipskid):
     slipsize = 12
-    slipscale = 20
+    slipscale = 15
     if slipskid < -10:
         slipskid = -10
     elif slipskid > 10:
         slipskid = 10
 
-    draw.rectangle((ah_zerox - 60, sizey - slipsize * 2, ah_zerox + 60, sizey - 1),
+    draw.rectangle((ah_zerox - 150, sizey - slipsize * 2, ah_zerox + 150, sizey - 1),
                    fill="black")
     draw.ellipse((ah_zerox - slipskid * slipscale - slipsize, sizey - slipsize * 2,
                   ah_zerox - slipskid * slipscale + slipsize, sizey - 1), fill="white")
