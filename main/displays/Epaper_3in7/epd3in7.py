@@ -422,8 +422,8 @@ class EPD:
 
 
     def display_1Gray(self, image):
-        if (image == None):
-            return            
+        # if (image == None):
+        #    return
 
         self.send_command(0x4E)
         self.send_data(0x00)
