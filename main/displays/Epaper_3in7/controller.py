@@ -308,16 +308,21 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
 '''
 
 def rollmarks(draw, roll):
+    if ah_zerox > ah_zeroy:
+        di = ah_zeroy
+    else:
+        di = ah_zerox
+
     for rm in roll_posmarks:
         s = math.sin(math.radians(rm - roll + 90))
         c = math.cos(math.radians(rm - roll + 90))
         if rm % 30 == 0:
-            draw.line((ah_zerox - ah_zerox * c, ah_zeroy - ah_zerox * s, ah_zerox - (ah_zerox - 16) * c,
-                       ah_zeroy - (ah_zerox - 16) * s), fill="black", width=2)
+            draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 16) * c,
+                       ah_zeroy - (di - 16) * s), fill="black", width=2)
         else:
-            draw.line((ah_zerox - ah_zerox * c, ah_zeroy - ah_zerox * s, ah_zerox - (ah_zerox - 10) * c,
-                       ah_zeroy - (ah_zerox - 10) * s), fill="black", width=2)
-    draw.polygon((ah_zerox, 20, ah_zerox - 10, 20 + 5, ah_zerox + 5, 20 + 5), fill="black")
+            draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 10) * c,
+                       ah_zeroy - (di - 10) * s), fill="black", width=2)
+    draw.polygon((ah_zerox, 20, ah_zerox - 15, 20 + 10, ah_zerox + 15, 20 + 10), fill="black")
 
 
 def linepoints(pitch, roll, pitch_distance, length):
@@ -335,7 +340,7 @@ def linepoints(pitch, roll, pitch_distance, length):
 
 
 def slip(draw, slipskid):
-    slipsize = 10
+    slipsize = 20
     slipscale = 5
     if slipskid < -10:
         slipskid = -10
@@ -343,9 +348,9 @@ def slip(draw, slipskid):
         slipskid = 10
 
     draw.rectangle((ah_zerox - 60, device.height - slipsize * 2, ah_zerox + 60, device.height - 1),
-                   fill="white", outline="black")
+                   fill="black")
     draw.ellipse((ah_zerox - slipskid * slipscale - slipsize, device.height - slipsize * 2,
-                  ah_zerox - slipskid * slipscale + slipsize, device.height - 1), fill="black")
+                  ah_zerox - slipskid * slipscale + slipsize, device.height - 1), fill="white")
 
 
 def ahrs(draw, pitch, roll, heading, slipskid, error_message):
@@ -372,4 +377,4 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
 
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
-        centered_text(draw, 80, error_message, largefont, fill="black")
+        centered_text(draw, 80, error_message, smallfont, fill="black")
