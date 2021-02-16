@@ -245,7 +245,7 @@ class EPD:
 
 
     def getbuffer_optimized(self, image):
-        pb = numpy.packbits(numpy.asarray(image), 1)
+        pb = numpy.packbits(numpy.rot90(numpy.asarray(image)))
         return pb
         '''
         # logging.debug("bufsiz = ",int(self.width/8) * self.height)
