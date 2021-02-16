@@ -247,31 +247,7 @@ class EPD:
     def getbuffer_optimized(self, image):
         pb = numpy.packbits(numpy.rot90(numpy.asarray(image)))
         return pb
-        '''
-        # logging.debug("bufsiz = ",int(self.width/8) * self.height)
-        buf = [0xFF] * (int(self.width/8) * self.height)
-        image_monocolor = image.convert('1')
-        imwidth, imheight = image_monocolor.size
-        pixels = image_monocolor.load()
-        # logging.debug("imwidth = %d, imheight = %d",imwidth,imheight)
-        if(imwidth == self.width and imheight == self.height):
-            logging.debug("Vertical")
-            for y in range(imheight):
-                for x in range(imwidth):
-                    # Set the bits for the column of pixels at the current position.
-                    if pixels[x, y] == 0:
-                        buf[int((x + y * self.width) / 8)] &= ~(0x80 >> (x % 8))
-        elif(imwidth == self.height and imheight == self.width):
-            logging.debug("Horizontal")
-            for y in range(imheight):
-                for x in range(imwidth):
-                    newx = y
-                    newy = self.height - x - 1
-                    if pixels[x, y] == 0:
-                        buf[int((newx + newy*self.width) / 8)] &= ~(0x80 >> (y % 8))
-        return buf
-        '''
-
+        # works only for horizontal image
 
     def getbuffer(self, image):
         # logging.debug("bufsiz = ",int(self.width/8) * self.height)
@@ -434,11 +410,6 @@ class EPD:
 
         self.send_command(0x24)
         self.send_data2(image)
-        # for j in range(0, self.height):
-        #    for i in range(0, int(self.width / 8)):
-        #     self.send_data(image[i + j * int(self.width / 8)])   
-
-        # self.load_lut(self.lut_1Gray_DU)
         self.load_lut(self.lut_1Gray_A2)
         self.send_command(0x20)
         self.ReadBusy()
@@ -457,9 +428,6 @@ class EPD:
 
         self.send_command(0x24)
         self.send_data2(image)
-        # for j in range(0, self.height):
-        #    for i in range(0, int(self.width / 8)):
-        #     self.send_data(image[i + j * int(self.width / 8)])
 
         self.load_lut(self.lut_1Gray_DU)
         # self.load_lut(self.lut_1Gray_A2)
@@ -480,9 +448,6 @@ class EPD:
 
         self.send_command(0x24)
         self.send_data2(image)
-        # for j in range(0, self.height):
-        #    for i in range(0, int(self.width / 8)):
-        #     self.send_data(image[i + j * int(self.width / 8)])
 
         # self.load_lut(self.lut_1Gray_DU)
         self.load_lut(self.lut_1Gray_A2)
@@ -508,10 +473,7 @@ class EPD:
         #        self.send_data(0xff)
         if(mode == 0):              #4Gray
             self.send_command(0x26)
-            self.send_data2(self.getbuffer(self.image_0xff))
-            # for j in range(0, self.height):
-            #    for i in range(0, int(self.width / 8)):
-            #        self.send_data(0xff)
+            self.send_data2(self.getbuffer_optimized(self.image_0xff))
             self.load_lut(self.lut_4Gray_GC)
             self.send_command(0x22)
             self.send_data(0xC7)
