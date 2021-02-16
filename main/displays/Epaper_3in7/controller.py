@@ -363,8 +363,8 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     draw.line((h1, h2), fill="black", width=4)  # horizon line
 
     earthfill = 0;
-    while earthfill < 180:
-        earthfill += 3
+    while earthfill > -180:
+        earthfill -= 3
         draw.line((linepoints(pitch, roll, earthfill, 600)), fill="black", width=1)
 
     for pm in pitch_posmarks:  # pitchmarks
