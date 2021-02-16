@@ -59,7 +59,6 @@ verysmallfont = ""
 webfont = ""
 device = None
 image = None
-ahrs_image = None
 ahrs_draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
@@ -314,9 +313,6 @@ def slip(draw, slipskid):
 
 
 def ahrs(draw, pitch, roll, heading, slipskid, error_message):
-    global image
-    global ahrs_image
-
     # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     h1, h2 = linepoints(pitch, roll, 0, 200)  # horizon points
     h3, h4 = linepoints(pitch, roll, -180, 200)

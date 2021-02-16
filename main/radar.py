@@ -433,7 +433,7 @@ async def display_and_cutoff():
                         logging.debug("Shutdown triggered: Display task terminating ...")
                         return
                 elif global_mode == 4:   # refresh display, only relevant for epaper
-                    print("Radar: Display driver - Refreshing")
+                    logging.debug("Radar: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 1
                 elif global_mode == 5:   # ahrs'

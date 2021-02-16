@@ -64,6 +64,9 @@ awesomefont = ""
 device = None
 epaper_image = None
 draw = None
+roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
+pitch_posmarks = (-30, -20, -10, 10, 20, 30)
+PITCH_SCALE = 1.5
 # end device globals
 
 
@@ -152,16 +155,9 @@ def cleanup():
 
 def refresh():
     global device
-    global epaper_image
-    global draw
 
-    print("Refreshing display ...")
-    # device.init(0)
-    # device.Clear(0x00, 0)  # necessary to overwrite everything
     device.Clear(0xFF, 0)  # necessary to overwrite everything
     device.init(1)
-    # device.Clear(0xFF, 1)
-    print("Done.")
 
 
 def clear(draw):
@@ -239,13 +235,12 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     if gps_quality == 0:
         t = "GPS-NoFix"
     elif gps_quality == 1:
-        t = "3D GPS\n" + str(round(gps_h_accuracy, 1)) +"m"
+        t = "3D GPS\n" + str(round(gps_h_accuracy, 1)) + "m"
     elif gps_quality == 2:
-        t = "DGNSS\n" + str(round(gps_h_accuracy, 1)) +"m"
+        t = "DGNSS\n" + str(round(gps_h_accuracy, 1)) + "m"
     else:
         t = ""
     draw.text((5, SMALL+10), t, font=verysmallfont, fill="black")
-
 
     t = "FL"+str(round(ownalt / 100))
     textsize = draw.textsize(t, verysmallfont)
@@ -298,9 +293,76 @@ def shutdown(draw, countdown):
     message = "to cancel ..."
     centered_text(draw, 130, message, smallfont, fill="black")
 
-
+'''
 def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     centered_text(draw, 10, "AHRS not provided ", largefont, fill="black")
     centered_text(draw, 40, "on this display.", largefont, fill="black")
     centered_text(draw, 120, "Long press on middle button", largefont, fill="black")
     centered_text(draw, 150, "to continue ...", largefont, fill="black")
+'''
+
+def rollmarks(draw, roll):
+    for rm in roll_posmarks:
+        s = math.sin(math.radians(rm - roll + 90))
+        c = math.cos(math.radians(rm - roll + 90))
+        if rm % 30 == 0:
+            draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox - 8) * c, zeroy - (zerox - 8) * s),
+                      fill="white", width=2)
+        else:
+            draw.line((zerox - zerox * c, zeroy - zerox * s, zerox - (zerox - 5) * c, zeroy - (zerox - 5) * s),
+                      fill="white", width=1)
+    draw.polygon((zerox, 10, zerox - 5, 10 + 5, zerox + 5, 10 + 5), fill="white")
+
+
+def linepoints(pitch, roll, pitch_distance, length):
+    s = math.sin(math.radians(180 + roll))
+    c = math.cos(math.radians(180 + roll))
+    dist = (-pitch + pitch_distance) * PITCH_SCALE
+    move = (dist * s, dist * c)
+    s1 = math.sin(math.radians(-90 - roll))
+    c1 = math.cos(math.radians(-90 - roll))
+    p1 = (zerox - length * s1, zeroy + length * c1)
+    p2 = (zerox + length * s1, zeroy - length * c1)
+    ps = (p1[0] + move[0], p1[1] + move[1])
+    pe = (p2[0] + move[0], p2[1] + move[1])
+    return ps, pe
+
+
+def slip(draw, slipskid):
+    slipsize = 10
+    slipscale = 5
+    if slipskid < -10:
+        slipskid = -10
+    elif slipskid > 10:
+        slipskid = 10
+
+    draw.rectangle((zerox - 60, device.height - slipsize * 2, zerox + 60, device.height - 1),
+                   fill="white", outline="black")
+    draw.ellipse((zerox - slipskid * slipscale - slipsize, device.height - slipsize * 2,
+                  zerox - slipskid * slipscale + slipsize, device.height - 1), fill="black")
+
+
+def ahrs(draw, pitch, roll, heading, slipskid, error_message):
+    # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
+    h1, h2 = linepoints(pitch, roll, 0, 600)  # horizon points
+    h3, h4 = linepoints(pitch, roll, -180, 600)
+    draw.polygon((h1, h2, h4, h3), fill="white")  # earth
+    h3, h4 = linepoints(pitch, roll, 180, 600)
+    draw.polygon((h1, h2, h4, h3), fill="white")  # sky
+    draw.line((h1, h2), fill="black", width=5)  # horizon line
+    for pm in pitch_posmarks:  # pitchmarks
+        draw.line((linepoints(pitch, roll, pm, 10)), fill="black", width=2)
+
+    # pointer in the middle
+    draw.line((zerox - 30, zeroy, zerox - 15, zeroy), width=4, fill="black")
+    draw.line((zerox + 30, zeroy, zerox + 15, zeroy), width=4, fill="black")
+    draw.polygon((zerox, zeroy + 2, zerox - 10, zeroy + 8, zerox + 10, zeroy + 8), fill="black")
+
+    # roll indicator
+    rollmarks(draw, roll)
+    # slip indicator
+    slip(draw, slipskid)
+
+    # infotext = "P:" + str(pitch) + " R:" + str(roll)
+    if error_message:
+        centered_text(draw, 100, error_message, largefont, fill="black")
