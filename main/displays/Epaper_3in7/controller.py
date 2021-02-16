@@ -322,7 +322,7 @@ def rollmarks(draw, roll):
         else:
             draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 16) * c,
                        ah_zeroy - (di - 16) * s), fill="black", width=4)
-    draw.polygon((ah_zerox, 24, ah_zerox - 20, 24 + 16, ah_zerox + 20, 20 + 16), fill="black")
+    draw.polygon((ah_zerox, 24, ah_zerox - 20, 24 + 16, ah_zerox + 20, 24 + 16), fill="black")
 
 
 def linepoints(pitch, roll, pitch_distance, length):
