@@ -128,6 +128,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    - left button short: change radar range (2nm -> 5nm -> 10nm -> 40nm)
    - middle button short: enable/disable sound (if bluetooth speaker/headset is connected)
    - right button short: change height difference for traffic (1000ft -> 2000 ft -> 5000 ft -> 10k ft -> 50k ft)
+   - right button long: screen refresh. This is relevant for Epaper only since it becomes "dirty" over time with partial refresh.
    
 Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
 
