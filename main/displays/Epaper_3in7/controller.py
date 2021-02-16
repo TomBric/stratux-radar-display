@@ -340,8 +340,8 @@ def linepoints(pitch, roll, pitch_distance, length):
 
 
 def slip(draw, slipskid):
-    slipsize = 15
-    slipscale = 10
+    slipsize = 12
+    slipscale = 20
     if slipskid < -10:
         slipskid = -10
     elif slipskid > 10:
