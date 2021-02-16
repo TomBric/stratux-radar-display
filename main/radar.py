@@ -451,7 +451,7 @@ async def display_and_cutoff():
                     aircraft_changed = True
             for i in to_delete:
                 del all_ac[i]
-    except asyncio.CancelledError:
+    except (asyncio.CancelledError, RuntimeError):
         print("Display task terminating ...")
         logging.debug("Display task terminating ...")
 
