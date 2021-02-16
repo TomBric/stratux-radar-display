@@ -81,7 +81,7 @@ def make_font(name, size):
 def display():
     global device
     global epaper_image
-    device.async_display_1Gray(device.getbuffer(epaper_image))
+    device.async_display_1Gray(device.getbuffer_optimized(epaper_image))
 
 
 def is_busy():
@@ -133,7 +133,7 @@ def init():
     # measure time for refresh
     start = time.time()
     # do sync version of display to measure time
-    device.display_1Gray(device.getbuffer(epaper_image))
+    device.display_1Gray(device.getbuffer_optimized(epaper_image))
     end = time.time()
     display_refresh = end-start
     logging.info("Measured Display Refresh Time: " + str(display_refresh) + " seconds")
