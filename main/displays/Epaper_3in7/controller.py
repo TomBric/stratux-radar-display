@@ -103,7 +103,6 @@ def next_arcposition(old_arcposition):
     new_arcposition = (old_arcposition + 210) % 360
     if ARCPOSITION_EXCLUDE_TO >= new_arcposition >= ARCPOSITION_EXCLUDE_FROM:
         new_arcposition = (new_arcposition + 210) % 360
-    print("Arcposition: ", new_arcposition)
     return new_arcposition
 
 
