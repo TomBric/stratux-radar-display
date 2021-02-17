@@ -53,8 +53,6 @@ RADAR_VERSION = "1.0c"
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 1.0
 RADAR_CUTOFF = 29
-ARCPOSITION_EXCLUDE_FROM = 130
-ARCPOSITION_EXCLUDE_TO = 230
 UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
 BLUEZ_CHECK_TIME = 3.0
@@ -256,9 +254,7 @@ def new_traffic(json_str):
         distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
         if is_new or 'circradius' not in ac:
             # calc argposition if new or adsb before
-            last_arcposition = (last_arcposition + 210) % 360
-            if ARCPOSITION_EXCLUDE_TO >= last_arcposition >= ARCPOSITION_EXCLUDE_FROM:
-                last_arcposition = (last_arcposition + 210) % 360
+            last_arcposition = display_control.next_arcposition(last_arcposition)   # display specific
             ac['arcposition'] = last_arcposition
         ac['gps_distance'] = distcirc
         ac['circradius'] = distx
