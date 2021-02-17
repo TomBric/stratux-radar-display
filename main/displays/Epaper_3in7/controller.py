@@ -46,8 +46,8 @@ VERYSMALL = 18
 AWESOME_FONTSIZE = 18   # bluetooth indicator
 AIRCRAFT_SIZE = 6        # size of aircraft arrow
 MINIMAL_CIRCLE = 20     # minimal size of mode-s circle
-ARCPOSITION_EXCLUDE_FROM = 130
-ARCPOSITION_EXCLUDE_TO = 230
+ARCPOSITION_EXCLUDE_FROM = 110
+ARCPOSITION_EXCLUDE_TO = 250
 # end definitions
 
 # global device properties
