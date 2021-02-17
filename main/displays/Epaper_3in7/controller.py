@@ -95,6 +95,9 @@ def is_busy():
 
 
 def next_arcposition(old_arcposition):
+    global ARCPOSITION_EXCLUDE_FROM
+    global ARCPOSITION_EXCLUDE_TO
+
     # defines next position of height indicator on circle. Can be used to exclude several ranges or
     # be used to define the next angle on the circle
     new_arcposition = (old_arcposition + 210) % 360
@@ -133,7 +136,7 @@ def init():
     zerox = sizex / 2
     zeroy = 200    # not centered
     ah_zeroy = sizey / 2   # zero line for ahrs
-    ah_zerox = sizex /2
+    ah_zerox = sizex / 2
     max_pixel = 400
     verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
@@ -300,13 +303,6 @@ def shutdown(draw, countdown):
     message = "to cancel ..."
     centered_text(draw, 130, message, smallfont, fill="black")
 
-'''
-def ahrs(draw, pitch, roll, heading, slipskid, error_message):
-    centered_text(draw, 10, "AHRS not provided ", largefont, fill="black")
-    centered_text(draw, 40, "on this display.", largefont, fill="black")
-    centered_text(draw, 120, "Long press on middle button", largefont, fill="black")
-    centered_text(draw, 150, "to continue ...", largefont, fill="black")
-'''
 
 def rollmarks(draw, roll):
     if ah_zerox > ah_zeroy:
@@ -365,7 +361,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     draw.polygon((h1, h2, h4, h3), fill="white")  # sky
     draw.line((h1, h2), fill="black", width=4)  # horizon line
 
-    earthfill = 0;
+    earthfill = 0
     while earthfill > -180:
         earthfill -= 3
         draw.line((linepoints(pitch, roll, earthfill, 600)), fill="black", width=1)
