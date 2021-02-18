@@ -43,6 +43,7 @@ import subprocess
 # constants
 STATUS_TIMEOUT = 1.0
 BLUETOOTH_SCAN_TIME = 15.0
+BT_SCAN_WAIT = 0.2
 
 # globals
 status_url = ""
@@ -125,12 +126,12 @@ async def bt_scan():
                                                 stdout=asyncio.subprocess.PIPE)
     while True:
         stdout_line, stderr_line = await proc.communicate()
-        print("Line: ", stdout_line)
-        if stdout_line is None and stderr_line is None:
+        if stdout_line.at_eof():
+            print("Scan Off")
             subprocess.run(["bluetoothctl", "scan", "off"])
             return   # subprocess done
-        if stdout_line is not None:
-            scan_result(stdout_line)
+        scan_result(stdout_line.readline())
+        await asyncio.sleep(BT_SCAN_WAIT)
 
 
 def start_async_bt_scan():   # started by ui-coroutine

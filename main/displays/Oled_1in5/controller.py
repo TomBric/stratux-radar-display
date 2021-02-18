@@ -352,10 +352,10 @@ def status(draw, status, left_text, middle_text, right_text, stratux_ip, bt_devi
 
 
 def bt_scanning(draw, time_left, devnames):
-    centered_text(draw, 0, "Scan BT ...", smallfont, fill="yellow")
-    centered_text(draw, SMALL, str(time_left) + " secs", smallfont, fill="yellow")
-    draw.text((0, 4*SMALL), "Detected Devices:", font=smallfont, fill="white")
+    centered_text(draw, 0, "Scan BT", largefont, fill="yellow")
+    centered_text(draw, LARGE, str(time_left) + " secs", smallfont, fill="yellow")
+    draw.text((0, 2*LARGE), "Detected Devices:", font=smallfont, fill="white")
     t = ""
     for dev in devnames:
         t = t + dev + '\n'
-    draw.text((20, 4*SMALL), t, font=verysmallfont, fill="white")
+    draw.text((20, 2*LARGE+SMALL), t, font=verysmallfont, fill="white")
