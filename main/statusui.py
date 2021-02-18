@@ -34,8 +34,11 @@
 import logging
 import requests
 import radarbuttons
+import time
 
 # constants
+STATUS_TIMEOUT = 1.0
+
 # globals
 status_changed = True
 status_ui_changed = False   # for future use
@@ -43,7 +46,7 @@ status_url = ""
 status_values = {'radar_ip': "0.0.0.0", 'stratux_ip': "0.0.0.0", 'stratux_temp': "0.0", 'bt_devices': None,
                  'gps_hardware': "NoGps", 'gps_solution': "No Fix", 'sat_in_solution': 0, 'sat_seen': 0,
                  'sat_tracked': 0, 'sdr_device': 0, 'messages_1090': 0, 'messages_ogn': 0}
-
+last_status_get = 0.0  # time stamp of the last status request
 
 def init(display_control, url):   # prepare everything
     global status_url
@@ -65,6 +68,9 @@ def get_status():
 def draw_status(draw, display_control):
     global status_changed
 
+    now = time.time()
+    if now >= last_status_get + STATUS_TIMEOUT:
+        get_status()
     if status_changed or status_ui_changed:
         status_changed = False
         display_control.clear(draw)
