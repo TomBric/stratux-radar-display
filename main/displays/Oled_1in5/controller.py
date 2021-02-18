@@ -338,12 +338,17 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
         centered_text(draw, 30, error_message, smallfont, fill="red")
 
 
-def status(draw, status, stratux_ip, bt_devices, bt_names):
+def status(draw, status, left_text, middle_text, right_text, stratux_ip, bt_devices, bt_names):
     status_text = "Stratux: " + format(stratux_ip) + "\n"
     status_text += "BT-Devices: " + str(bt_devices) + "\n"
     for name in bt_names:
         status_text += "    " + name + "\n"
     draw.text((0, 0), status_text, font=verysmallfont, fill="white")
+
+    draw.text((0, sizey - SMALL - 3), left_text, font=smallfont, fill="green")
+    textsize = draw.textsize(right_text, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL - 3), right_text, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="green")
 
 
 def bt_scanning(draw, time_left, devnames):
