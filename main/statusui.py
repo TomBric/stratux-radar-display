@@ -113,10 +113,11 @@ def scan_result(line):
     global new_devices
 
     split = line.split(maxsplit=2)
-    if split[0] == '[NEW]' and split[1] == 'Device':
-        bt_addr = split[2]
-        bt_name = split[3]
-        new_devices.append([bt_addr, bt_name])
+    if len(split) >= 2:
+        if split[0] == '[NEW]' and split[1] == 'Device':
+            bt_addr = split[2]
+            bt_name = split[3]
+            new_devices.append([bt_addr, bt_name])
 
 
 async def bt_scan():
