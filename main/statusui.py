@@ -120,7 +120,7 @@ def scan_result(line):
 
 
 async def bt_scan():
-    proc = await asyncio.create_subprocess_exec(["bluetoothctl", "--timeout", BLUETOOTH_SCAN_TIME, "scan", "on"],
+    proc = await asyncio.create_subprocess_exec("bluetoothctl", "--timeout", str(BLUETOOTH_SCAN_TIME), "scan", "on",
                                                 stdout=asyncio.subprocess.PIPE)
     while True:
         stdout_line, stderr_line = await proc.communicate()
