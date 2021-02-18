@@ -381,7 +381,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
         centered_text(draw, 80, error_message, smallfont, fill="black")
 
 
-def status(draw, status, left, middle, right stratux_ip, bt_devices, bt_names):
+def status(draw, status, left, middle, right, stratux_ip, bt_devices, bt_names):
     print("Status display not yet implemented")
 
 
