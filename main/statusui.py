@@ -83,15 +83,15 @@ def draw_status(draw, display_control):
     now = time.time()
     if now >= last_status_get + STATUS_TIMEOUT:
         status_answer = get_status()
-        bt_devices, devnames = radarbluez.connected_devices()
 
         display_control.clear(draw)
         if scan_end == 0:
+            bt_devices, devnames = radarbluez.connected_devices()
             display_control.status(draw, status_answer, left, middle, right, stratux_ip, bt_devices, devnames)
         else:
-            countdown = math.floor(scan_end - time.time())
+            countdown = math.floor(scan_end - now)
             if countdown > 0:
-                display_control.bt_scanning(draw, countdown, devnames)
+                display_control.bt_scanning(draw, countdown, new_devices)
             else:
                 scan_end = 0
         display_control.display()
