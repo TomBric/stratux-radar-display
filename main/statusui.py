@@ -35,6 +35,7 @@ import logging
 import requests
 import radarbuttons
 import time
+import radarbluez
 
 # constants
 STATUS_TIMEOUT = 1.0
@@ -74,8 +75,10 @@ def draw_status(draw, display_control):
     now = time.time()
     if now >= last_status_get + STATUS_TIMEOUT:
         status_answer = get_status()
+        bt_devices, devnames = radarbluez.connected_devices()
+
         display_control.clear(draw)
-        display_control.status(draw, status_answer, stratux_ip)
+        display_control.status(draw, status_answer, stratux_ip, bt_devices, devnames)
         display_control.display()
 
 
