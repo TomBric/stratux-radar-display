@@ -147,7 +147,7 @@ def user_input(bluetooth_active):
 
     middle = "Mode"
     if bluetooth_active:
-        right = "BT-Scan"
+        right = "Scan"
     else:
         right = ""
     btime, button = radarbuttons.check_buttons()
