@@ -68,6 +68,7 @@ def get_status():
         return None
     return status_answer
 
+
 def draw_status(draw, display_control):
     global status_changed
 
@@ -75,9 +76,11 @@ def draw_status(draw, display_control):
     if now >= last_status_get + STATUS_TIMEOUT:
         status_answer = get_status()
         try:
-            host_name = socket.gethostname()
-            my_ip = socket.gethostbyname(host_name)
-        except:
+            hostname = socket.gethostname()
+            my_ip = socket.gethostbyname(hostname)
+        except OSError:
+            hostname = "undef"
+            my_ip = "0.0.0.0"
             print("StatusUI: Unable to get Hostname and IP")
         display_control.clear(draw)
         display_control.status(draw, status_answer, hostname, my_ip, stratux_ip)
