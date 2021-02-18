@@ -131,7 +131,8 @@ async def bt_scan():
 
 
 def start_async_bt_scan():   # started by ui-coroutine
-    asyncio.run(bt_scan())
+    loop = asyncio.get_event_loop()
+    loop.create_task(bt_scan())
 
 
 def user_input(bluetooth_active):
