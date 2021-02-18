@@ -336,3 +336,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
         centered_text(draw, 30, error_message, smallfont, fill="red")
+
+
+def status(draw, status):
+    print("Status display not yet implemented")

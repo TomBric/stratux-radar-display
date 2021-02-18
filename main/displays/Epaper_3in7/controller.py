@@ -95,9 +95,6 @@ def is_busy():
 
 
 def next_arcposition(old_arcposition):
-    global ARCPOSITION_EXCLUDE_FROM
-    global ARCPOSITION_EXCLUDE_TO
-
     # defines next position of height indicator on circle. Can be used to exclude several ranges or
     # be used to define the next angle on the circle
     new_arcposition = (old_arcposition + 210) % 360
@@ -382,3 +379,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
         centered_text(draw, 80, error_message, smallfont, fill="black")
+
+
+def status(draw, status):
+    print("Status display not yet implemented")

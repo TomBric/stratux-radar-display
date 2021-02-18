@@ -31,50 +31,59 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import logging
+import requests
 import radarbuttons
 
 # constants
 # globals
-ahrs_ui_changed = True
-
-MSG_GROUND_TEST = "No GPS,Ground ONLY!"
-MSG_PSEUDO_AHRS = "PSEUDO AHRS ONLY!"
-MSG_NO_AHRS = "NO IMU OR GPS!"
-
-
-def init(display_control):   # prepare everything
-    pass   # nothing to do in the setup now
+status_changed = True
+status_ui_changed = False   # for future use
+status_url = ""
+status_values = {'radar_ip': "0.0.0.0", 'stratux_ip': "0.0.0.0", 'stratux_temp': "0.0", 'bt_devices': None,
+                 'gps_hardware': "NoGps", 'gps_solution': "No Fix", 'sat_in_solution': 0, 'sat_seen': 0,
+                 'sat_tracked': 0, 'sdr_device': 0, 'messages_1090': 0, 'messages_ogn': 0}
 
 
-def draw_ahrs(draw, display_control, was_changed, pitch, roll, heading, slip, gps_hor_accuracy, ahrs_sensor):
-    global ahrs_ui_changed
+def init(display_control, url):   # prepare everything
+    global status_url
+    status_url = url
+    logging.debug("Status UI: Initialized GET settings to " + status_url)
 
-    if was_changed or ahrs_ui_changed:
-        ahrs_ui_changed = False
-        error_message = None
-        if gps_hor_accuracy >= 30 and ahrs_sensor:
-            error_message = MSG_GROUND_TEST
-        if gps_hor_accuracy >= 30 and not ahrs_sensor:
-            error_message = MSG_NO_AHRS
-        if gps_hor_accuracy < 30 and not ahrs_sensor:
-            error_message = MSG_PSEUDO_AHRS
+
+def get_status():
+    global status_url
+
+    try:
+        answer = requests.get(status_url)
+        status_answer = answer.json()
+        print(status_answer)
+    except (requests.exceptions.RequestException, ValueError) as e:
+        logging.debug("Status UI: Status GET exception", e)
+
+
+def draw_status(draw, display_control):
+    global status_changed
+
+    if status_changed or status_ui_changed:
+        status_changed = False
         display_control.clear(draw)
-        display_control.ahrs(draw, pitch, roll, heading, slip, error_message)
+        display_control.status(draw, status_values)
         display_control.display()
 
 
 def user_input():
-    global ahrs_ui_changed
+    global status_ui_changed
 
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
     if btime == 0:
         return 0  # stay in timer mode
-    ahrs_ui_changed = True
+    status_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
-        return 7  # next mode to be status display
+        return 1  # next mode to be radar
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long- refresh
         return 6  # start next mode for display driver: refresh called from ahrs
-    return 5  # no mode change
+    return 7  # no mode change

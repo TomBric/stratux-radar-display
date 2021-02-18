@@ -45,6 +45,7 @@ import radarui
 import timerui
 import shutdownui
 import ahrsui
+import statusui
 import importlib
 
 # constant definitions
@@ -63,6 +64,7 @@ DEFAULT_URL_HOST_BASE = "192.168.10.1"
 url_situation_ws = ""
 url_radar_ws = ""
 url_settings_set = ""
+url_status_get = ""
 device = ""
 draw = None
 all_ac = {}
@@ -84,8 +86,9 @@ display_control = None
 speak = False  # BT is generally enabled
 bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
-global_mode = 1   # 1=Radar 2=Timer 3=Shutdown 4=refresh 5=ahrs 0=Init
-LAST_MODE = 3    # to be never reached
+global_mode = 1
+# 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
+# 7=status 8=refresh from status   0=Init
 
 
 def draw_all_ac(draw, allac):
@@ -388,6 +391,8 @@ async def user_interface():
                 await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
             elif global_mode == 5:  # ahrs
                 next_mode = ahrsui.user_input()
+            elif global_mode == 7:  # status
+                next_mode = statusui.user_input()
 
             if next_mode > 0:
                 ui_changed = True
@@ -439,6 +444,8 @@ async def display_and_cutoff():
                     logging.debug("AHRS: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 5
+                elif global_mode == 7:  # status display
+                    statusui.draw_status(draw, display_control)
                 await asyncio.sleep(0.1)
 
             logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
@@ -498,6 +505,7 @@ if __name__ == "__main__":
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
     ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
     ap.add_argument("-a", "--ahrs", required=False, help="Start mode is ahrs", action='store_true', default=False)
+    ap.add_argument("-x", "--status", required=False, help="Start mode is status", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     args = vars(ap.parse_args())
@@ -512,10 +520,13 @@ if __name__ == "__main__":
         global_mode = 2   # start_in_timer_mode
     if args['ahrs']:
         global_mode = 5   # start_in_ahrs mode
+    if args['status']:
+        global_mode = 7   # start in status mode
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_settings_set = "http://" + url_host_base + "/setSettings"
+    url_status_get = "http://" + url_host_base + "/getStatus"
 
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
