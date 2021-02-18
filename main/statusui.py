@@ -61,9 +61,7 @@ def get_status():
     try:
         answer = requests.get(status_url)
         status_answer = answer.json()
-        print(status_answer)
     except (requests.exceptions.RequestException, ValueError) as e:
-        print("Status UI: Status GET exception", e)
         logging.debug("Status UI: Status GET exception", e)
         return None
     return status_answer
