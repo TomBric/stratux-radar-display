@@ -339,4 +339,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
 
 
 def status(draw, status, hostname, my_ip, stratux_ip):
-    print("Status display not yet implemented")
+    status_text = "Disp "+ my_ip + "Stra: " + stratux_ip + "\n"
+    status_text += "dev " + str(status['Devices']) +" GPS(so/se/tr): " + str(status['GPS_satellites_locked']) \
+                   + "/" + str(status['GPS_satellites_seen']) + "/" + str(status['GPS_satellites_tracked'])
+    draw.text((0, 0), status_text, font=verysmallfont, fill="white")
