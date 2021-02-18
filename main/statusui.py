@@ -35,22 +35,23 @@ import logging
 import requests
 import radarbuttons
 import time
+import socket
 
 # constants
 STATUS_TIMEOUT = 1.0
 
 # globals
-status_changed = True
-status_ui_changed = False   # for future use
 status_url = ""
-status_values = {'radar_ip': "0.0.0.0", 'stratux_ip': "0.0.0.0", 'stratux_temp': "0.0", 'bt_devices': None,
-                 'gps_hardware': "NoGps", 'gps_solution': "No Fix", 'sat_in_solution': 0, 'sat_seen': 0,
-                 'sat_tracked': 0, 'sdr_device': 0, 'messages_1090': 0, 'messages_ogn': 0}
+stratux_ip = "0.0.0.0"
 last_status_get = 0.0  # time stamp of the last status request
 
-def init(display_control, url):   # prepare everything
+
+def init(display_control, url, target_ip):   # prepare everything
     global status_url
+    global stratux_ip
+
     status_url = url
+    stratux_ip = target_ip
     logging.debug("Status UI: Initialized GET settings to " + status_url)
 
 
@@ -64,18 +65,22 @@ def get_status():
     except (requests.exceptions.RequestException, ValueError) as e:
         print("Status UI: Status GET exception", e)
         logging.debug("Status UI: Status GET exception", e)
-
+        return None
+    return status_answer
 
 def draw_status(draw, display_control):
     global status_changed
 
     now = time.time()
     if now >= last_status_get + STATUS_TIMEOUT:
-        get_status()
-    if status_changed or status_ui_changed:
-        status_changed = False
+        status_answer = get_status()
+        try:
+            host_name = socket.gethostname()
+            my_ip = socket.gethostbyname(host_name)
+        except:
+            print("StatusUI: Unable to get Hostname and IP")
         display_control.clear(draw)
-        display_control.status(draw, status_values)
+        display_control.status(draw, status_answer, hostname, my_ip, stratux_ip)
         display_control.display()
 
 

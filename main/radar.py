@@ -481,7 +481,7 @@ def main():
         radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     ahrsui.init(display_control)
-    statusui.init(display_control, url_status_get)
+    statusui.init(display_control, url_status_get, DEFAULT_URL_HOST_BASE)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())
