@@ -124,10 +124,12 @@ async def bt_scan():
                                                 stdout=asyncio.subprocess.PIPE)
     while True:
         stdout_line, stderr_line = await proc.communicate()
+        print("Line: ", stdout_line)
         if stdout_line is None and stderr_line is None:
             subprocess.run(["bluetoothctl", "scan", "off"])
             return   # subprocess done
-        scan_result(stdout_line)
+        if stdout_line is not None:
+            scan_result(stdout_line)
 
 
 def start_async_bt_scan():   # started by ui-coroutine
