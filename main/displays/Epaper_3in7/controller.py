@@ -383,3 +383,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
 
 def status(draw, status, stratux_ip, bt_devices, bt_names):
     print("Status display not yet implemented")
+
+
+def bt_scanning(draw, time_left, devnames):
+    print("Status display not yet implemented")

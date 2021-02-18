@@ -89,6 +89,7 @@ sound_on = True  # user may toogle sound off by UI
 global_mode = 1
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
 # 7=status 8=refresh from status   0=Init
+bluetooth_active = False
 
 
 def draw_all_ac(draw, allac):
@@ -392,7 +393,7 @@ async def user_interface():
             elif global_mode == 5:  # ahrs
                 next_mode = ahrsui.user_input()
             elif global_mode == 7:  # status
-                next_mode = statusui.user_input()
+                next_mode = statusui.user_input(bluetooth_active)
 
             if next_mode > 0:
                 ui_changed = True
@@ -475,10 +476,11 @@ def main():
     global zeroy
     global draw
     global display_refresh_time
+    global bluetooth_active
 
     radarui.init(url_settings_set)
     if speak:
-        radarbluez.bluez_init()
+        bluetooth_active = radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     ahrsui.init(display_control)
     statusui.init(display_control, url_status_get, DEFAULT_URL_HOST_BASE)

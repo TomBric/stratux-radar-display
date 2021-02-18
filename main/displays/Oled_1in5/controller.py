@@ -340,7 +340,17 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
 
 def status(draw, status, stratux_ip, bt_devices, bt_names):
     status_text = "Stratux: " + format(stratux_ip) + "\n"
-    status_text += "BT-Devices:" + str(bt_devices) + "\n"
+    status_text += "BT-Devices: " + str(bt_devices) + "\n"
     for name in bt_names:
-        status_text += "  " + name + "\n"
+        status_text += "    " + name + "\n"
     draw.text((0, 0), status_text, font=verysmallfont, fill="white")
+
+
+def bt_scanning(draw, time_left, devnames):
+    centered_text(draw, 0, "Scan BT ...", smallfont, fill="yellow")
+    centered_text(draw, SMALL, str(time_left) + " secs", smallfont, fill="yellow")
+    draw.text((0, 4*SMALL), "Detected Devices:", font=smallfont, fill="white")
+    t = ""
+    for dev in devnames:
+        t = t + dev + '\n'
+    draw.text((20, 4*SMALL), t, font=verysmallfont, fill="white")

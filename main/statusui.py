@@ -36,14 +36,23 @@ import requests
 import radarbuttons
 import time
 import radarbluez
+import math
+import asyncio
+import subprocess
 
 # constants
 STATUS_TIMEOUT = 1.0
+BLUETOOTH_SCAN_TIME = 15.0
 
 # globals
 status_url = ""
 stratux_ip = "0.0.0.0"
 last_status_get = 0.0  # time stamp of the last status request
+left = ""           # button text
+middle = ""         # button text
+right = ""          # button text
+scan_end = 0.0      # time, when a bt scan will be finished
+new_devices = []
 
 
 def init(display_control, url, target_ip):   # prepare everything
@@ -68,7 +77,7 @@ def get_status():
 
 
 def draw_status(draw, display_control):
-    global status_changed
+    global scan_end
 
     now = time.time()
     if now >= last_status_get + STATUS_TIMEOUT:
@@ -76,22 +85,78 @@ def draw_status(draw, display_control):
         bt_devices, devnames = radarbluez.connected_devices()
 
         display_control.clear(draw)
-        display_control.status(draw, status_answer, stratux_ip, bt_devices, devnames)
+        if scan_end == 0:
+            display_control.status(draw, status_answer, left, middle, right, stratux_ip, bt_devices, devnames)
+        else:
+            countdown = math.floor(scan_end - time.time())
+            if countdown > 0:
+                display_control.bt_scanning(draw, countdown, devnames)
+            else:
+                scan_end = 0
         display_control.display()
 
 
-def user_input():
-    global status_ui_changed
+def trust_pair_connect(bt_addr):
+    res = subprocess.run(["bluetoothctl", "trust", bt_addr])
+    if res.returncode != 0:
+        return False
+    res = subprocess.run(["bluetoothctl", "pair", bt_addr])
+    if res.returncode != 0:
+        return False
+    res = subprocess.run(["bluetoothctl", "connect", bt_addr])
+    if res.returncode != 0:
+        return False
+    return True
 
+
+def scan_result(line):
+    global new_devices
+
+    split = line.split(maxsplit=2)
+    if split[0] == '[NEW]' and split[1] == 'Device':
+        bt_addr = split[2]
+        bt_name = split[3]
+        new_devices.append([bt_addr, bt_name])
+
+
+async def bt_scan():
+    proc = await asyncio.create_subprocess_exec(["bluetoothctl", "--timeout", BLUETOOTH_SCAN_TIME, "scan", "on"],
+                                                stdout=asyncio.subprocess.PIPE)
+    while True:
+        stdout_line, stderr_line = await proc.communicate()
+        if stdout_line is None and stderr_line is None:
+            subprocess.run(["bluetoothctl", "scan", "off"])
+            return   # subprocess done
+        scan_result(stdout_line)
+
+
+def start_async_bt_scan():   # started by ui-coroutine
+    asyncio.run(bt_scan())
+
+
+def user_input(bluetooth_active):
+    global left
+    global middle
+    global right
+    global scan_end
+
+    middle = "Mode"
+    if bluetooth_active:
+        right = "BT-Scan"
+    else:
+        right = ""
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
     if btime == 0:
         return 0  # stay in timer mode
-    status_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
         return 1  # next mode to be radar
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
+    if bluetooth_active and button == 2 and btime == 1:  # right and short
+        start_async_bt_scan()
+        scan_end = time.time() + BLUETOOTH_SCAN_TIME
+        return 7  # stay in status mode
     if button == 2 and btime == 2:  # right and long- refresh
         return 6  # start next mode for display driver: refresh called from ahrs
     return 7  # no mode change
