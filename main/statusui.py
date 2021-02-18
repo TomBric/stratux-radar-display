@@ -77,7 +77,8 @@ def draw_status(draw, display_control):
         status_answer = get_status()
         try:
             hostname = socket.gethostname()
-            my_ip = socket.gethostbyname(hostname)
+            my_ip = [ip for ip in socket.gethostbyname_ex(hostname)[2]
+                     if not ip.startswith("127.")][: 1]
         except OSError:
             hostname = "undef"
             my_ip = "0.0.0.0"
