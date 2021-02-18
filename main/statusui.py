@@ -35,7 +35,6 @@ import logging
 import requests
 import radarbuttons
 import time
-import socket
 
 # constants
 STATUS_TIMEOUT = 1.0
@@ -75,16 +74,8 @@ def draw_status(draw, display_control):
     now = time.time()
     if now >= last_status_get + STATUS_TIMEOUT:
         status_answer = get_status()
-        try:
-            hostname = socket.gethostname()
-            my_ip = [ip for ip in socket.gethostbyname_ex(hostname)[2]
-                     if not ip.startswith("127.")][: 1]
-        except OSError:
-            hostname = "undef"
-            my_ip = "0.0.0.0"
-            print("StatusUI: Unable to get Hostname and IP")
         display_control.clear(draw)
-        display_control.status(draw, status_answer, hostname, my_ip, stratux_ip)
+        display_control.status(draw, status_answer, stratux_ip)
         display_control.display()
 
 

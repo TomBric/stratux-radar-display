@@ -338,8 +338,8 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
         centered_text(draw, 30, error_message, smallfont, fill="red")
 
 
-def status(draw, status, hostname, my_ip, stratux_ip):
-    status_text = my_ip + " to "+ stratux_ip + "\n"
+def status(draw, status, stratux_ip):
+    status_text = "Stratux: " + format(stratux_ip) + "\n"
     status_text += "dev " + str(status['Devices']) +" GPS(so/se/tr): " + str(status['GPS_satellites_locked']) \
                    + "/" + str(status['GPS_satellites_seen']) + "/" + str(status['GPS_satellites_tracked'])
     draw.text((0, 0), status_text, font=verysmallfont, fill="white")
