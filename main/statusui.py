@@ -175,6 +175,7 @@ def user_input(bluetooth_active):
     global right
     global scan_end
     global status_mode
+    global new_devices
 
     middle = "Mode"
     if bluetooth_active:
