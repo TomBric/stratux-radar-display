@@ -116,8 +116,7 @@ def draw_status(draw, display_control):
         else:
             text += "No detections."
         display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
-
-        display_control.display()
+    display_control.display()
 
 
 def trust_pair_connect(bt_addr):
