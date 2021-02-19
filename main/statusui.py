@@ -131,12 +131,12 @@ async def bt_scan():
                                                 stdout=asyncio.subprocess.PIPE)
     while True:
         stdout_line, stderr_line = await proc.communicate()
-        print("Communicate: RetCod ", proc.returncode, " stdout ", str(stdout_line))
+        print("Communicate: RetCod ", proc.returncode, " stdout ", stdout_line.decode("UTF-8"))
         if proc is not None:   # finished
-            scan_result(str(stdout_line))
+            scan_result(stdout_line.decode("UTF-8"))
             print("Blueotooth Scan done")
             return   # subprocess done
-        scan_result(str(stdout_line))
+        scan_result(stdout_line.decode("UTF-8"))
         await asyncio.sleep(BT_SCAN_WAIT)
 
 
