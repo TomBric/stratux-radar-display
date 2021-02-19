@@ -112,18 +112,20 @@ def trust_pair_connect(bt_addr):
     return True
 
 
-def scan_result(line):
+def scan_result(output):
     global new_devices
 
-    print("Scan result: ", line)
-    split = line.split(maxsplit=2)
-    print("Split: ", split[0], " ", split[1])
-    if len(split) >= 2:
-        if split[0] == '[NEW]' and split[1] == 'Device':
-            bt_addr = split[2]
-            bt_name = split[3]
-            new_devices.append([bt_addr, bt_name])
-            print("New Device detected: ",bt_addr, " ", bt_name)
+    print("Scan result: ", output)
+    lines = output.splitlines()
+    for line in lines:
+        split = line.split(maxsplit=2)
+        print("Split: ", split[0], " ", split[1])
+        if len(split) >= 2:
+            if split[0] == '[NEW]' and split[1] == 'Device':
+                bt_addr = split[2]
+                bt_name = split[3]
+                new_devices.append([bt_addr, bt_name])
+                print("New Device detected: ", bt_addr, " ", bt_name)
 
 
 async def bt_scan():
