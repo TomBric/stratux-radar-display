@@ -357,5 +357,5 @@ def bt_scanning(draw, time_left, devnames):
     draw.text((0, 2*LARGE), "Detected Devices:", font=smallfont, fill="white")
     t = ""
     for dev in devnames:
-        t = t + dev + '\n'
+        t = t + dev[1] + '\n'    # dev 1 is name, addr is not printed on this small display
     draw.text((20, 2*LARGE+SMALL), t, font=smallfont, fill="white")

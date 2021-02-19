@@ -119,7 +119,6 @@ def scan_result(output):
     lines = output.splitlines()
     for line in lines:
         split = line.split(maxsplit=3)
-        print("Split: ", split[0], " ", split[1])
         if len(split) >= 2:
             if 'NEW' in split[0] and 'Device' in split[1]:
                 bt_addr = split[2]
