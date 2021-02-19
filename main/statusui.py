@@ -115,6 +115,7 @@ def trust_pair_connect(bt_addr):
 def scan_result(line):
     global new_devices
 
+    print("Scan result: ", line)
     split = line.split(maxsplit=2)
     if len(split) >= 2:
         if split[0] == '[NEW]' and split[1] == 'Device':
@@ -133,7 +134,7 @@ async def bt_scan():
             print("Blueotooth Scan Off")
             subprocess.run(["bluetoothctl", "scan", "off"])
             return   # subprocess done
-        scan_result(stdout_line.readline())
+        scan_result(stdout_line)
         await asyncio.sleep(BT_SCAN_WAIT)
 
 
