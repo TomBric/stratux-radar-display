@@ -179,11 +179,12 @@ def user_input(bluetooth_active):
     global status_mode
     global new_devices
 
-    middle = "Mode"
-    if bluetooth_active:
-        right = "Scan"
-    else:
-        right = ""
+    if status_mode == 0
+        middle = "Mode"
+        if bluetooth_active:
+            right = "Scan"
+        else:
+            right = ""
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
     if btime == 0:
@@ -203,20 +204,6 @@ def user_input(bluetooth_active):
     if status_mode == 1:   # active scanning, no interface options, just wait
         pass
     if status_mode == 2:  # scanning finished, evaluating
-        if len(new_devices) > 0:
-            if button == 0 and btime == 1:  # left short, YES
-                print("Connecting:", new_devices[0][1])
-                trust_pair_connect(new_devices[0][0])
-                del new_devices[0]
-            if button == 2 and btime == 1:  # right short, NO
-                print("Not Connecting:", new_devices[0][1])
-                del new_devices[0]
-        if button == 1 and btime == 1:   # middle short, Cancel
-            new_devices = []
-            left = ""
-            middle = "Mode"
-            right = "Scan"
-            status_mode = 0
         if len(new_devices) == 0:   # device mgmt finished
             if bluetooth_active and button == 2 and btime == 1:  # right and short
                 status_mode = 1
@@ -225,4 +212,19 @@ def user_input(bluetooth_active):
                 right = ""
                 start_async_bt_scan()
                 scan_end = time.time() + BLUETOOTH_SCAN_TIME
+                return 7
+        if len(new_devices) > 0:
+            if button == 0 and btime == 1:  # left short, YES
+                print("Connecting:", new_devices[0][1])
+                trust_pair_connect(new_devices[0][0])
+                del new_devices[0]
+            if button == 2 and btime == 1:  # right short, NO
+                print("Not Connecting:", new_devices[0][1])
+                del new_devices[0]
+        if len(new_devices) or (button == 1 and btime == 1):   # middle short, Cancel
+            new_devices = []
+            left = ""
+            middle = "Mode"
+            right = "Scan"
+            status_mode = 0
     return 7  # no mode change
