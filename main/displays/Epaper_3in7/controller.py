@@ -386,7 +386,7 @@ def status(draw, status, left_text, middle_text, right_text, stratux_ip, bt_devi
     status_text += "BT-Devices: " + str(bt_devices) + "\n"
     for name in bt_names:
         status_text += " " + name + "\n"
-    draw.text((5, 0), status_text, font=smallfont, fill="black")
+    draw.text((5, 10), status_text, font=smallfont, fill="black")
 
     draw.text((5, sizey - SMALL - 3), left_text, font=smallfont, fill="black")
     textsize = draw.textsize(right_text, smallfont)
@@ -395,9 +395,9 @@ def status(draw, status, left_text, middle_text, right_text, stratux_ip, bt_devi
 
 
 def bt_scanning(draw, headline, subline, text, left_text, middle_text, right_text):
-    centered_text(draw, 0, headline, largefont, fill="black")
-    centered_text(draw, LARGE, subline, smallfont, fill="black")
-    draw.text((0, 2*LARGE), text, font=smallfont, fill="black")
+    centered_text(draw, 0, headline, verylargefont, fill="black")
+    centered_text(draw, VERYLARGE, subline, largefont, fill="black")
+    draw.text((5, VERYLARGE+LARGE), text, font=smallfont, fill="black")
 
     draw.text((5, sizey - SMALL - 3), left_text, font=smallfont, fill="black")
     textsize = draw.textsize(right_text, smallfont)
