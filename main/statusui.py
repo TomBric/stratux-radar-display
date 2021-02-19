@@ -228,7 +228,7 @@ def user_input(bluetooth_active):
                 print("Not Connecting:", new_devices[0][1])
                 remove_device(new_devices[0][0])
                 del new_devices[0]
-        if len(new_devices) or (button == 1 and btime == 1):   # middle short, Cancel
+        if len(new_devices)==0 or (button == 1 and btime == 1):   # middle short, Cancel
             new_devices = []
             left = ""
             middle = "Mode"
