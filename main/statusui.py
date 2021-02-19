@@ -131,7 +131,8 @@ async def bt_scan():
     while True:
         stdout_line, stderr_line = await proc.communicate()
         print("Communicate: RetCod ", proc.returncode, " stdout ", stdout_line)
-        if proc.returncode:   # finished
+        if proc is not None:   # finished
+            scan_result(stdout_line)
             print("Blueotooth Scan Off")
             subprocess.run(["bluetoothctl", "scan", "off"])
             return   # subprocess done
