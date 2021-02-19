@@ -117,6 +117,7 @@ def scan_result(line):
 
     print("Scan result: ", line)
     split = line.split(maxsplit=2)
+    print("Split: ", split[0], " ", split[1])
     if len(split) >= 2:
         if split[0] == '[NEW]' and split[1] == 'Device':
             bt_addr = split[2]
@@ -131,7 +132,6 @@ async def bt_scan():
                                                 stdout=asyncio.subprocess.PIPE)
     while True:
         stdout_line, stderr_line = await proc.communicate()
-        print("Communicate: RetCod ", proc.returncode, " stdout ", stdout_line.decode("UTF-8"))
         if proc is not None:   # finished
             scan_result(stdout_line.decode("UTF-8"))
             print("Blueotooth Scan done")
