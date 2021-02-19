@@ -342,7 +342,7 @@ def status(draw, status, left_text, middle_text, right_text, stratux_ip, bt_devi
     status_text = "Stratux: " + format(stratux_ip) + "\n"
     status_text += "BT-Devices: " + str(bt_devices) + "\n"
     for name in bt_names:
-        status_text += "    " + name + "\n"
+        status_text += " " + name + "\n"
     draw.text((0, 0), status_text, font=smallfont, fill="white")
 
     draw.text((0, sizey - SMALL - 3), left_text, font=smallfont, fill="green")
@@ -358,4 +358,4 @@ def bt_scanning(draw, time_left, devnames):
     t = ""
     for dev in devnames:
         t = t + dev[1] + '\n'    # dev 1 is name, addr is not printed on this small display
-    draw.text((20, 2*LARGE+SMALL), t, font=smallfont, fill="white")
+    draw.text((5, 2*LARGE+SMALL), t, font=smallfont, fill="white")
