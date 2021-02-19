@@ -221,14 +221,14 @@ def user_input(bluetooth_active):
                 return 7
         if len(new_devices) > 0:
             if button == 0 and btime == 1:  # left short, YES
-                print("Connecting:", new_devices[0][1])
+                logging.debug("Connecting:", new_devices[0][1])
                 trust_pair_connect(new_devices[0][0])
                 del new_devices[0]
             if button == 2 and btime == 1:  # right short, NO
-                print("Not Connecting:", new_devices[0][1])
+                logging.debug("Not Connecting:", new_devices[0][1])
                 remove_device(new_devices[0][0])
                 del new_devices[0]
-        if len(new_devices)==0 or (button == 1 and btime == 1):   # middle short, Cancel
+        if len(new_devices) ==0 or (button == 1 and btime == 1):   # middle short, Cancel
             new_devices = []
             left = ""
             middle = "Mode"
