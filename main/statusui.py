@@ -41,7 +41,7 @@ import asyncio
 import subprocess
 
 # constants
-STATUS_TIMEOUT = 1.0
+STATUS_TIMEOUT = 0.5
 BLUETOOTH_SCAN_TIME = 15.0
 BT_SCAN_WAIT = 0.2
 
@@ -79,9 +79,11 @@ def get_status():
 
 def draw_status(draw, display_control):
     global scan_end
+    global last_status_get
 
     now = time.time()
     if now >= last_status_get + STATUS_TIMEOUT:
+        last_status_get = now
         status_answer = get_status()
 
         display_control.clear(draw)
