@@ -86,8 +86,8 @@ def draw_status(draw, display_control):
     global right
     global scan_end
 
-    now = time.time()
     display_control.clear(draw)
+    now = time.time()
     if status_mode == 0:
         if now >= last_status_get + STATUS_TIMEOUT:
             last_status_get = now
