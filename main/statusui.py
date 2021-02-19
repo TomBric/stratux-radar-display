@@ -118,12 +118,15 @@ def scan_result(output):
     print("Scan result: ", output)
     lines = output.splitlines()
     for line in lines:
-        split = line.split(maxsplit=2)
+        split = line.split(maxsplit=3)
         print("Split: ", split[0], " ", split[1])
         if len(split) >= 2:
-            if split[0] == '[NEW]' and split[1] == 'Device':
+            if 'NEW' in split[0] and 'Device' in split[1]:
                 bt_addr = split[2]
-                bt_name = split[3]
+                if len(split) >= 3:
+                    bt_name = split[3]
+                else:
+                    bt_name = ''
                 new_devices.append([bt_addr, bt_name])
                 print("New Device detected: ", bt_addr, " ", bt_name)
 
