@@ -179,7 +179,7 @@ def user_input(bluetooth_active):
     global status_mode
     global new_devices
 
-    if status_mode == 0
+    if status_mode == 0:
         middle = "Mode"
         if bluetooth_active:
             right = "Scan"
