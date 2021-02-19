@@ -340,9 +340,11 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
 
 def status(draw, status, left_text, middle_text, right_text, stratux_ip, bt_devices, bt_names):
     status_text = "Stratux: " + format(stratux_ip) + "\n"
-    status_text += "BT-Devices: " + str(bt_devices) + "\n"
-    for name in bt_names:
-        status_text += " " + name + "\n"
+    if bt_devices is not None:
+        status_text += "BT-Devices: " + str(bt_devices) + "\n"
+    if bt_names is not None:
+        for name in bt_names:
+            status_text += " " + name + "\n"
     draw.text((0, 0), status_text, font=smallfont, fill="white")
 
     draw.text((0, sizey - SMALL - 3), left_text, font=smallfont, fill="green")
