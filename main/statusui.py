@@ -135,6 +135,12 @@ def trust_pair_connect(bt_addr):
     return True
 
 
+def remove_device(bt_addr):
+    res = subprocess.run(["bluetoothctl", "remove", bt_addr])
+    if res.returncode != 0:
+        return False
+
+
 def scan_result(output):
     global new_devices
 
@@ -220,6 +226,7 @@ def user_input(bluetooth_active):
                 del new_devices[0]
             if button == 2 and btime == 1:  # right short, NO
                 print("Not Connecting:", new_devices[0][1])
+                remove_device(new_devices[0][1])
                 del new_devices[0]
         if len(new_devices) or (button == 1 and btime == 1):   # middle short, Cancel
             new_devices = []
