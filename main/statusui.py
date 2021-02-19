@@ -106,7 +106,7 @@ def draw_status(draw, display_control):
     elif status_mode == 2:   # scan evaluation
         headline = "BT-Scan"
         subline = "finished."
-        text = str(len(new_devices)) + "new devices: \n\n"
+        text = str(len(new_devices)) + " new devices found: \n"
         if len(new_devices) > 0:
             text += "Connect?\n"
             text += new_devices[0][1]
@@ -114,6 +114,9 @@ def draw_status(draw, display_control):
             middle = "Cancel"
             right = "NO"
         else:
+            left = ""
+            middle = "Cont"
+            right = "Scan"
             text += "No detections."
         display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
     display_control.display()
@@ -199,21 +202,27 @@ def user_input(bluetooth_active):
             scan_end = time.time() + BLUETOOTH_SCAN_TIME
     if status_mode == 1:   # active scanning, no interface options, just wait
         pass
-    if status_mode == 2:
-        if button == 0 and btime == 1:  # left short, YES
-            if len(new_devices) > 0:
+    if status_mode == 2:  # scanning finished, evaluating
+        if len(new_devices) > 0:
+            if button == 0 and btime == 1:  # left short, YES
                 print("Connecting:", new_devices[0][1])
                 trust_pair_connect(new_devices[0][0])
                 del new_devices[0]
-        if button == 1 and btime == 1:   # middle short, Cancel
-            new_devices = []
-            status_mode = 1
-        if button == 2 and btime == 1:    # right short, NO
-            if len(new_devices) > 0:
+            if button == 2 and btime == 1:  # right short, NO
                 print("Not Connecting:", new_devices[0][1])
                 del new_devices[0]
-        if len(new_devices) == 0:   # device mgmt finished
-            status_mode = 0
-            left = "Mode"
+        if button == 1 and btime == 1:   # middle short, Cancel
+            new_devices = []
+            left = ""
+            middle = "Mode"
             right = "Scan"
+            status_mode = 0
+        if len(new_devices) == 0:   # device mgmt finished
+            if bluetooth_active and button == 2 and btime == 1:  # right and short
+                status_mode = 1
+                left = ""
+                middle = ""
+                right = ""
+                start_async_bt_scan()
+                scan_end = time.time() + BLUETOOTH_SCAN_TIME
     return 7  # no mode change
