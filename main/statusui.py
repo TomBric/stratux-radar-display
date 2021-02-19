@@ -122,6 +122,7 @@ def scan_result(line):
             bt_addr = split[2]
             bt_name = split[3]
             new_devices.append([bt_addr, bt_name])
+            print("New Device detected: ",bt_addr, " ", bt_name)
 
 
 async def bt_scan():
