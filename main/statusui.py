@@ -197,6 +197,7 @@ def user_input(bluetooth_active):
             right = ""
             start_async_bt_scan()
             scan_end = time.time() + BLUETOOTH_SCAN_TIME
+            status_mode = 1
             return 7  # stay in status mode
     if status_mode == 1:   # active scanning, no interface options, just wait
         return 7
