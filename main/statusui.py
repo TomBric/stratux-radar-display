@@ -87,7 +87,6 @@ def draw_status(draw, display_control):
 
         display_control.clear(draw)
         if scan_end == 0:
-            print("Retrieving status")
             status_answer = get_status()
             bt_devices, devnames = radarbluez.connected_devices()
             display_control.status(draw, status_answer, left, middle, right, stratux_ip, bt_devices, devnames)
@@ -125,12 +124,13 @@ def scan_result(line):
 
 
 async def bt_scan():
+    print("Starting Bluetooth-Scan")
     proc = await asyncio.create_subprocess_exec("bluetoothctl", "--timeout", str(BLUETOOTH_SCAN_TIME), "scan", "on",
                                                 stdout=asyncio.subprocess.PIPE)
     while True:
         stdout_line, stderr_line = await proc.communicate()
-        if stdout_line.at_eof():
-            print("Scan Off")
+        if proc.returncode:   # finished
+            print("Blueotooth Scan Off")
             subprocess.run(["bluetoothctl", "scan", "off"])
             return   # subprocess done
         scan_result(stdout_line.readline())
