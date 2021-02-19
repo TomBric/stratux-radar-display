@@ -41,7 +41,7 @@ import asyncio
 import subprocess
 
 # constants
-STATUS_TIMEOUT = 0.5
+STATUS_TIMEOUT = 0.3
 BLUETOOTH_SCAN_TIME = 15.0
 BT_SCAN_WAIT = 0.2
 
@@ -84,38 +84,38 @@ def draw_status(draw, display_control):
     global left
     global middle
     global right
+    global scan_end
 
     now = time.time()
-    if now >= last_status_get + STATUS_TIMEOUT:
-        last_status_get = now
-
-        display_control.clear(draw)
-        if status_mode == 0:
-            status_answer = get_status()
-            bt_devices, devnames = radarbluez.connected_devices()
-            display_control.status(draw, status_answer, left, middle, right, stratux_ip, bt_devices, devnames)
-        elif status_mode == 1:   # scan running
-            countdown = math.floor(scan_end - now)
-            if countdown > 0:
-                headline = "BT-Scan"
-                subline = str(countdown) + " secs"
-                text = ""
-                display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
-            else:
-                status_mode = 2
-        elif status_mode == 2:   # scan evaluation
+    display_control.clear(draw)
+    if status_mode == 0:
+        if now >= last_status_get + STATUS_TIMEOUT:
+            last_status_get = now
+        status_answer = get_status()
+        bt_devices, devnames = radarbluez.connected_devices()
+        display_control.status(draw, status_answer, left, middle, right, stratux_ip, bt_devices, devnames)
+    elif status_mode == 1:   # scan running
+        countdown = math.floor(scan_end - now)
+        if countdown > 0:
             headline = "BT-Scan"
-            subline = "finished."
-            text = str(len(new_devices)) + "new devices: \n\n"
-            if len(new_devices) > 0:
-                text += "Connect?\n"
-                text += new_devices[0][1]
-                left = "YES"
-                middle = "Cancel"
-                right = "NO"
-            else:
-                text += "No detections."
+            subline = str(countdown) + " secs"
+            text = ""
             display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
+        else:
+            status_mode = 2
+    elif status_mode == 2:   # scan evaluation
+        headline = "BT-Scan"
+        subline = "finished."
+        text = str(len(new_devices)) + "new devices: \n\n"
+        if len(new_devices) > 0:
+            text += "Connect?\n"
+            text += new_devices[0][1]
+            left = "YES"
+            middle = "Cancel"
+            right = "NO"
+        else:
+            text += "No detections."
+        display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
 
         display_control.display()
 
@@ -192,15 +192,14 @@ def user_input(bluetooth_active):
         return 3  # start next mode shutdown!
     if status_mode == 0:
         if bluetooth_active and button == 2 and btime == 1:  # right and short
+            status_mode = 1
             left = ""
             middle = ""
             right = ""
             start_async_bt_scan()
             scan_end = time.time() + BLUETOOTH_SCAN_TIME
-            status_mode = 1
-            return 7  # stay in status mode
     if status_mode == 1:   # active scanning, no interface options, just wait
-        return 7
+        pass
     if status_mode == 2:
         if button == 0 and btime == 1:  # left short, YES
             if len(new_devices) > 0:
