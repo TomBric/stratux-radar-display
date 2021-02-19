@@ -42,7 +42,7 @@ import subprocess
 
 # constants
 STATUS_TIMEOUT = 0.3
-BLUETOOTH_SCAN_TIME = 15.0
+BLUETOOTH_SCAN_TIME = 30.0
 BT_SCAN_WAIT = 0.2
 
 # globals
