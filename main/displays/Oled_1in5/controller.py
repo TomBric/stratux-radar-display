@@ -351,11 +351,11 @@ def status(draw, status, left_text, middle_text, right_text, stratux_ip, bt_devi
     centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="green")
 
 
-def bt_scanning(draw, time_left, devnames):
-    centered_text(draw, 0, "Scan BT", largefont, fill="yellow")
-    centered_text(draw, LARGE, str(time_left) + " secs", smallfont, fill="yellow")
-    draw.text((0, 2*LARGE), "Detected Devices:", font=smallfont, fill="white")
-    t = ""
-    for dev in devnames:
-        t = t + dev[1] + '\n'    # dev 1 is name, addr is not printed on this small display
-    draw.text((5, 2*LARGE+SMALL), t, font=smallfont, fill="white")
+def bt_scanning(draw, headline, subline, text, left, middle, right):
+    centered_text(draw, 0, headline, largefont, fill="yellow")
+    centered_text(draw, LARGE, subline, smallfont, fill="yellow")
+    draw.text((0, 2*LARGE), text, font=smallfont, fill="white")
+    draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")

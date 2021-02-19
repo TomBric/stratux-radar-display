@@ -385,5 +385,5 @@ def status(draw, status, left, middle, right, stratux_ip, bt_devices, bt_names):
     print("Status display not yet implemented")
 
 
-def bt_scanning(draw, time_left, devnames):
+def bt_scanning(draw, headline, subline, text, left, middle, right):
     print("Status display not yet implemented")
