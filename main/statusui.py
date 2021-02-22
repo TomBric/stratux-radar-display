@@ -54,7 +54,9 @@ middle = ""         # button text
 right = ""          # button text
 scan_end = 0.0      # time, when a bt scan will be finished
 new_devices = []
-status_mode = 0     # 0 = normal, 1 = scan running, 2 = scan evaluation
+status_mode = 0
+# 0 = normal, 1 = scan running, 2 = scan evaluation, 3-network display, 4-network set ssid 5-network set passw
+wifi_ssid = ""
 
 
 def init(display_control, url, target_ip):   # prepare everything
@@ -119,6 +121,16 @@ def draw_status(draw, display_control):
             right = "Scan"
             text += "No detections."
         display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
+    elif status_mode == 3:  # display network information
+        headline = "WIFI Info"
+        subline = ""
+        text = "WIFI SSID\n" + wifi_ssid
+        display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
+    elif status_mode == 4:  # change network settings
+        headline = "Change WIFI"
+        subline = ""
+        text = "WIFI SSID\n" + wifi_ssid
+        display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
     display_control.display()
 
 
@@ -177,6 +189,22 @@ def start_async_bt_scan():   # started by ui-coroutine
     loop.create_task(bt_scan())
 
 
+def read_network():
+    res = subprocess.run(["sudo", "wpa_cli", "list_networks"], encoding="UTF-8", capture_output=True)
+    if res.returncode != 0:
+        return ""
+    lines = res.stdout.splitlines()
+    if len(lines) >= 2:
+        line2 = lines[2].split()
+    else:
+        return ""
+    if len(line2) >= 1:
+        ssid = line2[1]
+        return ssid
+    else:
+        return ""
+
+
 def user_input(bluetooth_active):
     global left
     global middle
@@ -184,9 +212,11 @@ def user_input(bluetooth_active):
     global scan_end
     global status_mode
     global new_devices
+    global wifi_ssid
 
     if status_mode == 0:
         middle = "Mode"
+        left = "Netw"
         if bluetooth_active:
             right = "Scan"
         else:
@@ -199,7 +229,7 @@ def user_input(bluetooth_active):
         return 1  # next mode to be radar
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
-    if status_mode == 0:
+    if status_mode == 0:   # normal status display
         if bluetooth_active and button == 2 and btime == 1:  # right and short
             status_mode = 1
             left = ""
@@ -207,9 +237,14 @@ def user_input(bluetooth_active):
             right = ""
             start_async_bt_scan()
             scan_end = time.time() + BLUETOOTH_SCAN_TIME
-    if status_mode == 1:   # active scanning, no interface options, just wait
+        if button == 0 and btime == 1:  # left and short, network config
+            status_mode = 3
+            middle = "Cont"
+            right = "Chg"
+            wifi_ssid = read_network()
+    elif status_mode == 1:   # active scanning, no interface options, just wait
         pass
-    if status_mode == 2:  # scanning finished, evaluating
+    elif status_mode == 2:  # scanning finished, evaluating
         if len(new_devices) == 0:   # device mgmt finished
             if bluetooth_active and button == 2 and btime == 1:  # right and short
                 status_mode = 1
@@ -230,8 +265,18 @@ def user_input(bluetooth_active):
                 del new_devices[0]
         if len(new_devices) == 0 or (button == 1 and btime == 1):   # middle short, Cancel
             new_devices = []
-            left = ""
+            left = "Netw"
             middle = "Mode"
             right = "Scan"
             status_mode = 0
+    elif status_mode == 3:  # network display
+        if button == 0 and btime == 1:  # left and short, change network config
+            status_mode = 4
+        if button == 1 and btime == 1:  # middle and short, go back to normal status
+            left = "Netw"
+            middle = "Mode"
+            right = "Scan"
+            status_mode = 0
+    elif status_mode == 4:  # change network
+        pass
     return 7  # no mode change
