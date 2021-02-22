@@ -124,7 +124,7 @@ def draw_status(draw, display_control):
     elif status_mode == 3:  # display network information
         headline = "WIFI Info"
         subline = ""
-        text = "WIFI SSID\n" + wifi_ssid
+        text = "WIFI SSID = \n" + wifi_ssid
         display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
@@ -241,6 +241,7 @@ def user_input(bluetooth_active):
             status_mode = 3
             middle = "Cont"
             right = "Chg"
+            left = ""
             wifi_ssid = read_network()
     elif status_mode == 1:   # active scanning, no interface options, just wait
         pass
@@ -278,5 +279,9 @@ def user_input(bluetooth_active):
             right = "Scan"
             status_mode = 0
     elif status_mode == 4:  # change network
-        pass
+        if button == 1 and btime == 1:  # middle and short, go back to normal status
+            left = "Netw"
+            middle = "Mode"
+            right = "Scan"
+            status_mode = 0
     return 7  # no mode change
