@@ -150,10 +150,10 @@ def startup(draw, version, target_ip, seconds, refresh_time):
     logo = Image.open(logopath)
     draw.rectangle(((0, 0), (sizex, 64)), fill="blue")
     draw.bitmap((zerox - 32, 0), logo, fill="white")
-    centered_text(draw, 64, "Oled-Radar "+version, largefont, fill="white")
+    centered_text(draw, 64, "OledRadar "+version, largefont, fill="white")
     centered_text(draw, sizey - 3 * SMALL, "Connecting to", smallfont, fill="white")
     centered_text(draw, sizey - 2*SMALL, target_ip, smallfont, fill="white")
-    centered_text(draw, sizey - SMALL, "RefreshTime: " + str(round(refresh_time, 1)), smallfont, fill="white")
+    centered_text(draw, sizey - SMALL, "RefreshTime: " + str(round(refresh_time, 2)), smallfont, fill="white")
     display()
     time.sleep(seconds)
 
