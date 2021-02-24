@@ -105,7 +105,11 @@ def init():
     smallfont = make_font("Font.ttc", SMALL)  # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
     webfont = make_font("fontawesome-webfont.ttf", SMALL)  # font for Bluetooth indications
-    display_refresh = 0.1  # oled has no busy flag, so take this as update value
+    start = time.time()
+    # do sync version of display to measure time
+    device.display(image)
+    end = time.time()
+    display_refresh = end - start
     return draw, sizex, zerox, zeroy, display_refresh
 
 
@@ -141,16 +145,15 @@ def refresh():
     pass  # nothing to do for Oled, does not need a refresh function
 
 
-def startup(draw, version, target_ip, seconds):
+def startup(draw, version, target_ip, seconds, refresh_time):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
     logo = Image.open(logopath)
     draw.rectangle(((0, 0), (sizex, 64)), fill="blue")
     draw.bitmap((zerox - 32, 0), logo, fill="white")
-    centered_text(draw, 64, "Oled-Radar", largefont, fill="white")
-    versionstr = "Version " + version
-    centered_text(draw, 64 + LARGE, versionstr, smallfont, fill="white")
-    centered_text(draw, sizey - 2 * SMALL, "Connecting to", smallfont, fill="white")
-    centered_text(draw, sizey - SMALL, target_ip, smallfont, fill="white")
+    centered_text(draw, 64, "Oled-Radar "+version, largefont, fill="white")
+    centered_text(draw, sizey - 3 * SMALL, "Connecting to", smallfont, fill="white")
+    centered_text(draw, sizey - 2*SMALL, target_ip, smallfont, fill="white")
+    centered_text(draw, sizey - SMALL, "RefreshTime: " + str(round(refresh_time, 1)), smallfont, fill="white")
     display()
     time.sleep(seconds)
 

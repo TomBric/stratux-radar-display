@@ -205,6 +205,26 @@ def read_network():
         return ""
 
 
+def set_network(new_wifi, new_pass):
+    pass
+
+
+def input_string(button, btime, was_string, position):
+    '''
+    if button == 1 and btime == 1:  # middle and short, go back to normal status
+        left = "+"
+        middle = "Nxt/Fin" \
+                 ""
+        right = "-"
+        status_mode = 0
+    '''
+    return 9,""
+
+
+def user_yes_no(headline, text):
+    return True
+
+
 def user_input(bluetooth_active):
     global left
     global middle
@@ -213,6 +233,9 @@ def user_input(bluetooth_active):
     global status_mode
     global new_devices
     global wifi_ssid
+
+    new_wifi = ""
+    new_pass = ""
 
     if status_mode == 0:
         middle = "Mode"
@@ -271,7 +294,7 @@ def user_input(bluetooth_active):
             right = "Scan"
             status_mode = 0
     elif status_mode == 3:  # network display
-        if button == 0 and btime == 1:  # left and short, change network config
+        if button == 2 and btime == 1:  # right and short, change network config
             status_mode = 4
         if button == 1 and btime == 1:  # middle and short, go back to normal status
             left = "Netw"
@@ -279,9 +302,13 @@ def user_input(bluetooth_active):
             right = "Scan"
             status_mode = 0
     elif status_mode == 4:  # change network
-        if button == 1 and btime == 1:  # middle and short, go back to normal status
-            left = "Netw"
-            middle = "Mode"
-            right = "Scan"
-            status_mode = 0
+        status_mode, new_wifi = input_string(button, btime, wifi_ssid, 5)
+        # go to status_mode 5
+    elif status_mode == 5:  # change wifi PSK
+        status_mode, new_pass = input_string(button, btime, "", 6)
+    elif status_mode == 6:  # check yes/no
+        answer = user_yes_no("Change Wifi", "Set new wifi to?\n\n" + new_wifi + "Key:\n" + new_pass)
+        if answer:
+            set_network(new_wifi, new_pass)
+        status_mode = 0
     return 7  # no mode change
