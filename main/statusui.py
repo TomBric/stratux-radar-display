@@ -101,6 +101,7 @@ def draw_status(draw, display_control, bluetooth_active):
         #    last_status_get = now
         # status_answer = get_status()  not used for now
         status_text = "Stratux: " + format(stratux_ip) + "\n"
+        status_text += "DispRefresh: " + str(round(refresh_time,2)) + "\n"
         bt_devices, bt_names = radarbluez.connected_devices()
         if bt_devices is not None:
             status_text += "BT-Devices: " + str(bt_devices) + "\n"
