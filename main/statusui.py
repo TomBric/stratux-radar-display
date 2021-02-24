@@ -70,6 +70,7 @@ def init(display_control, url, target_ip, refresh):   # prepare everything
     status_url = url
     stratux_ip = target_ip
     logging.debug("Status UI: Initialized GET settings to " + status_url)
+    refresh_time = refresh
 
 
 def get_status():
