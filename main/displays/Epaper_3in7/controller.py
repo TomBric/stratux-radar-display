@@ -175,16 +175,13 @@ def centered_text(draw, y, text, font, fill):
     draw.text((zerox - ts[0] / 2, y), text, font=font, fill=fill)
 
 
-def startup(draw, version, target_ip, seconds, refresh_time):
+def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
     logo = Image.open(logopath)
     draw.bitmap((zerox-192/2, 0), logo, fill="black")
     versionstr = "Epaper-Radar " + version
     centered_text(draw, 188, versionstr, largefont, fill="black")
     centered_text(draw, sizey - 2 * VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
-    centered_text(draw, sizey - VERYSMALL - 2, "Display refresh time" + str(round(refresh_time,2)) + " secs",
-                  verysmallfont, fill="black")
-
     display()
     time.sleep(seconds)
 
@@ -384,25 +381,13 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
         centered_text(draw, 80, error_message, smallfont, fill="black")
 
 
-def status(draw, status, left_text, middle_text, right_text, stratux_ip, bt_devices, bt_names):
-    status_text = "Stratux: " + format(stratux_ip) + "\n"
-    if bt_devices is not None:
-        status_text += "BT-Devices: " + str(bt_devices) + "\n"
-    if bt_names is not None:
-        for name in bt_names:
-            status_text += " " + name + "\n"
-    draw.text((5, 10), status_text, font=smallfont, fill="black")
-
-    draw.text((5, sizey - SMALL - 3), left_text, font=smallfont, fill="black")
-    textsize = draw.textsize(right_text, smallfont)
-    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right_text, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="black")
-
-
-def bt_scanning(draw, headline, subline, text, left_text, middle_text, right_text):
+def text_screen(draw, headline, subline, text, left_text, middle_text, right_text):
     centered_text(draw, 0, headline, verylargefont, fill="black")
-    centered_text(draw, VERYLARGE, subline, largefont, fill="black")
-    draw.text((5, VERYLARGE+LARGE), text, font=smallfont, fill="black")
+    txt_starty = VERYLARGE
+    if subline is not None:
+        centered_text(draw, txt_starty, subline, largefont, fill="black")
+        txt_starty += LARGE
+    draw.text((5, txt_starty), text, font=smallfont, fill="black")
 
     draw.text((5, sizey - SMALL - 3), left_text, font=smallfont, fill="black")
     textsize = draw.textsize(right_text, smallfont)

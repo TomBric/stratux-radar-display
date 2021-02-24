@@ -446,7 +446,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 5
                 elif global_mode == 7:  # status display
-                    statusui.draw_status(draw, display_control)
+                    statusui.draw_status(draw, display_control, bluetooth_active)
                 await asyncio.sleep(0.1)
 
             logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
@@ -483,8 +483,8 @@ def main():
         bluetooth_active = radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     ahrsui.init(display_control)
-    statusui.init(display_control, url_status_get, DEFAULT_URL_HOST_BASE)
-    display_control.startup(draw, RADAR_VERSION, url_host_base, 4, display_refresh_time)
+    statusui.init(display_control, url_status_get, DEFAULT_URL_HOST_BASE, display_refresh_time)
+    display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())
     except asyncio.CancelledError:

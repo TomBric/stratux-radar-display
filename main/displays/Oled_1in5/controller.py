@@ -145,7 +145,7 @@ def refresh():
     pass  # nothing to do for Oled, does not need a refresh function
 
 
-def startup(draw, version, target_ip, seconds, refresh_time):
+def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
     logo = Image.open(logopath)
     draw.rectangle(((0, 0), (sizex, 64)), fill="blue")
@@ -153,7 +153,6 @@ def startup(draw, version, target_ip, seconds, refresh_time):
     centered_text(draw, 64, "OledRadar "+version, largefont, fill="white")
     centered_text(draw, sizey - 3 * SMALL, "Connecting to", smallfont, fill="white")
     centered_text(draw, sizey - 2*SMALL, target_ip, smallfont, fill="white")
-    centered_text(draw, sizey - SMALL, "RefreshTime: " + str(round(refresh_time, 2)), smallfont, fill="white")
     display()
     time.sleep(seconds)
 
@@ -341,25 +340,13 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
         centered_text(draw, 30, error_message, smallfont, fill="red")
 
 
-def status(draw, status, left_text, middle_text, right_text, stratux_ip, bt_devices, bt_names):
-    status_text = "Stratux: " + format(stratux_ip) + "\n"
-    if bt_devices is not None:
-        status_text += "BT-Devices: " + str(bt_devices) + "\n"
-    if bt_names is not None:
-        for name in bt_names:
-            status_text += " " + name + "\n"
-    draw.text((0, 0), status_text, font=smallfont, fill="white")
-
-    draw.text((0, sizey - SMALL - 3), left_text, font=smallfont, fill="green")
-    textsize = draw.textsize(right_text, smallfont)
-    draw.text((sizex - textsize[0], sizey - SMALL - 3), right_text, font=smallfont, fill="green", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="green")
-
-
-def bt_scanning(draw, headline, subline, text, left, middle, right):
+def text_screen(draw, headline, subline, text, left, middle, right):
     centered_text(draw, 0, headline, largefont, fill="yellow")
-    centered_text(draw, LARGE, subline, smallfont, fill="yellow")
-    draw.text((0, 2*LARGE), text, font=smallfont, fill="white")
+    txt_starty = LARGE
+    if subline is not None:
+        centered_text(draw, LARGE, subline, smallfont, fill="yellow")
+        txt_starty += LARGE
+    draw.text((0, txt_starty), text, font=smallfont, fill="white")
     draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")

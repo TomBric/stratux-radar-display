@@ -57,11 +57,15 @@ new_devices = []
 status_mode = 0
 # 0 = normal, 1 = scan running, 2 = scan evaluation, 3-network display, 4-network set ssid 5-network set passw
 wifi_ssid = ""
+refresh_time = 0.0
+new_wifi = ""
+new_pass = ""
 
 
-def init(display_control, url, target_ip):   # prepare everything
+def init(display_control, url, target_ip, refresh):   # prepare everything
     global status_url
     global stratux_ip
+    global refresh_time
 
     status_url = url
     stratux_ip = target_ip
@@ -80,29 +84,39 @@ def get_status():
     return status_answer
 
 
-def draw_status(draw, display_control):
+def draw_status(draw, display_control, bluetooth_active):
     global status_mode
     global last_status_get
     global left
     global middle
     global right
     global scan_end
+    global new_wifi
+    global new_pass
 
     display_control.clear(draw)
     now = time.time()
     if status_mode == 0:
-        if now >= last_status_get + STATUS_TIMEOUT:
-            last_status_get = now
-        status_answer = get_status()
-        bt_devices, devnames = radarbluez.connected_devices()
-        display_control.status(draw, status_answer, left, middle, right, stratux_ip, bt_devices, devnames)
+        # if now >= last_status_get + STATUS_TIMEOUT:
+        #    last_status_get = now
+        # status_answer = get_status()  not used for now
+        status_text = "Stratux: " + format(stratux_ip) + "\n"
+        bt_devices, bt_names = radarbluez.connected_devices()
+        if bt_devices is not None:
+            status_text += "BT-Devices: " + str(bt_devices) + "\n"
+        if bt_names is not None:
+            for name in bt_names:
+                status_text += " " + name + "\n"
+        if bluetooth_active:
+            right = "Scan"
+        else:
+            right = ""
+        display_control.text_screen(draw, "Status", None, status_text, "Netw", "Mode", right)
     elif status_mode == 1:   # scan running
         countdown = math.floor(scan_end - now)
         if countdown > 0:
-            headline = "BT-Scan"
             subline = str(countdown) + " secs"
-            text = ""
-            display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
+            display_control.text_screen(draw, "BT-Scan", subline, "", "", "", "")
         else:
             status_mode = 2
     elif status_mode == 2:   # scan evaluation
@@ -120,17 +134,19 @@ def draw_status(draw, display_control):
             middle = "Cont"
             right = "Scan"
             text += "No detections."
-        display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
+        display_control.text_screen(draw, headline, subline, text, left, middle, right)
     elif status_mode == 3:  # display network information
-        headline = "WIFI Info"
-        subline = ""
-        text = "WIFI SSID = \n" + wifi_ssid
-        display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
+        display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID = \n" + wifi_ssid, "", "Cont", "Chg")
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
         subline = ""
         text = "WIFI SSID\n" + wifi_ssid
-        display_control.bt_scanning(draw, headline, subline, text, left, middle, right)
+        display_control.text_screen(draw, headline, subline, text, left, middle, right)
+    elif status_mode == 6:   # "yes" or "no"
+        headline = "Change WIFI"
+        subline = "Confirm change"
+        text = "Really change to?\n WIFI SSID:\n" + new_wifi + "\n Passphrase:\n" + new_pass
+        display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
     display_control.display()
 
 
@@ -218,7 +234,7 @@ def input_string(button, btime, was_string, position):
         right = "-"
         status_mode = 0
     '''
-    return 9,""
+    return 9, ""
 
 
 def user_yes_no(headline, text):
@@ -233,9 +249,8 @@ def user_input(bluetooth_active):
     global status_mode
     global new_devices
     global wifi_ssid
-
-    new_wifi = ""
-    new_pass = ""
+    global new_wifi
+    global new_pass
 
     if status_mode == 0:
         middle = "Mode"
@@ -255,16 +270,10 @@ def user_input(bluetooth_active):
     if status_mode == 0:   # normal status display
         if bluetooth_active and button == 2 and btime == 1:  # right and short
             status_mode = 1
-            left = ""
-            middle = ""
-            right = ""
             start_async_bt_scan()
             scan_end = time.time() + BLUETOOTH_SCAN_TIME
         if button == 0 and btime == 1:  # left and short, network config
             status_mode = 3
-            middle = "Cont"
-            right = "Chg"
-            left = ""
             wifi_ssid = read_network()
     elif status_mode == 1:   # active scanning, no interface options, just wait
         pass
@@ -272,9 +281,6 @@ def user_input(bluetooth_active):
         if len(new_devices) == 0:   # device mgmt finished
             if bluetooth_active and button == 2 and btime == 1:  # right and short
                 status_mode = 1
-                left = ""
-                middle = ""
-                right = ""
                 start_async_bt_scan()
                 scan_end = time.time() + BLUETOOTH_SCAN_TIME
                 return 7
@@ -289,17 +295,11 @@ def user_input(bluetooth_active):
                 del new_devices[0]
         if len(new_devices) == 0 or (button == 1 and btime == 1):   # middle short, Cancel
             new_devices = []
-            left = "Netw"
-            middle = "Mode"
-            right = "Scan"
             status_mode = 0
     elif status_mode == 3:  # network display
         if button == 2 and btime == 1:  # right and short, change network config
             status_mode = 4
         if button == 1 and btime == 1:  # middle and short, go back to normal status
-            left = "Netw"
-            middle = "Mode"
-            right = "Scan"
             status_mode = 0
     elif status_mode == 4:  # change network
         status_mode, new_wifi = input_string(button, btime, wifi_ssid, 5)
@@ -307,8 +307,9 @@ def user_input(bluetooth_active):
     elif status_mode == 5:  # change wifi PSK
         status_mode, new_pass = input_string(button, btime, "", 6)
     elif status_mode == 6:  # check yes/no
-        answer = user_yes_no("Change Wifi", "Set new wifi to?\n\n" + new_wifi + "Key:\n" + new_pass)
-        if answer:
+        if button == 2 and btime == 1:  # right and short, "No"
+            status_mode = 3
+        elif button == 0 and btime == 1:  # left and short, "yes"
             set_network(new_wifi, new_pass)
-        status_mode = 0
+            status_mode = 3
     return 7  # no mode change
