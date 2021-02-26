@@ -264,7 +264,7 @@ def user_input(bluetooth_active):
     # start of ahrs global behaviour
     if btime == 0:
         return 0  # stay in timer mode
-    if button == 1 and btime == 2:  # middle and long
+    if button == 1 and btime == 2 and status_mode != 4 and status_mode != 5:  # middle and long
         return 1  # next mode to be radar
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
