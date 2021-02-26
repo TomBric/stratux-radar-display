@@ -365,9 +365,9 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     bbox = draw.textbbox((bbox[0], bbox[3]), prefix, font=smallfont)
     draw.text((bbox[0], bbox[3]), prefix, fill="white", font=smallfont)
 
-    bbox_rect = draw.textbbox((bbox[2], bbox[1]), inp, font=smallfont)
+    bbox_rect = draw.textbbox((bbox[2], bbox[3]), inp, font=smallfont)
     draw.rectangle(bbox_rect, fill="red")
-    draw.text((bbox[2], bbox[1]), inp, font=smallfont, fill="white")
+    draw.text((bbox[2], bbox[3]), inp, font=smallfont, fill="white")
     draw.text((bbox[2], bbox[3]), suffix, font=smallfont, fill="white")
 
     draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
