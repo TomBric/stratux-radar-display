@@ -363,8 +363,8 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     print("After text: ",bbox)
     draw.text((0, txt_starty), text, font=smallfont, fill="white")
 
-    bbox = draw.textbbox((bbox[0], bbox[3] - SMALL), prefix, font=smallfont)
-    draw.text((bbox[0], bbox[3]-SMALL), prefix, fill="white", font=smallfont)
+    bbox = draw.textbbox((bbox[0], bbox[3]), prefix, font=smallfont)
+    draw.text((bbox[0], bbox[3]), prefix, fill="white", font=smallfont)
 
     bbox = draw.textbbox((bbox[2], bbox[3]-SMALL), inp, font=smallfont)
     draw.rectangle(bbox, fill="red")
