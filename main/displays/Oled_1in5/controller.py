@@ -367,12 +367,12 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     print("For prefix:", bbox[0], ":", bbox[3])
     draw.text((bbox[0], bbox[3]), prefix, fill="white", font=smallfont)
 
-    print("For input:", bbox_p[2], ":", bbox_p[1])
-    bbox_rect = draw.textbbox((bbox_p[2], bbox_p[1]), inp, font=smallfont)
+    print("For input:", bbox_p[2], ":", bbox[3])
+    bbox_rect = draw.textbbox((bbox_p[2], bbox[3]), inp, font=smallfont)
     print("BBox rect:", bbox_rect)
     draw.rectangle(bbox_rect, fill="red")
-    draw.text((bbox_rect[0], bbox_rect[1]), inp, font=smallfont, fill="white")
-    draw.text((bbox_rect[2], bbox_rect[1]), suffix, font=smallfont, fill="white")
+    draw.text((bbox_rect[0], bbox[3]), inp, font=smallfont, fill="white")
+    draw.text((bbox_rect[2], bbox[3]), suffix, font=smallfont, fill="white")
 
     draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
     textsize = draw.textsize(right, smallfont)
