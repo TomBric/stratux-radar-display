@@ -60,6 +60,7 @@ wifi_ssid = ""
 refresh_time = 0.0
 new_wifi = ""
 new_pass = ""
+charpos = 0         # position of current input char
 
 
 def init(display_control, url, target_ip, refresh):   # prepare everything
@@ -144,19 +145,17 @@ def draw_status(draw, display_control, bluetooth_active):
         subline = "WIFI SSID"
         text = "Enter SSID\n:"
         prefix = new_wifi[0:charpos+1]
-        input = new_wifi[charpos]
-        suffix = new_wifi[charpos+1, len(new_wifi)]
-        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "+", prefix, input, suffix)
+        char = new_wifi[charpos]
+        suffix = new_wifi[charpos+1:len(new_wifi)]
+        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "+", prefix, char, suffix)
     elif status_mode == 5:   # change password
         headline = "Change WIFI"
         subline = "Password"
         text = "Enter Password\n(none or min 8):"
         prefix = new_pass[0:charpos + 1]
-        input = new_pass[charpos]
-        suffix = new_pass[charpos + 1, len(new_wifi)]
-        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "+", prefix, input, suffix)
-
-
+        char = new_pass[charpos]
+        suffix = new_pass[charpos + 1:len(new_wifi)]
+        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "+", prefix, char, suffix)
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
         subline = "Confirm change"
@@ -242,18 +241,6 @@ def set_network(wifi, passw):
         logging.debug("STATUSUI: Setting Wifi network failed.")
 
 
-def input_string(button, btime, was_string, position):
-    '''
-    if button == 1 and btime == 1:  # middle and short, go back to normal status
-        left = "+"
-        middle = "Nxt/Fin" \
-                 ""
-        right = "-"
-        status_mode = 0
-    '''
-    return 6, ""
-
-
 def user_input(bluetooth_active):
     global left
     global middle
@@ -264,6 +251,7 @@ def user_input(bluetooth_active):
     global wifi_ssid
     global new_wifi
     global new_pass
+    global charpos
 
     if status_mode == 0:
         middle = "Mode"
@@ -311,14 +299,32 @@ def user_input(bluetooth_active):
             status_mode = 0
     elif status_mode == 3:  # network display
         if button == 2 and btime == 1:  # right and short, change network config
+            charpos = 0
             status_mode = 4
         if button == 1 and btime == 1:  # middle and short, go back to normal status
             status_mode = 0
     elif status_mode == 4:  # change network
-        status_mode, new_wifi = input_string(button, btime, wifi_ssid, 5)
-        # go to status_mode 5
+        if button == 0 and btime == 1:  # left and short, +
+            pass
+        if button == 1 and btime == 1:  # middle and short, next charpos
+            charpos += 1
+        if button == 1 and btime == 2:  # middle and long finish
+            charpos = 0
+            status_mode = 5
+        if button == 2 and btime == 1:  # right and short, -
+            pass
     elif status_mode == 5:  # change wifi PSK
-        status_mode, new_pass = input_string(button, btime, "", 6)
+        if button == 0 and btime == 1:  # left and short, +
+            pass
+        if button == 1 and btime == 1:  # middle and short, next charpos
+            charpos += 1
+        if button == 1 and btime == 2:  # middle and long finish
+            if len(new_wifi) > 0 and (len(new_pass) == 0 or len(new_pass) >= 0):
+                status_mode = 6
+            else:
+                status_mode = 3    # invalid input, go back to display of network
+        if button == 2 and btime == 1:  # right and short, -
+            pass
     elif status_mode == 6:  # check yes/no
         if button == 2 and btime == 1:  # right and short, "No"
             status_mode = 3
