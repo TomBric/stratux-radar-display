@@ -102,7 +102,7 @@ def draw_status(draw, display_control, bluetooth_active):
         #    last_status_get = now
         # status_answer = get_status()  not used for now
         status_text = "Stratux: " + format(stratux_ip) + "\n"
-        status_text += "DispRefresh: " + str(round(refresh_time,2)) + "\n"
+        status_text += "DispRefresh: " + str(round(refresh_time, 2)) + " s\n"
         bt_devices, bt_names = radarbluez.connected_devices()
         if bt_devices is not None:
             status_text += "BT-Devices: " + str(bt_devices) + "\n"
@@ -141,9 +141,22 @@ def draw_status(draw, display_control, bluetooth_active):
         display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID = \n" + wifi_ssid, "", "Cont", "Chg")
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
-        subline = ""
-        text = "WIFI SSID\n" + wifi_ssid
-        display_control.text_screen(draw, headline, subline, text, left, middle, right)
+        subline = "WIFI SSID"
+        text = "Enter SSID\n:"
+        prefix = new_wifi[0:charpos+1]
+        input = new_wifi[charpos]
+        suffix = new_wifi[charpos+1, len(new_wifi)]
+        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "+", prefix, input, suffix)
+    elif status_mode == 5:   # change password
+        headline = "Change WIFI"
+        subline = "Password"
+        text = "Enter Password\n(none or min 8):"
+        prefix = new_pass[0:charpos + 1]
+        input = new_pass[charpos]
+        suffix = new_pass[charpos + 1, len(new_wifi)]
+        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "+", prefix, input, suffix)
+
+
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
         subline = "Confirm change"
@@ -223,8 +236,10 @@ def read_network():
         return ""
 
 
-def set_network(new_wifi, new_pass):
-    pass
+def set_network(wifi, passw):
+    res = subprocess.run(["sudo", "raspi-config", "nonint", "do_wifi_ssid_passphrase", wifi, passw])
+    if res != 0:
+        logging.debug("STATUSUI: Setting Wifi network failed.")
 
 
 def input_string(button, btime, was_string, position):
@@ -236,11 +251,7 @@ def input_string(button, btime, was_string, position):
         right = "-"
         status_mode = 0
     '''
-    return 9, ""
-
-
-def user_yes_no(headline, text):
-    return True
+    return 6, ""
 
 
 def user_input(bluetooth_active):

@@ -351,3 +351,26 @@ def text_screen(draw, headline, subline, text, left, middle, right):
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
+
+
+def screen_input(draw, headline, subline, text, left, middle, right, prefix, input, suffix):
+    centered_text(draw, 0, headline, largefont, fill="yellow")
+    txt_starty = LARGE
+    if subline is not None:
+        centered_text(draw, LARGE, subline, smallfont, fill="yellow")
+        txt_starty += LARGE
+    bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
+    draw.text((0, txt_starty), text, font=smallfont, fill="white")
+
+    bbox = draw.textbbox((bbox[0][0], bbox[1][1] - SMALL), prefix, font=smallfont)
+    draw.text((bbox[0][0], bbox[1][1]-SMALL), prefix, fill="white", font=smallfont)
+
+    bbox = draw.textbbox((bbox[0][1], bbox[1][1]-SMALL), prefix, font=smallfont)
+    draw.rectangle(bbox,fill="darkgreen")
+    draw.text(bbox[0], input, font=smallfont, fill="white")
+    draw.text(bbox[1], suffix, font=smallfont, fill="white")
+
+    draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")

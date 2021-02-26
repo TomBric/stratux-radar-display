@@ -393,3 +393,7 @@ def text_screen(draw, headline, subline, text, left_text, middle_text, right_tex
     textsize = draw.textsize(right_text, smallfont)
     draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right_text, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="black")
+
+
+def screen_input(draw, headline, subline, text, left, middle, right, prefix, input, suffix):
+    pass
