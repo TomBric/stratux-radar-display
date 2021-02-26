@@ -155,7 +155,7 @@ def draw_status(draw, display_control, bluetooth_active):
         prefix = new_pass[0:charpos]
         char = new_pass[charpos]
         suffix = new_pass[charpos + 1:len(new_pass)]
-        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "+", prefix, char, suffix)
+        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
         subline = "Confirm change"
