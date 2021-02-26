@@ -58,8 +58,8 @@ status_mode = 0
 # 0 = normal, 1 = scan running, 2 = scan evaluation, 3-network display, 4-network set ssid 5-network set passw
 wifi_ssid = ""
 refresh_time = 0.0
-new_wifi = ""
-new_pass = ""
+new_wifi = "                "   # max 16 chars accepted
+new_pass = "                "   # max 16 chars accepted
 charpos = 0         # position of current input char
 
 
