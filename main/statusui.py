@@ -39,11 +39,13 @@ import radarbluez
 import math
 import asyncio
 import subprocess
+import string
 
 # constants
 STATUS_TIMEOUT = 0.3
 BLUETOOTH_SCAN_TIME = 30.0
 BT_SCAN_WAIT = 0.2
+CHARSET = string.ascii_uppercase + string.ascii_lowercase + string.digits + string.punctuation
 
 # globals
 status_url = ""
@@ -241,6 +243,17 @@ def set_network(wifi, passw):
         logging.debug("STATUSUI: Setting Wifi network failed.")
 
 
+def next_char(current):
+    return CHARSET[(CHARSET.index(current) + 1) % len(CHARSET)]
+
+
+def prev_char(current):
+    pos = CHARSET.index(current) - 1
+    if pos < 0:
+        pos = len(CHARSET)
+    return CHARSET[pos]
+
+
 def user_input(bluetooth_active):
     global left
     global middle
@@ -305,17 +318,17 @@ def user_input(bluetooth_active):
             status_mode = 0
     elif status_mode == 4:  # change network
         if button == 0 and btime == 1:  # left and short, +
-            pass
+            new_wifi = new_wifi[:charpos] + next_char(new_wifi[charpos]) + new_wifi[charpos+1:]
         if button == 1 and btime == 1:  # middle and short, next charpos
             charpos += 1
         if button == 1 and btime == 2:  # middle and long finish
             charpos = 0
             status_mode = 5
         if button == 2 and btime == 1:  # right and short, -
-            pass
+            new_wifi = new_wifi[:charpos] + prev_char(new_wifi[charpos]) + new_wifi[charpos+1:]
     elif status_mode == 5:  # change wifi PSK
         if button == 0 and btime == 1:  # left and short, +
-            pass
+            new_pass = new_pass[:charpos] + next_char(new_pass[charpos]) + new_pass[charpos+1:]
         if button == 1 and btime == 1:  # middle and short, next charpos
             charpos += 1
         if button == 1 and btime == 2:  # middle and long finish
@@ -324,7 +337,7 @@ def user_input(bluetooth_active):
             else:
                 status_mode = 3    # invalid input, go back to display of network
         if button == 2 and btime == 1:  # right and short, -
-            pass
+            new_pass = new_pass[:charpos] + prev_char(new_pass[charpos]) + new_pass[charpos+1:]
     elif status_mode == 6:  # check yes/no
         if button == 2 and btime == 1:  # right and short, "No"
             status_mode = 3
