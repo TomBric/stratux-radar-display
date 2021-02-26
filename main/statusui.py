@@ -244,11 +244,11 @@ def set_network(wifi, passw):
 
 
 def next_char(current):
-    return CHARSET[(CHARSET.index(current) + 1) % len(CHARSET)]
+    return CHARSET[(CHARSET.find(current) + 1) % len(CHARSET)]
 
 
 def prev_char(current):
-    pos = CHARSET.index(current) - 1
+    pos = CHARSET.find(current) - 1
     if pos < 0:
         pos = len(CHARSET)
     return CHARSET[pos]
