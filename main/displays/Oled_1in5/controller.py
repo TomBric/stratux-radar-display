@@ -360,14 +360,13 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
         centered_text(draw, LARGE, subline, smallfont, fill="yellow")
         txt_starty += LARGE
     bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
-    print("After text: ",bbox)
     draw.text((0, txt_starty), text, font=smallfont, fill="white")
 
     bbox = draw.textbbox((bbox[0], bbox[3]), prefix, font=smallfont)
     draw.text((bbox[0], bbox[3]), prefix, fill="white", font=smallfont)
 
-    bbox = draw.textbbox((bbox[2], bbox[1]), inp, font=smallfont)
-    draw.rectangle(bbox, fill="red")
+    bbox_rect = draw.textbbox((bbox[2], bbox[1]), inp, font=smallfont)
+    draw.rectangle(bbox_rect, fill="red")
     draw.text((bbox[2], bbox[1]), inp, font=smallfont, fill="white")
     draw.text((bbox[2], bbox[3]), suffix, font=smallfont, fill="white")
 
