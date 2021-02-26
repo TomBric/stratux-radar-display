@@ -58,7 +58,7 @@ status_mode = 0
 # 0 = normal, 1 = scan running, 2 = scan evaluation, 3-network display, 4-network set ssid 5-network set passw
 wifi_ssid = ""
 refresh_time = 0.0
-new_wifi = "                "   # max 16 chars accepted
+new_wifi = "stratux         "   # max 16 chars accepted
 new_pass = "                "   # max 16 chars accepted
 charpos = 0         # position of current input char
 
@@ -143,7 +143,7 @@ def draw_status(draw, display_control, bluetooth_active):
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
         subline = "WIFI SSID"
-        text = "Enter SSID\n:"
+        text = "Enter SSID:\n"
         prefix = new_wifi[0:charpos+1]
         char = new_wifi[charpos]
         suffix = new_wifi[charpos+1:len(new_wifi)]

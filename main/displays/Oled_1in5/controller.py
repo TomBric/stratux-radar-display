@@ -360,6 +360,7 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
         centered_text(draw, LARGE, subline, smallfont, fill="yellow")
         txt_starty += LARGE
     bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
+    print("After text: ",bbox)
     draw.text((0, txt_starty), text, font=smallfont, fill="white")
 
     bbox = draw.textbbox((bbox[0], bbox[3] - SMALL), prefix, font=smallfont)
