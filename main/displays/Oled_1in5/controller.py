@@ -353,7 +353,7 @@ def text_screen(draw, headline, subline, text, left, middle, right):
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 
-def screen_input(draw, headline, subline, text, left, middle, right, prefix, input, suffix):
+def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp, suffix):
     centered_text(draw, 0, headline, largefont, fill="yellow")
     txt_starty = LARGE
     if subline is not None:
@@ -365,10 +365,10 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     bbox = draw.textbbox((bbox[0], bbox[3] - SMALL), prefix, font=smallfont)
     draw.text((bbox[0], bbox[3]-SMALL), prefix, fill="white", font=smallfont)
 
-    bbox = draw.textbbox((bbox[2], bbox[3]-SMALL), prefix, font=smallfont)
+    bbox = draw.textbbox((bbox[2], bbox[3]-SMALL), inp, font=smallfont)
     draw.rectangle(bbox,fill="darkgreen")
-    draw.text(bbox[0], input, font=smallfont, fill="white")
-    draw.text(bbox[1], suffix, font=smallfont, fill="white")
+    draw.text((bbox[0], bbox[3]-SMALL), input, font=smallfont, fill="white")
+    draw.text((bbox[2], bbox[3]-SMALL), suffix, font=smallfont, fill="white")
 
     draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
     textsize = draw.textsize(right, smallfont)
