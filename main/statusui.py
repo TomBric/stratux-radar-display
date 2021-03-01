@@ -110,7 +110,7 @@ def draw_status(draw, display_control, bluetooth_active):
         # if now >= last_status_get + STATUS_TIMEOUT:
         #    last_status_get = now
         # status_answer = get_status()  not used for now
-        status_text = "Stratux: " + format(stratux_ip) + "\n"
+        status_text = "Strx: " + format(stratux_ip) + "\n"
         status_text += "DispRefresh: " + str(round(refresh_time, 2)) + " s\n"
         bt_devices, bt_names = radarbluez.connected_devices()
         if bt_devices is not None:
@@ -167,8 +167,8 @@ def draw_status(draw, display_control, bluetooth_active):
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
         subline = "Confirm change"
-        text = "Really change to?\n WIFI SSID:\n" + new_wifi + "\n Passphrase:\n" + new_pass \
-               + "\nStratux-IP:\n" + new_stratux_ip
+        text = "SSID: " + new_wifi + "\nPass:\n" + new_pass \
+               + "\nStratux:\n" + new_stratux_ip
         display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
     elif status_mode == 7:   # input of stratux-ip
         headline = "Change WIFI"
@@ -393,12 +393,13 @@ def user_input(bluetooth_active):
             charpos += 1
             if charpos >= len(new_pass):
                 charpos = 0
-                status_mode = 5
+                status_mode = 7
         if button == 1 and btime == 2:  # middle and long finish
             new_wifi = new_wifi.strip()
             new_pass = new_pass.strip()
             if len(new_wifi) > 0 and (len(new_pass) == 0 or len(new_pass) >= 8):
                 new_stratux_ip = ipv4_to_string(string_to_ipv4(stratux_ip))  # to normalize and have leading zeros
+                charpos = 0
                 status_mode = 7
             else:
                 status_mode = 10   # invalid input, go back to error display
@@ -446,6 +447,7 @@ def user_input(bluetooth_active):
             new_wifi = DEFAULT_WIFI
             new_pass = DEFAULT_PASS
             new_stratux_ip = stratux_ip
+            charpos = 0
             status_mode = 4   # change network
         if button == 0 and btime == 1:  # left and short, "cancel"
             new_wifi = DEFAULT_WIFI
