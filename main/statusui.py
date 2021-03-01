@@ -167,8 +167,8 @@ def draw_status(draw, display_control, bluetooth_active):
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
         subline = "Confirm change"
-        text = "SSID: " + new_wifi + "\nPass:\n" + new_pass \
-               + "\nStratux:\n" + new_stratux_ip
+        text = "SSID: " + new_wifi + "\nPass: " + new_pass \
+               + "\nStrx" + new_stratux_ip
         display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
     elif status_mode == 7:   # input of stratux-ip
         headline = "Change WIFI"
@@ -434,7 +434,7 @@ def user_input(bluetooth_active):
         if button == 1 and btime == 2:  # middle and long finish
             ip_is_invalid = False
             try:
-                ipaddress.ip_address(new_stratux_ip)
+                ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip))
             except ValueError:
                 ip_is_invalid = True
             charpos = 0
