@@ -40,12 +40,16 @@ import math
 import asyncio
 import subprocess
 import string
+import ipaddress
 
 # constants
 STATUS_TIMEOUT = 0.3
 BLUETOOTH_SCAN_TIME = 30.0
 BT_SCAN_WAIT = 0.2
 CHARSET = string.ascii_uppercase + string.ascii_lowercase + string.digits + string.punctuation
+NUMBERS = string.digits
+DEFAULT_WIFI = "stratux         "
+DEFAULT_PASS = "                "
 
 # globals
 status_url = ""
@@ -62,6 +66,7 @@ wifi_ssid = ""
 refresh_time = 0.0
 new_wifi = "stratux         "   # max 16 chars accepted
 new_pass = "                "   # max 16 chars accepted
+new_stratux_ip = stratux_ip
 charpos = 0         # position of current input char
 
 
@@ -97,6 +102,7 @@ def draw_status(draw, display_control, bluetooth_active):
     global scan_end
     global new_wifi
     global new_pass
+    global stratux_ip
 
     display_control.clear(draw)
     now = time.time()
@@ -149,7 +155,7 @@ def draw_status(draw, display_control, bluetooth_active):
         prefix = new_wifi[0:charpos]
         char = new_wifi[charpos]
         suffix = new_wifi[charpos+1:len(new_wifi)]
-        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "+", prefix, char, suffix)
+        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 5:   # change password
         headline = "Change WIFI"
         subline = "Password"
@@ -161,8 +167,34 @@ def draw_status(draw, display_control, bluetooth_active):
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
         subline = "Confirm change"
-        text = "Really change to?\n WIFI SSID:\n" + new_wifi + "\n Passphrase:\n" + new_pass
+        text = "Really change to?\n WIFI SSID:\n" + new_wifi + "\n Passphrase:\n" + new_pass \
+               + "\nStratux-IP:\n" + stratux_ip
         display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
+    elif status_mode == 7:   # input of stratux-ip
+        headline = "Change WIFI"
+        subline = "Stratux IP Addr"
+        text = "Enter IP of Stratux:\n"
+        prefix = stratux_ip[0:charpos]
+        char = stratux_ip[charpos]
+        suffix = stratux_ip[charpos + 1:len(new_wifi)]
+        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
+    elif status_mode == 10:   # Error dispay
+        headline = "Change WIFI"
+        subline = "Input Error!"
+        ip_is_invalid = False
+        try:
+            ipaddress.ip_address(stratux_ip)
+        except ValueError:
+            ip_is_invalid = True
+        if len(new_wifi) == 0:
+            text = "SSID invalid"
+        elif 0 < len(new_pass) <= 8:
+            text = "Passphrase too\nshort (none\nor min 8 char)"
+        elif ip_is_invalid:
+            text = "Stratux IP invalid"
+        else:
+            text = "unspecified error"
+        display_control.text_screen(draw, headline, subline, text, "Canc", "", "Redo")
     display_control.display()
 
 
@@ -254,6 +286,17 @@ def prev_char(current):
     return CHARSET[pos]
 
 
+def next_number(current):
+    return NUMBERS[(NUMBERS.find(current) + 1) % len(NUMBERS)]
+
+
+def prev_number(current):
+    pos = NUMBERS.find(current) - 1
+    if pos < 0:
+        pos = len(NUMBERS)
+    return NUMBERS[pos]
+
+
 def user_input(bluetooth_active):
     global left
     global middle
@@ -265,6 +308,7 @@ def user_input(bluetooth_active):
     global new_wifi
     global new_pass
     global charpos
+    global new_stratux_ip
 
     if status_mode == 0:
         middle = "Mode"
@@ -321,6 +365,9 @@ def user_input(bluetooth_active):
             new_wifi = new_wifi[:charpos] + next_char(new_wifi[charpos]) + new_wifi[charpos+1:]
         if button == 1 and btime == 1:  # middle and short, next charpos
             charpos += 1
+            if charpos > len(new_wifi):
+                charpos = 0
+                status_mode = 5
         if button == 1 and btime == 2:  # middle and long finish
             charpos = 0
             status_mode = 5
@@ -331,11 +378,17 @@ def user_input(bluetooth_active):
             new_pass = new_pass[:charpos] + next_char(new_pass[charpos]) + new_pass[charpos+1:]
         if button == 1 and btime == 1:  # middle and short, next charpos
             charpos += 1
+            if charpos > len(new_pass):
+                charpos = 0
+                status_mode = 5
         if button == 1 and btime == 2:  # middle and long finish
-            if len(new_wifi) > 0 and (len(new_pass) == 0 or len(new_pass) >= 0):
-                status_mode = 6
+            new_wifi = new_wifi.strip()
+            new_pass = new_pass.strip()
+            if len(new_wifi) > 0 and (len(new_pass) == 0 or len(new_pass) >= 8):
+                new_stratux_ip = stratux_ip
+                status_mode = 7
             else:
-                status_mode = 3    # invalid input, go back to display of network
+                status_mode = 10   # invalid input, go back to error display
         if button == 2 and btime == 1:  # right and short, -
             new_pass = new_pass[:charpos] + prev_char(new_pass[charpos]) + new_pass[charpos+1:]
     elif status_mode == 6:  # check yes/no
@@ -344,4 +397,45 @@ def user_input(bluetooth_active):
         elif button == 0 and btime == 1:  # left and short, "yes"
             set_network(new_wifi, new_pass)
             status_mode = 3
+    elif status_mode == 7:   # input stratux_ip
+        if button == 0 and btime == 1:  # left and short, +
+            new_stratux_ip = new_stratux_ip[:charpos] + next_number(new_stratux_ip[charpos]) \
+                             + new_stratux_ip[charpos+1:]
+        if button == 1 and btime == 1:  # middle and short, next charpos
+            charpos += 1
+            if charpos > len(new_stratux_ip):
+                ip_is_invalid = False
+                try:
+                    ipaddress.ip_address(new_stratux_ip)
+                except ValueError:
+                    ip_is_invalid = True
+                charpos = 0
+                if not ip_is_invalid:
+                    status_mode = 6
+                else:
+                    status_mode = 10
+            elif charpos == 3 or charpos == 7 or charpos == 11:
+                charpos += 1   # skip "."
+        if button == 1 and btime == 2:  # middle and long finish
+            ip_is_invalid = False
+            try:
+                ipaddress.ip_address(new_stratux_ip)
+            except ValueError:
+                ip_is_invalid = True
+            charpos = 0
+            if not ip_is_invalid:
+                status_mode = 6
+            else:
+                status_mode = 10
+    elif status_mode == 10:     # display error
+        if button == 2 and btime == 1:  # right and short, "redo"
+            new_wifi = DEFAULT_WIFI
+            new_pass = DEFAULT_PASS
+            new_stratux_ip = stratux_ip
+            status_mode = 4   # change network
+        if button == 0 and btime == 1:  # left and short, "cancel"
+            new_wifi = DEFAULT_WIFI
+            new_pass = DEFAULT_PASS
+            new_stratux_ip = stratux_ip
+            status_mode = 3  # display network
     return 7  # no mode change
