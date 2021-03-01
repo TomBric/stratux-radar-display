@@ -283,7 +283,7 @@ def prev_char(current):
     pos = CHARSET.find(current) - 1
     if pos < 0:
         pos = len(CHARSET)
-    return CHARSET[pos]
+    return CHARSET[pos-1]
 
 
 def next_number(current):
@@ -294,7 +294,7 @@ def prev_number(current):
     pos = NUMBERS.find(current) - 1
     if pos < 0:
         pos = len(NUMBERS)
-    return NUMBERS[pos]
+    return NUMBERS[pos-1]
 
 
 def ipv4_to_string(ip):   # generate string with leading zeros
