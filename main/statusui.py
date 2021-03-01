@@ -168,22 +168,22 @@ def draw_status(draw, display_control, bluetooth_active):
         headline = "Change WIFI"
         subline = "Confirm change"
         text = "Really change to?\n WIFI SSID:\n" + new_wifi + "\n Passphrase:\n" + new_pass \
-               + "\nStratux-IP:\n" + stratux_ip
+               + "\nStratux-IP:\n" + new_stratux_ip
         display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
     elif status_mode == 7:   # input of stratux-ip
         headline = "Change WIFI"
         subline = "Stratux IP Addr"
         text = "Enter IP of Stratux:\n"
-        prefix = stratux_ip[0:charpos]
-        char = stratux_ip[charpos]
-        suffix = stratux_ip[charpos + 1:len(new_wifi)]
+        prefix = new_stratux_ip[0:charpos]
+        char = new_stratux_ip[charpos]
+        suffix = new_stratux_ip[charpos + 1:len(new_stratux_ip)]
         display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 10:   # Error dispay
         headline = "Change WIFI"
         subline = "Input Error!"
         ip_is_invalid = False
         try:
-            ipaddress.ip_address(stratux_ip)
+            ipaddress.ip_address(new_stratux_ip)
         except ValueError:
             ip_is_invalid = True
         if len(new_wifi) == 0:
@@ -297,6 +297,18 @@ def prev_number(current):
     return NUMBERS[pos]
 
 
+def ipv4_to_string(ip):   # generate string with leading zeros
+    s = str((int(ip) >> 24) % 256,).zfill(3) + "." + str((int(ip) >> 16) % 256).zfill(3) + "." \
+        + str((int(ip) >> 8) % 256).zfill(3) + "." + str(int(ip) % 256).zfill(3)
+    return s
+
+
+def string_to_ipv4(ipv4str):
+    parts = ipv4str.split('.')
+    ipaddr = (int(parts[0]) << 24) + (int(parts[1]) << 16) + (int(parts[2]) << 8) + int(parts[3])
+    return ipaddr
+
+
 def user_input(bluetooth_active):
     global left
     global middle
@@ -309,6 +321,7 @@ def user_input(bluetooth_active):
     global new_pass
     global charpos
     global new_stratux_ip
+    global stratux_ip
 
     if status_mode == 0:
         middle = "Mode"
@@ -385,7 +398,7 @@ def user_input(bluetooth_active):
             new_wifi = new_wifi.strip()
             new_pass = new_pass.strip()
             if len(new_wifi) > 0 and (len(new_pass) == 0 or len(new_pass) >= 8):
-                new_stratux_ip = stratux_ip
+                new_stratux_ip = ipv4_to_string(string_to_ipv4(stratux_ip))  # to normalize and have leading zeros
                 status_mode = 7
             else:
                 status_mode = 10   # invalid input, go back to error display
@@ -396,6 +409,7 @@ def user_input(bluetooth_active):
             status_mode = 3
         elif button == 0 and btime == 1:  # left and short, "yes"
             set_network(new_wifi, new_pass)
+            stratux_ip = new_stratux_ip
             status_mode = 3
     elif status_mode == 7:   # input stratux_ip
         if button == 0 and btime == 1:  # left and short, +
@@ -406,7 +420,7 @@ def user_input(bluetooth_active):
             if charpos > len(new_stratux_ip):
                 ip_is_invalid = False
                 try:
-                    ipaddress.ip_address(new_stratux_ip)
+                    ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip))
                 except ValueError:
                     ip_is_invalid = True
                 charpos = 0

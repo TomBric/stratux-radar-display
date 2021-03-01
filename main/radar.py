@@ -61,6 +61,7 @@ SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
+url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
 url_radar_ws = ""
 url_settings_set = ""
@@ -483,7 +484,7 @@ def main():
         bluetooth_active = radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     ahrsui.init(display_control)
-    statusui.init(display_control, url_status_get, DEFAULT_URL_HOST_BASE, display_refresh_time)
+    statusui.init(display_control, url_status_get, url_host_base, display_refresh_time)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())
