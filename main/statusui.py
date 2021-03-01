@@ -378,7 +378,7 @@ def user_input(bluetooth_active):
             new_wifi = new_wifi[:charpos] + next_char(new_wifi[charpos]) + new_wifi[charpos+1:]
         if button == 1 and btime == 1:  # middle and short, next charpos
             charpos += 1
-            if charpos > len(new_wifi):
+            if charpos >= len(new_wifi):
                 charpos = 0
                 status_mode = 5
         if button == 1 and btime == 2:  # middle and long finish
@@ -391,7 +391,7 @@ def user_input(bluetooth_active):
             new_pass = new_pass[:charpos] + next_char(new_pass[charpos]) + new_pass[charpos+1:]
         if button == 1 and btime == 1:  # middle and short, next charpos
             charpos += 1
-            if charpos > len(new_pass):
+            if charpos >= len(new_pass):
                 charpos = 0
                 status_mode = 5
         if button == 1 and btime == 2:  # middle and long finish
@@ -417,7 +417,7 @@ def user_input(bluetooth_active):
                              + new_stratux_ip[charpos+1:]
         if button == 1 and btime == 1:  # middle and short, next charpos
             charpos += 1
-            if charpos > len(new_stratux_ip):
+            if charpos >= len(new_stratux_ip):
                 ip_is_invalid = False
                 try:
                     ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip))

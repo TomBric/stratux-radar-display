@@ -40,6 +40,7 @@ from . import radar_opts
 # global constants
 VERYLARGE = 24
 LARGE = 18  # size of height indications of aircraft
+MEDIUM = 14
 SMALL = 12  # size of information indications on top and bottom
 VERYSMALL = 10  # used for "nm" and "ft"
 AIRCRAFT_SIZE = 3  # size of aircraft arrow
@@ -54,6 +55,7 @@ zerox = 0
 zeroy = 0
 verylargefont = ""
 largefont = ""
+mediumfont = ""
 smallfont = ""
 verysmallfont = ""
 webfont = ""
@@ -85,6 +87,7 @@ def init():
     global zeroy
     global verylargefont
     global largefont
+    global mediumfont
     global smallfont
     global verysmallfont
     global webfont
@@ -102,6 +105,7 @@ def init():
     device.contrast(255)  # set full contrast
     verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)  # font for height indications
+    mediumfont = make_font("Font.ttc", MEDIUM)
     smallfont = make_font("Font.ttc", SMALL)  # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
     webfont = make_font("fontawesome-webfont.ttf", SMALL)  # font for Bluetooth indications
@@ -361,12 +365,12 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
         txt_starty += LARGE
     bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
     draw.text((0, txt_starty), text, font=smallfont, fill="white")
-    bbox_p = draw.textbbox((bbox[0], bbox[3]), prefix, font=largefont)
-    draw.text((bbox[0], bbox[3]), prefix, fill="white", font=largefont)
-    bbox_rect = draw.textbbox((bbox_p[2], bbox[3]), inp, font=largefont)
+    bbox_p = draw.textbbox((bbox[0], bbox[3]), prefix, font=mediumfont)
+    draw.text((bbox[0], bbox[3]), prefix, fill="white", font=mediumfont)
+    bbox_rect = draw.textbbox((bbox_p[2], bbox[3]), inp, font=mediumfont)
     draw.rectangle(bbox_rect, fill="red")
-    draw.text((bbox_rect[0], bbox[3]), inp, font=largefont, fill="black")
-    draw.text((bbox_rect[2], bbox[3]), suffix, font=largefont, fill="white")
+    draw.text((bbox_rect[0], bbox[3]), inp, font=mediumfont, fill="black")
+    draw.text((bbox_rect[2], bbox[3]), suffix, font=mediumfont, fill="white")
 
     draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
     textsize = draw.textsize(right, smallfont)
