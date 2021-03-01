@@ -64,8 +64,8 @@ status_mode = 0
 # 0 = normal, 1 = scan running, 2 = scan evaluation, 3-network display, 4-network set ssid 5-network set passw
 wifi_ssid = ""
 refresh_time = 0.0
-new_wifi = "stratux         "   # max 16 chars accepted
-new_pass = "                "   # max 16 chars accepted
+new_wifi = DEFAULT_WIFI
+new_pass = DEFAULT_PASS
 new_stratux_ip = stratux_ip
 charpos = 0         # position of current input char
 
@@ -168,7 +168,7 @@ def draw_status(draw, display_control, bluetooth_active):
         headline = "Change WIFI"
         subline = "Confirm change"
         text = "SSID: " + new_wifi + "\nPass: " + new_pass \
-               + "\nStrx" + new_stratux_ip
+               + "\nStrx: " + new_stratux_ip
         display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
     elif status_mode == 7:   # input of stratux-ip
         headline = "Change WIFI"
@@ -370,6 +370,9 @@ def user_input(bluetooth_active):
     elif status_mode == 3:  # network display
         if button == 2 and btime == 1:  # right and short, change network config
             charpos = 0
+            new_wifi = DEFAULT_WIFI
+            new_pass = DEFAULT_PASS
+            new_stratux_ip = stratux_ip
             status_mode = 4
         if button == 1 and btime == 1:  # middle and short, go back to normal status
             status_mode = 0
