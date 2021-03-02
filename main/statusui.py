@@ -147,7 +147,8 @@ def draw_status(draw, display_control, bluetooth_active):
             text += "No detections."
         display_control.text_screen(draw, headline, subline, text, left, middle, right)
     elif status_mode == 3:  # display network information
-        display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID = \n" + wifi_ssid, "", "Cont", "Chg")
+        display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID:\n" + wifi_ssid + "\nStratux-IP:\n" + stratux_ip,
+                                    "", "Cont", "Chg")
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
         subline = "WIFI SSID"
