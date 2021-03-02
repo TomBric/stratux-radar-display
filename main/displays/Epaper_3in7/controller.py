@@ -410,7 +410,7 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     draw.text((bbox_rect[0], bbox[3]), inp, font=smallfont, fill="white")
     draw.text((bbox_rect[2], bbox[3]), suffix, font=smallfont, fill="black")
 
-    draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="black")
+    draw.text((5, sizey - SMALL - 3), left, font=smallfont, fill="black")
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
+    centered_text(draw, sizey - SMALL - 8, middle, smallfont, fill="black")
