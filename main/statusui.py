@@ -424,6 +424,9 @@ def user_input(bluetooth_active):
         if button == 0 and btime == 1:  # left and short, +
             new_stratux_ip = new_stratux_ip[:charpos] + next_number(new_stratux_ip[charpos]) \
                              + new_stratux_ip[charpos+1:]
+        if button == 2 and btime == 1:  # left and short, +
+            new_stratux_ip = new_stratux_ip[:charpos] + prev_number(new_stratux_ip[charpos]) \
+                             + new_stratux_ip[charpos+1:]
         if button == 1 and btime == 1:  # middle and short, next charpos
             charpos += 1
             if charpos >= len(new_stratux_ip):
