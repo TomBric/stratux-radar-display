@@ -50,6 +50,7 @@ CHARSET = string.ascii_uppercase + string.ascii_lowercase + string.digits + stri
 NUMBERS = string.digits
 DEFAULT_WIFI = "stratux         "
 DEFAULT_PASS = "                "
+MAX_WIFI_LENGTH = 16
 
 # globals
 status_url = ""
@@ -371,7 +372,10 @@ def user_input(bluetooth_active):
     elif status_mode == 3:  # network display
         if button == 2 and btime == 1:  # right and short, change network config
             charpos = 0
-            new_wifi = DEFAULT_WIFI
+            if wifi_ssid != "":
+                new_wifi = wifi_ssid.ljust(MAX_WIFI_LENGTH)
+            else:
+                new_wifi = DEFAULT_WIFI
             new_pass = DEFAULT_PASS
             new_stratux_ip = stratux_ip
             status_mode = 4
