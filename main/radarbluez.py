@@ -36,6 +36,7 @@ import re
 import pydbus
 import logging
 from espeakng import ESpeakNG
+import subprocess
 
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
@@ -61,23 +62,24 @@ def bluez_init():
     bus = pydbus.SystemBus()
     if bus is None:
         logging.debug("Systembus not received")
-        return
+        return False
     try:
         manager = bus.get(BLUEZ_SERVICE, '/')
         adapter = bus.get(BLUEZ_SERVICE, ADAPTER_PATH)
     except (KeyError, TypeError):
         logging.debug("Bluetooth: BLUEZ-SERVICE not initialised")
-        return
+        return False
     bluetooth_active = True
     connected_devices()     # check if already devices are connected
     if esng is None:
         esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
         if esng is None:
             logging.info("Bluetooth: espeak-ng not initialized")
-            return
+            return True
         logging.info("Bluetooth: espeak-ng successfully initialized.")
     esng.say("Stratux Radar connected")
     print("SPEAK: Stratux Radar connected")
+    return True
 
 
 def speak(text):
@@ -99,7 +101,7 @@ def connected_devices():
     global bt_devices
 
     if not bluetooth_active:
-        return
+        return 0, []
     managed_objects = manager.GetManagedObjects()
     r = re.compile('\/org\/bluez\/hci\d*\/dev_(.*)')
     # to match strings like /org/bluez/hci0/dev_58_C9_35_2F_A1_EF
@@ -112,3 +114,16 @@ def connected_devices():
                     device_names.append(value['org.bluez.Device1']['Name'])
     bt_devices = len(device_names)
     return bt_devices, device_names
+
+
+def trust_pair_connect(bt_addr):
+    res = subprocess.run(["bluetoothctl", "trust", bt_addr])
+    if res.returncode != 0:
+        return False
+    res = subprocess.run(["bluetoothctl", "pair", bt_addr])
+    if res.returncode != 0:
+        return False
+    res = subprocess.run(["bluetoothctl", "connect", bt_addr])
+    if res.returncode != 0:
+        return False
+    return True

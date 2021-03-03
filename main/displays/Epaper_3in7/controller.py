@@ -46,8 +46,8 @@ VERYSMALL = 18
 AWESOME_FONTSIZE = 18   # bluetooth indicator
 AIRCRAFT_SIZE = 6        # size of aircraft arrow
 MINIMAL_CIRCLE = 20     # minimal size of mode-s circle
-ARCPOSITION_EXCLUDE_FROM = 130
-ARCPOSITION_EXCLUDE_TO = 230
+ARCPOSITION_EXCLUDE_FROM = 110
+ARCPOSITION_EXCLUDE_TO = 250
 # end definitions
 
 # global device properties
@@ -99,7 +99,7 @@ def next_arcposition(old_arcposition):
     # be used to define the next angle on the circle
     new_arcposition = (old_arcposition + 210) % 360
     if ARCPOSITION_EXCLUDE_TO >= new_arcposition >= ARCPOSITION_EXCLUDE_FROM:
-        new_arcposition = (old_arcposition + 210) % 360
+        new_arcposition = (new_arcposition + 210) % 360
     return new_arcposition
 
 
@@ -132,7 +132,7 @@ def init():
     zerox = sizex / 2
     zeroy = 200    # not centered
     ah_zeroy = sizey / 2   # zero line for ahrs
-    ah_zerox = sizex /2
+    ah_zerox = sizex / 2
     max_pixel = 400
     verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
@@ -180,8 +180,8 @@ def startup(draw, version, target_ip, seconds):
     logo = Image.open(logopath)
     draw.bitmap((zerox-192/2, 0), logo, fill="black")
     versionstr = "Epaper-Radar " + version
-    centered_text(draw, 193, versionstr, largefont, fill="black")
-    centered_text(draw, sizey - VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
+    centered_text(draw, 188, versionstr, largefont, fill="black")
+    centered_text(draw, sizey - 2 * VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
     display()
     time.sleep(seconds)
 
@@ -299,13 +299,6 @@ def shutdown(draw, countdown):
     message = "to cancel ..."
     centered_text(draw, 130, message, smallfont, fill="black")
 
-'''
-def ahrs(draw, pitch, roll, heading, slipskid, error_message):
-    centered_text(draw, 10, "AHRS not provided ", largefont, fill="black")
-    centered_text(draw, 40, "on this display.", largefont, fill="black")
-    centered_text(draw, 120, "Long press on middle button", largefont, fill="black")
-    centered_text(draw, 150, "to continue ...", largefont, fill="black")
-'''
 
 def rollmarks(draw, roll):
     if ah_zerox > ah_zeroy:
@@ -364,7 +357,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     draw.polygon((h1, h2, h4, h3), fill="white")  # sky
     draw.line((h1, h2), fill="black", width=4)  # horizon line
 
-    earthfill = 0;
+    earthfill = 0
     while earthfill > -180:
         earthfill -= 3
         draw.line((linepoints(pitch, roll, earthfill, 600)), fill="black", width=1)
@@ -386,3 +379,38 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
         centered_text(draw, 80, error_message, smallfont, fill="black")
+
+
+def text_screen(draw, headline, subline, text, left_text, middle_text, right_text):
+    centered_text(draw, 0, headline, verylargefont, fill="black")
+    txt_starty = VERYLARGE
+    if subline is not None:
+        centered_text(draw, txt_starty, subline, largefont, fill="black")
+        txt_starty += LARGE
+    draw.text((5, txt_starty), text, font=smallfont, fill="black")
+
+    draw.text((5, sizey - SMALL - 3), left_text, font=smallfont, fill="black")
+    textsize = draw.textsize(right_text, smallfont)
+    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right_text, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="black")
+
+
+def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp, suffix):
+    centered_text(draw, 0, headline, largefont, fill="black")
+    txt_starty = LARGE
+    if subline is not None:
+        centered_text(draw, LARGE, subline, smallfont, fill="black")
+        txt_starty += LARGE
+    bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
+    draw.text((0, txt_starty), text, font=smallfont, fill="black")
+    bbox_p = draw.textbbox((bbox[0], bbox[3]), prefix, font=smallfont)
+    draw.text((bbox[0], bbox[3]), prefix, fill="black", font=smallfont)
+    bbox_rect = draw.textbbox((bbox_p[2], bbox[3]), inp, font=smallfont)
+    draw.rectangle(bbox_rect, fill="black")
+    draw.text((bbox_rect[0], bbox[3]), inp, font=smallfont, fill="white")
+    draw.text((bbox_rect[2], bbox[3]), suffix, font=smallfont, fill="black")
+
+    draw.text((5, sizey - SMALL - 3), left, font=smallfont, fill="black")
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL - 8, middle, smallfont, fill="black")

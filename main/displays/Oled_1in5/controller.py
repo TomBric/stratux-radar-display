@@ -40,6 +40,7 @@ from . import radar_opts
 # global constants
 VERYLARGE = 24
 LARGE = 18  # size of height indications of aircraft
+MEDIUM = 14
 SMALL = 12  # size of information indications on top and bottom
 VERYSMALL = 10  # used for "nm" and "ft"
 AIRCRAFT_SIZE = 3  # size of aircraft arrow
@@ -54,6 +55,7 @@ zerox = 0
 zeroy = 0
 verylargefont = ""
 largefont = ""
+mediumfont = ""
 smallfont = ""
 verysmallfont = ""
 webfont = ""
@@ -85,6 +87,7 @@ def init():
     global zeroy
     global verylargefont
     global largefont
+    global mediumfont
     global smallfont
     global verysmallfont
     global webfont
@@ -102,10 +105,15 @@ def init():
     device.contrast(255)  # set full contrast
     verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)  # font for height indications
+    mediumfont = make_font("Font.ttc", MEDIUM)
     smallfont = make_font("Font.ttc", SMALL)  # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
     webfont = make_font("fontawesome-webfont.ttf", SMALL)  # font for Bluetooth indications
-    display_refresh = 0.1  # oled has no busy flag, so take this as update value
+    start = time.time()
+    # do sync version of display to measure time
+    device.display(image)
+    end = time.time()
+    display_refresh = end - start
     return draw, sizex, zerox, zeroy, display_refresh
 
 
@@ -146,11 +154,9 @@ def startup(draw, version, target_ip, seconds):
     logo = Image.open(logopath)
     draw.rectangle(((0, 0), (sizex, 64)), fill="blue")
     draw.bitmap((zerox - 32, 0), logo, fill="white")
-    centered_text(draw, 64, "Oled-Radar", largefont, fill="white")
-    versionstr = "Version " + version
-    centered_text(draw, 64 + LARGE, versionstr, smallfont, fill="white")
-    centered_text(draw, sizey - 2 * SMALL, "Connecting to", smallfont, fill="white")
-    centered_text(draw, sizey - SMALL, target_ip, smallfont, fill="white")
+    centered_text(draw, 64, "OledRadar "+version, largefont, fill="white")
+    centered_text(draw, sizey - 3 * SMALL, "Connecting to", smallfont, fill="white")
+    centered_text(draw, sizey - 2*SMALL, target_ip, smallfont, fill="white")
     display()
     time.sleep(seconds)
 
@@ -336,3 +342,37 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
         centered_text(draw, 30, error_message, smallfont, fill="red")
+
+
+def text_screen(draw, headline, subline, text, left, middle, right):
+    centered_text(draw, 0, headline, largefont, fill="yellow")
+    txt_starty = LARGE
+    if subline is not None:
+        centered_text(draw, LARGE, subline, smallfont, fill="yellow")
+        txt_starty += LARGE
+    draw.text((0, txt_starty), text, font=smallfont, fill="white")
+    draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
+
+
+def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp, suffix):
+    centered_text(draw, 0, headline, largefont, fill="yellow")
+    txt_starty = LARGE
+    if subline is not None:
+        centered_text(draw, LARGE, subline, smallfont, fill="yellow")
+        txt_starty += LARGE
+    bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
+    draw.text((0, txt_starty), text, font=smallfont, fill="white")
+    bbox_p = draw.textbbox((bbox[0], bbox[3]), prefix, font=mediumfont)
+    draw.text((bbox[0], bbox[3]), prefix, fill="white", font=mediumfont)
+    bbox_rect = draw.textbbox((bbox_p[2], bbox[3]), inp, font=mediumfont)
+    draw.rectangle(bbox_rect, fill="red")
+    draw.text((bbox_rect[0], bbox[3]), inp, font=mediumfont, fill="black")
+    draw.text((bbox_rect[2], bbox[3]), suffix, font=mediumfont, fill="white")
+
+    draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")

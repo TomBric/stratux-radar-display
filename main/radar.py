@@ -45,16 +45,15 @@ import radarui
 import timerui
 import shutdownui
 import ahrsui
+import statusui
 import importlib
 
 # constant definitions
-RADAR_VERSION = "1.0c"
+RADAR_VERSION = "1.0d"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 1.0
 RADAR_CUTOFF = 29
-ARCPOSITION_EXCLUDE_FROM = 130
-ARCPOSITION_EXCLUDE_TO = 230
 UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
 BLUEZ_CHECK_TIME = 3.0
@@ -62,9 +61,11 @@ SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
+url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
 url_radar_ws = ""
 url_settings_set = ""
+url_status_get = ""
 device = ""
 draw = None
 all_ac = {}
@@ -86,8 +87,10 @@ display_control = None
 speak = False  # BT is generally enabled
 bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
-global_mode = 1   # 1=Radar 2=Timer 3=Shutdown 4=refresh 5=ahrs 0=Init
-LAST_MODE = 3    # to be never reached
+global_mode = 1
+# 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
+# 7=status 8=refresh from status   0=Init
+bluetooth_active = False
 
 
 def draw_all_ac(draw, allac):
@@ -256,9 +259,7 @@ def new_traffic(json_str):
         distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
         if is_new or 'circradius' not in ac:
             # calc argposition if new or adsb before
-            last_arcposition = (last_arcposition + 210) % 360
-            if ARCPOSITION_EXCLUDE_TO >= last_arcposition >= ARCPOSITION_EXCLUDE_FROM:
-                last_arcposition = (last_arcposition + 210) % 360
+            last_arcposition = display_control.next_arcposition(last_arcposition)   # display specific
             ac['arcposition'] = last_arcposition
         ac['gps_distance'] = distcirc
         ac['circradius'] = distx
@@ -392,6 +393,8 @@ async def user_interface():
                 await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
             elif global_mode == 5:  # ahrs
                 next_mode = ahrsui.user_input()
+            elif global_mode == 7:  # status
+                next_mode = statusui.user_input(bluetooth_active)
 
             if next_mode > 0:
                 ui_changed = True
@@ -443,6 +446,8 @@ async def display_and_cutoff():
                     logging.debug("AHRS: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 5
+                elif global_mode == 7:  # status display
+                    statusui.draw_status(draw, display_control, bluetooth_active)
                 await asyncio.sleep(0.1)
 
             logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
@@ -472,12 +477,14 @@ def main():
     global zeroy
     global draw
     global display_refresh_time
+    global bluetooth_active
 
     radarui.init(url_settings_set)
     if speak:
-        radarbluez.bluez_init()
+        bluetooth_active = radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     ahrsui.init(display_control)
+    statusui.init(display_control, url_status_get, url_host_base, display_refresh_time)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())
@@ -502,6 +509,7 @@ if __name__ == "__main__":
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
     ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
     ap.add_argument("-a", "--ahrs", required=False, help="Start mode is ahrs", action='store_true', default=False)
+    ap.add_argument("-x", "--status", required=False, help="Start mode is status", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     args = vars(ap.parse_args())
@@ -516,10 +524,13 @@ if __name__ == "__main__":
         global_mode = 2   # start_in_timer_mode
     if args['ahrs']:
         global_mode = 5   # start_in_ahrs mode
+    if args['status']:
+        global_mode = 7   # start in status mode
     url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_settings_set = "http://" + url_host_base + "/setSettings"
+    url_status_get = "http://" + url_host_base + "/getStatus"
 
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
