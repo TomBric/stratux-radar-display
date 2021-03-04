@@ -58,6 +58,7 @@ UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
 BLUEZ_CHECK_TIME = 3.0
 SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
+WATCHDOG_TIMER = 2.5   # time after "no connection" is assumed, if no new situation is received
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -71,7 +72,7 @@ draw = None
 all_ac = {}
 aircraft_changed = True
 ui_changed = True
-situation = {'was_changed': True, 'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
+situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
              'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000, 'gps_quality': 0,
              'gps_h_accuracy': 20000}
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
@@ -280,6 +281,7 @@ def new_situation(json_str):
 
     logging.debug("New Situation" + json_str)
     sit = json.loads(json_str)
+    situation['last_update'] = time.time()
     if not situation['connected']:
         situation['connected'] = True
         situation['was_changed'] = True
@@ -448,9 +450,8 @@ async def display_and_cutoff():
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(draw, display_control, bluetooth_active)
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.01)
 
-            logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
             for icao, ac in all_ac.items():
@@ -460,6 +461,13 @@ async def display_and_cutoff():
                     aircraft_changed = True
             for i in to_delete:
                 del all_ac[i]
+
+            # watchdog
+            if situation['last_update'] + WATCHDOG_TIMER < time.time():
+                if situation['connected']:
+                    situation['connected'] = False
+                    situation['was_changed'] = True
+                    logging.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
     except (asyncio.CancelledError, RuntimeError):
         print("Display task terminating ...")
         logging.debug("Display task terminating ...")
