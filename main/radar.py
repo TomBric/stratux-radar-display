@@ -58,7 +58,7 @@ UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
 BLUEZ_CHECK_TIME = 3.0
 SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
-WATCHDOG_TIMER = 2.5   # time after "no connection" is assumed, if no new situation is received
+WATCHDOG_TIMER = 6.0   # time after "no connection" is assumed, if no new situation is received
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
