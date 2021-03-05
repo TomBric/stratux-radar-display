@@ -58,7 +58,8 @@ UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
 BLUEZ_CHECK_TIME = 3.0
 SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
-WATCHDOG_TIMER = 6.0   # time after "no connection" is assumed, if no new situation is received
+WATCHDOG_TIMER = 3.0   # time after "no connection" is assumed, if no new situation is received
+PONG_TIMOUT = 2.0     # timeout used for regular status request, necessary towards stratux to keep the websockets open
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -72,9 +73,9 @@ draw = None
 all_ac = {}
 aircraft_changed = True
 ui_changed = True
-situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
-             'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000, 'gps_quality': 0,
-             'gps_h_accuracy': 20000}
+situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_active': False, 'course': 0,
+             'own_altitude': -99.0, 'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000,
+             'gps_quality': 0, 'gps_h_accuracy': 20000}
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
 # ahrs information, values are all rounded to integer
@@ -119,7 +120,6 @@ def draw_display(draw):
     global aircraft_changed
     global ui_changed
 
-    logging.debug("List of all aircraft > " + json.dumps(all_ac))
     if situation['was_changed'] or aircraft_changed or ui_changed:
         # display is only triggered if there was a change
         display_control.clear(draw)
@@ -372,6 +372,7 @@ async def user_interface():
     global global_mode
 
     last_bt_checktime = 0.0
+    last_status_pongtime = 0.0
     next_mode = 1
 
     try:
@@ -412,6 +413,8 @@ async def user_interface():
                         radarbluez.speak("Radar connected")
                     bt_devices = new_devices
                     ui_changed = True
+            if current_time > last_status_pongtime + PONG_TIMOUT:    # send a "pong" towards stratux
+                statusui.get_status()
     except asyncio.CancelledError:
         print("UI task terminating ...")
         logging.debug("Display task terminating ...")
