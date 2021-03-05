@@ -414,6 +414,7 @@ async def user_interface():
                     bt_devices = new_devices
                     ui_changed = True
             if current_time > last_status_pongtime + PONG_TIMOUT:    # send a "pong" towards stratux
+                last_status_pongtime = current_time
                 statusui.get_status()
     except asyncio.CancelledError:
         print("UI task terminating ...")
