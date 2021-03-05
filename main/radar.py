@@ -333,6 +333,7 @@ def new_situation(json_str):
 
 
 async def listen_forever(path, name, callback):
+    last_status_pongtime = 0.0
     print(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
@@ -343,7 +344,9 @@ async def listen_forever(path, name, callback):
                 while True:
                     # listener loop
                     try:
-                        message = await ws.recv()
+                        message = await asyncio.wait_for(ws.recv(), timeout=10)
+                    except asyncio.TimeoutError:  # No data in 10 seconds, send eventually a pong later on
+                        pass
                     except websockets.exceptions.ConnectionClosed:
                         logging.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
@@ -353,7 +356,12 @@ async def listen_forever(path, name, callback):
                         print(name + " shutting down ... ")
                         return
 
-                    callback(message)
+                    current_time = time.time()
+                    if current_time > last_status_pongtime + PONG_TIMOUT:  # send a "pong" towards stratux
+                        last_status_pongtime = current_time
+                        await ws.pong()
+                    if message is not None:
+                        callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
         except (socket.error, websockets.exceptions.WebSocketException):
@@ -372,7 +380,6 @@ async def user_interface():
     global global_mode
 
     last_bt_checktime = 0.0
-    last_status_pongtime = 0.0
     next_mode = 1
 
     try:
@@ -413,9 +420,6 @@ async def user_interface():
                         radarbluez.speak("Radar connected")
                     bt_devices = new_devices
                     ui_changed = True
-            if current_time > last_status_pongtime + PONG_TIMOUT:    # send a "pong" towards stratux
-                last_status_pongtime = current_time
-                statusui.get_status()
     except asyncio.CancelledError:
         print("UI task terminating ...")
         logging.debug("Display task terminating ...")
