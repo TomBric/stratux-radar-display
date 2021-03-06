@@ -348,6 +348,7 @@ async def listen_forever(path, name, callback):
                         message = await asyncio.wait_for(ws.recv(), timeout=CHECK_CONNECTION_TIMEOUT)
                     except asyncio.TimeoutError:
                         # No situation received in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
+                        logging.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
                             logging.debug(name + ': Watchdog detected connection loss.' +
                                                  ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
