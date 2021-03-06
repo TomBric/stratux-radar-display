@@ -59,7 +59,8 @@ MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
 BLUEZ_CHECK_TIME = 3.0
 SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 WATCHDOG_TIMER = 3.0   # time after "no connection" is assumed, if no new situation is received
-CHECK_CONNECTION_TIMEOUT = 5.0     # timeout used for regular status request, necessary towards stratux to keep the websockets open
+CHECK_CONNECTION_TIMEOUT = 5.0
+# timeout used for regular status request, necessary towards stratux to keep the websockets open
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -351,6 +352,7 @@ async def listen_forever(path, name, callback):
                             logging.debug(name + ': Watchdog detected connection loss.' +
                                                  'Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
+                            await ws.close()
                             break
                     except websockets.exceptions.ConnectionClosed:
                         logging.debug(
