@@ -344,9 +344,7 @@ async def listen_forever(path, name, callback):
                 while True:
                     # listener loop
                     try:
-                        message = await asyncio.wait_for(ws.recv(), timeout=10)
-                    except asyncio.TimeoutError:  # No data in 10 seconds, send eventually a pong later on
-                        pass
+                        message = await ws.recv()
                     except websockets.exceptions.ConnectionClosed:
                         logging.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
@@ -355,11 +353,6 @@ async def listen_forever(path, name, callback):
                     except asyncio.CancelledError:
                         print(name + " shutting down ... ")
                         return
-
-                    current_time = time.time()
-                    if current_time > last_status_pongtime + PONG_TIMOUT:  # send a "ping" towards stratux
-                        last_status_pongtime = current_time
-                        await ws.ping()
                     if message is not None:
                         callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
