@@ -345,7 +345,8 @@ async def listen_forever(path, name, callback):
                 while True:
                     # listener loop
                     try:
-                        message = await asyncio.wait_for(ws.recv(), timeout=CHECK_CONNECTION_TIMEOUT)
+                        # message = await asyncio.wait_for(ws.recv(), timeout=CHECK_CONNECTION_TIMEOUT)
+                        message = await ws.recv()
                     except asyncio.TimeoutError:
                         # No situation received in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
                         logging.debug(name + ': TimeOut received waiting for message.')
