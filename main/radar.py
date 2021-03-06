@@ -52,7 +52,7 @@ import importlib
 RADAR_VERSION = "1.0d"
 
 RETRY_TIMEOUT = 1
-LOST_CONNECTION_TIMEOUT = 1.0
+LOST_CONNECTION_TIMEOUT = 0.3
 RADAR_CUTOFF = 29
 UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
@@ -357,9 +357,9 @@ async def listen_forever(path, name, callback):
                         return
 
                     current_time = time.time()
-                    if current_time > last_status_pongtime + PONG_TIMOUT:  # send a "pong" towards stratux
+                    if current_time > last_status_pongtime + PONG_TIMOUT:  # send a "ping" towards stratux
                         last_status_pongtime = current_time
-                        await ws.pong()
+                        await ws.ping()
                     if message is not None:
                         callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
