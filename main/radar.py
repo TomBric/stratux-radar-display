@@ -59,7 +59,7 @@ MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
 BLUEZ_CHECK_TIME = 3.0
 SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 WATCHDOG_TIMER = 3.0   # time after "no connection" is assumed, if no new situation is received
-PONG_TIMOUT = 2.0     # timeout used for regular status request, necessary towards stratux to keep the websockets open
+CHECK_CONNECTION_TIMEOUT = 5.0     # timeout used for regular status request, necessary towards stratux to keep the websockets open
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -333,18 +333,25 @@ def new_situation(json_str):
 
 
 async def listen_forever(path, name, callback):
-    last_status_pongtime = 0.0
     print(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
         logging.debug(name + " active ...")
         try:
             async with websockets.connect(path, ping_timeout=None, ping_interval=None) as ws:
+                # stratux does not respond to pings!
                 logging.debug(name + " connected on " + path)
                 while True:
                     # listener loop
                     try:
-                        message = await ws.recv()
+                        message = await asyncio.wait_for(ws.recv(), timeout=CHECK_CONNECTION_TIMEOUT)
+                    except asyncio.TimeoutError:
+                        # No situation received in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
+                        if situation['connected'] is False:  # Probably connection lost
+                            logging.debug(name + ': Watchdog detected connection loss.' +
+                                                 'Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
+                            await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
+                            break
                     except websockets.exceptions.ConnectionClosed:
                         logging.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
