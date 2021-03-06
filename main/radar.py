@@ -52,12 +52,15 @@ import importlib
 RADAR_VERSION = "1.0d"
 
 RETRY_TIMEOUT = 1
-LOST_CONNECTION_TIMEOUT = 1.0
+LOST_CONNECTION_TIMEOUT = 0.3
 RADAR_CUTOFF = 29
 UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
 BLUEZ_CHECK_TIME = 3.0
 SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
+WATCHDOG_TIMER = 3.0   # time after "no connection" is assumed, if no new situation is received
+CHECK_CONNECTION_TIMEOUT = 5.0
+# timeout used for regular status request, necessary towards stratux to keep the websockets open
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -71,9 +74,9 @@ draw = None
 all_ac = {}
 aircraft_changed = True
 ui_changed = True
-situation = {'was_changed': True, 'connected': False, 'gps_active': False, 'course': 0, 'own_altitude': -99.0,
-             'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000, 'gps_quality': 0,
-             'gps_h_accuracy': 20000}
+situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_active': False, 'course': 0,
+             'own_altitude': -99.0, 'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000,
+             'gps_quality': 0, 'gps_h_accuracy': 20000}
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
 # ahrs information, values are all rounded to integer
@@ -118,7 +121,6 @@ def draw_display(draw):
     global aircraft_changed
     global ui_changed
 
-    logging.debug("List of all aircraft > " + json.dumps(all_ac))
     if situation['was_changed'] or aircraft_changed or ui_changed:
         # display is only triggered if there was a change
         display_control.clear(draw)
@@ -280,6 +282,7 @@ def new_situation(json_str):
 
     logging.debug("New Situation" + json_str)
     sit = json.loads(json_str)
+    situation['last_update'] = time.time()
     if not situation['connected']:
         situation['connected'] = True
         situation['was_changed'] = True
@@ -336,12 +339,20 @@ async def listen_forever(path, name, callback):
         # outer loop restarted every time the connection fails
         logging.debug(name + " active ...")
         try:
-            async with websockets.connect(path, ping_timeout=100) as ws:
+            async with websockets.connect(path, ping_timeout=None, ping_interval=None, close_timeout=2) as ws:
+                # stratux does not respond to pings! close timeout set down to get earlier disconnect
                 logging.debug(name + " connected on " + path)
                 while True:
                     # listener loop
                     try:
-                        message = await ws.recv()
+                        message = await asyncio.wait_for(ws.recv(), timeout=CHECK_CONNECTION_TIMEOUT)
+                    except asyncio.TimeoutError:
+                        # No situation received in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
+                        if situation['connected'] is False:  # Probably connection lost
+                            logging.debug(name + ': Watchdog detected connection loss.' +
+                                                 ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
+                            await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
+                            break
                     except websockets.exceptions.ConnectionClosed:
                         logging.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
@@ -350,8 +361,8 @@ async def listen_forever(path, name, callback):
                     except asyncio.CancelledError:
                         print(name + " shutting down ... ")
                         return
-
-                    callback(message)
+                    if message is not None:
+                        callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
         except (socket.error, websockets.exceptions.WebSocketException):
@@ -448,9 +459,8 @@ async def display_and_cutoff():
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(draw, display_control, bluetooth_active)
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.01)
 
-            logging.debug("CutOff running and cleaning ac with age older than " + str(RADAR_CUTOFF) + " seconds")
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
             for icao, ac in all_ac.items():
@@ -460,6 +470,13 @@ async def display_and_cutoff():
                     aircraft_changed = True
             for i in to_delete:
                 del all_ac[i]
+
+            # watchdog
+            if situation['last_update'] + WATCHDOG_TIMER < time.time():
+                if situation['connected']:
+                    situation['connected'] = False
+                    situation['was_changed'] = True
+                    logging.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
     except (asyncio.CancelledError, RuntimeError):
         print("Display task terminating ...")
         logging.debug("Display task terminating ...")

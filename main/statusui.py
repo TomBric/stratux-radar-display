@@ -46,7 +46,7 @@ import ipaddress
 STATUS_TIMEOUT = 0.3
 BLUETOOTH_SCAN_TIME = 30.0
 BT_SCAN_WAIT = 0.2
-CHARSET = string.ascii_uppercase + string.ascii_lowercase + string.digits + string.punctuation
+CHARSET = " " + string.ascii_uppercase + string.ascii_lowercase + string.digits + string.punctuation
 NUMBERS = string.digits
 DEFAULT_WIFI = "stratux         "
 DEFAULT_PASS = "                "
