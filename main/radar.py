@@ -339,8 +339,8 @@ async def listen_forever(path, name, callback):
         # outer loop restarted every time the connection fails
         logging.debug(name + " active ...")
         try:
-            async with websockets.connect(path, ping_timeout=None, ping_interval=None) as ws:
-                # stratux does not respond to pings!
+            async with websockets.connect(path, ping_timeout=None, ping_interval=None, close_timeout=2) as ws:
+                # stratux does not respond to pings! close timeout set down to get earlier disconnect
                 logging.debug(name + " connected on " + path)
                 while True:
                     # listener loop
