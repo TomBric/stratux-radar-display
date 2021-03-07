@@ -40,13 +40,14 @@ ahrs_ui_changed = True
 MSG_GROUND_TEST = "No GPS,Ground ONLY!"
 MSG_PSEUDO_AHRS = "PSEUDO AHRS ONLY!"
 MSG_NO_AHRS = "NO IMU OR GPS!"
+MSG_NO_CONNECTION = "NO CONNECTION!"
 
 
 def init(display_control):   # prepare everything
     pass   # nothing to do in the setup now
 
 
-def draw_ahrs(draw, display_control, was_changed, pitch, roll, heading, slip, gps_hor_accuracy, ahrs_sensor):
+def draw_ahrs(draw, display_control, connected, was_changed, pitch, roll, heading, slip, gps_hor_accuracy, ahrs_sensor):
     global ahrs_ui_changed
 
     if was_changed or ahrs_ui_changed:
@@ -58,6 +59,8 @@ def draw_ahrs(draw, display_control, was_changed, pitch, roll, heading, slip, gp
             error_message = MSG_NO_AHRS
         if gps_hor_accuracy < 30 and not ahrs_sensor:
             error_message = MSG_PSEUDO_AHRS
+        if not connected:
+            error_message = MSG_NO_CONNECTION
         display_control.clear(draw)
         display_control.ahrs(draw, pitch, roll, heading, slip, error_message)
         display_control.display()

@@ -288,6 +288,7 @@ def new_situation(json_str):
     if not situation['connected']:
         situation['connected'] = True
         situation['was_changed'] = True
+        ahrs['was_changed'] = True   # connection also relevant for ahrs
     gps_active = sit['GPSHorizontalAccuracy'] < 19999
     if situation['gps_active'] != gps_active:
         situation['gps_active'] = gps_active
@@ -373,6 +374,7 @@ async def listen_forever(path, name, callback):
             logging.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
                 situation['connected'] = False
+                ahrs['was_changed'] = True
                 situation['was_changed'] = True
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
@@ -455,8 +457,9 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 1
                 elif global_mode == 5:   # ahrs'
-                    ahrsui.draw_ahrs(draw, display_control, ahrs['was_changed'], ahrs['pitch'], ahrs['roll'],
-                                     ahrs['heading'], ahrs['slipskid'], ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
+                    ahrsui.draw_ahrs(draw, display_control, situation['connected'], ahrs['was_changed'], ahrs['pitch'],
+                                     ahrs['roll'], ahrs['heading'], ahrs['slipskid'], ahrs['gps_hor_accuracy'],
+                                     ahrs['ahrs_sensor'])
                 elif global_mode == 6:   # refresh display, only relevant for epaper, mode was radar
                     logging.debug("AHRS: Display driver - Refreshing")
                     display_control.refresh()
@@ -480,6 +483,7 @@ async def display_and_cutoff():
                 if situation['connected']:
                     situation['connected'] = False
                     situation['was_changed'] = True
+                    ahrs['was_changed'] = True
                     logging.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
     except (asyncio.CancelledError, RuntimeError):
         print("Display task terminating ...")
