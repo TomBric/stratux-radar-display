@@ -61,6 +61,8 @@ SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 WATCHDOG_TIMER = 3.0   # time after "no connection" is assumed, if no new situation is received
 CHECK_CONNECTION_TIMEOUT = 5.0
 # timeout used for regular status request, necessary towards stratux to keep the websockets open
+MIN_DISPLAY_REFRESH_TIME = 0.2
+# minimal time to wait for a display refresh, to give time for situation and traffic
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -461,7 +463,7 @@ async def display_and_cutoff():
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(draw, display_control, bluetooth_active)
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(MIN_DISPLAY_REFRESH_TIME)
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
