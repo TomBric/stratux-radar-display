@@ -61,6 +61,8 @@ SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 WATCHDOG_TIMER = 3.0   # time after "no connection" is assumed, if no new situation is received
 CHECK_CONNECTION_TIMEOUT = 5.0
 # timeout used for regular status request, necessary towards stratux to keep the websockets open
+MIN_DISPLAY_REFRESH_TIME = 0.1
+# minimal time to wait for a display refresh, to give time for situation and traffic
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -286,6 +288,7 @@ def new_situation(json_str):
     if not situation['connected']:
         situation['connected'] = True
         situation['was_changed'] = True
+        ahrs['was_changed'] = True   # connection also relevant for ahrs
     gps_active = sit['GPSHorizontalAccuracy'] < 19999
     if situation['gps_active'] != gps_active:
         situation['gps_active'] = gps_active
@@ -346,8 +349,10 @@ async def listen_forever(path, name, callback):
                     # listener loop
                     try:
                         message = await asyncio.wait_for(ws.recv(), timeout=CHECK_CONNECTION_TIMEOUT)
+                        # message = await ws.recv()
                     except asyncio.TimeoutError:
                         # No situation received in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
+                        logging.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
                             logging.debug(name + ': Watchdog detected connection loss.' +
                                                  ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
@@ -369,6 +374,7 @@ async def listen_forever(path, name, callback):
             logging.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
                 situation['connected'] = False
+                ahrs['was_changed'] = True
                 situation['was_changed'] = True
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
@@ -451,15 +457,16 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 1
                 elif global_mode == 5:   # ahrs'
-                    ahrsui.draw_ahrs(draw, display_control, ahrs['was_changed'], ahrs['pitch'], ahrs['roll'],
-                                     ahrs['heading'], ahrs['slipskid'], ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
+                    ahrsui.draw_ahrs(draw, display_control, situation['connected'], ahrs['was_changed'], ahrs['pitch'],
+                                     ahrs['roll'], ahrs['heading'], ahrs['slipskid'], ahrs['gps_hor_accuracy'],
+                                     ahrs['ahrs_sensor'])
                 elif global_mode == 6:   # refresh display, only relevant for epaper, mode was radar
                     logging.debug("AHRS: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(draw, display_control, bluetooth_active)
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(MIN_DISPLAY_REFRESH_TIME)
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
@@ -476,6 +483,7 @@ async def display_and_cutoff():
                 if situation['connected']:
                     situation['connected'] = False
                     situation['was_changed'] = True
+                    ahrs['was_changed'] = True
                     logging.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
     except (asyncio.CancelledError, RuntimeError):
         print("Display task terminating ...")
