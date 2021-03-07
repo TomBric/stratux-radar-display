@@ -322,7 +322,7 @@ def new_situation(json_str):
         ahrs['heading'] = round(sit['AHRSGyroHeading'])
         ahrs['was_changed'] = True
     if ahrs['slipskid'] != round(sit['AHRSSlipSkid']):
-        ahrs['heading'] = round(sit['AHRSSlipSkid'])
+        ahrs['slipskid'] = round(sit['AHRSSlipSkid'])
         ahrs['was_changed'] = True
     if ahrs['gps_hor_accuracy'] != round(sit['GPSHorizontalAccuracy']):
         ahrs['gps_hor_accuracy'] = round(sit['GPSHorizontalAccuracy'])
