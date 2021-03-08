@@ -193,7 +193,7 @@ def draw_status(draw, display_control, bluetooth_active):
         display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
-        subline = "Confirm change & reboot"
+        subline = "Confirm & reboot"
         text = "SSID: " + new_wifi + "\nPass: " + new_pass \
                + "\nStrx: " + new_stratux_ip
         display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
@@ -304,7 +304,7 @@ def read_network():
 def set_network(wifi, passw, new_stratux):
     global global_config
 
-    global_config['stratus_ip'] = new_stratux
+    global_config['stratux_ip'] = new_stratux
     write_config(global_config)
     res = subprocess.run(["sudo", "raspi-config", "nonint", "do_wifi_ssid_passphrase", wifi, passw])
     if res != 0:
