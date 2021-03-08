@@ -193,7 +193,7 @@ def draw_status(draw, display_control, bluetooth_active):
         display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
-        subline = "Confirm change and reboot"
+        subline = "Confirm change & reboot"
         text = "SSID: " + new_wifi + "\nPass: " + new_pass \
                + "\nStrx: " + new_stratux_ip
         display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
