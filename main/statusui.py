@@ -372,8 +372,8 @@ def user_input(bluetooth_active):
             right = ""
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
-    if btime == 0:
-        return 0  # stay in timer mode
+    if btime == 0 and status_mode != 11:   # for 11 do reboot
+        return 0  # stay in current mode
     if button == 1 and btime == 2 and status_mode != 4 and status_mode != 5 and status_mode != 7:  # middle and long
         return 1  # next mode to be radar
     if button == 0 and btime == 2:  # left and long
