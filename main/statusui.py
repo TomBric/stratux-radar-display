@@ -42,6 +42,7 @@ import subprocess
 import string
 import ipaddress
 import json
+import os
 
 # constants
 CONFIG_FILE = "stratux-radar.conf"
@@ -309,13 +310,13 @@ def set_network(wifi, passw, new_stratux):
 
     global_config['stratux_ip'] = new_stratux
     write_config(global_config)
-    res = subprocess.run(["sudo", "raspi-config", "nonint", "do_wifi_ssid_passphrase", wifi, passw])
+    res = os.system('sudo raspi-config nonint do_wifi_ssid_passphrase' + wifi + passw)
     if res != 0:
         logging.debug("STATUSUI: Setting Wifi network failed.")
         return
     logging.debug("STATUSUI: Rebooting!")
     display.cleanup()
-    res = subprocess.run(["sudo", "reboot"])
+    os.system('sudo reboot')
     if res != 0:
         logging.debug("STATUSUI: Reboot attempt failed.")
 
