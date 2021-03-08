@@ -301,7 +301,7 @@ def read_network():
         return ""
 
 
-async def set_network(wifi, passw, new_stratux):
+def set_network(wifi, passw, new_stratux):
     global global_config
 
     global_config['stratux_ip'] = new_stratux
@@ -310,8 +310,6 @@ async def set_network(wifi, passw, new_stratux):
     if res != 0:
         logging.debug("STATUSUI: Setting Wifi network failed.")
         return
-    # wait a second to give the display driver time for a goodbye message
-    await asyncio.sleep(1)
     res = subprocess.run(["sudo", "reboot"])
     if res != 0:
         logging.debug("STATUSUI: Reboot attempt failed.")
@@ -457,8 +455,6 @@ def user_input(bluetooth_active):
         if button == 2 and btime == 1:  # right and short, "No"
             status_mode = 3
         elif button == 0 and btime == 1:  # left and short, "yes"
-            set_network(new_wifi, new_pass, new_stratux_ip)
-            stratux_ip = new_stratux_ip
             status_mode = 11
     elif status_mode == 7:   # input stratux_ip
         if button == 0 and btime == 1:  # left and short, +
@@ -505,4 +501,7 @@ def user_input(bluetooth_active):
             new_pass = DEFAULT_PASS
             new_stratux_ip = stratux_ip
             status_mode = 3  # display network
+    elif status_mode == 11:  # reboot
+        set_network(new_wifi, new_pass, new_stratux_ip)
+        stratux_ip = new_stratux_ip
     return 7  # no mode change
