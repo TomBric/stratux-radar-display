@@ -222,6 +222,11 @@ def draw_status(draw, display_control, bluetooth_active):
         else:
             text = "unspecified error"
         display_control.text_screen(draw, headline, subline, text, "Canc", "", "Redo")
+    elif status_mode == 11:   # REBOOT DISPLAY
+        headline = "Rebooting"
+        subline = "Please wait ..."
+        text = "New network\nconfig applied."
+        display_control.text_screen(draw, headline, subline, text, "", "", "")
     display_control.display()
 
 
@@ -451,7 +456,7 @@ def user_input(bluetooth_active):
         elif button == 0 and btime == 1:  # left and short, "yes"
             set_network(new_wifi, new_pass, new_stratux_ip)
             stratux_ip = new_stratux_ip
-            status_mode = 3
+            status_mode = 11
     elif status_mode == 7:   # input stratux_ip
         if button == 0 and btime == 1:  # left and short, +
             new_stratux_ip = new_stratux_ip[:charpos] + next_number(new_stratux_ip[charpos]) \
