@@ -81,7 +81,7 @@ def read_config():
     except (OSError, IOError, ValueError) as e:
         logging.debug("StatusUI: Error " + str(e) + " reading " + CONFIG_FILE)
         return None
-    logging.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " +
+    logging.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " +
                   json.dumps(config, sort_keys=True, indent=4))
     return config
 
@@ -92,7 +92,7 @@ def write_config(config):
             json.dump(config, out, sort_keys=True, indent=4)
     except (OSError, IOError, ValueError) as e:
         logging.debug("StatusUI: Error " + str(e) + " writing " + CONFIG_FILE)
-    logging.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " +
+    logging.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " +
                   json.dumps(config, sort_keys=True, indent=4))
 
 
