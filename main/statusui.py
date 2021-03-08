@@ -301,7 +301,7 @@ def read_network():
         return ""
 
 
-def set_network(wifi, passw, new_stratux):
+async def set_network(wifi, passw, new_stratux):
     global global_config
 
     global_config['stratux_ip'] = new_stratux
@@ -309,6 +309,9 @@ def set_network(wifi, passw, new_stratux):
     res = subprocess.run(["sudo", "raspi-config", "nonint", "do_wifi_ssid_passphrase", wifi, passw])
     if res != 0:
         logging.debug("STATUSUI: Setting Wifi network failed.")
+        return
+    # wait a second to give the display driver time for a goodbye message
+    await asyncio.sleep(2)
     res = subprocess.run(["sudo", "reboot"])
     if res != 0:
         logging.debug("STATUSUI: Reboot attempt failed.")
