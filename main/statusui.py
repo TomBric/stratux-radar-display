@@ -41,8 +41,10 @@ import asyncio
 import subprocess
 import string
 import ipaddress
+import json
 
 # constants
+CONFIG_FILE = "stratux-radar.conf"
 STATUS_TIMEOUT = 0.3
 BLUETOOTH_SCAN_TIME = 30.0
 BT_SCAN_WAIT = 0.2
@@ -53,6 +55,7 @@ DEFAULT_PASS = "                "
 MAX_WIFI_LENGTH = 16
 
 # globals
+global_config = {'stratux_ip': "192.168.10.1", }
 status_url = ""
 stratux_ip = "0.0.0.0"
 last_status_get = 0.0  # time stamp of the last status request
@@ -69,6 +72,28 @@ new_wifi = DEFAULT_WIFI
 new_pass = DEFAULT_PASS
 new_stratux_ip = stratux_ip
 charpos = 0         # position of current input char
+
+
+def read_config():
+    try:
+        with open(CONFIG_FILE) as f:
+            config = json.load(f)
+    except (OSError, IOError, ValueError) as e:
+        logging.debug("StatusUI: Error " + str(e) + " reading " + CONFIG_FILE)
+        return None
+    logging.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " +
+                  json.dumps(config, sort_keys=True, indent=4))
+    return config
+
+
+def write_config(config):
+    try:
+        with open(CONFIG_FILE, 'wt') as out:
+            json.dump(config, out, sort_keys=True, indent=4)
+    except (OSError, IOError, ValueError) as e:
+        logging.debug("StatusUI: Error " + str(e) + " writing " + CONFIG_FILE)
+    logging.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " +
+                  json.dumps(config, sort_keys=True, indent=4))
 
 
 def init(display_control, url, target_ip, refresh):   # prepare everything
@@ -168,7 +193,7 @@ def draw_status(draw, display_control, bluetooth_active):
         display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
-        subline = "Confirm change"
+        subline = "Confirm change and reboot"
         text = "SSID: " + new_wifi + "\nPass: " + new_pass \
                + "\nStrx: " + new_stratux_ip
         display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
@@ -271,10 +296,17 @@ def read_network():
         return ""
 
 
-def set_network(wifi, passw):
+def set_network(wifi, passw, new_stratux):
+    global global_config
+
+    global_config['stratus_ip'] = new_stratux
+    write_config(global_config)
     res = subprocess.run(["sudo", "raspi-config", "nonint", "do_wifi_ssid_passphrase", wifi, passw])
     if res != 0:
         logging.debug("STATUSUI: Setting Wifi network failed.")
+    res = subprocess.run(["sudo", "reboot"])
+    if res != 0:
+        logging.debug("STATUSUI: Reboot attempt failed.")
 
 
 def next_char(current):
@@ -417,7 +449,7 @@ def user_input(bluetooth_active):
         if button == 2 and btime == 1:  # right and short, "No"
             status_mode = 3
         elif button == 0 and btime == 1:  # left and short, "yes"
-            set_network(new_wifi, new_pass)
+            set_network(new_wifi, new_pass, new_stratux_ip)
             stratux_ip = new_stratux_ip
             status_mode = 3
     elif status_mode == 7:   # input stratux_ip
