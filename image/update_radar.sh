@@ -19,7 +19,7 @@ cd $HOME_DIR || die "$HOME_DIR not found"
 now=$(date +"%F_%H%M%S")
 OLD_VERSION="$RADAR_DIR.$now"
 mv "$RADAR_DIR" "$OLD_VERSION" || echo "Info: No valid old version found."
-rm "$GITHUB_DIR/*"
+rm "$GITHUB_DIR/*.jpg"
 mv "$GITHUB_DIR" "$RADAR_DIR"
 cp "$OLD_VERSION/$CONFIGURATION" "$RADAR_DIR/$CONFIGURATION"  || echo "No old configuration found. Using default."
 

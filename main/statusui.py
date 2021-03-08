@@ -41,8 +41,11 @@ import asyncio
 import subprocess
 import string
 import ipaddress
+import json
+import os
 
 # constants
+CONFIG_FILE = "stratux-radar.conf"
 STATUS_TIMEOUT = 0.3
 BLUETOOTH_SCAN_TIME = 30.0
 BT_SCAN_WAIT = 0.2
@@ -53,8 +56,10 @@ DEFAULT_PASS = "                "
 MAX_WIFI_LENGTH = 16
 
 # globals
+global_config = {'stratux_ip': "192.168.10.1", }
 status_url = ""
 stratux_ip = "0.0.0.0"
+display = None
 last_status_get = 0.0  # time stamp of the last status request
 left = ""           # button text
 middle = ""         # button text
@@ -71,13 +76,37 @@ new_stratux_ip = stratux_ip
 charpos = 0         # position of current input char
 
 
+def read_config():
+    try:
+        with open(CONFIG_FILE) as f:
+            config = json.load(f)
+    except (OSError, IOError, ValueError) as e:
+        logging.debug("StatusUI: Error " + str(e) + " reading " + CONFIG_FILE)
+        return None
+    logging.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " +
+                  json.dumps(config, sort_keys=True, indent=4))
+    return config
+
+
+def write_config(config):
+    try:
+        with open(CONFIG_FILE, 'wt') as out:
+            json.dump(config, out, sort_keys=True, indent=4)
+    except (OSError, IOError, ValueError) as e:
+        logging.debug("StatusUI: Error " + str(e) + " writing " + CONFIG_FILE)
+    logging.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " +
+                  json.dumps(config, sort_keys=True, indent=4))
+
+
 def init(display_control, url, target_ip, refresh):   # prepare everything
     global status_url
     global stratux_ip
     global refresh_time
+    global display
 
     status_url = url
     stratux_ip = target_ip
+    display = display_control
     logging.debug("Status UI: Initialized GET settings to " + status_url)
     refresh_time = refresh
 
@@ -168,7 +197,7 @@ def draw_status(draw, display_control, bluetooth_active):
         display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
-        subline = "Confirm change"
+        subline = "Confirm & reboot"
         text = "SSID: " + new_wifi + "\nPass: " + new_pass \
                + "\nStrx: " + new_stratux_ip
         display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
@@ -197,6 +226,11 @@ def draw_status(draw, display_control, bluetooth_active):
         else:
             text = "unspecified error"
         display_control.text_screen(draw, headline, subline, text, "Canc", "", "Redo")
+    elif status_mode == 11:   # REBOOT DISPLAY
+        headline = "Rebooting"
+        subline = "Please wait ..."
+        text = "New network\nconfig applied."
+        display_control.text_screen(draw, headline, subline, text, "", "", "")
     display_control.display()
 
 
@@ -271,10 +305,19 @@ def read_network():
         return ""
 
 
-def set_network(wifi, passw):
-    res = subprocess.run(["sudo", "raspi-config", "nonint", "do_wifi_ssid_passphrase", wifi, passw])
+def set_network(wifi, passw, new_stratux):
+    global global_config
+
+    global_config['stratux_ip'] = new_stratux
+    write_config(global_config)
+    res = os.system('sudo raspi-config nonint do_wifi_ssid_passphrase ' + wifi + ' ' + passw)
     if res != 0:
         logging.debug("STATUSUI: Setting Wifi network failed.")
+        return
+    logging.debug("STATUSUI: Rebooting!")
+    os.system('sudo reboot')
+    if res != 0:
+        logging.debug("STATUSUI: Reboot attempt failed.")
 
 
 def next_char(current):
@@ -334,8 +377,8 @@ def user_input(bluetooth_active):
             right = ""
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
-    if btime == 0:
-        return 0  # stay in timer mode
+    if btime == 0 and status_mode != 11:   # for 11 do reboot
+        return 0  # stay in current mode
     if button == 1 and btime == 2 and status_mode != 4 and status_mode != 5 and status_mode != 7:  # middle and long
         return 1  # next mode to be radar
     if button == 0 and btime == 2:  # left and long
@@ -417,9 +460,7 @@ def user_input(bluetooth_active):
         if button == 2 and btime == 1:  # right and short, "No"
             status_mode = 3
         elif button == 0 and btime == 1:  # left and short, "yes"
-            set_network(new_wifi, new_pass)
-            stratux_ip = new_stratux_ip
-            status_mode = 3
+            status_mode = 11
     elif status_mode == 7:   # input stratux_ip
         if button == 0 and btime == 1:  # left and short, +
             new_stratux_ip = new_stratux_ip[:charpos] + next_number(new_stratux_ip[charpos]) \
@@ -465,4 +506,7 @@ def user_input(bluetooth_active):
             new_pass = DEFAULT_PASS
             new_stratux_ip = stratux_ip
             status_mode = 3  # display network
+    elif status_mode == 11:  # reboot
+        set_network(new_wifi, new_pass, new_stratux_ip)
+        stratux_ip = new_stratux_ip
     return 7  # no mode change

@@ -551,7 +551,12 @@ if __name__ == "__main__":
         global_mode = 5   # start_in_ahrs mode
     if args['status']:
         global_mode = 7   # start in status mode
-    url_host_base = args['connect']
+    # check config file, if extistent use config from there
+    global_config = statusui.read_config()
+    if global_config is not None:
+        url_host_base = global_config['stratux_ip']
+    else:
+        url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_settings_set = "http://" + url_host_base + "/setSettings"
