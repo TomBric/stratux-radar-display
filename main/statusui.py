@@ -311,7 +311,7 @@ async def set_network(wifi, passw, new_stratux):
         logging.debug("STATUSUI: Setting Wifi network failed.")
         return
     # wait a second to give the display driver time for a goodbye message
-    await asyncio.sleep(2)
+    await asyncio.sleep(1)
     res = subprocess.run(["sudo", "reboot"])
     if res != 0:
         logging.debug("STATUSUI: Reboot attempt failed.")
