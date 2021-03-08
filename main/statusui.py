@@ -315,8 +315,7 @@ def set_network(wifi, passw, new_stratux):
         logging.debug("STATUSUI: Setting Wifi network failed.")
         return
     logging.debug("STATUSUI: Rebooting!")
-    display.cleanup()
-    os.system('sudo reboot')
+    os.system('sleep 2; sudo reboot')
     if res != 0:
         logging.debug("STATUSUI: Reboot attempt failed.")
 
