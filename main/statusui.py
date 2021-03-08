@@ -310,7 +310,7 @@ def set_network(wifi, passw, new_stratux):
 
     global_config['stratux_ip'] = new_stratux
     write_config(global_config)
-    res = os.system('sudo raspi-config nonint do_wifi_ssid_passphrase' + wifi + passw)
+    res = os.system('sudo raspi-config nonint do_wifi_ssid_passphrase ' + wifi + ' ' + passw)
     if res != 0:
         logging.debug("STATUSUI: Setting Wifi network failed.")
         return
