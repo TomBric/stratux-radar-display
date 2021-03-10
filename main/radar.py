@@ -440,6 +440,7 @@ async def display_and_cutoff():
 
     try:
         while True:
+            await asyncio.sleep(MIN_DISPLAY_REFRESH_TIME)
             if display_control.is_busy():
                 await asyncio.sleep(display_refresh_time / 3)
                 # try it several times to be as fast as possible
@@ -467,7 +468,6 @@ async def display_and_cutoff():
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(draw, display_control, bluetooth_active)
-                await asyncio.sleep(MIN_DISPLAY_REFRESH_TIME)
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
