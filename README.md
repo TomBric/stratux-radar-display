@@ -100,12 +100,23 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    ### Bluetooth devices
    
    stratux-radar-display will automatically connect the your headset if their bluetooth is switched on. 
-   But once you need to do the pairing of a new bluetooth device. To do that:
-   1. Logon on your radar as user pi:  ssh pi@192.168.x.x
-   2. Start bluetoothctl:   
+   But once you need to do the pairing of a new bluetooth device. 
+   
+   There are two options for pairing:
+   
+   **Option 1: Directly on the device via buttons:**
+   
+   * Change to Status-Mode (long press middle button, to change from Radar-> Timer -> AHRS -> Status)
+   * Press "scan" (right button). The display now scans 30 secs for new devices. Set your headset as visible and it will be detected (For Bose A20 this is a 5 second press on the Bluetooth-Button until it flashes blue-red)
+   * A list of detected devices is shown, press "yes" for the detected device
+      
+   **Option 2: via ssh and bluetoothctl**
+   
+   * Logon on your radar as user pi:  ssh pi@192.168.x.x
+   * Start bluetoothctl:   
    ```
       -> bluetoothctl
-      -> scan on      set your device in pairing mode (for Bose A20, do a long press on the bluetooth button until it flashes magenta)
+      -> scan on      set your device in pairing mode (for Bose A20, do a 5 sec press on the bluetooth button until it flashes magenta)
       -> wait till your device is displayed, this will look like:  
             [NEW] Device 04:52:C7:02:C0:01 Bose A20,              04:52:C7:02:C0:01 is the device id, which will be different for you
       -> scan off
