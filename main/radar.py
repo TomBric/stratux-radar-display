@@ -358,7 +358,7 @@ async def listen_forever(path, name, callback):
                             logging.debug(name + ': Watchdog detected connection loss.' +
                                                  ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
-                            break
+                        break
                     except websockets.exceptions.ConnectionClosed:
                         logging.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
