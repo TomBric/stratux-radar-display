@@ -123,6 +123,7 @@ def draw_display(draw):
     global aircraft_changed
     global ui_changed
 
+    logging.debug("List of all aircraft > " + json.dumps(all_ac))
     if situation['was_changed'] or aircraft_changed or ui_changed:
         # display is only triggered if there was a change
         display_control.clear(draw)
@@ -259,7 +260,7 @@ def new_traffic(json_str):
             return
             # unspecified altitude, nothing displayed for now, leave it as it is
         distcirc = traffic['DistanceEstimated'] / 1852.0
-        logging.debug("Mode-S Traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
+        logging.debug("RADAR: Mode-S traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
         distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
         if is_new or 'circradius' not in ac:
             # calc argposition if new or adsb before
@@ -472,7 +473,7 @@ async def display_and_cutoff():
             cutoff = time.time() - RADAR_CUTOFF
             for icao, ac in all_ac.items():
                 if ac['last_contact_timestamp'] < cutoff:
-                    logging.debug("Cutting of " + str(icao))
+                    logging.debug("Cutting of " + hex(icao))
                     to_delete.append(icao)
                     aircraft_changed = True
             for i in to_delete:
