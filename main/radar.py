@@ -352,13 +352,13 @@ async def listen_forever(path, name, callback):
                         message = await asyncio.wait_for(ws.recv(), timeout=CHECK_CONNECTION_TIMEOUT)
                         # message = await ws.recv()
                     except asyncio.TimeoutError:
-                        # No situation received in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
+                        # No situation received or traffic in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
                         logging.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
                             logging.debug(name + ': Watchdog detected connection loss.' +
                                                  ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
-                        break
+                            break
                     except websockets.exceptions.ConnectionClosed:
                         logging.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
@@ -367,7 +367,7 @@ async def listen_forever(path, name, callback):
                     except asyncio.CancelledError:
                         print(name + " shutting down ... ")
                         return
-                    if message is not None:
+                    else:
                         callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
