@@ -59,7 +59,6 @@ MAX_WIFI_LENGTH = 16
 global_config = {'stratux_ip': "192.168.10.1", }
 status_url = ""
 stratux_ip = "0.0.0.0"
-display = None
 last_status_get = 0.0  # time stamp of the last status request
 left = ""           # button text
 middle = ""         # button text
@@ -102,11 +101,9 @@ def init(display_control, url, target_ip, refresh):   # prepare everything
     global status_url
     global stratux_ip
     global refresh_time
-    global display
 
     status_url = url
     stratux_ip = target_ip
-    display = display_control
     logging.debug("Status UI: Initialized GET settings to " + status_url)
     refresh_time = refresh
 

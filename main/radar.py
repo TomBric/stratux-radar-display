@@ -123,6 +123,7 @@ def draw_display(draw):
     global aircraft_changed
     global ui_changed
 
+    logging.debug("List of all aircraft > " + json.dumps(all_ac))
     if situation['was_changed'] or aircraft_changed or ui_changed:
         # display is only triggered if there was a change
         display_control.clear(draw)
@@ -259,7 +260,7 @@ def new_traffic(json_str):
             return
             # unspecified altitude, nothing displayed for now, leave it as it is
         distcirc = traffic['DistanceEstimated'] / 1852.0
-        logging.debug("Mode-S Traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
+        logging.debug("RADAR: Mode-S traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
         distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
         if is_new or 'circradius' not in ac:
             # calc argposition if new or adsb before
@@ -351,7 +352,7 @@ async def listen_forever(path, name, callback):
                         message = await asyncio.wait_for(ws.recv(), timeout=CHECK_CONNECTION_TIMEOUT)
                         # message = await ws.recv()
                     except asyncio.TimeoutError:
-                        # No situation received in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
+                        # No situation received or traffic in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
                         logging.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
                             logging.debug(name + ': Watchdog detected connection loss.' +
@@ -366,7 +367,7 @@ async def listen_forever(path, name, callback):
                     except asyncio.CancelledError:
                         print(name + " shutting down ... ")
                         return
-                    if message is not None:
+                    else:
                         callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
@@ -439,6 +440,7 @@ async def display_and_cutoff():
 
     try:
         while True:
+            await asyncio.sleep(MIN_DISPLAY_REFRESH_TIME)
             if display_control.is_busy():
                 await asyncio.sleep(display_refresh_time / 3)
                 # try it several times to be as fast as possible
@@ -466,13 +468,12 @@ async def display_and_cutoff():
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(draw, display_control, bluetooth_active)
-                await asyncio.sleep(MIN_DISPLAY_REFRESH_TIME)
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
             for icao, ac in all_ac.items():
                 if ac['last_contact_timestamp'] < cutoff:
-                    logging.debug("Cutting of " + str(icao))
+                    logging.debug("Cutting of " + hex(icao))
                     to_delete.append(icao)
                     aircraft_changed = True
             for i in to_delete:
