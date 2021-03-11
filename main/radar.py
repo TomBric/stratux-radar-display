@@ -49,7 +49,7 @@ import statusui
 import importlib
 
 # constant definitions
-RADAR_VERSION = "1.0d"
+RADAR_VERSION = "1.0e"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
