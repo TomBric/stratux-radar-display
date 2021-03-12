@@ -161,7 +161,7 @@ def startup(draw, version, target_ip, seconds):
     time.sleep(seconds)
 
 
-def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
+def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     p1 = posn(270 + direction, 2 * AIRCRAFT_SIZE)
     p2 = posn(270 + direction + 150, 4 * AIRCRAFT_SIZE)
     p3 = posn(270 + direction + 180, 2 * AIRCRAFT_SIZE)
@@ -189,7 +189,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
     draw.text(tposition, t, font=largefont, fill="white")
 
 
-def modesaircraft(draw, radius, height, arcposition):
+def modesaircraft(draw, radius, height, arcposition, tail):
     if radius < MINIMAL_CIRCLE:
         radius = MINIMAL_CIRCLE
     draw.ellipse((64 - radius, 64 - radius, 64 + radius, 64 + radius), width=3, outline="white")

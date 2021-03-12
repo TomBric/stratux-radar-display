@@ -103,8 +103,12 @@ def draw_all_ac(draw, allac):
     for icao, ac in dist_sorted:
         # first draw mode-s
         if 'circradius' in ac:
+            if 'tail' in ac:
+                tail = ac['tail']
+            else:
+                tail = None
             if ac['circradius'] <= max_pixel / 2:
-                display_control.modesaircraft(draw, ac['circradius'], ac['height'], ac['arcposition'])
+                display_control.modesaircraft(draw, ac['circradius'], ac['height'], ac['arcposition'], tail)
     for icao, ac in dist_sorted:
         # then draw adsb
         if 'x' in ac:
@@ -113,8 +117,12 @@ def draw_all_ac(draw, allac):
                     line_length = ac['nspeed_length']
                 else:
                     line_length = 0
+                if 'tail' in ac:
+                    tail = ac['tail']
+                else:
+                    tail = None
                 display_control.aircraft(draw, ac['x'], ac['y'], ac['direction'], ac['height'], ac['vspeed'],
-                                         line_length)
+                                         line_length, tail)
 
 
 def draw_display(draw):
@@ -213,6 +221,8 @@ def new_traffic(json_str):
     if traffic['Speed_valid']:
         ac['nspeed'] = traffic['Speed']
     ac['vspeed'] = traffic['Vvel']
+    if traffic['Tail']:
+        ac['tail'] = traffic['Tail']
 
     if traffic['Position_valid'] and situation['gps_active']:
         # adsb traffic and stratux has valid gps signal

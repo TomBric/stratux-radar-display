@@ -186,7 +186,7 @@ def startup(draw, version, target_ip, seconds):
     time.sleep(seconds)
 
 
-def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
+def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     p1 = posn(direction, 2 * AIRCRAFT_SIZE)
     p2 = posn(direction + 150, 4 * AIRCRAFT_SIZE)
     p3 = posn(direction + 180, 2 * AIRCRAFT_SIZE)
@@ -210,11 +210,16 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
         tposition = (x - 4 * AIRCRAFT_SIZE - tsize[0], int(y - tsize[1] / 2))
     else:
         tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - tsize[1] / 2))
-    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + tsize[1])), fill="white")
+    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
     draw.text(tposition, t, font=largefont, fill="black")
+    if tail is not None:
+        tsize = draw.textsize(tail, smallfont)
+        draw.rectangle((tposition[0], tposition[1]+LARGE, tposition[0]+tsize[0],
+                        tposition[1]+LARGE+SMALL), fill="white")
+        draw.text((tposition[0], tposition[1] + LARGE), tail, font=smallfont, fill="black")
 
 
-def modesaircraft(draw, radius, height, arcposition):
+def modesaircraft(draw, radius, height, arcposition, tail):
     if radius < MINIMAL_CIRCLE:
         radius = MINIMAL_CIRCLE
     draw.ellipse((zerox-radius, zeroy-radius, zerox+radius, zeroy+radius), width=3, outline="black")
@@ -226,8 +231,13 @@ def modesaircraft(draw, radius, height, arcposition):
     t = signchar+str(abs(height))
     tsize = draw.textsize(t, largefont)
     tposition = (zerox+arctext[0]-tsize[0]/2, zeroy+arctext[1]-tsize[1]/2)
-    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+tsize[1])), fill="white")
+    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+LARGE)), fill="white")
     draw.text(tposition, t, font=largefont, fill="black")
+    if tail is not None:
+        tsize = draw.textsize(tail, smallfont)
+        tposition = (zerox + arctext[0] - tsize[0] / 2, zeroy + LARGE + arctext[1] - tsize[1] / 2)
+        draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + tsize[1])), fill="white")
+        draw.text(tposition, tail, font=smallfont, fill="black")
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
