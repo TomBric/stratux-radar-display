@@ -235,9 +235,9 @@ def modesaircraft(draw, radius, height, arcposition, tail):
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
         tsize = draw.textsize(tail, verysmallfont)
-        tposition = (zerox + arctext[0] - tsize[0] / 2, zeroy + LARGE + arctext[1] - tsize[1] / 2)
-        draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + tsize[1])), fill="white")
-        draw.text(tposition, tail, font=verysmallfont, fill="black")
+        draw.rectangle((tposition[0], tposition[1] + LARGE, tposition[0] + tsize[0],
+                        tposition[1] + LARGE + VERYSMALL), fill="white")
+        draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
