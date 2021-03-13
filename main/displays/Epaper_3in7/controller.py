@@ -219,7 +219,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
-def modesaircraft(draw, radius, height, arcposition, tail):
+def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
     if radius < MINIMAL_CIRCLE:
         radius = MINIMAL_CIRCLE
     draw.ellipse((zerox-radius, zeroy-radius, zerox+radius, zeroy+radius), width=3, outline="black")
@@ -229,6 +229,10 @@ def modesaircraft(draw, radius, height, arcposition, tail):
     else:
         signchar = "-"
     t = signchar+str(abs(height))
+    if vspeed > 0:
+        t = t + '\u2197'
+    if vspeed < 0:
+        t = t + '\u2198'
     tsize = draw.textsize(t, largefont)
     tposition = (zerox+arctext[0]-tsize[0]/2, zeroy+arctext[1]-tsize[1]/2)
     draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+LARGE)), fill="white")

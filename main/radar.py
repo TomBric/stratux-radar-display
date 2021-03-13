@@ -109,7 +109,8 @@ def draw_all_ac(draw, allac):
             else:
                 tail = None
             if ac['circradius'] <= max_pixel / 2:
-                display_control.modesaircraft(draw, ac['circradius'], ac['height'], ac['arcposition'], tail)
+                display_control.modesaircraft(draw, ac['circradius'], ac['height'], ac['arcposition'], ac['vspeed'],
+                                              tail)
     for icao, ac in dist_sorted:
         # then draw adsb
         if 'x' in ac:
