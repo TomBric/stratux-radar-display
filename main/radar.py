@@ -564,9 +564,11 @@ if __name__ == "__main__":
     if args['status']:
         global_mode = 7   # start in status mode
     # check config file, if extistent use config from there
-    global_config = statusui.read_config()
-    if global_config is not None:
-        url_host_base = global_config['stratux_ip']
+    saved_config = statusui.read_config()
+    if saved_config is not None:
+        url_host_base = saved_config['stratux_ip']
+        if 'display_tail' in saved_config:
+            global_config['display_tail'] = saved_config['display_tail']
     else:
         url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
