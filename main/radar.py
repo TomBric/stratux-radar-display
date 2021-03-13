@@ -82,6 +82,7 @@ situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
 # ahrs information, values are all rounded to integer
+global_config = {'stratux_ip': "192.168.10.1", 'display_tail': True}
 
 max_pixel = 0
 zerox = 0
@@ -103,7 +104,7 @@ def draw_all_ac(draw, allac):
     for icao, ac in dist_sorted:
         # first draw mode-s
         if 'circradius' in ac:
-            if 'tail' in ac:
+            if global_config['display_tail'] and 'tail' in ac:
                 tail = ac['tail']
             else:
                 tail = None
@@ -117,7 +118,7 @@ def draw_all_ac(draw, allac):
                     line_length = ac['nspeed_length']
                 else:
                     line_length = 0
-                if 'tail' in ac:
+                if global_config['display_tail'] and 'tail' in ac:
                     tail = ac['tail']
                 else:
                     tail = None
@@ -520,7 +521,7 @@ def main():
         bluetooth_active = radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     ahrsui.init(display_control)
-    statusui.init(display_control, url_status_get, url_host_base, display_refresh_time)
+    statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())

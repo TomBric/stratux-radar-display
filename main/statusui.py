@@ -56,7 +56,7 @@ DEFAULT_PASS = "                "
 MAX_WIFI_LENGTH = 16
 
 # globals
-global_config = {'stratux_ip': "192.168.10.1", }
+global_config = {}
 status_url = ""
 stratux_ip = "0.0.0.0"
 last_status_get = 0.0  # time stamp of the last status request
@@ -97,15 +97,17 @@ def write_config(config):
                   json.dumps(config, sort_keys=True, indent=4))
 
 
-def init(display_control, url, target_ip, refresh):   # prepare everything
+def init(display_control, url, target_ip, refresh, config):   # prepare everything
     global status_url
     global stratux_ip
     global refresh_time
+    global global_config
 
     status_url = url
     stratux_ip = target_ip
     logging.debug("Status UI: Initialized GET settings to " + status_url)
     refresh_time = refresh
+    global_config = config
 
 
 def get_status():
@@ -175,7 +177,7 @@ def draw_status(draw, display_control, bluetooth_active):
         display_control.text_screen(draw, headline, subline, text, left, middle, right)
     elif status_mode == 3:  # display network information
         display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID:\n" + wifi_ssid + "\nStratux-IP:\n" + stratux_ip,
-                                    "", "Cont", "Chg")
+                                    "Opt", "Cont", "Chg")
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
         subline = "WIFI SSID"
@@ -228,6 +230,11 @@ def draw_status(draw, display_control, bluetooth_active):
         subline = "Please wait ..."
         text = "New network\nconfig applied."
         display_control.text_screen(draw, headline, subline, text, "", "", "")
+    elif status_mode == 12:   # Options Registration
+        headline = "Options"
+        subline = "Please select ..."
+        text = "Show registration?"
+        display_control.text_screen(draw, headline, subline, text, "Yes", "Canc", "No")
     display_control.display()
 
 
@@ -421,6 +428,8 @@ def user_input(bluetooth_active):
             status_mode = 4
         if button == 1 and btime == 1:  # middle and short, go back to normal status
             status_mode = 0
+        if button == 0 and btime == 1:  # left and short, go to options
+            status_mode = 12
     elif status_mode == 4:  # change network
         if button == 0 and btime == 1:  # left and short, +
             new_wifi = new_wifi[:charpos] + next_char(new_wifi[charpos]) + new_wifi[charpos+1:]
@@ -506,4 +515,14 @@ def user_input(bluetooth_active):
     elif status_mode == 11:  # reboot
         set_network(new_wifi, new_pass, new_stratux_ip)
         stratux_ip = new_stratux_ip
+    elif status_mode == 12:  # Set Options Display Registration
+        if button == 2 and btime == 1:  # No, do not display registration
+            global_config['display_tail'] = False
+            write_config(global_config)
+            status_mode = 3
+        if button == 0 and btime == 1:  # yes, do  display registration
+            global_config['display_tail'] = True
+            write_config(global_config)
+            status_mode = 3
+
     return 7  # no mode change
