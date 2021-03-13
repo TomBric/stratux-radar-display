@@ -524,5 +524,7 @@ def user_input(bluetooth_active):
             global_config['display_tail'] = True
             write_config(global_config)
             status_mode = 3
+        if button == 1 and btime == 1:  # cancel
+            status_mode = 3
 
     return 7  # no mode change

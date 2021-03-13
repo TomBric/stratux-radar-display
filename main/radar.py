@@ -82,7 +82,7 @@ situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
 # ahrs information, values are all rounded to integer
-global_config = {'stratux_ip': "192.168.10.1", 'display_tail': True}
+global_config = {'display_tail': True}
 
 max_pixel = 0
 zerox = 0
@@ -564,13 +564,13 @@ if __name__ == "__main__":
     if args['status']:
         global_mode = 7   # start in status mode
     # check config file, if extistent use config from there
+    url_host_base = args['connect']
     saved_config = statusui.read_config()
     if saved_config is not None:
-        url_host_base = saved_config['stratux_ip']
+        if 'stratux_ip' in saved_config:
+            url_host_base = saved_config['stratux_ip']   # set stratux ip if interactively changed one time
         if 'display_tail' in saved_config:
             global_config['display_tail'] = saved_config['display_tail']
-    else:
-        url_host_base = args['connect']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_settings_set = "http://" + url_host_base + "/setSettings"
