@@ -82,7 +82,7 @@ situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
 # ahrs information, values are all rounded to integer
-global_config = {'display_tail': True}
+global_config = {}
 
 max_pixel = 0
 zerox = 0
@@ -549,6 +549,8 @@ if __name__ == "__main__":
     ap.add_argument("-x", "--status", required=False, help="Start mode is status", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
+    ap.add_argument("-r", "--registration", required=False, help="Display registration no",
+                    action="store_true", default=False)
     args = vars(ap.parse_args())
     if args['verbose']:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)-15s > %(message)s')
@@ -563,6 +565,7 @@ if __name__ == "__main__":
         global_mode = 5   # start_in_ahrs mode
     if args['status']:
         global_mode = 7   # start in status mode
+    global_config['display_tail'] = args['registration'] # display registration if set
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()
