@@ -145,7 +145,7 @@ def init():
     device.display_1Gray(device.getbuffer_optimized(epaper_image))
     end = time.time()
     display_refresh = end-start
-    logging.info("Measured Display Refresh Time: " + str(display_refresh) + " seconds")
+    logging.info("Measured Display Refresh Time: " + str(round(display_refresh,3)) + " seconds")
     return draw, max_pixel, zerox, zeroy, display_refresh
 
 
