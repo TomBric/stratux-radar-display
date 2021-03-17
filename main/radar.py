@@ -46,6 +46,7 @@ import timerui
 import shutdownui
 import ahrsui
 import statusui
+import gmeterui
 import importlib
 
 # constant definitions
@@ -81,6 +82,7 @@ situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_
              'gps_quality': 0, 'gps_h_accuracy': 20000}
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
+gmeter = {'was_changed': True, 'current:': 0.0, 'max': 0.0, 'min': 0.0}
 # ahrs information, values are all rounded to integer
 global_config = {}
 
@@ -95,7 +97,7 @@ bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
 global_mode = 1
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
-# 7=status 8=refresh from status   0=Init
+# 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 0=Init
 bluetooth_active = False
 
 
@@ -302,6 +304,7 @@ def new_situation(json_str):
         situation['connected'] = True
         situation['was_changed'] = True
         ahrs['was_changed'] = True   # connection also relevant for ahrs
+        gmeter['was_changed'] = True  # connection also relevant for ahrs
     gps_active = sit['GPSHorizontalAccuracy'] < 19999
     if situation['gps_active'] != gps_active:
         situation['gps_active'] = gps_active
@@ -348,6 +351,19 @@ def new_situation(json_str):
         ahrs['ahrs_sensor'] = ahrs_flag
         ahrs['was_changed'] = True
 
+    current = round(sit['AHRSGload'], 2)
+    if gmeter['current'] != current:
+        gmeter['current'] = current
+        gmeter['was_changed'] = True
+    max = round(sit['AHRSGloadMax'], 2)
+    if gmeter['max'] != max:
+        gmeter['max'] = max
+        gmeter['was_changed'] = True
+    min = round(sit['AHRSGloadMin'], 2)
+    if gmeter['min'] != min:
+        gmeter['min'] = min
+        gmeter['was_changed'] = True
+
 
 async def listen_forever(path, name, callback):
     print(name + " waiting for " + path)
@@ -389,6 +405,7 @@ async def listen_forever(path, name, callback):
                 situation['connected'] = False
                 ahrs['was_changed'] = True
                 situation['was_changed'] = True
+                gmeter['was_changed'] = True
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
 
@@ -425,6 +442,9 @@ async def user_interface():
                 next_mode = ahrsui.user_input()
             elif global_mode == 7:  # status
                 next_mode = statusui.user_input(bluetooth_active)
+            elif global_mode == 9:  # gmeter
+                next_mode = gmeterui.user_input()
+
 
             if next_mode > 0:
                 ui_changed = True
@@ -474,12 +494,23 @@ async def display_and_cutoff():
                     ahrsui.draw_ahrs(draw, display_control, situation['connected'], ahrs['was_changed'], ahrs['pitch'],
                                      ahrs['roll'], ahrs['heading'], ahrs['slipskid'], ahrs['gps_hor_accuracy'],
                                      ahrs['ahrs_sensor'])
+                    ahrs['was_changed'] = False
                 elif global_mode == 6:   # refresh display, only relevant for epaper, mode was radar
                     logging.debug("AHRS: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(draw, display_control, bluetooth_active)
+                elif global_mode == 8:   # refresh display, only relevant for epaper, mode was status
+                    logging.debug("Status: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 7
+                elif global_mode == 9:  # gmeter display
+                    gmeterui.draw_gmeter(draw, display_control, situation['connected'], gmeter)
+                elif global_mode == 10:   # refresh display, only relevant for epaper, mode was gmeter
+                    logging.debug("Gmeter: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 9
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
@@ -497,6 +528,7 @@ async def display_and_cutoff():
                     situation['connected'] = False
                     situation['was_changed'] = True
                     ahrs['was_changed'] = True
+                    gmeter['was_changed'] = True
                     logging.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
     except (asyncio.CancelledError, RuntimeError):
         print("Display task terminating ...")
@@ -523,6 +555,7 @@ def main():
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     ahrsui.init(display_control)
     statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
+    gmeterui.init(url_gmeter_reset)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())
@@ -579,6 +612,7 @@ if __name__ == "__main__":
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_settings_set = "http://" + url_host_base + "/setSettings"
     url_status_get = "http://" + url_host_base + "/getStatus"
+    url_gmeter_reset = "http://" + url_host_base + "/resetGMeter"
 
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint

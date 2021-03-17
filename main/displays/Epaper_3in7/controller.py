@@ -303,6 +303,10 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
     centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
 
 
+def gmeter(draw, current, max, min, error_message):
+    pass
+
+
 def shutdown(draw, countdown):
     message = "Shutdown "
     centered_text(draw, 10, message, largefont, fill="black")
