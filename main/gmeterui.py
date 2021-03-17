@@ -56,8 +56,8 @@ def reset_gmeter():
         logging.debug("Posting gmeter-reset exception: ", e)
 
 
-def draw_gmeter(draw, display_control, connected, gmeter):
-    if gmeter['was_changed']:
+def draw_gmeter(draw, display_control, ui_changed, connected, gmeter):
+    if ui_changed or gmeter['was_changed']:
         gmeter['was_changed'] = False
         error_message = None
         if not connected:

@@ -491,9 +491,9 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 1
                 elif global_mode == 5:   # ahrs'
-                    ahrsui.draw_ahrs(draw, display_control, situation['connected'], ahrs['was_changed'], ahrs['pitch'],
-                                     ahrs['roll'], ahrs['heading'], ahrs['slipskid'], ahrs['gps_hor_accuracy'],
-                                     ahrs['ahrs_sensor'])
+                    ahrsui.draw_ahrs(draw, display_control, situation['connected'], ui_changed or ahrs['was_changed'],
+                                     ahrs['pitch'],ahrs['roll'], ahrs['heading'], ahrs['slipskid'],
+                                     ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
                     ahrs['was_changed'] = False
                 elif global_mode == 6:   # refresh display, only relevant for epaper, mode was radar
                     logging.debug("AHRS: Display driver - Refreshing")
@@ -506,7 +506,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 7
                 elif global_mode == 9:  # gmeter display
-                    gmeterui.draw_gmeter(draw, display_control, situation['connected'], gmeter)
+                    gmeterui.draw_gmeter(draw, display_control, ui_changed, situation['connected'], gmeter)
                 elif global_mode == 10:   # refresh display, only relevant for epaper, mode was gmeter
                     logging.debug("Gmeter: Display driver - Refreshing")
                     display_control.refresh()
