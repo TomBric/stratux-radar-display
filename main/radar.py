@@ -581,6 +581,7 @@ if __name__ == "__main__":
     ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
     ap.add_argument("-a", "--ahrs", required=False, help="Start mode is ahrs", action='store_true', default=False)
     ap.add_argument("-x", "--status", required=False, help="Start mode is status", action='store_true', default=False)
+    ap.add_argument("-g", "--gmeter", required=False, help="Start mode is g-meter", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no",
@@ -599,6 +600,8 @@ if __name__ == "__main__":
         global_mode = 5   # start_in_ahrs mode
     if args['status']:
         global_mode = 7   # start in status mode
+    if args['gmeter']:
+        global_mode = 9   # start in g-meter mode
     global_config['display_tail'] = args['registration'] # display registration if set
     # check config file, if extistent use config from there
     url_host_base = args['connect']
