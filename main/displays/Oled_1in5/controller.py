@@ -126,6 +126,11 @@ def centered_text(draw, y, text, font, fill):
     draw.text((zerox - ts[0] / 2, y), text, font=font, fill=fill)
 
 
+def right_text(draw, y, text, font, fill):
+    ts = draw.textsize(text, font)
+    draw.text((sizex - ts[0], y), text, font=font, fill=fill)
+
+
 def display():
     device.display(image)
 
@@ -274,14 +279,14 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 def gmeter(draw, current, maxg, ming, error_message):
     centered_text(draw, 0, "G-Meter", largefont, fill="yellow")
     draw.text((0, LARGE+SMALL), "max", font=smallfont, fill="cyan")
-    centered_text(draw, LARGE+SMALL, "{:1.2f}".format(maxg),largefont, fill="magenta")
+    right_text(draw, LARGE+SMALL, "{:1.2f}".format(maxg),largefont, fill="magenta")
     if error_message is None:
-        draw.text((0, 2*LARGE+SMALL), "current", font=smallfont, fill="cyan")
-        centered_text(draw, 2*LARGE+SMALL, "{:1.2f}".format(current), verylargefont, fill="white")
+        draw.text((0, 2*LARGE+SMALL+LARGE/2), "current", font=smallfont, fill="cyan")
+        right_text(draw, 2*LARGE+SMALL, "{:1.2f}".format(current), verylargefont, fill="white")
     else:
         centered_text(draw, 2 * LARGE + 2 * SMALL, error_message, verylargefont, fill="red")
-    draw.text((0, 2*LARGE+2*SMALL+VERYLARGE), "min", font=smallfont, fill="cyan")
-    centered_text(draw, 2*LARGE+2*SMALL+VERYLARGE, "{:1.2f}".format(ming), largefont, fill="magenta")
+    draw.text((0, 2*LARGE+SMALL+VERYLARGE), "min", font=smallfont, fill="cyan")
+    right_text(draw, 2*LARGE+SMALL+VERYLARGE, "{:1.2f}".format(ming), largefont, fill="magenta")
 
 
     right = "Reset"
