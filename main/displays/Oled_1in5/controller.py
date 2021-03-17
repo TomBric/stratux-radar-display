@@ -273,15 +273,15 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 def gmeter(draw, current, maxg, ming, error_message):
     centered_text(draw, 0, "G-Meter", largefont, fill="yellow")
-    draw.text((0, LARGE), "max", font=smallfont, fill="cyan")
-    centered_text(draw, LARGE+SMALL, str(maxg),largefont, fill="magenta")
+    draw.text((0, LARGE+SMALL), "max", font=smallfont, fill="cyan")
+    centered_text(draw, LARGE+SMALL, "{:1.2f}".format(maxg),largefont, fill="magenta")
     if error_message is None:
         draw.text((0, 2*LARGE+SMALL), "current", font=smallfont, fill="cyan")
-        centered_text(draw, 2*LARGE+2*SMALL, str(current), verylargefont, fill="white")
+        centered_text(draw, 2*LARGE+SMALL, "{:1.2f}".format(current), verylargefont, fill="white")
     else:
         centered_text(draw, 2 * LARGE + 2 * SMALL, error_message, verylargefont, fill="red")
-    draw.text((0, 2*LARGE + 2*SMALL+ VERYLARGE), "min", font=smallfont, fill="cyan")
-    centered_text(draw, 2*LARGE + 2*SMALL + VERYLARGE, str(ming), largefont, fill="magenta")
+    draw.text((0, 2*LARGE+2*SMALL+VERYLARGE), "min", font=smallfont, fill="cyan")
+    centered_text(draw, 2*LARGE+2*SMALL+VERYLARGE, "{:1.2f}".format(ming), largefont, fill="magenta")
 
 
     right = "Reset"
