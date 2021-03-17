@@ -82,7 +82,7 @@ situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_
              'gps_quality': 0, 'gps_h_accuracy': 20000}
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
-gmeter = {'was_changed': True, 'current:': 0.0, 'max': 0.0, 'min': 0.0}
+gmeter = {'was_changed': True, 'current': 0.0, 'max': 0.0, 'min': 0.0}
 # ahrs information, values are all rounded to integer
 global_config = {}
 
