@@ -44,7 +44,6 @@ url_gmeter_reset = ""
 def init(url):
     global url_gmeter_reset
 
-    radarbuttons.init()
     url_gmeter_reset = url
     logging.debug("GMeterUI: Initialized POST settings to " + url_gmeter_reset)
 
