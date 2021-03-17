@@ -351,15 +351,15 @@ def new_situation(json_str):
         ahrs['ahrs_sensor'] = ahrs_flag
         ahrs['was_changed'] = True
 
-    current = round(sit['AHRSGload'], 2)
+    current = round(sit['AHRSGLoad'], 2)
     if gmeter['current'] != current:
         gmeter['current'] = current
         gmeter['was_changed'] = True
-    max = round(sit['AHRSGloadMax'], 2)
+    max = round(sit['AHRSGLoadMax'], 2)
     if gmeter['max'] != max:
         gmeter['max'] = max
         gmeter['was_changed'] = True
-    min = round(sit['AHRSGloadMin'], 2)
+    min = round(sit['AHRSGLoadMin'], 2)
     if gmeter['min'] != min:
         gmeter['min'] = min
         gmeter['was_changed'] = True
