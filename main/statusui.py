@@ -384,7 +384,7 @@ def user_input(bluetooth_active):
     if btime == 0 and status_mode != 11:   # for 11 do reboot
         return 0  # stay in current mode
     if button == 1 and btime == 2 and status_mode != 4 and status_mode != 5 and status_mode != 7:  # middle and long
-        return 1  # next mode to be radar
+        return 9  # next mode to be gmeter
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if status_mode == 0:   # normal status display
