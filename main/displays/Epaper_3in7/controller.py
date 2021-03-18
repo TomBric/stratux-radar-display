@@ -309,15 +309,34 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    centered_text(draw, 0, "G-Meter", verylargefont, fill="black")
-    draw.text((5, 88), "max", font=smallfont, fill="black")
+    azerox = 200  # zero for analogue meter
+    azeroy = 120
+    asize = 240
+    msize = 15  # size of markings
+    m_marks = ((180, 3), (202.5, 2), (225, 1), (247.5, 0), (270, 1), (292.5, 1), (315, 2), (337.5, 3), (0, 4))
+    for m in m_marks:
+        s = math.sin(math.radians(m[0]))
+        c = math.cos(math.radians(m[0]))
+        draw.line((azerox-asize*c, azeroy-asize*s, azerox-(asize-msize)*c, azeroy-(asize-msize)*s),
+                  fill="black", width=4)
+        draw.text((azerox-(asize-msize+LARGE/2)*c-LARGE/2, azeroy-(asize-msize+LARGE/2)*s-LARGE/2),
+                  str(m[1]), largefont, fill="black")
+    draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=3, fill="black")
+    draw.ellipse((azerox-5, azeroy-5, azerox+5, azeroy+5), outline="black", fill="black", width=1)
+    gval = -(5-current)*20
+    s = math.sin(math.radians(gval))
+    c = math.cos(math.radians(gval))
+    draw.line((azerox-(asize-msize)*c, azeroy-(asize-msize)*s, azerox, azeroy), fill="black", width=6)
+
+    draw.text((zerox, 0), "G-Meter", verylargefont, fill="black")
+    draw.text((zerox, 88), "max", font=smallfont, fill="black")
     right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
-        draw.text((5, 138), "current", font=smallfont, fill="black")
+        draw.text((zerox, 138), "current", font=smallfont, fill="black")
         right_text(draw, 126, "{:+1.2f}".format(current), verylargefont, fill="black")
     else:
-        centered_text(draw, 126, error_message, largefont, fill="black")
-    draw.text((5, 188), "min", font=smallfont, fill="black")
+        centered_text(draw, 126, error_message, verylargefont, fill="black")
+    draw.text((zerox, 188), "min", font=smallfont, fill="black")
     right_text(draw, 185, "{:+1.2f}".format(ming), largefont, fill="black")
 
     right = "Reset"
