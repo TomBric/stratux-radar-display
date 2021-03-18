@@ -75,7 +75,7 @@ def user_input():
         return 0  # stay in timer mode
     ahrs_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
-        return 7  # next mode to be status display
+        return 9  # next mode to be gmeter
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long- refresh
