@@ -328,7 +328,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     c = math.cos(math.radians(gval))
     draw.line((azerox-(asize-msize)*c, azeroy-(asize-msize)*s, azerox, azeroy), fill="black", width=6)
 
-    draw.text((zerox, 0), "G-Meter", verylargefont, fill="black")
+    draw.text((zerox, 0), "G-Meter", font=verylargefont, fill="black")
     draw.text((zerox, 88), "max", font=smallfont, fill="black")
     right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
