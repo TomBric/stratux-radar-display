@@ -69,6 +69,11 @@ draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
 PITCH_SCALE = 4.0
+azerox = 140  # zero for analogue meter
+azeroy = 140
+asize = 140
+msize = 15  # size of markings
+m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
 # end device globals
 
 
@@ -145,7 +150,7 @@ def init():
     device.display_1Gray(device.getbuffer_optimized(epaper_image))
     end = time.time()
     display_refresh = end-start
-    logging.info("Measured Display Refresh Time: " + str(display_refresh) + " seconds")
+    logging.info("Measured Display Refresh Time: " + str(round(display_refresh, 3)) + " seconds")
     return draw, max_pixel, zerox, zeroy, display_refresh
 
 
@@ -175,6 +180,11 @@ def centered_text(draw, y, text, font, fill):
     draw.text((zerox - ts[0] / 2, y), text, font=font, fill=fill)
 
 
+def right_text(draw, y, text, font, fill):
+    ts = draw.textsize(text, font)
+    draw.text((sizex-5-ts[0], y), text, font=font, fill=fill)
+
+
 def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
     logo = Image.open(logopath)
@@ -186,7 +196,7 @@ def startup(draw, version, target_ip, seconds):
     time.sleep(seconds)
 
 
-def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
+def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     p1 = posn(direction, 2 * AIRCRAFT_SIZE)
     p2 = posn(direction + 150, 4 * AIRCRAFT_SIZE)
     p3 = posn(direction + 180, 2 * AIRCRAFT_SIZE)
@@ -201,20 +211,25 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
     else:
         t = "-" + str(abs(height))
     if vspeed > 0:
-        t = t + '\u2191'
+        t = t + '\u2197'
     if vspeed < 0:
-        t = t + '\u2193'
+        t = t + '\u2198'
     tsize = draw.textsize(t, largefont)
     if tsize[0] + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
         # would draw text outside, move to the left
         tposition = (x - 4 * AIRCRAFT_SIZE - tsize[0], int(y - tsize[1] / 2))
     else:
         tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - tsize[1] / 2))
-    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + tsize[1])), fill="white")
+    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
     draw.text(tposition, t, font=largefont, fill="black")
+    if tail is not None:
+        tsize = draw.textsize(tail, verysmallfont)
+        draw.rectangle((tposition[0], tposition[1]+LARGE, tposition[0]+tsize[0],
+                        tposition[1]+LARGE+VERYSMALL), fill="white")
+        draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
-def modesaircraft(draw, radius, height, arcposition):
+def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
     if radius < MINIMAL_CIRCLE:
         radius = MINIMAL_CIRCLE
     draw.ellipse((zerox-radius, zeroy-radius, zerox+radius, zeroy+radius), width=3, outline="black")
@@ -224,10 +239,19 @@ def modesaircraft(draw, radius, height, arcposition):
     else:
         signchar = "-"
     t = signchar+str(abs(height))
+    if vspeed > 0:
+        t = t + '\u2197'
+    if vspeed < 0:
+        t = t + '\u2198'
     tsize = draw.textsize(t, largefont)
     tposition = (zerox+arctext[0]-tsize[0]/2, zeroy+arctext[1]-tsize[1]/2)
-    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+tsize[1])), fill="white")
+    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+LARGE)), fill="white")
     draw.text(tposition, t, font=largefont, fill="black")
+    if tail is not None:
+        tsize = draw.textsize(tail, verysmallfont)
+        draw.rectangle((tposition[0], tposition[1] + LARGE, tposition[0] + tsize[0],
+                        tposition[1] + LARGE + VERYSMALL), fill="white")
+        draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
@@ -273,7 +297,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
 
 
-def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs):
+def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
     draw.text((5, 0), "UTC", font=smallfont, fill="black")
     centered_text(draw, SMALL, utctime, verylargefont, fill="black")
     if stoptime is not None:
@@ -284,9 +308,42 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
             centered_text(draw, 3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
 
     draw.text((5, sizey-SMALL-3), left_text, font=smallfont, fill="black")
-    textsize = draw.textsize(right_text, smallfont)
-    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_text, font=smallfont, fill="black", align="right")
+    textsize = draw.textsize(right_t, smallfont)
+    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_t, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
+
+
+def gmeter(draw, current, maxg, ming, error_message):
+    for m in m_marks:
+        s = math.sin(math.radians(m[0]+90))
+        c = math.cos(math.radians(m[0]+90))
+        draw.line((azerox-asize*c, azeroy-asize*s, azerox-(asize-msize)*c, azeroy-(asize-msize)*s),
+                  fill="black", width=4)
+        draw.text((azerox-(asize-msize-SMALL/2)*c, azeroy-(asize-msize-SMALL/2)*s-SMALL/2),
+                  str(m[1]), font=smallfont, fill="black")
+    draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
+    draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="black", width=1)
+    gval = (current-1.0)*22.5
+    s = math.sin(math.radians(gval))
+    c = math.cos(math.radians(gval))
+    draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox, azeroy), fill="black", width=8)
+
+    draw.text((zerox-30, 0), "G-Meter", font=verylargefont, fill="black")
+    draw.text((zerox-30, 88), "max", font=smallfont, fill="black")
+    right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
+    if error_message is None:
+        draw.text((zerox-30, 138), "current", font=smallfont, fill="black")
+        right_text(draw, 126, "{:+1.2f}".format(current), verylargefont, fill="black")
+    else:
+        draw.text((zerox-30, 138), error_message, font=largefont, fill="black")
+    draw.text((zerox-30, 188), "min", font=smallfont, fill="black")
+    right_text(draw, 185, "{:+1.2f}".format(ming), largefont, fill="black")
+
+    right = "Reset"
+    middle = "Mode"
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey-SMALL-3, middle, smallfont, fill="black")
 
 
 def shutdown(draw, countdown):

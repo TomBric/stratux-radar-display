@@ -46,10 +46,11 @@ import timerui
 import shutdownui
 import ahrsui
 import statusui
+import gmeterui
 import importlib
 
 # constant definitions
-RADAR_VERSION = "1.0e"
+RADAR_VERSION = "1.0f"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -81,7 +82,9 @@ situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_
              'gps_quality': 0, 'gps_h_accuracy': 20000}
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
+gmeter = {'was_changed': True, 'current': 0.0, 'max': 0.0, 'min': 0.0}
 # ahrs information, values are all rounded to integer
+global_config = {}
 
 max_pixel = 0
 zerox = 0
@@ -94,7 +97,7 @@ bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
 global_mode = 1
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
-# 7=status 8=refresh from status   0=Init
+# 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 0=Init
 bluetooth_active = False
 
 
@@ -103,8 +106,13 @@ def draw_all_ac(draw, allac):
     for icao, ac in dist_sorted:
         # first draw mode-s
         if 'circradius' in ac:
+            if global_config['display_tail'] and 'tail' in ac:
+                tail = ac['tail']
+            else:
+                tail = None
             if ac['circradius'] <= max_pixel / 2:
-                display_control.modesaircraft(draw, ac['circradius'], ac['height'], ac['arcposition'])
+                display_control.modesaircraft(draw, ac['circradius'], ac['height'], ac['arcposition'], ac['vspeed'],
+                                              tail)
     for icao, ac in dist_sorted:
         # then draw adsb
         if 'x' in ac:
@@ -113,8 +121,12 @@ def draw_all_ac(draw, allac):
                     line_length = ac['nspeed_length']
                 else:
                     line_length = 0
+                if global_config['display_tail'] and 'tail' in ac:
+                    tail = ac['tail']
+                else:
+                    tail = None
                 display_control.aircraft(draw, ac['x'], ac['y'], ac['direction'], ac['height'], ac['vspeed'],
-                                         line_length)
+                                         line_length, tail)
 
 
 def draw_display(draw):
@@ -213,6 +225,8 @@ def new_traffic(json_str):
     if traffic['Speed_valid']:
         ac['nspeed'] = traffic['Speed']
     ac['vspeed'] = traffic['Vvel']
+    if traffic['Tail']:
+        ac['tail'] = traffic['Tail']
 
     if traffic['Position_valid'] and situation['gps_active']:
         # adsb traffic and stratux has valid gps signal
@@ -290,6 +304,7 @@ def new_situation(json_str):
         situation['connected'] = True
         situation['was_changed'] = True
         ahrs['was_changed'] = True   # connection also relevant for ahrs
+        gmeter['was_changed'] = True  # connection also relevant for ahrs
     gps_active = sit['GPSHorizontalAccuracy'] < 19999
     if situation['gps_active'] != gps_active:
         situation['gps_active'] = gps_active
@@ -336,6 +351,19 @@ def new_situation(json_str):
         ahrs['ahrs_sensor'] = ahrs_flag
         ahrs['was_changed'] = True
 
+    current = round(sit['AHRSGLoad'], 2)
+    if gmeter['current'] != current:
+        gmeter['current'] = current
+        gmeter['was_changed'] = True
+    max = round(sit['AHRSGLoadMax'], 2)
+    if gmeter['max'] != max:
+        gmeter['max'] = max
+        gmeter['was_changed'] = True
+    min = round(sit['AHRSGLoadMin'], 2)
+    if gmeter['min'] != min:
+        gmeter['min'] = min
+        gmeter['was_changed'] = True
+
 
 async def listen_forever(path, name, callback):
     print(name + " waiting for " + path)
@@ -377,6 +405,7 @@ async def listen_forever(path, name, callback):
                 situation['connected'] = False
                 ahrs['was_changed'] = True
                 situation['was_changed'] = True
+                gmeter['was_changed'] = True
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
 
@@ -413,6 +442,9 @@ async def user_interface():
                 next_mode = ahrsui.user_input()
             elif global_mode == 7:  # status
                 next_mode = statusui.user_input(bluetooth_active)
+            elif global_mode == 9:  # gmeter
+                next_mode = gmeterui.user_input()
+
 
             if next_mode > 0:
                 ui_changed = True
@@ -459,15 +491,27 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 1
                 elif global_mode == 5:   # ahrs'
-                    ahrsui.draw_ahrs(draw, display_control, situation['connected'], ahrs['was_changed'], ahrs['pitch'],
-                                     ahrs['roll'], ahrs['heading'], ahrs['slipskid'], ahrs['gps_hor_accuracy'],
-                                     ahrs['ahrs_sensor'])
+                    ahrsui.draw_ahrs(draw, display_control, situation['connected'], ui_changed or ahrs['was_changed'],
+                                     ahrs['pitch'],ahrs['roll'], ahrs['heading'], ahrs['slipskid'],
+                                     ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
+                    ahrs['was_changed'] = False
                 elif global_mode == 6:   # refresh display, only relevant for epaper, mode was radar
                     logging.debug("AHRS: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(draw, display_control, bluetooth_active)
+                elif global_mode == 8:   # refresh display, only relevant for epaper, mode was status
+                    logging.debug("Status: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 7
+                elif global_mode == 9:  # gmeter display
+                    gmeterui.draw_gmeter(draw, display_control, ui_changed, situation['connected'], gmeter)
+                    gmeter['was_changed'] = False
+                elif global_mode == 10:   # refresh display, only relevant for epaper, mode was gmeter
+                    logging.debug("Gmeter: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 9
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
@@ -485,6 +529,7 @@ async def display_and_cutoff():
                     situation['connected'] = False
                     situation['was_changed'] = True
                     ahrs['was_changed'] = True
+                    gmeter['was_changed'] = True
                     logging.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
     except (asyncio.CancelledError, RuntimeError):
         print("Display task terminating ...")
@@ -510,7 +555,8 @@ def main():
         bluetooth_active = radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     ahrsui.init(display_control)
-    statusui.init(display_control, url_status_get, url_host_base, display_refresh_time)
+    statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
+    gmeterui.init(url_gmeter_reset)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())
@@ -536,8 +582,11 @@ if __name__ == "__main__":
     ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
     ap.add_argument("-a", "--ahrs", required=False, help="Start mode is ahrs", action='store_true', default=False)
     ap.add_argument("-x", "--status", required=False, help="Start mode is status", action='store_true', default=False)
+    ap.add_argument("-g", "--gmeter", required=False, help="Start mode is g-meter", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
+    ap.add_argument("-r", "--registration", required=False, help="Display registration no",
+                    action="store_true", default=False)
     args = vars(ap.parse_args())
     if args['verbose']:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)-15s > %(message)s')
@@ -552,16 +601,22 @@ if __name__ == "__main__":
         global_mode = 5   # start_in_ahrs mode
     if args['status']:
         global_mode = 7   # start in status mode
+    if args['gmeter']:
+        global_mode = 9   # start in g-meter mode
+    global_config['display_tail'] = args['registration'] # display registration if set
     # check config file, if extistent use config from there
-    global_config = statusui.read_config()
-    if global_config is not None:
-        url_host_base = global_config['stratux_ip']
-    else:
-        url_host_base = args['connect']
+    url_host_base = args['connect']
+    saved_config = statusui.read_config()
+    if saved_config is not None:
+        if 'stratux_ip' in saved_config:
+            url_host_base = saved_config['stratux_ip']   # set stratux ip if interactively changed one time
+        if 'display_tail' in saved_config:
+            global_config['display_tail'] = saved_config['display_tail']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_settings_set = "http://" + url_host_base + "/setSettings"
     url_status_get = "http://" + url_host_base + "/getStatus"
+    url_gmeter_reset = "http://" + url_host_base + "/resetGMeter"
 
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint

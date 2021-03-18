@@ -32,52 +32,52 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import radarbuttons
+import logging
+import requests
 
 # constants
+MSG_NO_CONNECTION = "No Connection!"
 # globals
-ahrs_ui_changed = True
-
-MSG_GROUND_TEST = "No GPS,Ground ONLY!"
-MSG_PSEUDO_AHRS = "PSEUDO AHRS ONLY!"
-MSG_NO_AHRS = "NO IMU OR GPS!"
-MSG_NO_CONNECTION = "NO CONNECTION!"
+url_gmeter_reset = ""
 
 
-def init(display_control):   # prepare everything
-    pass   # nothing to do in the setup now
+def init(url):
+    global url_gmeter_reset
+
+    url_gmeter_reset = url
+    logging.debug("GMeterUI: Initialized POST settings to " + url_gmeter_reset)
 
 
-def draw_ahrs(draw, display_control, connected, was_changed, pitch, roll, heading, slip, gps_hor_accuracy, ahrs_sensor):
-    global ahrs_ui_changed
+def reset_gmeter():
+    logging.debug("GMeterUI: Reset gmeter triggered")
+    try:
+        requests.post(url_gmeter_reset)
+    except requests.exceptions.RequestException as e:
+        logging.debug("Posting gmeter-reset exception: ", e)
 
-    if was_changed or ahrs_ui_changed:
-        ahrs_ui_changed = False
+
+def draw_gmeter(draw, display_control, ui_changed, connected, gmeter):
+    if ui_changed or gmeter['was_changed']:
         error_message = None
-        if gps_hor_accuracy >= 30 and ahrs_sensor:
-            error_message = MSG_GROUND_TEST
-        if gps_hor_accuracy >= 30 and not ahrs_sensor:
-            error_message = MSG_NO_AHRS
-        if gps_hor_accuracy < 30 and not ahrs_sensor:
-            error_message = MSG_PSEUDO_AHRS
         if not connected:
             error_message = MSG_NO_CONNECTION
         display_control.clear(draw)
-        display_control.ahrs(draw, pitch, roll, heading, slip, error_message)
+        display_control.gmeter(draw, gmeter['current'], gmeter['max'], gmeter['min'], error_message)
         display_control.display()
 
 
 def user_input():
-    global ahrs_ui_changed
-
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
     if btime == 0:
-        return 0  # stay in timer mode
-    ahrs_ui_changed = True
+        return 0  # stay in current mode
     if button == 1 and btime == 2:  # middle and long
-        return 9  # next mode to be gmeter
+        return 7  # next mode to be status
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long- refresh
-        return 6  # start next mode for display driver: refresh called from ahrs
-    return 5  # no mode change
+        return 10  # start next mode for display driver: refresh called from gmeter
+    if button == 2 and btime == 1:  # right and short - reset
+        reset_gmeter()
+        return 9
+    return 9  # no mode change

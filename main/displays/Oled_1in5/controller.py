@@ -126,6 +126,11 @@ def centered_text(draw, y, text, font, fill):
     draw.text((zerox - ts[0] / 2, y), text, font=font, fill=fill)
 
 
+def right_text(draw, y, text, font, fill):
+    ts = draw.textsize(text, font)
+    draw.text((sizex - ts[0], y), text, font=font, fill=fill)
+
+
 def display():
     device.display(image)
 
@@ -161,7 +166,7 @@ def startup(draw, version, target_ip, seconds):
     time.sleep(seconds)
 
 
-def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
+def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     p1 = posn(270 + direction, 2 * AIRCRAFT_SIZE)
     p2 = posn(270 + direction + 150, 4 * AIRCRAFT_SIZE)
     p3 = posn(270 + direction + 180, 2 * AIRCRAFT_SIZE)
@@ -189,7 +194,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length):
     draw.text(tposition, t, font=largefont, fill="white")
 
 
-def modesaircraft(draw, radius, height, arcposition):
+def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
     if radius < MINIMAL_CIRCLE:
         radius = MINIMAL_CIRCLE
     draw.ellipse((64 - radius, 64 - radius, 64 + radius, 64 + radius), width=3, outline="white")
@@ -199,6 +204,10 @@ def modesaircraft(draw, radius, height, arcposition):
     else:
         signchar = "-"
     t = signchar + str(abs(height))
+    if vspeed > 0:
+        t = t + '\u2191'
+    if vspeed < 0:
+        t = t + '\u2193'
     tsize = draw.textsize(t, largefont)
     tposition = (64 + arctext[0] - tsize[0] / 2, 64 + arctext[1] - tsize[1] / 2)
     draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + tsize[1])), fill="black")
@@ -265,6 +274,25 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
     textsize = draw.textsize(right_text, smallfont)
     draw.text((sizex - textsize[0], sizey - SMALL - 3), right_text, font=smallfont, fill="green", align="right")
     centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="green")
+
+
+def gmeter(draw, current, maxg, ming, error_message):
+    centered_text(draw, 0, "G-Meter", largefont, fill="yellow")
+    draw.text((0, 36), "max", font=smallfont, fill="cyan")
+    right_text(draw, 30, "{:+1.2f}".format(maxg), largefont, fill="magenta")
+    if error_message is None:
+        draw.text((0, 57), "current", font=smallfont, fill="cyan")
+        right_text(draw, 48, "{:+1.2f}".format(current), verylargefont, fill="white")
+    else:
+        centered_text(draw, 57, error_message, largefont, fill="red")
+    draw.text((0, 80), "min", font=smallfont, fill="cyan")
+    right_text(draw, 74, "{:+1.2f}".format(ming), largefont, fill="magenta")
+
+    right = "Reset"
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
+    middle = "Mode"
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 
 def shutdown(draw, countdown):
