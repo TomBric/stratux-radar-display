@@ -279,7 +279,7 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 def gmeter(draw, current, maxg, ming, error_message):
     centered_text(draw, 0, "G-Meter", largefont, fill="yellow")
     draw.text((0, 36), "max", font=smallfont, fill="cyan")
-    right_text(draw, 30, "{:+1.2f}".format(maxg),largefont, fill="magenta")
+    right_text(draw, 30, "{:+1.2f}".format(maxg), largefont, fill="magenta")
     if error_message is None:
         draw.text((0, 57), "current", font=smallfont, fill="cyan")
         right_text(draw, 48, "{:+1.2f}".format(current), verylargefont, fill="white")
@@ -287,7 +287,6 @@ def gmeter(draw, current, maxg, ming, error_message):
         centered_text(draw, 48, error_message, largefont, fill="red")
     draw.text((0, 72), "min", font=smallfont, fill="cyan")
     right_text(draw, 66, "{:+1.2f}".format(ming), largefont, fill="magenta")
-
 
     right = "Reset"
     textsize = draw.textsize(right, smallfont)
