@@ -69,6 +69,11 @@ draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
 PITCH_SCALE = 4.0
+azerox = 140  # zero for analogue meter
+azeroy = 140
+asize = 140
+msize = 15  # size of markings
+m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
 # end device globals
 
 
@@ -309,11 +314,6 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    azerox = 140  # zero for analogue meter
-    azeroy = 140
-    asize = 140
-    msize = 15  # size of markings
-    m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
     for m in m_marks:
         s = math.sin(math.radians(m[0]+90))
         c = math.cos(math.radians(m[0]+90))
@@ -326,17 +326,17 @@ def gmeter(draw, current, maxg, ming, error_message):
     gval = (current-1.0)*22.5
     s = math.sin(math.radians(gval))
     c = math.cos(math.radians(gval))
-    draw.line((azerox-(asize-msize)*c, azeroy-(asize-msize)*s, azerox, azeroy), fill="black", width=8)
+    draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox, azeroy), fill="black", width=8)
 
-    draw.text((zerox, 0), "G-Meter", font=verylargefont, fill="black")
-    draw.text((zerox, 88), "max", font=smallfont, fill="black")
+    draw.text((zerox-20, 0), "G-Meter", font=verylargefont, fill="black")
+    draw.text((zerox-20, 88), "max", font=smallfont, fill="black")
     right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
-        draw.text((zerox, 138), "current", font=smallfont, fill="black")
+        draw.text((zerox-20, 138), "current", font=smallfont, fill="black")
         right_text(draw, 126, "{:+1.2f}".format(current), verylargefont, fill="black")
     else:
         centered_text(draw, 126, error_message, verylargefont, fill="black")
-    draw.text((zerox, 188), "min", font=smallfont, fill="black")
+    draw.text((zerox-20, 188), "min", font=smallfont, fill="black")
     right_text(draw, 185, "{:+1.2f}".format(ming), largefont, fill="black")
 
     right = "Reset"
