@@ -177,7 +177,7 @@ def centered_text(draw, y, text, font, fill):
 
 def right_text(draw, y, text, font, fill):
     ts = draw.textsize(text, font)
-    draw.text((sizex - ts[0], y), text, font=font, fill=fill)
+    draw.text((sizex-5-ts[0], y), text, font=font, fill=fill)
 
 
 def startup(draw, version, target_ip, seconds):
@@ -310,15 +310,15 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 def gmeter(draw, current, maxg, ming, error_message):
     centered_text(draw, 0, "G-Meter", verylargefont, fill="black")
-    draw.text((0, 69), "max", font=smallfont, fill="black")
-    right_text(draw, 75, "{:+1.2f}".format(maxg), largefont, fill="black")
+    draw.text((5, 69), "max", font=smallfont, fill="black")
+    right_text(draw, 76, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
-        draw.text((0, 104), "current", font=smallfont, fill="black")
-        right_text(draw, 116, "{:+1.2f}".format(current), verylargefont, fill="black")
+        draw.text((5, 138), "current", font=smallfont, fill="black")
+        right_text(draw, 126, "{:+1.2f}".format(current), verylargefont, fill="black")
     else:
-        centered_text(draw, 116, error_message, largefont, fill="black")
-    draw.text((0, 160), "min", font=smallfont, fill="black")
-    right_text(draw, 166, "{:+1.2f}".format(ming), largefont, fill="black")
+        centered_text(draw, 126, error_message, largefont, fill="black")
+    draw.text((5, 188), "min", font=smallfont, fill="black")
+    right_text(draw, 176, "{:+1.2f}".format(ming), largefont, fill="black")
 
     right = "Reset"
     middle = "Mode"
