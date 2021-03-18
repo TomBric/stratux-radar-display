@@ -309,9 +309,9 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    azerox = 200  # zero for analogue meter
-    azeroy = 120
-    asize = 240
+    azerox = 140  # zero for analogue meter
+    azeroy = 140
+    asize = 140
     msize = 15  # size of markings
     m_marks = ((180, 3), (202.5, 2), (225, 1), (247.5, 0), (270, 1), (292.5, 1), (315, 2), (337.5, 3), (0, 4))
     for m in m_marks:
