@@ -320,7 +320,7 @@ def gmeter(draw, current, maxg, ming, error_message):
         draw.line((azerox-asize*c, azeroy-asize*s, azerox-(asize-msize)*c, azeroy-(asize-msize)*s),
                   fill="black", width=4)
         draw.text((azerox-(asize-msize+LARGE/2)*c-LARGE/2, azeroy-(asize-msize+LARGE/2)*s-LARGE/2),
-                  str(m[1]), largefont, fill="black")
+                  str(m[1]), font=largefont, fill="black")
     draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=3, fill="black")
     draw.ellipse((azerox-5, azeroy-5, azerox+5, azeroy+5), outline="black", fill="black", width=1)
     gval = -(5-current)*20
