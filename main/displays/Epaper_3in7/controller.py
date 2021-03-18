@@ -145,7 +145,7 @@ def init():
     device.display_1Gray(device.getbuffer_optimized(epaper_image))
     end = time.time()
     display_refresh = end-start
-    logging.info("Measured Display Refresh Time: " + str(round(display_refresh,3)) + " seconds")
+    logging.info("Measured Display Refresh Time: " + str(round(display_refresh, 3)) + " seconds")
     return draw, max_pixel, zerox, zeroy, display_refresh
 
 
@@ -320,11 +320,12 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.text((0, 160), "min", font=smallfont, fill="black")
     right_text(draw, 166, "{:+1.2f}".format(ming), largefont, fill="black")
 
-    right_text = "Reset"
-    middle_text = "Mode"
-    textsize = draw.textsize(right_text, smallfont)
-    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_text, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
+    right = "Reset"
+    middle = "Mode"
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey-SMALL-3, middle, smallfont, fill="black")
+
 
 def shutdown(draw, countdown):
     message = "Shutdown "
