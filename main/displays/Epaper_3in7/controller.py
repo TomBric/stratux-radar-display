@@ -175,6 +175,11 @@ def centered_text(draw, y, text, font, fill):
     draw.text((zerox - ts[0] / 2, y), text, font=font, fill=fill)
 
 
+def right_text(draw, y, text, font, fill):
+    ts = draw.textsize(text, font)
+    draw.text((sizex - ts[0], y), text, font=font, fill=fill)
+
+
 def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
     logo = Image.open(logopath)
@@ -287,7 +292,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
 
 
-def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs):
+def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
     draw.text((5, 0), "UTC", font=smallfont, fill="black")
     centered_text(draw, SMALL, utctime, verylargefont, fill="black")
     if stoptime is not None:
@@ -298,14 +303,28 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
             centered_text(draw, 3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
 
     draw.text((5, sizey-SMALL-3), left_text, font=smallfont, fill="black")
-    textsize = draw.textsize(right_text, smallfont)
-    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_text, font=smallfont, fill="black", align="right")
+    textsize = draw.textsize(right_t, smallfont)
+    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_t, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
 
 
-def gmeter(draw, current, max, min, error_message):
-    pass
+def gmeter(draw, current, maxg, ming, error_message):
+    centered_text(draw, 0, "G-Meter", verylargefont, fill="black")
+    draw.text((0, 69), "max", font=smallfont, fill="black")
+    right_text(draw, 75, "{:+1.2f}".format(maxg), largefont, fill="black")
+    if error_message is None:
+        draw.text((0, 104), "current", font=smallfont, fill="black")
+        right_text(draw, 116, "{:+1.2f}".format(current), verylargefont, fill="black")
+    else:
+        centered_text(draw, 116, error_message, largefont, fill="black")
+    draw.text((0, 160), "min", font=smallfont, fill="black")
+    right_text(draw, 166, "{:+1.2f}".format(ming), largefont, fill="black")
 
+    right_text = "Reset"
+    middle_text = "Mode"
+    textsize = draw.textsize(right_text, smallfont)
+    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_text, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
 
 def shutdown(draw, countdown):
     message = "Shutdown "
