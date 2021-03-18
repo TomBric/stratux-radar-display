@@ -335,7 +335,7 @@ def gmeter(draw, current, maxg, ming, error_message):
         draw.text((zerox-30, 138), "current", font=smallfont, fill="black")
         right_text(draw, 126, "{:+1.2f}".format(current), verylargefont, fill="black")
     else:
-        centered_text(draw, 126, error_message, verylargefont, fill="black")
+        draw.text((zerox-30, 138), error_message, largefont, fill="black")
     draw.text((zerox-30, 188), "min", font=smallfont, fill="black")
     right_text(draw, 185, "{:+1.2f}".format(ming), largefont, fill="black")
 
