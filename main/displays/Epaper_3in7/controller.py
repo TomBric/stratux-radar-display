@@ -313,17 +313,17 @@ def gmeter(draw, current, maxg, ming, error_message):
     azeroy = 140
     asize = 140
     msize = 15  # size of markings
-    m_marks = ((180, 3), (202.5, 2), (225, 1), (247.5, 0), (270, 1), (292.5, 1), (315, 2), (337.5, 3), (0, 4))
+    m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
     for m in m_marks:
         s = math.sin(math.radians(m[0]+90))
         c = math.cos(math.radians(m[0]+90))
         draw.line((azerox-asize*c, azeroy-asize*s, azerox-(asize-msize)*c, azeroy-(asize-msize)*s),
                   fill="black", width=4)
-        draw.text((azerox-(asize-msize+LARGE/2)*c+LARGE/2, azeroy-(asize-msize+LARGE/2)*s+LARGE/2),
+        draw.text((azerox-(asize-msize+LARGE/2)*c+LARGE/2, azeroy-(asize-msize+LARGE/2)*s-LARGE/2),
                   str(m[1]), font=largefont, fill="black")
     draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=3, fill="black")
     draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="black", width=1)
-    gval = -(5-current)*20
+    gval = (current-1.0)*22.5 + 270
     s = math.sin(math.radians(gval))
     c = math.cos(math.radians(gval))
     draw.line((azerox-(asize-msize)*c, azeroy-(asize-msize)*s, azerox, azeroy), fill="black", width=4)
