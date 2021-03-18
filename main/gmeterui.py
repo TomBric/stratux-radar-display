@@ -36,7 +36,7 @@ import logging
 import requests
 
 # constants
-MSG_NO_CONNECTION = "NO CONNECTION!"
+MSG_NO_CONNECTION = "No Connection!"
 # globals
 url_gmeter_reset = ""
 
