@@ -326,7 +326,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     gval = (current-1.0)*22.5
     s = math.sin(math.radians(gval))
     c = math.cos(math.radians(gval))
-    draw.line((azerox-(asize-msize)*c, azeroy-(asize-msize)*s, azerox, azeroy), fill="black", width=6)
+    draw.line((azerox-(asize-msize)*c, azeroy-(asize-msize)*s, azerox, azeroy), fill="black", width=8)
 
     draw.text((zerox, 0), "G-Meter", font=verylargefont, fill="black")
     draw.text((zerox, 88), "max", font=smallfont, fill="black")

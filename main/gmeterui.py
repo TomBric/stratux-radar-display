@@ -58,7 +58,6 @@ def reset_gmeter():
 
 def draw_gmeter(draw, display_control, ui_changed, connected, gmeter):
     if ui_changed or gmeter['was_changed']:
-        gmeter['was_changed'] = False
         error_message = None
         if not connected:
             error_message = MSG_NO_CONNECTION

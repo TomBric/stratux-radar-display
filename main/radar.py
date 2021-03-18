@@ -507,6 +507,7 @@ async def display_and_cutoff():
                     global_mode = 7
                 elif global_mode == 9:  # gmeter display
                     gmeterui.draw_gmeter(draw, display_control, ui_changed, situation['connected'], gmeter)
+                    gmeter['was_changed'] = False
                 elif global_mode == 10:   # refresh display, only relevant for epaper, mode was gmeter
                     logging.debug("Gmeter: Display driver - Refreshing")
                     display_control.refresh()
