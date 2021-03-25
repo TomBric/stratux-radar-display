@@ -303,10 +303,11 @@ def compass(draw, heading, error_message):
     csize = sizex/2   # radius of compass rose
     cmsize = 7        # length of compass marks
 
-    for m in range(0, 350, 10):
+    draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=1)
+    for m in range(0, 360, 10):
         s = math.sin(math.radians(heading + m + 90))
         c = math.cos(math.radians(heading + m + 90))
-        print("Point: ",m, "=", (zerox - csize * c, zeroy - csize * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s))
+        # print("Point: ",m, "=", (zerox - csize * c, zeroy - csize * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s))
         draw.line((zerox - csize * c, zeroy - csize * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s),
                   fill="white", width=2)
         if m % 30 == 0:
@@ -325,7 +326,6 @@ def compass(draw, heading, error_message):
             t = math.tan(math.radians(heading+m+135))
             center = (zerox - (csize - cmsize - LARGE / 2) * c, zeroy - (csize - cmsize - LARGE / 2) * s)
             # image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
-    draw.ellipse((0, 0, sizex, sizey), outline="white", fill="black", width=1)
     if error_message is not None:
         centered_text(draw, 57, error_message, largefont, fill="red")
 
