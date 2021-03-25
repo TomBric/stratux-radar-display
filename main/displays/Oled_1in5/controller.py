@@ -117,7 +117,7 @@ def init():
     end = time.time()
     display_refresh = end - start
     pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
-    compass_aircraft = Image.open(pic_path).convert(device.mode)
+    compass_aircraft = Image.open(pic_path).convert("RGBA")
     return draw, sizex, zerox, zeroy, display_refresh
 
 
