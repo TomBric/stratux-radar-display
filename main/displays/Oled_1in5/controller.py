@@ -306,6 +306,7 @@ def compass(draw, heading, error_message):
     for m in range(0, 350, 10):
         s = math.sin(math.radians(heading + m + 90))
         c = math.cos(math.radians(heading + m + 90))
+        print("Point: ",m, "=", (zerox - csize * c, zeroy - csize * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s))
         draw.line((zerox - csize * c, zeroy - csize * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s),
                   fill="white", width=2)
         if m % 30 == 0:
