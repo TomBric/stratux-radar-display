@@ -327,12 +327,11 @@ def compass(draw, heading, error_message):
                 mark = "W"
             else:
                 mark = str(int(m/10))
-            cdraw.rectangle((0,0,SMALL*2,SMALL*2),fill="black")
-            cdraw.text((SMALL/2, SMALL/2), mark, font=smallfont, fill="white")
-            w, h = smallfont.getsize(mark)
+            w, h = largefont.getsize(mark)
             mask = Image.new('1', (w, h))
             cdraw = ImageDraw.Draw(mask)
-            cdraw.text((0, 0), mark, 1, font=smallfont)
+            cdraw.rectangle((0, 0, w, h), fill="black")
+            cdraw.text((0, 0), mark, 1, font=largefont)
             mask = mask.rotate(-m+heading, expand=True)
             t = math.tan(math.radians(heading+m))
             center = (zerox - (csize - cmsize - SMALL / 2) * c, zeroy - (csize - cmsize - SMALL / 2) * s)
