@@ -308,7 +308,7 @@ def compass(draw, heading, error_message):
     cmsize = 7        # length of compass marks
 
     draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=1)
-    image.paste(compass_aircraft, (round(zerox) - 32, 32))
+    image.paste(compass_aircraft, (round(zerox) - 30, 30))
     draw.line((zerox, 0, zerox, 30), fill="white", width=2)
     draw.polygon((zerox, 10, zerox - 5, 0, zerox + 5, 0), fill="white")
     for m in range(0, 360, 10):
