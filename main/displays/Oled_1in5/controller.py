@@ -317,6 +317,7 @@ def compass(draw, heading, error_message):
         draw.line((zerox - csize * c, zeroy - csize * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s),
                   fill="white", width=1)
         if m % 30 == 0:
+            color = "yellow"
             if m == 0:
                 mark = "N"
             elif m == 90:
@@ -327,6 +328,7 @@ def compass(draw, heading, error_message):
                 mark = "W"
             else:
                 mark = str(int(m/10))
+                color = "white"
             w, h = largefont.getsize(mark)
             mask = Image.new('1', (w, h))
             cdraw = ImageDraw.Draw(mask)
@@ -336,10 +338,6 @@ def compass(draw, heading, error_message):
             t = math.tan(math.radians(heading+m))
             center = (zerox - (csize - cmsize - SMALL / 2) * c, zeroy - (csize - cmsize - SMALL / 2) * s)
             # image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
-            if m % 30 == 0:
-                color = "yellow"
-            else:
-                color = "white"
             image.paste(color, (round(center[0]-SMALL), round(center[1])-SMALL), mask)
     if error_message is not None:
         centered_text(draw, 57, error_message, largefont, fill="red")
