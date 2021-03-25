@@ -64,6 +64,7 @@ image = None
 ahrs_draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
+compass_aircraft = None   # image of aircraft for compass-display
 
 
 # end device globals
@@ -93,6 +94,7 @@ def init():
     global webfont
     global device
     global image
+    global compass_aircraft
 
     config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
     device = radar_opts.get_device(['-f', config_path])
@@ -114,6 +116,8 @@ def init():
     device.display(image)
     end = time.time()
     display_refresh = end - start
+    pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
+    compass_aircraft = Image.open(pic_path)
     return draw, sizex, zerox, zeroy, display_refresh
 
 
@@ -304,6 +308,9 @@ def compass(draw, heading, error_message):
     cmsize = 7        # length of compass marks
 
     draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=1)
+    draw.bitmap((zerox - 32, 32), compass_aircraft, fill="white")
+    draw.line((zerox, 0, zerox, 20), fill="white", width=3)
+    draw.polygon((zerox, 10, zerox - 5, 0, zerox + 5, 0), fill="white")
     for m in range(0, 360, 10):
         s = math.sin(math.radians(heading + m + 90))
         c = math.cos(math.radians(heading + m + 90))
