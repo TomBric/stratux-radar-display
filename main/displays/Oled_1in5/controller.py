@@ -117,7 +117,7 @@ def init():
     end = time.time()
     display_refresh = end - start
     pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
-    compass_aircraft = Image.open(pic_path).convert("RGB")
+    compass_aircraft = Image.open(pic_path).convert("RGBA")
     return draw, sizex, zerox, zeroy, display_refresh
 
 
@@ -162,7 +162,7 @@ def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
     logo = Image.open(logopath)
     draw.rectangle(((0, 0), (sizex, 64)), fill="blue")
-    draw.bitmap((zerox - 32, 0), logo, fill="white")
+    draw.bitmap((zerox - 32, 0), logo, fill="black")
     centered_text(draw, 64, "OledRadar "+version, largefont, fill="white")
     centered_text(draw, sizey - 3 * SMALL, "Connecting to", smallfont, fill="white")
     centered_text(draw, sizey - 2*SMALL, target_ip, smallfont, fill="white")
