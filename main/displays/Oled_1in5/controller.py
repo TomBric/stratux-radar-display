@@ -295,6 +295,38 @@ def gmeter(draw, current, maxg, ming, error_message):
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 
+def compass(draw, heading, error_message):
+    cimage = Image.new(device.mode, (LARGE*2, LARGE*2))  # larger to make sure rotated characters still fit
+    cdraw = ImageDraw.Draw(cimage)
+    csize = sizex/2   # radius of compass rose
+    cmsize = 7        # length of compass marks
+
+    for m in range(0, 350, 10):
+        s = math.sin(math.radians(heading + m + 90))
+        c = math.cos(math.radians(heading + m + 90))
+        draw.line((zerox - csize * c, zeroy - csize * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s),
+                  fill="white", width=2)
+        if m % 30 == 0:
+            if m == 0:
+                mark = "N"
+            elif m == 90:
+                mark = "E"
+            elif m == 180:
+                mark = "S"
+            elif m == 270:
+                mark = "W"
+            else:
+                mark = str(m/10)
+            cdraw.text((LARGE/2, LARGE/2), mark, font=largefont, fill="white")
+            rotim = cdraw.rotate(heading+m, expand=True)
+            t = math.tan(math.radians(heading+m+135))
+            center = (zerox - (csize - cmsize - LARGE / 2) * c, zeroy - (csize - cmsize - LARGE / 2) * s)
+            draw.paste(rotim, (center[0]-t*LARGE, center[1]-LARGE/t))
+    draw.ellipse((0, 0, sizex, sizey), outline="white", fill="black", width=1)
+    if error_message is not None:
+        centered_text(draw, 57, error_message, largefont, fill="red")
+
+
 def shutdown(draw, countdown):
     message = "Shutdown "
     centered_text(draw, 10, message, largefont, fill="white")

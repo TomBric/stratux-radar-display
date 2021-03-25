@@ -346,6 +346,10 @@ def gmeter(draw, current, maxg, ming, error_message):
     centered_text(draw, sizey-SMALL-3, middle, smallfont, fill="black")
 
 
+def compass(draw, heading, error_message):
+    pass
+
+
 def shutdown(draw, countdown):
     message = "Shutdown "
     centered_text(draw, 10, message, largefont, fill="black")
