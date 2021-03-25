@@ -307,7 +307,7 @@ def compass(draw, heading, error_message):
     csize = sizex/2   # radius of compass rose
     cmsize = 7        # length of compass marks
 
-    draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=1)
+    draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=2)
     image.paste(compass_aircraft, (round(zerox) - 30, 30))
     draw.line((zerox, 0, zerox, 30), fill="white", width=1)
     draw.polygon((zerox, 12, zerox - 6, 0, zerox + 6, 0), fill="white")
@@ -332,7 +332,7 @@ def compass(draw, heading, error_message):
             rotim = cimage.rotate(heading+m, expand=True)
             t = math.tan(math.radians(heading+m+135))
             center = (zerox - (csize - cmsize - LARGE / 2) * c, zeroy - (csize - cmsize - LARGE / 2) * s)
-            # image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
+            image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
     if error_message is not None:
         centered_text(draw, 57, error_message, largefont, fill="red")
 
