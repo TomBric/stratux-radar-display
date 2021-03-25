@@ -314,7 +314,6 @@ def compass(draw, heading, error_message):
     for m in range(0, 360, 10):
         s = math.sin(math.radians(heading + m + 90))
         c = math.cos(math.radians(heading + m + 90))
-        # print("Point: ",m, "=", (zerox - csize * c, zeroy - csize * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s))
         draw.line((zerox - csize * c, zeroy - csize * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s),
                   fill="white", width=1)
         if m % 30 == 0:
@@ -332,7 +331,8 @@ def compass(draw, heading, error_message):
             rotim = cimage.rotate(heading+m, expand=True)
             t = math.tan(math.radians(heading+m+135))
             center = (zerox - (csize - cmsize - LARGE / 2) * c, zeroy - (csize - cmsize - LARGE / 2) * s)
-            image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
+            # image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
+            image.paste(rotim, (round(center[0]), round(center[1])))
     if error_message is not None:
         centered_text(draw, 57, error_message, largefont, fill="red")
 
