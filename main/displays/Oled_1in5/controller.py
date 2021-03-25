@@ -329,10 +329,10 @@ def compass(draw, heading, error_message):
                 mark = str(m/10)
             cdraw.text((SMALL/2, SMALL/2), mark, font=largefont, fill="white")
             rotim = cimage.rotate(heading+m)
-            t = math.tan(math.radians(heading+m+135))
+            t = math.tan(math.radians(heading+m))
             center = (zerox - (csize - cmsize - SMALL / 2) * c, zeroy - (csize - cmsize - SMALL / 2) * s)
             # image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
-            image.paste(rotim, (round(center[0]), round(center[1])))
+            image.paste(rotim, (round(center[0]-SMALL), round(center[1])-SMALL))
     if error_message is not None:
         centered_text(draw, 57, error_message, largefont, fill="red")
 
