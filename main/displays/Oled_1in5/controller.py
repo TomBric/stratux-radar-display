@@ -323,7 +323,7 @@ def compass(draw, heading, error_message):
             rotim = cimage.rotate(heading+m, expand=True)
             t = math.tan(math.radians(heading+m+135))
             center = (zerox - (csize - cmsize - LARGE / 2) * c, zeroy - (csize - cmsize - LARGE / 2) * s)
-            image.paste(rotim, (center[0]-t*LARGE, center[1]-LARGE/t))
+            image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
     draw.ellipse((0, 0, sizex, sizey), outline="white", fill="black", width=1)
     if error_message is not None:
         centered_text(draw, 57, error_message, largefont, fill="red")
