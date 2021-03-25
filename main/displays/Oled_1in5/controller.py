@@ -336,7 +336,11 @@ def compass(draw, heading, error_message):
             t = math.tan(math.radians(heading+m))
             center = (zerox - (csize - cmsize - SMALL / 2) * c, zeroy - (csize - cmsize - SMALL / 2) * s)
             # image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
-            image.paste("white", (round(center[0]-SMALL), round(center[1])-SMALL), mask)
+            if m % 30 == 0:
+                color = "yellow"
+            else:
+                color = "white"
+            image.paste(color, (round(center[0]-SMALL), round(center[1])-SMALL), mask)
     if error_message is not None:
         centered_text(draw, 57, error_message, largefont, fill="red")
 
