@@ -309,8 +309,8 @@ def compass(draw, heading, error_message):
 
     draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=1)
     image.paste(compass_aircraft, (round(zerox) - 30, 30))
-    draw.line((zerox, 0, zerox, 30), fill="white", width=2)
-    draw.polygon((zerox, 16, zerox - 8, 0, zerox + 8, 0), fill="white")
+    draw.line((zerox, 0, zerox, 30), fill="white", width=1)
+    draw.polygon((zerox, 12, zerox - 6, 0, zerox + 6, 0), fill="white")
     for m in range(0, 360, 10):
         s = math.sin(math.radians(heading + m + 90))
         c = math.cos(math.radians(heading + m + 90))
