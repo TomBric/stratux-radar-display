@@ -162,7 +162,7 @@ def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
     logo = Image.open(logopath)
     draw.rectangle(((0, 0), (sizex, 64)), fill="blue")
-    draw.bitmap((zerox - 32, 0), logo, fill="black")
+    draw.bitmap((zerox - 32, 0), logo, fill="white")
     centered_text(draw, 64, "OledRadar "+version, largefont, fill="white")
     centered_text(draw, sizey - 3 * SMALL, "Connecting to", smallfont, fill="white")
     centered_text(draw, sizey - 2*SMALL, target_ip, smallfont, fill="white")
@@ -308,7 +308,7 @@ def compass(draw, heading, error_message):
     cmsize = 7        # length of compass marks
 
     draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=1)
-    draw.bitmap((zerox - 32, 32), compass_aircraft, fill="white")
+    draw.bitmap((zerox - 32, 32), compass_aircraft, fill="black")
     draw.line((zerox, 0, zerox, 20), fill="white", width=3)
     draw.polygon((zerox, 10, zerox - 5, 0, zerox + 5, 0), fill="white")
     for m in range(0, 360, 10):
