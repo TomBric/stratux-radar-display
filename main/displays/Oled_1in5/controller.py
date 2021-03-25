@@ -328,7 +328,7 @@ def compass(draw, heading, error_message):
             else:
                 mark = str(m/10)
             cdraw.rectangle((0,0,SMALL*2,SMALL*2),fill="black")
-            cdraw.text((SMALL/2, SMALL/2), mark, font=largefont, fill="white")
+            cdraw.text((SMALL/2, SMALL/2), mark, font=smallfont, fill="white")
             rotim = cimage.rotate(-heading-m)
             t = math.tan(math.radians(heading+m))
             center = (zerox - (csize - cmsize - SMALL / 2) * c, zeroy - (csize - cmsize - SMALL / 2) * s)
