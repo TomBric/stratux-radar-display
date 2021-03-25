@@ -326,7 +326,7 @@ def compass(draw, heading, error_message):
             elif m == 270:
                 mark = "W"
             else:
-                mark = str(m/10)
+                mark = str(int(m/10))
             cdraw.rectangle((0,0,SMALL*2,SMALL*2),fill="black")
             cdraw.text((SMALL/2, SMALL/2), mark, font=smallfont, fill="white")
             rotim = cimage.rotate(-heading-m)
