@@ -296,6 +296,8 @@ def gmeter(draw, current, maxg, ming, error_message):
 
 
 def compass(draw, heading, error_message):
+    global image
+
     cimage = Image.new(device.mode, (LARGE*2, LARGE*2))  # larger to make sure rotated characters still fit
     cdraw = ImageDraw.Draw(cimage)
     csize = sizex/2   # radius of compass rose
@@ -321,7 +323,7 @@ def compass(draw, heading, error_message):
             rotim = cimage.rotate(heading+m, expand=True)
             t = math.tan(math.radians(heading+m+135))
             center = (zerox - (csize - cmsize - LARGE / 2) * c, zeroy - (csize - cmsize - LARGE / 2) * s)
-            draw.paste(rotim, (center[0]-t*LARGE, center[1]-LARGE/t))
+            image.paste(rotim, (center[0]-t*LARGE, center[1]-LARGE/t))
     draw.ellipse((0, 0, sizex, sizey), outline="white", fill="black", width=1)
     if error_message is not None:
         centered_text(draw, 57, error_message, largefont, fill="red")
