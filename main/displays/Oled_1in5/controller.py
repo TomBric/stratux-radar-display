@@ -333,7 +333,7 @@ def compass(draw, heading, error_message):
             mask = Image.new('1', (w, h))
             cdraw = ImageDraw.Draw(mask)
             cdraw.text((0, 0), mark, 1, font=smallfont)
-            mask = mask.rotate(-heading+m, expand=True)
+            mask = mask.rotate(-m+heading, expand=True)
             t = math.tan(math.radians(heading+m))
             center = (zerox - (csize - cmsize - SMALL / 2) * c, zeroy - (csize - cmsize - SMALL / 2) * s)
             # image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
