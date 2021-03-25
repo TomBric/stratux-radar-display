@@ -302,7 +302,7 @@ def gmeter(draw, current, maxg, ming, error_message):
 def compass(draw, heading, error_message):
     global image
 
-    cimage = Image.new(device.mode, (SMALL*2, SMAPP*2))  # larger to make sure rotated characters still fit
+    cimage = Image.new(device.mode, (SMALL*2, SMALL*2))  # larger to make sure rotated characters still fit
     cdraw = ImageDraw.Draw(cimage)
     csize = sizex/2   # radius of compass rose
     cmsize = 7        # length of compass marks
