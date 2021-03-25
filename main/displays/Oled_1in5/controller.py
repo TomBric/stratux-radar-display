@@ -302,7 +302,7 @@ def gmeter(draw, current, maxg, ming, error_message):
 def compass(draw, heading, error_message):
     global image
 
-    cimage = Image.new(device.mode, (LARGE*2, LARGE*2))  # larger to make sure rotated characters still fit
+    cimage = Image.new(device.mode, (SMALL*2, SMAPP*2))  # larger to make sure rotated characters still fit
     cdraw = ImageDraw.Draw(cimage)
     csize = sizex/2   # radius of compass rose
     cmsize = 7        # length of compass marks
@@ -327,10 +327,10 @@ def compass(draw, heading, error_message):
                 mark = "W"
             else:
                 mark = str(m/10)
-            cdraw.text((LARGE/2, LARGE/2), mark, font=largefont, fill="white")
+            cdraw.text((SMALL/2, SMALL/2), mark, font=largefont, fill="white")
             rotim = cimage.rotate(heading+m, expand=True)
             t = math.tan(math.radians(heading+m+135))
-            center = (zerox - (csize - cmsize - LARGE / 2) * c, zeroy - (csize - cmsize - LARGE / 2) * s)
+            center = (zerox - (csize - cmsize - SMALL / 2) * c, zeroy - (csize - cmsize - SMALL / 2) * s)
             # image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
             image.paste(rotim, (round(center[0]), round(center[1])))
     if error_message is not None:
