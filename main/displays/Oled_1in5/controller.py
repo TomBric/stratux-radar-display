@@ -312,8 +312,8 @@ def compass(draw, heading, error_message):
     draw.line((zerox, 0, zerox, 30), fill="white", width=1)
     draw.polygon((zerox, 12, zerox - 6, 0, zerox + 6, 0), fill="white")
     for m in range(0, 360, 10):
-        s = math.sin(math.radians(heading + m))
-        c = math.cos(math.radians(heading + m))
+        s = math.sin(math.radians(heading + m + 90))
+        c = math.cos(math.radians(heading + m + 90))
         draw.line((zerox - csize * c, zeroy - csize * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s),
                   fill="white", width=1)
         if m % 30 == 0:
