@@ -72,7 +72,7 @@ def user_input():
     if btime == 0:
         return 0  # stay in current mode
     if button == 1 and btime == 2:  # middle and long
-        return 7  # next mode to be status
+        return 11  # next mode to be compass
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long- refresh
