@@ -162,7 +162,6 @@ def init():
     # compass
     pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
     compass_aircraft = Image.open(pic_path)
-    # compass_aircraft.putalpha(0)   # set transparency mask
     mask = Image.new('1', (LARGE * 2, LARGE * 2))
     cdraw = ImageDraw.Draw(mask)
     return draw, max_pixel, zerox, zeroy, display_refresh
@@ -370,7 +369,7 @@ def compass(draw, heading, error_message):
     csize = sizey / 2  # radius of compass rose
 
     draw.ellipse((sizex/2-csize, 0, sizex/2+csize-1, sizey - 1), outline="black", fill="white", width=4)
-    draw.bitmap((zerox - 60, 80), compass_aircraft, fill="black")
+    draw.bitmap((zerox - 60, 60), compass_aircraft, fill="black")
     # epaper_image.paste("black", (round(zerox) - 60, 60), compass_aircraft)
     draw.line((czerox, 20, czerox, 60), fill="black", width=3)
     text = str(heading) + '°'
