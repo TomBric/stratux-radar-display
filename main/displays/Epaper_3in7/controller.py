@@ -370,7 +370,6 @@ def compass(draw, heading, error_message):
 
     draw.ellipse((sizex/2-csize, 0, sizex/2+csize-1, sizey - 1), outline="black", fill="white", width=4)
     draw.bitmap((zerox - 60, 70), compass_aircraft, fill="black")
-    # epaper_image.paste("black", (round(zerox) - 60, 60), compass_aircraft)
     draw.line((czerox, 20, czerox, 70), fill="black", width=4)
     text = str(heading) + '°'
     textsize = draw.textsize(text, smallfont)
