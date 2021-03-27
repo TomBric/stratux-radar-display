@@ -302,8 +302,8 @@ def gmeter(draw, current, maxg, ming, error_message):
 def compass(draw, heading, error_message):
     global image
 
-    cimage = Image.new("L", (SMALL*2, SMALL*2))  # larger to make sure rotated characters still fit
-    cdraw = ImageDraw.Draw(cimage)
+    mask = Image.new('1', (LARGE * 2, LARGE * 2))
+    cdraw = ImageDraw.Draw(mask)
     csize = sizex/2   # radius of compass rose
     cmsize = 7        # length of compass marks
 
@@ -329,16 +329,13 @@ def compass(draw, heading, error_message):
             else:
                 mark = str(int(m/10))
                 color = "white"
+            cdraw.rectangle((0, 0, LARGE*2, LARGE*2), fill="black")
+            # cdraw.text(((LARGE*2-w)/2, (LARGE*2-h)/2), mark, 1, font=largefont)
             w, h = largefont.getsize(mark)
-            mask = Image.new('1', (w, h))
-            cdraw = ImageDraw.Draw(mask)
-            cdraw.rectangle((0, 0, w, h), fill="black")
-            cdraw.text((0, 0), mark, 1, font=largefont)
-            mask = mask.rotate(-m+heading, expand=True)
-            t = math.tan(math.radians(heading+m))
+            cdraw.text(((LARGE*2-w)/2, (LARGE*2-h)/2), mark, font=largefont)
+            mask = mask.rotate(-m+heading, expand=False)
             center = (zerox - (csize - cmsize - SMALL / 2) * c, zeroy - (csize - cmsize - SMALL / 2) * s)
-            # image.paste(rotim, (round(center[0]-t*LARGE), round(center[1]-LARGE/t)))
-            image.paste(color, (round(center[0]-SMALL), round(center[1])-SMALL), mask)
+            image.paste(color, (round(center[0]-SMALL), round(center[1]-SMALL)), mask)
     if error_message is not None:
         centered_text(draw, 57, error_message, largefont, fill="red")
 
