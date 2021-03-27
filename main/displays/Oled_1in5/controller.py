@@ -121,8 +121,8 @@ def init():
     device.display(image)
     end = time.time()
     display_refresh = end - start
-    pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
     # compass
+    pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
     compass_aircraft = Image.open(pic_path).convert("RGBA")
     mask = Image.new('1', (LARGE * 2, LARGE * 2))
     cdraw = ImageDraw.Draw(mask)
