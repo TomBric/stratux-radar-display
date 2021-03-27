@@ -305,11 +305,11 @@ def compass(draw, heading, error_message):
     mask = Image.new('1', (LARGE * 2, LARGE * 2))
     cdraw = ImageDraw.Draw(mask)
     csize = sizex/2   # radius of compass rose
-    cmsize = 7        # length of compass marks
+    cmsize = 10        # length of compass marks
 
     draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=2)
     image.paste(compass_aircraft, (round(zerox) - 30, 30))
-    draw.line((zerox, 0, zerox, 30), fill="white", width=1)
+    draw.line((zerox, 10, zerox, 30), fill="white", width=1)
     # draw.polygon((zerox, 12, zerox - 6, 0, zerox + 6, 0), fill="white")
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading+ 90))
