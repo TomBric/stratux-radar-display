@@ -16,17 +16,17 @@ Find below a photo of the current supported displays
 - the oled display is relatively small, but can be build into a 2 1/4" or larger instrument mounting hole
 - the epaper display is larger and has optimal readability in sunlight. As e-paper it has a slower update of approx. once per second
 
-![Display photo](https://github.com/TomBric/stratux-radar-display/blob/no-code/images/StratuxRadar.jpg)
+![Display photo](https://github.com/TomBric/stratux-radar-display/no-code/images/StratuxRadar.jpg)
 
 ## Hardware-List
 - Raspberry Hardware: Since the code is pure python, no special hardware is required. I recommend a current "raspbian standard desktop os" as operating system. Performance requirements are not so high, so I recommend a "Rasperry Zero WH 512MByte RAM". Normal Raspberry 3B or 4 are also possible (but not tested by me). The Raspi Zero has the smallest form factor and best battery consumption. 
 - Epaper-Display: Waveshare 18057 3.7inch e-Paper HAT: Directly mountable on the Raspi as a HAT.
 Alternatively Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Paper Raw Panel Driver HAT 13512. The advantage of the latter is a better form factor for mounting it into some cases. Please make sure to switch the "Display Config" switch to A.
 
-![Epaper photo](https://github.com/TomBric/stratux-radar-display/blob/no-code/images/Epaper_3in7.jpg)
+![Epaper photo](https://github.com/TomBric/stratux-radar-display/no-code/images/Epaper_3in7.jpg)
 
 - Oled-Display: Waveshare 14747, 128x128, General 1.5inch RGB OLED display Module
-   ![Oled photo](https://github.com/TomBric/stratux-radar-display/blob/no-code/images/Oled_1in5.jpg)
+   ![Oled photo](https://github.com/TomBric/stratux-radar-display/no-code/images/Oled_1in5.jpg)
    
  # Hardware connection of the OLED 1.5 inch display
  
