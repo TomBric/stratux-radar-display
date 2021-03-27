@@ -360,7 +360,7 @@ def gmeter(draw, current, maxg, ming, error_message):
 
 
 def compass(draw, heading, error_message):
-    global image
+    global epaper_image
     global mask
     global cdraw
 
@@ -369,7 +369,7 @@ def compass(draw, heading, error_message):
     csize = sizey / 2  # radius of compass rose
 
     draw.ellipse((0, 0, sizex - 1, sizey - 1), outline="black", fill="white", width=2)
-    image.paste(compass_aircraft, (round(zerox) - 30, 30))
+    epaper_image.paste(compass_aircraft, (round(zerox) - 30, 30))
     draw.line((czerox, 10, czerox, 30), fill="black", width=1)
     text = str(heading) + '°'
     textsize = draw.textsize(text, smallfont)
@@ -398,7 +398,7 @@ def compass(draw, heading, error_message):
             cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
             rotmask = mask.rotate(-m + heading, expand=False)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
-            image.paste(color, (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
+            epaper_image.paste(color, (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
     if error_message is not None:
         centered_text(draw, 120, error_message, largefont, fill="black")
 
