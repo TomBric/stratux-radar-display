@@ -78,7 +78,7 @@ m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), 
 compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
-cmsize = 10        # length of compass marks
+cmsize = 16        # length of compass marks
 # end device globals
 
 
@@ -368,9 +368,9 @@ def compass(draw, heading, error_message):
     czeroy = sizey / 2
     csize = sizey / 2  # radius of compass rose
 
-    draw.ellipse((sizex/2-csize, 0, sizex/2+csize-1, sizey - 1), outline="black", fill="white", width=2)
+    draw.ellipse((sizex/2-csize, 0, sizex/2+csize-1, sizey - 1), outline="black", fill="white", width=4)
     epaper_image.paste("black", (round(zerox) - 60, 60), compass_aircraft)
-    draw.line((czerox, 10, czerox, 30), fill="black", width=1)
+    draw.line((czerox, 10, czerox, 30), fill="black", width=3)
     text = str(heading) + '°'
     textsize = draw.textsize(text, smallfont)
     draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="black", align="right")
@@ -379,7 +379,7 @@ def compass(draw, heading, error_message):
         c = math.cos(math.radians(m - heading + 90))
         draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
                    czeroy - (csize - cmsize) * s),
-                  fill="black", width=1)
+                  fill="black", width=2)
         if m % 30 == 0:
             color = "black"
             if m == 0:
