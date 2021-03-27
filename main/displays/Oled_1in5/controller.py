@@ -314,10 +314,10 @@ def compass(draw, heading, error_message):
     textsize = draw.textsize(text, smallfont)
     draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="floralwhite", align="right")
     for m in range(0, 360, 10):
-        s = math.sin(math.radians(m - heading+ 90))
+        s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
-        draw.line((zerox - (csize-1) * c, zeroy - (csize-1) * s, zerox - (csize - cmsize) * c, zeroy - (csize - cmsize) * s),
-                  fill="white", width=1)
+        draw.line(round(zerox-(csize-1)*c), round(zeroy-(csize-1)*s), round(zerox-(csize-cmsize)*c),
+                  round(zeroy-(csize-cmsize)*s), fill="white", width=1)
         if m % 30 == 0:
             color = "yellow"
             if m == 0:
