@@ -161,7 +161,7 @@ def init():
     logging.info("Measured Display Refresh Time: " + str(round(display_refresh, 3)) + " seconds")
     # compass
     pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
-    compass_aircraft = Image.open(pic_path)
+    compass_aircraft = Image.open(pic_path).putalpha(255)
     mask = Image.new('1', (LARGE * 2, LARGE * 2))
     cdraw = ImageDraw.Draw(mask)
     return draw, max_pixel, zerox, zeroy, display_refresh
