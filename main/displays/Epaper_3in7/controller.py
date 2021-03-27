@@ -78,7 +78,7 @@ m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), 
 compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
-cmsize = 16        # length of compass marks
+cmsize = 20        # length of compass marks
 # end device globals
 
 
@@ -162,7 +162,7 @@ def init():
     # compass
     pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
     compass_aircraft = Image.open(pic_path)
-    compass_aircraft.putalpha(255)   # set transparency mask
+    compass_aircraft.putalpha(0)   # set transparency mask
     mask = Image.new('1', (LARGE * 2, LARGE * 2))
     cdraw = ImageDraw.Draw(mask)
     return draw, max_pixel, zerox, zeroy, display_refresh
@@ -372,7 +372,7 @@ def compass(draw, heading, error_message):
     draw.ellipse((sizex/2-csize, 0, sizex/2+csize-1, sizey - 1), outline="black", fill="white", width=4)
     draw.bitmap((zerox - 60, 80), compass_aircraft, fill="black")
     # epaper_image.paste("black", (round(zerox) - 60, 60), compass_aircraft)
-    draw.line((czerox, 10, czerox, 30), fill="black", width=3)
+    draw.line((czerox, 20, czerox, 60), fill="black", width=3)
     text = str(heading) + '°'
     textsize = draw.textsize(text, smallfont)
     draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="black", align="right")
