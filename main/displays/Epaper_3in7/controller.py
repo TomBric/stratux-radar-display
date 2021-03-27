@@ -369,12 +369,12 @@ def compass(draw, heading, error_message):
     csize = sizey / 2  # radius of compass rose
 
     draw.ellipse((sizex/2-csize, 0, sizex/2+csize-1, sizey - 1), outline="black", fill="white", width=4)
-    draw.bitmap((zerox - 60, 60), compass_aircraft, fill="black")
+    draw.bitmap((zerox - 60, 70), compass_aircraft, fill="black")
     # epaper_image.paste("black", (round(zerox) - 60, 60), compass_aircraft)
-    draw.line((czerox, 20, czerox, 60), fill="black", width=3)
+    draw.line((czerox, 20, czerox, 70), fill="black", width=4)
     text = str(heading) + '°'
     textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="black", align="right")
+    draw.text((sizex - textsize[0] - 100 , sizey - textsize[1] - 5), text, font=smallfont, fill="black", align="right")
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
