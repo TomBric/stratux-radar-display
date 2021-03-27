@@ -323,7 +323,7 @@ def compass(draw, heading, error_message):
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
-        draw.line(zerox-(csize-1)*c, zeroy-(csize-1)*s, zerox-(csize-cmsize)*c, zeroy-(csize-cmsize)*s,
+        draw.line((zerox-(csize-1)*c, zeroy-(csize-1)*s, zerox-(csize-cmsize)*c, zeroy-(csize-cmsize)*s),
                   fill="white", width=1)
         if m % 30 == 0:
             color = "yellow"
