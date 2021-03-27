@@ -61,12 +61,15 @@ verysmallfont = ""
 webfont = ""
 device = None
 image = None
+# ahrs
 ahrs_draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
+# compass
 compass_aircraft = None   # image of aircraft for compass-display
-
-
+mask = None
+cdraw = None
+cmsize = 10        # length of compass marks
 # end device globals
 
 
@@ -95,6 +98,8 @@ def init():
     global device
     global image
     global compass_aircraft
+    global mask
+    global cdraw
 
     config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
     device = radar_opts.get_device(['-f', config_path])
@@ -117,7 +122,10 @@ def init():
     end = time.time()
     display_refresh = end - start
     pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
+    # compass
     compass_aircraft = Image.open(pic_path).convert("RGBA")
+    mask = Image.new('1', (LARGE * 2, LARGE * 2))
+    cdraw = ImageDraw.Draw(mask)
     return draw, sizex, zerox, zeroy, display_refresh
 
 
@@ -301,11 +309,10 @@ def gmeter(draw, current, maxg, ming, error_message):
 
 def compass(draw, heading, error_message):
     global image
+    global mask
+    global cdraw
 
-    mask = Image.new('1', (LARGE * 2, LARGE * 2))
-    cdraw = ImageDraw.Draw(mask)
     csize = sizex/2   # radius of compass rose
-    cmsize = 10        # length of compass marks
 
     draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=2)
     image.paste(compass_aircraft, (round(zerox) - 30, 30))
@@ -316,8 +323,8 @@ def compass(draw, heading, error_message):
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
-        draw.line(round(zerox-(csize-1)*c), round(zeroy-(csize-1)*s), round(zerox-(csize-cmsize)*c),
-                  round(zeroy-(csize-cmsize)*s), fill="white", width=1)
+        draw.line(zerox-(csize-1)*c, zeroy-(csize-1)*s, zerox-(csize-cmsize)*c, zeroy-(csize-cmsize)*s,
+                  fill="white", width=1)
         if m % 30 == 0:
             color = "yellow"
             if m == 0:
@@ -332,7 +339,6 @@ def compass(draw, heading, error_message):
                 mark = str(int(m/10))
                 color = "white"
             cdraw.rectangle((0, 0, LARGE*2, LARGE*2), fill="black")
-            # cdraw.text(((LARGE*2-w)/2, (LARGE*2-h)/2), mark, 1, font=largefont)
             w, h = largefont.getsize(mark)
             cdraw.text(((LARGE*2-w)/2, (LARGE*2-h)/2), mark, 1, font=largefont)
             rotmask = mask.rotate(-m+heading, expand=False)
