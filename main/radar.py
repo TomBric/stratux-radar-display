@@ -51,7 +51,7 @@ import compassui
 import importlib
 
 # constant definitions
-RADAR_VERSION = "1.0f"
+RADAR_VERSION = "1.0g"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
