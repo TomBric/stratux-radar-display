@@ -334,8 +334,8 @@ def compass(draw, heading, error_message):
             w, h = largefont.getsize(mark)
             cdraw.text(((LARGE*2-w)/2, (LARGE*2-h)/2), mark, 1, font=largefont)
             rotmask = mask.rotate(-m+heading, expand=False)
-            center = (zerox - (csize - cmsize - SMALL / 2) * c, zeroy - (csize - cmsize - SMALL / 2) * s)
-            image.paste(color, (round(center[0]-SMALL), round(center[1]-SMALL)), rotmask)
+            center = (zerox - (csize - cmsize - LARGE / 2) * c, zeroy - (csize - cmsize - LARGE / 2) * s)
+            image.paste(color, (round(center[0]-LARGE), round(center[1]-LARGE)), rotmask)
     if error_message is not None:
         centered_text(draw, 57, error_message, largefont, fill="red")
 
