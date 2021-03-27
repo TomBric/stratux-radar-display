@@ -61,11 +61,15 @@ verysmallfont = ""
 webfont = ""
 device = None
 image = None
+# ahrs
 ahrs_draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
-
-
+# compass
+compass_aircraft = None   # image of aircraft for compass-display
+mask = None
+cdraw = None
+cmsize = 10        # length of compass marks
 # end device globals
 
 
@@ -93,6 +97,9 @@ def init():
     global webfont
     global device
     global image
+    global compass_aircraft
+    global mask
+    global cdraw
 
     config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
     device = radar_opts.get_device(['-f', config_path])
@@ -114,6 +121,11 @@ def init():
     device.display(image)
     end = time.time()
     display_refresh = end - start
+    # compass
+    pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
+    compass_aircraft = Image.open(pic_path).convert("RGBA")
+    mask = Image.new('1', (LARGE * 2, LARGE * 2))
+    cdraw = ImageDraw.Draw(mask)
     return draw, sizex, zerox, zeroy, display_refresh
 
 
@@ -293,6 +305,47 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
     middle = "Mode"
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
+
+
+def compass(draw, heading, error_message):
+    global image
+    global mask
+    global cdraw
+
+    csize = sizex/2   # radius of compass rose
+
+    draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=2)
+    image.paste(compass_aircraft, (round(zerox) - 30, 30))
+    draw.line((zerox, 10, zerox, 30), fill="white", width=1)
+    text = str(heading) + '°'
+    textsize = draw.textsize(text, smallfont)
+    draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="floralwhite", align="right")
+    for m in range(0, 360, 10):
+        s = math.sin(math.radians(m - heading + 90))
+        c = math.cos(math.radians(m - heading + 90))
+        draw.line((zerox-(csize-1)*c, zeroy-(csize-1)*s, zerox-(csize-cmsize)*c, zeroy-(csize-cmsize)*s),
+                  fill="white", width=1)
+        if m % 30 == 0:
+            color = "yellow"
+            if m == 0:
+                mark = "N"
+            elif m == 90:
+                mark = "E"
+            elif m == 180:
+                mark = "S"
+            elif m == 270:
+                mark = "W"
+            else:
+                mark = str(int(m/10))
+                color = "white"
+            cdraw.rectangle((0, 0, LARGE*2, LARGE*2), fill="black")
+            w, h = largefont.getsize(mark)
+            cdraw.text(((LARGE*2-w)/2, (LARGE*2-h)/2), mark, 1, font=largefont)
+            rotmask = mask.rotate(-m+heading, expand=False)
+            center = (zerox - (csize - cmsize - LARGE / 2) * c, zeroy - (csize - cmsize - LARGE / 2) * s)
+            image.paste(color, (round(center[0]-LARGE), round(center[1]-LARGE)), rotmask)
+    if error_message is not None:
+        centered_text(draw, 57, error_message, largefont, fill="red")
 
 
 def shutdown(draw, countdown):

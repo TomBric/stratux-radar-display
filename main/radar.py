@@ -47,6 +47,7 @@ import shutdownui
 import ahrsui
 import statusui
 import gmeterui
+import compassui
 import importlib
 
 # constant definitions
@@ -97,7 +98,7 @@ bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
 global_mode = 1
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
-# 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 0=Init
+# 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass 0=Init
 bluetooth_active = False
 
 
@@ -444,7 +445,8 @@ async def user_interface():
                 next_mode = statusui.user_input(bluetooth_active)
             elif global_mode == 9:  # gmeter
                 next_mode = gmeterui.user_input()
-
+            elif global_mode == 11:  # compass
+                next_mode = compassui.user_input()
 
             if next_mode > 0:
                 ui_changed = True
@@ -492,7 +494,7 @@ async def display_and_cutoff():
                     global_mode = 1
                 elif global_mode == 5:   # ahrs'
                     ahrsui.draw_ahrs(draw, display_control, situation['connected'], ui_changed or ahrs['was_changed'],
-                                     ahrs['pitch'],ahrs['roll'], ahrs['heading'], ahrs['slipskid'],
+                                     ahrs['pitch'], ahrs['roll'], ahrs['heading'], ahrs['slipskid'],
                                      ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
                     ahrs['was_changed'] = False
                 elif global_mode == 6:   # refresh display, only relevant for epaper, mode was radar
@@ -512,6 +514,14 @@ async def display_and_cutoff():
                     logging.debug("Gmeter: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 9
+                elif global_mode == 11:  # compass display
+                    compassui.draw_compass(draw, display_control, situation['was_changed'], situation['connected'],
+                                           situation['course'])
+                    situation['was_changed'] = False
+                elif global_mode == 12:   # refresh display, only relevant for epaper, mode was gmeter
+                    logging.debug("Compass: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 11
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
@@ -583,6 +593,7 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--ahrs", required=False, help="Start mode is ahrs", action='store_true', default=False)
     ap.add_argument("-x", "--status", required=False, help="Start mode is status", action='store_true', default=False)
     ap.add_argument("-g", "--gmeter", required=False, help="Start mode is g-meter", action='store_true', default=False)
+    ap.add_argument("-o", "--compass", required=False, help="Start mode is compass", action='store_true', default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no",
@@ -603,7 +614,9 @@ if __name__ == "__main__":
         global_mode = 7   # start in status mode
     if args['gmeter']:
         global_mode = 9   # start in g-meter mode
-    global_config['display_tail'] = args['registration'] # display registration if set
+    if args['compass']:
+        global_mode = 11   # start in compass mode
+    global_config['display_tail'] = args['registration']  # display registration if set
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()

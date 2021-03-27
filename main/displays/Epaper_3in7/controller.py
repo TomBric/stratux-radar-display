@@ -74,6 +74,11 @@ azeroy = 140
 asize = 140
 msize = 15  # size of markings
 m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
+# compass
+compass_aircraft = None   # image of aircraft for compass-display
+mask = None
+cdraw = None
+cmsize = 20        # length of compass marks
 # end device globals
 
 
@@ -124,6 +129,9 @@ def init():
     global device
     global epaper_image
     global draw
+    global compass_aircraft
+    global mask
+    global cdraw
 
     device = epd3in7.EPD()
     device.init(0)
@@ -151,6 +159,11 @@ def init():
     end = time.time()
     display_refresh = end-start
     logging.info("Measured Display Refresh Time: " + str(round(display_refresh, 3)) + " seconds")
+    # compass
+    pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
+    compass_aircraft = Image.open(pic_path)
+    mask = Image.new('1', (LARGE * 2, LARGE * 2))
+    cdraw = ImageDraw.Draw(mask)
     return draw, max_pixel, zerox, zeroy, display_refresh
 
 
@@ -344,6 +357,51 @@ def gmeter(draw, current, maxg, ming, error_message):
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey-SMALL-3, middle, smallfont, fill="black")
+
+
+def compass(draw, heading, error_message):
+    global epaper_image
+    global mask
+    global cdraw
+
+    czerox = sizex / 2
+    czeroy = sizey / 2
+    csize = sizey / 2  # radius of compass rose
+
+    draw.ellipse((sizex/2-csize, 0, sizex/2+csize-1, sizey - 1), outline="black", fill="white", width=4)
+    draw.bitmap((zerox - 60, 70), compass_aircraft, fill="black")
+    # epaper_image.paste("black", (round(zerox) - 60, 60), compass_aircraft)
+    draw.line((czerox, 20, czerox, 70), fill="black", width=4)
+    text = str(heading) + '°'
+    textsize = draw.textsize(text, smallfont)
+    draw.text((sizex - textsize[0] - 100 , sizey - textsize[1] - 5), text, font=smallfont, fill="black", align="right")
+    for m in range(0, 360, 10):
+        s = math.sin(math.radians(m - heading + 90))
+        c = math.cos(math.radians(m - heading + 90))
+        draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
+                   czeroy - (csize - cmsize) * s),
+                  fill="black", width=2)
+        if m % 30 == 0:
+            color = "black"
+            if m == 0:
+                mark = "N"
+            elif m == 90:
+                mark = "E"
+            elif m == 180:
+                mark = "S"
+            elif m == 270:
+                mark = "W"
+            else:
+                mark = str(int(m / 10))
+                color = "black"
+            cdraw.rectangle((0, 0, LARGE * 2, LARGE * 2), fill="black")
+            w, h = largefont.getsize(mark)
+            cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
+            rotmask = mask.rotate(-m + heading, expand=False)
+            center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
+            epaper_image.paste(color, (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
+    if error_message is not None:
+        centered_text(draw, 120, error_message, largefont, fill="black")
 
 
 def shutdown(draw, countdown):
