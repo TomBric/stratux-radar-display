@@ -23,7 +23,7 @@ Find below a photo of the current supported displays
 - Epaper-Display: Waveshare 18057 3.7inch e-Paper HAT: Directly mountable on the Raspi as a HAT.
 Alternatively Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Paper Raw Panel Driver HAT 13512. The advantage of the latter is a better form factor for mounting it into some cases. Please make sure to switch the "Display Config" switch to A.
 
-![Epaper photo](https://github.com/TomBric/stratux-radar-display/blob/mainno-code/images/Epaper_3in7.jpg)
+![Epaper photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_3in7.jpg)
 
 - Oled-Display: Waveshare 14747, 128x128, General 1.5inch RGB OLED display Module
    ![Oled photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Oled_1in5.jpg)
