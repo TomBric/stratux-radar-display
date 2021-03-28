@@ -385,8 +385,8 @@ def compass(draw, heading, error_message):
             draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
                        czeroy - (csize - cmsize) * s), fill="black", width=2)
         else:
-            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize - 3) * c,
-                       czeroy - (csize - cmsize - 3) * s), fill="black", width=4)
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
+                       czeroy - (csize - cmsize) * s), fill="black", width=4)
             cdraw.rectangle((0, 0, LARGE * 2, LARGE * 2), fill="black")
             if m == 0:
                 mark = "N"
