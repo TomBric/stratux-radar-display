@@ -1,5 +1,5 @@
 # stratux-radar-display
-Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero WH). Reads the aircraft data from Stratux and displays them on the specified display. The newest version now has a user interface include. You can connect 3 pushbottons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer is also implemented.
+Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero WH). Reads the aircraft data from Stratux and displays them on the specified display. The newest version now has a user interface include. You can connect 3 pushbottons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon and a compass (based on GPS) are also implemented.
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
@@ -14,7 +14,7 @@ Usage:
 
 Find below a photo of the current supported displays
 - the oled display is relatively small, but can be build into a 2 1/4" or larger instrument mounting hole
-- the epaper display is larger and has optimal readability in sunlight. As e-paper it has a slower update of approx. once per second
+- the epaper display is larger and has optimal readability in sunlight. As e-paper it has a slower update of approx. twice per second. For the radar display this update rate is appropriate
 
 ![Display photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/StratuxRadar.jpg)
 
@@ -156,5 +156,45 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
       - press right button to increase countdown time by 1 mins
       - max countdown time is 2 hours. If you set countdown time > 2 h, countdone timer will be cleared
    
- ### AHRS mode:
+### AHRS mode:
  - no special interaction, press long middle for next mode
+
+### G-Meter mode:
+ - press right short to reset the max and min value to 1
+ - long press middle for next mode
+
+
+### Compass mode
+- no special interaction, press long middle for next mode
+
+
+# Shell command parameters
+```
+  usage: radar.py [-h] -d DEVICE [-s] [-t] [-a] [-x] [-g] [-o] [-c CONNECT] [-v]
+                [-r]
+
+Stratux web radar for separate displays
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DEVICE, --device DEVICE
+                        Display device to use
+  -s, --speak           Speech warnings on
+  -t, --timer           Start mode is timer
+  -a, --ahrs            Start mode is ahrs
+  -x, --status          Start mode is status
+  -g, --gmeter          Start mode is g-meter
+  -o, --compass         Start mode is compass
+  -c CONNECT, --connect CONNECT
+                        Connect to Stratux-IP
+  -v, --verbose         Debug output on
+  -r, --registration    Display registration no   
+  
+  
+Example:
+python3 main/radar.py -d Epaper_3in7 -c 192.168.10.1 -r -s
+
+  ```
+
+
+
