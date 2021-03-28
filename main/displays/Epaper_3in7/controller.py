@@ -381,7 +381,7 @@ def compass(draw, heading, error_message):
                    czeroy - (csize - cmsize) * s),
                   fill="black", width=2)
         if m % 30 == 0:
-            color = "black"
+            cdraw.rectangle((0, 0, LARGE * 2, LARGE * 2), fill="black")
             if m == 0:
                 mark = "N"
             elif m == 90:
@@ -392,13 +392,15 @@ def compass(draw, heading, error_message):
                 mark = "W"
             else:
                 mark = str(int(m / 10))
-                color = "black"
-            cdraw.rectangle((0, 0, LARGE * 2, LARGE * 2), fill="black")
-            w, h = largefont.getsize(mark)
-            cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
+            if m % 90 != 0:
+                w, h = largefont.getsize(mark)
+                cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
+            else:
+                w, h = verylargefont.getsize(mark)
+                cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=verylargefont)
             rotmask = mask.rotate(-m + heading, expand=False)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
-            epaper_image.paste(color, (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
+            epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
     if error_message is not None:
         centered_text(draw, 120, error_message, largefont, fill="black")
 
