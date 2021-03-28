@@ -6,6 +6,7 @@ Current supported displays are:
 - Epaper Display 3.7 inch (waveshare)
 
 More displays can be integrated.
+You can find 3D printer files for cases of both variants in the repo (no-code). The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. 
 
 Usage:   
 - python3 radar.py -d <DeviceName> [-s] -c <Stratux IP>
