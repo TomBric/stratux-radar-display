@@ -377,11 +377,13 @@ def compass(draw, heading, error_message):
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
-        draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
-                   czeroy - (csize - cmsize) * s),
-                  fill="black", width=2)
-        if m % 30 == 0:
-            cdraw.rectangle((0, 0, LARGE * 2, LARGE * 2), fill="black")
+        if m % 30 != 0:
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
+                   czeroy - (csize - cmsize) * s), fill="black", width=2)
+        else:
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
+                       czeroy - (csize - cmsize) * s), fill="black", width=4)
+            # cdraw.rectangle((0, 0, LARGE * 2, LARGE * 2), fill="black")
             if m == 0:
                 mark = "N"
             elif m == 90:
@@ -392,12 +394,8 @@ def compass(draw, heading, error_message):
                 mark = "W"
             else:
                 mark = str(int(m / 10))
-            if m % 90 != 0:
-                w, h = largefont.getsize(mark)
-                cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
-            else:
-                w, h = verylargefont.getsize(mark)
-                cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=verylargefont)
+            w, h = largefont.getsize(mark)
+            cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
             rotmask = mask.rotate(-m + heading, expand=False)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
             epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
