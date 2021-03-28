@@ -336,7 +336,7 @@ def gmeter(draw, current, maxg, ming, error_message):
         c = math.cos(math.radians(m[0]+90))
         draw.line((azerox-asize*c, azeroy-asize*s, azerox-(asize-msize)*c, azeroy-(asize-msize)*s),
                   fill="black", width=4)
-        draw.text((azerox-(asize-msize-SMALL/2)*c, azeroy-(asize-msize-SMALL/2)*s-SMALL/2),str(m[1]),
+        draw.text((azerox-(asize-msize-SMALL/2)*c-SMALL/4, azeroy-(asize-msize-SMALL/2)*s-SMALL/2),str(m[1]),
                   font=smallfont, fill="black")
     draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
     draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="black", width=1)
