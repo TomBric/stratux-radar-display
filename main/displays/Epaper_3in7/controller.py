@@ -265,8 +265,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
         tsize = draw.textsize(tail, verysmallfont)
-        draw.rectangle((tposition[0], tposition[1] + LARGE, tposition[0] + tsize[0],
-                        tposition[1] + LARGE + VERYSMALL), fill="white")
+        # draw.rectangle((tposition[0], tposition[1] + LARGE, tposition[0] + tsize[0], tposition[1] + LARGE + VERYSMALL), fill="white")
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
