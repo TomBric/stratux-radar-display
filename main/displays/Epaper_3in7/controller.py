@@ -237,11 +237,11 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
         tposition = (x - 4 * AIRCRAFT_SIZE - tsize[0], int(y - tsize[1] / 2))
     else:
         tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - tsize[1] / 2))
-    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
+    # draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
         tsize = draw.textsize(tail, verysmallfont)
-        draw.rectangle((tposition[0], tposition[1]+LARGE, tposition[0]+tsize[0],
+        # draw.rectangle((tposition[0], tposition[1]+LARGE, tposition[0]+tsize[0],
                         tposition[1]+LARGE+VERYSMALL), fill="white")
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
