@@ -199,3 +199,32 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
     - press long middle for next mode
 
 ![Compass](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-CompassMode.jpg)
+
+
+# Shell command parameters
+```
+  usage: radar.py [-h] -d DEVICE [-s] [-t] [-a] [-x] [-g] [-o] [-c CONNECT] [-v]
+                [-r]
+
+Stratux web radar for separate displays
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DEVICE, --device DEVICE
+                        Display device to use
+  -s, --speak           Speech warnings on
+  -t, --timer           Start mode is timer
+  -a, --ahrs            Start mode is ahrs
+  -x, --status          Start mode is status
+  -g, --gmeter          Start mode is g-meter
+  -o, --compass         Start mode is compass
+  -c CONNECT, --connect CONNECT
+                        Connect to Stratux-IP
+  -v, --verbose         Debug output on
+  -r, --registration    Display registration no   
+  
+  
+Example:
+python3 main/radar.py -d Epaper_3in7 -c 192.168.10.1 -r -s
+
+  ```
