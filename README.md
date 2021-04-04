@@ -188,8 +188,8 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
 ### G-Meter mode:
     - press short right to reset min and max values
     - press long middle for next mode
-![AHRS](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-G-Meter-Mode.jpg)
+![Gmeter](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-G-Meter-Mode.jpg)
 
 ### Compass mode:
     - press long middle for next mode
-![AHRS](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-CompassMode.jpg)
+![Compass](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-CompassMode.jpg)
