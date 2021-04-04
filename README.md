@@ -97,9 +97,9 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. 
    Installation is only for expert users! To install the software perform the following steps:
    
-  1. Connect your stratux to a network, e.g. by integrating into your WLAN: Logon as root on your stratux. Make a copy of the existing /etc/network/interfaces (e.g. cp /etc/network/interfaces /etc/network/interfaces.stratux) and modify /etc/network/interfaces, so that is looks like
-
+  1. Connect your stratux to a network, e.g. by integrating into your WLAN: Logon as root on your stratux. Make a copy of the existing /etc/network/interfaces (e.g. cp /etc/network/interfaces /etc/network/interfaces.stratux) and modify /etc/network/interfaces, so that it looks like
     ```
+    
     auto lo
     iface lo inet loopback
     allow-hotplug eth0
@@ -109,8 +109,8 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
     iface wlan0 inet dhcp
        wpa-ssid "<YOUR WLAN SSID AT HOME>"
        wpa-psk "<YOUR WLAN WPA PSK FROM HOME>"
+       
     ```
-
    This will connect your stratux to your local wlan. Alternatively connect Stratux via network cable.
    
   2. Reboot and log on to your Stratux as user pi, directory /home/pi
