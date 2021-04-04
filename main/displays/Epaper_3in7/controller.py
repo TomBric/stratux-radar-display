@@ -40,6 +40,7 @@ from pathlib import Path
 
 # global constants
 VERYLARGE = 48    # timer
+MORELARGE = 36
 LARGE = 30           # size of height indications of aircraft
 SMALL = 24      # size of information indications on top and bottom
 VERYSMALL = 18
@@ -59,6 +60,7 @@ ah_zerox = 0  # zero point for ahrs
 ah_zeroy = 0
 max_pixel = 0
 verylargefont = ""
+morelargefont = ""
 largefont = ""
 smallfont = ""
 verysmallfont = ""
@@ -122,6 +124,7 @@ def init():
     global ah_zeroy
     global max_pixel
     global verylargefont
+    global morelargefont
     global largefont
     global smallfont
     global verysmallfont
@@ -148,6 +151,7 @@ def init():
     ah_zerox = sizex / 2
     max_pixel = 400
     verylargefont = make_font("Font.ttc", VERYLARGE)
+    morelargefont = make_font("Font.ttc", MORELARGE)
     largefont = make_font("Font.ttc", LARGE)               # font for height indications
     smallfont = make_font("Font.ttc", SMALL)            # font for information indications
     verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
@@ -233,12 +237,11 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
         tposition = (x - 4 * AIRCRAFT_SIZE - tsize[0], int(y - tsize[1] / 2))
     else:
         tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - tsize[1] / 2))
-    draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
+    # draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
         tsize = draw.textsize(tail, verysmallfont)
-        draw.rectangle((tposition[0], tposition[1]+LARGE, tposition[0]+tsize[0],
-                        tposition[1]+LARGE+VERYSMALL), fill="white")
+        # draw.rectangle((tposition[0], tposition[1]+LARGE, tposition[0]+tsize[0], tposition[1]+LARGE+VERYSMALL), fill="white")
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
@@ -332,8 +335,8 @@ def gmeter(draw, current, maxg, ming, error_message):
         c = math.cos(math.radians(m[0]+90))
         draw.line((azerox-asize*c, azeroy-asize*s, azerox-(asize-msize)*c, azeroy-(asize-msize)*s),
                   fill="black", width=4)
-        draw.text((azerox-(asize-msize-SMALL/2)*c, azeroy-(asize-msize-SMALL/2)*s-SMALL/2),
-                  str(m[1]), font=smallfont, fill="black")
+        draw.text((azerox-(asize-msize-SMALL/2)*c-SMALL/4, azeroy-(asize-msize-SMALL/2)*s-SMALL/2),str(m[1]),
+                  font=smallfont, fill="black")
     draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
     draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="black", width=1)
     gval = (current-1.0)*22.5
@@ -373,15 +376,17 @@ def compass(draw, heading, error_message):
     draw.line((czerox, 20, czerox, 70), fill="black", width=4)
     text = str(heading) + '°'
     textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0] - 100 , sizey - textsize[1] - 5), text, font=smallfont, fill="black", align="right")
+    draw.text((sizex - textsize[0] - 100, sizey - textsize[1] - 5), text, font=smallfont, fill="black", align="right")
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
-        draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
-                   czeroy - (csize - cmsize) * s),
-                  fill="black", width=2)
-        if m % 30 == 0:
-            color = "black"
+        if m % 30 != 0:
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
+                       czeroy - (csize - cmsize) * s), fill="black", width=2)
+        else:
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
+                       czeroy - (csize - cmsize) * s), fill="black", width=4)
+            cdraw.rectangle((0, 0, LARGE * 2, LARGE * 2), fill="black")
             if m == 0:
                 mark = "N"
             elif m == 90:
@@ -392,13 +397,15 @@ def compass(draw, heading, error_message):
                 mark = "W"
             else:
                 mark = str(int(m / 10))
-                color = "black"
-            cdraw.rectangle((0, 0, LARGE * 2, LARGE * 2), fill="black")
-            w, h = largefont.getsize(mark)
-            cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
+            if m % 90 != 0:
+                w, h = largefont.getsize(mark)
+                cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
+            else:
+                w, h = morelargefont.getsize(mark)
+                cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=morelargefont)
             rotmask = mask.rotate(-m + heading, expand=False)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
-            epaper_image.paste(color, (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
+            epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
     if error_message is not None:
         centered_text(draw, 120, error_message, largefont, fill="black")
 
