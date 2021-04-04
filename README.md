@@ -100,15 +100,15 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
   1. Connect your stratux to a network, e.g. by integrating into your WLAN: Logon as root on your stratux. Make a copy of the existing /etc/network/interfaces (e.g. cp /etc/network/interfaces /etc/network/interfaces.stratux) and modify /etc/network/interfaces, so that is looks like
 
     ```
-auto lo
-iface lo inet loopback
-allow-hotplug eth0
-iface eth0 inet dhcp
-allow-hotplug wlan0
+    auto lo
+    iface lo inet loopback
+    allow-hotplug eth0
+    iface eth0 inet dhcp
+    allow-hotplug wlan0
 
-iface wlan0 inet dhcp
- wpa-ssid "<YOUR WLAN SSID AT HOME>"
- wpa-psk "<YOUR WLAN WPA PSK FROM HOME>"
+    iface wlan0 inet dhcp
+       wpa-ssid "<YOUR WLAN SSID AT HOME>"
+       wpa-psk "<YOUR WLAN WPA PSK FROM HOME>"
     ```
 
    This will connect your stratux to your local wlan. Alternatively connect Stratux via network cable.
