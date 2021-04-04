@@ -94,7 +94,25 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
 
    
    ### Installation on a standard stratux device
-   stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. You can then start with step 5 from expert setup above. The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
+   stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. 
+   Installation is only for expert users! To install the software perform the following steps:
+   1. Connect your stratux to a network, e.g. by integrating into your WLAN. Logon as root on your stratux and modify /etc/network/interfaces, so that is looks like
+'''
+auto lo
+iface lo inet loopback
+allow-hotplug eth0
+iface eth0 inet dhcp
+allow-hotplug wlan0
+
+iface wlan0 inet dhcp
+ wpa-ssid "<YOUR WLAN SSID AT HOME>"
+ wpa-psk "<YOUR WLAN WPA PSK FROM HOME>"
+'''
+This will connect your stratux to your local wlan. Alternatively connect Stratux via network cable.
+   4. Reboot and log on to your Stratux as user pi
+   5. Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
+   6. Execute the configuration skript: "/bin/bash stratux-radar-display/image/configure_radar_for_stratux.sh"
+   7. You can then start with step 5 from expert setup above. The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
    Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry ZeroWH.
    
    
