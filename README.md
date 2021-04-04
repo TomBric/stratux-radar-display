@@ -97,9 +97,8 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. 
    Installation is only for expert users! To install the software perform the following steps:
    
-  1. Connect your stratux to a network, e.g. by integrating into your WLAN: Logon as root on your stratux. Make a copy of the existing /etc/network/interfaces (e.g. cp /etc/network/interfaces /etc/network/interfaces.stratux) and modify /etc/network/interfaces, so that it looks like
-    ```
-    
+   1. Connect your stratux to a network, e.g. by integrating into your WLAN: Logon as root on your stratux. Make a copy of the existing /etc/network/interfaces (e.g. cp /etc/network/interfaces /etc/network/interfaces.stratux) and modify /etc/network/interfaces, so that it looks like
+   ```
     auto lo
     iface lo inet loopback
     allow-hotplug eth0
@@ -108,17 +107,16 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
 
     iface wlan0 inet dhcp
        wpa-ssid "<YOUR WLAN SSID AT HOME>"
-       wpa-psk "<YOUR WLAN WPA PSK FROM HOME>"
-       
-    ```
+       wpa-psk "<YOUR WLAN WPA PSK FROM HOME>"  
+   ```
    This will connect your stratux to your local wlan. Alternatively connect Stratux via network cable.
    
-  2. Reboot and log on to your Stratux as user pi, directory /home/pi
+   2. Reboot and log on to your Stratux as user pi, directory /home/pi
     Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
-  3. Execute the configuration skript: "/bin/bash stratux-radar-display/image/configure_radar_on_stratux.sh"
-  4. Configure the startup skript "image/stratux-radar.sh": remove the option "-s" and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7"
-  5. Restore the original /etc/network/interfaces (e.g. by "mv /etc/network/interfaces.stratux /etc/network/interfaces")
-  6. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
+   3. Execute the configuration skript: "/bin/bash stratux-radar-display/image/configure_radar_on_stratux.sh"
+   4. Configure the startup skript "image/stratux-radar.sh": remove the option "-s" and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7"
+   5. Restore the original /etc/network/interfaces (e.g. by "mv /etc/network/interfaces.stratux /etc/network/interfaces")
+   6. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
 
 The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
    Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry ZeroWH.
