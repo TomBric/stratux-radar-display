@@ -96,7 +96,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    ### Installation on a standard stratux device
    stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. 
    Installation is only for expert users! To install the software perform the following steps:
-   1. Connect your stratux to a network, e.g. by integrating into your WLAN: Logon as root on your stratux. Make a copy of the existing /etc/network/interfaces (e.g. cp /etc/netwokr/interface /etc/network/interfaces.stratux) and modify /etc/network/interfaces, so that is looks like
+   1. Connect your stratux to a network, e.g. by integrating into your WLAN: Logon as root on your stratux. Make a copy of the existing /etc/network/interfaces (e.g. cp /etc/network/interfaces /etc/network/interfaces.stratux) and modify /etc/network/interfaces, so that is looks like
 ```
 auto lo
 iface lo inet loopback
@@ -111,7 +111,7 @@ iface wlan0 inet dhcp
 This will connect your stratux to your local wlan. Alternatively connect Stratux via network cable.
    4. Reboot and log on to your Stratux as user pi, directory /home/pi
    5. Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
-   6. Execute the configuration skript: "/bin/bash stratux-radar-display/image/configure_radar_for_stratux.sh"
+   6. Execute the configuration skript: "/bin/bash stratux-radar-display/image/configure_radar_on_stratux.sh"
    7. Configure the startup skript "image/stratux-radar.sh": remove the option "-s" and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7"
    8. Restore the original /etc/network/interfaces (e.g. by "mv /etc/network/interfaces.stratux /etc/network/interfaces")
    9. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
