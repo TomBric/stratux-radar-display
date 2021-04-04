@@ -38,7 +38,7 @@ sudo pip3 install --upgrade PILLOW
 sudo apt install python3-numpy -y
 
 # get files from repo
-cd /home/pi && git clone https://github.com/TomBric/stratux-radar-display.git
+# cd /home/pi && git clone https://github.com/TomBric/stratux-radar-display.git
 
 # include autostart into crontab, so that radar starts on every boot
 echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -
