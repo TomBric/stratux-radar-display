@@ -14,7 +14,7 @@
 sudo apt-get update -y
 # sudo apt-get upgrade -y
 sudo apt install python3-pip python3-pil -y
-# sudo apt-get install libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
+sudo apt-get install libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
 sudo pip3 install luma.oled
 # sudo apt-get install git -y
 
@@ -68,4 +68,4 @@ echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" |
 # sudo systemctl --system start pulseaudio.service
 
 # enable spi
-# sudo raspi-config nonint do_spi 0
+sudo raspi-config nonint do_spi 0
