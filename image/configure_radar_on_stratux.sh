@@ -3,7 +3,7 @@
 # script configures basic libraries necessary for stratux-radar
 # script to be run as pi on stratux (without a zero pi)
 
-# luma files and more
+# luma files, pip3 and more
 sudo apt-get update -y
 sudo apt install python3-pip python3-pil -y
 sudo apt-get install libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
@@ -22,7 +22,6 @@ sudo apt-get install libbluetooth-dev -y
 sudo pip3 install pybluez
 sudo pip3 install pydbus
 sudo pip3 install --upgrade PILLOW
-
 sudo apt install python3-numpy -y
 
 # get files from repo
