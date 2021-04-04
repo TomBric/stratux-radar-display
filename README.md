@@ -166,7 +166,9 @@ The Oled display uses different GPIO-Pins as the baro-sensor, so there is no con
    - middle button short: enable/disable sound (if bluetooth speaker/headset is connected)
    - right button short: change height difference for traffic (1000ft -> 2000 ft -> 5000 ft -> 10k ft -> 50k ft)
    - right button long: screen refresh. This is relevant for Epaper only since it becomes "dirty" over time with partial refresh.
-   
+     
+![Radar](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-Radar-Mode.jpg)
+
 Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
 
 ### Timer screen mode:
@@ -174,24 +176,31 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
    - left button short: start lap-timer (displayed on bottom)
    - middle short: change to countdown-setting. Here a countdown timer can be set. If the countdown runs down to 0:00, this will also be signalled by sound output in your headset
    - press middle short again to end countdown-setting. Countdown will be started, wenn timer is started. It timer is already running, countdown will start as soon as you leave the countdown setting mode
-   
+
    - in countdown-setting mode:
       - press middle short again to end countdown-setting. Countdown will be started, wenn timer is started. It timer is already running, countdown will start as soon as you leave the countdown setting mode
       - press left button to increase countdown time by 10 mins
       - press right button to increase countdown time by 1 mins
       - max countdown time is 2 hours. If you set countdown time > 2 h, countdone timer will be cleared
-   
-### AHRS mode:
+
+    
+![Timer](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-TimerMode.jpg)
+
+ ### AHRS mode:
  - no special interaction, press long middle for next mode
 
+![AHRS](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-AHRS-Mode.jpg)
+
 ### G-Meter mode:
- - press right short to reset the max and min value to 1
- - long press middle for next mode
+    - press short right to reset min and max values
+    - press long middle for next mode
 
+![Gmeter](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-G-Meter-Mode.jpg)
 
-### Compass mode
-- no special interaction, press long middle for next mode
+### Compass mode:
+    - press long middle for next mode
 
+![Compass](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-CompassMode.jpg)
 
 # Shell command parameters
 ```
@@ -220,6 +229,4 @@ Example:
 python3 main/radar.py -d Epaper_3in7 -c 192.168.10.1 -r -s
 
   ```
-
-
 
