@@ -418,8 +418,8 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     vmsize_l = 20
 
     draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
-    draw.text((25, czeroy - VERYSMALL - 15), "up", font=verysmallfont, fill="black", align="left")
-    draw.text((25, czeroy + 15), "dn", font=verysmallfont, fill="black", align="left")
+    draw.text((35, czeroy - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
+    draw.text((35, czeroy + 25), "dn", font=verysmallfont, fill="black", align="left")
     middle_text = "Vertical Speed"
     ts = draw.textsize(middle_text, verysmallfont)
     draw.text((czerox - ts[0]/2, czeroy - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
@@ -462,7 +462,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     s = math.sin(math.radians(vert_val))
     c = math.cos(math.radians(vert_val))
     draw.line((czerox - (csize - vmsize_l - 3) * c, czeroy - (csize - vmsize_l - 3) * s,
-               czerox + 8 * c, czeroy + 8 * s), fill="black", width=6)
+               czerox + 32 * c, czeroy + 32 * s), fill="black", width=6)
     draw.line((czerox - (csize - vmsize_n - 3) * c, czeroy - (csize - vmsize_n - 3) * s, czerox, czeroy), fill="black",
               width=3)
     draw.ellipse((czerox - 8, czeroy - 8, czerox + 8, czeroy + 8), outline="black", fill="white", width=3)
