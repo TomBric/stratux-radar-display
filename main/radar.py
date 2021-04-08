@@ -540,7 +540,7 @@ async def display_and_cutoff():
                 elif global_mode == 13:  # vsi display
                     verticalspeed.draw_vsi(draw, display_control, situation['was_changed'], situation['connected'],
                         situation['vertical_speed'], situation['own_altitude'], situation['gps_speed'],
-                        situation['gps_altitude'])
+                        situation['course'], situation['gps_altitude'])
                     situation['was_changed'] = False
                 elif global_mode == 14:   # refresh display, only relevant for epaper, mode was gmeter
                     logging.debug("VSI: Display driver - Refreshing")
