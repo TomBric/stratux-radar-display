@@ -454,7 +454,6 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     if error_message is not None:
         centered_text(draw, 120, error_message, largefont, fill="black")
 
-    draw.ellipse((czerox - 5, czeroy - 5, czerox + 5, czeroy + 5), outline="black", fill="white", width=2)
     vert_val = vertical_speed * scale   # normalize from -170 to 170 degrees
     if vert_val > 170.0:   # set max / min values
         vert_val = 170.0
@@ -462,10 +461,11 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
         vert_val = -170.0
     s = math.sin(math.radians(vert_val))
     c = math.cos(math.radians(vert_val))
-    draw.line((czerox - (csize - vmsize_l - 3) * c, czeroy - (csize - vmsize_l - 3) * s, czerox, czeroy), fill="black",
-              width=6)
+    draw.line((czerox - (csize - vmsize_l - 3) * c, czeroy - (csize - vmsize_l - 3) * s,
+               czerox + 8 * c, czeroy + 8 * s), fill="black", width=6)
     draw.line((czerox - (csize - vmsize_n - 3) * c, czeroy - (csize - vmsize_n - 3) * s, czerox, czeroy), fill="black",
               width=3)
+    draw.ellipse((czerox - 8, czeroy - 8, czerox + 8, czeroy + 8), outline="black", fill="white", width=3)
 
 
 def shutdown(draw, countdown):
