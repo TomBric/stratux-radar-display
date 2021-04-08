@@ -81,6 +81,8 @@ compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
 cmsize = 20        # length of compass marks
+vertical_max = 0.0 # max value for vertical speed
+vertical_min = 0.0 # min value for vertical speed
 # end device globals
 
 
@@ -344,8 +346,6 @@ def gmeter(draw, current, maxg, ming, error_message):
     c = math.cos(math.radians(gval))
     draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox+32*c, azeroy+32*s), fill="black", width=6)
 
-
-
     draw.text((zerox-30, 0), "G-Meter", font=verylargefont, fill="black")
     draw.text((zerox-30, 88), "max", font=smallfont, fill="black")
     right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
@@ -413,12 +413,18 @@ def compass(draw, heading, error_message):
 
 
 def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, error_message):
+    global vertical_max
+    global vertical_min
     csize = sizey / 2  # radius of compass rose
     czerox = csize    # move to the left
     czeroy = sizey / 2
     vmsize_n = 10
     vmsize_l = 20
 
+    if vertical_speed > vertical_max:
+        vertical_max = vertical_speed
+    if vertical_speed < vertical_min:
+        vertical_min = vertical_speed
     draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
     draw.text((35, czeroy - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
     draw.text((35, czeroy + 25), "dn", font=verysmallfont, fill="black", align="left")
@@ -429,11 +435,21 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     ts = draw.textsize(middle_text, verysmallfont)
     draw.text((czerox - ts[0]/2, czeroy + 10), middle_text, font=verysmallfont, fill="black", align="left")
 
-    text = "FL: \n\nGPS-Alt[ft]: \n\nGPS-Speed[kts]: \n\nGPS-Course:"
-    val_text = "\n" + str(round(flight_level/100)) + "\n\n" + str(round(gps_altitude)) + "\n\n" + str(round(gps_speed,1)) + "\n\n" + \
-        str(gps_course) + "°"
-    draw.text((300, 10), text, font=smallfont, fill="black", align="left")
-    draw.text((400, 10), val_text, font=smallfont, fill="black", align="right")
+    # right data display
+    draw.text((280,10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
+    draw.text((301,31), "act", font=verysmallfont, fill="black", align="left")
+    draw.text((301,55), "max", font=verysmallfont, fill="black", align="left")
+    draw.text((301,79), "min", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 28, "{:+1.0f}".format(vertical_speed), smallfont, fill="black")
+    right_text(draw, 52, "{:+1.0f}".format(vertical_max), smallfont, fill="black")
+    right_text(draw, 76, "{:+1.0f}".format(vertical_min), smallfont, fill="black")
+    draw.text((280, 113), "Flight-Level", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 110, "{:+1.0f}".format(round(flight_level/100)), smallfont, fill="black")
+    draw.text((280, 137), "GPS-Alt [ft]", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 134, "{:+1.0f}".format(gps_altitude), smallfont, fill="black")
+    draw.text((280, 161), "GPS-Speed [kts]", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 158, "{:+1.1f}".format(gps_speed), smallfont, fill="black")
+
     scale = 170.0 / 2000.0
     for m in range(-2000, 2100, 100):
         s = math.sin(math.radians(m * scale))
@@ -468,6 +484,12 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.line((czerox - (csize - vmsize_n - 3) * c, czeroy - (csize - vmsize_n - 3) * s, czerox, czeroy), fill="black",
               width=3)
     draw.ellipse((czerox - 8, czeroy - 8, czerox + 8, czeroy + 8), outline="black", fill="white", width=3)
+
+    right = "Reset"
+    middle = "Mode"
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
 
 
 def shutdown(draw, countdown):
