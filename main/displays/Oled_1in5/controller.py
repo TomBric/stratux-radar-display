@@ -325,7 +325,7 @@ def compass(draw, heading, error_message):
         c = math.cos(math.radians(m - heading + 90))
         if m % 30 != 0:
             draw.line((zerox-(csize-1)*c, zeroy-(csize-1)*s, zerox-(csize-cmsize)*c, zeroy-(csize-cmsize)*s),
-                  fill="white", width=1)
+                      fill="white", width=1)
         else:
             draw.line((zerox - (csize - 1) * c, zeroy - (csize - 1) * s, zerox - (csize - cmsize) * c,
                        zeroy - (csize - cmsize) * s), fill="white", width=3)
@@ -353,7 +353,60 @@ def compass(draw, heading, error_message):
 
 def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
         error_message):
-    pass
+    csize = sizex / 2  # radius of vsi
+    vmsize_n = 8
+    vmsize_l = 14
+
+    draw.arc((zerox - csize, 0, zerox + csize - 1, sizey - 1), 10, 350, fill="white", width=2)
+    draw.text((10, zeroy - VERYSMALL - 16), "up", font=verysmallfont, fill="white", align="left")
+    draw.text((10, zeroy + 16), "dn", font=verysmallfont, fill="white", align="left")
+    middle_text = "Vert Spd"
+    ts = draw.textsize(middle_text, verysmallfont)
+    draw.text((zerox - ts[0] / 2, zeroy - ts[1] - 10), middle_text, font=verysmallfont, fill="white", align="left")
+    middle_text = "100 ft/min"
+    ts = draw.textsize(middle_text, verysmallfont)
+    draw.text((zerox - ts[0] / 2, zeroy + 10), middle_text, font=verysmallfont, fill="black", align="left")
+
+    scale = 170.0 / 2000.0
+    for m in range(-2000, 2100, 100):
+        s = math.sin(math.radians(m * scale))
+        c = math.cos(math.radians(m * scale))
+        if m % 500 != 0:
+            draw.line((zerox - (csize - 1) * c, zeroy - (csize - 1) * s, zerox - (csize - vmsize_n) * c,
+                       zeroy - (csize - vmsize_n) * s), fill="white", width=1)
+        else:
+            draw.line((zerox - (csize - 1) * c, zeroy - (csize - 1) * s, zerox - (csize - vmsize_l) * c,
+                       zeroy - (csize - vmsize_l) * s), fill="white", width=3)
+            mark = str(round(abs(m / 100)))
+            w, h = largefont.getsize(mark)
+            if m != 2000 and m != -2000:
+                center = (zerox-(csize-1-vmsize_l-LARGE/2) * c, zeroy-(csize-5-vmsize_l-LARGE/2) * s)
+                draw.text((center[0] - w / 2, center[1] - h / 2), mark, fill="white", font=largefont)
+            if m == 2000:  # put 2 in the middle at 180 degrees
+                draw.text((zerox + (csize - 1 - vmsize_l - LARGE / 2) - w / 2, zeroy - 1 - h / 2), mark, fill="white",
+                          font=largefont)
+
+    if error_message is not None:
+        centered_text(draw, 60, error_message, largefont, fill="red")
+
+    vert_val = vertical_speed * scale  # normalize from -170 to 170 degrees
+    if vert_val > 170.0:  # set max / min values
+        vert_val = 170.0
+    elif vert_val < -170.0:
+        vert_val = -170.0
+    s = math.sin(math.radians(vert_val))
+    c = math.cos(math.radians(vert_val))
+    draw.line((zerox - (csize - vmsize_l - 3) * c, zeroy - (csize - vmsize_l - 3) * s,
+               zerox + 32 * c, zeroy + 32 * s), fill="white", width=3)
+    draw.line((zerox - (csize - vmsize_n - 3) * c, zeroy - (csize - vmsize_n - 3) * s, zerox, zeroy), fill="white",
+              width=1)
+    draw.ellipse((zerox - 4, zeroy - 4, zerox + 4, zeroy + 4), outline="white", fill="black", width=2)
+
+    right = "Reset"
+    middle = "Mode"
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 
 def shutdown(draw, countdown):

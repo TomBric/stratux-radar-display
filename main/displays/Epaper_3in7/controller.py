@@ -439,7 +439,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((300, 163), "Flight-Level", font=verysmallfont, fill="black", align="left")
     right_text(draw, 160, "{:1.0f}".format(round(flight_level/100)), smallfont, fill="black")
     draw.text((300, 187), "GPS-Alt [ft]", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 184, "{:+1.0f}".format(gps_altitude), smallfont, fill="black")
+    right_text(draw, 184, "{:1.0f}".format(gps_altitude), smallfont, fill="black")
     draw.text((300, 211), "GpsSpd [kts]", font=verysmallfont, fill="black", align="left")
     right_text(draw, 208, "{:+1.1f}".format(gps_speed), smallfont, fill="black")
 
