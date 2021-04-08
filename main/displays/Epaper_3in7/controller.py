@@ -428,16 +428,16 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((300, 10), text, font=smallfont, fill="black", align="left")
     draw.text((400, 10), val_text, font=smallfont, fill="black", align="right")
     scale = 170.0 / 2000.0
-    for m in range(-2000, 2000, 100):
-        s = math.sin(math.radians(m * scale + 180))
-        c = math.cos(math.radians(m * scale + 180))
-        if m % 5 != 0:
+    for m in range(-1900, 2000, 100):
+        s = math.sin(math.radians(m * scale))
+        c = math.cos(math.radians(m * scale))
+        if m % 500 != 0:
             draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_n) * c,
                        czeroy - (csize - vmsize_n) * s), fill="black", width=2)
         else:
             draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_l) * c,
                        czeroy - (csize - vmsize_l) * s), fill="black", width=4)
-            mark = str(abs(m))
+            mark = str(abs(m/100))
             w, h = largefont.getsize(mark)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
             draw.text((center[0] - w/2, center[1] - h/2), mark, fill="black", font=largefont)
@@ -446,6 +446,10 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
 
     draw.ellipse((czerox - 10, czeroy - 10, czerox + 10, czeroy + 10), outline="black", fill="black", width=1)
     vert_val = vertical_speed * scale   # normalize from -170 to 170 degrees
+    if vert_val > 170.0:   # set max / min values
+        vert_val = 170.0
+    elif vert_val < -170.0:
+        vert_val = -170.0
     s = math.sin(math.radians(vert_val))
     c = math.cos(math.radians(vert_val))
     draw.line((czerox - (csize - vmsize_l - 3) * c, czeroy - (csize - vmsize_l - 3) * s, czerox, czeroy), fill="black",
