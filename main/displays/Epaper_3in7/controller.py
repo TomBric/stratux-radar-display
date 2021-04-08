@@ -416,17 +416,17 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     global cdraw
 
     csize = sizey / 2  # radius of compass rose
-    czerox = sizex / 2 - csize / 2    # move to the left
+    czerox = csize    # move to the left
     czeroy = sizey / 2
-    vmsize_n = 5
-    vmsize_l = 8
+    vmsize_n = 10
+    vmsize_l = 20
 
     draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
-    text = "Flight-Level: \nGPS-Altitude: \nGPS-Speed: \nGPS-Course:"
-    val_text = str(round(flight_level/100)) + "\n" + str(round(gps_altitude)) + " ft\n" + str(round(gps_speed,1)) + " kts\n" + \
+    text = "FL: \nGPS-Alt[ft]: \nGPS-Speed[kts]: \nGPS-Course:"
+    val_text = str(round(flight_level/100)) + "\n" + str(round(gps_altitude)) + "\n" + str(round(gps_speed,1)) + "\n" + \
         str(gps_course) + "°"
-    draw.text((250, 50), text, font=smallfont, fill="black", align="right")
-    draw.text((380, 50), val_text, font=smallfont, fill="black", align="right")
+    draw.text((260, 50), text, font=smallfont, fill="black", align="left")
+    draw.text((400, 50), val_text, font=smallfont, fill="black", align="right")
     scale = 170 / 20
     for m in range(-20, 20, 1):
         s = math.sin(math.radians(m * scale + 90))
