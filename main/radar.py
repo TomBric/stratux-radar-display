@@ -82,7 +82,9 @@ ui_changed = True
 situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_active': False, 'course': 0,
              'own_altitude': -99.0, 'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000,
              'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
-             'vertical_speed': -10000.0}
+             'vertical_speed': 0.0}
+vertical_max = 0.0   # max value for vertical speed
+vertical_min = 0.0   # min valud for vertical speed
 
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
@@ -301,6 +303,8 @@ def new_traffic(json_str):
 def new_situation(json_str):
     global situation
     global ahrs
+    global vertical_max
+    global vertical_min
 
     logging.debug("New Situation" + json_str)
     sit = json.loads(json_str)
@@ -341,6 +345,10 @@ def new_situation(json_str):
     if situation['vertical_speed'] != sit['BaroVerticalSpeed']:
         situation['vertical_speed'] = sit['BaroVerticalSpeed']
         situation['was_changed'] = True
+        if situation['vertical_speed'] > vertical_max:
+            vertical_max = situation['vertical_speed']
+        if situation['vertical_speed'] < vertical_min:
+            vertical_min = situation['vertical_speed']
 
     if ahrs['pitch'] != round(sit['AHRSPitch']):
         ahrs['pitch'] = round(sit['AHRSPitch'])
@@ -429,6 +437,8 @@ async def user_interface():
     global sound_on
     global ui_changed
     global global_mode
+    global vertical_max
+    global vertical_min
 
     last_bt_checktime = 0.0
     next_mode = 1
@@ -461,7 +471,10 @@ async def user_interface():
             elif global_mode == 11:  # compass
                 next_mode = compassui.user_input()
             elif global_mode == 13:  # vertical speed indicator
-                next_mode = verticalspeed.user_input()
+                next_mode, reset_vsi = verticalspeed.user_input()
+                if reset_vsi:
+                    vertical_max = 0.0
+                    vertical_min = 0.0
 
             if next_mode > 0:
                 ui_changed = True
@@ -486,6 +499,7 @@ async def display_and_cutoff():
     global aircraft_changed
     global global_mode
     global display_control
+    global ui_changed
 
     try:
         while True:
@@ -512,6 +526,7 @@ async def display_and_cutoff():
                                      ahrs['pitch'], ahrs['roll'], ahrs['heading'], ahrs['slipskid'],
                                      ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
                     ahrs['was_changed'] = False
+                    ui_changed = False
                 elif global_mode == 6:   # refresh display, only relevant for epaper, mode was radar
                     logging.debug("AHRS: Display driver - Refreshing")
                     display_control.refresh()
@@ -525,6 +540,7 @@ async def display_and_cutoff():
                 elif global_mode == 9:  # gmeter display
                     gmeterui.draw_gmeter(draw, display_control, ui_changed, situation['connected'], gmeter)
                     gmeter['was_changed'] = False
+                    ui_changed = False
                 elif global_mode == 10:   # refresh display, only relevant for epaper, mode was gmeter
                     logging.debug("Gmeter: Display driver - Refreshing")
                     display_control.refresh()
@@ -538,10 +554,11 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 11
                 elif global_mode == 13:  # vsi display
-                    verticalspeed.draw_vsi(draw, display_control, situation['was_changed'], situation['connected'],
-                        situation['vertical_speed'], situation['own_altitude'], situation['gps_speed'],
-                        situation['course'], situation['gps_altitude'])
+                    verticalspeed.draw_vsi(draw, display_control, situation['was_changed'] or ui_changed,
+                        situation['connected'], situation['vertical_speed'], situation['own_altitude'], situation['gps_speed'],
+                        situation['course'], situation['gps_altitude'], vertical_max, vertical_min)
                     situation['was_changed'] = False
+                    ui_changed = False
                 elif global_mode == 14:   # refresh display, only relevant for epaper, mode was gmeter
                     logging.debug("VSI: Display driver - Refreshing")
                     display_control.refresh()

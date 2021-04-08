@@ -33,7 +33,6 @@
 
 import radarbuttons
 import logging
-import requests
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -45,13 +44,14 @@ def init():
 
 
 def draw_vsi(draw, display_control, was_changed, connected, vertical_speed, flight_level, gps_speed, gps_course,
-             gps_altitude):
+             gps_altitude, vert_max, vert_min):
     if was_changed:
         error_message = None
         if not connected:
             error_message = MSG_NO_CONNECTION
         display_control.clear(draw)
-        display_control.vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, error_message)
+        display_control.vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
+                            vert_max, vert_min, error_message)
         display_control.display()
 
 
@@ -59,11 +59,13 @@ def user_input():
     btime, button = radarbuttons.check_buttons()
     # start of vsi global behaviour
     if btime == 0:
-        return 0  # stay in current mode
+        return 0, False  # stay in current mode
     if button == 1 and btime == 2:  # middle and long
-        return 7  # next mode to be status
+        return 7, False  # next mode to be status
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return 3, False  # start next mode shutdown!
+    if button == 2 and btime == 1:  # right and short- reset values
+        return 13, True  # start next mode for display driver: refresh called from vsi
     if button == 2 and btime == 2:  # right and long- refresh
-        return 14  # start next mode for display driver: refresh called from vsi
-    return 13  # no mode change
+        return 14, False  # start next mode for display driver: refresh called from vsi
+    return 13, False  # no mode change for any other interaction

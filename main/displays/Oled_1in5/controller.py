@@ -351,7 +351,8 @@ def compass(draw, heading, error_message):
         centered_text(draw, 57, error_message, largefont, fill="red")
 
 
-def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, error_message):
+def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
+        error_message):
     pass
 
 
