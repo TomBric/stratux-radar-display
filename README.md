@@ -1,11 +1,12 @@
 # stratux-radar-display
-Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero WH). Reads the aircraft data from Stratux and displays them on the specified display. The newest version now has a user interface include. You can connect 3 pushbottons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer is also implemented.
+Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero WH). Reads the aircraft data from Stratux and displays them on the specified display. The newest version now has a user interface include. You can connect 3 pushbottons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon and a compass (based on GPS) are also implemented.
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
 - Epaper Display 3.7 inch (waveshare)
 
 More displays can be integrated.
+You can find 3D printer files for cases of both variants in the repo (no-code). The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. 
 
 Usage:   
 - python3 radar.py -d <DeviceName> [-s] -c <Stratux IP>
@@ -14,7 +15,7 @@ Usage:
 
 Find below a photo of the current supported displays
 - the oled display is relatively small, but can be build into a 2 1/4" or larger instrument mounting hole
-- the epaper display is larger and has optimal readability in sunlight. As e-paper it has a slower update of approx. once per second
+- the epaper display is larger and has optimal readability in sunlight. As e-paper it has a slower update of approx. twice per second. For the radar display this update rate is appropriate
 
 ![Display photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/StratuxRadar.jpg)
 
@@ -23,7 +24,7 @@ Find below a photo of the current supported displays
 - Epaper-Display: Waveshare 18057 3.7inch e-Paper HAT: Directly mountable on the Raspi as a HAT.
 Alternatively Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Paper Raw Panel Driver HAT 13512. The advantage of the latter is a better form factor for mounting it into some cases. Please make sure to switch the "Display Config" switch to A.
 
-![Epaper photo](https://github.com/TomBric/stratux-radar-display/blob/mainno-code/images/Epaper_3in7.jpg)
+![Epaper photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_3in7.jpg)
 
 - Oled-Display: Waveshare 14747, 128x128, General 1.5inch RGB OLED display Module
    ![Oled photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Oled_1in5.jpg)
@@ -181,6 +182,7 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
       - press left button to increase countdown time by 10 mins
       - press right button to increase countdown time by 1 mins
       - max countdown time is 2 hours. If you set countdown time > 2 h, countdone timer will be cleared
+
     
 ![Timer](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-TimerMode.jpg)
 
@@ -199,7 +201,6 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
     - press long middle for next mode
 
 ![Compass](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-CompassMode.jpg)
-
 
 # Shell command parameters
 ```
@@ -228,3 +229,4 @@ Example:
 python3 main/radar.py -d Epaper_3in7 -c 192.168.10.1 -r -s
 
   ```
+
