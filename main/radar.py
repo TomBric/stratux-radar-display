@@ -48,6 +48,7 @@ import ahrsui
 import statusui
 import gmeterui
 import compassui
+import verticalspeed
 import importlib
 
 # constant definitions
@@ -80,7 +81,9 @@ aircraft_changed = True
 ui_changed = True
 situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_active': False, 'course': 0,
              'own_altitude': -99.0, 'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000,
-             'gps_quality': 0, 'gps_h_accuracy': 20000}
+             'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
+             'vertical_speed': -10000.0}
+
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
 gmeter = {'was_changed': True, 'current': 0.0, 'max': 0.0, 'min': 0.0}
@@ -98,7 +101,8 @@ bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
 global_mode = 1
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
-# 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass 0=Init
+# 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
+# 13=VSI 14=refresh from VSI 0=Init
 bluetooth_active = False
 
 
@@ -328,6 +332,15 @@ def new_situation(json_str):
     if situation['gps_h_accuracy'] != sit['GPSHorizontalAccuracy']:
         situation['gps_h_accuracy'] = sit['GPSHorizontalAccuracy']
         situation['was_changed'] = True
+    if situation['gps_speed'] != sit['GPSGroundSpeed']:
+        situation['gps_speed'] = sit['GPSGroundSpeed']
+        situation['was_changed'] = True
+    if situation['gps_altitude'] != sit['GPSAltitudeMSL']:
+        situation['gps_altitude'] = sit['GPSAltitudeMSL']
+        situation['was_changed'] = True
+    if situation['vertical_speed'] != sit['BaroVerticalSpeed']:
+        situation['vertical_speed'] = sit['BaroVerticalSpeed']
+        situation['was_changed'] = True
 
     if ahrs['pitch'] != round(sit['AHRSPitch']):
         ahrs['pitch'] = round(sit['AHRSPitch'])
@@ -447,6 +460,8 @@ async def user_interface():
                 next_mode = gmeterui.user_input()
             elif global_mode == 11:  # compass
                 next_mode = compassui.user_input()
+            elif global_mode == 13:  # vertical speed indicator
+                next_mode = verticalspeed.user_input()
 
             if next_mode > 0:
                 ui_changed = True
@@ -522,6 +537,15 @@ async def display_and_cutoff():
                     logging.debug("Compass: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 11
+                elif global_mode == 13:  # vsi display
+                    verticalspeed.draw_vsi(draw, display_control, situation['was_changed'], situation['connected'],
+                        situation['vertical_speed'], situation['own_altitude'], situation['gps_speed'],
+                        situation['gps_altitude'])
+                    situation['was_changed'] = False
+                elif global_mode == 14:   # refresh display, only relevant for epaper, mode was gmeter
+                    logging.debug("VSI: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 13
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
@@ -594,6 +618,8 @@ if __name__ == "__main__":
     ap.add_argument("-x", "--status", required=False, help="Start mode is status", action='store_true', default=False)
     ap.add_argument("-g", "--gmeter", required=False, help="Start mode is g-meter", action='store_true', default=False)
     ap.add_argument("-o", "--compass", required=False, help="Start mode is compass", action='store_true', default=False)
+    ap.add_argument("-i", "--vsi", required=False, help="Start mode is vertical speed indicator", action='store_true',
+                    default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no",
@@ -616,6 +642,8 @@ if __name__ == "__main__":
         global_mode = 9   # start in g-meter mode
     if args['compass']:
         global_mode = 11   # start in compass mode
+    if args['vsi']:
+        global_mode = 13   # start in vsi mode
     global_config['display_tail'] = args['registration']  # display registration if set
     # check config file, if extistent use config from there
     url_host_base = args['connect']

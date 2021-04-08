@@ -335,7 +335,7 @@ def gmeter(draw, current, maxg, ming, error_message):
         c = math.cos(math.radians(m[0]+90))
         draw.line((azerox-asize*c, azeroy-asize*s, azerox-(asize-msize)*c, azeroy-(asize-msize)*s),
                   fill="black", width=4)
-        draw.text((azerox-(asize-msize-SMALL/2)*c-SMALL/4, azeroy-(asize-msize-SMALL/2)*s-SMALL/2),str(m[1]),
+        draw.text((azerox-(asize-msize-SMALL/2)*c-SMALL/4, azeroy-(asize-msize-SMALL/2)*s-SMALL/2), str(m[1]),
                   font=smallfont, fill="black")
     draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
     draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="black", width=1)
@@ -408,6 +408,48 @@ def compass(draw, heading, error_message):
             epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
     if error_message is not None:
         centered_text(draw, 120, error_message, largefont, fill="black")
+
+
+def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, error_message):
+    global epaper_image
+    global mask
+    global cdraw
+
+    csize = sizey / 2  # radius of compass rose
+    czerox = sizex / 2 - csize    # move to the left
+    czeroy = sizey / 2
+    vmsize_n = 5
+    vmsize_l = 8
+
+    draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, outline="black", fill="white", width=4)
+    text = "Flight-Level: \nGPS-Altitude: \nGPS-Speed: \nGPS-Course:"
+    val_text = str(round(flight_level/100)) + "\n" + str(gps_altitude) + " ft\n" + str(gps_speed) + " kts\n" + \
+        str(gps_course) + "°"
+    draw.text((250, 50), text, font=smallfont, fill="black", align="right")
+    draw.text((380, 50), val_text, font=smallfont, fill="black", align="right")
+    scale = 20 / 170
+    for m in range(-20, 20, 1):
+        s = math.sin(math.radians(m * scale + 90))
+        c = math.cos(math.radians(m - scale + 90))
+        if m % 5 != 0:
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_n) * c,
+                       czeroy - (csize - vmsize_n) * s), fill="black", width=2)
+        else:
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_l) * c,
+                       czeroy - (csize - vmsize_l) * s), fill="black", width=4)
+            mark = str(abs(m))
+            w, h = largefont.getsize(mark)
+            center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
+            draw.text((center[0] - w/2, center[1] - h/2), mark, 1, font=largefont)
+    if error_message is not None:
+        centered_text(draw, 120, error_message, largefont, fill="black")
+
+    draw.ellipse((czerox - 10, czeroy - 10, czerox + 10, czeroy + 10), outline="black", fill="black", width=1)
+    vert_val = vertical_speed / 2000.0 * 170.0   # normalize from -170 to 170 degrees
+    s = math.sin(math.radians(vert_val))
+    c = math.cos(math.radians(vert_val))
+    draw.line((czerox - (csize - vmsize_l - 3) * c, czeroy - (csize - vmsize_l - 3) * s, czerox, czeroy), fill="black",
+              width=8)
 
 
 def shutdown(draw, countdown):

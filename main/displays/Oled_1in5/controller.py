@@ -351,6 +351,10 @@ def compass(draw, heading, error_message):
         centered_text(draw, 57, error_message, largefont, fill="red")
 
 
+def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, error_message):
+    pass
+
+
 def shutdown(draw, countdown):
     message = "Shutdown "
     centered_text(draw, 10, message, largefont, fill="white")
