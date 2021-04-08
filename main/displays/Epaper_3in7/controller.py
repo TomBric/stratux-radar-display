@@ -418,6 +418,8 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     vmsize_l = 20
 
     draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
+    draw.text((20, czeroy - VERYSMALL - 10), "up", font=verysmallfont, fill="black", align="left")
+    draw.text((20, czeroy + 10), "up", font=verysmallfont, fill="black", align="left")
     middle_text = "Vertical Speed"
     ts = draw.textsize(middle_text, verysmallfont)
     draw.text((czerox - ts[0]/2, czeroy - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
@@ -443,10 +445,10 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
             mark = str(round(abs(m/100)))
             w, h = largefont.getsize(mark)
             if m != 2000 and m!= -2000:
-                center = (czerox - (csize - 5 - cmsize - LARGE / 2) * c, czeroy - (csize - 5 - cmsize - LARGE / 2) * s)
+                center = (czerox - (csize - 1 - vmsize_l - LARGE / 2) * c, czeroy - (csize - 5 - vmsize_l - LARGE / 2) * s)
                 draw.text((center[0] - w/2, center[1] - h/2), mark, fill="black", font=largefont)
             if m == 2000: # put 2 in the middle at 180 degrees
-                draw.text((czerox + (csize -1 - cmsize - LARGE/2) - w/2, czeroy - 1 - h/2), mark, fill="black",
+                draw.text((czerox + (csize - 1 - vmsize_l - LARGE/2) - w/2, czeroy - 1 - h/2), mark, fill="black",
                           font=largefont)
 
     if error_message is not None:
@@ -461,7 +463,9 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     s = math.sin(math.radians(vert_val))
     c = math.cos(math.radians(vert_val))
     draw.line((czerox - (csize - vmsize_l - 3) * c, czeroy - (csize - vmsize_l - 3) * s, czerox, czeroy), fill="black",
-              width=8)
+              width=6)
+    draw.line((czerox - (csize - vmsize_n - 3) * c, czeroy - (csize - vmsize_n - 3) * s, czerox, czeroy), fill="black",
+              width=3)
 
 
 def shutdown(draw, countdown):
