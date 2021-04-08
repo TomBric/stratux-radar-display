@@ -335,14 +335,14 @@ def gmeter(draw, current, maxg, ming, error_message):
         c = math.cos(math.radians(m[0]+90))
         draw.line((azerox-asize*c, azeroy-asize*s, azerox-(asize-msize)*c, azeroy-(asize-msize)*s),
                   fill="black", width=4)
-        draw.text((azerox-(asize-msize-SMALL/2)*c-SMALL/4, azeroy-(asize-msize-SMALL/2)*s-SMALL/2),str(m[1]),
+        draw.text((azerox-(asize-msize-SMALL/2)*c-SMALL/4, azeroy-(asize-msize-SMALL/2)*s-SMALL/2), str(m[1]),
                   font=smallfont, fill="black")
     draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
     draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="black", width=1)
     gval = (current-1.0)*22.5
     s = math.sin(math.radians(gval))
     c = math.cos(math.radians(gval))
-    draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox, azeroy), fill="black", width=8)
+    draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox+32*c, azeroy+32*s), fill="black", width=6)
 
     draw.text((zerox-30, 0), "G-Meter", font=verylargefont, fill="black")
     draw.text((zerox-30, 88), "max", font=smallfont, fill="black")
@@ -398,16 +398,91 @@ def compass(draw, heading, error_message):
             else:
                 mark = str(int(m / 10))
             if m % 90 != 0:
-                w, h = largefont.getsize(mark)
+                w, h = draw.textsize(mark, largefont)
                 cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
             else:
-                w, h = morelargefont.getsize(mark)
+                w, h = draw.textsize(mark, morelargefont)
                 cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=morelargefont)
             rotmask = mask.rotate(-m + heading, expand=False)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
             epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
     if error_message is not None:
         centered_text(draw, 120, error_message, largefont, fill="black")
+
+
+def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
+        error_message):
+    csize = sizey / 2  # radius of compass rose
+    czerox = csize    # move to the left
+    czeroy = sizey / 2
+    vmsize_n = 10
+    vmsize_l = 20
+
+    draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
+    draw.text((35, czeroy - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
+    draw.text((35, czeroy + 25), "dn", font=verysmallfont, fill="black", align="left")
+    middle_text = "Vertical Speed"
+    ts = draw.textsize(middle_text, verysmallfont)
+    draw.text((czerox - ts[0]/2, czeroy - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
+    middle_text = "100 feet per min"
+    ts = draw.textsize(middle_text, verysmallfont)
+    draw.text((czerox - ts[0]/2, czeroy + 10), middle_text, font=verysmallfont, fill="black", align="left")
+
+    # right data display
+    draw.text((300, 10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
+    draw.text((330, 31), "act", font=verysmallfont, fill="black", align="left")
+    draw.text((330, 55), "max", font=verysmallfont, fill="black", align="left")
+    draw.text((330, 79), "min", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 28, "{:+1.0f}".format(vertical_speed), smallfont, fill="black")
+    right_text(draw, 52, "{:+1.0f}".format(vertical_max), smallfont, fill="black")
+    right_text(draw, 76, "{:+1.0f}".format(vertical_min), smallfont, fill="black")
+    draw.text((300, 163), "Flight-Level", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 160, "{:1.0f}".format(round(flight_level/100)), smallfont, fill="black")
+    draw.text((300, 187), "GPS-Alt [ft]", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 184, "{:1.0f}".format(gps_altitude), smallfont, fill="black")
+    draw.text((300, 211), "GpsSpd [kts]", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 208, "{:1.1f}".format(gps_speed), smallfont, fill="black")
+
+    scale = 170.0 / 2000.0
+    for m in range(-2000, 2100, 100):
+        s = math.sin(math.radians(m * scale))
+        c = math.cos(math.radians(m * scale))
+        if m % 500 != 0:
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_n) * c,
+                       czeroy - (csize - vmsize_n) * s), fill="black", width=2)
+        else:
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_l) * c,
+                       czeroy - (csize - vmsize_l) * s), fill="black", width=4)
+            mark = str(round(abs(m/100)))
+            w, h = draw.textsize(mark, largefont)
+            if m != 2000 and m != -2000:
+                center = (czerox - (csize-1-vmsize_l-LARGE/2) * c, czeroy - (csize-5-vmsize_l-LARGE/2) * s)
+                draw.text((center[0] - w/2, center[1] - h/2), mark, fill="black", font=largefont)
+            if m == 2000:  # put 2 in the middle at 180 degrees
+                draw.text((czerox + (csize - 1 - vmsize_l - LARGE/2) - w/2, czeroy - 1 - h/2), mark, fill="black",
+                          font=largefont)
+
+    if error_message is not None:
+        centered_text(draw, 60, error_message, largefont, fill="black")
+
+    vert_val = vertical_speed * scale   # normalize from -170 to 170 degrees
+    if vert_val > 170.0:   # set max / min values
+        vert_val = 170.0
+    elif vert_val < -170.0:
+        vert_val = -170.0
+    s = math.sin(math.radians(vert_val))
+    c = math.cos(math.radians(vert_val))
+    draw.line((czerox - (csize - vmsize_l - 3) * c, czeroy - (csize - vmsize_l - 3) * s,
+               czerox + 32 * c, czeroy + 32 * s), fill="black", width=6)
+    draw.line((czerox - (csize - vmsize_n - 3) * c, czeroy - (csize - vmsize_n - 3) * s, czerox, czeroy), fill="black",
+              width=3)
+    draw.ellipse((czerox - 8, czeroy - 8, czerox + 8, czeroy + 8), outline="black", fill="white", width=3)
+
+    right = "Reset"
+    middle = "    Mode"
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
 
 
 def shutdown(draw, countdown):
