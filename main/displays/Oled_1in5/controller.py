@@ -358,14 +358,14 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     vmsize_l = 14
 
     draw.arc((zerox - csize, 0, zerox + csize - 1, sizey - 1), 10, 350, fill="white", width=2)
-    draw.text((10, zeroy - VERYSMALL - 16), "up", font=verysmallfont, fill="white", align="left")
-    draw.text((10, zeroy + 16), "dn", font=verysmallfont, fill="white", align="left")
+    draw.text((12, zeroy - VERYSMALL - 12), "up", font=verysmallfont, fill="white", align="left")
+    draw.text((12, zeroy + 12), "dn", font=verysmallfont, fill="white", align="left")
     middle_text = "Vert Spd"
     ts = draw.textsize(middle_text, verysmallfont)
     draw.text((zerox - ts[0] / 2, zeroy - ts[1] - 10), middle_text, font=verysmallfont, fill="white", align="left")
     middle_text = "100 ft/min"
     ts = draw.textsize(middle_text, verysmallfont)
-    draw.text((zerox - ts[0] / 2, zeroy + 10), middle_text, font=verysmallfont, fill="black", align="left")
+    draw.text((zerox - ts[0] / 2, zeroy + 10), middle_text, font=verysmallfont, fill="white", align="left")
 
     scale = 170.0 / 2000.0
     for m in range(-2000, 2100, 100):
@@ -397,16 +397,10 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     s = math.sin(math.radians(vert_val))
     c = math.cos(math.radians(vert_val))
     draw.line((zerox - (csize - vmsize_l - 3) * c, zeroy - (csize - vmsize_l - 3) * s,
-               zerox + 32 * c, zeroy + 32 * s), fill="white", width=3)
+               zerox + 16 * c, zeroy + 16 * s), fill="white", width=3)
     draw.line((zerox - (csize - vmsize_n - 3) * c, zeroy - (csize - vmsize_n - 3) * s, zerox, zeroy), fill="white",
               width=1)
     draw.ellipse((zerox - 4, zeroy - 4, zerox + 4, zeroy + 4), outline="white", fill="black", width=2)
-
-    right = "Reset"
-    middle = "Mode"
-    textsize = draw.textsize(right, smallfont)
-    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 
 def shutdown(draw, countdown):
