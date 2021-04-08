@@ -342,7 +342,7 @@ def compass(draw, heading, error_message):
                 mark = str(int(m/10))
                 color = "white"
             cdraw.rectangle((0, 0, LARGE*2, LARGE*2), fill="black")
-            w, h = largefont.getsize(mark)
+            w, h = draw.textsize(mark, largefont)
             cdraw.text(((LARGE*2-w)/2, (LARGE*2-h)/2), mark, 1, font=largefont)
             rotmask = mask.rotate(-m+heading, expand=False)
             center = (zerox - (csize - cmsize - LARGE / 2) * c, zeroy - (csize - cmsize - LARGE / 2) * s)

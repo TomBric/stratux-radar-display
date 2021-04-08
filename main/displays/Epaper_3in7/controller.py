@@ -398,10 +398,10 @@ def compass(draw, heading, error_message):
             else:
                 mark = str(int(m / 10))
             if m % 90 != 0:
-                w, h  = draw.textsize(mark, largefont)
+                w, h = draw.textsize(mark, largefont)
                 cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
             else:
-                w, h  = draw.textsize(mark, morelargefont)
+                w, h = draw.textsize(mark, morelargefont)
                 cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=morelargefont)
             rotmask = mask.rotate(-m + heading, expand=False)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
@@ -455,10 +455,10 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
                        czeroy - (csize - vmsize_l) * s), fill="black", width=4)
             mark = str(round(abs(m/100)))
             w, h = draw.textsize(mark, largefont)
-            if m != 2000 and m!= -2000:
-                center = (czerox - (csize - 1 - vmsize_l - LARGE / 2) * c, czeroy - (csize - 5 - vmsize_l - LARGE / 2) * s)
+            if m != 2000 and m != -2000:
+                center = (czerox - (csize-1-vmsize_l-LARGE/2) * c, czeroy - (csize-5-vmsize_l-LARGE/2) * s)
                 draw.text((center[0] - w/2, center[1] - h/2), mark, fill="black", font=largefont)
-            if m == 2000: # put 2 in the middle at 180 degrees
+            if m == 2000:  # put 2 in the middle at 180 degrees
                 draw.text((czerox + (csize - 1 - vmsize_l - LARGE/2) - w/2, czeroy - 1 - h/2), mark, fill="black",
                           font=largefont)
 
