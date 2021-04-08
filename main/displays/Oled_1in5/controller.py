@@ -378,7 +378,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
             draw.line((zerox - (csize - 1) * c, zeroy - (csize - 1) * s, zerox - (csize - vmsize_l) * c,
                        zeroy - (csize - vmsize_l) * s), fill="white", width=3)
             mark = str(round(abs(m / 100)))
-            w, h = largefont.getsize(mark)
+            w, h = draw.textsize(mark, largefont)
             if m != 2000 and m != -2000:
                 center = (zerox-(csize-1-vmsize_l-LARGE/2) * c, zeroy-(csize-5-vmsize_l-LARGE/2) * s)
                 draw.text((center[0] - w / 2, center[1] - h / 2), mark, fill="white", font=largefont)
@@ -396,10 +396,10 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
         vert_val = -170.0
     s = math.sin(math.radians(vert_val))
     c = math.cos(math.radians(vert_val))
-    draw.line((zerox - (csize - vmsize_l - 3) * c, zeroy - (csize - vmsize_l - 3) * s,
-               zerox + 16 * c, zeroy + 16 * s), fill="white", width=3)
     draw.line((zerox - (csize - vmsize_n - 3) * c, zeroy - (csize - vmsize_n - 3) * s, zerox, zeroy), fill="white",
               width=1)
+    draw.line((zerox - (csize - vmsize_l - 3) * c, zeroy - (csize - vmsize_l - 3) * s,
+               zerox + 16 * c, zeroy + 16 * s), fill="white", width=5)
     draw.ellipse((zerox - 4, zeroy - 4, zerox + 4, zeroy + 4), outline="white", fill="black", width=2)
 
 
