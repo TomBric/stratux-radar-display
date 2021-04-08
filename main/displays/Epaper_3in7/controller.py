@@ -436,10 +436,11 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
             mark = str(round(abs(m/100)))
             w, h = largefont.getsize(mark)
             if m != 2000 and m!= -2000:
-                center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
+                center = (czerox - (csize - 1 - cmsize - LARGE / 2) * c, czeroy - (csize -1 - cmsize - LARGE / 2) * s)
                 draw.text((center[0] - w/2, center[1] - h/2), mark, fill="black", font=largefont)
             if m == 2000: # put 2 in the middle at 180 degrees
-                draw.text((czerox - (csize - cmsize - LARGE/2) - w/2, czeroy - h/2), mark, fill="black", font=largefont)
+                draw.text((czerox + (csize -1 - cmsize - LARGE/2) - w/2, czeroy - 1 - h/2), mark, fill="black",
+                          font=largefont)
 
     if error_message is not None:
         centered_text(draw, 120, error_message, largefont, fill="black")
