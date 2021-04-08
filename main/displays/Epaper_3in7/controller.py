@@ -421,7 +421,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     vmsize_n = 5
     vmsize_l = 8
 
-    draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, outline="black", fill="white", width=4)
+    draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
     text = "Flight-Level: \nGPS-Altitude: \nGPS-Speed: \nGPS-Course:"
     val_text = str(round(flight_level/100)) + "\n" + str(gps_altitude) + " ft\n" + str(gps_speed) + " kts\n" + \
         str(gps_course) + "°"
