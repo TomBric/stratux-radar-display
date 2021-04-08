@@ -422,15 +422,15 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     vmsize_l = 20
 
     draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
-    text = "FL: \nGPS-Alt[ft]: \nGPS-Speed[kts]: \nGPS-Course:"
-    val_text = str(round(flight_level/100)) + "\n" + str(round(gps_altitude)) + "\n" + str(round(gps_speed,1)) + "\n" + \
+    text = "FL: \n\nGPS-Alt[ft]: \n\nGPS-Speed[kts]: \n\nGPS-Course:"
+    val_text = "\n" + str(round(flight_level/100)) + "\n\n" + str(round(gps_altitude)) + "\n\n" + str(round(gps_speed,1)) + "\n\n" + \
         str(gps_course) + "°"
-    draw.text((260, 50), text, font=smallfont, fill="black", align="left")
-    draw.text((400, 50), val_text, font=smallfont, fill="black", align="right")
-    scale = 170 / 20
-    for m in range(-20, 20, 1):
-        s = math.sin(math.radians(m * scale + 90))
-        c = math.cos(math.radians(m * scale + 90))
+    draw.text((300, 10), text, font=smallfont, fill="black", align="left")
+    draw.text((400, 10), val_text, font=smallfont, fill="black", align="right")
+    scale = 170.0 / 2000.0
+    for m in range(-2000, 2000, 100):
+        s = math.sin(math.radians(m * scale + 180))
+        c = math.cos(math.radians(m * scale + 180))
         if m % 5 != 0:
             draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_n) * c,
                        czeroy - (csize - vmsize_n) * s), fill="black", width=2)
@@ -440,12 +440,12 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
             mark = str(abs(m))
             w, h = largefont.getsize(mark)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
-            draw.text((center[0] - w/2, center[1] - h/2), mark, 1, font=largefont)
+            draw.text((center[0] - w/2, center[1] - h/2), mark, fill="black", font=largefont)
     if error_message is not None:
         centered_text(draw, 120, error_message, largefont, fill="black")
 
     draw.ellipse((czerox - 10, czeroy - 10, czerox + 10, czeroy + 10), outline="black", fill="black", width=1)
-    vert_val = vertical_speed / 2000.0 * 170.0   # normalize from -170 to 170 degrees
+    vert_val = vertical_speed * scale   # normalize from -170 to 170 degrees
     s = math.sin(math.radians(vert_val))
     c = math.cos(math.radians(vert_val))
     draw.line((czerox - (csize - vmsize_l - 3) * c, czeroy - (csize - vmsize_l - 3) * s, czerox, czeroy), fill="black",
