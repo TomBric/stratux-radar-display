@@ -418,8 +418,8 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     vmsize_l = 20
 
     draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
-    draw.text((20, czeroy - VERYSMALL - 10), "up", font=verysmallfont, fill="black", align="left")
-    draw.text((20, czeroy + 10), "up", font=verysmallfont, fill="black", align="left")
+    draw.text((25, czeroy - VERYSMALL - 15), "up", font=verysmallfont, fill="black", align="left")
+    draw.text((25, czeroy + 15), "dn", font=verysmallfont, fill="black", align="left")
     middle_text = "Vertical Speed"
     ts = draw.textsize(middle_text, verysmallfont)
     draw.text((czerox - ts[0]/2, czeroy - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
@@ -454,7 +454,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     if error_message is not None:
         centered_text(draw, 120, error_message, largefont, fill="black")
 
-    draw.ellipse((czerox - 10, czeroy - 10, czerox + 10, czeroy + 10), outline="black", fill="black", width=1)
+    draw.ellipse((czerox - 5, czeroy - 5, czerox + 5, czeroy + 5), outline="black", fill="white", width=2)
     vert_val = vertical_speed * scale   # normalize from -170 to 170 degrees
     if vert_val > 170.0:   # set max / min values
         vert_val = 170.0
