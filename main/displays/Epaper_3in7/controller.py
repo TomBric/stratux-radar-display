@@ -411,10 +411,6 @@ def compass(draw, heading, error_message):
 
 
 def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, error_message):
-    global epaper_image
-    global mask
-    global cdraw
-
     csize = sizey / 2  # radius of compass rose
     czerox = csize    # move to the left
     czeroy = sizey / 2
@@ -428,7 +424,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((300, 10), text, font=smallfont, fill="black", align="left")
     draw.text((400, 10), val_text, font=smallfont, fill="black", align="right")
     scale = 170.0 / 2000.0
-    for m in range(-1900, 2000, 100):
+    for m in range(-2000, 2100, 100):
         s = math.sin(math.radians(m * scale))
         c = math.cos(math.radians(m * scale))
         if m % 500 != 0:
@@ -437,10 +433,14 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
         else:
             draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_l) * c,
                        czeroy - (csize - vmsize_l) * s), fill="black", width=4)
-            mark = str(abs(m/100))
+            mark = str(round(abs(m/100)))
             w, h = largefont.getsize(mark)
-            center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
-            draw.text((center[0] - w/2, center[1] - h/2), mark, fill="black", font=largefont)
+            if m != 2000 and m!= -2000:
+                center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
+                draw.text((center[0] - w/2, center[1] - h/2), mark, fill="black", font=largefont)
+            if m == 2000: # put 2 in the middle at 180 degrees
+                draw.text((czerox - (csize - cmsize - LARGE/2) - w/2, czeroy - h/2), mark, fill="black", font=largefont)
+
     if error_message is not None:
         centered_text(draw, 120, error_message, largefont, fill="black")
 
