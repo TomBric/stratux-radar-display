@@ -420,10 +420,10 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
     middle_text = "Vertical Speed"
     ts = draw.textsize(middle_text, verysmallfont)
-    draw.text((czerox - ts[0]/2, czeroy - ts[0] - 10), middle_text, font=verysmallfont, fill="black", align="left")
+    draw.text((czerox - ts[0]/2, czeroy - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
     middle_text = "100 feet per min"
     ts = draw.textsize(middle_text, verysmallfont)
-    draw.text((czerox - ts[0]/2, czeroy +10), middle_text, font=verysmallfont, fill="black", align="left")
+    draw.text((czerox - ts[0]/2, czeroy + 10), middle_text, font=verysmallfont, fill="black", align="left")
 
     text = "FL: \n\nGPS-Alt[ft]: \n\nGPS-Speed[kts]: \n\nGPS-Course:"
     val_text = "\n" + str(round(flight_level/100)) + "\n\n" + str(round(gps_altitude)) + "\n\n" + str(round(gps_speed,1)) + "\n\n" + \
