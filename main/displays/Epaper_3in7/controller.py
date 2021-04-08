@@ -436,19 +436,19 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((czerox - ts[0]/2, czeroy + 10), middle_text, font=verysmallfont, fill="black", align="left")
 
     # right data display
-    draw.text((280,10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
-    draw.text((301,31), "act", font=verysmallfont, fill="black", align="left")
-    draw.text((301,55), "max", font=verysmallfont, fill="black", align="left")
-    draw.text((301,79), "min", font=verysmallfont, fill="black", align="left")
+    draw.text((300,10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
+    draw.text((330,31), "act", font=verysmallfont, fill="black", align="left")
+    draw.text((330,55), "max", font=verysmallfont, fill="black", align="left")
+    draw.text((330,79), "min", font=verysmallfont, fill="black", align="left")
     right_text(draw, 28, "{:+1.0f}".format(vertical_speed), smallfont, fill="black")
     right_text(draw, 52, "{:+1.0f}".format(vertical_max), smallfont, fill="black")
     right_text(draw, 76, "{:+1.0f}".format(vertical_min), smallfont, fill="black")
-    draw.text((280, 113), "Flight-Level", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 110, "{:+1.0f}".format(round(flight_level/100)), smallfont, fill="black")
-    draw.text((280, 137), "GPS-Alt [ft]", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 134, "{:+1.0f}".format(gps_altitude), smallfont, fill="black")
-    draw.text((280, 161), "GPS-Speed [kts]", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 158, "{:+1.1f}".format(gps_speed), smallfont, fill="black")
+    draw.text((300, 173), "Flight-Level", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 170, "{:1.0f}".format(round(flight_level/100)), smallfont, fill="black")
+    draw.text((300, 177), "GPS-Alt [ft]", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 184, "{:+1.0f}".format(gps_altitude), smallfont, fill="black")
+    draw.text((300, 211), "GPS-Speed [kts]", font=verysmallfont, fill="black", align="left")
+    right_text(draw, 208, "{:+1.1f}".format(gps_speed), smallfont, fill="black")
 
     scale = 170.0 / 2000.0
     for m in range(-2000, 2100, 100):
@@ -486,7 +486,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.ellipse((czerox - 8, czeroy - 8, czerox + 8, czeroy + 8), outline="black", fill="white", width=3)
 
     right = "Reset"
-    middle = "Mode"
+    middle = "    Mode"
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
