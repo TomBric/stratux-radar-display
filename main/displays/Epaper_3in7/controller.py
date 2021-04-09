@@ -463,7 +463,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
                           font=largefont)
 
     if error_message is not None:
-        centered_text(draw, 60, error_message, largefont, fill="black")
+        centered_text(draw, 60, error_message, verylargefont, fill="black")
 
     vert_val = vertical_speed * scale   # normalize from -170 to 170 degrees
     if vert_val > 170.0:   # set max / min values
