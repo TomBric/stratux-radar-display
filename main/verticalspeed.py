@@ -36,6 +36,7 @@ import logging
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
+MSG_NO_BARO = "No Barosensor!"
 # globals
 
 
@@ -44,11 +45,18 @@ def init():
 
 
 def draw_vsi(draw, display_control, was_changed, connected, vertical_speed, flight_level, gps_speed, gps_course,
-             gps_altitude, vert_max, vert_min):
+             gps_altitude, vert_max, vert_min, gps_fixed, baro_valid):
     if was_changed:
         error_message = None
         if not connected:
             error_message = MSG_NO_CONNECTION
+        if not baro_valid:
+            error_message = MSG_NO_BARO
+        if not gps_fixed:
+            gps_course = 0.0   # no error message, just set all figures to zero
+            gps_altitude = 0.0
+            gps_speed = 0.0
+
         display_control.clear(draw)
         display_control.vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
                             vert_max, vert_min, error_message)

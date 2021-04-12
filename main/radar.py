@@ -82,7 +82,7 @@ ui_changed = True
 situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_active': False, 'course': 0,
              'own_altitude': -99.0, 'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000,
              'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
-             'vertical_speed': 0.0}
+             'vertical_speed': 0.0, 'baro_valid': False}
 vertical_max = 0.0   # max value for vertical speed
 vertical_min = 0.0   # min valud for vertical speed
 
@@ -342,13 +342,28 @@ def new_situation(json_str):
     if situation['gps_altitude'] != sit['GPSAltitudeMSL']:
         situation['gps_altitude'] = sit['GPSAltitudeMSL']
         situation['was_changed'] = True
-    if situation['vertical_speed'] != sit['BaroVerticalSpeed']:
-        situation['vertical_speed'] = sit['BaroVerticalSpeed']
-        situation['was_changed'] = True
-        if situation['vertical_speed'] > vertical_max:
-            vertical_max = situation['vertical_speed']
-        if situation['vertical_speed'] < vertical_min:
-            vertical_min = situation['vertical_speed']
+
+    if sit['BaroSourceType'] == 1 or sit['BaroSourceType'] == 2 or sit['BaroSourceType'] == 3:
+        # 1 = BMP280, 2 = OGN device, 3 = NMEA device
+        if situation['vertical_speed'] != sit['BaroVerticalSpeed']:
+            situation['vertical_speed'] = sit['BaroVerticalSpeed']
+            situation['was_changed'] = True
+            if situation['vertical_speed'] > vertical_max:
+                vertical_max = situation['vertical_speed']
+            if situation['vertical_speed'] < vertical_min:
+                vertical_min = situation['vertical_speed']
+        if not situation['baro_valid']:
+            situation['baro_valid'] = True
+            situation['was_changed'] = True
+            vertical_max = 0   # invalidate min/max
+            vertical_min = 0
+    else:   # no baro (=0) or ADSB estimation (=4), not enough data for vertical speed
+        if situation['baro_valid']:
+            situation['baro_valid'] = False
+            situation['vertical_speed'] = 0.0
+            situation['was_changed'] = True
+            vertical_max = 0  # invalidate min/max
+            vertical_min = 0
 
     if ahrs['pitch'] != round(sit['AHRSPitch']):
         ahrs['pitch'] = round(sit['AHRSPitch'])
@@ -556,7 +571,8 @@ async def display_and_cutoff():
                 elif global_mode == 13:  # vsi display
                     verticalspeed.draw_vsi(draw, display_control, situation['was_changed'] or ui_changed,
                         situation['connected'], situation['vertical_speed'], situation['own_altitude'], situation['gps_speed'],
-                        situation['course'], situation['gps_altitude'], vertical_max, vertical_min)
+                        situation['course'], situation['gps_altitude'], vertical_max, vertical_min, situation['gps_active'],
+                        situation['baro_valid'])
                     situation['was_changed'] = False
                     ui_changed = False
                 elif global_mode == 14:   # refresh display, only relevant for epaper, mode was gmeter
