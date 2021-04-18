@@ -51,7 +51,7 @@ import compassui
 import verticalspeed
 import importlib
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 
 # constant definitions
 RADAR_VERSION = "1.0h"
@@ -311,6 +311,7 @@ def updateTime(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
         # stratux will deliver "0001-01-01T00:00:00Z" if not time signal is valid, this will also raise an ValueError
         logging.debug("Radar: ERROR converting GPS-Time: " + time_str)
         return
+    gps_datetime.replace(tzinfo=timezone.utc)  # make sure that time is interpreted as utc
     if abs(time.time() - gps_datetime.timestamp()) > MAX_TIMER_OFFSET:
         # raspi system timer differs from received GPSTime
         logging.debug("Setting Time from GPS-Time to: " + time_str)
