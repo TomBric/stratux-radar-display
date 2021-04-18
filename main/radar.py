@@ -50,6 +50,8 @@ import gmeterui
 import compassui
 import verticalspeed
 import importlib
+import subprocess
+from datetime import datetime
 
 # constant definitions
 RADAR_VERSION = "1.0h"
@@ -66,6 +68,8 @@ CHECK_CONNECTION_TIMEOUT = 5.0
 # timeout used for regular status request, necessary towards stratux to keep the websockets open
 MIN_DISPLAY_REFRESH_TIME = 0.1
 # minimal time to wait for a display refresh, to give time for situation and traffic
+MAX_TIMER_OFFSET = 10
+# max time the local system time and the received GPS-Time may differ. If they differ, system time will be set
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -300,6 +304,20 @@ def new_traffic(json_str):
                 ac['was_spoken'] = False
 
 
+def updateTime(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
+    try:
+        gps_datetime = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+    except ValueError:
+        logging.debug("ERROR converting GPS-Time: " + time_str)
+        return
+    if abs(time.time() - gps_datetime.timestamp()) > MAX_TIMER_OFFSET:
+        # raspi system timer differs from received GPSTime
+        logging.debug("Setting Time from GPS-Time to: " + time_str)
+        res = subprocess.run(["sudo", "date", "-s", "@"+str(gps_datetime.timestamp())])
+        if res.returncode != 0:
+            logging.debug("Error setting system time")
+
+
 def new_situation(json_str):
     global situation
     global ahrs
@@ -364,7 +382,10 @@ def new_situation(json_str):
             situation['was_changed'] = True
             vertical_max = 0  # invalidate min/max
             vertical_min = 0
-
+    # set system time if not synchronized properly
+    if situation['gps_active']:
+        updateTime(sit['GPSTime'])
+    # ahrs
     if ahrs['pitch'] != round(sit['AHRSPitch']):
         ahrs['pitch'] = round(sit['AHRSPitch'])
         ahrs['was_changed'] = True
