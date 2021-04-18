@@ -308,14 +308,15 @@ def updateTime(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
     try:
         gps_datetime = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
     except ValueError:
-        logging.debug("ERROR converting GPS-Time: " + time_str)
+        # stratux will deliver "0001-01-01T00:00:00Z" if not time signal is valid, this will also raise an ValueError
+        logging.debug("Radar: ERROR converting GPS-Time: " + time_str)
         return
     if abs(time.time() - gps_datetime.timestamp()) > MAX_TIMER_OFFSET:
         # raspi system timer differs from received GPSTime
         logging.debug("Setting Time from GPS-Time to: " + time_str)
         res = subprocess.run(["sudo", "date", "-s", "@"+str(gps_datetime.timestamp())])
         if res.returncode != 0:
-            logging.debug("Error setting system time")
+            logging.debug("Radar: Error setting system time")
 
 
 def new_situation(json_str):
