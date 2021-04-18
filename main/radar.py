@@ -314,7 +314,7 @@ def updateTime(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
     if abs(time.time() - gps_datetime.timestamp()) > MAX_TIMER_OFFSET:
         # raspi system timer differs from received GPSTime
         logging.debug("Setting Time from GPS-Time to: " + time_str)
-        res = subprocess.run(["sudo", "date", "-s", "@"+str(gps_datetime.timestamp())])
+        res = subprocess.run(["sudo", "date", "--utc", "-s", "@"+str(gps_datetime.timestamp())])
         if res.returncode != 0:
             logging.debug("Radar: Error setting system time")
 
