@@ -112,7 +112,7 @@ def init(display_control, url, target_ip, refresh, config):   # prepare everythi
     refresh_time = refresh
     global_config = config
     new_pass = DEFAULT_PASS
-    new_stratux_ip = stratux_ip
+    new_stratux_ip = ipv4_to_string(string_to_ipv4(stratux_ip))  # to normalize and have leading zeros
     new_wifi = DEFAULT_WIFI
 
 
@@ -457,7 +457,6 @@ def user_input(bluetooth_active):
             check_wifi = new_wifi.strip()
             check_new_pass = new_pass.strip()
             if len(check_wifi) > 0 and (len(check_new_pass) == 0 or len(check_new_pass) >= 8):
-                new_stratux_ip = ipv4_to_string(string_to_ipv4(stratux_ip))  # to normalize and have leading zeros
                 charpos = 0
                 status_mode = 7
             else:
@@ -473,7 +472,7 @@ def user_input(bluetooth_active):
         if button == 0 and btime == 1:  # left and short, +
             new_stratux_ip = new_stratux_ip[:charpos] + next_number(new_stratux_ip[charpos]) \
                              + new_stratux_ip[charpos+1:]
-        if button == 2 and btime == 1:  # left and short, +
+        if button == 2 and btime == 1:  # left and short, -
             new_stratux_ip = new_stratux_ip[:charpos] + prev_number(new_stratux_ip[charpos]) \
                              + new_stratux_ip[charpos+1:]
         if button == 1 and btime == 1:  # middle and short, next charpos
