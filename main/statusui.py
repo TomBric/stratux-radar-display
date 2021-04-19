@@ -102,12 +102,18 @@ def init(display_control, url, target_ip, refresh, config):   # prepare everythi
     global stratux_ip
     global refresh_time
     global global_config
+    global new_stratux_ip
+    global new_pass
+    global new_wifi
 
     status_url = url
     stratux_ip = target_ip
     logging.debug("Status UI: Initialized GET settings to " + status_url)
     refresh_time = refresh
     global_config = config
+    new_pass = DEFAULT_PASS
+    new_stratux_ip = stratux_ip
+    new_wifi = DEFAULT_WIFI
 
 
 def get_status():
@@ -395,6 +401,8 @@ def user_input(bluetooth_active):
         if button == 0 and btime == 1:  # left and short, network config
             status_mode = 3
             wifi_ssid = read_network()
+            if wifi_ssid != "":
+                new_wifi = wifi_ssid.ljust(MAX_WIFI_LENGTH)
     elif status_mode == 1:   # active scanning, no interface options, just wait
         pass
     elif status_mode == 2:  # scanning finished, evaluating
@@ -419,12 +427,6 @@ def user_input(bluetooth_active):
     elif status_mode == 3:  # network display
         if button == 2 and btime == 1:  # right and short, change network config
             charpos = 0
-            if wifi_ssid != "":
-                new_wifi = wifi_ssid.ljust(MAX_WIFI_LENGTH)
-            else:
-                new_wifi = DEFAULT_WIFI
-            new_pass = DEFAULT_PASS
-            new_stratux_ip = stratux_ip
             status_mode = 4
         if button == 1 and btime == 1:  # middle and short, go back to normal status
             status_mode = 0
