@@ -454,9 +454,9 @@ def user_input(bluetooth_active):
                 charpos = 0
                 status_mode = 7
         if button == 1 and btime == 2:  # middle and long finish
-            new_wifi = new_wifi.strip()
-            new_pass = new_pass.strip()
-            if len(new_wifi) > 0 and (len(new_pass) == 0 or len(new_pass) >= 8):
+            check_wifi = new_wifi.strip()
+            check_new_pass = new_pass.strip()
+            if len(check_wifi) > 0 and (len(check_new_pass) == 0 or len(check_new_pass) >= 8):
                 new_stratux_ip = ipv4_to_string(string_to_ipv4(stratux_ip))  # to normalize and have leading zeros
                 charpos = 0
                 status_mode = 7
@@ -504,17 +504,13 @@ def user_input(bluetooth_active):
                 status_mode = 10
     elif status_mode == 10:     # display error
         if button == 2 and btime == 1:  # right and short, "redo"
-            new_wifi = DEFAULT_WIFI
-            new_pass = DEFAULT_PASS
-            new_stratux_ip = stratux_ip
             charpos = 0
             status_mode = 4   # change network
         if button == 0 and btime == 1:  # left and short, "cancel"
-            new_wifi = DEFAULT_WIFI
-            new_pass = DEFAULT_PASS
-            new_stratux_ip = stratux_ip
             status_mode = 3  # display network
     elif status_mode == 11:  # reboot
+        new_wifi = new_wifi.strip()
+        new_pass = new_pass.strip()
         set_network(new_wifi, new_pass, new_stratux_ip)
         stratux_ip = new_stratux_ip
     elif status_mode == 12:  # Set Options Display Registration
