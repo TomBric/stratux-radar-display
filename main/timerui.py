@@ -65,6 +65,10 @@ def reset_timer():
     global cdown_time
     global cdown_spoken
     global timer_mode
+    global lap_head
+    global right_text
+    global middle_text
+    global left_text
 
     stoptime = 0
     laptime = 0
@@ -74,6 +78,10 @@ def reset_timer():
     cdown_time = 0.0  # count down time
     cdown_spoken = False  # to speak zero only once
     timer_mode = 0  # 0 = normal, 1 = countdown-set
+    lap_head = "Laptimer"
+    right_text = "Start"
+    middle_text = "Mode"
+    left_text = ""
 
 
 def draw_timer(draw, display_control, refresh_time):
