@@ -157,7 +157,7 @@ def draw_status(draw, display_control, bluetooth_active):
             right = "Scan"
         else:
             right = ""
-        display_control.text_screen(draw, "Status", None, status_text, "Netw", "Mode", right)
+        display_control.text_screen(draw, "Display Status", None, status_text, "Netw", "Mode", right)
     elif status_mode == 1:   # scan running
         countdown = math.floor(scan_end - now)
         if countdown > 0:
