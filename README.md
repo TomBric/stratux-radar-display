@@ -75,8 +75,8 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    
    ## Software Installation Instructions
    ### Standard setup
-   1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Image with epaper is the version for the waveshare 3.7 inch epaper displays. Both version will support Bluetooth
-   2. Flash the image using Balena/Etcher or Win32DiskImager or Raspberry Pi Imager to your SD card (at least 8GB)
+   1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Image with epaper is the version for the waveshare 3.7 inch epaper displays. Both versions will support Bluetooth
+   2. Flash the image using Raspberry Pi Imager (select "OwnImage") or Win32DiskImager to your SD card (32 GB cards recommended)
    3. Insert the SD into you raspberry and let it boot. It should automatically startup and connect to the Stratux-Europe edition. 
    Remark: Current configuration is for Stratux-Europe on IP address 192.168.10.1. If you have a different configuration please update /home/pi/stratux-radar-display/image/stratux_radar.sh accordingly.
    
