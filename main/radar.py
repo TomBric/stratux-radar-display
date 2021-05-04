@@ -320,6 +320,7 @@ def updateTime(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
             logging.debug("Radar: Error setting system time")
         else:
             timerui.reset_timer()    # all timers are reset to be on the safe side!
+            radarbuttons.reset_buttons();  # reset button-timers (start-time)
 
 
 def new_situation(json_str):
