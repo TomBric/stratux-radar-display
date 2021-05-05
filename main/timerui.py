@@ -55,6 +55,35 @@ cdown_spoken = False  # to speak zero only once
 timer_mode = 0    # 0 = normal, 1 = countdown-set
 
 
+def reset_timer():
+    # called when clock had to be recalibrated, to be safe, all timers are reset!
+    global stoptime
+    global laptime
+    global timer_running
+    global was_in_secs
+    global timer_ui_changed
+    global cdown_time
+    global cdown_spoken
+    global timer_mode
+    global lap_head
+    global right_text
+    global middle_text
+    global left_text
+
+    stoptime = 0
+    laptime = 0
+    timer_running = False
+    was_in_secs = 0.0  # last time displayed
+    timer_ui_changed = True
+    cdown_time = 0.0  # count down time
+    cdown_spoken = False  # to speak zero only once
+    timer_mode = 0  # 0 = normal, 1 = countdown-set
+    lap_head = "Laptimer"
+    right_text = "Start"
+    middle_text = "Mode"
+    left_text = ""
+
+
 def draw_timer(draw, display_control, refresh_time):
     global was_in_secs
     global timer_ui_changed

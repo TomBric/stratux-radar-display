@@ -50,9 +50,12 @@ import gmeterui
 import compassui
 import verticalspeed
 import importlib
+import subprocess
+import radarbuttons
+from datetime import datetime, timezone
 
 # constant definitions
-RADAR_VERSION = "1.0h"
+RADAR_VERSION = "1.0i"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -66,6 +69,8 @@ CHECK_CONNECTION_TIMEOUT = 5.0
 # timeout used for regular status request, necessary towards stratux to keep the websockets open
 MIN_DISPLAY_REFRESH_TIME = 0.1
 # minimal time to wait for a display refresh, to give time for situation and traffic
+MAX_TIMER_OFFSET = 10
+# max time the local system time and the received GPS-Time may differ. If they differ, system time will be set
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -91,6 +96,7 @@ ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0,
 gmeter = {'was_changed': True, 'current': 0.0, 'max': 0.0, 'min': 0.0}
 # ahrs information, values are all rounded to integer
 global_config = {}
+last_bt_checktime = 0.0
 
 max_pixel = 0
 zerox = 0
@@ -300,6 +306,28 @@ def new_traffic(json_str):
                 ac['was_spoken'] = False
 
 
+def updateTime(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
+    global last_bt_checktime
+
+    try:
+        gps_datetime = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+    except ValueError:
+        # stratux will deliver "0001-01-01T00:00:00Z" if not time signal is valid, this will also raise an ValueError
+        logging.debug("Radar: ERROR converting GPS-Time: " + time_str)
+        return
+    gps_datetime = gps_datetime.replace(tzinfo=timezone.utc)  # make sure that time is interpreted as utc
+    if abs(time.time() - gps_datetime.timestamp()) > MAX_TIMER_OFFSET:
+        # raspi system timer differs from received GPSTime
+        logging.debug("Setting Time from GPS-Time to: " + time_str)
+        res = subprocess.run(["sudo", "date", "--utc", "-s", "@"+str(gps_datetime.timestamp())])
+        if res.returncode != 0:
+            logging.debug("Radar: Error setting system time")
+        else:
+            timerui.reset_timer()    # all timers are reset to be on the safe side!
+            radarbuttons.reset_buttons()  # reset button-timers (start-time)
+            last_bt_checktime = 0.0  # reset timer
+
+
 def new_situation(json_str):
     global situation
     global ahrs
@@ -364,7 +392,10 @@ def new_situation(json_str):
             situation['was_changed'] = True
             vertical_max = 0  # invalidate min/max
             vertical_min = 0
-
+    # set system time if not synchronized properly
+    if situation['gps_active']:
+        updateTime(sit['GPSTime'])
+    # ahrs
     if ahrs['pitch'] != round(sit['AHRSPitch']):
         ahrs['pitch'] = round(sit['AHRSPitch'])
         ahrs['was_changed'] = True
@@ -454,8 +485,8 @@ async def user_interface():
     global global_mode
     global vertical_max
     global vertical_min
+    global last_bt_checktime
 
-    last_bt_checktime = 0.0
     next_mode = 1
 
     try:
@@ -515,6 +546,7 @@ async def display_and_cutoff():
     global global_mode
     global display_control
     global ui_changed
+    global situation
 
     try:
         while True:

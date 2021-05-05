@@ -67,6 +67,13 @@ def init():
     logging.debug("Radarbuttons: Initialized.")
 
 
+def reset_buttons():   # called if timer was modified. Reset of all timestamps necessary
+    global io_status
+
+    for button in io_status:
+        io_status[button]['starttime'] = 0.0
+
+
 def check_one_button(button):
     global io_status
 

@@ -68,6 +68,7 @@ new_devices = []
 status_mode = 0
 # 0 = normal, 1 = scan running, 2 = scan evaluation, 3-network display, 4-network set ssid 5-network set passw
 wifi_ssid = ""
+wifi_ip = ""
 refresh_time = 0.0
 new_wifi = DEFAULT_WIFI
 new_pass = DEFAULT_PASS
@@ -102,12 +103,18 @@ def init(display_control, url, target_ip, refresh, config):   # prepare everythi
     global stratux_ip
     global refresh_time
     global global_config
+    global new_stratux_ip
+    global new_pass
+    global new_wifi
 
     status_url = url
     stratux_ip = target_ip
     logging.debug("Status UI: Initialized GET settings to " + status_url)
     refresh_time = refresh
     global_config = config
+    new_pass = DEFAULT_PASS
+    new_stratux_ip = ipv4_to_string(string_to_ipv4(stratux_ip))  # to normalize and have leading zeros
+    new_wifi = DEFAULT_WIFI
 
 
 def get_status():
@@ -151,7 +158,7 @@ def draw_status(draw, display_control, bluetooth_active):
             right = "Scan"
         else:
             right = ""
-        display_control.text_screen(draw, "Status", None, status_text, "Netw", "Mode", right)
+        display_control.text_screen(draw, "Display Status", None, status_text, "Netw", "Mode", right)
     elif status_mode == 1:   # scan running
         countdown = math.floor(scan_end - now)
         if countdown > 0:
@@ -176,8 +183,8 @@ def draw_status(draw, display_control, bluetooth_active):
             text += "No detections."
         display_control.text_screen(draw, headline, subline, text, left, middle, right)
     elif status_mode == 3:  # display network information
-        display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID:\n" + wifi_ssid + "\nStratux-IP:\n" + stratux_ip,
-                                    "Opt", "Cont", "Chg")
+        display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID:\n" + wifi_ssid + "\nStratux-IP:\n" + stratux_ip
+                                    + "\nMyIP:" + wifi_ip, "Opt", "Cont", "Chg")
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
         subline = "WIFI SSID"
@@ -294,17 +301,25 @@ def start_async_bt_scan():   # started by ui-coroutine
 
 
 def read_network():
-    res = subprocess.run(["sudo", "wpa_cli", "list_networks"], encoding="UTF-8", capture_output=True)
+    res = subprocess.run(["sudo", "iwgetid", "--raw"], encoding="UTF-8", capture_output=True)
     if res.returncode != 0:
         return ""
-    lines = res.stdout.splitlines()
-    if len(lines) >= 2:
-        line2 = lines[2].split()
+    lines = res.stdout.splitlines()   # stdout delivers a CR at the end
+    if len(lines) >= 1:
+        ssid = lines[0]
+        return ssid
     else:
         return ""
-    if len(line2) >= 1:
-        ssid = line2[1]
-        return ssid
+
+
+def read_wlanip():
+    res = subprocess.run(["sudo", "hostname", "-I"], encoding="UTF-8", capture_output=True)
+    if res.returncode != 0:
+        return ""
+    lines = res.stdout.splitlines()  # stdout delivers a CR at the end
+    if len(lines) >= 1 and len(lines[0]) >= 1:
+        wlanip = lines[0].split()[0]     # if ip4 and ip6 present just take ipv4 adress
+        return wlanip
     else:
         return ""
 
@@ -366,6 +381,7 @@ def user_input(bluetooth_active):
     global status_mode
     global new_devices
     global wifi_ssid
+    global wifi_ip
     global new_wifi
     global new_pass
     global charpos
@@ -395,6 +411,9 @@ def user_input(bluetooth_active):
         if button == 0 and btime == 1:  # left and short, network config
             status_mode = 3
             wifi_ssid = read_network()
+            wifi_ip = read_wlanip()
+            if wifi_ssid != "":
+                new_wifi = wifi_ssid.ljust(MAX_WIFI_LENGTH)
     elif status_mode == 1:   # active scanning, no interface options, just wait
         pass
     elif status_mode == 2:  # scanning finished, evaluating
@@ -419,12 +438,6 @@ def user_input(bluetooth_active):
     elif status_mode == 3:  # network display
         if button == 2 and btime == 1:  # right and short, change network config
             charpos = 0
-            if wifi_ssid != "":
-                new_wifi = wifi_ssid.ljust(MAX_WIFI_LENGTH)
-            else:
-                new_wifi = DEFAULT_WIFI
-            new_pass = DEFAULT_PASS
-            new_stratux_ip = stratux_ip
             status_mode = 4
         if button == 1 and btime == 1:  # middle and short, go back to normal status
             status_mode = 0
@@ -452,10 +465,9 @@ def user_input(bluetooth_active):
                 charpos = 0
                 status_mode = 7
         if button == 1 and btime == 2:  # middle and long finish
-            new_wifi = new_wifi.strip()
-            new_pass = new_pass.strip()
-            if len(new_wifi) > 0 and (len(new_pass) == 0 or len(new_pass) >= 8):
-                new_stratux_ip = ipv4_to_string(string_to_ipv4(stratux_ip))  # to normalize and have leading zeros
+            check_wifi = new_wifi.strip()
+            check_new_pass = new_pass.strip()
+            if len(check_wifi) > 0 and (len(check_new_pass) == 0 or len(check_new_pass) >= 8):
                 charpos = 0
                 status_mode = 7
             else:
@@ -471,7 +483,7 @@ def user_input(bluetooth_active):
         if button == 0 and btime == 1:  # left and short, +
             new_stratux_ip = new_stratux_ip[:charpos] + next_number(new_stratux_ip[charpos]) \
                              + new_stratux_ip[charpos+1:]
-        if button == 2 and btime == 1:  # left and short, +
+        if button == 2 and btime == 1:  # left and short, -
             new_stratux_ip = new_stratux_ip[:charpos] + prev_number(new_stratux_ip[charpos]) \
                              + new_stratux_ip[charpos+1:]
         if button == 1 and btime == 1:  # middle and short, next charpos
@@ -502,19 +514,15 @@ def user_input(bluetooth_active):
                 status_mode = 10
     elif status_mode == 10:     # display error
         if button == 2 and btime == 1:  # right and short, "redo"
-            new_wifi = DEFAULT_WIFI
-            new_pass = DEFAULT_PASS
-            new_stratux_ip = stratux_ip
             charpos = 0
             status_mode = 4   # change network
         if button == 0 and btime == 1:  # left and short, "cancel"
-            new_wifi = DEFAULT_WIFI
-            new_pass = DEFAULT_PASS
-            new_stratux_ip = stratux_ip
             status_mode = 3  # display network
     elif status_mode == 11:  # reboot
-        set_network(new_wifi, new_pass, new_stratux_ip)
-        stratux_ip = new_stratux_ip
+        new_wifi = new_wifi.strip()
+        new_pass = new_pass.strip()
+        stratux_ip = str(ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip)))   # to eliminate zeros
+        set_network(new_wifi, new_pass, stratux_ip)
     elif status_mode == 12:  # Set Options Display Registration
         if button == 2 and btime == 1:  # No, do not display registration
             global_config['display_tail'] = False
