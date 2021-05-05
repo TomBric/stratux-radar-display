@@ -184,7 +184,7 @@ def draw_status(draw, display_control, bluetooth_active):
         display_control.text_screen(draw, headline, subline, text, left, middle, right)
     elif status_mode == 3:  # display network information
         display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID:\n" + wifi_ssid + "\nStratux-IP:\n" + stratux_ip
-                                    + "Own-IP:\n"+ wifi_ip,"Opt", "Cont", "Chg")
+                                    + "\nOwn-IP:\n" + wifi_ip, "Opt", "Cont", "Chg")
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
         subline = "WIFI SSID"
@@ -311,6 +311,7 @@ def read_network():
     else:
         return ""
 
+
 def read_wlanip():
     res = subprocess.run(["sudo", "hostname", "-I"], encoding="UTF-8", capture_output=True)
     if res.returncode != 0:
@@ -380,6 +381,7 @@ def user_input(bluetooth_active):
     global status_mode
     global new_devices
     global wifi_ssid
+    global wifi_ip
     global new_wifi
     global new_pass
     global charpos
