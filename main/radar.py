@@ -51,6 +51,7 @@ import compassui
 import verticalspeed
 import importlib
 import subprocess
+import radarbuttons
 from datetime import datetime, timezone
 
 # constant definitions
@@ -95,6 +96,7 @@ ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0,
 gmeter = {'was_changed': True, 'current': 0.0, 'max': 0.0, 'min': 0.0}
 # ahrs information, values are all rounded to integer
 global_config = {}
+last_bt_checktime = 0.0
 
 max_pixel = 0
 zerox = 0
@@ -305,6 +307,8 @@ def new_traffic(json_str):
 
 
 def updateTime(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
+    global last_bt_checktime
+
     try:
         gps_datetime = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
     except ValueError:
@@ -320,7 +324,8 @@ def updateTime(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
             logging.debug("Radar: Error setting system time")
         else:
             timerui.reset_timer()    # all timers are reset to be on the safe side!
-            radarbuttons.reset_buttons();  # reset button-timers (start-time)
+            radarbuttons.reset_buttons()  # reset button-timers (start-time)
+            last_bt_checktime = 0.0  # reset timer
 
 
 def new_situation(json_str):
@@ -480,8 +485,8 @@ async def user_interface():
     global global_mode
     global vertical_max
     global vertical_min
+    global last_bt_checktime
 
-    last_bt_checktime = 0.0
     next_mode = 1
 
     try:
@@ -541,6 +546,7 @@ async def display_and_cutoff():
     global global_mode
     global display_control
     global ui_changed
+    global situation
 
     try:
         while True:
