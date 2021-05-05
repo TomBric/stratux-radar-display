@@ -68,6 +68,7 @@ new_devices = []
 status_mode = 0
 # 0 = normal, 1 = scan running, 2 = scan evaluation, 3-network display, 4-network set ssid 5-network set passw
 wifi_ssid = ""
+wifi_ip = ""
 refresh_time = 0.0
 new_wifi = DEFAULT_WIFI
 new_pass = DEFAULT_PASS
@@ -182,8 +183,8 @@ def draw_status(draw, display_control, bluetooth_active):
             text += "No detections."
         display_control.text_screen(draw, headline, subline, text, left, middle, right)
     elif status_mode == 3:  # display network information
-        display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID:\n" + wifi_ssid + "\nStratux-IP:\n" + stratux_ip,
-                                    "Opt", "Cont", "Chg")
+        display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID:\n" + wifi_ssid + "\nStratux-IP:\n" + stratux_ip
+                                    + "Own-IP:\n"+ wifi_ip,"Opt", "Cont", "Chg")
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
         subline = "WIFI SSID"
@@ -310,6 +311,17 @@ def read_network():
     else:
         return ""
 
+def read_wlanip():
+    res = subprocess.run(["sudo", "hostname", "-I"], encoding="UTF-8", capture_output=True)
+    if res.returncode != 0:
+        return ""
+    lines = res.stdout.splitlines()  # stdout delivers a CR at the end
+    if len(lines) >= 1:
+        wlanip = lines[0]
+        return wlanip
+    else:
+        return ""
+
 
 def set_network(wifi, passw, new_stratux):
     global global_config
@@ -397,6 +409,7 @@ def user_input(bluetooth_active):
         if button == 0 and btime == 1:  # left and short, network config
             status_mode = 3
             wifi_ssid = read_network()
+            wifi_ip = read_wlanip()
             if wifi_ssid != "":
                 new_wifi = wifi_ssid.ljust(MAX_WIFI_LENGTH)
     elif status_mode == 1:   # active scanning, no interface options, just wait
