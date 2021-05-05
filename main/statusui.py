@@ -300,16 +300,12 @@ def start_async_bt_scan():   # started by ui-coroutine
 
 
 def read_network():
-    res = subprocess.run(["sudo", "wpa_cli", "list_networks"], encoding="UTF-8", capture_output=True)
+    res = subprocess.run(["sudo", "iwgetid", "--raw"], encoding="UTF-8", capture_output=True)
     if res.returncode != 0:
         return ""
-    lines = res.stdout.splitlines()
-    if len(lines) >= 2:
-        line2 = lines[2].split()
-    else:
-        return ""
-    if len(line2) >= 1:
-        ssid = line2[1]
+    lines = res.stdout.splitlines()   # stdout delivers a CR at the end
+    if len(lines) >= 1:
+        ssid = lines[0]
         return ssid
     else:
         return ""
