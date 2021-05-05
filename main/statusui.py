@@ -510,7 +510,7 @@ def user_input(bluetooth_active):
     elif status_mode == 11:  # reboot
         new_wifi = new_wifi.strip()
         new_pass = new_pass.strip()
-        stratux_ip = ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip))
+        stratux_ip = str(ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip)))   # to eliminate zeros
         set_network(new_wifi, new_pass, stratux_ip)
     elif status_mode == 12:  # Set Options Display Registration
         if button == 2 and btime == 1:  # No, do not display registration
