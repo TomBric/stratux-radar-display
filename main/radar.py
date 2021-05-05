@@ -54,7 +54,7 @@ import subprocess
 from datetime import datetime, timezone
 
 # constant definitions
-RADAR_VERSION = "1.0h"
+RADAR_VERSION = "1.0i"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
