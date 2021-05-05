@@ -317,8 +317,8 @@ def read_wlanip():
     if res.returncode != 0:
         return ""
     lines = res.stdout.splitlines()  # stdout delivers a CR at the end
-    if len(lines) >= 1:
-        wlanip = lines[0]
+    if len(lines) >= 1 and len(lines[0]) >= 1:
+        wlanip = lines[0].split()[0]     # if ip4 and ip6 present just take ipv4 adress
         return wlanip
     else:
         return ""
