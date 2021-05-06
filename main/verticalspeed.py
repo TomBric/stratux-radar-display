@@ -68,7 +68,7 @@ def user_input():
     # start of vsi global behaviour
     if btime == 0:
         return 0, False  # stay in current mode
-    if button == 1 and btime == 2:  # middle and long
+    if button == 1 and (btime == 2 or btime == 1):  # middle
         return 7, False  # next mode to be status
     if button == 0 and btime == 2:  # left and long
         return 3, False  # start next mode shutdown!

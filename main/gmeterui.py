@@ -71,7 +71,7 @@ def user_input():
     # start of ahrs global behaviour
     if btime == 0:
         return 0  # stay in current mode
-    if button == 1 and btime == 2:  # middle and long
+    if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return 11  # next mode to be compass
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
