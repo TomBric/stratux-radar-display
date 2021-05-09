@@ -1,0 +1,1 @@
+Stratux Display 3,7inch waveshare by Mofaheiti on Thingiverse: https://www.thingiverse.com/thing:4783777
