@@ -43,6 +43,7 @@ BLUEZ_SERVICE = 'org.bluez'
 ADAPTER_PATH = '/org/bluez/hci0'
 
 # global variables
+rlog = None
 bus = None
 manager = None
 adapter = None
@@ -58,25 +59,27 @@ def bluez_init():
     global esng
     global bluetooth_active
     global bt_devices
+    global rlog
 
+    rlog = logging.getLogger('stratux-radar-log')
     bus = pydbus.SystemBus()
     if bus is None:
-        logging.debug("Systembus not received")
+        rlog.debug("Systembus not received")
         return False
     try:
         manager = bus.get(BLUEZ_SERVICE, '/')
         adapter = bus.get(BLUEZ_SERVICE, ADAPTER_PATH)
     except (KeyError, TypeError):
-        logging.debug("Bluetooth: BLUEZ-SERVICE not initialised")
+        rlog.debug("Bluetooth: BLUEZ-SERVICE not initialised")
         return False
     bluetooth_active = True
     connected_devices()     # check if already devices are connected
     if esng is None:
         esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
         if esng is None:
-            logging.info("Bluetooth: espeak-ng not initialized")
+            rlog.info("Bluetooth: espeak-ng not initialized")
             return True
-        logging.info("Bluetooth: espeak-ng successfully initialized.")
+        rlog.info("Bluetooth: espeak-ng successfully initialized.")
     esng.say("Stratux Radar connected")
     print("SPEAK: Stratux Radar connected")
     return True
@@ -89,11 +92,11 @@ def speak(text):
         if esng is None:   # first initialization failed
             esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
             if esng is None:
-                logging.info("Bluetooth: espeak-ng not initialized")
+                rlog.info("Bluetooth: espeak-ng not initialized")
                 return
-            logging.info("Bluetooth: espeak-ng successfully initialized.")
+            rlog.info("Bluetooth: espeak-ng successfully initialized.")
         esng.say(text)
-        logging.debug("Bluetooth speak: "+text)
+        rlog.debug("Bluetooth speak: "+text)
 
 
 def connected_devices():
