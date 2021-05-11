@@ -650,6 +650,7 @@ def main():
     global display_refresh_time
     global bluetooth_active
 
+    print("Stratux Radar Display " + RADAR_VERSION + " running ...")
     radarui.init(url_settings_set)
     if speak:
         bluetooth_active = radarbluez.bluez_init()
