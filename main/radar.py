@@ -73,6 +73,7 @@ MAX_TIMER_OFFSET = 10
 # max time the local system time and the received GPS-Time may differ. If they differ, system time will be set
 
 # global variables
+rlog = None   # radar specific logger
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
 url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
@@ -148,7 +149,7 @@ def draw_display(draw):
     global aircraft_changed
     global ui_changed
 
-    logging.debug("List of all aircraft > " + json.dumps(all_ac))
+    rlog.debug("List of all aircraft > " + json.dumps(all_ac))
     if situation['was_changed'] or aircraft_changed or ui_changed:
         # display is only triggered if there was a change
         display_control.clear(draw)
@@ -203,7 +204,7 @@ def new_traffic(json_str):
     global aircraft_changed
 
     aircraft_changed = True
-    logging.debug("New Traffic" + json_str)
+    rlog.debug("New Traffic" + json_str)
     traffic = json.loads(json_str)
     changed = False
     if 'RadarRange' in traffic or 'RadarLimits' in traffic:
@@ -220,7 +221,7 @@ def new_traffic(json_str):
         # ignore rest of message
     if 'Icao_addr' not in traffic:
         # steering message without aircraft content
-        logging.debug("No Icao_addr in message" + json_str)
+        rlog.debug("No Icao_addr in message" + json_str)
         return
 
     is_new = False
@@ -243,7 +244,7 @@ def new_traffic(json_str):
 
     if traffic['Position_valid'] and situation['gps_active']:
         # adsb traffic and stratux has valid gps signal
-        logging.debug('RADAR: ADSB traffic ' + hex(traffic['Icao_addr']) + " at height " + str(ac['height']))
+        rlog.debug('RADAR: ADSB traffic ' + hex(traffic['Icao_addr']) + " at height " + str(ac['height']))
         if 'circradius' in ac:
             del ac['circradius']
             # was mode-s target before, now invalidate mode-s info
@@ -287,7 +288,7 @@ def new_traffic(json_str):
             return
             # unspecified altitude, nothing displayed for now, leave it as it is
         distcirc = traffic['DistanceEstimated'] / 1852.0
-        logging.debug("RADAR: Mode-S traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
+        rlog.debug("RADAR: Mode-S traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
         distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
         if is_new or 'circradius' not in ac:
             # calc argposition if new or adsb before
@@ -313,15 +314,15 @@ def updateTime(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
         gps_datetime = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
     except ValueError:
         # stratux will deliver "0001-01-01T00:00:00Z" if not time signal is valid, this will also raise an ValueError
-        logging.debug("Radar: ERROR converting GPS-Time: " + time_str)
+        rlog.debug("Radar: ERROR converting GPS-Time: " + time_str)
         return
     gps_datetime = gps_datetime.replace(tzinfo=timezone.utc)  # make sure that time is interpreted as utc
     if abs(time.time() - gps_datetime.timestamp()) > MAX_TIMER_OFFSET:
         # raspi system timer differs from received GPSTime
-        logging.debug("Setting Time from GPS-Time to: " + time_str)
+        rlog.debug("Setting Time from GPS-Time to: " + time_str)
         res = subprocess.run(["sudo", "date", "--utc", "-s", "@"+str(gps_datetime.timestamp())])
         if res.returncode != 0:
-            logging.debug("Radar: Error setting system time")
+            rlog.debug("Radar: Error setting system time")
         else:
             timerui.reset_timer()    # all timers are reset to be on the safe side!
             radarbuttons.reset_buttons()  # reset button-timers (start-time)
@@ -334,7 +335,7 @@ def new_situation(json_str):
     global vertical_max
     global vertical_min
 
-    logging.debug("New Situation" + json_str)
+    rlog.debug("New Situation" + json_str)
     sit = json.loads(json_str)
     situation['last_update'] = time.time()
     if not situation['connected']:
@@ -437,11 +438,11 @@ async def listen_forever(path, name, callback):
     print(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
-        logging.debug(name + " active ...")
+        rlog.debug(name + " active ...")
         try:
             async with websockets.connect(path, ping_timeout=None, ping_interval=None, close_timeout=2) as ws:
                 # stratux does not respond to pings! close timeout set down to get earlier disconnect
-                logging.debug(name + " connected on " + path)
+                rlog.debug(name + " connected on " + path)
                 while True:
                     # listener loop
                     try:
@@ -449,14 +450,14 @@ async def listen_forever(path, name, callback):
                         # message = await ws.recv()
                     except asyncio.TimeoutError:
                         # No situation received or traffic in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
-                        logging.debug(name + ': TimeOut received waiting for message.')
+                        rlog.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
-                            logging.debug(name + ': Watchdog detected connection loss.' +
+                            rlog.debug(name + ': Watchdog detected connection loss.' +
                                                  ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                             break
                     except websockets.exceptions.ConnectionClosed:
-                        logging.debug(
+                        rlog.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                         await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                         break
@@ -468,7 +469,7 @@ async def listen_forever(path, name, callback):
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
         except (socket.error, websockets.exceptions.WebSocketException):
-            logging.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
+            rlog.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
                 situation['connected'] = False
                 ahrs['was_changed'] = True
@@ -530,7 +531,7 @@ async def user_interface():
             if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
                 last_bt_checktime = current_time
                 new_devices, devnames = radarbluez.connected_devices()
-                logging.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
+                rlog.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
                 if new_devices != bt_devices:
                     if new_devices > bt_devices:  # new or additional device
                         radarbluez.speak("Radar connected")
@@ -538,7 +539,7 @@ async def user_interface():
                     ui_changed = True
     except asyncio.CancelledError:
         print("UI task terminating ...")
-        logging.debug("Display task terminating ...")
+        rlog.debug("Display task terminating ...")
 
 
 async def display_and_cutoff():
@@ -562,10 +563,10 @@ async def display_and_cutoff():
                 elif global_mode == 3:   # shutdown
                     final_shutdown = shutdownui.draw_shutdown(draw, display_control)
                     if final_shutdown:
-                        logging.debug("Shutdown triggered: Display task terminating ...")
+                        rlog.debug("Shutdown triggered: Display task terminating ...")
                         return
                 elif global_mode == 4:   # refresh display, only relevant for epaper, mode was radar
-                    logging.debug("Radar: Display driver - Refreshing")
+                    rlog.debug("Radar: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 1
                 elif global_mode == 5:   # ahrs'
@@ -575,13 +576,13 @@ async def display_and_cutoff():
                     ahrs['was_changed'] = False
                     ui_changed = False
                 elif global_mode == 6:   # refresh display, only relevant for epaper, mode was radar
-                    logging.debug("AHRS: Display driver - Refreshing")
+                    rlog.debug("AHRS: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(draw, display_control, bluetooth_active)
                 elif global_mode == 8:   # refresh display, only relevant for epaper, mode was status
-                    logging.debug("Status: Display driver - Refreshing")
+                    rlog.debug("Status: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 7
                 elif global_mode == 9:  # gmeter display
@@ -589,7 +590,7 @@ async def display_and_cutoff():
                     gmeter['was_changed'] = False
                     ui_changed = False
                 elif global_mode == 10:   # refresh display, only relevant for epaper, mode was gmeter
-                    logging.debug("Gmeter: Display driver - Refreshing")
+                    rlog.debug("Gmeter: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 9
                 elif global_mode == 11:  # compass display
@@ -597,7 +598,7 @@ async def display_and_cutoff():
                                            situation['course'])
                     situation['was_changed'] = False
                 elif global_mode == 12:   # refresh display, only relevant for epaper, mode was gmeter
-                    logging.debug("Compass: Display driver - Refreshing")
+                    rlog.debug("Compass: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 11
                 elif global_mode == 13:  # vsi display
@@ -608,7 +609,7 @@ async def display_and_cutoff():
                     situation['was_changed'] = False
                     ui_changed = False
                 elif global_mode == 14:   # refresh display, only relevant for epaper, mode was gmeter
-                    logging.debug("VSI: Display driver - Refreshing")
+                    rlog.debug("VSI: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 13
 
@@ -616,7 +617,7 @@ async def display_and_cutoff():
             cutoff = time.time() - RADAR_CUTOFF
             for icao, ac in all_ac.items():
                 if ac['last_contact_timestamp'] < cutoff:
-                    logging.debug("Cutting of " + hex(icao))
+                    rlog.debug("Cutting of " + hex(icao))
                     to_delete.append(icao)
                     aircraft_changed = True
             for i in to_delete:
@@ -629,10 +630,10 @@ async def display_and_cutoff():
                     situation['was_changed'] = True
                     ahrs['was_changed'] = True
                     gmeter['was_changed'] = True
-                    logging.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
+                    rlog.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
     except (asyncio.CancelledError, RuntimeError):
         print("Display task terminating ...")
-        logging.debug("Display task terminating ...")
+        rlog.debug("Display task terminating ...")
 
 
 async def courotines():
@@ -660,7 +661,7 @@ def main():
     try:
         asyncio.run(courotines())
     except asyncio.CancelledError:
-        logging.debug("Main cancelled")
+        rlog.debug("Main cancelled")
 
 
 def quit_gracefully(*args):
@@ -690,10 +691,13 @@ if __name__ == "__main__":
     ap.add_argument("-r", "--registration", required=False, help="Display registration no",
                     action="store_true", default=False)
     args = vars(ap.parse_args())
+    # set up logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
+    rlog = logging.getLogger('stratux-radar-log')
     if args['verbose']:
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)-15s > %(message)s')
+        rlog.setLevel(logging.DEBUG)
     else:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
+        rlog.setLevel(logging.INFO)
     url_host_base = args['connect']
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     speak = args['speak']
