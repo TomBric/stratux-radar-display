@@ -81,7 +81,7 @@ def bluez_init():
             return True
         rlog.info("Bluetooth: espeak-ng successfully initialized.")
     esng.say("Stratux Radar connected")
-    print("SPEAK: Stratux Radar connected")
+    rlog.debug("SPEAK: Stratux Radar connected")
     return True
 
 
@@ -92,9 +92,9 @@ def speak(text):
         if esng is None:   # first initialization failed
             esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
             if esng is None:
-                rlog.info("Bluetooth: espeak-ng not initialized")
+                rlog.debug("Bluetooth: espeak-ng not initialized")
                 return
-            rlog.info("Bluetooth: espeak-ng successfully initialized.")
+            rlog.debug("Bluetooth: espeak-ng successfully initialized.")
         esng.say(text)
         rlog.debug("Bluetooth speak: "+text)
 
