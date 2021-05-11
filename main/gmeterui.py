@@ -39,21 +39,24 @@ import requests
 MSG_NO_CONNECTION = "No Connection!"
 # globals
 url_gmeter_reset = ""
+rlog = None
 
 
 def init(url):
     global url_gmeter_reset
+    global rlog
 
     url_gmeter_reset = url
-    logging.debug("GMeterUI: Initialized POST settings to " + url_gmeter_reset)
+    rlog = logging.getLogger('stratux-radar-log')
+    rlog.debug("GMeterUI: Initialized POST settings to " + url_gmeter_reset)
 
 
 def reset_gmeter():
-    logging.debug("GMeterUI: Reset gmeter triggered")
+    rlog.debug("GMeterUI: Reset gmeter triggered")
     try:
         requests.post(url_gmeter_reset)
     except requests.exceptions.RequestException as e:
-        logging.debug("Posting gmeter-reset exception: ", e)
+        rlog.debug("Posting gmeter-reset exception: ", e)
 
 
 def draw_gmeter(draw, display_control, ui_changed, connected, gmeter):

@@ -31,7 +31,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
-import logging
 from . import epd3in7
 from PIL import Image, ImageDraw, ImageFont
 import math
@@ -162,7 +161,6 @@ def init():
     device.display_1Gray(device.getbuffer_optimized(epaper_image))
     end = time.time()
     display_refresh = end-start
-    logging.info("Measured Display Refresh Time: " + str(round(display_refresh, 3)) + " seconds")
     # compass
     pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
     compass_aircraft = Image.open(pic_path)
@@ -178,7 +176,6 @@ def cleanup():
     device.Clear(0xFF, 0)
     device.sleep()
     device.Dev_exit()
-    logging.debug("Epaper cleaned up.")
 
 
 def refresh():

@@ -435,7 +435,7 @@ def new_situation(json_str):
 
 
 async def listen_forever(path, name, callback):
-    print(name + " waiting for " + path)
+    rlog.debug(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
         rlog.debug(name + " active ...")
@@ -462,7 +462,7 @@ async def listen_forever(path, name, callback):
                         await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                         break
                     except asyncio.CancelledError:
-                        print(name + " shutting down ... ")
+                        rlog.debug(name + " shutting down ... ")
                         return
                     else:
                         callback(message)
@@ -538,7 +538,7 @@ async def user_interface():
                     bt_devices = new_devices
                     ui_changed = True
     except asyncio.CancelledError:
-        print("UI task terminating ...")
+        rlog.debug("UI task terminating ...")
         rlog.debug("Display task terminating ...")
 
 
@@ -632,7 +632,7 @@ async def display_and_cutoff():
                     gmeter['was_changed'] = True
                     rlog.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
     except (asyncio.CancelledError, RuntimeError):
-        print("Display task terminating ...")
+        rlog.debug("Display task terminating ...")
         rlog.debug("Display task terminating ...")
 
 
@@ -669,7 +669,7 @@ def quit_gracefully(*args):
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
-    print("CleanUp Display ...")
+    rlog.debug("CleanUp Display ...")
     display_control.cleanup()
     return 0
 
