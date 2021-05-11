@@ -77,9 +77,9 @@ def bluez_init():
     if esng is None:
         esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
         if esng is None:
-            rlog.info("Bluetooth: espeak-ng not initialized")
+            rlog.debug("Bluetooth: espeak-ng not initialized")
             return True
-        rlog.info("Bluetooth: espeak-ng successfully initialized.")
+        rlog.debug("Bluetooth: espeak-ng successfully initialized.")
     esng.say("Stratux Radar connected")
     rlog.debug("SPEAK: Stratux Radar connected")
     return True
