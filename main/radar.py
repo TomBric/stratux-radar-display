@@ -307,7 +307,7 @@ def new_traffic(json_str):
                 ac['was_spoken'] = False
 
 
-def updateTime(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
+def update_time(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
     global last_bt_checktime
 
     try:
@@ -396,7 +396,10 @@ def new_situation(json_str):
             vertical_min = 0
     # set system time if not synchronized properly
     if situation['gps_active']:
-        updateTime(sit['GPSTime'])
+        if sit['GPSLastFixLocalTime'].split('.')[0] == sit['GPSLastGPSTimeStratuxTime'].split('.')[0]:
+            # take GPSTime only if last fix time and last stratux time match (in seconds), sometimes, a fix is there, but
+            # not yet an update time value from GPS, but the old one is transmitted by stratux
+            update_time(sit['GPSTime'])
     # ahrs
     if ahrs['pitch'] != round(sit['AHRSPitch']):
         ahrs['pitch'] = round(sit['AHRSPitch'])
