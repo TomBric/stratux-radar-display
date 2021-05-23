@@ -1,5 +1,5 @@
 # stratux-radar-display
-Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero WH). Reads the aircraft data from Stratux and displays them on the specified display. The newest version now has a user interface include. You can connect 3 pushbottons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon and a compass (based on GPS) are also implemented.
+Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W). Reads the aircraft data from Stratux and displays them on the specified display. The newest version now has a user interface included. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
@@ -8,11 +8,6 @@ Current supported displays are:
 More displays can be integrated.
 You can find 3D printer files for cases of both variants in the repo (no-code). The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. 
 
-Usage:   
-- python3 radar.py -d <DeviceName> [-s] -c <Stratux IP>
-- runs radar application using DeviceName as display. -s indicates to use bluetooth for sound output. -c is the ip address of the Stratux to connect to (default is 192.168.10.1)
-- Example: python3 radar.py -d Oled_1in5 -s -c 192.168.10.20
-
 Find below a photo of the current supported displays
 - the oled display is relatively small, but can be build into a 2 1/4" or larger instrument mounting hole
 - the epaper display is larger and has optimal readability in sunlight. As e-paper it has a slower update of approx. twice per second. For the radar display this update rate is appropriate
@@ -20,9 +15,9 @@ Find below a photo of the current supported displays
 ![Display photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/StratuxRadar.jpg)
 
 ## Hardware-List
-- Raspberry Hardware: Since the code is pure python, no special hardware is required. I recommend a current "raspbian standard desktop os" as operating system. Performance requirements are not so high, so I recommend a "Rasperry Zero WH 512MByte RAM". Normal Raspberry 3B or 4 are also possible (but not tested by me). The Raspi Zero has the smallest form factor and best battery consumption. 
-- Epaper-Display: Waveshare 18057 3.7inch e-Paper HAT: Directly mountable on the Raspi as a HAT.
-Alternatively Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Paper Raw Panel Driver HAT 13512. The advantage of the latter is a better form factor for mounting it into some cases. Please make sure to switch the "Display Config" switch to A.
+- Raspberry Hardware: Since the code is pure python, no special hardware is required. I recommend a current "raspbian standard desktop os" as operating system. Performance requirements are not so high, so I recommend a "Rasperry Zero W 512MByte RAM". Normal Raspberry 3B or 4 are also possible (but not tested by me). The Raspi Zero has the smallest form factor and best battery consumption. 
+- Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Paper Raw Panel Driver HAT 13512. Please make sure to switch the "Display Config" switch to A.
+(Alternatively Waveshare 18057 3.7inch e-Paper HAT: Directly mountable on the Raspi as a HAT, if you buy an Raspi Zero WH, but then you can't connect the buttons).
 
 ![Epaper photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_3in7.jpg)
 
@@ -75,7 +70,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    
    ## Software Installation Instructions
    ### Standard setup
-   1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Image with epaper is the version for the waveshare 3.7 inch epaper displays. Both versions will support Bluetooth
+   1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Image with "epaper" is the version for the waveshare 3.7 inch epaper displays. Both versions will support Bluetooth
    2. Flash the image using Raspberry Pi Imager (select "OwnImage") or Win32DiskImager to your SD card (32 GB cards recommended)
    3. Insert the SD into you raspberry and let it boot. It should automatically startup and connect to the Stratux-Europe edition. 
    Remark: Current configuration is for Stratux-Europe on IP address 192.168.10.1. If you have a different configuration please update /home/pi/stratux-radar-display/image/stratux_radar.sh accordingly.
@@ -134,7 +129,7 @@ The Oled display uses different GPIO-Pins as the baro-sensor, so there is no con
    
    * Change to Status-Mode (long press middle button, to change from Radar-> Timer -> AHRS -> Status)
    * Press "scan" (right button). The display now scans 30 secs for new devices. Set your headset as visible and it will be detected (For Bose A20 this is a 5 second press on the Bluetooth-Button until it flashes blue-red)
-   * A list of detected devices is shown, press "yes" for the detected device
+   * A list of detected devices is shown, press "yes" for the detected device. Sometimes you need to repeat the scan until your headset is detected.
       
    **Option 2: via ssh and bluetoothctl**
    
@@ -204,8 +199,8 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
 
 # Shell command parameters
 ```
-  usage: radar.py [-h] -d DEVICE [-s] [-t] [-a] [-x] [-g] [-o] [-c CONNECT] [-v]
-                [-r]
+  usage: radar.py [-h] -d DEVICE [-s] [-t] [-a] [-x] [-g] [-o] [-i] [-c CONNECT]
+                [-v] [-r]
 
 Stratux web radar for separate displays
 
@@ -219,10 +214,11 @@ optional arguments:
   -x, --status          Start mode is status
   -g, --gmeter          Start mode is g-meter
   -o, --compass         Start mode is compass
+  -i, --vsi             Start mode is vertical speed indicator
   -c CONNECT, --connect CONNECT
                         Connect to Stratux-IP
   -v, --verbose         Debug output on
-  -r, --registration    Display registration no   
+  -r, --registration    Display registration no (for Epaper only)
   
   
 Example:
