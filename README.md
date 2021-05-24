@@ -24,6 +24,8 @@ Find below a photo of the current supported displays
 - Oled-Display: Waveshare 14747, 128x128, General 1.5inch RGB OLED display Module
    ![Oled photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Oled_1in5.jpg)
    
+ - Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters LM2596. Then you can use the aircraft power supply (up to 40V). Calibrate the LM2596 at home for a power output at 5 V e.g. using an old laptop power supply. LM2596 also work well for the stratux itself. No problems with radio noise.  
+   
  # Hardware connection of the OLED 1.5 inch display
  
 | Connection  | PIN# on Raspberry  | Cable color |
@@ -225,4 +227,5 @@ Example:
 python3 main/radar.py -d Epaper_3in7 -c 192.168.10.1 -r -s
 
   ```
+
 
