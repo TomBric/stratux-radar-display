@@ -691,7 +691,7 @@ def main():
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
 
-u
+
 def quit_gracefully(*args):
     print("Keyboard interrupt. Quitting ...")
     tasks = asyncio.all_tasks()
