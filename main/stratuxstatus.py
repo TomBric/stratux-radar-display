@@ -74,6 +74,7 @@ def start():  # start listening on status websocket
 
 
 def stop():  # stop listening on status websocket
+    print("Stopping status ws ")
     if status_listener is not None:
         status_listener.cancel()
 
