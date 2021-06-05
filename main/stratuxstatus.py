@@ -101,7 +101,7 @@ def draw_status(draw, display_control, ui_changed, connected):
             subline = "Not connected"
             text = ""
         display_control.text_screen(draw, headline, subline, text, "", "Mode", "")
-
+        display_control.display()
 
 def status_callback(json_str):
     global strx_status
