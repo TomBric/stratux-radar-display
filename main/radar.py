@@ -449,15 +449,15 @@ def new_situation(json_str):
         gmeter['was_changed'] = True
 
 
-async def listen_forever(path, name, callback):
-    rlog.debug(name + " waiting for " + path)
+async def listen_forever(path, name, callback,local_log):
+    local_log.debug(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
-        rlog.debug(name + " active ...")
+        local_log.debug(name + " active ...")
         try:
             async with websockets.connect(path, ping_timeout=None, ping_interval=None, close_timeout=2) as ws:
                 # stratux does not respond to pings! close timeout set down to get earlier disconnect
-                rlog.debug(name + " connected on " + path)
+                local_log.debug(name + " connected on " + path)
                 while True:
                     # listener loop
                     try:
@@ -465,26 +465,26 @@ async def listen_forever(path, name, callback):
                         # message = await ws.recv()
                     except asyncio.TimeoutError:
                         # No situation received or traffic in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
-                        rlog.debug(name + ': TimeOut received waiting for message.')
+                        local_log.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
-                            rlog.debug(name + ': Watchdog detected connection loss.' +
+                            local_log.debug(name + ': Watchdog detected connection loss.' +
                                                  ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                             break
                     except websockets.exceptions.ConnectionClosed:
-                        rlog.debug(
+                        local_log.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                         await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                         break
                     except asyncio.CancelledError:
-                        rlog.debug(name + " shutting down ... ")
+                        local_log.debug(name + " shutting down ... ")
                         return
                     else:
                         callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
         except (socket.error, websockets.exceptions.WebSocketException):
-            rlog.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
+            local_log.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
                 situation['connected'] = False
                 ahrs['was_changed'] = True
@@ -663,8 +663,8 @@ async def display_and_cutoff():
 
 
 async def courotines():
-    await asyncio.wait([listen_forever(url_radar_ws, "TrafficHandler", new_traffic),
-                        listen_forever(url_situation_ws, "SituationHandler", new_situation),
+    await asyncio.wait([listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog),
+                        listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog),
                         display_and_cutoff(), user_interface()])
 
 
