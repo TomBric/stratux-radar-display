@@ -406,7 +406,7 @@ def user_input(bluetooth_active):
         return 3  # start next mode shutdown!
     if status_mode == 0:   # normal status display
         if button == 1 and (btime == 2 or btime == 1): # middle
-            return 1  # next mode to be radar
+            return 15  # next mode to be stratuxstatus
         if bluetooth_active and button == 2 and btime == 1:  # right and short
             status_mode = 1
             start_async_bt_scan()

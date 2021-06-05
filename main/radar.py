@@ -52,10 +52,11 @@ import verticalspeed
 import importlib
 import subprocess
 import radarbuttons
+import stratuxstatus
 from datetime import datetime, timezone
 
 # constant definitions
-RADAR_VERSION = "1.0i"
+RADAR_VERSION = "1.0k"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -98,8 +99,9 @@ vertical_min = 0.0   # min valud for vertical speed
 
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
-gmeter = {'was_changed': True, 'current': 0.0, 'max': 0.0, 'min': 0.0}
 # ahrs information, values are all rounded to integer
+gmeter = {'was_changed': True, 'current': 0.0, 'max': 0.0, 'min': 0.0}
+# status information as received from stratux
 global_config = {}
 last_bt_checktime = 0.0
 
@@ -534,6 +536,11 @@ async def user_interface():
                 if reset_vsi:
                     vertical_max = 0.0
                     vertical_min = 0.0
+            elif global_mode == 15:  # stratux status
+                stratuxstatus.start()   # starts status_listener couroutine if not yet running
+                next_mode = stratuxstatus.user_input()
+                if next_mode != 15:
+                    stratuxstatus.stop()   # stops status_listener
 
             if next_mode > 0:
                 ui_changed = True
@@ -624,6 +631,13 @@ async def display_and_cutoff():
                     rlog.debug("VSI: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 13
+                elif global_mode == 15:  # stratux_statux display
+                    stratuxstatus.draw_status(draw, display_control, ui_changed, situation['connected'])
+                    ui_changed = False
+                elif global_mode == 16:   # refresh display, only relevant for epaper, mode was stratux_status
+                    rlog.debug("StratusStatus: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 15
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
@@ -698,6 +712,8 @@ if __name__ == "__main__":
     ap.add_argument("-o", "--compass", required=False, help="Start mode is compass", action='store_true', default=False)
     ap.add_argument("-i", "--vsi", required=False, help="Start mode is vertical speed indicator", action='store_true',
                     default=False)
+    ap.add_argument("-z", "--strx", required=False, help="Start mode is stratux-status", action='store_true',
+                    default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no (Epaper only)",
@@ -725,6 +741,8 @@ if __name__ == "__main__":
         global_mode = 11   # start in compass mode
     if args['vsi']:
         global_mode = 13   # start in vsi mode
+    if args['strx']:
+        global_mode = 15   # start in stratux-status
     global_config['display_tail'] = args['registration']  # display registration if set
     # check config file, if extistent use config from there
     url_host_base = args['connect']
