@@ -310,7 +310,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
 
     # optical keep alive bar at right side
-    draw.line((sizex-8, sizey/2+optical_bar*10, sizex-8, sizey/2+optical_bar*10+8), fill="black", width=5)
+    draw.line((sizex-8, 60+optical_bar*10, sizex-8, 60+optical_bar*10+8), fill="black", width=5)
 
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
     draw.text((5, 0), "UTC", font=smallfont, fill="black")

@@ -71,7 +71,7 @@ MIN_DISPLAY_REFRESH_TIME = 0.1
 # minimal time to wait for a display refresh, to give time for situation and traffic
 MAX_TIMER_OFFSET = 10
 # max time the local system time and the received GPS-Time may differ. If they differ, system time will be set
-OPTICAL_ALIVE_BARS = 5
+OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
