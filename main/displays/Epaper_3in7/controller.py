@@ -268,7 +268,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy):
+              gps_quality, gps_h_accuracy, optical_bar):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
@@ -309,6 +309,8 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         textsize = draw.textsize(t, awesomefont)
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
 
+    # optical keep alive bar at right side
+    draw.line((sizex-5, zeroy+optical_bar*28, sizex-5, zeroy+optical_bar*28+20), fill="black", width=5)
 
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
     draw.text((5, 0), "UTC", font=smallfont, fill="black")

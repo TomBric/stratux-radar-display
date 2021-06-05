@@ -71,6 +71,10 @@ MIN_DISPLAY_REFRESH_TIME = 0.1
 # minimal time to wait for a display refresh, to give time for situation and traffic
 MAX_TIMER_OFFSET = 10
 # max time the local system time and the received GPS-Time may differ. If they differ, system time will be set
+OPTICAL_ALIVE_BARS = 5
+# number of bars for an optical alive
+OPTICAL_ALIVE_TIME = 2
+# time in secs after which the optical alive bar moves on
 
 # global variables
 rlog = None   # radar specific logger
@@ -111,8 +115,9 @@ sound_on = True  # user may toogle sound off by UI
 global_mode = 1
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
 # 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
-# 13=VSI 14=refresh from VSI 0=Init
+# 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status 0=Init
 bluetooth_active = False
+optical_alive = -1
 
 
 def draw_all_ac(draw, allac):
@@ -148,14 +153,17 @@ def draw_display(draw):
     global situation
     global aircraft_changed
     global ui_changed
+    global optical_alive
 
     rlog.debug("List of all aircraft > " + json.dumps(all_ac))
-    if situation['was_changed'] or aircraft_changed or ui_changed:
+    new_alive = (int(time.time()) % (OPTICAL_ALIVE_BARS * OPTICAL_ALIVE_TIME)) / OPTICAL_ALIVE_TIME
+    if situation['was_changed'] or aircraft_changed or ui_changed or new_alive != optical_alive:
         # display is only triggered if there was a change
+        optical_alive = new_alive
         display_control.clear(draw)
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
-                                  sound_on, situation['gps_quality'], situation['gps_h_accuracy'])
+                                  sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive)
         draw_all_ac(draw, all_ac)
         display_control.display()
         situation['was_changed'] = False
@@ -637,7 +645,6 @@ async def display_and_cutoff():
                     rlog.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
     except (asyncio.CancelledError, RuntimeError):
         rlog.debug("Display task terminating ...")
-        rlog.debug("Display task terminating ...")
 
 
 async def courotines():
@@ -693,7 +700,7 @@ if __name__ == "__main__":
                     default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
-    ap.add_argument("-r", "--registration", required=False, help="Display registration no",
+    ap.add_argument("-r", "--registration", required=False, help="Display registration no (Epaper only)",
                     action="store_true", default=False)
     args = vars(ap.parse_args())
     # set up logging
