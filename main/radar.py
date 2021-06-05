@@ -156,7 +156,7 @@ def draw_display(draw):
     global optical_alive
 
     rlog.debug("List of all aircraft > " + json.dumps(all_ac))
-    new_alive = (int(time.time()) % (OPTICAL_ALIVE_BARS * OPTICAL_ALIVE_TIME)) / OPTICAL_ALIVE_TIME
+    new_alive = int((int(time.time()) % (OPTICAL_ALIVE_BARS * OPTICAL_ALIVE_TIME)) / OPTICAL_ALIVE_TIME)
     if situation['was_changed'] or aircraft_changed or ui_changed or new_alive != optical_alive:
         # display is only triggered if there was a change
         optical_alive = new_alive
