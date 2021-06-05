@@ -83,8 +83,9 @@ DEFAULT_URL_HOST_BASE = "192.168.10.1"
 url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
 url_radar_ws = ""
-url_settings_set = ""
 url_status_ws = ""
+url_settings_set = ""
+url_status_get = ""
 device = ""
 draw = None
 all_ac = {}
@@ -681,15 +682,16 @@ def main():
         bluetooth_active = radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     ahrsui.init(display_control)
-    statusui.init(display_control, url_status_ws, url_host_base, display_refresh_time, global_config)
+    statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
+    stratuxstatus.init(display_control, url_status_ws)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(courotines())
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
 
-
+u
 def quit_gracefully(*args):
     print("Keyboard interrupt. Quitting ...")
     tasks = asyncio.all_tasks()
@@ -757,6 +759,7 @@ if __name__ == "__main__":
     url_status_ws = "ws://" + url_host_base + "/status"
     url_settings_set = "http://" + url_host_base + "/setSettings"
     url_gmeter_reset = "http://" + url_host_base + "/resetGMeter"
+    url_status_get = "http://" + url_host_base + "/getStatus"
 
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
