@@ -537,10 +537,9 @@ async def user_interface():
                     vertical_max = 0.0
                     vertical_min = 0.0
             elif global_mode == 15:  # stratux status
-                print("Starting status")
                 stratuxstatus.start()   # starts status_listener couroutine if not yet running
                 next_mode = stratuxstatus.user_input()
-                if next_mode != 15:
+                if next_mode != 0 or next_mode != 15:
                     stratuxstatus.stop()   # stops status_listener
 
             if next_mode > 0:
