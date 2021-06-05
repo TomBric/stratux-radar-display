@@ -67,8 +67,10 @@ def start():  # start listening on status websocket
     global status_listener
 
     if status_listener is None:
+        print("Listener was none, starting")
         loop = asyncio.get_event_loop()
         status_listener = loop.create_task(radar.listen_forever(status_url, "StatusListener", status_callback))
+        print("Listener ", status_listener)
 
 
 def stop():  # stop listening on status websocket
