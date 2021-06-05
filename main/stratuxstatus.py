@@ -82,7 +82,7 @@ def stop():  # stop listening on status websocket
 def draw_status(draw, display_control, ui_changed, connected):
     global strx_status
 
-    print("StratuxUI draw_status")
+    print("StratuxUI draw_status. strx_status ",strx_status)
     headline = "Stratux Status"
     if strx_status['was_changed'] or ui_changed:
         display_control.clear(draw)
