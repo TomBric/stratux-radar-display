@@ -76,7 +76,7 @@ def stop():  # stop listening on status websocket
         status_listener.cancel()
 
 
-def draw_stratus(draw, display_control, ui_changed, connected):
+def draw_status(draw, display_control, ui_changed, connected):
     global strx_status
 
     headline = "Stratux Status"
