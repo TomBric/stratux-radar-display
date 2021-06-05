@@ -84,7 +84,7 @@ url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
 url_radar_ws = ""
 url_settings_set = ""
-url_status_get = ""
+url_status_ws = ""
 device = ""
 draw = None
 all_ac = {}
@@ -681,7 +681,7 @@ def main():
         bluetooth_active = radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
     ahrsui.init(display_control)
-    statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
+    statusui.init(display_control, url_status_ws, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
@@ -754,8 +754,8 @@ if __name__ == "__main__":
             global_config['display_tail'] = saved_config['display_tail']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
+    url_status_ws = "ws://" + url_host_base + "/status"
     url_settings_set = "http://" + url_host_base + "/setSettings"
-    url_status_get = "http://" + url_host_base + "/getStatus"
     url_gmeter_reset = "http://" + url_host_base + "/resetGMeter"
 
     try:
