@@ -102,6 +102,7 @@ def draw_status(draw, display_control, ui_changed, connected):
 def status_callback(json_str):
     global strx_status
 
+    print("Status callback received.")
     rlog.debug("New status" + json_str)
     stat = json.loads(json_str)
 
