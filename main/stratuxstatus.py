@@ -134,7 +134,7 @@ def status_callback(json_str):
         strx_status['CPUTemp'] = str(round(stat['CPUTemp'], 1)) + "°C / " + str(round(stat['CPUTemp']*9/5+32.0, 1)) + "°F"
     else:
         strx_status['CPUTemp'] = "unaivalable"
-
+    print("Status callback decoded")
 
 def user_input():
     global left
