@@ -412,12 +412,12 @@ def shutdown(draw, countdown, shutdownmode):
     elif shutdownmode == 2:
         message = "Reboot"
     centered_text(draw, 10, message, largefont, fill="white")
-    message = "Press left button to cancel ..."
+    message = "Left to cancel ..."
     centered_text(draw, 30, message, smallfont, fill="white")
-    message = "Press middle for display only ..."
-    centered_text(draw, 50, message, smallfont, fill="white")
-    message = "Press right for reboot all ..."
-    centered_text(draw, 80, message, smallfont, fill="white")
+    message = "Middle for display only ..."
+    centered_text(draw, 45, message, smallfont, fill="white")
+    message = "Right for reboot all ..."
+    centered_text(draw, 60, message, smallfont, fill="white")
 
     left_text = "Canc"
     middle_text = "Displ"

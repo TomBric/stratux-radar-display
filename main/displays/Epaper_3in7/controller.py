@@ -497,9 +497,9 @@ def shutdown(draw, countdown, shutdownmode):
     message = "Press left button to cancel ..."
     centered_text(draw, 110, message, smallfont, fill="black")
     message = "Press middle for display only ..."
-    centered_text(draw, 130, message, smallfont, fill="black")
+    centered_text(draw, 140, message, smallfont, fill="black")
     message = "Press right for reboot all ..."
-    centered_text(draw, 150, message, smallfont, fill="black")
+    centered_text(draw, 170, message, smallfont, fill="black")
 
     left_text = "Cancel"
     middle_text = "Display only"
