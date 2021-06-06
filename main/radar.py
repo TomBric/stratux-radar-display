@@ -680,6 +680,7 @@ def main():
 
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
     radarui.init(url_settings_set)
+    shutdownui.init(url_shutdown, url_reboot)
     if speak:
         bluetooth_active = radarbluez.bluez_init()
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
@@ -759,6 +760,8 @@ if __name__ == "__main__":
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_status_ws = "ws://" + url_host_base + "/status"
+    url_shutdown = "http://" + url_host_base + "/shutdown"
+    url_reboot = "http://" + url_host_base + "/reboot"
     url_settings_set = "http://" + url_host_base + "/setSettings"
     url_gmeter_reset = "http://" + url_host_base + "/resetGMeter"
     url_status_get = "http://" + url_host_base + "/getStatus"
