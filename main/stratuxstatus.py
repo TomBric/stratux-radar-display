@@ -110,6 +110,7 @@ def draw_status(draw, display_control, ui_changed, connected):
         display_control.display()
         strx['was_changed'] = False
 
+
 def status_callback(json_str):
     global strx
 

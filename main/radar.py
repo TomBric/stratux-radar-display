@@ -62,10 +62,10 @@ RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
 RADAR_CUTOFF = 29
 UI_REACTION_TIME = 0.1
-MINIMAL_WAIT_TIME = 0.01   # give other coroutines some time to to their jobs
+MINIMAL_WAIT_TIME = 0.01  # give other coroutines some time to to their jobs
 BLUEZ_CHECK_TIME = 3.0
 SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
-WATCHDOG_TIMER = 3.0   # time after "no connection" is assumed, if no new situation is received
+WATCHDOG_TIMER = 3.0  # time after "no connection" is assumed, if no new situation is received
 CHECK_CONNECTION_TIMEOUT = 5.0
 # timeout used for regular status request, necessary towards stratux to keep the websockets open
 MIN_DISPLAY_REFRESH_TIME = 0.1
@@ -78,7 +78,7 @@ OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
 
 # global variables
-rlog = None   # radar specific logger
+rlog = None  # radar specific logger
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
 url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
@@ -91,12 +91,12 @@ draw = None
 all_ac = {}
 aircraft_changed = True
 ui_changed = True
-situation = {'was_changed': True, 'last_update': 0.0,  'connected': False, 'gps_active': False, 'course': 0,
+situation = {'was_changed': True, 'last_update': 0.0, 'connected': False, 'gps_active': False, 'course': 0,
              'own_altitude': -99.0, 'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000,
              'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
              'vertical_speed': 0.0, 'baro_valid': False}
-vertical_max = 0.0   # max value for vertical speed
-vertical_min = 0.0   # min valud for vertical speed
+vertical_max = 0.0  # max value for vertical speed
+vertical_min = 0.0  # min valud for vertical speed
 
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
@@ -303,7 +303,7 @@ def new_traffic(json_str):
         distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
         if is_new or 'circradius' not in ac:
             # calc argposition if new or adsb before
-            last_arcposition = display_control.next_arcposition(last_arcposition)   # display specific
+            last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
             ac['arcposition'] = last_arcposition
         ac['gps_distance'] = distcirc
         ac['circradius'] = distx
@@ -318,7 +318,7 @@ def new_traffic(json_str):
                 ac['was_spoken'] = False
 
 
-def update_time(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
+def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
     global last_bt_checktime
 
     try:
@@ -331,12 +331,12 @@ def update_time(time_str):    # time_str has format "2021-04-18T15:58:58.1Z"
     if abs(time.time() - gps_datetime.timestamp()) > MAX_TIMER_OFFSET:
         # raspi system timer differs from received GPSTime
         rlog.debug("Setting Time from GPS-Time to: " + time_str + ". System time was " +
-                   time.strftime("%H:%M:%S",time.gmtime()))
-        res = subprocess.run(["sudo", "date", "--utc", "-s", "@"+str(gps_datetime.timestamp())])
+                   time.strftime("%H:%M:%S", time.gmtime()))
+        res = subprocess.run(["sudo", "date", "--utc", "-s", "@" + str(gps_datetime.timestamp())])
         if res.returncode != 0:
             rlog.debug("Radar: Error setting system time")
         else:
-            timerui.reset_timer()    # all timers are reset to be on the safe side!
+            timerui.reset_timer()  # all timers are reset to be on the safe side!
             radarbuttons.reset_buttons()  # reset button-timers (start-time)
             last_bt_checktime = 0.0  # reset timer
 
@@ -353,7 +353,7 @@ def new_situation(json_str):
     if not situation['connected']:
         situation['connected'] = True
         situation['was_changed'] = True
-        ahrs['was_changed'] = True   # connection also relevant for ahrs
+        ahrs['was_changed'] = True  # connection also relevant for ahrs
         gmeter['was_changed'] = True  # connection also relevant for ahrs
     gps_active = sit['GPSHorizontalAccuracy'] < 19999
     if situation['gps_active'] != gps_active:
@@ -396,9 +396,9 @@ def new_situation(json_str):
         if not situation['baro_valid']:
             situation['baro_valid'] = True
             situation['was_changed'] = True
-            vertical_max = 0   # invalidate min/max
+            vertical_max = 0  # invalidate min/max
             vertical_min = 0
-    else:   # no baro (=0) or ADSB estimation (=4), not enough data for vertical speed
+    else:  # no baro (=0) or ADSB estimation (=4), not enough data for vertical speed
         if situation['baro_valid']:
             situation['baro_valid'] = False
             situation['vertical_speed'] = 0.0
@@ -408,7 +408,7 @@ def new_situation(json_str):
     # set system time if not synchronized properly
     if situation['gps_active']:
         if sit['GPSLastFixLocalTime'].split('.')[0] == sit['GPSLastGPSTimeStratuxTime'].split('.')[0]:
-            # take GPSTime only if last fix time and last stratux time match (in seconds), sometimes, a fix is there, but
+            # take GPSTime only if last fix time and last stratux time match (in seconds), sometimes a fix is there, but
             # not yet an update time value from GPS, but the old one is transmitted by stratux
             update_time(sit['GPSTime'])
     # ahrs
@@ -449,7 +449,7 @@ def new_situation(json_str):
         gmeter['was_changed'] = True
 
 
-async def listen_forever(path, name, callback,local_log):
+async def listen_forever(path, name, callback, local_log):
     local_log.debug(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
@@ -468,7 +468,7 @@ async def listen_forever(path, name, callback,local_log):
                         local_log.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
                             local_log.debug(name + ': Watchdog detected connection loss.' +
-                                                 ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
+                                            ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                             break
                     except websockets.exceptions.ConnectionClosed:
@@ -522,8 +522,8 @@ async def user_interface():
             elif global_mode == 3:  # shutdown mode
                 next_mode = shutdownui.user_input()
             elif global_mode == 4:  # refresh mode
-                next_mode = 0   # wait for display to change next mode
-                await asyncio.sleep(UI_REACTION_TIME*2)   # give display driver time ...
+                next_mode = 0  # wait for display to change next mode
+                await asyncio.sleep(UI_REACTION_TIME * 2)  # give display driver time ...
             elif global_mode == 5:  # ahrs
                 next_mode = ahrsui.user_input()
             elif global_mode == 7:  # status
@@ -538,10 +538,10 @@ async def user_interface():
                     vertical_max = 0.0
                     vertical_min = 0.0
             elif global_mode == 15:  # stratux status
-                stratuxstatus.start()   # starts status_listener couroutine if not yet running
+                stratuxstatus.start()  # starts status_listener couroutine if not yet running
                 next_mode = stratuxstatus.user_input()
                 if next_mode != 0 and next_mode != 15:
-                    stratuxstatus.stop()   # stops status_listener
+                    stratuxstatus.stop()  # stops status_listener
 
             if next_mode > 0:
                 ui_changed = True
@@ -576,32 +576,32 @@ async def display_and_cutoff():
                 await asyncio.sleep(display_refresh_time / 3)
                 # try it several times to be as fast as possible
             else:
-                if global_mode == 1:   # Radar
+                if global_mode == 1:  # Radar
                     draw_display(draw)
-                elif global_mode == 2:   # Timer'
+                elif global_mode == 2:  # Timer'
                     timerui.draw_timer(draw, display_control, display_refresh_time)
-                elif global_mode == 3:   # shutdown
+                elif global_mode == 3:  # shutdown
                     final_shutdown = shutdownui.draw_shutdown(draw, display_control)
                     if final_shutdown:
                         rlog.debug("Shutdown triggered: Display task terminating ...")
                         return
-                elif global_mode == 4:   # refresh display, only relevant for epaper, mode was radar
+                elif global_mode == 4:  # refresh display, only relevant for epaper, mode was radar
                     rlog.debug("Radar: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 1
-                elif global_mode == 5:   # ahrs'
+                elif global_mode == 5:  # ahrs'
                     ahrsui.draw_ahrs(draw, display_control, situation['connected'], ui_changed or ahrs['was_changed'],
                                      ahrs['pitch'], ahrs['roll'], ahrs['heading'], ahrs['slipskid'],
                                      ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
                     ahrs['was_changed'] = False
                     ui_changed = False
-                elif global_mode == 6:   # refresh display, only relevant for epaper, mode was radar
+                elif global_mode == 6:  # refresh display, only relevant for epaper, mode was radar
                     rlog.debug("AHRS: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(draw, display_control, bluetooth_active)
-                elif global_mode == 8:   # refresh display, only relevant for epaper, mode was status
+                elif global_mode == 8:  # refresh display, only relevant for epaper, mode was status
                     rlog.debug("Status: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 7
@@ -609,7 +609,7 @@ async def display_and_cutoff():
                     gmeterui.draw_gmeter(draw, display_control, ui_changed, situation['connected'], gmeter)
                     gmeter['was_changed'] = False
                     ui_changed = False
-                elif global_mode == 10:   # refresh display, only relevant for epaper, mode was gmeter
+                elif global_mode == 10:  # refresh display, only relevant for epaper, mode was gmeter
                     rlog.debug("Gmeter: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 9
@@ -617,25 +617,27 @@ async def display_and_cutoff():
                     compassui.draw_compass(draw, display_control, situation['was_changed'], situation['connected'],
                                            situation['course'])
                     situation['was_changed'] = False
-                elif global_mode == 12:   # refresh display, only relevant for epaper, mode was gmeter
+                elif global_mode == 12:  # refresh display, only relevant for epaper, mode was gmeter
                     rlog.debug("Compass: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 11
                 elif global_mode == 13:  # vsi display
                     verticalspeed.draw_vsi(draw, display_control, situation['was_changed'] or ui_changed,
-                        situation['connected'], situation['vertical_speed'], situation['own_altitude'], situation['gps_speed'],
-                        situation['course'], situation['gps_altitude'], vertical_max, vertical_min, situation['gps_active'],
-                        situation['baro_valid'])
+                                           situation['connected'], situation['vertical_speed'],
+                                           situation['own_altitude'], situation['gps_speed'],
+                                           situation['course'], situation['gps_altitude'], vertical_max, vertical_min,
+                                           situation['gps_active'],
+                                           situation['baro_valid'])
                     situation['was_changed'] = False
                     ui_changed = False
-                elif global_mode == 14:   # refresh display, only relevant for epaper, mode was gmeter
+                elif global_mode == 14:  # refresh display, only relevant for epaper, mode was gmeter
                     rlog.debug("VSI: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 13
                 elif global_mode == 15:  # stratux_statux display
                     stratuxstatus.draw_status(draw, display_control, ui_changed, situation['connected'])
                     ui_changed = False
-                elif global_mode == 16:   # refresh display, only relevant for epaper, mode was stratux_status
+                elif global_mode == 16:  # refresh display, only relevant for epaper, mode was stratux_status
                     rlog.debug("StratusStatus: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 15
@@ -732,26 +734,26 @@ if __name__ == "__main__":
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     speak = args['speak']
     if args['timer']:
-        global_mode = 2   # start_in_timer_mode
+        global_mode = 2  # start_in_timer_mode
     if args['ahrs']:
-        global_mode = 5   # start_in_ahrs mode
+        global_mode = 5  # start_in_ahrs mode
     if args['status']:
-        global_mode = 7   # start in status mode
+        global_mode = 7  # start in status mode
     if args['gmeter']:
-        global_mode = 9   # start in g-meter mode
+        global_mode = 9  # start in g-meter mode
     if args['compass']:
-        global_mode = 11   # start in compass mode
+        global_mode = 11  # start in compass mode
     if args['vsi']:
-        global_mode = 13   # start in vsi mode
+        global_mode = 13  # start in vsi mode
     if args['strx']:
-        global_mode = 15   # start in stratux-status
+        global_mode = 15  # start in stratux-status
     global_config['display_tail'] = args['registration']  # display registration if set
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()
     if saved_config is not None:
         if 'stratux_ip' in saved_config:
-            url_host_base = saved_config['stratux_ip']   # set stratux ip if interactively changed one time
+            url_host_base = saved_config['stratux_ip']  # set stratux ip if interactively changed one time
         if 'display_tail' in saved_config:
             global_config['display_tail'] = saved_config['display_tail']
     url_situation_ws = "ws://" + url_host_base + "/situation"

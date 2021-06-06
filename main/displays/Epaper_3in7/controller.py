@@ -238,7 +238,6 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
         tsize = draw.textsize(tail, verysmallfont)
-        # draw.rectangle((tposition[0], tposition[1]+LARGE, tposition[0]+tsize[0], tposition[1]+LARGE+VERYSMALL), fill="white")
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
@@ -311,6 +310,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
 
     # optical keep alive bar at right side
     draw.line((sizex-8, 80+optical_bar*10, sizex-8, 80+optical_bar*10+8), fill="black", width=5)
+
 
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
     draw.text((5, 0), "UTC", font=smallfont, fill="black")
