@@ -37,24 +37,25 @@ import radarbuttons
 import asyncio
 import json
 
-
 # constants
 
 # globals
 status = {}
 status_url = ""
 rlog = None
-status_listener = None   # couroutine task for querying statux
-strx_status = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES_messages_max': 0,
-               'OGN_messages_last_minute': 0, 'OGN_messages_max': 0, 'UAT_messages_last_minute': 0,
-               'UAT_messages_max': 0, 'CPUTemp': "unavail", 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0,
-               'GPS_satellites_seen': 0}
+status_listener = None  # couroutine task for querying statux
+strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES_messages_max': 0,
+        'OGN_connected': False, 'OGN_messages_last_minute': 0, 'OGN_messages_max': 0,
+        'UATRadio_connected': False, 'UAT_messages_last_minute': 0, 'UAT_messages_max': 0,
+        'CPUTemp': "unavail",
+        'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0,
+        'GPS_satellites_seen': 0}
 left = ""
 middle = ""
 right = ""
 
 
-def init(display_control, url):   # prepare everything
+def init(display_control, url):  # prepare everything
     global status_url
     global rlog
 
@@ -77,57 +78,73 @@ def stop():  # stop listening on status websocket
 
 
 def draw_status(draw, display_control, ui_changed, connected):
-    global strx_status
+    global strx
 
     headline = "Stratux Status"
-    if strx_status['was_changed'] or ui_changed:
+    if strx['was_changed'] or ui_changed:
         display_control.clear(draw)
         if connected:
-            subline = strx_status['version']
-            text = \
-                " 1090: Cur " + str(strx_status['ES_messages_last_minute']) + " Pea " + str(strx_status['ES_messages_max']) + "\n" +\
-                " OGN : Cur " + str(strx_status['OGN_messages_last_minute']) + " Pea " + str(strx_status['OGN_messages_max']) + "\n" +\
-                " UAT:  Cur " + str(strx_status['UAT_messages_last_minute']) + " Pea " + str(strx_status['UAT_messages_max']) + "\n" +\
-                "Temp: " + strx_status['CPUTemp'] + "\n" + \
-                "Sat: " + str(strx_status['GPS_satellites_locked']) + " lo/" + str(strx_status['GPS_satellites_tracked']) +\
-                " tra/" + str(strx_status['GPS_satellites_seen']) + " seen"
-            strx_status['was_changed'] = False
+            subline = strx['version']
+            text = "1090: ct " + str(strx['ES_messages_last_minute']) + " pk " + str(strx['ES_messages_max']) + "\n"
+            if strx['OGN_connected']:
+                text += "OGN: ct " + str(strx['OGN_messages_last_minute']) + " pk " + str(
+                    strx['OGN_messages_max']) + "\n"
+                text += "  noi" + str(round(strx['OGN_noise_db'], 1)) + " dB / ga " + str(
+                    round(strx['OGN_gain_db'], 1)) + " dB\n"
+            if strx['UAT_connected']:
+                text += "UAT: ct " + str(strx['UAT_messages_last_minute']) + " pk " + str(
+                    strx['UAT_messages_max']) + "\n"
+            text += "Temp: " + strx['CPUTemp'] + "\n"
+            if strx['GPS_connected']:
+                text += "Sat: " + str(strx['GPS_satellites_locked']) + " lo / " + str(strx['GPS_satellites_tracked']) +\
+                        " tr / " + str(strx['GPS_satellites_seen']) + " se"
+            else:
+                text += "No GPS"
+            strx['was_changed'] = False
         else:
             subline = "Not connected"
             text = ""
         display_control.text_screen(draw, headline, subline, text, "", "Mode", "")
         display_control.display()
 
+
 def status_callback(json_str):
-    global strx_status
+    global strx
 
     rlog.debug("New status" + json_str)
     stat = json.loads(json_str)
 
-    strx_status['was_changed'] = True
+    strx['was_changed'] = True
 
-    strx_status['version'] = stat['Version']
-    strx_status['devices'] = stat['Devices']
+    strx['version'] = stat['Version']
+    strx['devices'] = stat['Devices']
 
-    strx_status['UAT_messages_last_minute'] = stat['UAT_messages_last_minute']
-    strx_status['UAT_messages_max'] = stat['UAT_messages_max']
-    strx_status['ES_messages_last_minute'] = stat['ES_messages_last_minute']
-    strx_status['ES_messages_max'] = stat['ES_messages_max']
-    strx_status['OGN_messages_last_minute'] = stat['OGN_messages_last_minute']
-    strx_status['OGN_messages_max'] = stat['OGN_messages_max']
+    strx['UATRadio_connected'] = stat['UATRadio_connected']
+    strx['UAT_messages_last_minute'] = stat['UAT_messages_last_minute']
+    strx['UAT_messages_max'] = stat['UAT_messages_max']
 
-    strx_status['GPS_satellites_locked'] = stat['GPS_satellites_locked']
-    strx_status['GPS_satellites_tracked'] = stat['GPS_satellites_tracked']
-    strx_status['GPS_satellites_seen'] = stat['GPS_satellites_seen']
-    strx_status['GPS_solution'] = stat['GPS_solution']
+    strx['ES_messages_last_minute'] = stat['ES_messages_last_minute']
+    strx['ES_messages_max'] = stat['ES_messages_max']
 
-    strx_status['OGN_noise_db'] = stat['OGN_noise_db']
-    strx_status['OGN_gain_db'] = stat['OGN_gain_db']
+    strx['OGN_connected'] = stat['OGN_connected']
+    strx['OGN_messages_last_minute'] = stat['OGN_messages_last_minute']
+    strx['OGN_messages_max'] = stat['OGN_messages_max']
+
+    strx['GPS_connected'] = stat['GPS_connected']
+    strx['GPS_satellites_locked'] = stat['GPS_satellites_locked']
+    strx['GPS_satellites_tracked'] = stat['GPS_satellites_tracked']
+    strx['GPS_satellites_seen'] = stat['GPS_satellites_seen']
+    strx['GPS_solution'] = stat['GPS_solution']
+
+    strx['OGN_noise_db'] = stat['OGN_noise_db']
+    strx['OGN_gain_db'] = stat['OGN_gain_db']
 
     if 'CPUTemp' in stat:
-        strx_status['CPUTemp'] = str(round(stat['CPUTemp'], 1)) + "°C / " + str(round(stat['CPUTemp']*9/5+32.0, 1)) + "°F"
+        strx['CPUTemp'] = str(round(stat['CPUTemp'], 1)) + "°C / " + str(
+            round(stat['CPUTemp'] * 9 / 5 + 32.0, 1)) + "°F"
     else:
-        strx_status['CPUTemp'] = "unaivalable"
+        strx['CPUTemp'] = "unaivalable"
+
 
 def user_input():
     global left
