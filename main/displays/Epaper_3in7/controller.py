@@ -484,16 +484,30 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
 
 
-def shutdown(draw, countdown):
-    message = "Shutdown "
+def shutdown(draw, countdown, shutdownmode):
+    if shutdownmode == 0:   # shutdown stratux + display
+        message = "Shutdown stratux & display"
+    elif shutdownmode == 1:
+        message = "Shutdown display"
+    elif shutdownmode == 2:
+        message = "Reboot"
     centered_text(draw, 10, message, largefont, fill="black")
     message = "in " + str(countdown) + " seonds!"
     centered_text(draw, 40, message, largefont, fill="black")
-    message = "Press any button"
+    message = "Press left button to cancel ..."
     centered_text(draw, 110, message, smallfont, fill="black")
-    message = "to cancel ..."
-    centered_text(draw, 130, message, smallfont, fill="black")
+    message = "Press middle for display only ..."
+    centered_text(draw, 140, message, smallfont, fill="black")
+    message = "Press right for reboot all ..."
+    centered_text(draw, 170, message, smallfont, fill="black")
 
+    left_text = "Cancel"
+    middle_text = "Display only"
+    right_text = "Reboot"
+    draw.text((5, sizey - SMALL - 3), left_text, font=smallfont, fill="black")
+    textsize = draw.textsize(right_text, smallfont)
+    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right_text, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="black")
 
 def rollmarks(draw, roll):
     if ah_zerox > ah_zeroy:
