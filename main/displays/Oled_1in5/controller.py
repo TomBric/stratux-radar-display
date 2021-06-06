@@ -403,15 +403,29 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.ellipse((zerox - 4, zeroy - 4, zerox + 4, zeroy + 4), outline="white", fill="black", width=2)
 
 
-def shutdown(draw, countdown):
-    message = "Shutdown "
+def shutdown(draw, countdown, shutdownmode):
+    message = ""
+    if shutdownmode == 0:   # shutdown stratux + display
+        message = "Shutdown all"
+    elif shutdownmode == 1:
+        message = "Shutdwn display"
+    elif shutdownmode == 2:
+        message = "Reboot"
     centered_text(draw, 10, message, largefont, fill="white")
-    message = "in " + str(countdown) + " seonds!"
-    centered_text(draw, 30, message, largefont, fill="white")
-    message = "Press any button"
-    centered_text(draw, 60, message, smallfont, fill="white")
-    message = "to cancel ..."
+    message = "Press left button to cancel ..."
+    centered_text(draw, 30, message, smallfont, fill="white")
+    message = "Press middle for display only ..."
+    centered_text(draw, 50, message, smallfont, fill="white")
+    message = "Press right for reboot all ..."
     centered_text(draw, 80, message, smallfont, fill="white")
+
+    left_text = "Canc"
+    middle_text = "Displ"
+    right_text = "Rebo"
+    draw.text((0, sizey - SMALL - 3), left_text, font=smallfont, fill="green")
+    textsize = draw.textsize(right_text, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL - 3), right_text, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="green")
 
 
 def rollmarks(draw, roll):

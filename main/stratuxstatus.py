@@ -99,8 +99,8 @@ def draw_status(draw, display_control, ui_changed, connected):
                     strx['UAT_messages_max']) + "\n"
             text += "Temp: " + strx['CPUTemp'] + "\n"
             if strx['GPS_connected']:
-                text += "Sat: " + str(strx['GPS_satellites_locked']) + " lo / " + str(strx['GPS_satellites_tracked']) +\
-                        " tr / " + str(strx['GPS_satellites_seen']) + " se"
+                text += "Sat: " + str(strx['GPS_satellites_locked']) + " in / " + str(strx['GPS_satellites_seen']) +\
+                        " se / " + str(strx['GPS_satellites_tracked']) + " tr"
             else:
                 text += "No GPS connected"
         else:
@@ -150,10 +150,6 @@ def status_callback(json_str):
 
 
 def user_input():
-    global left
-    global middle
-    global right
-
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
         return 0  # stay in current mode

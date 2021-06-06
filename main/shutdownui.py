@@ -34,25 +34,61 @@
 import os
 import radarbuttons
 import time
+import requests
+import logging
 
 SHUTDOWN_WAIT_TIME = 6.0
 shutdown_time = 0.0
+shutdown_mode = 0   # 0 = both shutdown, 1 = display shutdown only, 2 = reboot stratux + display
 clear_before_shutoff = False
+
+url_reboot = ""
+url_shutdown = ""
+rlog = None
+
+
+def init(shutdown, reboot):
+    global url_reboot
+    global url_shutdown
+    global rlog
+
+    url_reboot = reboot
+    url_shutdown = shutdown
+    rlog = logging.getLogger('stratux-radar-log')
+    rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
 
 
 def draw_shutdown(draw, display_control):
     global clear_before_shutoff
+    global shutdown_mode
 
     if shutdown_time > 0:
         display_control.clear(draw)
         rest_time = int(shutdown_time - time.time())
         if rest_time < 0:
             rest_time = 0   # if clear is too slow, so that not a minus is displayed
-        display_control.shutdown(draw, rest_time)
+        display_control.shutdown(draw, rest_time, shutdown_mode)
         display_control.display()
-    if clear_before_shutoff:
+    if clear_before_shutoff:   # this is signal for display driver to initiate shutdown/reboot
         display_control.cleanup()
-        os.popen("sudo shutdown --poweroff now").read()
+
+        if shutdown_mode == 0:   # shutdown display and stratux
+            os.popen("sudo shutdown --poweroff now").read()
+            rlog.debug("Posting shutdown.")
+            try:
+                requests.post(url_shutdown)
+            except requests.exceptions.RequestException as e:
+                rlog.debug("Posting shutdown exception: ", e)
+        elif shutdown_mode == 1:   # only display shutdown
+            os.popen("sudo shutdown --poweroff now").read()
+        elif shutdown_mode == 2:   # reboot display and stratux
+            rlog.debug("Posting reboot.")
+            try:
+                requests.post(url_reboot)
+            except requests.exceptions.RequestException as e:
+                rlog.debug("Posting shutdown exception: ", e)
+            os.popen("sudo shutdown --reboot now").read()
+
         clear_before_shutoff = False
         return True
     else:
@@ -61,15 +97,27 @@ def draw_shutdown(draw, display_control):
 
 def user_input():
     global shutdown_time
+    global shutdown_mode
     global clear_before_shutoff
 
     if shutdown_time == 0.0:     # first time or after stopped shutdwon
         shutdown_time = time.time() + SHUTDOWN_WAIT_TIME
     btime, button = radarbuttons.check_buttons()
-    if btime > 0:   # any button pressed
+    if btime == 0:   # nothing pressed
+        if time.time() > shutdown_time:
+            rlog.debug("Shutdown now")
+            clear_before_shutoff = True  # enable display driver to trigger shutdown
+        return 0  # stay in current mode
+    if button == 0:  # left
+        shutdown_mode = 0
         shutdown_time = 0.0
         return 1  # go back to radar mode
-    if time.time() > shutdown_time:
-        print("Shutdown now")
-        clear_before_shutoff = True   # enable display driver to trigger shutdown
-    return 3   # go back to shutdown mode
+    if button == 1:  # middle, display only shutdown
+        shutdown_mode = 1
+        shutdown_time = 0.0
+        return 3  # stay in shutdown mode
+    if button == 2:  # right, reboot all
+        shutdown_mode = 2
+        shutdown_time = 0.0
+        return 3  # stay in shutdown mode
+    return 3  # no mode change
