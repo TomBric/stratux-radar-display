@@ -73,8 +73,11 @@ def start():  # start listening on status websocket
 
 
 def stop():  # stop listening on status websocket
+    global status_listener
+
     if status_listener is not None:
         status_listener.cancel()
+        status_listener = None
 
 
 def draw_status(draw, display_control, ui_changed, connected):
@@ -100,13 +103,12 @@ def draw_status(draw, display_control, ui_changed, connected):
                         " tr / " + str(strx['GPS_satellites_seen']) + " se"
             else:
                 text += "No GPS connected"
-            strx['was_changed'] = False
         else:
             subline = "Not connected"
             text = ""
         display_control.text_screen(draw, headline, subline, text, "", "Mode", "")
         display_control.display()
-
+        strx['was_changed'] = False
 
 def status_callback(json_str):
     global strx
