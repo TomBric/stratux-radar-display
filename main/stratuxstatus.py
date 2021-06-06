@@ -67,14 +67,11 @@ def start():  # start listening on status websocket
     global status_listener
 
     if status_listener is None:
-        print("Listener was none, starting")
         loop = asyncio.get_event_loop()
         status_listener = loop.create_task(radar.listen_forever(status_url, "StatusListener", status_callback, rlog))
-        print("Listener ", status_listener)
 
 
 def stop():  # stop listening on status websocket
-    print("Stopping status ws ")
     if status_listener is not None:
         status_listener.cancel()
 
@@ -82,20 +79,18 @@ def stop():  # stop listening on status websocket
 def draw_status(draw, display_control, ui_changed, connected):
     global strx_status
 
-    print("StratuxUI draw_status. strx_status ",strx_status)
     headline = "Stratux Status"
     if strx_status['was_changed'] or ui_changed:
         display_control.clear(draw)
         if connected:
             subline = strx_status['version']
             text = \
-                "Messages\n" +\
-                " 1090: Cur " + str(strx_status['ES_messages_last_minute']) + "Pea " + str(strx_status['ES_messages_max']) + "\n" +\
-                " OGN : Cur " + str(strx_status['OGN_messages_last_minute']) + "Pea " + str(strx_status['OGN_messages_max']) + "\n" +\
-                " UAT:  Cur " + str(strx_status['UAT_messages_last_minute']) + "Pea " + str(strx_status['UAT_messages_max']) + "\n" +\
-                "CPU_Temp: " + strx_status['CPUTemp'] + "\n" + \
-                "Sat: " + str(strx_status['GPS_satellites_locked']) + "lock " + str(strx_status['GPS_satellites_tracked']) +\
-                " trac" + str(strx_status['GPS_satellites_seen']) + " seen"
+                " 1090: Cur " + str(strx_status['ES_messages_last_minute']) + " Pea " + str(strx_status['ES_messages_max']) + "\n" +\
+                " OGN : Cur " + str(strx_status['OGN_messages_last_minute']) + " Pea " + str(strx_status['OGN_messages_max']) + "\n" +\
+                " UAT:  Cur " + str(strx_status['UAT_messages_last_minute']) + " Pea " + str(strx_status['UAT_messages_max']) + "\n" +\
+                "Temp: " + strx_status['CPUTemp'] + "\n" + \
+                "Sat: " + str(strx_status['GPS_satellites_locked']) + " lo/" + str(strx_status['GPS_satellites_tracked']) +\
+                " tra/" + str(strx_status['GPS_satellites_seen']) + " seen"
             strx_status['was_changed'] = False
         else:
             subline = "Not connected"
@@ -106,7 +101,6 @@ def draw_status(draw, display_control, ui_changed, connected):
 def status_callback(json_str):
     global strx_status
 
-    print("Status callback received.")
     rlog.debug("New status" + json_str)
     stat = json.loads(json_str)
 
@@ -134,7 +128,6 @@ def status_callback(json_str):
         strx_status['CPUTemp'] = str(round(stat['CPUTemp'], 1)) + "°C / " + str(round(stat['CPUTemp']*9/5+32.0, 1)) + "°F"
     else:
         strx_status['CPUTemp'] = "unaivalable"
-    print("Status callback decoded")
 
 def user_input():
     global left
