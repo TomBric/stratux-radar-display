@@ -91,7 +91,7 @@ def draw_status(draw, display_control, ui_changed, connected):
                     strx['OGN_messages_max']) + "\n"
                 text += "  noi" + str(round(strx['OGN_noise_db'], 1)) + " dB / ga " + str(
                     round(strx['OGN_gain_db'], 1)) + " dB\n"
-            if strx['UAT_connected']:
+            if strx['UATRadio_connected']:
                 text += "UAT: ct " + str(strx['UAT_messages_last_minute']) + " pk " + str(
                     strx['UAT_messages_max']) + "\n"
             text += "Temp: " + strx['CPUTemp'] + "\n"
