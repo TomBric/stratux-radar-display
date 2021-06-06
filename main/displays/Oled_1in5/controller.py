@@ -408,7 +408,7 @@ def shutdown(draw, countdown, shutdownmode):
     if shutdownmode == 0:   # shutdown stratux + display
         message = "Shutdown all"
     elif shutdownmode == 1:
-        message = "Shutdwn display"
+        message = "Shtdwn displ"
     elif shutdownmode == 2:
         message = "Reboot"
     centered_text(draw, 10, message, largefont, fill="white")
