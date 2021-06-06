@@ -92,7 +92,7 @@ def draw_status(draw, display_control, ui_changed, connected):
             if strx['OGN_connected']:
                 text += "OGN: ct " + str(strx['OGN_messages_last_minute']) + " pk " + str(
                     strx['OGN_messages_max']) + "\n"
-                text += "  noi: " + str(round(strx['OGN_noise_db'], 1)) + " @ " + str(
+                text += " noise: " + str(round(strx['OGN_noise_db'], 1)) + " @ " + str(
                     round(strx['OGN_gain_db'], 1)) + " dB\n"
             if strx['UATRadio_connected']:
                 text += "UAT: ct " + str(strx['UAT_messages_last_minute']) + " pk " + str(
