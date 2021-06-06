@@ -56,6 +56,7 @@ DEFAULT_PASS = "                "
 MAX_WIFI_LENGTH = 16
 
 # globals
+rlog = None
 global_config = {}
 status_url = ""
 stratux_ip = "0.0.0.0"
@@ -106,10 +107,12 @@ def init(display_control, url, target_ip, refresh, config):   # prepare everythi
     global new_stratux_ip
     global new_pass
     global new_wifi
+    global rlog
 
     status_url = url
     stratux_ip = target_ip
-    logging.debug("Status UI: Initialized GET settings to " + status_url)
+    rlog = logging.getLogger('stratux-radar-log')
+    rlog.debug("Status UI: Initialized GET settings to " + status_url)
     refresh_time = refresh
     global_config = config
     new_pass = DEFAULT_PASS
@@ -124,7 +127,7 @@ def get_status():
         answer = requests.get(status_url)
         status_answer = answer.json()
     except (requests.exceptions.RequestException, ValueError) as e:
-        logging.debug("Status UI: Status GET exception", e)
+        rlog.debug("Status UI: Status GET exception", e)
         return None
     return status_answer
 
@@ -278,18 +281,18 @@ def scan_result(output):
                 else:
                     bt_name = ''
                 new_devices.append([bt_addr, bt_name])
-                logging.debug("BT-Scan: new Device detected ", bt_addr, " ", bt_name)
+                rlog.debug("BT-Scan: new Device detected ", bt_addr, " ", bt_name)
 
 
 async def bt_scan():
-    logging.debug("Starting Bluetooth-Scan")
+    rlog.debug("Starting Bluetooth-Scan")
     proc = await asyncio.create_subprocess_exec("bluetoothctl", "--timeout", str(BLUETOOTH_SCAN_TIME), "scan", "on",
                                                 stdout=asyncio.subprocess.PIPE)
     while True:
         stdout_line, stderr_line = await proc.communicate()
         if proc is not None:   # finished
             scan_result(stdout_line.decode("UTF-8"))
-            logging.debug("Blueotooth Scan done")
+            rlog.debug("Blueotooth Scan done")
             return   # subprocess done
         scan_result(stdout_line.decode("UTF-8"))
         await asyncio.sleep(BT_SCAN_WAIT)
@@ -331,12 +334,12 @@ def set_network(wifi, passw, new_stratux):
     write_config(global_config)
     res = os.system('sudo raspi-config nonint do_wifi_ssid_passphrase ' + wifi + ' ' + passw)
     if res != 0:
-        logging.debug("STATUSUI: Setting Wifi network failed.")
+        rlog.debug("STATUSUI: Setting Wifi network failed.")
         return
-    logging.debug("STATUSUI: Rebooting!")
+    rlog.debug("STATUSUI: Rebooting!")
     os.system('sudo reboot')
     if res != 0:
-        logging.debug("STATUSUI: Reboot attempt failed.")
+        rlog.debug("STATUSUI: Reboot attempt failed.")
 
 
 def next_char(current):
@@ -402,8 +405,8 @@ def user_input(bluetooth_active):
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if status_mode == 0:   # normal status display
-        if button == 1 and (btime == 2 or btime == 1): # middle
-            return 1  # next mode to be radar
+        if button == 1 and (btime == 2 or btime == 1):  # middle
+            return 15  # next mode to be stratuxstatus
         if bluetooth_active and button == 2 and btime == 1:  # right and short
             status_mode = 1
             start_async_bt_scan()
@@ -425,11 +428,11 @@ def user_input(bluetooth_active):
                 return 7
         if len(new_devices) > 0:
             if button == 0 and btime == 1:  # left short, YES
-                logging.debug("Connecting:", new_devices[0][1])
+                rlog.debug("Connecting:", new_devices[0][1])
                 trust_pair_connect(new_devices[0][0])
                 del new_devices[0]
             if button == 2 and btime == 1:  # right short, NO
-                logging.debug("Not Connecting:", new_devices[0][1])
+                rlog.debug("Not Connecting:", new_devices[0][1])
                 remove_device(new_devices[0][0])
                 del new_devices[0]
         if len(new_devices) == 0 or (button == 1 and btime == 1):   # middle short, Cancel

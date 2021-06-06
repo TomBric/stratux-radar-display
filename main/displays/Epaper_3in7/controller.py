@@ -31,7 +31,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
-import logging
 from . import epd3in7
 from PIL import Image, ImageDraw, ImageFont
 import math
@@ -162,7 +161,6 @@ def init():
     device.display_1Gray(device.getbuffer_optimized(epaper_image))
     end = time.time()
     display_refresh = end-start
-    logging.info("Measured Display Refresh Time: " + str(round(display_refresh, 3)) + " seconds")
     # compass
     pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
     compass_aircraft = Image.open(pic_path)
@@ -178,7 +176,6 @@ def cleanup():
     device.Clear(0xFF, 0)
     device.sleep()
     device.Dev_exit()
-    logging.debug("Epaper cleaned up.")
 
 
 def refresh():
@@ -241,7 +238,6 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
         tsize = draw.textsize(tail, verysmallfont)
-        # draw.rectangle((tposition[0], tposition[1]+LARGE, tposition[0]+tsize[0], tposition[1]+LARGE+VERYSMALL), fill="white")
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
@@ -271,7 +267,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy):
+              gps_quality, gps_h_accuracy, optical_bar):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
@@ -311,6 +307,9 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
             t = "\uf1f6"  # bell off symbol
         textsize = draw.textsize(t, awesomefont)
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
+
+    # optical keep alive bar at right side
+    draw.line((sizex-8, 80+optical_bar*10, sizex-8, 80+optical_bar*10+8), fill="black", width=5)
 
 
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):

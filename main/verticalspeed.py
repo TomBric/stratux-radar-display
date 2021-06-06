@@ -32,7 +32,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import radarbuttons
-import logging
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -41,7 +40,7 @@ MSG_NO_BARO = "No Barosensor!"
 
 
 def init():
-    logging.debug("VerticalSpeedUI: Initialized.")
+    pass
 
 
 def draw_vsi(draw, display_control, was_changed, connected, vertical_speed, flight_level, gps_speed, gps_course,

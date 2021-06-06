@@ -41,24 +41,27 @@ height_diff = (1000, 2000, 5000, 10000, 50000)
 sound_on = True
 
 url_settings_set = ""
+rlog = None
 
 
 def init(url):
     global url_settings_set
+    global rlog
 
     radarbuttons.init()
     url_settings_set = url
-    logging.debug("Radar UI: Initialized POST settings to " + url_settings_set)
+    rlog = logging.getLogger('stratux-radar-log')
+    rlog.debug("Radar UI: Initialized POST settings to " + url_settings_set)
 
 
 def communicate_limits(radarrange, threshold):
     global url_settings_set
 
-    logging.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
+    rlog.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
     try:
         requests.post(url_settings_set, json={'RadarLimits': threshold, 'RadarRange': radarrange})
     except requests.exceptions.RequestException as e:
-        logging.debug("Posting limits exception", e)
+        rlog.debug("Posting limits exception", e)
 
 
 def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
@@ -92,6 +95,6 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
         if btime == 2:    # middle and long
             return 2, False  # start next mode timer
         else:          # middle and short
-            logging.debug("Sound  toggled by UI")
+            rlog.debug("Sound  toggled by UI")
             return 1, True
     return 1, False

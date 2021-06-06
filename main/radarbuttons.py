@@ -42,6 +42,7 @@ MIDDLE = 20
 RIGHT = 21
 
 # status
+rlog = None
 time_left = 0.0
 time_middle = 0.0
 time_right = 0.0
@@ -56,6 +57,7 @@ io_status = {LEFT: {'virtualno': 0, 'status': False, 'starttime': 0.0, 'already_
 
 def init():
     global io_status
+    global rlog
 
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
@@ -64,7 +66,8 @@ def init():
         GPIO.setup(iopin, GPIO.IN, GPIO.PUD_UP)
         GPIO.add_event_detect(iopin, GPIO.FALLING, bouncetime=300)
 
-    logging.debug("Radarbuttons: Initialized.")
+    rlog = logging.getLogger('stratux-radar-log')
+    rlog.debug("Radarbuttons: Initialized.")
 
 
 def reset_buttons():   # called if timer was modified. Reset of all timestamps necessary
@@ -114,7 +117,7 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
     for button in io_status:
         stat = check_one_button(button)
         if stat > 0:
-            logging.debug("Button press: button " + str(io_status[button]['virtualno'])
-                          + " presstime " + str(stat) + " (1=short, 2=long)")
+            rlog.debug("Button press: button " + str(io_status[button]['virtualno']) + " presstime " +
+                       str(stat) + " (1=short, 2=long)")
             return stat, io_status[button]['virtualno']
     return 0, 0

@@ -31,7 +31,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import logging
 import os
 import radarbuttons
 import time
@@ -52,9 +51,7 @@ def draw_shutdown(draw, display_control):
         display_control.shutdown(draw, rest_time)
         display_control.display()
     if clear_before_shutoff:
-        logging.debug("Cleaning display")
         display_control.cleanup()
-        logging.debug("Display driver: doing shutdown")
         os.popen("sudo shutdown --poweroff now").read()
         clear_before_shutoff = False
         return True
@@ -73,7 +70,6 @@ def user_input():
         shutdown_time = 0.0
         return 1  # go back to radar mode
     if time.time() > shutdown_time:
-        logging.debug("Initiating shutdown ...")
         print("Shutdown now")
         clear_before_shutoff = True   # enable display driver to trigger shutdown
     return 3   # go back to shutdown mode
