@@ -73,12 +73,12 @@ def draw_shutdown(draw, display_control):
         display_control.cleanup()
 
         if shutdown_mode == 0:   # shutdown display and stratux
-            os.popen("sudo shutdown --poweroff now").read()
             rlog.debug("Posting shutdown.")
             try:
                 requests.post(url_shutdown)
             except requests.exceptions.RequestException as e:
                 rlog.debug("Posting shutdown exception: ", e)
+            os.popen("sudo shutdown --poweroff now").read()
         elif shutdown_mode == 1:   # only display shutdown
             os.popen("sudo shutdown --poweroff now").read()
         elif shutdown_mode == 2:   # reboot display and stratux
