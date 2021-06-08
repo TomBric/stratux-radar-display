@@ -157,10 +157,9 @@ def status_callback(json_str):
     strx['OGN_gain_db'] = stat['OGN_gain_db']
 
     if 'CPUTemp' in stat:
-        strx['CPUTemp'] = str(round(stat['CPUTemp'], 1)) + "°C / " + str(
-            round(stat['CPUTemp'] * 9 / 5 + 32.0, 1)) + "°F"
+        strx['CPUTemp'] = stat['CPUTemp']
     else:
-        strx['CPUTemp'] = "unaivalable"
+        strx['CPUTemp'] = -300
 
 
 def user_input():
