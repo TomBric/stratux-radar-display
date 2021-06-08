@@ -536,9 +536,12 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
 
     draw.text((0, y), text, font=verysmallfont, fill="white", align="left")
     right_val = str(int(max_val)) + unit
-    draw.text((sizex - 1, y), right_val, font=verysmallfont, fill="white", align="right")
-    draw.rounded_rectangle([bar_start-2, y, bar_end+3, y+VERYSMALL], radius=2, fill=None, outline="white", width=1)
-    if val >= red:
+    textsize = draw.textsize(right_val, verysmallfont)
+    draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="white", align="right")
+    draw.rounded_rectangle([bar_start-2, y-2, bar_end+3, y+VERYSMALL], radius=2, fill=None, outline="white", width=1)
+    if red == 0:
+        color = "white"
+    elif val >= red:
         color = "red"
     elif val >= yellow:
         color = "orange"
@@ -549,25 +552,25 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     else:
         xval = 0
     draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
-    draw.text(((bar_end-bar_start)/2, y), str(val), font=verysmallfont, fill="white", align="middle")
-    return y+VERYSMALL
+    draw.text(((bar_end-bar_start)/2+bar_start, y), str(val), font=verysmallfont, fill="white", align="middle")
+    return y+VERYSMALL+2
 
 
 def stratux(draw, stat):
     starty = 0
     centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="yellow")
-    starty += SMALL
+    starty += SMALL+5
     starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
     if stat['OGN_connected']:
         starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
-        noise_text = "noise" + str(stat['OGN_noise_db']) + "@" + str(stat['OGN_gain_db']) + " dB"
+        noise_text = "noise= " + str(stat['OGN_noise_db']) + "@" + str(stat['OGN_gain_db']) + " dB"
         centered_text(draw, starty, noise_text, verysmallfont, fill="white")
         starty += VERYSMALL
     if stat['UATRadio_connected']:
         starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
     starty += 3
     if stat["CPUTemp"] > -300:   #  -300 means no value available
-        starty = bar(draw, starty, "Temp", stat['CPUTemp'], 100, 70, 80, "°C")
+        starty = bar(draw, starty, "Temp", round(stat['CPUTemp'],1) , 100, 70, 80, "°C")
         starty += 3
     # GPS
     draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
