@@ -555,7 +555,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     t = str(val)
     textsize = draw.textsize(t, verysmallfont)
     draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="white")
-    return y+VERYSMALL+3
+    return y+VERYSMALL+5
 
 
 def stratux(draw, stat):
