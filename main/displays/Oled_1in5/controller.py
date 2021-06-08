@@ -544,7 +544,11 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
         color = "orange"
     else:
         color = "green"
-    draw.rectangle([bar_start, y, bar_start+(bar_end-bar_start)*val/max_val, y+VERYSMALL], fill=color, outline=None)
+    if max_val != 0:
+        xval = bar_start + (bar_end - bar_start) * val / max_val
+    else:
+        xval = 0
+    draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
     draw.text(((bar_end-bar_start)/2, y), val, font=verysmallfont, fill="white", align="middle")
     return y+VERYSMALL
 
