@@ -549,7 +549,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     else:
         xval = 0
     draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
-    draw.text(((bar_end-bar_start)/2, y), val, font=verysmallfont, fill="white", align="middle")
+    draw.text(((bar_end-bar_start)/2, y), str(val), font=verysmallfont, fill="white", align="middle")
     return y+VERYSMALL
 
 
