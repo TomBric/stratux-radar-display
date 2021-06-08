@@ -558,7 +558,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     return y+VERYSMALL+5
 
 
-def stratux(draw, stat):
+def stratux(draw, stat, altitude, gps_alt):
     starty = 0
     centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="yellow")
     starty += SMALL+8
@@ -594,5 +594,9 @@ def stratux(draw, stat):
         gps = "NoFix"
     textsize = draw.textsize(gps, verysmallfont)
     draw.text((sizex - textsize[0], starty), gps, font=verysmallfont, fill="white")
+    starty += VERYSMALL+5
+    fl = '{3:.0f}'.format(round(altitude)/100)
+    alt = '{5:.0f}'.format(gps_alt)
+    draw.text((0,starty), fl+" "+alt+"ft  IMU  BMP", font=verysmallfont, fill="white")
 
     centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")

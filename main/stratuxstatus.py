@@ -80,12 +80,12 @@ def stop():  # stop listening on status websocket
         status_listener = None
 
 
-def draw_status(draw, display_control, ui_changed, connected):
+def draw_status(draw, display_control, ui_changed, connected, altitude, gps_alt):
     global strx
     if strx['was_changed'] or ui_changed:
         display_control.clear(draw)
         if connected:
-            display_control.stratux(draw, strx)
+            display_control.stratux(draw, strx, altitude, gps_alt)
         else:
             headline = "Stratux"
             subline = "not connected"

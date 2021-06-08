@@ -635,7 +635,8 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 13
                 elif global_mode == 15:  # stratux_statux display
-                    stratuxstatus.draw_status(draw, display_control, ui_changed, situation['connected'])
+                    stratuxstatus.draw_status(draw, display_control, ui_changed, situation['connected'],
+                                              situation['own_altitude'], situation['gps_altitude'])
                     ui_changed = False
                 elif global_mode == 16:  # refresh display, only relevant for epaper, mode was stratux_status
                     rlog.debug("StratusStatus: Display driver - Refreshing")
