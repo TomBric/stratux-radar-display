@@ -50,7 +50,7 @@ strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES
         'CPUTemp': -300, 'CPUTempMax': -300,
         'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0, 'GPS_position_accuracy': 0,
         'GPS_satellites_seen': 0, 'OGN_noise_db': 0.0, 'OGN_gain_db': 0.0,
-        'IMUconnected': False, 'BMPconnected': False}
+        'IMUConnected': False, 'BMPConnected': False}
 left = ""
 middle = ""
 right = ""
@@ -158,8 +158,8 @@ def status_callback(json_str):
     strx['OGN_noise_db'] = stat['OGN_noise_db']
     strx['OGN_gain_db'] = stat['OGN_gain_db']
 
-    strx['BMPconnected'] = stat['BMPconnected']
-    strx['IMUconnected'] = stat['IMUconnected']
+    strx['BMPConnected'] = stat['BMPConnected']
+    strx['IMUConnected'] = stat['IMUConnected']
 
     if 'CPUTemp' in stat:
         strx['CPUTemp'] = stat['CPUTemp']
