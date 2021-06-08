@@ -559,7 +559,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
 
 def round_text(draw,x, y, text, color):
     ts = draw.textsize(text, verysmallfont)
-    draw.rounded_rectangle([x-2, y-2, x+ts[0]+2, y+ts[1]+2], radius=4, fill=color)
+    draw.rounded_rectangle([x-2, y-1, x+ts[0]+2, y+ts[1]+1], radius=4, fill=color)
     draw.text((x,y), text, font=verysmallfont, fill="white")
     return x+ts[0]+5
 
