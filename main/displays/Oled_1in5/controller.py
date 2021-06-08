@@ -538,7 +538,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     right_val = str(int(max_val)) + unit
     textsize = draw.textsize(right_val, verysmallfont)
     draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="white", align="right")
-    draw.rounded_rectangle([bar_start-2, y-1, bar_end+2, y+VERYSMALL+1], radius=3, fill=None, outline="white", width=1)
+    draw.rounded_rectangle([bar_start-2, y-1, bar_end+2, y+VERYSMALL+1], radius=0, fill=None, outline="white", width=1)
     if red == 0:
         color = "DimGray"
     elif val >= red:
@@ -576,10 +576,9 @@ def stratux(draw, stat):
         starty += 3
     # GPS
     draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
-    draw.text((20, starty), '\uf7c0', font=webfont, fill="white")
-    draw.rounded_rectangle([35, starty, 55, starty + VERYSMALL], radius=0, fill="green", outline=None)
-    draw.rounded_rectangle([44, starty, 75, starty + VERYSMALL], radius=0, fill="DarkOrange", outline=None)
-    draw.rounded_rectangle([75, starty, 95, starty + VERYSMALL], radius=0, fill="red", outline=None)
+    draw.rounded_rectangle([35, starty, 55, starty + VERYSMALL], radius=4, fill="green", outline=None)
+    draw.rounded_rectangle([55, starty, 75, starty + VERYSMALL], radius=4, fill="DarkOrange", outline=None)
+    draw.rounded_rectangle([75, starty, 95, starty + VERYSMALL], radius=4, fill="red", outline=None)
     t = str(stat['GPS_satellites_locked'])
     textsize = draw.textsize(t, verysmallfont)
     draw.text((48-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
