@@ -575,12 +575,18 @@ def stratux(draw, stat):
     # GPS
     draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
     draw.text((20, starty), '\uf7c0', font=verysmallfont, fill="white")
-    draw.rounded_rectangle([30, starty, 50, starty + VERYSMALL], radius=2, fill="green", outline=None)
-    draw.rounded_rectangle([50, starty, 70, starty + VERYSMALL], radius=2, fill="orange", outline=None)
-    draw.rounded_rectangle([70, starty, 90, starty + VERYSMALL], radius=2, fill="red", outline=None)
-    draw.text((40, starty), str(stat['GPS_satellites_locked']), font=verysmallfont, fill="white", align="middle")
-    draw.text((60, starty), str(stat['GPS_satellites_tracked']), font=verysmallfont, fill="white", align="middle")
-    draw.text((80, starty), str(stat['GPS_satellites_seen']), font=verysmallfont, fill="white", align="middle")
+    draw.rounded_rectangle([40, starty, 60, starty + VERYSMALL], radius=2, fill="green", outline=None)
+    draw.rounded_rectangle([60, starty, 80, starty + VERYSMALL], radius=2, fill="orange", outline=None)
+    draw.rounded_rectangle([80, starty, 100, starty + VERYSMALL], radius=2, fill="red", outline=None)
+    t = str(stat['GPS_satellites_locked'])
+    textsize = draw.textsize(t, verysmallfont)
+    draw.text((50-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
+    t = str(stat['GPS_satellites_tracked'])
+    textsize = draw.textsize(t, verysmallfont)
+    draw.text((70-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
+    t = str(stat['GPS_satellites_seen'])
+    textsize = draw.textsize(t, verysmallfont)
+    draw.text((90-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
     if stat['GPS_position_accuracy'] < 19999:
         gps = str(round(stat['GPS_position_accuracy'],1)) + "m"
     else:

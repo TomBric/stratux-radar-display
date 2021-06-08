@@ -47,8 +47,8 @@ status_listener = None  # couroutine task for querying statux
 strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES_messages_max': 0,
         'OGN_connected': False, 'OGN_messages_last_minute': 0, 'OGN_messages_max': 0,
         'UATRadio_connected': False, 'UAT_messages_last_minute': 0, 'UAT_messages_max': 0,
-        'CPUTemp': -300, 'CPUTempMax':-300,
-        'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0, 'GPS_position_accuracy':0
+        'CPUTemp': -300, 'CPUTempMax': -300,
+        'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0, 'GPS_position_accuracy': 0,
         'GPS_satellites_seen': 0, 'OGN_noise_db': 0.0, 'OGN_gain_db': 0.0}
 left = ""
 middle = ""
