@@ -582,10 +582,10 @@ def stratux(draw, stat):
     t = str(stat['GPS_satellites_locked'])
     textsize = draw.textsize(t, verysmallfont)
     draw.text((48-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
-    t = str(stat['GPS_satellites_tracked'])
+    t = str(stat['GPS_satellites_seen'])
     textsize = draw.textsize(t, verysmallfont)
     draw.text((67-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
-    t = str(stat['GPS_satellites_seen'])
+    t = str(stat['GPS_satellites_tracked'])
     textsize = draw.textsize(t, verysmallfont)
     draw.text((87-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
     if stat['GPS_position_accuracy'] < 19999:
