@@ -540,7 +540,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="white", align="right")
     draw.rounded_rectangle([bar_start-1, y-1, bar_end+1, y+VERYSMALL+1], radius=3, fill=None, outline="white", width=1)
     if red == 0:
-        color = "white"
+        color = "gray"
     elif val >= red:
         color = "red"
     elif val >= yellow:
@@ -552,7 +552,9 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     else:
         xval = 0
     draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
-    draw.text(((bar_end-bar_start)/2+bar_start, y), str(val), font=verysmallfont, fill="white", align="middle")
+    t = str(val)
+    textsize = draw.textsize(t, verysmallfont)
+    draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="white")
     return y+VERYSMALL+2
 
 
@@ -570,7 +572,7 @@ def stratux(draw, stat):
         starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
     starty += 3
     if stat['CPUTemp'] > -300:   #  -300 means no value available
-        starty = bar(draw, starty, "Temp", round(stat['CPUTemp'],1) , 100, 70, 80, "°C")
+        starty = bar(draw, starty, "Temp", round(stat['CPUTemp'],1) , round(stat['CPUTempMax'],0), 70, 80, "°C")
         starty += 3
     # GPS
     draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
