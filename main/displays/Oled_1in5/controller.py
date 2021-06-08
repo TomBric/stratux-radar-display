@@ -602,9 +602,9 @@ def stratux(draw, stat, altitude, gps_alt):
     starty += VERYSMALL+5
 
     fl = '{:3.0f}'.format(round(altitude) / 100)
-    x = round_text(draw, 3, starty, fl, "black")
+    x = round_text(draw, 3, starty, fl, "DimGray")
     alt = '{:5.0f}'.format(gps_alt)
-    x = round_text(x, starty, alt, "black")
+    x = round_text(draw, x, starty, alt, "DimGray")
     if stat['IMUConnected']:
         col = "green"
     else:
