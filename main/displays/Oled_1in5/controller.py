@@ -532,13 +532,13 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
 
 def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     bar_start = 30
-    bar_end = 90
+    bar_end = 100
 
     draw.text((0, y), text, font=verysmallfont, fill="white", align="left")
     right_val = str(int(max_val)) + unit
     textsize = draw.textsize(right_val, verysmallfont)
     draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="white", align="right")
-    draw.rounded_rectangle([bar_start-2, y-2, bar_end+3, y+VERYSMALL], radius=2, fill=None, outline="white", width=1)
+    draw.rounded_rectangle([bar_start-1, y-1, bar_end+1, y+VERYSMALL+1], radius=3, fill=None, outline="white", width=1)
     if red == 0:
         color = "white"
     elif val >= red:
@@ -569,7 +569,7 @@ def stratux(draw, stat):
     if stat['UATRadio_connected']:
         starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
     starty += 3
-    if stat["CPUTemp"] > -300:   #  -300 means no value available
+    if stat['CPUTemp'] > -300:   #  -300 means no value available
         starty = bar(draw, starty, "Temp", round(stat['CPUTemp'],1) , 100, 70, 80, "°C")
         starty += 3
     # GPS
@@ -581,5 +581,11 @@ def stratux(draw, stat):
     draw.text((40, starty), str(stat['GPS_satellites_locked']), font=verysmallfont, fill="white", align="middle")
     draw.text((60, starty), str(stat['GPS_satellites_tracked']), font=verysmallfont, fill="white", align="middle")
     draw.text((80, starty), str(stat['GPS_satellites_seen']), font=verysmallfont, fill="white", align="middle")
+    if stat['GPS_position_accuracy'] < 19999:
+        gps = str(round(stat['GPS_position_accuracy'],1)) + "m"
+    else:
+        gps = "NoFix"
+    textsize = draw.textsize(gps, verysmallfont)
+    draw.text((sizex - textsize[0], starty), gps, font=verysmallfont, fill="white")
 
     centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")

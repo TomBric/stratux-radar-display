@@ -47,8 +47,8 @@ status_listener = None  # couroutine task for querying statux
 strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES_messages_max': 0,
         'OGN_connected': False, 'OGN_messages_last_minute': 0, 'OGN_messages_max': 0,
         'UATRadio_connected': False, 'UAT_messages_last_minute': 0, 'UAT_messages_max': 0,
-        'CPUTemp': "unavail",
-        'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0,
+        'CPUTemp': -300, 'CPUTempMax':-300,
+        'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0, 'GPS_position_accuracy':0
         'GPS_satellites_seen': 0, 'OGN_noise_db': 0.0, 'OGN_gain_db': 0.0}
 left = ""
 middle = ""
@@ -152,12 +152,14 @@ def status_callback(json_str):
     strx['GPS_satellites_tracked'] = stat['GPS_satellites_tracked']
     strx['GPS_satellites_seen'] = stat['GPS_satellites_seen']
     strx['GPS_solution'] = stat['GPS_solution']
+    strx['GPS_position_accuracy'] = stat['GPS_position_accuracy']
 
     strx['OGN_noise_db'] = stat['OGN_noise_db']
     strx['OGN_gain_db'] = stat['OGN_gain_db']
 
     if 'CPUTemp' in stat:
         strx['CPUTemp'] = stat['CPUTemp']
+        strx['CPUTempMax'] = stat['CPUTempMax']
     else:
         strx['CPUTemp'] = -300
 
