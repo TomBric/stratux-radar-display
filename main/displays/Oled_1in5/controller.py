@@ -557,6 +557,11 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="white")
     return y+VERYSMALL+5
 
+def round_text(draw,x, y, text, color):
+    ts = draw.textsize(text, verysmallfont)
+    draw.rounded_rectangle([x-2, y-2, x+ts[0]+2, y+ts[1]+2], radius=4, fill=color, outline="white")
+    draw.text((x,y), text, font=verysmallfont, fill="white")
+    return x+ts[0]+2
 
 def stratux(draw, stat, altitude, gps_alt):
     starty = 0
@@ -595,8 +600,20 @@ def stratux(draw, stat, altitude, gps_alt):
     textsize = draw.textsize(gps, verysmallfont)
     draw.text((sizex - textsize[0], starty), gps, font=verysmallfont, fill="white")
     starty += VERYSMALL+5
-    fl = '{:3.0f}'.format(round(altitude)/100)
+
+    fl = '{:3.0f}'.format(round(altitude) / 100)
+    x = round_text(draw, 3, starty, fl, "none")
     alt = '{:5.0f}'.format(gps_alt)
-    draw.text((0,starty), "FL"+fl+" GPS "+alt+"ft  IMU  BMP", font=verysmallfont, fill="white")
+    x = round_text(x, starty, alt, None)
+    if stat['IMU_connected']:
+        col = "green"
+    else:
+        col = "red"
+    x = round_text(draw, x, starty, "IMU", col)
+    if stat['BMP_connected']:
+        col = "green"
+    else:
+        col = "red"
+    x = round_text(draw, x, starty, "BMP", col)
 
     centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")
