@@ -576,7 +576,7 @@ def stratux(draw, stat):
         starty += 3
     # GPS
     draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
-    draw.text((20, starty), '\uf7c0', font=verysmallfont, fill="white")
+    draw.text((20, starty), '\uf7c0', font=webfont, fill="white")
     draw.rounded_rectangle([40, starty, 60, starty + VERYSMALL], radius=2, fill="green", outline=None)
     draw.rounded_rectangle([60, starty, 80, starty + VERYSMALL], radius=2, fill="DarkOrange", outline=None)
     draw.rounded_rectangle([80, starty, 100, starty + VERYSMALL], radius=2, fill="red", outline=None)
