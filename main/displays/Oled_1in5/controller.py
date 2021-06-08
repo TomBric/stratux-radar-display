@@ -595,8 +595,8 @@ def stratux(draw, stat, altitude, gps_alt):
     textsize = draw.textsize(gps, verysmallfont)
     draw.text((sizex - textsize[0], starty), gps, font=verysmallfont, fill="white")
     starty += VERYSMALL+5
-    fl = '{3:.0f}'.format(round(altitude)/100)
-    alt = '{5:.0f}'.format(gps_alt)
+    fl = '{:3.0f}'.format(round(altitude)/100)
+    alt = '{:5.0f}'.format(gps_alt)
     draw.text((0,starty), fl+" "+alt+"ft  IMU  BMP", font=verysmallfont, fill="white")
 
     centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")
