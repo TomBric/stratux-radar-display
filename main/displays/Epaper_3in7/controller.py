@@ -623,3 +623,7 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL - 8, middle, smallfont, fill="black")
+
+
+def stratux(draw, stat):
+    pass

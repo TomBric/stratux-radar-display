@@ -528,3 +528,50 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
+
+
+def bar(draw, y, text, val, max_val, yellow, red, unit=""):
+    bar_start = 30
+    bar_end = 90
+
+    draw.text((0, y), text, font=verysmallfont, fill="white", align="left")
+    right_val = str(int(max_val)) + unit
+    draw.text((sizex - 1, y), right_val, font=verysmallfont, fill="white", align="right")
+    draw.rounded_rectangle([bar_start-2, y, bar_end+3, y+VERYSMALL], radius=2, fill=None, outline="white", width=1)
+    if val >= red:
+        color = "red"
+    elif val >= yellow:
+        color = "orange"
+    else:
+        color = "green"
+    draw.rectangle([bar_start, y, bar_start+(bar_end-bar_start)*val/max_val, y+VERYSMALL], fill=color, outline=None)
+    draw.text(((bar_end-bar_start)/2, y), val, font=verysmallfont, fill="white", align="middle")
+    return y+VERYSMALL
+
+
+def stratux(draw, stat):
+    starty = 0
+    centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="yellow")
+    starty += SMALL
+    starty = bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
+    if stat['OGN_connected']:
+        starty = bar(starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
+        noise_text = "noise" + stat['OGN_noise_db'] + "@" + stat['OGN_gain_db'] + " dB"
+        centered_text(draw, starty, noise_text, verysmallfont, fill="white")
+        starty += VERYSMALL
+    if stat['UATRadio_connected']:
+        starty = bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
+    starty += 3
+    starty = bar(starty, "Temp", stat['CPU_temp'], 100, 70, 80, "°C")
+    starty += 3
+    # GPS
+    draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
+    draw.text((20, starty), '\uf7c0', font=verysmallfont, fill="white")
+    draw.rounded_rectangle([30, starty, 50, starty + VERYSMALL], radius=2, fill="green", outline=None)
+    draw.rounded_rectangle([50, starty, 70, starty + VERYSMALL], radius=2, fill="orange", outline=None)
+    draw.rounded_rectangle([70, starty, 90, starty + VERYSMALL], radius=2, fill="red", outline=None)
+    draw.text((40, starty), str(stat['GPS_satellites_locked']), font=verysmallfont, fill="white", align="middle")
+    draw.text((60, starty), str(stat['GPS_satellites_tracked']), font=verysmallfont, fill="white", align="middle")
+    draw.text((80, starty), str(stat['GPS_satellites_seen']), font=verysmallfont, fill="white", align="middle")
+
+    centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")

@@ -49,7 +49,7 @@ strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES
         'UATRadio_connected': False, 'UAT_messages_last_minute': 0, 'UAT_messages_max': 0,
         'CPUTemp': "unavail",
         'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0,
-        'GPS_satellites_seen': 0}
+        'GPS_satellites_seen': 0, 'OGN_noise_db': 0.0, 'OGN_gain_db': 0.0}
 left = ""
 middle = ""
 right = ""
@@ -82,7 +82,20 @@ def stop():  # stop listening on status websocket
 
 def draw_status(draw, display_control, ui_changed, connected):
     global strx
+    if strx['was_changed'] or ui_changed:
+        display_control.clear(draw)
+        if connected:
+            display_control.stratux(draw, strx)
+        else:
+            headline = "Stratux"
+            subline = "not connected"
+            text = ""
+            display_control.text_screen(draw, headline, subline, text, "", "Mode", "")
+        display_control.display()
+        strx['was_changed'] = False
 
+
+"""
     headline = "Stratux Status"
     if strx['was_changed'] or ui_changed:
         display_control.clear(draw)
@@ -109,6 +122,7 @@ def draw_status(draw, display_control, ui_changed, connected):
         display_control.text_screen(draw, headline, subline, text, "", "Mode", "")
         display_control.display()
         strx['was_changed'] = False
+"""
 
 
 def status_callback(json_str):
