@@ -96,36 +96,6 @@ def draw_status(draw, display_control, ui_changed, connected, altitude, gps_alt)
         strx['was_changed'] = False
 
 
-"""
-    headline = "Stratux Status"
-    if strx['was_changed'] or ui_changed:
-        display_control.clear(draw)
-        if connected:
-            subline = strx['version']
-            text = "1090: ct " + str(strx['ES_messages_last_minute']) + " pk " + str(strx['ES_messages_max']) + "\n"
-            if strx['OGN_connected']:
-                text += "OGN: ct " + str(strx['OGN_messages_last_minute']) + " pk " + str(
-                    strx['OGN_messages_max']) + "\n"
-                text += " noise: " + str(round(strx['OGN_noise_db'], 1)) + " @ " + str(
-                    round(strx['OGN_gain_db'], 1)) + " dB\n"
-            if strx['UATRadio_connected']:
-                text += "UAT: ct " + str(strx['UAT_messages_last_minute']) + " pk " + str(
-                    strx['UAT_messages_max']) + "\n"
-            text += "Temp: " + strx['CPUTemp'] + "\n"
-            if strx['GPS_connected']:
-                text += "Sat: " + str(strx['GPS_satellites_locked']) + " in / " + str(strx['GPS_satellites_seen']) +\
-                        " se / " + str(strx['GPS_satellites_tracked']) + " tr"
-            else:
-                text += "No GPS connected"
-        else:
-            subline = "Not connected"
-            text = ""
-        display_control.text_screen(draw, headline, subline, text, "", "Mode", "")
-        display_control.display()
-        strx['was_changed'] = False
-"""
-
-
 def status_callback(json_str):
     global strx
 
