@@ -560,7 +560,7 @@ def stratux(draw, stat):
     starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
     if stat['OGN_connected']:
         starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
-        noise_text = "noise" + stat['OGN_noise_db'] + "@" + stat['OGN_gain_db'] + " dB"
+        noise_text = "noise" + str(stat['OGN_noise_db']) + "@" + str(stat['OGN_gain_db']) + " dB"
         centered_text(draw, starty, noise_text, verysmallfont, fill="white")
         starty += VERYSMALL
     if stat['UATRadio_connected']:
