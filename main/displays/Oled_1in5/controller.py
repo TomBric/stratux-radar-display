@@ -544,7 +544,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     elif val >= red:
         color = "red"
     elif val >= yellow:
-        color = "orange"
+        color = "DarkOrange"
     else:
         color = "green"
     if max_val != 0:
@@ -578,7 +578,7 @@ def stratux(draw, stat):
     draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
     draw.text((20, starty), '\uf7c0', font=verysmallfont, fill="white")
     draw.rounded_rectangle([40, starty, 60, starty + VERYSMALL], radius=2, fill="green", outline=None)
-    draw.rounded_rectangle([60, starty, 80, starty + VERYSMALL], radius=2, fill="orange", outline=None)
+    draw.rounded_rectangle([60, starty, 80, starty + VERYSMALL], radius=2, fill="DarkOrange", outline=None)
     draw.rounded_rectangle([80, starty, 100, starty + VERYSMALL], radius=2, fill="red", outline=None)
     t = str(stat['GPS_satellites_locked'])
     textsize = draw.textsize(t, verysmallfont)
