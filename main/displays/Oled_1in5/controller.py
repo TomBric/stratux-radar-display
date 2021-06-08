@@ -566,7 +566,7 @@ def stratux(draw, stat):
     if stat['UATRadio_connected']:
         starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
     starty += 3
-    starty = bar(draw, starty, "Temp", stat['CPU_temp'], 100, 70, 80, "°C")
+    starty = bar(draw, starty, "Temp", stat['CPUTemp'], 100, 70, 80, "°C")
     starty += 3
     # GPS
     draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
