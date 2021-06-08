@@ -538,7 +538,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     right_val = str(int(max_val)) + unit
     textsize = draw.textsize(right_val, verysmallfont)
     draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="white", align="right")
-    draw.rounded_rectangle([bar_start-2, y-1, bar_end+2, y+VERYSMALL+1], radius=0, fill=None, outline="white", width=1)
+    draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline="white", width=1)
     if red == 0:
         color = "DimGray"
     elif val >= red:
