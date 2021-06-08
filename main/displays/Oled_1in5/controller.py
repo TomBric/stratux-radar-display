@@ -561,7 +561,7 @@ def round_text(draw,x, y, text, color):
     ts = draw.textsize(text, verysmallfont)
     draw.rounded_rectangle([x-2, y-2, x+ts[0]+2, y+ts[1]+2], radius=4, fill=color)
     draw.text((x,y), text, font=verysmallfont, fill="white")
-    return x+ts[0]+4
+    return x+ts[0]+5
 
 def stratux(draw, stat, altitude, gps_alt):
     starty = 0
