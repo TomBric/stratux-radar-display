@@ -561,7 +561,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
 def stratux(draw, stat):
     starty = 0
     centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="yellow")
-    starty += SMALL+5
+    starty += SMALL+8
     starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
     if stat['OGN_connected']:
         starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
@@ -570,25 +570,25 @@ def stratux(draw, stat):
         starty += VERYSMALL
     if stat['UATRadio_connected']:
         starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
-    starty += 3
+    starty += 6
     if stat['CPUTemp'] > -300:   #  -300 means no value available
         starty = bar(draw, starty, "Temp", round(stat['CPUTemp'],1) , round(stat['CPUTempMax'],0), 70, 80, "°C")
         starty += 3
     # GPS
     draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
     draw.text((20, starty), '\uf7c0', font=webfont, fill="white")
-    draw.rounded_rectangle([40, starty, 60, starty + VERYSMALL], radius=2, fill="green", outline=None)
-    draw.rounded_rectangle([60, starty, 80, starty + VERYSMALL], radius=2, fill="DarkOrange", outline=None)
-    draw.rounded_rectangle([80, starty, 100, starty + VERYSMALL], radius=2, fill="red", outline=None)
+    draw.rounded_rectangle([35, starty, 55, starty + VERYSMALL], radius=0, fill="green", outline=None)
+    draw.rounded_rectangle([44, starty, 75, starty + VERYSMALL], radius=0, fill="DarkOrange", outline=None)
+    draw.rounded_rectangle([75, starty, 95, starty + VERYSMALL], radius=0, fill="red", outline=None)
     t = str(stat['GPS_satellites_locked'])
     textsize = draw.textsize(t, verysmallfont)
-    draw.text((50-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
+    draw.text((48-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
     t = str(stat['GPS_satellites_tracked'])
     textsize = draw.textsize(t, verysmallfont)
-    draw.text((70-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
+    draw.text((67-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
     t = str(stat['GPS_satellites_seen'])
     textsize = draw.textsize(t, verysmallfont)
-    draw.text((90-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
+    draw.text((87-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
     if stat['GPS_position_accuracy'] < 19999:
         gps = str(round(stat['GPS_position_accuracy'],1)) + "m"
     else:
