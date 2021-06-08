@@ -538,9 +538,9 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     right_val = str(int(max_val)) + unit
     textsize = draw.textsize(right_val, verysmallfont)
     draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="white", align="right")
-    draw.rounded_rectangle([bar_start-1, y-1, bar_end+1, y+VERYSMALL+1], radius=3, fill=None, outline="white", width=1)
+    draw.rounded_rectangle([bar_start-2, y-1, bar_end+2, y+VERYSMALL+1], radius=3, fill=None, outline="white", width=1)
     if red == 0:
-        color = "gray"
+        color = "DimGray"
     elif val >= red:
         color = "red"
     elif val >= yellow:
@@ -555,7 +555,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
     t = str(val)
     textsize = draw.textsize(t, verysmallfont)
     draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="white")
-    return y+VERYSMALL+2
+    return y+VERYSMALL+3
 
 
 def stratux(draw, stat):
