@@ -553,16 +553,16 @@ def stratux(draw, stat):
     starty = 0
     centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="yellow")
     starty += SMALL
-    starty = bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
+    starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
     if stat['OGN_connected']:
-        starty = bar(starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
+        starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
         noise_text = "noise" + stat['OGN_noise_db'] + "@" + stat['OGN_gain_db'] + " dB"
         centered_text(draw, starty, noise_text, verysmallfont, fill="white")
         starty += VERYSMALL
     if stat['UATRadio_connected']:
-        starty = bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
+        starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
     starty += 3
-    starty = bar(starty, "Temp", stat['CPU_temp'], 100, 70, 80, "°C")
+    starty = bar(draw, starty, "Temp", stat['CPU_temp'], 100, 70, 80, "°C")
     starty += 3
     # GPS
     draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
