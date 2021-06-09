@@ -625,5 +625,98 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     centered_text(draw, sizey - SMALL - 8, middle, smallfont, fill="black")
 
 
-def stratux(draw, stat):
-    pass
+
+
+def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval = 0):
+    bar_start = 30
+    bar_end = 100
+
+    draw.text((0, y), text, font=verysmallfont, fill="white", align="left")
+    right_val = str(int(max_val)) + unit
+    textsize = draw.textsize(right_val, verysmallfont)
+    draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="white", align="right")
+    draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline="white", width=1)
+    if red == 0:
+        color = "DimGray"
+    elif val >= red:
+        color = "red"
+    elif val >= yellow:
+        color = "DarkOrange"
+    else:
+        color = "green"
+    if val < minval:
+        val = minval   # to display a minimum bar, valtext should be provided in this case
+    if max_val != 0:
+        xval = bar_start + (bar_end - bar_start) * val / max_val
+    else:
+        xval = bar_start
+    draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
+    if valtext != None:
+        t = valtext
+    else:
+        t = str(val)
+    textsize = draw.textsize(t, verysmallfont)
+    draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="white")
+    return y+VERYSMALL+5
+
+def round_text(draw,x, y, text, color, yesno = True):
+    ts = draw.textsize(text, verysmallfont)
+    draw.rounded_rectangle([x-2, y-1, x+ts[0]+2, y+ts[1]+1], radius=4, fill=color)
+    draw.text((x,y), text, font=verysmallfont, fill="white")
+    draw.line([x-2, y+ts[1]+1, x+ts[0]+2, y-1], fill="black", width=4)
+    return x+ts[0]+5
+
+def stratux(draw, stat, altitude, gps_alt, gps_quality):
+    starty = 0
+    centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="black")
+    starty += SMALL+8
+    starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
+    if stat['OGN_connected']:
+        starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
+        noise_text = str(round(stat['OGN_noise_db'],1)) + "@" + str(round(stat['OGN_gain_db'],1)) + "dB"
+        starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext= noise_text)
+    if stat['UATRadio_connected']:
+        starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
+    starty += 6
+    if stat['CPUTemp'] > -300:   #  -300 means no value available
+        starty = bar(draw, starty, "temp", round(stat['CPUTemp'],1) , round(stat['CPUTempMax'],0), 70, 80, "°C")
+        starty += 3
+    # GPS
+    if gps_quality == 1:
+        t = "3D GPS"
+    elif gps_quality == 2:
+        t = "DGNSS"
+    else:
+        t = "GPS"
+    draw.text((0, starty), "GPS", font=verysmallfont, fill="black")
+    draw.rounded_rectangle([35, starty, 55, starty + VERYSMALL], radius=4, fill="white", outline="black")
+    draw.rounded_rectangle([55, starty, 75, starty + VERYSMALL], radius=4, fill="white", outline="black")
+    draw.rounded_rectangle([75, starty, 95, starty + VERYSMALL], radius=4, fill="white", outline="black")
+    t = str(stat['GPS_satellites_locked'])
+    textsize = draw.textsize(t, verysmallfont)
+    draw.text((48-textsize[0]/2, starty), t, font=verysmallfont, fill="black", align="middle")
+    t = str(stat['GPS_satellites_seen'])
+    textsize = draw.textsize(t, verysmallfont)
+    draw.text((67-textsize[0]/2, starty), t, font=verysmallfont, fill="black", align="middle")
+    t = str(stat['GPS_satellites_tracked'])
+    textsize = draw.textsize(t, verysmallfont)
+    draw.text((87-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
+    if stat['GPS_position_accuracy'] < 19999:
+        gps = str(round(stat['GPS_position_accuracy'],1)) + "m"
+    else:
+        gps = "NoFix"
+    textsize = draw.textsize(gps, verysmallfont)
+    draw.text((sizex - textsize[0], starty), gps, font=verysmallfont, fill="black")
+    starty += VERYSMALL+5
+
+    fl = '{:3.0f}'.format(round(altitude) / 100)
+    x = round_text(draw, 3, starty, "FL" + fl, "black")
+    if stat['GPS_position_accuracy'] < 19999:
+        alt = '{:5.0f}'.format(gps_alt)
+    else:
+        alt=" --- "
+    x = round_text(draw, x, starty, "Alt"+alt+"ft", "black")
+    x = round_text(draw, x, starty, "IMU", "black", stat['IMUConnected'])
+    x = round_text(draw, x, starty, "BMP", "black", stat['BMPConnected'])
+
+    # centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")

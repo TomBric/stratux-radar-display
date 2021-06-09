@@ -568,7 +568,7 @@ def round_text(draw,x, y, text, color):
     draw.text((x,y), text, font=verysmallfont, fill="white")
     return x+ts[0]+5
 
-def stratux(draw, stat, altitude, gps_alt):
+def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty = 0
     centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="yellow")
     starty += SMALL+8
@@ -584,7 +584,13 @@ def stratux(draw, stat, altitude, gps_alt):
         starty = bar(draw, starty, "temp", round(stat['CPUTemp'],1) , round(stat['CPUTempMax'],0), 70, 80, "°C")
         starty += 3
     # GPS
-    draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
+    if gps_quality == 1:
+        t = "3D GPS"
+    elif gps_quality == 2:
+        t = "DGNSS"
+    else:
+        t = "GPS"
+    draw.text((0, starty), t, font=verysmallfont, fill="white")
     draw.rounded_rectangle([35, starty, 55, starty + VERYSMALL], radius=4, fill="green", outline=None)
     draw.rounded_rectangle([55, starty, 75, starty + VERYSMALL], radius=4, fill="DarkOrange", outline=None)
     draw.rounded_rectangle([75, starty, 95, starty + VERYSMALL], radius=4, fill="red", outline=None)
