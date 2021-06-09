@@ -577,13 +577,11 @@ def stratux(draw, stat, altitude, gps_alt):
         starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
         noise_text = str(stat['OGN_noise_db']) + "@" + str(stat['OGN_gain_db']) + " dB"
         starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext= noise_text)
-        centered_text(draw, starty, noise_text, verysmallfont, fill="white")
-        starty += VERYSMALL
     if stat['UATRadio_connected']:
         starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
     starty += 6
     if stat['CPUTemp'] > -300:   #  -300 means no value available
-        starty = bar(draw, starty, "Temp", round(stat['CPUTemp'],1) , round(stat['CPUTempMax'],0), 70, 80, "°C")
+        starty = bar(draw, starty, "temp", round(stat['CPUTemp'],1) , round(stat['CPUTempMax'],0), 70, 80, "°C")
         starty += 3
     # GPS
     draw.text((0, starty), "GPS", font=verysmallfont, fill="white")
