@@ -636,14 +636,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
     textsize = draw.textsize(right_val, verysmallfont)
     draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="black", align="right")
     draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline="black", width=1)
-    if red == 0:
-        color = "black"
-    elif val >= red:
-        color = "black"
-    elif val >= yellow:
-        color = "black"
-    else:
-        color = "black"
+    color = "black"
     if val < minval:
         val = minval   # to display a minimum bar, valtext should be provided in this case
     if max_val != 0:
@@ -656,7 +649,9 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
     else:
         t = str(val)
     textsize = draw.textsize(t, verysmallfont)
-    draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="white")
+    s = (bar_end - bar_start)/2 + bar_start-textsize[0] / 2
+    draw.rectangle([s, y, s+ts[0], y+ts[1]], fill="white")
+    draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="black")
     return y+VERYSMALL+15
 
 def round_text(draw,x, y, text, color, yesno = True, out=None):
