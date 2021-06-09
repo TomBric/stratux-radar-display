@@ -680,22 +680,22 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         starty = bar(draw, starty, "temp", round(stat['CPUTemp'],1) , round(stat['CPUTempMax'],0), 70, 80, "°C")
         starty += 3
     # GPS
-    draw.text((5, starty), "GPS solution", font=verysmallfont, fill="black")
+    draw.text((5, starty), "GPS sol", font=verysmallfont, fill="black")
     if gps_quality == 1:
         t = "3D GPS"
     elif gps_quality == 2:
         t = "DGNSS"
     else:
-        t = "GPS"
+        t = ""
     if stat['GPS_position_accuracy'] < 19999:
         gps = str(round(stat['GPS_position_accuracy'],1)) + "m"
     else:
         gps = "NoFix"
     draw.text((100, starty), t + ", " + gps, font=verysmallfont, fill="black")
 
-    t = "Satellites: " + str(stat['GPS_satellites_locked']) + " in sol / "+\
-        str(stat['GPS_satellites_seen']) + " seen / " + str(stat['GPS_satellites_tracked']) + " tracked"
-    draw.text((240, starty), t, font=verysmallfont, fill="black")
+    t = "Sat: " + str(stat['GPS_satellites_locked']) + " sol / "+\
+        str(stat['GPS_satellites_seen']) + " seen / " + str(stat['GPS_satellites_tracked']) + " track"
+    draw.text((220, starty), t, font=verysmallfont, fill="black")
     # x = round_text(draw, 100, starty, str(stat['GPS_satellites_locked'])+" in sol", "white", out="black")
     # x = round_text(draw, x, starty, str(stat['GPS_satellites_seen']) + " seen", "white", out="black")
     # x = round_text(draw, x, starty, str(stat['GPS_satellites_tracked']) + " tracked", "white", out="black")
@@ -709,6 +709,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         alt=" --- "
     t = "FL" + str(round(altitude/100)) + "GPS-Alt "+ alt
     draw.text((100, starty), t, font=verysmallfont, fill="black")
+    starty += VERYSMALL + 5
     draw.text((5, starty), "Sensors", font=verysmallfont, fill="black")
     x = round_text(draw, 100, starty, "IMU", "white", stat['IMUConnected'], out="black")
     x = round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
