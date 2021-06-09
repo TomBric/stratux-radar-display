@@ -691,11 +691,11 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         gps = str(round(stat['GPS_position_accuracy'],1)) + "m"
     else:
         gps = "NoFix"
-    draw.text((100, starty), t + ", " + gps, font=verysmallfont, fill="black")
+    draw.text((100, starty), t + gps, font=verysmallfont, fill="black")
 
-    t = "Sat: " + str(stat['GPS_satellites_locked']) + " sol / "+\
-        str(stat['GPS_satellites_seen']) + " seen / " + str(stat['GPS_satellites_tracked']) + " track"
-    draw.text((220, starty), t, font=verysmallfont, fill="black")
+    t = "Sat: " + str(stat['GPS_satellites_locked']) + " sol/"+\
+        str(stat['GPS_satellites_seen']) + " seen/" + str(stat['GPS_satellites_tracked']) + " track"
+    draw.text((240, starty), t, font=verysmallfont, fill="black")
     # x = round_text(draw, 100, starty, str(stat['GPS_satellites_locked'])+" in sol", "white", out="black")
     # x = round_text(draw, x, starty, str(stat['GPS_satellites_seen']) + " seen", "white", out="black")
     # x = round_text(draw, x, starty, str(stat['GPS_satellites_tracked']) + " tracked", "white", out="black")
@@ -707,7 +707,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         alt = '{:5.0f}'.format(gps_alt)
     else:
         alt=" --- "
-    t = "FL" + str(round(altitude/100)) + "GPS-Alt "+ alt
+    t = "FL" + str(round(altitude/100)) + "       GPS-Alt "+ alt +"ft"
     draw.text((100, starty), t, font=verysmallfont, fill="black")
     starty += VERYSMALL + 5
     draw.text((5, starty), "Sensors", font=verysmallfont, fill="black")
