@@ -629,12 +629,12 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
 
 def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval = 0):
     bar_start = 100
-    bar_end = 400
+    bar_end = 420
 
-    draw.text((0, y), text, font=verysmallfont, fill="black", align="left")
+    draw.text((5, y), text, font=verysmallfont, fill="black", align="left")
     right_val = str(int(max_val)) + unit
     textsize = draw.textsize(right_val, verysmallfont)
-    draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="black", align="right")
+    draw.text((sizex - textsize[0]-5, y), right_val, font=verysmallfont, fill="black", align="right")
     draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline="black", width=1)
     color = "black"
     if val < minval:
@@ -680,32 +680,37 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         starty = bar(draw, starty, "temp", round(stat['CPUTemp'],1) , round(stat['CPUTempMax'],0), 70, 80, "°C")
         starty += 3
     # GPS
+    draw.text((5, starty), "GPS solution", font=verysmallfont, fill="black")
     if gps_quality == 1:
         t = "3D GPS"
     elif gps_quality == 2:
         t = "DGNSS"
     else:
         t = "GPS"
-    draw.text((0, starty), t, font=verysmallfont, fill="black")
-    x = round_text(draw, 100, starty, str(stat['GPS_satellites_locked'])+" in sol", "white", out="black")
-    x = round_text(draw, x, starty, str(stat['GPS_satellites_seen']) + " seen", "white", out="black")
-    x = round_text(draw, x, starty, str(stat['GPS_satellites_tracked']) + " tracked", "white", out="black")
     if stat['GPS_position_accuracy'] < 19999:
         gps = str(round(stat['GPS_position_accuracy'],1)) + "m"
     else:
         gps = "NoFix"
-    textsize = draw.textsize(gps, verysmallfont)
-    draw.text((sizex - textsize[0], starty), gps, font=verysmallfont, fill="black")
+    draw.text((100, starty), t + ", " + gps, font=verysmallfont, fill="black")
+
+    t = "Satellites: " + str(stat['GPS_satellites_locked']) + " in sol / "+\
+        str(stat['GPS_satellites_seen']) + " seen / " + str(stat['GPS_satellites_tracked']) + " tracked"
+    draw.text((240, starty), t, font=verysmallfont, fill="black")
+    # x = round_text(draw, 100, starty, str(stat['GPS_satellites_locked'])+" in sol", "white", out="black")
+    # x = round_text(draw, x, starty, str(stat['GPS_satellites_seen']) + " seen", "white", out="black")
+    # x = round_text(draw, x, starty, str(stat['GPS_satellites_tracked']) + " tracked", "white", out="black")
+
     starty += VERYSMALL+5
 
-    fl = '{:3.0f}'.format(round(altitude) / 100)
-    x = round_text(draw, 100, starty, "FL" + fl, "white", out="black")
+    draw.text((5, starty), "Altitudes", font=verysmallfont, fill="black")
     if stat['GPS_position_accuracy'] < 19999:
         alt = '{:5.0f}'.format(gps_alt)
     else:
         alt=" --- "
-    x = round_text(draw, x, starty, "Alt"+alt+"ft", "white", out="black")
-    x = round_text(draw, x, starty, "IMU", "white", stat['IMUConnected'], out="black")
+    t = "FL" + str(round(altitude/100)) + "GPS-Alt "+ alt
+    draw.text((100, starty), t, font=verysmallfont, fill="black")
+    draw.text((5, starty), "Sensors", font=verysmallfont, fill="black")
+    x = round_text(draw, 100, starty, "IMU", "white", stat['IMUConnected'], out="black")
     x = round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
 
-    # centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")
+
