@@ -610,7 +610,7 @@ def stratux(draw, stat, altitude, gps_alt):
     if stat['GPS_position_accuracy'] < 19999:
         alt = '{:5.0f}'.format(gps_alt)
     else:
-        alt="---"
+        alt=" --- "
     x = round_text(draw, x, starty, "Alt"+alt+"ft", "DimGray")
     if stat['IMUConnected']:
         col = "green"
