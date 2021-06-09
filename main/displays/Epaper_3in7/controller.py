@@ -689,7 +689,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         t = "DGNSS"
     else:
         t = "GPS"
-    draw.text((0, starty), "GPS", font=verysmallfont, fill="black")
+    draw.text((0, starty), t, font=verysmallfont, fill="black")
     x = round_text(draw, 100, starty, str(stat['GPS_satellites_locked'])+" in sol", "white", out="black")
     x = round_text(draw, x, starty, str(stat['GPS_satellites_seen']) + " seen", "white", out="black")
     x = round_text(draw, x, starty, str(stat['GPS_satellites_tracked']) + " tracked", "white", out="black")
