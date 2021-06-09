@@ -628,8 +628,8 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
 
 
 def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval = 0):
-    bar_start = 30
-    bar_end = 100
+    bar_start = 100
+    bar_end = 350
 
     draw.text((0, y), text, font=verysmallfont, fill="black", align="left")
     right_val = str(int(max_val)) + unit
