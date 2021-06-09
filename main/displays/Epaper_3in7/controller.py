@@ -662,7 +662,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
 def round_text(draw,x, y, text, color, yesno = True, out=None):
     ts = draw.textsize(text, verysmallfont)
     draw.rounded_rectangle([x-2, y-1, x+ts[0]+2, y+ts[1]+1], radius=4, fill=color, outline=out)
-    draw.text((x,y), text, font=verysmallfont, fill="white")
+    draw.text((x,y), text, font=verysmallfont, fill="black")
     if not yesno:
         draw.line([x-2, y+ts[1]+1, x+ts[0]+2, y-1], fill="black", width=4)
     return x+ts[0]+5
@@ -695,13 +695,13 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     draw.rounded_rectangle([210, starty, 260, starty + VERYSMALL], radius=4, fill="white", outline="black")
     t = str(stat['GPS_satellites_locked'])
     textsize = draw.textsize(t, verysmallfont)
-    draw.text((48-textsize[0]/2, starty), t, font=verysmallfont, fill="black", align="middle")
+    draw.text((125-textsize[0]/2, starty), t, font=verysmallfont, fill="black", align="middle")
     t = str(stat['GPS_satellites_seen'])
     textsize = draw.textsize(t, verysmallfont)
-    draw.text((67-textsize[0]/2, starty), t, font=verysmallfont, fill="black", align="middle")
+    draw.text((180-textsize[0]/2, starty), t, font=verysmallfont, fill="black", align="middle")
     t = str(stat['GPS_satellites_tracked'])
     textsize = draw.textsize(t, verysmallfont)
-    draw.text((87-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
+    draw.text((235-textsize[0]/2, starty), t, font=verysmallfont, fill="black", align="middle")
     if stat['GPS_position_accuracy'] < 19999:
         gps = str(round(stat['GPS_position_accuracy'],1)) + "m"
     else:
