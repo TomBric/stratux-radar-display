@@ -530,7 +530,7 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 
-def bar(draw, y, text, val, max_val, yellow, red, unit=""):
+def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval = 0):
     bar_start = 30
     bar_end = 100
 
@@ -547,12 +547,17 @@ def bar(draw, y, text, val, max_val, yellow, red, unit=""):
         color = "DarkOrange"
     else:
         color = "green"
+    if val < minval:
+        val = minval   # to display a minimum bar, valtext should be provided in this case
     if max_val != 0:
         xval = bar_start + (bar_end - bar_start) * val / max_val
     else:
-        xval = 0
+        xval = bar_start
     draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
-    t = str(val)
+    if valtext != None:
+        t = valtext
+    else:
+        t = str(val)
     textsize = draw.textsize(t, verysmallfont)
     draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="white")
     return y+VERYSMALL+5
@@ -570,7 +575,8 @@ def stratux(draw, stat, altitude, gps_alt):
     starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
     if stat['OGN_connected']:
         starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
-        noise_text = "noise= " + str(stat['OGN_noise_db']) + "@" + str(stat['OGN_gain_db']) + " dB"
+        noise_text = str(stat['OGN_noise_db']) + "@" + str(stat['OGN_gain_db']) + " dB"
+        starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, unit="dB", minval=1, valtext= noise_text)
         centered_text(draw, starty, noise_text, verysmallfont, fill="white")
         starty += VERYSMALL
     if stat['UATRadio_connected']:
@@ -616,4 +622,4 @@ def stratux(draw, stat, altitude, gps_alt):
         col = "red"
     x = round_text(draw, x, starty, "BMP", col)
 
-    centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")
+    # centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")
