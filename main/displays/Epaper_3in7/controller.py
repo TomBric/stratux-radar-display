@@ -690,18 +690,9 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     else:
         t = "GPS"
     draw.text((0, starty), "GPS", font=verysmallfont, fill="black")
-    draw.rounded_rectangle([100, starty, 150, starty + VERYSMALL], radius=4, fill="white", outline="black")
-    draw.rounded_rectangle([155, starty, 205, starty + VERYSMALL], radius=4, fill="white", outline="black")
-    draw.rounded_rectangle([210, starty, 260, starty + VERYSMALL], radius=4, fill="white", outline="black")
-    t = str(stat['GPS_satellites_locked'])
-    textsize = draw.textsize(t, verysmallfont)
-    draw.text((125-textsize[0]/2, starty), t, font=verysmallfont, fill="black", align="middle")
-    t = str(stat['GPS_satellites_seen'])
-    textsize = draw.textsize(t, verysmallfont)
-    draw.text((180-textsize[0]/2, starty), t, font=verysmallfont, fill="black", align="middle")
-    t = str(stat['GPS_satellites_tracked'])
-    textsize = draw.textsize(t, verysmallfont)
-    draw.text((235-textsize[0]/2, starty), t, font=verysmallfont, fill="black", align="middle")
+    x = round_text(draw, 100, starty, str(stat['GPS_satellites_locked'])+" in sol", "white", out="black")
+    x = round_text(draw, x, starty, str(stat['GPS_satellites_seen']) + " tracked", "white", out="black")
+    x = round_text(draw, x, starty, str(stat['GPS_satellites_tracked']) + " seen", "white", out="black")
     if stat['GPS_position_accuracy'] < 19999:
         gps = str(round(stat['GPS_position_accuracy'],1)) + "m"
     else:
