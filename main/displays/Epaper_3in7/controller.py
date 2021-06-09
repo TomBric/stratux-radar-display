@@ -711,13 +711,13 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty += VERYSMALL+5
 
     fl = '{:3.0f}'.format(round(altitude) / 100)
-    x = round_text(draw, 3, starty, "FL" + fl, "white", outline="black")
+    x = round_text(draw, 3, starty, "FL" + fl, "white", out="black")
     if stat['GPS_position_accuracy'] < 19999:
         alt = '{:5.0f}'.format(gps_alt)
     else:
         alt=" --- "
-    x = round_text(draw, x, starty, "Alt"+alt+"ft", "white", outline="black")
-    x = round_text(draw, x, starty, "IMU", "white", stat['IMUConnected'], outline="black")
-    x = round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], outline="black")
+    x = round_text(draw, x, starty, "Alt"+alt+"ft", "white", out="black")
+    x = round_text(draw, x, starty, "IMU", "white", stat['IMUConnected'], out="black")
+    x = round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
 
     # centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")
