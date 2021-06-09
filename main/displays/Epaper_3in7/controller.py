@@ -643,8 +643,8 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
         xval = bar_start + (bar_end - bar_start) * val / max_val
     else:
         xval = bar_start
-    for b in range(int(bar_start), int(xval), 4):
-        draw.line([(b, y), (b, y-VERYSMALL)], fill="black",width=2)
+    for b in range(int(bar_start), int(xval), 3):
+        draw.line([(b, y), (b, y+VERYSMALL)], fill="black",width=1)
     # draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
     if valtext != None:
         t = valtext
@@ -652,8 +652,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
         t = str(val)
     ts = draw.textsize(t, verysmallfont)
     s = (bar_end - bar_start)/2 + bar_start-textsize[0] / 2
-    draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont,
-              fill="black", stroke_width=2, stroke_fill="white")
+    draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="black")
     return y+VERYSMALL+15
 
 def round_text(draw,x, y, text, color, yesno = True, out=None):
