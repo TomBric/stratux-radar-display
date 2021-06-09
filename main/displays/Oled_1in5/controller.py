@@ -576,7 +576,7 @@ def stratux(draw, stat, altitude, gps_alt):
     if stat['OGN_connected']:
         starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
         noise_text = str(stat['OGN_noise_db']) + "@" + str(stat['OGN_gain_db']) + " dB"
-        starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, unit="dB", minval=1, valtext= noise_text)
+        starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext= noise_text)
         centered_text(draw, starty, noise_text, verysmallfont, fill="white")
         starty += VERYSMALL
     if stat['UATRadio_connected']:
