@@ -650,8 +650,8 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
         t = str(val)
     ts = draw.textsize(t, verysmallfont)
     s = (bar_end - bar_start)/2 + bar_start-textsize[0] / 2
-    draw.rectangle([s, y, s+ts[0], y+ts[1]], fill="white")
-    draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="black")
+    draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont,
+              fill="black", stroke_width=3, stroke_fill="white")
     return y+VERYSMALL+15
 
 def round_text(draw,x, y, text, color, yesno = True, out=None):
