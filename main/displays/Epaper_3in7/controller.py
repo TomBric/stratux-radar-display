@@ -648,7 +648,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
         t = valtext
     else:
         t = str(val)
-    textsize = draw.textsize(t, verysmallfont)
+    ts = draw.textsize(t, verysmallfont)
     s = (bar_end - bar_start)/2 + bar_start-textsize[0] / 2
     draw.rectangle([s, y, s+ts[0], y+ts[1]], fill="white")
     draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="black")
