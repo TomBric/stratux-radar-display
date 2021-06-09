@@ -657,7 +657,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
         t = str(val)
     textsize = draw.textsize(t, verysmallfont)
     draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="white")
-    return y+VERYSMALL+5
+    return y+VERYSMALL+15
 
 def round_text(draw,x, y, text, color, yesno = True, out=None):
     ts = draw.textsize(text, verysmallfont)
