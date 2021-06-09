@@ -643,7 +643,9 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
         xval = bar_start + (bar_end - bar_start) * val / max_val
     else:
         xval = bar_start
-    draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
+    for b in range(bar_start, xval, 4):
+        draw.line([(b, y), (b, y-VERYSMALL)], fill="black",width=2)
+    # draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
     if valtext != None:
         t = valtext
     else:
