@@ -631,19 +631,19 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
     bar_start = 30
     bar_end = 100
 
-    draw.text((0, y), text, font=verysmallfont, fill="white", align="left")
+    draw.text((0, y), text, font=verysmallfont, fill="black", align="left")
     right_val = str(int(max_val)) + unit
     textsize = draw.textsize(right_val, verysmallfont)
-    draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="white", align="right")
-    draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline="white", width=1)
+    draw.text((sizex - textsize[0], y), right_val, font=verysmallfont, fill="black", align="right")
+    draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline="black", width=1)
     if red == 0:
-        color = "DimGray"
+        color = "black"
     elif val >= red:
-        color = "red"
+        color = "black"
     elif val >= yellow:
-        color = "DarkOrange"
+        color = "black"
     else:
-        color = "green"
+        color = "black"
     if val < minval:
         val = minval   # to display a minimum bar, valtext should be provided in this case
     if max_val != 0:
