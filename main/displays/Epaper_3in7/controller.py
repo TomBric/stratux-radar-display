@@ -684,7 +684,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
 
 
     draw.text((5, starty), "GPS sol", font=verysmallfont, fill="black")
-    draw.text((100, starty), str['GPS_detected_type'], font=verysmallfont, fill="black")
+    draw.text((100, starty), stat['GPS_detected_type'], font=verysmallfont, fill="black")
     starty += VERYSMALL + 5
     if gps_quality == 1:
         t = "3D GPS "
