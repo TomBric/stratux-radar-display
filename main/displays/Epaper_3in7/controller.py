@@ -652,7 +652,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
     ts = draw.textsize(t, verysmallfont)
     draw.text(((bar_end-bar_start)/2+bar_start-ts[0]/2, y), t, font=verysmallfont, fill="black",
               stroke_width=1, stroke_fill="white")
-    return y+VERYSMALL+15
+    return y+VERYSMALL+12
 
 
 def round_text(draw, x, y, text, color, yesno=True, out=None):
@@ -680,15 +680,20 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         starty = bar(draw, starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
         starty += 3
     # GPS
+    draw.text((5, starty), "GPS hw", font=verysmallfont, fill="black")
+
+
     draw.text((5, starty), "GPS sol", font=verysmallfont, fill="black")
+    draw.text((100, starty), str['GPS_detected_type'], font=verysmallfont, fill="black")
+    starty += VERYSMALL + 5
     if gps_quality == 1:
-        t = "3D GPS"
+        t = "3D GPS "
     elif gps_quality == 2:
-        t = "DGNSS"
+        t = "DGNSS "
     else:
         t = ""
     if stat['GPS_position_accuracy'] < 19999:
-        gps = " " + str(round(stat['GPS_position_accuracy'], 1)) + "m"
+        gps = str(round(stat['GPS_position_accuracy'], 1)) + "m"
     else:
         gps = "NoFix"
     draw.text((100, starty), t + gps, font=verysmallfont, fill="black")
