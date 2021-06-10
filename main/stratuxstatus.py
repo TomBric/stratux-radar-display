@@ -100,7 +100,7 @@ hardware = [
 def decode_gps_hardware(detected_type):
     code = detected_type & 0x0f
     if code < len(hardware):
-        return hardware[code-1]
+        return hardware[code]
     else:
         return "unknown"
 
