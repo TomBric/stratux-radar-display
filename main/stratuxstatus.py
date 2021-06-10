@@ -50,7 +50,7 @@ strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES
         'CPUTemp': -300, 'CPUTempMax': -300,
         'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0, 'GPS_position_accuracy': 0,
         'GPS_satellites_seen': 0, 'OGN_noise_db': 0.0, 'OGN_gain_db': 0.0,
-        'IMUConnected': False, 'BMPConnected': False, 'GPS_detected_type': "Unknown" }
+        'IMUConnected': False, 'BMPConnected': False, 'GPS_detected_type': "Unknown"}
 left = ""
 middle = ""
 right = ""
@@ -82,27 +82,34 @@ def stop():  # stop listening on status websocket
 
 
 hardware = [
-    "Not installed", # 0
-    "Serial port",  # 1
-    "Prolific USB-serial bridge", # 2
-    "OGN Tracker", # 3
-    "unknown", # 4
-    "unknown", # 5
-    "USB u-blox 6 GPS receiver", # 6
-    "USB u-blox 7 GNSS receiver", # 7
-    "USB u-blox 8 GNSS receiver", # 8
-    "USB u-blox 9 GNSS receiver", # 9
-    "USB Serial IN", # 10
-    "SoftRF Dongle", # 11
-    "Network" # 12
+    "Not installed",  # 0
+    "Serial port",   # 1
+    "Prolific USB-serial bridge",  # 2
+    "OGN Tracker",  # 3
+    "unknown",  # 4
+    "unknown",  # 5
+    "USB u-blox 6 GPS receiver",  # 6
+    "USB u-blox 7 GNSS receiver",  # 7
+    "USB u-blox 8 GNSS receiver",  # 8
+    "USB u-blox 9 GNSS receiver",  # 9
+    "USB Serial IN",  # 10
+    "SoftRF Dongle",  # 11
+    "Network"  # 12
 ]
+
 
 def decode_gps_hardware(detected_type):
     code = detected_type & 0x0f
     if code < len(hardware):
-        return hardware[code]
+        s = hardware[code]
     else:
-        return "unknown"
+        s = "unknown"
+    gps_prot = detected_type >> 4
+    if gps_prot == 1:
+        s += " (NMEA prot)"
+    else:
+        s += " (Not comm)"
+    return s
 
 
 def draw_status(draw, display_control, ui_changed, connected, altitude, gps_alt, gps_quality):
