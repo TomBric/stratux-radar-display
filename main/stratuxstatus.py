@@ -47,9 +47,10 @@ status_listener = None  # couroutine task for querying statux
 strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES_messages_max': 0,
         'OGN_connected': False, 'OGN_messages_last_minute': 0, 'OGN_messages_max': 0,
         'UATRadio_connected': False, 'UAT_messages_last_minute': 0, 'UAT_messages_max': 0,
-        'CPUTemp': "unavail",
-        'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0,
-        'GPS_satellites_seen': 0}
+        'CPUTemp': -300, 'CPUTempMax': -300,
+        'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0, 'GPS_position_accuracy': 0,
+        'GPS_satellites_seen': 0, 'OGN_noise_db': 0.0, 'OGN_gain_db': 0.0,
+        'IMUConnected': False, 'BMPConnected': False, 'GPS_detected_type': "Unknown"}
 left = ""
 middle = ""
 right = ""
@@ -80,33 +81,48 @@ def stop():  # stop listening on status websocket
         status_listener = None
 
 
-def draw_status(draw, display_control, ui_changed, connected):
-    global strx
+hardware = [
+    "Not installed",  # 0
+    "Serial port",   # 1
+    "Prolific USB-serial bridge",  # 2
+    "OGN Tracker",  # 3
+    "unknown",  # 4
+    "unknown",  # 5
+    "USB u-blox 6 GPS receiver",  # 6
+    "USB u-blox 7 GNSS receiver",  # 7
+    "USB u-blox 8 GNSS receiver",  # 8
+    "USB u-blox 9 GNSS receiver",  # 9
+    "USB Serial IN",  # 10
+    "SoftRF Dongle",  # 11
+    "Network"  # 12
+]
 
-    headline = "Stratux Status"
-    if strx['was_changed'] or ui_changed:
+
+def decode_gps_hardware(detected_type):
+    code = detected_type & 0x0f
+    if code < len(hardware):
+        s = hardware[code]
+    else:
+        s = "unknown"
+    gps_prot = detected_type >> 4
+    if gps_prot == 1:
+        s += " (NMEA prot)"
+    else:
+        s += " (Not comm)"
+    return s
+
+
+def draw_status(draw, display_control, ui_changed, connected, altitude, gps_alt, gps_quality):
+    global strx
+    if strx['was_changed'] or ui_changed or not connected:
         display_control.clear(draw)
         if connected:
-            subline = strx['version']
-            text = "1090: ct " + str(strx['ES_messages_last_minute']) + " pk " + str(strx['ES_messages_max']) + "\n"
-            if strx['OGN_connected']:
-                text += "OGN: ct " + str(strx['OGN_messages_last_minute']) + " pk " + str(
-                    strx['OGN_messages_max']) + "\n"
-                text += " noise: " + str(round(strx['OGN_noise_db'], 1)) + " @ " + str(
-                    round(strx['OGN_gain_db'], 1)) + " dB\n"
-            if strx['UATRadio_connected']:
-                text += "UAT: ct " + str(strx['UAT_messages_last_minute']) + " pk " + str(
-                    strx['UAT_messages_max']) + "\n"
-            text += "Temp: " + strx['CPUTemp'] + "\n"
-            if strx['GPS_connected']:
-                text += "Sat: " + str(strx['GPS_satellites_locked']) + " in / " + str(strx['GPS_satellites_seen']) +\
-                        " se / " + str(strx['GPS_satellites_tracked']) + " tr"
-            else:
-                text += "No GPS connected"
+            display_control.stratux(draw, strx, altitude, gps_alt, gps_quality)
         else:
-            subline = "Not connected"
+            headline = "Stratux"
+            subline = "not connected"
             text = ""
-        display_control.text_screen(draw, headline, subline, text, "", "Mode", "")
+            display_control.text_screen(draw, headline, subline, text, "", "Mode", "")
         display_control.display()
         strx['was_changed'] = False
 
@@ -138,15 +154,20 @@ def status_callback(json_str):
     strx['GPS_satellites_tracked'] = stat['GPS_satellites_tracked']
     strx['GPS_satellites_seen'] = stat['GPS_satellites_seen']
     strx['GPS_solution'] = stat['GPS_solution']
+    strx['GPS_position_accuracy'] = stat['GPS_position_accuracy']
 
     strx['OGN_noise_db'] = stat['OGN_noise_db']
     strx['OGN_gain_db'] = stat['OGN_gain_db']
 
+    strx['BMPConnected'] = stat['BMPConnected']
+    strx['IMUConnected'] = stat['IMUConnected']
+    strx['GPS_detected_type'] = decode_gps_hardware(stat['GPS_detected_type'])
+
     if 'CPUTemp' in stat:
-        strx['CPUTemp'] = str(round(stat['CPUTemp'], 1)) + "°C / " + str(
-            round(stat['CPUTemp'] * 9 / 5 + 32.0, 1)) + "°F"
+        strx['CPUTemp'] = stat['CPUTemp']
+        strx['CPUTempMax'] = stat['CPUTempMax']
     else:
-        strx['CPUTemp'] = "unaivalable"
+        strx['CPUTemp'] = -300
 
 
 def user_input():
@@ -155,6 +176,8 @@ def user_input():
         return 0  # stay in current mode
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
+    if button == 2 and btime == 2:  # right and long- refresh
+        return 16  # start next mode for display driver: refresh called from gmeter
     if button == 1 and (btime == 2 or btime == 1):  # middle
         return 1  # next mode to be radar
     return 15  # no mode change

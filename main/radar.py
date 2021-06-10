@@ -521,9 +521,6 @@ async def user_interface():
                 next_mode = timerui.user_input()
             elif global_mode == 3:  # shutdown mode
                 next_mode = shutdownui.user_input()
-            elif global_mode == 4:  # refresh mode
-                next_mode = 0  # wait for display to change next mode
-                await asyncio.sleep(UI_REACTION_TIME * 2)  # give display driver time ...
             elif global_mode == 5:  # ahrs
                 next_mode = ahrsui.user_input()
             elif global_mode == 7:  # status
@@ -635,7 +632,9 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 13
                 elif global_mode == 15:  # stratux_statux display
-                    stratuxstatus.draw_status(draw, display_control, ui_changed, situation['connected'])
+                    stratuxstatus.draw_status(draw, display_control, ui_changed, situation['connected'],
+                                              situation['own_altitude'], situation['gps_altitude'],
+                                              situation['gps_quality'])
                     ui_changed = False
                 elif global_mode == 16:  # refresh display, only relevant for epaper, mode was stratux_status
                     rlog.debug("StratusStatus: Display driver - Refreshing")
