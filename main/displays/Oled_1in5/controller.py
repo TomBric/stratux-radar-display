@@ -530,7 +530,7 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 
-def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval = 0):
+def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0):
     bar_start = 30
     bar_end = 100
 
@@ -554,7 +554,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
     else:
         xval = bar_start
     draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
-    if valtext != None:
+    if valtext is not None:
         t = valtext
     else:
         t = str(val)
@@ -562,11 +562,13 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval 
     draw.text(((bar_end-bar_start)/2+bar_start-textsize[0]/2, y), t, font=verysmallfont, fill="white")
     return y+VERYSMALL+5
 
-def round_text(draw,x, y, text, color):
+
+def round_text(draw, x, y, text, color):
     ts = draw.textsize(text, verysmallfont)
     draw.rounded_rectangle([x-2, y-1, x+ts[0]+2, y+ts[1]+1], radius=4, fill=color)
-    draw.text((x,y), text, font=verysmallfont, fill="white")
+    draw.text((x, y), text, font=verysmallfont, fill="white")
     return x+ts[0]+5
+
 
 def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty = 0
@@ -575,13 +577,13 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
     if stat['OGN_connected']:
         starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
-        noise_text = str(round(stat['OGN_noise_db'],1)) + "@" + str(round(stat['OGN_gain_db'],1)) + "dB"
-        starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext= noise_text)
+        noise_text = str(round(stat['OGN_noise_db'], 1)) + "@" + str(round(stat['OGN_gain_db'], 1)) + "dB"
+        starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext=noise_text)
     if stat['UATRadio_connected']:
         starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
     starty += 6
-    if stat['CPUTemp'] > -300:   #  -300 means no value available
-        starty = bar(draw, starty, "temp", round(stat['CPUTemp'],1) , round(stat['CPUTempMax'],0), 70, 80, "°C")
+    if stat['CPUTemp'] > -300:    # -300 means no value available
+        starty = bar(draw, starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
         starty += 3
     # GPS
     if gps_quality == 1:
@@ -604,7 +606,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     textsize = draw.textsize(t, verysmallfont)
     draw.text((87-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
     if stat['GPS_position_accuracy'] < 19999:
-        gps = str(round(stat['GPS_position_accuracy'],1)) + "m"
+        gps = str(round(stat['GPS_position_accuracy'], 1)) + "m"
     else:
         gps = "NoFix"
     textsize = draw.textsize(gps, verysmallfont)
@@ -616,7 +618,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     if stat['GPS_position_accuracy'] < 19999:
         alt = '{:5.0f}'.format(gps_alt)
     else:
-        alt=" --- "
+        alt = " --- "
     x = round_text(draw, x, starty, "Alt"+alt+"ft", "DimGray")
     if stat['IMUConnected']:
         col = "green"
@@ -627,6 +629,4 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         col = "green"
     else:
         col = "red"
-    x = round_text(draw, x, starty, "BMP", col)
-
-    # centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")
+    round_text(draw, x, starty, "BMP", col)
