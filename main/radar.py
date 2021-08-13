@@ -264,7 +264,7 @@ def new_traffic(json_str):
         if 'Track' in traffic:
             ac['direction'] = traffic['Track'] - situation['course']
             # sometimes track is missing, than leave it as it is
-        if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= situation['RadarLimits']:
+        if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= round(situation['RadarLimits']/100):
             res_angle = gps_angle - situation['course']
             gpsx = math.sin(math.radians(res_angle)) * gps_rad
             gpsy = - math.cos(math.radians(res_angle)) * gps_rad
