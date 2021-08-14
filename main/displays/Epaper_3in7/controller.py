@@ -282,12 +282,10 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         t = "DGNSS\n" + str(round(gps_h_accuracy, 1)) + "m"
     else:
         t = ""
-    draw.text((5, SMALL+10), t, font=verysmallfont, fill="black")
     if basemode:
-        t = "Ground\n mode!"
-        tsize = draw.textsize(t, verysmallfont)
-        draw.rectangle((5, sizey-tsize[1], 5 + tsize[0], sizey), fill="black")
-        draw.text((5, sizey-tsize[1]), "Ground\nmode!", font=verysmallfont, fill="white")
+        t += "Ground\nMode!"
+    draw.text((5, SMALL+10), t, font=verysmallfont, fill="black")
+
     t = "FL"+str(round(ownalt / 100))
     textsize = draw.textsize(t, verysmallfont)
     draw.text((sizex - textsize[0] - 5, SMALL+10), t, font=verysmallfont, fill="black")
