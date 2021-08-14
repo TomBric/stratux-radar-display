@@ -712,7 +712,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Stratux web radar for separate displays')
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
-    ap.add_argument("-n", "--north", required=False, help="Base mode: always display north up", action='store_true',
+    ap.add_argument("-n", "--north", required=False, help="Ground mode: always display north up", action='store_true',
                     default=False)
     ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
     ap.add_argument("-a", "--ahrs", required=False, help="Start mode is ahrs", action='store_true', default=False)
