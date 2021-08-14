@@ -267,7 +267,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy, optical_bar):
+              gps_quality, gps_h_accuracy, optical_bar, basemode):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
@@ -283,7 +283,11 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     else:
         t = ""
     draw.text((5, SMALL+10), t, font=verysmallfont, fill="black")
-
+    if basemode:
+        t = "Ground\nmode!"
+        tsize = draw.textsize(t, verysmallfont)
+        draw.rectangle((5, 60, 5 + tsize[0], 60 + tsize[1]), fill="black")
+        draw.text((5, 60), "Ground\nmode!", font=verysmallfont, fill="white")
     t = "FL"+str(round(ownalt / 100))
     textsize = draw.textsize(t, verysmallfont)
     draw.text((sizex - textsize[0] - 5, SMALL+10), t, font=verysmallfont, fill="black")

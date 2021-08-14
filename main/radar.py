@@ -113,6 +113,7 @@ last_arcposition = 0
 display_refresh_time = 0
 display_control = None
 speak = False  # BT is generally enabled
+basemode = False  # True if display is always in north direction
 bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
 global_mode = 1
@@ -166,7 +167,8 @@ def draw_display(draw):
         display_control.clear(draw)
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
-                                  sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive)
+                                  sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
+                                  basemode)
         draw_all_ac(draw, all_ac)
         display_control.display()
         situation['was_changed'] = False
@@ -359,9 +361,10 @@ def new_situation(json_str):
     if situation['gps_active'] != gps_active:
         situation['gps_active'] = gps_active
         situation['was_changed'] = True
-    if situation['course'] != round(sit['GPSTrueCourse']):
-        situation['course'] = round(sit['GPSTrueCourse'])
-        situation['was_changed'] = True
+    if not basemode:
+        if situation['course'] != round(sit['GPSTrueCourse']):
+            situation['course'] = round(sit['GPSTrueCourse'])
+            situation['was_changed'] = True
     if situation['own_altitude'] != sit['BaroPressureAltitude']:
         situation['own_altitude'] = sit['BaroPressureAltitude']
         situation['was_changed'] = True
@@ -709,6 +712,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Stratux web radar for separate displays')
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
+    ap.add_argument("-n", "--north", required=False, help="Base mode: always display north up", action='store_true',
+                    default=False)
     ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
     ap.add_argument("-a", "--ahrs", required=False, help="Start mode is ahrs", action='store_true', default=False)
     ap.add_argument("-x", "--status", required=False, help="Start mode is status", action='store_true', default=False)
@@ -733,6 +738,7 @@ if __name__ == "__main__":
     url_host_base = args['connect']
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     speak = args['speak']
+    basemode = args['north']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:
