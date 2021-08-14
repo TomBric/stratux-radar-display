@@ -201,7 +201,7 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
 
 # Shell command parameters
 ```
-  usage: radar.py [-h] -d DEVICE [-s] [-t] [-a] [-x] [-g] [-o] [-i] [-z]
+usage: radar.py [-h] -d DEVICE [-s] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z]
                 [-c CONNECT] [-v] [-r]
 
 Stratux web radar for separate displays
@@ -211,6 +211,7 @@ optional arguments:
   -d DEVICE, --device DEVICE
                         Display device to use
   -s, --speak           Speech warnings on
+  -n, --north           Ground mode: always display north up
   -t, --timer           Start mode is timer
   -a, --ahrs            Start mode is ahrs
   -x, --status          Start mode is status
@@ -222,6 +223,8 @@ optional arguments:
                         Connect to Stratux-IP
   -v, --verbose         Debug output on
   -r, --registration    Display registration no (Epaper only)
+
+
   ```
 
 
