@@ -56,7 +56,7 @@ import stratuxstatus
 from datetime import datetime, timezone
 
 # constant definitions
-RADAR_VERSION = "1.1"
+RADAR_VERSION = "1.2"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3

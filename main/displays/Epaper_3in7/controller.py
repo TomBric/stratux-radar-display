@@ -283,7 +283,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     else:
         t = ""
     if basemode:
-        t += "Ground\nMode!"
+        t += "\nGround\nMode!"
     draw.text((5, SMALL+10), t, font=verysmallfont, fill="black")
 
     t = "FL"+str(round(ownalt / 100))
