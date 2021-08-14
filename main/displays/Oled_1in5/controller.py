@@ -227,7 +227,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy, optical_alive):
+              gps_quality, gps_h_accuracy, optical_alive, basemode):
     draw.ellipse((0, 0, sizex - 1, sizey - 1), outline="floralwhite")
     draw.ellipse((sizex / 4, sizey / 4, zerox + sizex / 4, zeroy + sizey / 4), outline="floralwhite")
     draw.ellipse((zerox - 2, zeroy - 2, zerox + 2, zeroy + 2), outline="floralwhite")
@@ -265,6 +265,10 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         centered_text(draw, 0, "No GPS", smallfont, fill="red")
     if not connected:
         centered_text(draw, zeroy, "No Connection!", smallfont, fill="red")
+    if basemode:
+        text = "Ground mode"
+        textsize = draw.textsize(text, smallfont)
+        centered_text(draw, sizey - textsize[1], text, smallfont, fill="red")
 
 
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs):
