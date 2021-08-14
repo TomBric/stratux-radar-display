@@ -266,7 +266,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     if not connected:
         centered_text(draw, zeroy, "No Connection!", smallfont, fill="red")
     if basemode:
-        text = "Ground Mode!"
+        text = "Ground mode"
         textsize = draw.textsize(text, smallfont)
         centered_text(draw, sizey - textsize[1], text, smallfont, fill="red")
 
