@@ -21,7 +21,7 @@ sudo pip3 install py-espeak-ng
 sudo apt-get install libbluetooth-dev -y
 sudo pip3 install pybluez
 sudo pip3 install pydbus
-mkdir /home/pi/tmp;export TMPDIR='/home/pi/tmp'; sudo pip3 install --upgrade PILLOW
+mkdir /home/pi/tmp; export TMPDIR='/home/pi/tmp'; sudo pip3 install --upgrade PILLOW
 sudo apt install python3-numpy -y
 
 # get files from repo
