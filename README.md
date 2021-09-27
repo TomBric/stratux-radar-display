@@ -91,7 +91,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    9. The configuration skript will make an entry in crontab of user pi, so that radar will start automatically after reboot.
 
    
-   ### Installation on a standard stratux device
+   ### Installation on a standard stratux device (for stratux versions before eu026!)
    stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. 
    Installation is only for expert users! To install the software perform the following steps:
    
@@ -119,6 +119,17 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
 The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
    Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry ZeroWH.
    
+   ### Installation on a standard stratux device for stratux version eu026
+   stratux uses a volatile filesystem in the versions starting from eu026 (September 2021). Furthermore stratux now directly enables you to log into your home network via settings. So the setup for eu026 versions and newer is a little bit different:
+   
+   1. Setup your local network configuration in the stratux settings tab. Enter your "Wifi Client SSID" as well as your "Wifi Client Passphrase" to connect stratux to your local home network.
+   2. Enable a writeable persistent filesystem in the settings tab by setting "Persistent Logging". 
+   3. Reboot and log on to your Stratux as user pi, directory /home/pi
+    Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
+   4. Execute the configuration skript: "/bin/bash stratux-radar-display/image/configure_radar_on_stratux.sh"
+   5. Configure the startup skript "image/stratux-radar.sh": remove the option "-s" and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7"
+   6. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
+
    
    ### Bluetooth devices
    
