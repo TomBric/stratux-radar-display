@@ -114,7 +114,7 @@ def next_arcposition(old_arcposition):
     return new_arcposition
 
 
-def init():
+def init(fullcircle = False):
     global sizex
     global sizey
     global zerox
@@ -145,7 +145,10 @@ def init():
     sizex = device.height
     sizey = device.width
     zerox = sizex / 2
-    zeroy = 200    # not centered
+    if not fullcircle:
+        zeroy = 200    # not centered
+    else:
+        zeroy = sizey / 2
     ah_zeroy = sizey / 2   # zero line for ahrs
     ah_zerox = sizex / 2
     max_pixel = 400

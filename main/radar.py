@@ -114,6 +114,7 @@ display_refresh_time = 0
 display_control = None
 speak = False  # BT is generally enabled
 basemode = False  # True if display is always in north direction
+fullcircle = False  # True if epaper display should display full circle centered
 bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
 global_mode = 1
@@ -685,7 +686,7 @@ def main():
     shutdownui.init(url_shutdown, url_reboot)
     if speak:
         bluetooth_active = radarbluez.bluez_init()
-    draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
+    draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
     ahrsui.init(display_control)
     statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
@@ -727,6 +728,8 @@ if __name__ == "__main__":
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no (Epaper only)",
                     action="store_true", default=False)
+    ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (Epaper only)",
+                    action="store_true", default=False)
     args = vars(ap.parse_args())
     # set up logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
@@ -739,6 +742,7 @@ if __name__ == "__main__":
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     speak = args['speak']
     basemode = args['north']
+    fullcircle = args['fullcircle']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:

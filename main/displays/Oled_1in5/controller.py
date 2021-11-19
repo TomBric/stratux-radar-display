@@ -84,7 +84,7 @@ def make_font(name, size):
     return ImageFont.truetype(font_path, size)
 
 
-def init():
+def init(fullcircle = False):
     global sizex
     global sizey
     global zerox
