@@ -33,7 +33,8 @@
 
 
 import re
-from pydbus import SystemBus
+# import pydbus
+from dasbus.connection import SessionMessageBus
 import logging
 from espeakng import ESpeakNG
 import subprocess
@@ -62,13 +63,14 @@ def bluez_init():
     global rlog
 
     rlog = logging.getLogger('stratux-radar-log')
-    bus = pydbus.SystemBus()
+    # bus = pydbus.SystemBus()
+    bus = SessionMessageBus()
     if bus is None:
         rlog.debug("Systembus not received")
         return False
     try:
-        manager = bus.get(BLUEZ_SERVICE, '/')
-        adapter = bus.get(BLUEZ_SERVICE, ADAPTER_PATH)
+        manager = bus.get_proxy(BLUEZ_SERVICE, '/')
+        adapter = bus.get_proxy(BLUEZ_SERVICE, ADAPTER_PATH)
     except (KeyError, TypeError):
         rlog.debug("Bluetooth: BLUEZ-SERVICE not initialised")
         return False
