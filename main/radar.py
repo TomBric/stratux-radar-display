@@ -56,7 +56,7 @@ import stratuxstatus
 from datetime import datetime, timezone
 
 # constant definitions
-RADAR_VERSION = "1.2"
+RADAR_VERSION = "1.3"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -114,6 +114,7 @@ display_refresh_time = 0
 display_control = None
 speak = False  # BT is generally enabled
 basemode = False  # True if display is always in north direction
+fullcircle = False  # True if epaper display should display full circle centered
 bt_devices = 0
 sound_on = True  # user may toogle sound off by UI
 global_mode = 1
@@ -486,7 +487,7 @@ async def listen_forever(path, name, callback, local_log):
                         callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
-        except (socket.error, websockets.exceptions.WebSocketException):
+        except (socket.error, websockets.exceptions.WebSocketException, asyncio.CancelledError, asyncio.TimeoutError):
             local_log.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
                 situation['connected'] = False
@@ -666,10 +667,12 @@ async def display_and_cutoff():
         rlog.debug("Display task terminating ...")
 
 
-async def courotines():
-    await asyncio.wait([listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog),
-                        listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog),
-                        display_and_cutoff(), user_interface()])
+async def coroutines():
+    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
+    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+    dis_cutoff = asyncio.create_task(display_and_cutoff())
+    u_interface = asyncio.create_task(user_interface())
+    await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface])
 
 
 def main():
@@ -685,14 +688,14 @@ def main():
     shutdownui.init(url_shutdown, url_reboot)
     if speak:
         bluetooth_active = radarbluez.bluez_init()
-    draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init()
+    draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
     ahrsui.init(display_control)
     statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(display_control, url_status_ws)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
-        asyncio.run(courotines())
+        asyncio.run(coroutines())
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
 
@@ -727,6 +730,8 @@ if __name__ == "__main__":
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no (Epaper only)",
                     action="store_true", default=False)
+    ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (Epaper only)",
+                    action="store_true", default=False)
     args = vars(ap.parse_args())
     # set up logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
@@ -739,6 +744,7 @@ if __name__ == "__main__":
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     speak = args['speak']
     basemode = args['north']
+    fullcircle = args['fullcircle']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:

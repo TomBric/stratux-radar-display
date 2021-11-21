@@ -5,7 +5,7 @@
 
 # luma files, pip3 and more
 sudo apt-get update -y
-sudo apt install python3-pip python3-pil -y
+sudo apt install python3-pip python3-pil python3-gi -y
 sudo apt-get install libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
 sudo pip3 install luma.oled
 

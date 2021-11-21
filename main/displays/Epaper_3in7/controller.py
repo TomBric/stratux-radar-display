@@ -114,7 +114,7 @@ def next_arcposition(old_arcposition):
     return new_arcposition
 
 
-def init():
+def init(fullcircle = False):
     global sizex
     global sizey
     global zerox
@@ -145,10 +145,14 @@ def init():
     sizex = device.height
     sizey = device.width
     zerox = sizex / 2
-    zeroy = 200    # not centered
+    if not fullcircle:
+        zeroy = 200    # not centered
+        max_pixel = 400
+    else:
+        zeroy = sizey / 2
+        max_pixel = sizey
     ah_zeroy = sizey / 2   # zero line for ahrs
     ah_zerox = sizex / 2
-    max_pixel = 400
     verylargefont = make_font("Font.ttc", VERYLARGE)
     morelargefont = make_font("Font.ttc", MORELARGE)
     largefont = make_font("Font.ttc", LARGE)               # font for height indications

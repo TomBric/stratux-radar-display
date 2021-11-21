@@ -63,6 +63,7 @@ def bluez_init():
 
     rlog = logging.getLogger('stratux-radar-log')
     bus = pydbus.SystemBus()
+
     if bus is None:
         rlog.debug("Systembus not received")
         return False
