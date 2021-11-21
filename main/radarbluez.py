@@ -33,7 +33,7 @@
 
 
 import re
-import pydbus
+from pydbus import SystemBus
 import logging
 from espeakng import ESpeakNG
 import subprocess
