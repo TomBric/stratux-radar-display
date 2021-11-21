@@ -487,7 +487,7 @@ async def listen_forever(path, name, callback, local_log):
                         callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
-        except (socket.error, websockets.exceptions.WebSocketException, asyncio.CancelledError):
+        except (socket.error, websockets.exceptions.WebSocketException, asyncio.CancelledError, asyncio.TimeoutError):
             local_log.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
                 situation['connected'] = False
