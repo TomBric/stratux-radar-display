@@ -667,10 +667,12 @@ async def display_and_cutoff():
         rlog.debug("Display task terminating ...")
 
 
-async def courotines():
-    await asyncio.wait([listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog),
-                        listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog),
-                        display_and_cutoff(), user_interface()])
+async def coroutines():
+    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
+    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+    dis_cutoff = asyncio.create_task(display_and_cutoff())
+    u_interface = asyncio.create_task(user_interface())
+    await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface])
 
 
 def main():
@@ -693,7 +695,7 @@ def main():
     stratuxstatus.init(display_control, url_status_ws)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
-        asyncio.run(courotines())
+        asyncio.run(coroutines())
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
 
