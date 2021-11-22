@@ -701,7 +701,7 @@ def main():
 
 
 def quit_gracefully(*args):
-    print("Keyboard interrupt. Quitting ...")
+    print("Keyboard interrupt or shutdown. Quitting ...")
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
@@ -779,6 +779,7 @@ if __name__ == "__main__":
 
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
+        signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown
         main()
     except KeyboardInterrupt:
         pass
