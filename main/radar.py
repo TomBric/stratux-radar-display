@@ -563,7 +563,6 @@ async def user_interface():
                     ui_changed = True
     except asyncio.CancelledError:
         rlog.debug("UI task terminating ...")
-        rlog.debug("Display task terminating ...")
 
 
 async def display_and_cutoff():
@@ -704,12 +703,12 @@ def main():
 
 
 def quit_gracefully(*args):
+    rlog.debug("CleanUp Display ...")
+    display_control.cleanup()
     print("Keyboard interrupt or shutdown. Quitting ...")
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
-    rlog.debug("CleanUp Display ...")
-    display_control.cleanup()
     return 0
 
 
