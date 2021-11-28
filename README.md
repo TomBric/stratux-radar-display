@@ -91,7 +91,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
 
    
    ### Installation on a standard stratux device (for stratux versions eu027 or newer!)
-   stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. 
+   stratux-radar-display can run also directly on your stratux device. You can find an example of a case with everything installed in the [wiki](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display)). Connect the displays to the GPIO pins of the Stratux. 
    Installation is only for expert users! To install the software perform the following steps:
    
    1. Connect your stratux to a network, e.g. by integrating into your WLAN: go to "Settings" and add your local wifi network.
