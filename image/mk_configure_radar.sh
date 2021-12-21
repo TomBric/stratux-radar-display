@@ -5,7 +5,11 @@
 # called via qemu
 
 # remove desktop packages
-apt purge xserver* lightdm* vlc* lxde* chromium* desktop* gnome* gstreamer* gtk* hicolor-icon-theme* lx* mesa* -y
+apt purge xserver* lightdm* vlc* lxde* chromium* desktop* gnome* gstreamer* gtk* hicolor-icon-theme* lx* mesa* \
+python3-pygame pocketsphinx-en-us libllvm11 libgtk-3-common libflite1 libgtk2.0-common poppler-data \
+libqt5gui5 qttranslations5-l10n libc6-dbg geany-common gdb libqt5core5a libstdc++-10-dev libgcc-10-dev python3-jedi \
+libpython3.9-dev -y
+apt-get remove realvnc-vnc-server -y
 apt-get autoremove -y
 
 # luma files and more
@@ -30,10 +34,10 @@ apt purge piwiz -y
 # necessary to disable bluetoothmessage "To turn on ..."
 
 # get files from repo
-sudo -u pi cd /home/pi && git clone https://github.com/TomBric/stratux-radar-display.git
+cd /home/pi && git clone https://github.com/TomBric/stratux-radar-display.git
 
-# include autostart into crontab, so that radar starts on every boot
-sudo -u pi echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -
+# include autostart into crontab of pi, so that radar starts on every boot
+echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
 # only works if crontab is empty, otherwise use
 # crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
 
