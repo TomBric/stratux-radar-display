@@ -12,6 +12,7 @@ BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_armhf/images/raspios_a
 ZIPNAME="2021-10-30-raspios-bullseye-armhf.zip"
 IMGNAME="${ZIPNAME%.*}.img"
 TMPDIR="$HOME/stratux-tmp"
+DISPLAY_SRC=home/pi
 
 
 die() {
@@ -60,10 +61,10 @@ mkdir -p mnt
 mount -t ext4 ${lo}p2 mnt/ || die "root-mount failed"
 mount -t vfat ${lo}p1 mnt/boot || die "boot-mount failed"
 
-cd mnt/home/pi/
+cd mnt/$DISPLAY_SRC
 git clone --recursive -b $2 https://github.com/TomBric/stratux-radar-display.git
 cd ../../../
-chroot mnt /bin/bash home/pi/stratux-radar-display/image/mk_configure_radar.sh
+chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh
 mkdir -p out
 
 # Move the selfupdate file out of there..
@@ -93,18 +94,16 @@ outname="stratux-display-$(git describe --tags --abbrev=0)-$(git log -n 1 --pret
 cd $TMPDIR
 
 # Rename and zip EU version
-mv $IMGNAME $outname
-zip out/$outname.zip $outname
+mv $IMGNAME $outname_oled
+zip out/$outname_oled.zip $outname_oled
 
 
-# Now create US default config into the image and create the eu-us version..
-if [ "$3" == "us" ]; then
-    mount -t vfat -o offset=$bootoffset $outname mnt/ || die "boot-mount failed"
-    echo '{"UAT_Enabled": true,"OGN_Enabled": false,"DeveloperMode": false}' > mnt/stratux.conf
-    umount mnt
-    mv $outname $outname_us
-    zip out/$outname_us.zip $outname_us
-fi
+# Now create epaper version.
+mount -t vfat -o offset=$bootoffset $outname mnt/ || die "boot-mount failed"
+sed -i 's/Oled_1in5/Epaper_3in7/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
+umount mnt
+mv $outname $outname_epaper
+zip out/$outname_epaper.zip $outname_epaper
 
 
 echo "Final images has been placed into $TMPDIR/out. Please install and test the image."

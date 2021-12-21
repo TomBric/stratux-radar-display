@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# script configures basic libraries necessary for stratux-radar
+# script configures basic libraries and settings necessary for stratux-radar
 # script to be run as root
 # called via qemu
 
@@ -64,5 +64,5 @@ systemctl --system enable pulseaudio.service
 # systemctl --system start pulseaudio.service
 
 # enable spi
-# raspi-config nonint do_spi 0
+raspi-config nonint do_spi 0
 
