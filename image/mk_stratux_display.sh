@@ -63,7 +63,7 @@ mount -t vfat ${lo}p1 mnt/boot || die "boot-mount failed"
 cd mnt/home/pi/
 git clone --recursive -b $2 https://github.com/TomBric/stratux-radar-display.git
 cd ../../../
-chroot mnt /bin/bash -c /home/pi/stratux-radar-display/image/mk_configure_radar.sh
+chroot mnt /bin/bash /home/pi/stratux-radar-display/image/mk_configure_radar.sh
 mkdir -p out
 
 # Move the selfupdate file out of there..
