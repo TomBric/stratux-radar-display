@@ -14,8 +14,8 @@ set -x
 BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-11-08/2021-10-30-raspios-bullseye-armhf.zip"
 ZIPNAME="2021-10-30-raspios-bullseye-armhf.zip"
 IMGNAME="${ZIPNAME%.*}.img"
-TMPDIR="home/pi/stratux-display-tmp"
-DISPLAY_SRC=home/pi
+TMPDIR="/home/pi/stratux-display-tmp"
+DISPLAY_SRC="home/pi"
 
 
 die() {
