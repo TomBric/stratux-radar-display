@@ -254,7 +254,7 @@ def draw_status(draw, display_control, bluetooth_active):
         headline = "Options"
         subline = "Please select ..."
         text = "\nExternal sound volume?   " + str(global_config['sound_volume'])
-        display_control.text_screen(draw, headline, subline, text, "-", "Canc", "+")
+        display_control.text_screen(draw, headline, subline, text, "-", "Set", "+")
     display_control.display()
 
 
@@ -563,12 +563,12 @@ def user_input(bluetooth_active):
             if global_config['sound_volume'] < 100:
                 global_config['sound_volume'] += 1
             write_config(global_config)
-            status_mode = 3
+            status_mode = 14
         if button == 0 and btime == 1:  # -, decrease
             if global_config['sound_volume'] > 0:
                 global_config['sound_volume'] -= 1
             write_config(global_config)
-            status_mode = 3
+            status_mode = 14
         if button == 1 and btime == 1:  # cancel
             status_mode = 3
 
