@@ -94,20 +94,20 @@ truncate -s $(($bytesEnd + 4096)) $IMGNAME
 
 
 cd $SRCDIR
-outname="stratux-display-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
+outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
+outprefix="stratux-display"
 cd $TMPDIR
 
-# Rename and zip EU version
-mv $IMGNAME ${outname}_oled
-zip out/${outname}_oled.zip ${outname}_oled
+# Rename and zip oled version
+mv $IMGNAME ${outprefix}_oled${outname}
+zip out/${outprefix}-oled${outname}.zip ${outprefix}-oled${outname}
 
 
 # Now create epaper version.
-mount -t vfat -o offset=$bootoffset $outname mnt/ || die "boot-mount failed"
+mount -t vfat -o offset=$bootoffset ${outprefix}-oled${outname} mnt/ || die "boot-mount failed"
 sed -i 's/Oled_1in5/Epaper_3in7/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 umount mnt
-mv $outname ${outname}_epaper
-zip out/${outname_epaper}.zip ${outname}_epaper
-
+mv $${outprefix}-oled${outname} ${outprefix}-epaper${outname}
+zip out/${outprefix}-epaper${outname}.zip ${outprefix}-epaper${outname}
 
 echo "Final images have been placed into $TMPDIR/out. Please install and test the image."
