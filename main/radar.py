@@ -771,7 +771,7 @@ if __name__ == "__main__":
         global_mode = 15  # start in stratux-status
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
-    if args['ext-sound']>=0 and args['ext-sound']<=100:
+    if args['extsound']>=0 and args['extsound']<=100:
         global_config['sound_volume'] = args['extsound']
     else:
         global_config['sound_volume'] = 50    # default value if incorrect number specified
