@@ -6,6 +6,9 @@
 # If you want to build on x86 with aarch64 emulation, additionally install qemu-user-static qemu-system-arm
 # Run this script as root.
 # Run with argument "dev" to not clone the stratux repository from remote, but instead copy this current local checkout onto the image
+# call examples:
+#   sudo /bin/bash mk_stratux_display.sh "Create failed" dev
+#   sudo /bin/bash mk_stratux_display.sh "Create failed" main
 
 set -x
 BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-11-08/2021-10-30-raspios-bullseye-armhf.zip"
@@ -21,7 +24,7 @@ die() {
 }
 
 if [ "$#" -lt 2 ]; then
-    echo "Usage: " $0 " dev|prod branch [us]"
+    echo "Usage: " $0 "  <fail output> dev|main"
     exit 1
 fi
 
