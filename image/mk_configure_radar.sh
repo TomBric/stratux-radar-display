@@ -65,4 +65,5 @@ systemctl --system enable pulseaudio.service
 
 # enable spi
 raspi-config nonint do_spi 0
+echo "mk_configure_radar.sh finished"
 

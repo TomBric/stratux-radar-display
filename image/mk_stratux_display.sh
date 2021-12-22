@@ -11,7 +11,7 @@ set -x
 BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-11-08/2021-10-30-raspios-bullseye-armhf.zip"
 ZIPNAME="2021-10-30-raspios-bullseye-armhf.zip"
 IMGNAME="${ZIPNAME%.*}.img"
-TMPDIR="$HOME/stratux-tmp"
+TMPDIR="home/pi/stratux-display-tmp"
 DISPLAY_SRC=home/pi
 
 
@@ -67,8 +67,9 @@ cd ../../../
 chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh
 mkdir -p out
 
-# Move the selfupdate file out of there..
-mv mnt/root/update-*.sh out
+# copy wpa_config and create empty ssh
+cp mnt/root/$DISPLAY_SRC/stratux-radar-display/image/wpa_supplicant.conf mnt/boot
+touch mnt/boot/ssh
 
 umount mnt/boot
 umount mnt
@@ -94,16 +95,16 @@ outname="stratux-display-$(git describe --tags --abbrev=0)-$(git log -n 1 --pret
 cd $TMPDIR
 
 # Rename and zip EU version
-mv $IMGNAME $outname_oled
-zip out/$outname_oled.zip $outname_oled
+mv $IMGNAME ${outname}_oled
+zip out/${outname}_oled.zip ${outname}_oled
 
 
 # Now create epaper version.
 mount -t vfat -o offset=$bootoffset $outname mnt/ || die "boot-mount failed"
 sed -i 's/Oled_1in5/Epaper_3in7/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 umount mnt
-mv $outname $outname_epaper
-zip out/$outname_epaper.zip $outname_epaper
+mv $outname ${outname}_epaper
+zip out/${outname_epaper}.zip ${outname}_epaper
 
 
-echo "Final images has been placed into $TMPDIR/out. Please install and test the image."
+echo "Final images have been placed into $TMPDIR/out. Please install and test the image."
