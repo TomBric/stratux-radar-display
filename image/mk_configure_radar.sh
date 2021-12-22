@@ -2,7 +2,7 @@
 
 # script configures basic libraries and settings necessary for stratux-radar
 # script to be run as root
-# called via qemu
+# called via configure_radar as sudo auch via qemu
 
 # remove desktop packages
 apt purge xserver* lightdm* vlc* lxde* chromium* desktop* gnome* gstreamer* gtk* hicolor-icon-theme* lx* mesa* \
@@ -65,5 +65,5 @@ systemctl --system enable pulseaudio.service
 
 # enable spi
 raspi-config nonint do_spi 0
-echo "mk_configure_radar.sh finished"
+echo "Radar configuration finished"
 
