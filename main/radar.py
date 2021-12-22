@@ -741,7 +741,7 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (Epaper only)",
                     action="store_true", default=False)
-    ap.add_argument("-y", "--extsound", required=False, help="Set external sound volume [0-100]", default=50)
+    ap.add_argument("-y", "--extsound", type=int, required=False, help="Set external sound volume [0-100]", default=50)
     args = vars(ap.parse_args())
     # set up logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
