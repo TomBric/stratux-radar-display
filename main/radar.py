@@ -741,6 +741,7 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (Epaper only)",
                     action="store_true", default=False)
+    ap.add_argument("-y", "--ext-sound", required=False, help="Set external sound volume [0-100]", default=50)
     args = vars(ap.parse_args())
     # set up logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
@@ -770,6 +771,11 @@ if __name__ == "__main__":
         global_mode = 15  # start in stratux-status
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speak-distance']  # display registration if set
+    if args['ext-sound']>=0 and args['ext-sound']<=100:
+        global_config['sound_volume'] = args['ext-sound']
+    else:
+        global_config['sound_volume'] = 50    # default value if incorrect number specified
+
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()
@@ -780,6 +786,8 @@ if __name__ == "__main__":
             global_config['display_tail'] = saved_config['display_tail']
         if 'distance_warnings' in saved_config:
             global_config['distance_warnings'] = saved_config['distance_warnings']
+        if 'sound_volume' in saved_config:
+            global_config['sound_volume'] = saved_config['sound_volume']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_status_ws = "ws://" + url_host_base + "/status"

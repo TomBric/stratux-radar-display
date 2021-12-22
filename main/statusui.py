@@ -243,8 +243,18 @@ def draw_status(draw, display_control, bluetooth_active):
     elif status_mode == 12:   # Options Registration
         headline = "Options"
         subline = "Please select ..."
-        text = "Show registration?"
+        text = "\nShow registration?"
         display_control.text_screen(draw, headline, subline, text, "Yes", "Canc", "No")
+    elif status_mode == 13:   # Options speak distance warning
+        headline = "Options"
+        subline = "Please select ..."
+        text = "\nSpeak distance?"
+        display_control.text_screen(draw, headline, subline, text, "Yes", "Canc", "No")
+    elif status_mode == 14:   # set sound warnings
+        headline = "Options"
+        subline = "Please select ..."
+        text = "\nExternal sound volume?   " + str(global_config['sound_volume'])
+        display_control.text_screen(draw, headline, subline, text, "-", "Canc", "+")
     display_control.display()
 
 
@@ -530,12 +540,37 @@ def user_input(bluetooth_active):
         if button == 2 and btime == 1:  # No, do not display registration
             global_config['display_tail'] = False
             write_config(global_config)
-            status_mode = 3
+            status_mode = 13
         if button == 0 and btime == 1:  # yes, do  display registration
             global_config['display_tail'] = True
+            write_config(global_config)
+            status_mode = 13
+        if button == 1 and btime == 1:  # cancel
+            status_mode = 13
+    elif status_mode == 13:  # Set Options Speak Distance
+        if button == 2 and btime == 1:  # No, do not display registration
+            global_config['distance_warnings'] = False
+            write_config(global_config)
+            status_mode = 14
+        if button == 0 and btime == 1:  # yes, do  display registration
+            global_config['distance_warnings'] = True
+            write_config(global_config)
+            status_mode = 14
+        if button == 1 and btime == 1:  # cancel
+            status_mode = 14
+    elif status_mode == 14:  # External Sound Volume
+        if button == 2 and btime == 1:  # +, increase
+            if global_config['sound_volume'] < 100:
+                global_config['sound_volume'] += 1
+            write_config(global_config)
+            status_mode = 3
+        if button == 0 and btime == 1:  # -, decrease
+            if global_config['sound_volume'] > 0:
+                global_config['sound_volume'] -= 1
             write_config(global_config)
             status_mode = 3
         if button == 1 and btime == 1:  # cancel
             status_mode = 3
+
 
     return 7  # no mode change
