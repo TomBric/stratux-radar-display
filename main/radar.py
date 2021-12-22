@@ -200,7 +200,7 @@ def calc_gps_distance(lat, lng):
     return distradius, angle
 
 
-def speaktraffic(hdiff, direction=None):
+def speaktraffic(hdiff, direction=None, distance=None):
     if sound_on:
         feet = hdiff * 100
         sign = 'plus'
@@ -210,6 +210,11 @@ def speaktraffic(hdiff, direction=None):
         if direction:
             txt += str(direction) + ' o\'clock '
         txt += sign + ' ' + str(abs(feet)) + ' feet'
+        if direction:
+            txt += str(distance) + ' miles '
+        txt += sign + ' ' + str(abs(feet)) + ' feet'
+        if global_config['distance_warnings'] and distance:
+            txt += str(distance) + ' miles '
         radarbluez.speak(txt)
 
 
@@ -284,7 +289,7 @@ def new_traffic(json_str):
                 if oclock > 12:
                     oclock -= 12
                 if not ac['was_spoken']:
-                    speaktraffic(ac['height'], oclock)
+                    speaktraffic(ac['height'], oclock, round(gps_rad))
                     ac['was_spoken'] = True
             else:
                 # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
@@ -313,7 +318,7 @@ def new_traffic(json_str):
 
         if ac['gps_distance'] <= situation['RadarRange'] / 2:
             if not ac['was_spoken']:
-                speaktraffic(ac['height'])
+                speaktraffic(ac['height'], round(ac['gps_distance']))
                 ac['was_spoken'] = True
         else:
             # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
@@ -717,6 +722,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Stratux web radar for separate displays')
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
+    ap.add_argument("-sd", "--speak-distance", required=False, help="Speech with distance", action='store_true',
+                    default=False)
     ap.add_argument("-n", "--north", required=False, help="Ground mode: always display north up", action='store_true',
                     default=False)
     ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
@@ -762,6 +769,7 @@ if __name__ == "__main__":
     if args['strx']:
         global_mode = 15  # start in stratux-status
     global_config['display_tail'] = args['registration']  # display registration if set
+    global_config['distance_warnings'] = args['speak-distance']  # display registration if set
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()
@@ -770,6 +778,8 @@ if __name__ == "__main__":
             url_host_base = saved_config['stratux_ip']  # set stratux ip if interactively changed one time
         if 'display_tail' in saved_config:
             global_config['display_tail'] = saved_config['display_tail']
+        if 'distance_warnings' in saved_config:
+            global_config['distance_warnings'] = saved_config['distance_warnings']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_status_ws = "ws://" + url_host_base + "/status"

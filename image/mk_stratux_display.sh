@@ -110,7 +110,7 @@ sed -i 's/Epaper_3in7/TEMP_EP/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/st
 sed -i 's/Oled_1in5/Epaper_3in7 -r/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 sed -i 's/TEMP_EP/Oled_1in5/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 umount mnt
-mv $${outprefix}-oled${outname} ${outprefix}-epaper${outname}
+mv ${outprefix}-oled${outname} ${outprefix}-epaper${outname}
 zip out/${outprefix}-epaper${outname}.zip ${outprefix}-epaper${outname}
 
-echo "Final images have been placed into $TMPDIR/out. Please install and test the image."
+echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
