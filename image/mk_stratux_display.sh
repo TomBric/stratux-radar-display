@@ -99,13 +99,16 @@ outprefix="stratux-display"
 cd $TMPDIR
 
 # Rename and zip oled version
-mv $IMGNAME ${outprefix}_oled${outname}
+mv $IMGNAME ${outprefix}-oled${outname}
 zip out/${outprefix}-oled${outname}.zip ${outprefix}-oled${outname}
 
 
 # Now create epaper version.
-mount -t vfat -o offset=$bootoffset ${outprefix}-oled${outname} mnt/ || die "boot-mount failed"
-sed -i 's/Oled_1in5/Epaper_3in7/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
+mount -t ext4 -o offset=$partoffset ${outprefix}-oled${outname} mnt/ || die "root-mount failed"
+# save old command line to put it back to oled later
+sed -i 's/Epaper_3in7/TEMP_EP/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
+sed -i 's/Oled_1in5/Epaper_3in7 -r/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
+sed -i 's/TEMP_EP/Oled_1in5/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 umount mnt
 mv $${outprefix}-oled${outname} ${outprefix}-epaper${outname}
 zip out/${outprefix}-epaper${outname}.zip ${outprefix}-epaper${outname}
