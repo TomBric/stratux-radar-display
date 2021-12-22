@@ -722,7 +722,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Stratux web radar for separate displays')
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
     ap.add_argument("-s", "--speak", required=False, help="Speech warnings on", action='store_true', default=False)
-    ap.add_argument("-sd", "--speak-distance", required=False, help="Speech with distance", action='store_true',
+    ap.add_argument("-sd", "--speakdistance", required=False, help="Speech with distance", action='store_true',
                     default=False)
     ap.add_argument("-n", "--north", required=False, help="Ground mode: always display north up", action='store_true',
                     default=False)
@@ -741,7 +741,7 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (Epaper only)",
                     action="store_true", default=False)
-    ap.add_argument("-y", "--ext-sound", required=False, help="Set external sound volume [0-100]", default=50)
+    ap.add_argument("-y", "--extsound", required=False, help="Set external sound volume [0-100]", default=50)
     args = vars(ap.parse_args())
     # set up logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
@@ -770,9 +770,9 @@ if __name__ == "__main__":
     if args['strx']:
         global_mode = 15  # start in stratux-status
     global_config['display_tail'] = args['registration']  # display registration if set
-    global_config['distance_warnings'] = args['speak-distance']  # display registration if set
+    global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     if args['ext-sound']>=0 and args['ext-sound']<=100:
-        global_config['sound_volume'] = args['ext-sound']
+        global_config['sound_volume'] = args['extsound']
     else:
         global_config['sound_volume'] = 50    # default value if incorrect number specified
 
