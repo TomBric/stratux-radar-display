@@ -780,7 +780,6 @@ if __name__ == "__main__":
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     if args['extsound']>=0 and args['extsound']<=100:
         global_config['sound_volume'] = args['extsound']
-    sound_mixer = args['mixer']
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()
