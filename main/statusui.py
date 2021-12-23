@@ -76,6 +76,7 @@ new_pass = DEFAULT_PASS
 new_stratux_ip = stratux_ip
 charpos = 0         # position of current input char
 
+
 def read_config():
     try:
         with open(CONFIG_FILE) as f:
@@ -131,7 +132,7 @@ def get_status():
     return status_answer
 
 
-def draw_status(draw, display_control, bluetooth_active):
+def draw_status(draw, display_control, bluetooth_active, extsound_active):
     global status_mode
     global last_status_get
     global left
@@ -385,7 +386,7 @@ def string_to_ipv4(ipv4str):
     return ipaddr
 
 
-def user_input(bluetooth_active):
+def user_input(extsound_active, bluetooth_active):
     global left
     global middle
     global right
@@ -558,24 +559,26 @@ def user_input(bluetooth_active):
         if button == 1 and btime == 1:  # cancel
             status_mode = 14
     elif status_mode == 14:  # External Sound Volume
-        if button == 2 and btime == 1:  # +, increase
-            global_config['sound_volume'] += 5
-            if global_config['sound_volume'] > 100:
-                global_config['sound_volume'] = 100
-            radarbluez.setvolume(global_config['sound_volume'])
-            radarbluez.speak("Test")
-            write_config(global_config)
-            status_mode = 14
-        if button == 0 and btime == 1:  # -, decrease
-            global_config['sound_volume'] -= 5
-            if global_config['sound_volume'] < 0:
-                global_config['sound_volume'] = 0
-            radarbluez.setvolume(global_config['sound_volume'])
-            radarbluez.speak("Test")
-            write_config(global_config)
-            status_mode = 14
-        if button == 1 and btime == 1:  # cancel
+        if extsound_active:  # only enter, when external sound is active
+            if button == 2 and btime == 1:  # +, increase
+                global_config['sound_volume'] += 5
+                if global_config['sound_volume'] > 100:
+                    global_config['sound_volume'] = 100
+                radarbluez.setvolume(global_config['sound_volume'])
+                radarbluez.speak("Test")
+                write_config(global_config)
+                status_mode = 14
+            if button == 0 and btime == 1:  # -, decrease
+                global_config['sound_volume'] -= 5
+                if global_config['sound_volume'] < 0:
+                    global_config['sound_volume'] = 0
+                radarbluez.setvolume(global_config['sound_volume'])
+                radarbluez.speak("Test")
+                write_config(global_config)
+                status_mode = 14
+            if button == 1 and btime == 1:  # cancel
+                status_mode = 3
+        else:  # no extsound active
             status_mode = 3
-
 
     return 7  # no mode change
