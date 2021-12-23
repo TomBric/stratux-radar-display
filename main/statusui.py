@@ -76,7 +76,6 @@ new_pass = DEFAULT_PASS
 new_stratux_ip = stratux_ip
 charpos = 0         # position of current input char
 
-
 def read_config():
     try:
         with open(CONFIG_FILE) as f:
@@ -254,7 +253,7 @@ def draw_status(draw, display_control, bluetooth_active):
         headline = "Options"
         subline = "Please select ..."
         text = "\nExternal sound volume?   " + str(global_config['sound_volume'])
-        display_control.text_screen(draw, headline, subline, text, "-", "Set", "+")
+        display_control.text_screen(draw, headline, subline, text, "-5", "Set", "+5")
     display_control.display()
 
 
@@ -560,13 +559,19 @@ def user_input(bluetooth_active):
             status_mode = 14
     elif status_mode == 14:  # External Sound Volume
         if button == 2 and btime == 1:  # +, increase
-            if global_config['sound_volume'] < 100:
-                global_config['sound_volume'] += 1
+            global_config['sound_volume'] += 5
+            if global_config['sound_volume'] > 100:
+                global_config['sound_volume'] = 100
+            radarbluez.setvolume(global_config['sound_volume'])
+            radarbluez.speak("Test")
             write_config(global_config)
             status_mode = 14
         if button == 0 and btime == 1:  # -, decrease
-            if global_config['sound_volume'] > 0:
-                global_config['sound_volume'] -= 1
+            global_config['sound_volume'] -= 5
+            if global_config['sound_volume'] < 0:
+                global_config['sound_volume'] = 0
+            radarbluez.setvolume(global_config['sound_volume'])
+            radarbluez.speak("Test")
             write_config(global_config)
             status_mode = 14
         if button == 1 and btime == 1:  # cancel

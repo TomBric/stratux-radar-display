@@ -87,6 +87,7 @@ url_status_ws = ""
 url_settings_set = ""
 url_status_get = ""
 device = ""
+sound_mixer = None
 draw = None
 all_ac = {}
 aircraft_changed = True
@@ -121,7 +122,7 @@ global_mode = 1
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
 # 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
 # 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status 0=Init
-bluetooth_active = False
+sound_active = False
 optical_alive = -1
 
 
@@ -536,7 +537,7 @@ async def user_interface():
             elif global_mode == 5:  # ahrs
                 next_mode = ahrsui.user_input()
             elif global_mode == 7:  # status
-                next_mode = statusui.user_input(bluetooth_active)
+                next_mode = statusui.user_input(sound_active)
             elif global_mode == 9:  # gmeter
                 next_mode = gmeterui.user_input()
             elif global_mode == 11:  # compass
@@ -608,7 +609,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 5
                 elif global_mode == 7:  # status display
-                    statusui.draw_status(draw, display_control, bluetooth_active)
+                    statusui.draw_status(draw, display_control, sound_active)
                 elif global_mode == 8:  # refresh display, only relevant for epaper, mode was status
                     rlog.debug("Status: Display driver - Refreshing")
                     display_control.refresh()
@@ -688,13 +689,13 @@ def main():
     global zeroy
     global draw
     global display_refresh_time
-    global bluetooth_active
+    global sound_active
 
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
     radarui.init(url_settings_set)
     shutdownui.init(url_shutdown, url_reboot)
     if speak:
-        bluetooth_active = radarbluez.bluez_init()
+        sound_active = radarbluez.sound_init(sound_mixer, global_config)
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
     ahrsui.init(display_control)
     statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
@@ -741,7 +742,8 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (Epaper only)",
                     action="store_true", default=False)
-    ap.add_argument("-y", "--extsound", type=int, required=False, help="Set external sound volume [0-100]", default=50)
+    ap.add_argument("-y", "--extsound", type=int, required=False, help="Set external sound volume [0-100]", default=0)
+    ap.add_argument("-m", "--mixer", required=False, help="Sound mixer name")
     args = vars(ap.parse_args())
     # set up logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
@@ -775,7 +777,7 @@ if __name__ == "__main__":
         global_config['sound_volume'] = args['extsound']
     else:
         global_config['sound_volume'] = 50    # default value if incorrect number specified
-
+    sound_mixer = args['mixer']
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()

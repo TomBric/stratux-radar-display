@@ -22,9 +22,9 @@ pip3 install luma.oled
 #websockets for radar
 pip3 install websockets
 
-# espeak-ng for sound output
+# espeak-ng for sound output and alsoaudio for external sound
 apt-get install espeak-ng espeak-ng-data libespeak-ng-dev -y
-pip3 install py-espeak-ng
+pip3 install py-espeak-ng pyalsaaudio
 
 # bluetooth configs
 apt-get install libbluetooth-dev -y

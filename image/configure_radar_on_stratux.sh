@@ -12,6 +12,10 @@ sudo pip3 install luma.oled
 #websockets for radar
 sudo pip3 install websockets
 
+# sound configuration for external output
+sudo apt-get install libasound2-dev
+sudo pip3 install pyalsaaudio
+
 # espeak-ng for sound output
 # sudo apt-get update
 sudo apt-get install espeak-ng espeak-ng-data libespeak-ng-dev -y

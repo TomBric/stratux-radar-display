@@ -37,6 +37,7 @@ import pydbus
 import logging
 from espeakng import ESpeakNG
 import subprocess
+import alsaaudio
 
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
@@ -49,7 +50,37 @@ manager = None
 adapter = None
 esng = None
 bluetooth_active = False
+extsound_active = False
+sound_volume = 0
 bt_devices = 0          # no of active bluetooth devices last time checked via connected devices
+
+def sound_init(mixername, config):
+    global bluetooth_active
+    global extsound_active
+    global esng
+
+    bluez_init()
+    try:
+        mixer = alsaaudio.Mixer(mixername)
+    except alsaaudio.ALSAAudioError:
+        rlog.debug("Radarbluez: Error: could not get mixer '" + mixername + "'")
+
+    if mixer:
+        extsound_active = True
+        mixer.setvolume(config['sound_volume'])
+        rlog.debug("Radarbluez: External sound initialized")
+
+    if extsound_active or bluetooth_active:
+        if esng is None:
+            esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
+            if esng is None:
+                rlog.debug("Bluetooth: espeak-ng not initialized")
+                return False
+        rlog.debug("Bluetooth: espeak-ng successfully initialized.")
+        esng.say("Stratux Radar connected")
+        rlog.debug("SPEAK: Stratux Radar connected")
+        return True
+    return False
 
 
 def bluez_init():
@@ -75,21 +106,23 @@ def bluez_init():
         return False
     bluetooth_active = True
     connected_devices()     # check if already devices are connected
-    if esng is None:
-        esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-        if esng is None:
-            rlog.debug("Bluetooth: espeak-ng not initialized")
-            return True
-        rlog.debug("Bluetooth: espeak-ng successfully initialized.")
-    esng.say("Stratux Radar connected")
-    rlog.debug("SPEAK: Stratux Radar connected")
     return True
+
+
+def setvolume(new_volume):
+    global mixer
+    global sound_volume
+
+    if extsound_active:
+        mixer.setvolue(new_volume)
+        sound_volume = new_volume
 
 
 def speak(text):
     global esng
+    global global_config
 
-    if bluetooth_active and bt_devices > 0:
+    if global_config['sound_volume'] > 0 or (bluetooth_active and bt_devices > 0):
         if esng is None:   # first initialization failed
             esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
             if esng is None:
