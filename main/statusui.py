@@ -551,33 +551,34 @@ def user_input(extsound_active, bluetooth_active):
         if button == 2 and btime == 1:  # No, do not display registration
             global_config['distance_warnings'] = False
             write_config(global_config)
-            status_mode = 14
         if button == 0 and btime == 1:  # yes, do  display registration
             global_config['distance_warnings'] = True
             write_config(global_config)
+        if button == 1 and btime == 1:  # cancel
+            pass
+        if extsound_active:
+            status_mode = 14
+        else:
+            status_mode = 3
+    elif status_mode == 14:  # External Sound Volume
+        if button == 2 and btime == 1:  # +, increase
+            global_config['sound_volume'] += 5
+            if global_config['sound_volume'] > 100:
+                global_config['sound_volume'] = 100
+            radarbluez.setvolume(global_config['sound_volume'])
+            radarbluez.speak("Test")
+            write_config(global_config)
+            status_mode = 14
+        if button == 0 and btime == 1:  # -, decrease
+            global_config['sound_volume'] -= 5
+            if global_config['sound_volume'] < 0:
+                global_config['sound_volume'] = 0
+            radarbluez.setvolume(global_config['sound_volume'])
+            radarbluez.speak("Test")
+            write_config(global_config)
             status_mode = 14
         if button == 1 and btime == 1:  # cancel
-            status_mode = 14
-    elif status_mode == 14:  # External Sound Volume
-        if extsound_active:  # only enter, when external sound is active
-            if button == 2 and btime == 1:  # +, increase
-                global_config['sound_volume'] += 5
-                if global_config['sound_volume'] > 100:
-                    global_config['sound_volume'] = 100
-                radarbluez.setvolume(global_config['sound_volume'])
-                radarbluez.speak("Test")
-                write_config(global_config)
-                status_mode = 14
-            if button == 0 and btime == 1:  # -, decrease
-                global_config['sound_volume'] -= 5
-                if global_config['sound_volume'] < 0:
-                    global_config['sound_volume'] = 0
-                radarbluez.setvolume(global_config['sound_volume'])
-                radarbluez.speak("Test")
-                write_config(global_config)
-                status_mode = 14
-            if button == 1 and btime == 1:  # cancel
-                status_mode = 3
+            status_mode = 3
         else:  # no extsound active
             status_mode = 3
 
