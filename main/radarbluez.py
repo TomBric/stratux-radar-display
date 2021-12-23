@@ -81,7 +81,7 @@ def sound_init(config, bluetooth):
                     found = True
                     break
         if not found:
-            rlog.debug("Audio: Mixer "+ MIXERNAME + " not found.")
+            rlog.debug("Audio: Mixer '"+ MIXERNAME + "' not found.")
             return extsound_active, bluetooth_active
 
         try:
