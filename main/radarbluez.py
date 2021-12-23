@@ -64,7 +64,9 @@ def sound_init(config, bluetooth):
     global esng
     global mixer
     global cardno
+    global rlog
 
+    rlog = logging.getLogger('stratux-radar-log')
     if bluetooth:
         bluetooth_active = bluez_init()
     else:
@@ -118,7 +120,6 @@ def bluez_init():
     global bt_devices
     global rlog
 
-    rlog = logging.getLogger('stratux-radar-log')
     bus = pydbus.SystemBus()
 
     if bus is None:
