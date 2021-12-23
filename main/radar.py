@@ -699,7 +699,7 @@ def main():
     radarui.init(url_settings_set)
     shutdownui.init(url_shutdown, url_reboot)
     if speak:
-        extsound_active, bluetooth_active = radarbluez.sound_init(sound_mixer, global_config, bluetooth)
+        extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth)
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
     ahrsui.init(display_control)
     statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
