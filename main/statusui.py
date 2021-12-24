@@ -579,7 +579,5 @@ def user_input(extsound_active, bluetooth_active):
             status_mode = 14
         if button == 1 and btime == 1:  # cancel
             status_mode = 3
-        else:  # no extsound active
-            status_mode = 3
 
     return 7  # no mode change
