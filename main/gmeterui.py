@@ -80,6 +80,7 @@ def user_input():
     # start of gmeter global behaviour
     if btime == 0:
         return 0  # stay in current mode
+    rlog.debug("GMeter UI: button pressed")
     gmeterui_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return 11  # next mode to be compass
