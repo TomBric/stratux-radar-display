@@ -311,7 +311,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
             if sound_active:
                 t = "\uf028"  # volume symbol
             else:
-                t = "\uf6a9"  # volume off symbol
+                t = "\uf1f6"  # bell off symbol
         elif bt_devices > 0:
             if sound_active:
                 t = "\uf293"  # bluetooth symbol
