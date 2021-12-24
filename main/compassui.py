@@ -36,6 +36,7 @@ import radarbuttons
 # constants
 MSG_NO_CONNECTION = "No Connection!"
 # globals
+compassui_changed = True
 
 
 def init(url):
@@ -43,8 +44,11 @@ def init(url):
 
 
 def draw_compass(draw, display_control, changed, connected, heading):
-    if changed:
+    global compassui_changed
+
+    if changed or compassui_changed:
         error_message = None
+        compassui_changed = False
         if not connected:
             error_message = MSG_NO_CONNECTION
         display_control.clear(draw)
@@ -53,10 +57,13 @@ def draw_compass(draw, display_control, changed, connected, heading):
 
 
 def user_input():
+    global compassui_changed
+
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
     if btime == 0:
         return 0  # stay in current mode
+    compassui_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return 13  # next mode to be vsi
     if button == 0 and btime == 2:  # left and long

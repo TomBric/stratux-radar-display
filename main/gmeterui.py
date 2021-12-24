@@ -40,7 +40,7 @@ MSG_NO_CONNECTION = "No Connection!"
 # globals
 url_gmeter_reset = ""
 rlog = None
-gmeterui_changed = False
+gmeterui_changed = True
 
 
 def init(url):
