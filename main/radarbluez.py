@@ -69,32 +69,32 @@ def sound_init(config, bluetooth):
     rlog = logging.getLogger('stratux-radar-log')
     if bluetooth:
         bluetooth_active = bluez_init()
-        # do ext sound init in any case to reduce volume, if not selected
-        found = False
-        kwargs = {}
-        for cardno in alsaaudio.card_indexes():
-            kwargs = {'cardindex': cardno}
-            for m in alsaaudio.mixers(**kwargs):
-                rlog.debug("Audio: Available Card:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
-                if m == MIXERNAME:
-                    rlog.debug("Audio: Selected Mixer:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
-                    found = True
-                    break
-        if not found:
-            rlog.debug("Audio: Mixer '"+ MIXERNAME + "' not found.")
-            return extsound_active, bluetooth_active
+    # do ext sound init in any case to reduce volume, if not selected
+    found = False
+    kwargs = {}
+    for cardno in alsaaudio.card_indexes():
+        kwargs = {'cardindex': cardno}
+        for m in alsaaudio.mixers(**kwargs):
+            rlog.debug("Audio: Available Card:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
+            if m == MIXERNAME:
+                rlog.debug("Audio: Selected Mixer:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
+                found = True
+                break
+    if not found:
+        rlog.debug("Audio: Mixer '"+ MIXERNAME + "' not found.")
+        return extsound_active, bluetooth_active
 
-        try:
-            mixer = alsaaudio.Mixer(MIXERNAME, **kwargs)
-        except alsaaudio.ALSAAudioError:
-            rlog.debug("Radarbluez: Error: could not get mixer '" + MIXERNAME + "'")
+    try:
+        mixer = alsaaudio.Mixer(MIXERNAME, **kwargs)
+    except alsaaudio.ALSAAudioError:
+        rlog.debug("Radarbluez: Error: could not get mixer '" + MIXERNAME + "'")
 
-        if mixer:
-            mixer.setvolume(config['sound_volume'])
-            if config['sound_volume']>0:
-                extsound_active = True
-            rlog.debug("Radarbluez: External sound successfully initialized. Volume set to " +
-                       str(config['sound_volume']) + ".")
+    if mixer:
+        mixer.setvolume(config['sound_volume'])
+        if config['sound_volume']>0:
+            extsound_active = True
+        rlog.debug("Radarbluez: External sound successfully initialized. Volume set to " +
+                   str(config['sound_volume']) + ".")
 
     if extsound_active or bluetooth_active:
         if esng is None:
