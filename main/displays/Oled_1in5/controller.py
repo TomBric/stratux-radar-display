@@ -227,7 +227,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy, optical_alive, basemode):
+              gps_quality, gps_h_accuracy, optical_alive, basemode, extsound):
     draw.ellipse((0, 0, sizex - 1, sizey - 1), outline="floralwhite")
     draw.ellipse((sizex / 4, sizey / 4, zerox + sizex / 4, zeroy + sizey / 4), outline="floralwhite")
     draw.ellipse((zerox - 2, zeroy - 2, zerox + 2, zeroy + 2), outline="floralwhite")
@@ -251,13 +251,21 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     textsize = draw.textsize(text, smallfont)
     draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="floralwhite", align="right")
 
-    if bt_devices > 0:
-        if sound_active:
-            btcolor = "blue"
-            text = '\uf293'  # bluetooth symbol + no
-        else:
-            btcolor = "red"
-            text = '\uf1f6'  # bell off symbol
+    if extsound or bt_devices>0:
+        if extsound:
+            if sound_active:
+                btcolor = "blue"
+                t = "\uf028"  # volume symbol
+            else:
+                btcolor = "red"
+                t = "\uf1f6"  # bell off symbol
+        elif bt_devices > 0:
+            if sound_active:
+                btcolor = "blue"
+                text = '\uf293'  # bluetooth symbol + no
+            else:
+                btcolor = "red"
+                text = '\uf1f6'  # bell off symbol
         textsize = draw.textsize(text, webfont)
         draw.text((sizex - textsize[0], sizey - 2 * SMALL), text, font=webfont, fill=btcolor, align="right")
 
