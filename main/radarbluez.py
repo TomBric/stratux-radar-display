@@ -110,6 +110,8 @@ def sound_init(config, bluetooth):
         esng.say("Stratux Radar connected")
         rlog.debug("SPEAK: Stratux Radar connected")
 
+    rlog.debug("SoundInit: Bluetooth active " + str(bluetooth_active) + " ExtSound active "+ str(extsound_active) +
+               " ExtSound volume: " + str(config['sound_volume']) + ".")
     return extsound_active, bluetooth_active
 
 
