@@ -255,10 +255,10 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         if extsound:
             if sound_active:
                 btcolor = "blue"
-                t = "\uf028"  # volume symbol
+                text = "\uf028"  # volume symbol
             else:
                 btcolor = "red"
-                t = "\uf1f6"  # bell off symbol
+                text = "\uf1f6"  # bell off symbol
         elif bt_devices > 0:
             if sound_active:
                 btcolor = "blue"
