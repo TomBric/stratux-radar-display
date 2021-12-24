@@ -611,7 +611,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 5
                 elif global_mode == 7:  # status display
-                    statusui.draw_status(draw, display_control, extsound_active, bluetooth_active)
+                    statusui.draw_status(draw, display_control, bluetooth_active, extsound_active)
                 elif global_mode == 8:  # refresh display, only relevant for epaper, mode was status
                     rlog.debug("Status: Display driver - Refreshing")
                     display_control.refresh()
