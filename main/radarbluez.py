@@ -70,7 +70,7 @@ def sound_init(config, bluetooth):
     if bluetooth:
         bluetooth_active = bluez_init()
     else:
-        if global_config['sound_volume'] == 0:    # ext sound not activated via parameter or config
+        if config['sound_volume'] == 0:    # ext sound not activated via parameter or config
             return extsound_active, bluetooth_active
         found = False
         kwargs = {}
