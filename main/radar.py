@@ -162,6 +162,7 @@ def draw_display(draw):
     global aircraft_changed
     global ui_changed
     global optical_alive
+    global extsound_active
 
     rlog.debug("List of all aircraft > " + json.dumps(all_ac))
     new_alive = int((int(time.time()) % (OPTICAL_ALIVE_BARS * OPTICAL_ALIVE_TIME)) / OPTICAL_ALIVE_TIME)
@@ -172,7 +173,7 @@ def draw_display(draw):
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
                                   sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
-                                  basemode)
+                                  basemode, extsound_active)
         draw_all_ac(draw, all_ac)
         display_control.display()
         situation['was_changed'] = False
