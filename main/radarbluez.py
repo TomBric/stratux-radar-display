@@ -134,6 +134,7 @@ def bluez_init():
         rlog.debug("Bluetooth: BLUEZ-SERVICE not initialised")
         return False
     bluetooth_active = True
+    rlog.debug("Bluetooth: BLUEZ-SERVICE successfully activated.")
     connected_devices()     # check if already devices are connected
     return True
 
