@@ -575,7 +575,6 @@ def user_input(extsound_active, bluetooth_active):
                 global_config['sound_volume'] = 100
             radarbluez.setvolume(global_config['sound_volume'])
             radarbluez.speak("Test")
-            write_config(global_config)
             status_mode = 14
         if button == 0 and btime == 1:  # -, decrease
             global_config['sound_volume'] -= 5
@@ -583,9 +582,9 @@ def user_input(extsound_active, bluetooth_active):
                 global_config['sound_volume'] = 0
             radarbluez.setvolume(global_config['sound_volume'])
             radarbluez.speak("Test")
-            write_config(global_config)
             status_mode = 14
-        if button == 1 and btime == 1:  # cancel
+        if button == 1 and btime == 1:  # set
+            write_config(global_config)
             status_mode = 3
 
     return 7  # no mode change

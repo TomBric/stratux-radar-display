@@ -40,6 +40,7 @@ MSG_NO_CONNECTION = "No Connection!"
 # globals
 url_gmeter_reset = ""
 rlog = None
+gmeterui_changed = False
 
 
 def init(url):
@@ -60,7 +61,10 @@ def reset_gmeter():
 
 
 def draw_gmeter(draw, display_control, ui_changed, connected, gmeter):
-    if ui_changed or gmeter['was_changed']:
+    global gmeterui_changed
+
+    if ui_changed or gmeter['was_changed'] or gmeterui_changed:
+        gmeterui_changed = False
         error_message = None
         if not connected:
             error_message = MSG_NO_CONNECTION
@@ -70,10 +74,13 @@ def draw_gmeter(draw, display_control, ui_changed, connected, gmeter):
 
 
 def user_input():
+    global gmeterui_changed
+
     btime, button = radarbuttons.check_buttons()
-    # start of ahrs global behaviour
+    # start of gmeter global behaviour
     if btime == 0:
         return 0  # stay in current mode
+    gmeterui_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return 11  # next mode to be compass
     if button == 0 and btime == 2:  # left and long
