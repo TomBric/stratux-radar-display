@@ -69,9 +69,7 @@ def sound_init(config, bluetooth):
     rlog = logging.getLogger('stratux-radar-log')
     if bluetooth:
         bluetooth_active = bluez_init()
-    else:
-        if config['sound_volume'] == 0:    # ext sound not activated via parameter or config
-            return extsound_active, bluetooth_active
+        # do ext sound init in any case to reduce volume, if not selected
         found = False
         kwargs = {}
         for cardno in alsaaudio.card_indexes():
@@ -92,9 +90,11 @@ def sound_init(config, bluetooth):
             rlog.debug("Radarbluez: Error: could not get mixer '" + MIXERNAME + "'")
 
         if mixer:
-            extsound_active = True
             mixer.setvolume(config['sound_volume'])
-            rlog.debug("Radarbluez: External sound successfully initialized")
+            if config['sound_volume']>0:
+                extsound_active = True
+            rlog.debug("Radarbluez: External sound successfully initialized. Volume set to " +
+                       str(config['sound_volume']) + ".")
 
     if extsound_active or bluetooth_active:
         if esng is None:
