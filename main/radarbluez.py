@@ -52,7 +52,6 @@ adapter = None
 esng = None
 bluetooth_active = False
 extsound_active = False
-sound_volume = 0
 bt_devices = 0          # no of active bluetooth devices last time checked via connected devices
 mixer = None
 cardno = -1         # cardno where "Speaker" was detected, on Pi3B with USB typically 1
@@ -143,11 +142,8 @@ def bluez_init():
 
 def setvolume(new_volume):
     global mixer
-    global sound_volume
 
-    if extsound_active:
-        mixer.setvolue(new_volume)
-        sound_volume = new_volume
+    mixer.setvolume(new_volume)
 
 
 def speak(text):
