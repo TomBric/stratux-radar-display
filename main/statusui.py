@@ -80,7 +80,7 @@ charpos = 0         # position of current input char
 def read_config():
     global rlog
 
-    if rlog = None:   # may be called before init
+    if rlog == None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(CONFIG_FILE) as f:
@@ -94,7 +94,7 @@ def read_config():
 
 
 def write_config(config):
-    if rlog = None:   # may be called before init
+    if rlog == None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(CONFIG_FILE, 'wt') as out:
