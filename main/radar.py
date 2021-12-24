@@ -784,7 +784,6 @@ if __name__ == "__main__":
     url_host_base = args['connect']
     saved_config = statusui.read_config()
     if saved_config is not None:
-        rlog.debug("Local config found and in use:" + saved_config)
         if 'stratux_ip' in saved_config:
             url_host_base = saved_config['stratux_ip']  # set stratux ip if interactively changed one time
         if 'display_tail' in saved_config:
