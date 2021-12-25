@@ -49,7 +49,8 @@ rlog = None
 bus = None
 manager = None
 adapter = None
-esng = None
+b_esng = None
+e_esng = None
 bluetooth_active = False
 extsound_active = False
 bt_devices = 0          # no of active bluetooth devices last time checked via connected devices
@@ -80,7 +81,8 @@ def find_mixer():    # searches for a "Audio" mixer, independent whether it was 
 def sound_init(config, bluetooth):
     global bluetooth_active
     global extsound_active
-    global esng
+    global b_esng
+    global e_esng
     global mixer
     global rlog
 
@@ -99,22 +101,25 @@ def sound_init(config, bluetooth):
     if bluetooth:
         bluetooth_active = bluez_init()
 
-    if extsound_active or bluetooth_active:
-        if esng is None:
-            if bluetooth_active:
-                esng = ESpeakNG(voice='en-us', pitch=30, speed=175)  # pulseaudio then also uses speaker output
-            elif extsound_active:
-                audio = "plughw:" + str(card)
-                esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev=audio)
-            if esng is None:   # could not initialize esng
-                extsound_active = False
-                bluetooth_active = False
-                rlog.debug("Radarbluez: espeak-ng not initialized")
-                return extsound_active, bluetooth_active
-        rlog.debug("Radarbluez: espeak-ng successfully initialized.")
-        esng.say("Stratux Radar connected")
-        rlog.debug("SPEAK: Stratux Radar connected")
+    if bluetooth_active and b_esng is None:
+        b_esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
+        if b_esng is None:
+            rlog.debug("Radarbluez: Bluetooth espeak-ng not initialized")
+        else:
+            bluetooth_active = True
+            rlog.debug("Radarbluez: Bluetooth espeak-ng successfully initialized.")
+            b_esng.say("Stratux Radar connected")
 
+    if config['soundvolume']>=0 and e_esng is None:
+        audio = "plughw:" + str(card)
+        e_esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev=audio)
+        if e_esng is None:  # could not initialize esng
+            extsound_active = False
+            rlog.debug("Radarbluez: ExtSound espeak-ng not initialized")
+        else:
+            extsound_active = True
+            rlog.debug("Radarbluez: ExtSound espeak-ng successfully initialized.")
+            e_esng.say("Stratux Radar connected")
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
                " ExtSound volume: " + str(config['sound_volume']) + ".")
     return extsound_active, bluetooth_active
@@ -151,18 +156,20 @@ def setvolume(new_volume):
 
 
 def speak(text):
-    global esng
-    global extsound_active
+    global b_esng
+    global e_esng
 
-    if extsound_active or (bluetooth_active and bt_devices > 0):
-        if esng is None:   # first initialization failed, may happen with bluetooth, try again
-            esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-            if esng is None:
-                rlog.debug("Radarbluez: espeak-ng not initialized")
+    if extsound_active:
+        e_esng.say(text)
+    if bluetooth_active and bt_devices > 0:
+        if b_esng is None:   # first initialization failed, may happen with bluetooth, try again
+            b_esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
+            if b_esng is None:
+                rlog.debug("Radarbluez: Bluetooth espeak-ng not initialized")
                 return
-            rlog.debug("Radarbluez: espeak-ng successfully initialized.")
-        esng.say(text)
-        rlog.debug("Speak: "+text)
+            rlog.debug("Radarbluez: Bluetooth speak-ng successfully initialized.")
+        b_esng.say(text)
+    rlog.debug("Speak: "+text)
 
 
 def connected_devices():
