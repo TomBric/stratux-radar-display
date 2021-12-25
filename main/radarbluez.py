@@ -110,7 +110,7 @@ def sound_init(config, bluetooth):
             rlog.debug("Radarbluez: Bluetooth espeak-ng successfully initialized.")
             b_esng.say("Stratux Radar connected")
 
-    if config['soundvolume']>=0 and e_esng is None:
+    if config['sound_volume']>=0 and e_esng is None:
         audio = "plughw:" + str(card)
         e_esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev=audio)
         if e_esng is None:  # could not initialize esng
