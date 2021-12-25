@@ -65,51 +65,52 @@ def sound_init(config, bluetooth):
     global cardno
     global rlog
 
+    extsound_active = False
+    bluetooth_active = False
     rlog = logging.getLogger('stratux-radar-log')
     if bluetooth:
         bluetooth_active = bluez_init()
-    # do ext sound init in any case to reduce volume, if not selected
-    found = False
-    kwargs = {}
-    for cardno in alsaaudio.card_indexes():
-        kwargs = {'cardindex': cardno}
-        for m in alsaaudio.mixers(**kwargs):
-            rlog.debug("Audio: Available Card:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
-            if m == MIXERNAME:
-                rlog.debug("Audio: Selected Mixer:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
-                found = True
-                break
-    if not found:
-        rlog.debug("Audio: Mixer '"+ MIXERNAME + "' not found.")
-        return extsound_active, bluetooth_active
-
-    try:
-        mixer = alsaaudio.Mixer(MIXERNAME, **kwargs)
-    except alsaaudio.ALSAAudioError:
-        rlog.debug("Radarbluez: Error: could not get mixer '" + MIXERNAME + "'")
-
-    if mixer:
-        mixer.setvolume(config['sound_volume'])
-        if config['sound_volume']>0:
-            extsound_active = True
-        rlog.debug("Radarbluez: External sound successfully initialized. Volume set to " +
-                   str(config['sound_volume']) + ".")
+    if config['sound_volume'] >= 0:   # only try to initalize if sound volume was set
+        found = False
+        kwargs = {}
+        for cardno in alsaaudio.card_indexes():
+            kwargs = {'cardindex': cardno}
+            for m in alsaaudio.mixers(**kwargs):
+                rlog.debug("Audio: Available Card:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
+                if m == MIXERNAME:
+                    rlog.debug("Audio: Selected Mixer:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
+                    found = True
+                    break
+        if found:
+            try:
+                mixer = alsaaudio.Mixer(MIXERNAME, **kwargs)
+            except alsaaudio.ALSAAudioError:
+                rlog.debug("Radarbluez: Error: could not get mixer '" + MIXERNAME + "'")
+            if mixer:
+                mixer.setvolume(config['sound_volume'])
+                extsound_active = True
+                rlog.debug("Radarbluez: External sound successfully initialized. Volume set to " +
+                           str(config['sound_volume']) + ".")
+        else:
+            rlog.debug("Audio: Mixer '" + MIXERNAME + "' not found.")
 
     if extsound_active or bluetooth_active:
         if esng is None:
-            if extsound_active:
+            if bluetooth_active:
+                esng = ESpeakNG(voice='en-us', pitch=30, speed=175)  # pulseaudio then also uses speaker output
+            elif extsound_active:
                 audio = "plughw:" + str(cardno)
                 esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev=audio)
-            else:
-                esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-            if esng is None:
+            if esng is None:   # could not initialize esng
+                extsound_active = False
+                bluetooth_active = False
                 rlog.debug("Radarbluez: espeak-ng not initialized")
                 return extsound_active, bluetooth_active
         rlog.debug("Radarbluez: espeak-ng successfully initialized.")
         esng.say("Stratux Radar connected")
         rlog.debug("SPEAK: Stratux Radar connected")
 
-    rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: "+ str(extsound_active) +
+    rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
                " ExtSound volume: " + str(config['sound_volume']) + ".")
     return extsound_active, bluetooth_active
 
@@ -118,7 +119,6 @@ def bluez_init():
     global bus
     global manager
     global adapter
-    global esng
     global bluetooth_active
     global bt_devices
     global rlog
@@ -142,7 +142,6 @@ def bluez_init():
 
 def setvolume(new_volume):
     global mixer
-
     mixer.setvolume(new_volume)
 
 
@@ -151,7 +150,7 @@ def speak(text):
     global extsound_active
 
     if extsound_active or (bluetooth_active and bt_devices > 0):
-        if esng is None:   # first initialization failed
+        if esng is None:   # first initialization failed, may happen with bluetooth, try again
             esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
             if esng is None:
                 rlog.debug("Radarbluez: espeak-ng not initialized")

@@ -113,8 +113,6 @@ zeroy = 0
 last_arcposition = 0
 display_refresh_time = 0
 display_control = None
-speak = False   # True is any speech (bluetooth or extsound) is enabled
-bluetooth = False  # True if bluetooth is enabled by parameter -b
 basemode = False  # True if display is always in north direction
 fullcircle = False  # True if epaper display should display full circle centered
 bt_devices = 0
@@ -123,7 +121,8 @@ global_mode = 1
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
 # 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
 # 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status 0=Init
-extsound_active = False   # external sound was successfully activated
+bluetooth = False  # True if bluetooth is enabled by parameter -b
+extsound_active = False   # external sound was successfully activated, if global_config >=0
 bluetooth_active = False   # bluetooth successfully activated
 optical_alive = -1
 
@@ -561,7 +560,7 @@ async def user_interface():
                 global_mode = next_mode
 
             current_time = time.time()
-            if speak and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
+            if bluetooth_active and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
                 last_bt_checktime = current_time
                 new_devices, devnames = radarbluez.connected_devices()
                 rlog.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
@@ -694,13 +693,11 @@ def main():
     global display_refresh_time
     global extsound_active
     global bluetooth_active
-    global speak
 
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
     radarui.init(url_settings_set)
     shutdownui.init(url_shutdown, url_reboot)
-    if speak:
-        extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth)
+    extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth)
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
     ahrsui.init(display_control)
     statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
@@ -725,7 +722,7 @@ def quit_gracefully(*args):
 
 if __name__ == "__main__":
     # parse arguments for different configurations
-    ap = argparse.ArgumentParser(description='Stratux web radar for separate displays')
+    ap = argparse.ArgumentParser(description='Stratux radar display')
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
     ap.add_argument("-b", "--bluetooth", required=False, help="Bluetooth speech warnings on", action='store_true',
                     default=False)
@@ -748,8 +745,8 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (Epaper only)",
                     action="store_true", default=False)
-    ap.add_argument("-y", "--extsound", type=int, required=False, help="Ext sound on with volume [0-100]",
-                    default=0)
+    ap.add_argument("-y", "--extsound", type=int, choices=range(0,100), required=False, help="Ext sound on with volume [0-100]",
+                    default=-1)
     args = vars(ap.parse_args())
     # set up logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
@@ -779,8 +776,7 @@ if __name__ == "__main__":
         global_mode = 15  # start in stratux-status
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
-    if args['extsound']>=0 and args['extsound']<=100:
-        global_config['sound_volume'] = args['extsound']
+    global_config['sound_volume'] = args['extsound']    # -1 if not enabled at all
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()
@@ -793,13 +789,6 @@ if __name__ == "__main__":
             global_config['distance_warnings'] = saved_config['distance_warnings']
         if 'sound_volume' in saved_config:
             global_config['sound_volume'] = saved_config['sound_volume']
-    if global_config['sound_volume']>0 and bluetooth:
-        bluetooth = False
-        rlog.debug("radar: Bluetooth disabled because external sound is on")
-    if global_config['sound_volume']>0 or bluetooth:
-        speak = True
-    else:
-        speak = False
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_status_ws = "ws://" + url_host_base + "/status"
