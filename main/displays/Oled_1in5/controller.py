@@ -318,21 +318,18 @@ def gmeter(draw, current, maxg, ming, error_message):
     c = math.cos(math.radians(gval))
     draw.line((zerox-(csize-msize-3)*c, zeroy-(csize-msize-3)*s, zerox+32*c, zeroy+32*s), fill="white", width=3)
 
-    draw.text((zerox, 0), "G-Meter", font=largefont, fill="yellow")
+    draw.text((zerox, 0), "G-Meter", font=smallfont, fill="yellow")
     draw.text((zerox, 30), "max", font=smallfont, fill="cyan")
     right_text(draw, 30, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
-    if error_message is None:
-        draw.text((zerox, 57), "current", font=smallfont, fill="cyan")
-        right_text(draw, 48, "{:+1.2f}".format(current), smallfont, fill="white")
-    else:
+    if error_message:
         centered_text(draw, 57, error_message, largefont, fill="red")
     draw.text((zerox, 80), "min", font=smallfont, fill="cyan")
-    right_text(draw, 74, "{:+1.2f}".format(ming), smallfont, fill="magenta")
+    right_text(draw, 80, "{:+1.2f}".format(ming), smallfont, fill="magenta")
 
     right = "Reset"
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
-    middle = "Mode"
+    middle = "  Mode"
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 
