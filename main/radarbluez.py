@@ -56,6 +56,26 @@ bt_devices = 0          # no of active bluetooth devices last time checked via c
 mixer = None
 cardno = -1         # cardno where "Speaker" was detected, on Pi3B with USB typically 1
 
+def find_mixer():    # searches for a "Audio" mixer, independent whether it was selected
+    found = False
+    kwargs = {}
+    for cardno in alsaaudio.card_indexes():
+        kwargs = {'cardindex': cardno}
+        for m in alsaaudio.mixers(**kwargs):
+            rlog.debug("Audio: Available Card:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
+            if m == MIXERNAME:
+                rlog.debug("Audio: Selected Mixer:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
+                found = True
+                break
+    if not found:
+        return None
+
+    try:
+        mix = alsaaudio.Mixer(MIXERNAME, **kwargs)
+    except alsaaudio.ALSAAudioError:
+        rlog.debug("Radarbluez: Could not get mixer '" + MIXERNAME + "'")
+    return mix
+
 
 def sound_init(config, bluetooth):
     global bluetooth_active
@@ -68,31 +88,15 @@ def sound_init(config, bluetooth):
     extsound_active = False
     bluetooth_active = False
     rlog = logging.getLogger('stratux-radar-log')
+    mixer = find_mixer()   # search for mixer in any case
+    if mixer and config['sound_volume']>=0 :
+        mixer.setvolume(config['sound_volume'])
+        extsound_active = True
+    elif mixer and config['sound_volume'] == -1:   # audio device and mixer found, but no speaker selected
+        mixer.setvolume(0)
+        extsound_active = False
     if bluetooth:
         bluetooth_active = bluez_init()
-    if config['sound_volume'] >= 0:   # only try to initalize if sound volume was set
-        found = False
-        kwargs = {}
-        for cardno in alsaaudio.card_indexes():
-            kwargs = {'cardindex': cardno}
-            for m in alsaaudio.mixers(**kwargs):
-                rlog.debug("Audio: Available Card:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
-                if m == MIXERNAME:
-                    rlog.debug("Audio: Selected Mixer:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
-                    found = True
-                    break
-        if found:
-            try:
-                mixer = alsaaudio.Mixer(MIXERNAME, **kwargs)
-            except alsaaudio.ALSAAudioError:
-                rlog.debug("Radarbluez: Error: could not get mixer '" + MIXERNAME + "'")
-            if mixer:
-                mixer.setvolume(config['sound_volume'])
-                extsound_active = True
-                rlog.debug("Radarbluez: External sound successfully initialized. Volume set to " +
-                           str(config['sound_volume']) + ".")
-        else:
-            rlog.debug("Audio: Mixer '" + MIXERNAME + "' not found.")
 
     if extsound_active or bluetooth_active:
         if esng is None:
