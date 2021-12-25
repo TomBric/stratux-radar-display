@@ -54,7 +54,6 @@ bluetooth_active = False
 extsound_active = False
 bt_devices = 0          # no of active bluetooth devices last time checked via connected devices
 mixer = None
-cardno = -1         # cardno where "Speaker" was detected, on Pi3B with USB typically 1
 
 def find_mixer():    # searches for a "Audio" mixer, independent whether it was selected
     found = False
@@ -68,14 +67,14 @@ def find_mixer():    # searches for a "Audio" mixer, independent whether it was 
                 found = True
                 break
     if not found:
-        return None
+        return -1, None
 
     try:
         mix = alsaaudio.Mixer(MIXERNAME, **kwargs)
     except alsaaudio.ALSAAudioError:
         rlog.debug("Radarbluez: Could not get mixer '" + MIXERNAME + "'")
     rlog.debug("Radarbluez: Mixer '" + MIXERNAME + "' selected")
-    return mix
+    return cardno, mix
 
 
 def sound_init(config, bluetooth):
@@ -83,13 +82,12 @@ def sound_init(config, bluetooth):
     global extsound_active
     global esng
     global mixer
-    global cardno
     global rlog
 
     extsound_active = False
     bluetooth_active = False
     rlog = logging.getLogger('stratux-radar-log')
-    mixer = find_mixer()   # search for mixer in any case
+    card, mixer = find_mixer()   # search for mixer in any case
     if mixer and config['sound_volume']>=0 :
         mixer.setvolume(config['sound_volume'])
         extsound_active = True
@@ -106,7 +104,7 @@ def sound_init(config, bluetooth):
             if bluetooth_active:
                 esng = ESpeakNG(voice='en-us', pitch=30, speed=175)  # pulseaudio then also uses speaker output
             elif extsound_active:
-                audio = "plughw:" + str(cardno)
+                audio = "plughw:" + str(card)
                 esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev=audio)
             if esng is None:   # could not initialize esng
                 extsound_active = False
