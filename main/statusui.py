@@ -261,7 +261,7 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
     elif status_mode == 14:   # set sound warnings
         headline = "Options"
         subline = "Please select ..."
-        text = "\nExternal sound volume?   " + str(global_config['sound_volume'])
+        text = "\nExternal volume?   " + str(global_config['sound_volume'])
         display_control.text_screen(draw, headline, subline, text, "-5", "Set", "+5")
     display_control.display()
 

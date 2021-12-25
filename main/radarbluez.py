@@ -74,6 +74,7 @@ def find_mixer():    # searches for a "Audio" mixer, independent whether it was 
         mix = alsaaudio.Mixer(MIXERNAME, **kwargs)
     except alsaaudio.ALSAAudioError:
         rlog.debug("Radarbluez: Could not get mixer '" + MIXERNAME + "'")
+    rlog.debug("Radarbluez: Mixer '" + MIXERNAME + "' selected")
     return mix
 
 
