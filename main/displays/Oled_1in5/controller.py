@@ -311,7 +311,7 @@ def gmeter(draw, current, maxg, ming, error_message):
                   fill="white", width=2)
         draw.text((zerox-(csize-msize-SMALL/2)*c-SMALL/4, zeroy-(csize-msize-SMALL/2)*s-SMALL/2), str(m[1]),
                   font=smallfont, fill="white")
-    draw.arc((zerox-csize, zeroy-csize, zerox, sizey), 90, 270, width=3, fill="white")
+    draw.arc((zerox-csize, zeroy-csize, zerox, sizey-1), 90, 270, width=2, fill="white")
     draw.ellipse((zerox-3, zeroy-3, zerox+3, zeroy+3), outline="white", fill="white", width=1)
     gval = (current-1.0)*22.5
     s = math.sin(math.radians(gval))
