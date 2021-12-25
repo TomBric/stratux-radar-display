@@ -302,7 +302,7 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 def gmeter(draw, current, maxg, ming, error_message):
     msize = 8
-    csize = sizex / 2 - 20  # radius of gmeter
+    csize = sizex / 2 - 5  # radius of gmeter
 
     for m in m_marks:
         s = math.sin(math.radians(m[0]+90))
@@ -311,19 +311,19 @@ def gmeter(draw, current, maxg, ming, error_message):
                   fill="white", width=2)
         draw.text((zerox-(csize-msize-SMALL/2)*c-SMALL/4, zeroy-(csize-msize-SMALL/2)*s-SMALL/2), str(m[1]),
                   font=smallfont, fill="white")
-    draw.arc((0, 0, zerox*2, zeroy*2), 90, 270, width=3, fill="white")
-    draw.ellipse((zerox-5, zeroy-5, zerox+5, zeroy+5), outline="white", fill="white", width=1)
+    draw.arc((0, 0, csize*2, csize*2), 90, 270, width=3, fill="white")
+    draw.ellipse((zerox-3, zeroy-3, zerox+3, zeroy+3), outline="white", fill="white", width=1)
     gval = (current-1.0)*22.5
     s = math.sin(math.radians(gval))
     c = math.cos(math.radians(gval))
     draw.line((zerox-(csize-msize-3)*c, zeroy-(csize-msize-3)*s, zerox+32*c, zeroy+32*s), fill="white", width=3)
 
     draw.text((zerox+10, 0), "G-Meter", font=smallfont, fill="yellow")
-    draw.text((zerox, 30), "max", font=smallfont, fill="cyan")
+    draw.text((zerox+10, 30), "max", font=smallfont, fill="cyan")
     right_text(draw, 30, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
     if error_message:
         centered_text(draw, 57, error_message, largefont, fill="red")
-    draw.text((zerox, 80), "min", font=smallfont, fill="cyan")
+    draw.text((zerox+10, 80), "min", font=smallfont, fill="cyan")
     right_text(draw, 80, "{:+1.2f}".format(ming), smallfont, fill="magenta")
 
     right = "Reset"
