@@ -93,9 +93,11 @@ def sound_init(config, bluetooth):
     if mixer and config['sound_volume']>=0 :
         mixer.setvolume(config['sound_volume'])
         extsound_active = True
+        rlog.debug("Radarbluez: Setting ExtSound to " + str(config['sound_volume']))
     elif mixer and config['sound_volume'] == -1:   # audio device and mixer found, but no speaker selected
         mixer.setvolume(0)
         extsound_active = False
+        rlog.debug("Radarbluez: Setting ExtSound to " + str(config['sound_volume']))
     if bluetooth:
         bluetooth_active = bluez_init()
 
