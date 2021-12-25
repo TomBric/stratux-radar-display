@@ -301,8 +301,8 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    msize = 14
-    csize = sizex / 2  # radius of gmeter
+    msize = 8
+    csize = sizex / 2 - 20  # radius of gmeter
 
     for m in m_marks:
         s = math.sin(math.radians(m[0]+90))
