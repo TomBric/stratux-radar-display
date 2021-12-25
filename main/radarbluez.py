@@ -105,7 +105,7 @@ def sound_init(config, bluetooth):
                 esng = ESpeakNG(voice='en-us', pitch=30, speed=175)  # pulseaudio then also uses speaker output
             elif extsound_active:
                 audio = "plughw:" + str(cardno)
-                esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev=audio)
+                esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev="audio")
             if esng is None:   # could not initialize esng
                 extsound_active = False
                 bluetooth_active = False
