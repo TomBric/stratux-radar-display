@@ -90,14 +90,18 @@ def sound_init(config, bluetooth):
     bluetooth_active = False
     rlog = logging.getLogger('stratux-radar-log')
     card, mixer = find_mixer()   # search for mixer in any case
-    if mixer and config['sound_volume']>=0 :
-        mixer.setvolume(config['sound_volume'])
-        extsound_active = True
-        rlog.debug("Radarbluez: Setting ExtSound to " + str(config['sound_volume']))
-    elif mixer and config['sound_volume'] == -1:   # audio device and mixer found, but no speaker selected
-        mixer.setvolume(0)
+    if not mixer:
+        rlog.debug("Radarbluez: Mixer not found!")
         extsound_active = False
-        rlog.debug("Radarbluez: Setting ExtSound to 0")
+    else:
+        if config['sound_volume']>=0 :
+            mixer.setvolume(config['sound_volume'])
+            extsound_active = True
+            rlog.debug("Radarbluez: Setting ExtSound to " + str(config['sound_volume']))
+        if config['sound_volume'] == -1:   # audio device and mixer found, but no speaker selected
+            mixer.setvolume(0)
+            extsound_active = False
+            rlog.debug("Radarbluez: Setting ExtSound to 0")
     if bluetooth:
         bluetooth_active = bluez_init()
 
@@ -110,14 +114,13 @@ def sound_init(config, bluetooth):
             rlog.debug("Radarbluez: Bluetooth espeak-ng successfully initialized.")
             b_esng.say("Stratux Radar connected")
 
-    if config['sound_volume']>=0 and e_esng is None:
+    if extsound_active and e_esng is None:
         audio = "plughw:" + str(card)
         e_esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev=audio)
         if e_esng is None:  # could not initialize esng
             extsound_active = False
             rlog.debug("Radarbluez: ExtSound espeak-ng not initialized")
         else:
-            extsound_active = True
             rlog.debug("Radarbluez: ExtSound espeak-ng successfully initialized.")
             e_esng.say("Stratux Radar connected")
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
