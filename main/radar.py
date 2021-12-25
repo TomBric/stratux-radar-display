@@ -745,7 +745,7 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (Epaper only)",
                     action="store_true", default=False)
-    ap.add_argument("-y", "--extsound", type=int, choices=range(0,100), required=False, help="Ext sound on with volume [0-100]",
+    ap.add_argument("-y", "--extsound", type=int, required=False, help="Ext sound on with volume [0-100]",
                     default=-1)
     args = vars(ap.parse_args())
     # set up logging
@@ -777,6 +777,8 @@ if __name__ == "__main__":
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     global_config['sound_volume'] = args['extsound']    # -1 if not enabled at all
+    if global_config['sound_volume']<-1 or global_config['sound_volume']>100:
+        global_config['sound_volume'] = 50   # set to a medium value if strange numer used
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()
