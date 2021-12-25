@@ -264,7 +264,6 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         else:
             btcolor = "red"
             text = '\uf1f6'  # bell off symbol
-
         textsize = draw.textsize(text, webfont)
         draw.text((sizex - textsize[0], sizey - 2 * SMALL), text, font=webfont, fill=btcolor, align="right")
 
