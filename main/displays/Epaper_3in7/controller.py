@@ -307,16 +307,14 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         centered_text(draw, 30, "No Connection!", smallfont, fill="black")
 
     if extsound or bt_devices>0:
-        if extsound:
-            if sound_active:
-                t = "\uf028"  # volume symbol
-            else:
-                t = "\uf1f6"  # bell off symbol
-        elif bt_devices > 0:
-            if sound_active:
-                t = "\uf293"  # bluetooth symbol
-            else:
-                t = "\uf1f6"  # bell off symbol
+        if sound_active:
+            t=""
+            if extsound:
+                t += "\uf028"  # volume symbol
+            if bt_devices > 0:
+                t += "\uf293"  # bluetooth symbol
+        else:
+            t = "\uf1f6"  # bell off symbol
         textsize = draw.textsize(t, awesomefont)
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
 

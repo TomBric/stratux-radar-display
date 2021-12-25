@@ -253,17 +253,14 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
 
     if extsound or bt_devices>0:
         if sound_active:
-            if extsound and bt_devices >0:
-                btcolor = "orange"  # if both ext and bluetooth are connected, make orange bluetooth symbel
-                text = '\uf293'  # bluetooth symbol
-            elif extsound:
+            if extsound:
                 btcolor = "orange"
                 text = "\uf028"  # volume symbol
-            elif bt_devices>0:
+            if bt_devices > 0:
                 btcolor = "blue"
-                if extsound:
-                    bt_color = "orange"  # if both ext and bluetooth are connected, make orange bluetooth symbel
-                text = '\uf293'  # bluetooth symbol + no
+                text = '\uf293'  # bluetooth symbol
+            if extsound and bt_devices >0:
+                btcolor = "orange"  # if both ext and bluetooth are connected, make orange bluetooth symbel
         else:
             btcolor = "red"
             text = '\uf1f6'  # bell off symbol
