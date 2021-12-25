@@ -70,6 +70,8 @@ compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
 cmsize = 10        # length of compass marks
+#gmeter
+m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
 # end device globals
 
 
@@ -299,16 +301,33 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 
 def gmeter(draw, current, maxg, ming, error_message):
+    msize = 14
+    csize = sizex / 2  # radius of gmeter
+
+    for m in m_marks:
+        s = math.sin(math.radians(m[0]+90))
+        c = math.cos(math.radians(m[0]+90))
+        draw.line((zerox-csize*c, zeroy-csize*s, zerox-(csize-msize)*c, zeroy-(csize-msize)*s),
+                  fill="white", width=2)
+        draw.text((zerox-(csize-msize-SMALL/2)*c-SMALL/4, zeroy-(csize-msize-SMALL/2)*s-SMALL/2), str(m[1]),
+                  font=smallfont, fill="white")
+    draw.arc((0, 0, zerox*2, zeroy*2), 90, 270, width=3, fill="white")
+    draw.ellipse((zerox-5, zeroy-5, zerox+5, zeroy+5), outline="white", fill="white", width=1)
+    gval = (current-1.0)*22.5
+    s = math.sin(math.radians(gval))
+    c = math.cos(math.radians(gval))
+    draw.line((zerox-(csize-msize-3)*c, zeroy-(csize-msize-3)*s, zerox+32*c, zeroy+32*s), fill="white", width=3)
+
     centered_text(draw, 0, "G-Meter", largefont, fill="yellow")
-    draw.text((0, 36), "max", font=smallfont, fill="cyan")
-    right_text(draw, 30, "{:+1.2f}".format(maxg), largefont, fill="magenta")
+    draw.text((128, 30), "max", font=smallfont, fill="cyan")
+    right_text(draw, 30, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
     if error_message is None:
-        draw.text((0, 57), "current", font=smallfont, fill="cyan")
-        right_text(draw, 48, "{:+1.2f}".format(current), verylargefont, fill="white")
+        draw.text((128, 57), "current", font=smallfont, fill="cyan")
+        right_text(draw, 48, "{:+1.2f}".format(current), smallfont, fill="white")
     else:
         centered_text(draw, 57, error_message, largefont, fill="red")
-    draw.text((0, 80), "min", font=smallfont, fill="cyan")
-    right_text(draw, 74, "{:+1.2f}".format(ming), largefont, fill="magenta")
+    draw.text((128, 80), "min", font=smallfont, fill="cyan")
+    right_text(draw, 74, "{:+1.2f}".format(ming), smallfont, fill="magenta")
 
     right = "Reset"
     textsize = draw.textsize(right, smallfont)
