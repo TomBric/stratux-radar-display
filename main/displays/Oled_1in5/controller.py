@@ -252,22 +252,22 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="floralwhite", align="right")
 
     if extsound or bt_devices>0:
-        if extsound:
-            if sound_active:
+        if sound_active:
+            if extsound and bt_devices >0:
+                t_color = "orange"  # if both ext and bluetooth are connected, make orange bluetooth symbel
+                text = '\uf293'  # bluetooth symbol
+            elif extsound:
                 btcolor = "orange"
                 text = "\uf028"  # volume symbol
-            else:
-                btcolor = "red"
-                text = "\uf1f6"  # bell off symbol
-        elif bt_devices > 0:
-            if sound_active:
+            elif bt_devices>0:
                 btcolor = "blue"
                 if extsound:
-                    bt_color = "orange"   # if both ext and bluetooth are connected, make orange bluetooth symbel
+                    bt_color = "orange"  # if both ext and bluetooth are connected, make orange bluetooth symbel
                 text = '\uf293'  # bluetooth symbol + no
-            else:
-                btcolor = "red"
-                text = '\uf1f6'  # bell off symbol
+        else:
+            btcolor = "red"
+            text = '\uf1f6'  # bell off symbol
+
         textsize = draw.textsize(text, webfont)
         draw.text((sizex - textsize[0], sizey - 2 * SMALL), text, font=webfont, fill=btcolor, align="right")
 
