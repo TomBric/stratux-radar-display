@@ -72,7 +72,7 @@ cdraw = None
 cmsize = 10        # length of compass marks
 # gmeter
 m_marks = ((120, ""), (157.5, "-2"), (195, "-1"), (232.5, "0"), (270, "+1"), (307.5, "+2"), (345, "+3"),
-           (382.5, "+4"), (40, ""))
+           (382.5, "+4"), (420, ""))
 # end device globals
 
 
@@ -304,7 +304,7 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 def gmeter(draw, current, maxg, ming, error_message):
     msize = 5
     csize = sizex/2-2  # radius of gmeter
-    t_dist = 2   # distance of text from marks
+    t_dist = 3   # distance of text from marks
 
     for m in m_marks:
         s = math.sin(math.radians(m[0]+90))
