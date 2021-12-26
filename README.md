@@ -1,5 +1,6 @@
 # stratux-radar-display
 Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W). Reads the aircraft data from Stratux and displays them on the specified display. The newest version now has a user interface included. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
+- update in version 1.4: external sound connection is now supported by using a USB sound card (approx. 4 Euro). With that you can connect your display to your intercom. This external sound output is also functioning on the stratux only, without an additional Zero.
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
@@ -106,6 +107,9 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
 The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
    Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry Zero 2 or Zero W.
    
+   ### External Sound output
+   
+   You can connect your stratux device with your intercom if it has an input for external audio (e.g. TQ KRT2 has one). This is possible on the Pi Zero or the PI3B with an external USB sound card (using the builtin headphone output does not work on the Pi3B). I used a simple "3D USB 5.1 Sound card" available for 4 Euro. The sound volume can be controlled via the option "-y" or can be modified with the pushbuttons under ->Status-> Net/Opt -> External Volume.
    
    ### Bluetooth devices
    
@@ -188,15 +192,17 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
 
 # Shell command parameters
 ```
-usage: radar.py [-h] -d DEVICE [-s] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z] [-c CONNECT] [-v] [-r] [-e]
+usage: radar.py [-h] -d DEVICE [-b] [-sd] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z] [-c CONNECT] [-v] [-r] [-e]
+                [-y EXTSOUND]
 
-Stratux web radar for separate displays
+Stratux radar display
 
 optional arguments:
   -h, --help            show this help message and exit
   -d DEVICE, --device DEVICE
                         Display device to use
-  -s, --speak           Speech warnings on
+  -b, --bluetooth       Bluetooth speech warnings on
+  -sd, --speakdistance  Speech with distance
   -n, --north           Ground mode: always display north up
   -t, --timer           Start mode is timer
   -a, --ahrs            Start mode is ahrs
@@ -210,7 +216,8 @@ optional arguments:
   -v, --verbose         Debug output on
   -r, --registration    Display registration no (Epaper only)
   -e, --fullcircle      Display full circle radar (Epaper only)
-
+  -y EXTSOUND, --extsound EXTSOUND
+                        Ext sound on with volume [0-100]
   ```
 
 
