@@ -70,7 +70,7 @@ compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
 cmsize = 10        # length of compass marks
-#gmeter
+# gmeter
 m_marks = ((150, -3), (180, -2), (210, -1), (240, 0), (270, 1), (300, 2), (330, 3), (0, 4), (30, 5))
 # end device globals
 
@@ -86,7 +86,7 @@ def make_font(name, size):
     return ImageFont.truetype(font_path, size)
 
 
-def init(fullcircle = False):
+def init(fullcircle=False):
     global sizex
     global sizey
     global zerox
@@ -253,16 +253,16 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     textsize = draw.textsize(text, smallfont)
     draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="floralwhite", align="right")
 
-    if extsound or bt_devices>0:
+    if extsound or bt_devices > 0:
         if sound_active:
             if extsound:
                 btcolor = "orange"
                 text = "\uf028"  # volume symbol
-            if bt_devices > 0:
+                if bt_devices > 0:
+                    btcolor = "blue"
+            elif bt_devices > 0:
                 btcolor = "blue"
                 text = '\uf293'  # bluetooth symbol
-            if extsound and bt_devices >0:
-                btcolor = "orange"  # if both ext and bluetooth are connected, make orange bluetooth symbel
         else:
             btcolor = "red"
             text = '\uf1f6'  # bell off symbol
@@ -310,11 +310,9 @@ def gmeter(draw, current, maxg, ming, error_message):
         c = math.cos(math.radians(m[0]+90))
         draw.line((zerox-csize*c, zeroy-csize*s, zerox-(csize-msize)*c, zeroy-(csize-msize)*s),
                   fill="white", width=2)
-        # draw.text((zerox-(csize-msize-SMALL/2)*c-SMALL/4, zeroy-(csize-msize-SMALL/2)*s-SMALL/2), str(m[1]), font=smallfont, fill="white")
-
         w, h = draw.textsize(str(m[1]), largefont)
         center = (zerox - (csize - msize - t_dist - LARGE / 2) * c, zeroy - (csize - msize - t_dist - LARGE / 2) * s)
-        draw.text((center[0]-w/2, center[1]-h/2),str(m[1]), font = largefont, fill = "white")
+        draw.text((center[0]-w/2, center[1]-h/2), str(m[1]), font=largefont, fill="white")
     draw.arc((zerox-csize, zeroy-csize, zerox+csize, zeroy+csize), 60, 300, width=2, fill="white")
     draw.ellipse((zerox-3, zeroy-3, zerox+3, zeroy+3), outline="white", fill="white", width=1)
     gval = (current-1.0)*30.0
