@@ -302,15 +302,18 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 def gmeter(draw, current, maxg, ming, error_message):
     msize = 5
-    csize = sizex/2 - 2  # radius of gmeter
+    csize = sizex/2  # radius of gmeter
 
     for m in m_marks:
         s = math.sin(math.radians(m[0]+90))
         c = math.cos(math.radians(m[0]+90))
         draw.line((zerox-csize*c, zeroy-csize*s, zerox-(csize-msize)*c, zeroy-(csize-msize)*s),
                   fill="white", width=2)
-        draw.text((zerox-(csize-msize-SMALL/2)*c-SMALL/4, zeroy-(csize-msize-SMALL/2)*s-SMALL/2), str(m[1]),
-                  font=smallfont, fill="white")
+        # draw.text((zerox-(csize-msize-SMALL/2)*c-SMALL/4, zeroy-(csize-msize-SMALL/2)*s-SMALL/2), str(m[1]), font=smallfont, fill="white")
+
+        w, h = draw.textsize(str(m[1]), largefont)
+        center = (zerox - (csize -cmsize - LARGE / 2) * c, zeroy - (csize - msize - LARGE / 2) * s)
+        draw.text((center-w/2, center-h/2),str(m[1]), font = largefont, fill = "white")
     draw.arc((zerox-csize, zeroy-csize, zerox+csize, zeroy+csize), 60, 300, width=2, fill="white")
     draw.ellipse((zerox-3, zeroy-3, zerox+3, zeroy+3), outline="white", fill="white", width=1)
     gval = (current-1.0)*30.0
