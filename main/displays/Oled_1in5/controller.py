@@ -302,8 +302,8 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    msize = 5
-    csize = sizex/2-2  # radius of gmeter
+    msize = 7
+    csize = sizex/2-1  # radius of gmeter
     t_dist = 3   # distance of text from marks
 
     for m in m_marks:
@@ -321,7 +321,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     c = math.cos(math.radians(gval))
     draw.line((zerox-(csize-msize-5)*c, zeroy-(csize-msize-5)*s, zerox+5*c, zeroy+5*s), fill="white", width=3)
 
-    draw.text((zerox-25, 35), "G-Meter", font=largefont, fill="yellow")
+    draw.text((zerox-25, 38), "G-Meter", font=largefont, fill="yellow")
     draw.text((zerox+5, 63), "max", font=smallfont, fill="cyan")
     right_text(draw, 63, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
     if error_message:
