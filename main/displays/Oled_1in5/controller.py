@@ -71,7 +71,7 @@ mask = None
 cdraw = None
 cmsize = 10        # length of compass marks
 #gmeter
-m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
+m_marks = ((150, -3), (180, -2), (210, -1), (240, 0), (270, 1), (300, 2), (330, 3), (0, 4), (30, 5))
 # end device globals
 
 
@@ -313,12 +313,12 @@ def gmeter(draw, current, maxg, ming, error_message):
                   font=smallfont, fill="white")
     draw.arc((zerox-csize, zeroy-csize, zerox+csize, zeroy+csize), 60, 300, width=2, fill="white")
     draw.ellipse((zerox-3, zeroy-3, zerox+3, zeroy+3), outline="white", fill="white", width=1)
-    gval = (current-1.0)*22.5
+    gval = (current-1.0)*30.0
     s = math.sin(math.radians(gval))
     c = math.cos(math.radians(gval))
     draw.line((zerox-(csize-msize-3)*c, zeroy-(csize-msize-3)*s, zerox+10*c, zeroy+10*s), fill="white", width=3)
 
-    draw.text((zerox+20, 25), "G-Meter", font=smallfont, fill="yellow")
+    draw.text((zerox+5, 25), "G-Meter", font=smallfont, fill="yellow")
     draw.text((zerox+5, 40), "max", font=smallfont, fill="cyan")
     right_text(draw, 40, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
     if error_message:
