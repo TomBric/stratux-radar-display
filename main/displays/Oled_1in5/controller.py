@@ -71,7 +71,8 @@ mask = None
 cdraw = None
 cmsize = 10        # length of compass marks
 # gmeter
-m_marks = ((150, -3), (180, -2), (210, -1), (240, 0), (270, 1), (300, 2), (330, 3), (0, 4), (30, 5))
+m_marks = ((120, ""), (157.5, "-2"), (195, "-1"), (232.5, "0"), (270, "+1"), (307.5, "+2"), (345, "+3"),
+           (382.5, "+4"), (40, ""))
 # end device globals
 
 
@@ -312,21 +313,21 @@ def gmeter(draw, current, maxg, ming, error_message):
                   fill="white", width=2)
         w, h = draw.textsize(str(m[1]), largefont)
         center = (zerox - (csize - msize - t_dist - LARGE / 2) * c, zeroy - (csize - msize - t_dist - LARGE / 2) * s)
-        draw.text((center[0]-w/2, center[1]-h/2), str(m[1]), font=largefont, fill="white")
+        draw.text((center[0]-w/2, center[1]-h/2), m[1], font=largefont, fill="white")
     draw.arc((zerox-csize, zeroy-csize, zerox+csize, zeroy+csize), 30, 330, width=2, fill="white")
     draw.ellipse((zerox-3, zeroy-3, zerox+3, zeroy+3), outline="white", fill="white", width=1)
-    gval = (current-1.0)*30.0
+    gval = (current-1.0)*37.5
     s = math.sin(math.radians(gval))
     c = math.cos(math.radians(gval))
-    draw.line((zerox-(csize-msize-3)*c, zeroy-(csize-msize-3)*s, zerox+10*c, zeroy+10*s), fill="white", width=3)
+    draw.line((zerox-(csize-msize-5)*c, zeroy-(csize-msize-5)*s, zerox+5*c, zeroy+5*s), fill="white", width=3)
 
-    draw.text((zerox-20, 35), "G-Meter", font=largefont, fill="yellow")
-    draw.text((zerox+5, 65), "max", font=smallfont, fill="cyan")
-    right_text(draw, 65, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
+    draw.text((zerox-25, 35), "G-Meter", font=largefont, fill="yellow")
+    draw.text((zerox+5, 63), "max", font=smallfont, fill="cyan")
+    right_text(draw, 63, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
     if error_message:
         centered_text(draw, 57, error_message, largefont, fill="red")
-    draw.text((zerox+5, 80), "min", font=smallfont, fill="cyan")
-    right_text(draw, 80, "{:+1.2f}".format(ming), smallfont, fill="magenta")
+    draw.text((zerox+5, 75), "min", font=smallfont, fill="cyan")
+    right_text(draw, 75, "{:+1.2f}".format(ming), smallfont, fill="magenta")
 
     right = "Reset"
     textsize = draw.textsize(right, smallfont)
