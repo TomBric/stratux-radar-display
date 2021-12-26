@@ -313,7 +313,7 @@ def gmeter(draw, current, maxg, ming, error_message):
         w, h = draw.textsize(str(m[1]), largefont)
         center = (zerox - (csize - msize - t_dist - LARGE / 2) * c, zeroy - (csize - msize - t_dist - LARGE / 2) * s)
         draw.text((center[0]-w/2, center[1]-h/2), str(m[1]), font=largefont, fill="white")
-    draw.arc((zerox-csize, zeroy-csize, zerox+csize, zeroy+csize), 60, 300, width=2, fill="white")
+    draw.arc((zerox-csize, zeroy-csize, zerox+csize, zeroy+csize), 30, 330, width=2, fill="white")
     draw.ellipse((zerox-3, zeroy-3, zerox+3, zeroy+3), outline="white", fill="white", width=1)
     gval = (current-1.0)*30.0
     s = math.sin(math.radians(gval))
