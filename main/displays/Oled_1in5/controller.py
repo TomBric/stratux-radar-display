@@ -70,6 +70,9 @@ compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
 cmsize = 10        # length of compass marks
+# gmeter
+m_marks = ((120, ""), (157.5, "-2"), (195, "-1"), (232.5, "0"), (270, "+1"), (307.5, "+2"), (345, "+3"),
+           (382.5, "+4"), (420, ""))
 # end device globals
 
 
@@ -84,7 +87,7 @@ def make_font(name, size):
     return ImageFont.truetype(font_path, size)
 
 
-def init(fullcircle = False):
+def init(fullcircle=False):
     global sizex
     global sizey
     global zerox
@@ -227,7 +230,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy, optical_alive, basemode):
+              gps_quality, gps_h_accuracy, optical_alive, basemode, extsound):
     draw.ellipse((0, 0, sizex - 1, sizey - 1), outline="floralwhite")
     draw.ellipse((sizex / 4, sizey / 4, zerox + sizex / 4, zeroy + sizey / 4), outline="floralwhite")
     draw.ellipse((zerox - 2, zeroy - 2, zerox + 2, zeroy + 2), outline="floralwhite")
@@ -251,10 +254,16 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     textsize = draw.textsize(text, smallfont)
     draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="floralwhite", align="right")
 
-    if bt_devices > 0:
+    if extsound or bt_devices > 0:
         if sound_active:
-            btcolor = "blue"
-            text = '\uf293'  # bluetooth symbol + no
+            if extsound:
+                btcolor = "orange"
+                text = "\uf028"  # volume symbol
+                if bt_devices > 0:
+                    btcolor = "blue"
+            elif bt_devices > 0:
+                btcolor = "blue"
+                text = '\uf293'  # bluetooth symbol
         else:
             btcolor = "red"
             text = '\uf1f6'  # bell off symbol
@@ -293,21 +302,37 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    centered_text(draw, 0, "G-Meter", largefont, fill="yellow")
-    draw.text((0, 36), "max", font=smallfont, fill="cyan")
-    right_text(draw, 30, "{:+1.2f}".format(maxg), largefont, fill="magenta")
-    if error_message is None:
-        draw.text((0, 57), "current", font=smallfont, fill="cyan")
-        right_text(draw, 48, "{:+1.2f}".format(current), verylargefont, fill="white")
-    else:
+    msize = 7
+    csize = sizex/2-1  # radius of gmeter
+    t_dist = 3   # distance of text from marks
+
+    for m in m_marks:
+        s = math.sin(math.radians(m[0]+90))
+        c = math.cos(math.radians(m[0]+90))
+        draw.line((zerox-csize*c, zeroy-csize*s, zerox-(csize-msize)*c, zeroy-(csize-msize)*s),
+                  fill="white", width=2)
+        w, h = draw.textsize(str(m[1]), largefont)
+        center = (zerox - (csize - msize - t_dist - LARGE / 2) * c, zeroy - (csize - msize - t_dist - LARGE / 2) * s)
+        draw.text((center[0]-w/2, center[1]-h/2), m[1], font=largefont, fill="white")
+    draw.arc((zerox-csize, zeroy-csize, zerox+csize, zeroy+csize), 30, 330, width=2, fill="white")
+    draw.ellipse((zerox-3, zeroy-3, zerox+3, zeroy+3), outline="white", fill="white", width=1)
+    gval = (current-1.0)*37.5
+    s = math.sin(math.radians(gval))
+    c = math.cos(math.radians(gval))
+    draw.line((zerox-(csize-msize-5)*c, zeroy-(csize-msize-5)*s, zerox+5*c, zeroy+5*s), fill="white", width=3)
+
+    draw.text((zerox-25, 38), "G-Meter", font=largefont, fill="yellow")
+    draw.text((zerox+5, 63), "max", font=smallfont, fill="cyan")
+    right_text(draw, 63, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
+    if error_message:
         centered_text(draw, 57, error_message, largefont, fill="red")
-    draw.text((0, 80), "min", font=smallfont, fill="cyan")
-    right_text(draw, 74, "{:+1.2f}".format(ming), largefont, fill="magenta")
+    draw.text((zerox+5, 75), "min", font=smallfont, fill="cyan")
+    right_text(draw, 75, "{:+1.2f}".format(ming), smallfont, fill="magenta")
 
     right = "Reset"
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
-    middle = "Mode"
+    middle = ""
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 

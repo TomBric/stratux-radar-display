@@ -271,7 +271,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy, optical_bar, basemode):
+              gps_quality, gps_h_accuracy, optical_bar, basemode, extsound):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
@@ -306,9 +306,13 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     if not connected:
         centered_text(draw, 30, "No Connection!", smallfont, fill="black")
 
-    if bt_devices > 0:
+    if extsound or bt_devices>0:
         if sound_active:
-            t = "\uf293"  # bluetooth symbol
+            t=""
+            if extsound:
+                t += "\uf028"  # volume symbol
+            if bt_devices > 0:
+                t += "\uf293"  # bluetooth symbol
         else:
             t = "\uf1f6"  # bell off symbol
         textsize = draw.textsize(t, awesomefont)

@@ -78,24 +78,32 @@ charpos = 0         # position of current input char
 
 
 def read_config():
+    global rlog
+
+    if rlog == None:   # may be called before init
+        rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(CONFIG_FILE) as f:
             config = json.load(f)
     except (OSError, IOError, ValueError) as e:
-        logging.debug("StatusUI: Error " + str(e) + " reading " + CONFIG_FILE)
+        rlog.debug("StatusUI: Error " + str(e) + " reading " + CONFIG_FILE)
         return None
-    logging.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " +
+    rlog.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " +
                   json.dumps(config, sort_keys=True, indent=4))
     return config
 
 
 def write_config(config):
+    global rlog
+
+    if rlog == None:   # may be called before init
+        rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(CONFIG_FILE, 'wt') as out:
             json.dump(config, out, sort_keys=True, indent=4)
     except (OSError, IOError, ValueError) as e:
-        logging.debug("StatusUI: Error " + str(e) + " writing " + CONFIG_FILE)
-    logging.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " +
+        rlog.debug("StatusUI: Error " + str(e) + " writing " + CONFIG_FILE)
+    rlog.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " +
                   json.dumps(config, sort_keys=True, indent=4))
 
 
@@ -132,7 +140,7 @@ def get_status():
     return status_answer
 
 
-def draw_status(draw, display_control, bluetooth_active):
+def draw_status(draw, display_control, bluetooth_active, extsound_active):
     global status_mode
     global last_status_get
     global left
@@ -161,7 +169,7 @@ def draw_status(draw, display_control, bluetooth_active):
             right = "Scan"
         else:
             right = ""
-        display_control.text_screen(draw, "Display Status", None, status_text, "Netw", "Mode", right)
+        display_control.text_screen(draw, "Display Status", None, status_text, "Net/Opt", "Mode", right)
     elif status_mode == 1:   # scan running
         countdown = math.floor(scan_end - now)
         if countdown > 0:
@@ -243,8 +251,18 @@ def draw_status(draw, display_control, bluetooth_active):
     elif status_mode == 12:   # Options Registration
         headline = "Options"
         subline = "Please select ..."
-        text = "Show registration?"
+        text = "\nShow registration?"
         display_control.text_screen(draw, headline, subline, text, "Yes", "Canc", "No")
+    elif status_mode == 13:   # Options speak distance warning
+        headline = "Options"
+        subline = "Please select ..."
+        text = "\nSpeak distance?"
+        display_control.text_screen(draw, headline, subline, text, "Yes", "Canc", "No")
+    elif status_mode == 14:   # set sound warnings
+        headline = "Options"
+        subline = "Please select ..."
+        text = "\nExternal volume?   " + str(global_config['sound_volume'])
+        display_control.text_screen(draw, headline, subline, text, "-5", "Set", "+5")
     display_control.display()
 
 
@@ -376,7 +394,7 @@ def string_to_ipv4(ipv4str):
     return ipaddr
 
 
-def user_input(bluetooth_active):
+def user_input(extsound_active, bluetooth_active):
     global left
     global middle
     global right
@@ -530,12 +548,43 @@ def user_input(bluetooth_active):
         if button == 2 and btime == 1:  # No, do not display registration
             global_config['display_tail'] = False
             write_config(global_config)
-            status_mode = 3
+            status_mode = 13
         if button == 0 and btime == 1:  # yes, do  display registration
             global_config['display_tail'] = True
             write_config(global_config)
-            status_mode = 3
+            status_mode = 13
         if button == 1 and btime == 1:  # cancel
+            status_mode = 13
+    elif status_mode == 13:  # Set Options Speak Distance
+        if button == 2 and btime == 1:  # No, do not display registration
+            global_config['distance_warnings'] = False
+            write_config(global_config)
+        if button == 0 and btime == 1:  # yes, do  display registration
+            global_config['distance_warnings'] = True
+            write_config(global_config)
+        if button == 1 and btime == 1:  # cancel
+            pass
+        if extsound_active:
+            status_mode = 14
+        else:
+            status_mode = 3
+    elif status_mode == 14:  # External Sound Volume
+        if button == 2 and btime == 1:  # +, increase
+            global_config['sound_volume'] += 5
+            if global_config['sound_volume'] > 100:
+                global_config['sound_volume'] = 100
+            radarbluez.setvolume(global_config['sound_volume'])
+            radarbluez.speak("Test")
+            status_mode = 14
+        if button == 0 and btime == 1:  # -, decrease
+            global_config['sound_volume'] -= 5
+            if global_config['sound_volume'] < 0:
+                global_config['sound_volume'] = 0
+            radarbluez.setvolume(global_config['sound_volume'])
+            radarbluez.speak("Test")
+            status_mode = 14
+        if button == 1 and btime == 1:  # set
+            write_config(global_config)
             status_mode = 3
 
     return 7  # no mode change
