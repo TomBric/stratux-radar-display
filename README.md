@@ -1,12 +1,13 @@
 # stratux-radar-display
-Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W). Reads the aircraft data from Stratux and displays them on the specified display. The newest version now has a user interface included. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
+Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W). Reads the aircraft data from Stratux and displays them on the specified display. The newest version now has a user interface included. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
+- update in version 1.4: external sound connection is now supported by using a USB sound card (approx. 4 Euro). With that you can connect your display to your intercom. This external sound output is also functioning on the stratux only, without an additional Zero.
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
 - Epaper Display 3.7 inch (waveshare)
 
 More displays can be integrated.
-You can find 3D printer files for cases of both variants in the repo (no-code). The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. 
+You can find 3D printer files for cases of both variants in the repo (no-code). The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. Instructions e.g. how to build the 2 1/4 Oled case can be found in the wiki (https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display).
 
 Find below a photo of the current supported displays
 - the oled display is relatively small, but can be build into a 2 1/4" or larger instrument mounting hole
@@ -15,7 +16,7 @@ Find below a photo of the current supported displays
 ![Display photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/StratuxRadar.jpg)
 
 ## Hardware-List
-- Raspberry Hardware: Since the code is pure python, no special hardware is required. I recommend a current "raspbian standard desktop os" as operating system. Performance requirements are not so high, so I recommend a "Rasperry Zero W 512MByte RAM". Normal Raspberry 3B or 4 are also possible (but not tested by me). The Raspi Zero has the smallest form factor and best battery consumption. 
+- Raspberry Hardware: Since the code is pure python, no special hardware is required. I recommend a current "raspbian standard desktop os" as operating system. Performance requirements are not so high, so I recommend a "Rasperry Zero or Zero 2 W 512MByte RAM". Normal Raspberry 3B or 4 are also possible. The Raspi Zero has the smallest form factor and best battery consumption. 
 - Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Paper Raw Panel Driver HAT 13512. Please make sure to switch the "Display Config" switch to A.
 (Alternatively Waveshare 18057 3.7inch e-Paper HAT: Directly mountable on the Raspi as a HAT, if you buy an Raspi Zero WH, but then you can't connect the buttons).
 
@@ -78,58 +79,37 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    Remark: Current configuration is for Stratux-Europe on IP address 192.168.10.1. If you have a different configuration please update /home/pi/stratux-radar-display/image/stratux_radar.sh accordingly.
    
    ### Expert setup 
-   1. Configure a clean Raspbian buster installation on your SD card. E.g. using Raspberry Pi Imager. Recommended image is "Raspbian Pi OS 32 lite". If you want to integrate bluetooth sound output, please user "Raspian Pi OS desktop". Unfortunately bluetooth is not properly installed in the buster lite release.
-   2. For network configuration: Create empty file named "ssh" on the boot partition. Copy "wpa_supplicant.conf" on the boot partition as well. This well enable the Pi to connect to the Stratux and also enable ssh connection.
-   3. The file "wpa_supplicant.conf" is actually configured for the network "stratux". If you want a different network setup please modify "wpa_supplicant.conf" accordingly. To get the following configurations please setup network and keys in "wpa_supplicant.conf" so that you have internet connection.
-   4. Startup your Stratux and boot your new raspberry. Figure out the IP-adress of your raspberry, e.g. by checking in the logs of your WLAN router (or use arp requests)
-   5. From your workstation open a remote shell on the new raspberry:  ssh pi@192.168.x.x. Password is standard for the pi.
-   6. Copy the configuration script (under github/image) onto the radar-raspberry:  scp configure_radar.sh pi@192.168.x.x:/home/pi
-   7. Execute the configuration script as user pi. "/bin/bash configure_radar.sh".  This will take some time since it does an update on the pi. It will also clone a version of the radar into /home/pi/stratux-radar-display
-   8. Depending on your display modify /home/pi/stratux-radar-display/image/stratux_radar.sh. In paramater "-c" enter the IP address of your stratux and in parameter "-d" the device. E.g.
+   1. Configure a clean Raspbian installation on your SD card. E.g. using Raspberry Pi Imager. Image to flash is the standard image "Raspbian Pi OS (recommended)". 
+   2. Setup your main stratux in the following way:  Install version eu-027 on ther stratux or newer. Go to "Settings" and set Wifi-Mode: AP+Client. Enable "Internet-Passthrough" as well. Then "Add wifi client network" and add the data of your local home network. This all enables your stratux to have Internet connection and gives the display the possibility to access internet as well. 
+   3. Startup your Stratux and boot your new raspberry. Connect your PC/workstation to the standard "stratux WLAN" network and figure out the IP-adress of your display-raspberry, e.g. by using "arp -a".
+   4. From your workstation open a remote shell on the display-raspberry:  ssh pi@192.168.x.x. Password is standard for the pi.
+   5. Clone the stratux-radar-display repository by the command: "git clone https://github.com/TomBric/stratux-radar-display.git"
+   6. Execute the configuration script as user pi. "/bin/bash /home/pi/stratux-radar-display/image/configure_radar.sh".  This will take some time since it does an update on the pi. 
+   7. Depending on your display modify /home/pi/stratux-radar-display/image/stratux_radar.sh. In paramater "-c" enter the IP address of your stratux and in parameter "-d" the device. E.g.
          - cd /home/pi/stratux-radar-display/main && python3 radar.py -s -d Oled_1in5 -c 192.168.10.1 &            
-         - cd /home/pi/stratux-radar-display/main && python3 radar.py -s -d Epaper_3in7 -c 192.168.178.55 & 
-   9. The configuration skript will make an entry in crontab of user pi, so that radar will start automatically after reboot.
+         - cd /home/pi/stratux-radar-display/main && python3 radar.py -s -r -d Epaper_3in7 -c 192.168.10.1 & 
+   8. The configuration skript will make an entry in crontab of user pi, so that radar will start automatically after reboot. 
 
    
-   ### Installation on a standard stratux device (for stratux versions before eu026!)
-   stratux-radar-display can run also directly on your stratux device. Connect the displays to the GPIO pins of the Stratux. 
+   ### Installation on a standard stratux device (for stratux versions eu027 or newer!)
+   stratux-radar-display can run also directly on your stratux device. You can find an example of a case with everything installed in the [wiki](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display)). Connect the displays to the GPIO pins of the Stratux. 
    Installation is only for expert users! To install the software perform the following steps:
    
-   1. Connect your stratux to a network, e.g. by integrating into your WLAN: Logon as root on your stratux. Make a copy of the existing /etc/network/interfaces (e.g. cp /etc/network/interfaces /etc/network/interfaces.stratux) and modify /etc/network/interfaces, so that it looks like
-   ```
-    auto lo
-    iface lo inet loopback
-    allow-hotplug eth0
-    iface eth0 inet dhcp
-    allow-hotplug wlan0
-
-    iface wlan0 inet dhcp
-       wpa-ssid "<YOUR WLAN SSID AT HOME>"
-       wpa-psk "<YOUR WLAN WPA PSK FROM HOME>"  
-   ```
+   1. Connect your stratux to a network, e.g. by integrating into your WLAN: go to "Settings" and add your local wifi network.
    This will connect your stratux to your local wlan. Alternatively connect Stratux via network cable.
-   
-   2. Reboot and log on to your Stratux as user pi, directory /home/pi
-    Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
-   3. Execute the configuration skript: "/bin/bash stratux-radar-display/image/configure_radar_on_stratux.sh"
-   4. Configure the startup skript "image/stratux-radar.sh": remove the option "-s" and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7"
-   5. Restore the original /etc/network/interfaces (e.g. by "mv /etc/network/interfaces.stratux /etc/network/interfaces")
-   6. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
-
-The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
-   Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry ZeroWH.
-   
-   ### Installation on a standard stratux device for stratux version eu026
-   stratux uses a volatile filesystem in the versions starting from eu026 (September 2021). Furthermore stratux now directly enables you to log into your home network via settings. So the setup for eu026 versions and newer is a little bit different:
-   
-   1. Setup your local network configuration in the stratux settings tab. Enter your "Wifi Client SSID" as well as your "Wifi Client Passphrase" to connect stratux to your local home network.
    2. Enable a writeable persistent filesystem in the settings tab by setting "Persistent Logging". 
    3. Reboot and log on to your Stratux as user pi, directory /home/pi
-    Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
-   4. Execute the configuration skript: "/bin/bash stratux-radar-display/image/configure_radar_on_stratux.sh"
-   5. Configure the startup skript "image/stratux-radar.sh": remove the option "-s" and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7"
-   6. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
+   4. Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
+   3. Execute the configuration skript: "/bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh". It will take some time.
+   4. Configure the startup skript "image/stratux-radar.sh": remove the option "-s" and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7"
+   5. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
 
+The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
+   Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry Zero 2 or Zero W.
+   
+   ### External Sound output
+   
+   You can connect your stratux device with your intercom if it has an input for external audio (e.g. TQ KRT2 has one). This is possible on the Pi Zero or the PI3B with an external USB sound card (using the builtin headphone output does not work on the Pi3B). I used a simple "3D USB 5.1 Sound card" available for 4 Euro. The sound volume can be controlled via the option "-y" or can be modified with the pushbuttons under ->Status-> Net/Opt -> External Volume.
    
    ### Bluetooth devices
    
@@ -212,16 +192,17 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
 
 # Shell command parameters
 ```
-usage: radar.py [-h] -d DEVICE [-s] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z]
-                [-c CONNECT] [-v] [-r]
+usage: radar.py [-h] -d DEVICE [-b] [-sd] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z] [-c CONNECT] [-v] [-r] [-e]
+                [-y EXTSOUND]
 
-Stratux web radar for separate displays
+Stratux radar display
 
 optional arguments:
   -h, --help            show this help message and exit
   -d DEVICE, --device DEVICE
                         Display device to use
-  -s, --speak           Speech warnings on
+  -b, --bluetooth       Bluetooth speech warnings on
+  -sd, --speakdistance  Speech with distance
   -n, --north           Ground mode: always display north up
   -t, --timer           Start mode is timer
   -a, --ahrs            Start mode is ahrs
@@ -234,8 +215,9 @@ optional arguments:
                         Connect to Stratux-IP
   -v, --verbose         Debug output on
   -r, --registration    Display registration no (Epaper only)
-
-
+  -e, --fullcircle      Display full circle radar (Epaper only)
+  -y EXTSOUND, --extsound EXTSOUND
+                        Ext sound on with volume [0-100]
   ```
 
 
