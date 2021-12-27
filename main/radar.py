@@ -213,9 +213,6 @@ def speaktraffic(hdiff, direction=None, distance=None):
         if direction:
             txt += str(direction) + ' o\'clock '
         txt += sign + ' ' + str(abs(feet)) + ' feet'
-        if direction:
-            txt += str(distance) + ' miles '
-        txt += sign + ' ' + str(abs(feet)) + ' feet'
         if global_config['distance_warnings'] and distance:
             txt += str(distance) + ' miles '
         radarbluez.speak(txt)
