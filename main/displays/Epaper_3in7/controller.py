@@ -365,13 +365,15 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     deg_per_value = (to_degree - from_degree) / (end_value - start_value)
 
     draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
-             from_degree+90, to_degree+90, width=6, fill="black")
+             from_degree-90, to_degree-90, width=6, fill="black")
     # small marks first
     line = ((center_x, center_y - size / 2), (center_x, center_y - size / 2 + small_mark_length))
     m = start_value
     while m <= end_value:
+
         angle = deg_per_value * (m-start_value) + from_degree
         mark = translate(angle, line, (center_x, center_y))
+        print("mark: m %f deg_per_value %f angle %f", m, deg_per_value, angle)
         draw.line(mark, fill="black", width=2)
         m += small_marks_distance
     # large marks
