@@ -77,8 +77,8 @@ msize = 15  # size of markings
 
 arrow_line_size = 10   # must be an even number
 arrow = ((arrow_line_size/2,0), (-arrow_line_size/2,0), (-arrow_line_size/2, -asize+50), (0, -asize+10),
-         (arrow_line_size/2, -asize+50))
-# coordinates of arrow at angle 0 (pointing up) for polygon
+         (arrow_line_size/2, -asize+50), (arrow_line_size/2,0))
+# points of arrow at angle 0 (pointing up) for line drawing
 
 m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
 # compass
@@ -369,7 +369,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
     gval = (current-1.0)*22.5
     ar = translate(gval-90, arrow, (azerox, azeroy))
-    draw.polygon(ar, fill="white", outline="black", width=3)
+    draw.line(ar, fill="black", width=3)
     # s = math.sin(math.radians(gval))
     # c = math.cos(math.radians(gval))
     # draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox+32*c, azeroy+32*s), fill="black", width=6)
