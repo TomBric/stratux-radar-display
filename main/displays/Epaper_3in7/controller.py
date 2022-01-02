@@ -121,7 +121,7 @@ def next_arcposition(old_arcposition):
 
 def turn(sin_a, cos_a, p):
     # help function which turns a point around zero with degree a, cos_a and sin_a in radians
-    return round(p[0] * cos_a - p[1] * sin_a), round(p[0] * sin_a + p[1] * cos_a)
+    return round(azerox + p[0] * cos_a - p[1] * sin_a), round(azeroy + p[0] * sin_a + p[1] * cos_a)
 
 
 def translate(angle, points):
@@ -369,7 +369,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="black", width=1)
     gval = (current-1.0)*22.5
     ar = translate(gval, arrow)
-    draw.line((ar[0], ar[1]), fill="black",width=arrow_line_size)
+    draw.line((ar[0], azeroy + ar[1]), fill="black",width=arrow_line_size)
     draw.polygon((ar[2], ar[3], ar[4]), fill="black", outline="black")
     # s = math.sin(math.radians(gval))
     # c = math.cos(math.radians(gval))
