@@ -367,7 +367,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
              from_degree-90, to_degree-90, width=6, fill="black")
     # small marks first
-    line = ((0, -size/2-1), (0,-size / 2 + small_mark_length))
+    line = ((0, -size/2-3), (0,-size / 2 + small_mark_length))
     m = start_value
     while m <= end_value:
         angle = deg_per_value * (m-start_value) + from_degree
@@ -375,7 +375,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         draw.line(mark, fill="black", width=2)
         m += small_marks_distance
     # large marks
-    line=((0, -size/2-1), (0, -size/2 + big_mark_length))
+    line=((0, -size/2-3), (0, -size/2 + big_mark_length))
     m = start_value
     while m <= end_value:
         angle = deg_per_value*(m-start_value) + from_degree
@@ -416,16 +416,18 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.ellipse((azerox - 10, azeroy - 10, azerox + 10, azeroy + 10), fill="black")
     '''
 
-
-    draw.text((zerox-30, 0), "G-Meter", font=verylargefont, fill="black")
-    draw.text((zerox-30, 88), "max", font=smallfont, fill="black")
+    right_center_x = (sizex-asize)/2+asize    # center of remaining part
+    t = "G-Meter"
+    ts = draw.textsize(t, largefont)
+    draw.text((right_center_x - ts[0] / 2, 0), t, font=largefont, fill="black", align="left")
+    draw.text((asize+10, 88), "max", font=smallfont, fill="black")
     right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
-        draw.text((zerox-30, 138), "current", font=smallfont, fill="black")
+        draw.text((asize+10, 138), "act", font=smallfont, fill="black")
         right_text(draw, 126, "{:+1.2f}".format(current), verylargefont, fill="black")
     else:
-        draw.text((zerox-30, 138), error_message, font=largefont, fill="black")
-    draw.text((zerox-30, 188), "min", font=smallfont, fill="black")
+        draw.text((asize+10, 138), error_message, font=largefont, fill="black")
+    draw.text((asize+10, 188), "min", font=smallfont, fill="black")
     right_text(draw, 185, "{:+1.2f}".format(ming), largefont, fill="black")
 
     right = "Reset"
