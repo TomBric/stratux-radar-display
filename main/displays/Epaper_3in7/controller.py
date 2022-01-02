@@ -72,12 +72,12 @@ pitch_posmarks = (-30, -20, -10, 10, 20, 30)
 PITCH_SCALE = 4.0
 azerox = 140  # zero for analogue meter
 azeroy = 140
-asize = 140
+asize = 280
 msize = 15  # size of markings
 
 arrow_line_size = 10   # must be an even number
-arrow = ((arrow_line_size/2,0), (-arrow_line_size/2,0), (-arrow_line_size/2, -asize+50), (0, -asize+10),
-         (arrow_line_size/2, -asize+50), (arrow_line_size/2,0))
+arrow = ((arrow_line_size/2,0), (-arrow_line_size/2,0), (-arrow_line_size/2, -asize/2+50), (0, -asize/2+10),
+         (arrow_line_size/2, -asize/2+50), (arrow_line_size/2,0))
 # points of arrow at angle 0 (pointing up) for line drawing
 
 m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
@@ -130,7 +130,6 @@ def translate(angle, points, zero):
     c = math.cos(math.radians(angle))
     result = ()
     for p in points:
-        print("Point: " + str(p[0]) + ","+ str(p[1]))
         result += (turn(s, c, p, zero),)
     return result
 
