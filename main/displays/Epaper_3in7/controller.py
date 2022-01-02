@@ -75,7 +75,7 @@ azeroy = 140
 asize = 280
 msize = 15  # size of markings
 
-arrow_line_size = 10   # must be an even number
+arrow_line_size = 12   # must be an even number
 arrow = ((arrow_line_size/2,0), (-arrow_line_size/2,0), (-arrow_line_size/2, -asize/2+50), (0, -asize/2+10),
          (arrow_line_size/2, -asize/2+50), (arrow_line_size/2,0))
 # points of arrow at angle 0 (pointing up) for line drawing
