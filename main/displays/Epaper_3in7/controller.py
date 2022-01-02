@@ -368,13 +368,16 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
              from_degree+90, to_degree+90, width=6, fill="black")
     # small marks first
     line = ((center_x, center_y - size / 2), (center_x, center_y - size / 2 + small_mark_length))
-    for m in range(start_value, end_value, small_marks_distance):
+    m = start_value
+    while m <= end_value:
         angle = deg_per_value * (m-start_value) + from_degree
         mark = translate(angle, line, (center_x, center_y))
         draw.line(mark, fill="black", width=2)
+        m += small_marks_distance
     # large marks
     line=((center_x, center_y - size/2), (center_x, center_y - size/2 + big_mark_length))
-    for m in range(start_value, end_value, marks_distance):
+    m = start_value
+    while m <= end_value:
         angle = deg_per_value*(m-start_value) + from_degree
         mark = translate(angle, line, (center_x, center_y))
         draw.line(mark, fill="black", width=2)
@@ -384,6 +387,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         t_center = (0, center_x - size/2 + big_mark_length + LARGE/2)
         translate(angle, t_center, (center_x, center_y))
         draw.text((t_center[0]-w/2, t_center[1]-h/2), marktext, fill="black", font=largefont)
+        m += small_marks_distance
     # arrow
     angle = deg_per_value * (current - start_value) + from_degree
     ar = translate(angle, arrow, (azerox, azeroy))
