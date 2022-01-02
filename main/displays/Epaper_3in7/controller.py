@@ -358,7 +358,44 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
     centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
 
 
+def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
+          marks_distance, small_marks_distance, marks_text):
+    big_mark_length = 20
+    small_mark_length = 10
+    deg_per_value = (to_degree - from_degree) / (end_value - start_value)
+
+    draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
+             from_degree+90, to_degree+90, width=6, fill="black")
+    # small marks first
+    line = ((center_x, center_y - size / 2), (center_x, center_y - size / 2 + small_mark_length))
+    for m in range(start_value, end_value, small_marks_distance):
+        angle = deg_per_value * (m-start_value) + from_degree
+        mark = translate(angle, line, (center_x, center_y))
+        draw.line(mark, fill="black", width=2)
+    # large marks
+    line=((center_x, center_y - size/2), (center_x, center_y - size/2 + big_mark_length))
+    for m in range(start_value, end_value, marks_distance):
+        angle = deg_per_value*(m-start_value) + from_degree
+        mark = translate(angle, line, (center_x, center_y))
+        draw.line(mark, fill="black", width=2)
+        # text
+        marktext = str(m)
+        w, h = draw.textsize(marktext, largefont)
+        t_center = (0, center_x - size/2 + big_mark_length + LARGE/2)
+        translate(angle, t_center, (center_x, center_y))
+        draw.text((t_center[0]-w/2, t_center[1]-h/2), marktext, fill="black", font=largefont)
+    # arrow
+    angle = deg_per_value * (current - start_value) + from_degree
+    ar = translate(angle, arrow, (azerox, azeroy))
+    draw.line(ar, fill="black", width=4)
+    # centerpoint
+    draw.ellipse((azerox - 10, azeroy - 10, azerox + 10, azeroy + 10), fill="black")
+
+
 def gmeter(draw, current, maxg, ming, error_message):
+    meter(draw, current, -3, 5, 110, 430, asize, azerox, azeroy, 1, 0.25, None)
+
+    '''
     for m in m_marks:
         s = math.sin(math.radians(m[0]+90))
         c = math.cos(math.radians(m[0]+90))
@@ -374,6 +411,9 @@ def gmeter(draw, current, maxg, ming, error_message):
     # c = math.cos(math.radians(gval))
     # draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox+32*c, azeroy+32*s), fill="black", width=6)
     draw.ellipse((azerox - 10, azeroy - 10, azerox + 10, azeroy + 10), fill="black")
+    '''
+
+
     draw.text((zerox-30, 0), "G-Meter", font=verylargefont, fill="black")
     draw.text((zerox-30, 88), "max", font=smallfont, fill="black")
     right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
