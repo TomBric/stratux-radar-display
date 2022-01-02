@@ -368,9 +368,9 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
              from_degree-90, to_degree-90, width=6, fill="black")
     # small marks first
     line = ((center_x, center_y - size / 2), (center_x, center_y - size / 2 + small_mark_length))
+    print("Line p0 ", line[0]," p1 ", line[1])
     m = start_value
     while m <= end_value:
-
         angle = deg_per_value * (m-start_value) + from_degree
         mark = translate(angle, line, (center_x, center_y))
         print("mark: m:", m, " deg_per_value ", deg_per_value, " angle ", angle, " m0 ", mark[0], " m1 ", mark[1])
