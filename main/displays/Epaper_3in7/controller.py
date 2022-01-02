@@ -76,7 +76,7 @@ asize = 140
 msize = 15  # size of markings
 
 arrow_line_size = 10   # must be an even number
-arrow = ((0,0), (0, -asize+30), (-arrow_line_size/2, -asize+30), (arrow_line_size/2, -asize+30), (0, -asize+10))
+arrow = ((0,0), (0, -asize+50), (-arrow_line_size/2, -asize+50), (arrow_line_size/2, -asize+50), (0, -asize+10))
 # coordinates of arrow at angle 0 (pointing up), line is arrow_line_size thick
 
 m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
