@@ -382,12 +382,11 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         mark = translate(angle, line, (center_x, center_y))
         draw.line(mark, fill="black", width=2)
         # text
+        t_center = translate(angle, (0, center_x - size / 2 + big_mark_length + LARGE / 2), (center_x, center_y))
         marktext = str(m)
         w, h = draw.textsize(marktext, largefont)
-        t_center = (0, center_x - size/2 + big_mark_length + LARGE/2)
-        translate(angle, t_center, (center_x, center_y))
         draw.text((t_center[0]-w/2, t_center[1]-h/2), marktext, fill="black", font=largefont)
-        m += small_marks_distance
+        m += marks_distance
     # arrow
     angle = deg_per_value * (current - start_value) + from_degree
     ar = translate(angle, arrow, (azerox, azeroy))
