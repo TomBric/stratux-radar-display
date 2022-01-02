@@ -121,7 +121,7 @@ def next_arcposition(old_arcposition):
 
 def turn(sin_a, cos_a, p, zero):
     # help function which turns a point around zero with degree a, cos_a and sin_a in radians
-    return round(zero[0] + p[0] * cos_a - p[1] * sin_a), round(zero[1) + p[0] * sin_a + p[1] * cos_a)
+    return round(zero[0] + p[0] * cos_a - p[1] * sin_a), round(zero[1] + p[0] * sin_a + p[1] * cos_a)
 
 
 def translate(angle, points, zero):
