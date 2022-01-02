@@ -74,6 +74,11 @@ azerox = 140  # zero for analogue meter
 azeroy = 140
 asize = 140
 msize = 15  # size of markings
+
+arrow_line_size = 6   # must be an even number
+arrow = ((0,0), (0, -asize-20), (-arrow_line_size/2, -asize-20), (arrow_line_size/2, -asize-20) (0, -asize-10))
+# coordinates of arrow at angle 0 (pointing up), line is arrow_line_size thick
+
 m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
 # compass
 compass_aircraft = None   # image of aircraft for compass-display
@@ -112,6 +117,20 @@ def next_arcposition(old_arcposition):
     if ARCPOSITION_EXCLUDE_TO >= new_arcposition >= ARCPOSITION_EXCLUDE_FROM:
         new_arcposition = (new_arcposition + 210) % 360
     return new_arcposition
+
+
+def turn(sin_a, cos_a, p):
+    # help function which turns a point around zero with degree a, cos_a and sin_a in radians
+    return round(p[0] * cos_a - p[1] * sin_a), round(p[0] * sin_a + p[1] * cos_a)
+
+
+def translate(angle, points):
+    s = math.sin(math.radians(angle))
+    c = math.cos(math.radians(angle))
+    result = ()
+    for p in points:
+        result += (turn(s, c, p),)
+    return result
 
 
 def init(fullcircle = False):
@@ -349,9 +368,12 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
     draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="black", width=1)
     gval = (current-1.0)*22.5
-    s = math.sin(math.radians(gval))
-    c = math.cos(math.radians(gval))
-    draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox+32*c, azeroy+32*s), fill="black", width=6)
+    ar = translate(gval, arrow)
+    draw.line(ar[0], ar[1], fill="black",width=arrow_line_size)
+    draw.polygon(ar[2], ar[3], ar[4], fill="black", outline="black")
+    # s = math.sin(math.radians(gval))
+    # c = math.cos(math.radians(gval))
+    # draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox+32*c, azeroy+32*s), fill="black", width=6)
 
     draw.text((zerox-30, 0), "G-Meter", font=verylargefont, fill="black")
     draw.text((zerox-30, 88), "max", font=smallfont, fill="black")
