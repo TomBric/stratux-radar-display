@@ -367,14 +367,13 @@ def gmeter(draw, current, maxg, ming, error_message):
         draw.text((azerox-(asize-msize-SMALL/2)*c-SMALL/4, azeroy-(asize-msize-SMALL/2)*s-SMALL/2), str(m[1]),
                   font=smallfont, fill="black")
     draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
-    draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="white", width=3)
     gval = (current-1.0)*22.5
     ar = translate(gval-90, arrow, (azerox, azeroy))
     draw.polygon(ar, fill="black", outline="black")
     # s = math.sin(math.radians(gval))
     # c = math.cos(math.radians(gval))
     # draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox+32*c, azeroy+32*s), fill="black", width=6)
-
+    draw.ellipse((azerox - 10, azeroy - 10, azerox + 10, azeroy + 10), outline="black", fill="white", width=3)
     draw.text((zerox-30, 0), "G-Meter", font=verylargefont, fill="black")
     draw.text((zerox-30, 88), "max", font=smallfont, fill="black")
     right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
