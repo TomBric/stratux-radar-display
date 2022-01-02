@@ -369,7 +369,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
     gval = (current-1.0)*22.5
     ar = translate(gval-90, arrow, (azerox, azeroy))
-    draw.line(ar, fill="black", width=3)
+    draw.line(ar, fill="black", width=5)
     # s = math.sin(math.radians(gval))
     # c = math.cos(math.radians(gval))
     # draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox+32*c, azeroy+32*s), fill="black", width=6)
