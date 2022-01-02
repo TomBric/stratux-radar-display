@@ -369,7 +369,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="black", width=1)
     gval = (current-1.0)*22.5
     ar = translate(gval, arrow)
-    draw.line((ar[0], azeroy + ar[1]), fill="black",width=arrow_line_size)
+    draw.line((ar[0], ar[1]), fill="black",width=arrow_line_size)
     draw.polygon((ar[2], ar[3], ar[4]), fill="black", outline="black")
     # s = math.sin(math.radians(gval))
     # c = math.cos(math.radians(gval))
