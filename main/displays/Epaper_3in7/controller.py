@@ -130,6 +130,7 @@ def translate(angle, points, zero):
     c = math.cos(math.radians(angle))
     result = ()
     for p in points:
+        print("Point: " + str(p[0]) + ","+ str(p[1]))
         result += (turn(s, c, p, zero),)
     return result
 
