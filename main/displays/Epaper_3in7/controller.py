@@ -373,7 +373,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
 
         angle = deg_per_value * (m-start_value) + from_degree
         mark = translate(angle, line, (center_x, center_y))
-        print("mark: m %f deg_per_value %f angle %f", m, deg_per_value, angle)
+        print("mark: m:", m, " deg_per_value ", deg_per_value, " angle ", angle, " m0 ", mark[0], " m1 ", mark[1])
         draw.line(mark, fill="black", width=2)
         m += small_marks_distance
     # large marks
