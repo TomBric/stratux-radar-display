@@ -360,8 +360,8 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
           marks_distance, small_marks_distance, marks_text):
-    big_mark_length = 20
-    small_mark_length = 10
+    big_mark_length = 25
+    small_mark_length = 15
     deg_per_value = (to_degree - from_degree) / (end_value - start_value)
 
     draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
@@ -372,7 +372,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     while m <= end_value:
         angle = deg_per_value * (m-start_value) + from_degree
         mark = translate(angle, line, (center_x, center_y))
-        draw.line(mark, fill="black", width=2)
+        draw.line(mark, fill="black", width=3)
         m += small_marks_distance
     # large marks
     line=((0, -size/2+2), (0, -size/2 + big_mark_length))
@@ -380,9 +380,9 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     while m <= end_value:
         angle = deg_per_value*(m-start_value) + from_degree
         mark = translate(angle, line, (center_x, center_y))
-        draw.line(mark, fill="black", width=2)
+        draw.line(mark, fill="black", width=4)
         # text
-        t_center = translate(angle, ((0,-size/2 + big_mark_length + LARGE / 2), ), (center_x, center_y))
+        t_center = translate(angle, ((0,-size/2 + big_mark_length + LARGE/2) + 5, ), (center_x, center_y))
         marktext = str(m)
         w, h = draw.textsize(marktext, largefont)
         draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="black", font=largefont)
@@ -398,24 +398,6 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
 def gmeter(draw, current, maxg, ming, error_message):
     meter(draw, current, -3, 5, 110, 430, asize, azerox, azeroy, 1, 0.25, None)
 
-    '''
-    for m in m_marks:
-        s = math.sin(math.radians(m[0]+90))
-        c = math.cos(math.radians(m[0]+90))
-        draw.line((azerox-asize*c, azeroy-asize*s, azerox-(asize-msize)*c, azeroy-(asize-msize)*s),
-                  fill="black", width=4)
-        draw.text((azerox-(asize-msize-SMALL/2)*c-SMALL/4, azeroy-(asize-msize-SMALL/2)*s-SMALL/2), str(m[1]),
-                  font=smallfont, fill="black")
-    draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
-    gval = (current-1.0)*22.5
-    ar = translate(gval-90, arrow, (azerox, azeroy))
-    draw.line(ar, fill="black", width=4)
-    # s = math.sin(math.radians(gval))
-    # c = math.cos(math.radians(gval))
-    # draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox+32*c, azeroy+32*s), fill="black", width=6)
-    draw.ellipse((azerox - 10, azeroy - 10, azerox + 10, azeroy + 10), fill="black")
-    '''
-
     right_center_x = (sizex-asize)/2+asize    # center of remaining part
     t = "G-Meter"
     ts = draw.textsize(t, largefont)
@@ -424,14 +406,14 @@ def gmeter(draw, current, maxg, ming, error_message):
     right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
         draw.text((asize+20, 138), "act", font=smallfont, fill="black")
-        right_text(draw, 126, "{:+1.2f}".format(current), verylargefont, fill="black")
+        right_text(draw, 126, "{:+1.2f}".format(current), largefont, fill="black")
     else:
         draw.text((asize+20, 138), error_message, font=largefont, fill="black")
     draw.text((asize+20, 188), "min", font=smallfont, fill="black")
     right_text(draw, 185, "{:+1.2f}".format(ming), largefont, fill="black")
 
-    right = "   Reset"
-    middle = "Mode"
+    right = "Reset"
+    middle = "    Mode"
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey-SMALL-3, middle, smallfont, fill="black")
