@@ -398,7 +398,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    meter(draw, current, -3, 5, 110, 430, asize, azerox, azeroy, 1, 0.25, None)
+    meter(draw, current, -3, 5, 0, 350, asize, azerox, azeroy, 1, 0.25, None)
 
     '''
     for m in m_marks:
