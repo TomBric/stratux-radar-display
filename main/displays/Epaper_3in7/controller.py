@@ -386,7 +386,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         t_center = translate(angle, ((0, center_x - size / 2 + big_mark_length + LARGE / 2), ), (center_x, center_y))
         marktext = str(m)
         w, h = draw.textsize(marktext, largefont)
-        draw.text((t_center[0]-w/2, t_center[1]-h/2), marktext, fill="black", font=largefont)
+        draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="black", font=largefont)
         m += marks_distance
     # arrow
     angle = deg_per_value * (current - start_value) + from_degree
