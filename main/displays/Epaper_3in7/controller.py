@@ -402,15 +402,15 @@ def gmeter(draw, current, maxg, ming, error_message):
     t = "G-Meter"
     ts = draw.textsize(t, largefont)
     draw.text((right_center_x - ts[0] / 2, 0), t, font=largefont, fill="black", align="left")
-    draw.text((asize+20, 88), "max", font=smallfont, fill="black")
-    right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
+    draw.text((asize+30, 98), "max", font=smallfont, fill="black")
+    right_text(draw, 95, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
-        draw.text((asize+20, 138), "act", font=smallfont, fill="black")
-        right_text(draw, 126, "{:+1.2f}".format(current), largefont, fill="black")
+        draw.text((asize+30, 138), "act", font=smallfont, fill="black")
+        right_text(draw, 135, "{:+1.2f}".format(current), largefont, fill="black")
     else:
-        draw.text((asize+20, 138), error_message, font=largefont, fill="black")
-    draw.text((asize+20, 188), "min", font=smallfont, fill="black")
-    right_text(draw, 185, "{:+1.2f}".format(ming), largefont, fill="black")
+        draw.text((asize+30, 138), error_message, font=largefont, fill="black")
+    draw.text((asize+30, 178), "min", font=smallfont, fill="black")
+    right_text(draw, 175, "{:+1.2f}".format(ming), largefont, fill="black")
 
     right = "Reset"
     middle = "    Mode"
