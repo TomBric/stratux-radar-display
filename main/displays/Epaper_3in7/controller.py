@@ -70,17 +70,8 @@ draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
 PITCH_SCALE = 4.0
-azerox = 140  # zero for analogue meter
-azeroy = 140
-asize = 280
 msize = 15  # size of markings
 
-arrow_line_size = 12   # must be an even number
-arrow = ((arrow_line_size/2, 0), (-arrow_line_size/2, 0), (-arrow_line_size/2, -asize/2+50), (0, -asize/2+10),
-         (arrow_line_size/2, -asize/2+50), (arrow_line_size/2, 0))
-# points of arrow at angle 0 (pointing up) for line drawing
-
-m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
 # compass
 compass_aircraft = None   # image of aircraft for compass-display
 mask = None
@@ -363,6 +354,10 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     big_mark_length = 20
     small_mark_length = 10
     text_distance = 10
+    arrow_line_size = 12  # must be an even number
+    arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + 50),
+             (0, -size / 2 + 10), (arrow_line_size / 2, -size / 2 + 50), (arrow_line_size / 2, 0))
+    # points of arrow at angle 0 (pointing up) for line drawing
 
     deg_per_value = (to_degree - from_degree) / (end_value - start_value)
 
@@ -395,10 +390,10 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     elif current < start_value:
         current = start_value
     angle = deg_per_value * (current - start_value) + from_degree
-    ar = translate(angle, arrow, (azerox, azeroy))
+    ar = translate(angle, arrow, (center_x, center_y))
     draw.line(ar, fill="black", width=4)
     # centerpoint
-    draw.ellipse((azerox - 10, azeroy - 10, azerox + 10, azeroy + 10), fill="black")
+    draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill="black")
 
     if middle_text1 is not None:
         ts = smallfont.getsize(middle_text1)
@@ -409,20 +404,21 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    meter(draw, current, -3, 5, 110, 430, asize, azerox, azeroy, 1, 0.25, "G-Force", None)
+    gm_size = 280
+    meter(draw, current, -3, 5, 110, 430, gm_size, 140, 140, 1, 0.25, "G-Force", None)
 
-    right_center_x = (sizex-asize)/2+asize    # center of remaining part
+    right_center_x = (sizex-gm_size)/2+gm_size    # center of remaining part
     t = "G-Meter"
     ts = draw.textsize(t, largefont)
     draw.text((right_center_x - ts[0] / 2, 30), t, font=largefont, fill="black", align="left")
-    draw.text((asize+30, 98), "max", font=smallfont, fill="black")
+    draw.text((gm_size+30, 98), "max", font=smallfont, fill="black")
     right_text(draw, 95, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
-        draw.text((asize+30, 138), "act", font=smallfont, fill="black")
+        draw.text((gm_size+30, 138), "act", font=smallfont, fill="black")
         right_text(draw, 135, "{:+1.2f}".format(current), largefont, fill="black")
     else:
-        draw.text((asize+30, 138), error_message, font=largefont, fill="black")
-    draw.text((asize+30, 178), "min", font=smallfont, fill="black")
+        draw.text((gm_size+30, 138), error_message, font=largefont, fill="black")
+    draw.text((gm_size+30, 178), "min", font=smallfont, fill="black")
     right_text(draw, 175, "{:+1.2f}".format(ming), largefont, fill="black")
 
     right = "Reset"
