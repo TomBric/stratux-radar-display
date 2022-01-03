@@ -359,7 +359,7 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 
 def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
-          marks_distance, small_marks_distance, marks_text, middle_text1, middle_text2):
+          marks_distance, small_marks_distance, middle_text1, middle_text2):
     big_mark_length = 20
     small_mark_length = 10
     text_distance = 10
@@ -409,7 +409,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    meter(draw, current, -3, 5, 110, 430, asize, azerox, azeroy, 1, 0.25, None, "G-Force", None)
+    meter(draw, current, -3, 5, 110, 430, asize, azerox, azeroy, 1, 0.25, "G-Force", None)
 
     right_center_x = (sizex-asize)/2+asize    # center of remaining part
     t = "G-Meter"
@@ -482,8 +482,7 @@ def compass(draw, heading, error_message):
 
 def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
         error_message):
-    meter(draw, vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2 , sizey/2, 5, 1, None,
-          None, None)
+    meter(draw, vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2 , sizey/2, 5, 1, None, None)
     draw.text((35, sizey/2 - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
     draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill="black", align="left")
     middle_text = "Vertical Speed"
