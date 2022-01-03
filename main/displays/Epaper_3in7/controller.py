@@ -397,11 +397,11 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     draw.ellipse((azerox - 10, azeroy - 10, azerox + 10, azeroy + 10), fill="black")
 
     if middle_text1 is not None:
-        ts = draw.textsize(middle_text1, verysmallfont)
-        draw.text((center_x-ts[0]/2, center_y-ts[1]-10), middle_text1, font=verysmallfont, fill="black", align="left")
+        ts = draw.textsize(middle_text1, smallfont)
+        draw.text((center_x-ts[0]/2, center_y-ts[1]-20), middle_text1, font=smallfont, fill="black", align="left")
     if middle_text2 is not None:
-        ts = draw.textsize(middle_text2, verysmallfont)
-        draw.text((center_x-ts[0]/2, center_y+10), middle_text2, font=verysmallfont, fill="black", align="left")
+        ts = draw.textsize(middle_text2, smallfont)
+        draw.text((center_x-ts[0]/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
 
 
 def gmeter(draw, current, maxg, ming, error_message):
