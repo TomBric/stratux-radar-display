@@ -488,7 +488,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     vmsize_n = 10
     vmsize_l = 20
 
-    meter(draw, vertical_speed/100, -20, 20, 100, 80, sizey, sizey/2 , sizey/2, 5, 1, None,
+    meter(draw, vertical_speed/100, -20, 20, 100, 440, sizey, sizey/2 , sizey/2, 5, 1, None,
           "Vertical Speed", "100 ft/min")
     '''
     draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
