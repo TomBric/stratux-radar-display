@@ -362,7 +362,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
           marks_distance, small_marks_distance, marks_text, middle_text1, middle_text2):
     big_mark_length = 20
     small_mark_length = 10
-    text_distance = 8
+    text_distance = 10
 
     deg_per_value = (to_degree - from_degree) / (end_value - start_value)
 
