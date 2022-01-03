@@ -482,17 +482,15 @@ def compass(draw, heading, error_message):
 
 def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
         error_message):
-    csize = sizey / 2  # radius of compass rose
-    czerox = csize    # move to the left
-    czeroy = sizey / 2
-    vmsize_n = 10
-    vmsize_l = 20
-
     meter(draw, vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2 , sizey/2, 5, 1, None,
-          "Vertical Speed", "100 ft/min")
+          None, None)
     draw.text((35, sizey/2 - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
     draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill="black", align="left")
-
+    middle_text = "Vertical Speed"
+    ts = draw.textsize(middle_text, verysmallfont)
+    draw.text((sizey/2 - ts[0]/2, sizey/2 - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
+    middle_text = "100 feet per min"
+    ts = draw.textsize(middle_text, verysmallfont)
     '''
     draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
     draw.text((35, czeroy - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
