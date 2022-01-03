@@ -76,8 +76,8 @@ asize = 280
 msize = 15  # size of markings
 
 arrow_line_size = 12   # must be an even number
-arrow = ((arrow_line_size/2,0), (-arrow_line_size/2,0), (-arrow_line_size/2, -asize/2+50), (0, -asize/2+10),
-         (arrow_line_size/2, -asize/2+50), (arrow_line_size/2,0))
+arrow = ((arrow_line_size/2, 0), (-arrow_line_size/2, 0), (-arrow_line_size/2, -asize/2+50), (0, -asize/2+10),
+         (arrow_line_size/2, -asize/2+50), (arrow_line_size/2, 0))
 # points of arrow at angle 0 (pointing up) for line drawing
 
 m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
@@ -134,7 +134,7 @@ def translate(angle, points, zero):
     return result
 
 
-def init(fullcircle = False):
+def init(fullcircle=False):
     global sizex
     global sizey
     global zerox
@@ -326,9 +326,9 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     if not connected:
         centered_text(draw, 30, "No Connection!", smallfont, fill="black")
 
-    if extsound or bt_devices>0:
+    if extsound or bt_devices > 0:
         if sound_active:
-            t=""
+            t = ""
             if extsound:
                 t += "\uf028"  # volume symbol
             if bt_devices > 0:
@@ -359,32 +359,34 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 
 def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
-          marks_distance, small_marks_distance, marks_text):
-    big_mark_length = 25
-    small_mark_length = 15
+          marks_distance, small_marks_distance, marks_text, middle_text1, middle_text2):
+    big_mark_length = 20
+    small_mark_length = 10
+    text_distance = 5
+
     deg_per_value = (to_degree - from_degree) / (end_value - start_value)
 
     draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
              from_degree-90, to_degree-90, width=6, fill="black")
     # small marks first
-    line = ((0, -size/2+2), (0,-size/2+small_mark_length))
+    line = ((0, -size/2+2), (0, -size/2+small_mark_length))
     m = start_value
     while m <= end_value:
         angle = deg_per_value * (m-start_value) + from_degree
         mark = translate(angle, line, (center_x, center_y))
-        draw.line(mark, fill="black", width=3)
+        draw.line(mark, fill="black", width=2)
         m += small_marks_distance
     # large marks
-    line=((0, -size/2+2), (0, -size/2+big_mark_length))
+    line = ((0, -size/2+2), (0, -size/2+big_mark_length))
     m = start_value
     while m <= end_value:
         angle = deg_per_value*(m-start_value) + from_degree
         mark = translate(angle, line, (center_x, center_y))
         draw.line(mark, fill="black", width=4)
         # text
-        t_center = translate(angle, ((0,-size/2 + big_mark_length + LARGE/2 + 5), ), (center_x, center_y))
         marktext = str(m)
         w, h = draw.textsize(marktext, largefont)
+        t_center = translate(angle, ((0, -size/2 + big_mark_length + h/2 + text_distance), ), (center_x, center_y))
         draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="black", font=largefont)
         m += marks_distance
     # arrow
@@ -393,6 +395,13 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     draw.line(ar, fill="black", width=4)
     # centerpoint
     draw.ellipse((azerox - 10, azeroy - 10, azerox + 10, azeroy + 10), fill="black")
+
+    if middle_text1 is not None:
+        ts = draw.textsize(middle_text1, verysmallfont)
+        draw.text((center_x-ts[0]/2, center_y-ts[1]-10), middle_text1, font=verysmallfont, fill="black", align="left")
+    if middle_text2 is not None:
+        ts = draw.textsize(middle_text2, verysmallfont)
+        draw.text((center_x-ts[0]/2, center_y+10), middle_text2, font=verysmallfont, fill="black", align="left")
 
 
 def gmeter(draw, current, maxg, ming, error_message):
@@ -772,4 +781,4 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty += VERYSMALL + 10
     draw.text((5, starty), "sensors", font=verysmallfont, fill="black")
     x = round_text(draw, 100, starty, "IMU", "white", stat['IMUConnected'], out="black")
-    x = round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
+    round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
