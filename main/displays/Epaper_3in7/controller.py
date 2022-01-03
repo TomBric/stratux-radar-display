@@ -390,6 +390,10 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="black", font=largefont)
         m += marks_distance
     # arrow
+    if current > end_value:   # normalize values in allowed ranges
+        current = end_value
+    elif current < start_value:
+        current = start_value
     angle = deg_per_value * (current - start_value) + from_degree
     ar = translate(angle, arrow, (azerox, azeroy))
     draw.line(ar, fill="black", width=4)
@@ -484,6 +488,9 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     vmsize_n = 10
     vmsize_l = 20
 
+    meter(draw, vertical_speed/100, -20, 20, 100, 80, sizey, sizey/2 , sizey/2, 5, 1, None,
+          "Vertical Speed", "100 ft/min")
+    '''
     draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
     draw.text((35, czeroy - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
     draw.text((35, czeroy + 25), "dn", font=verysmallfont, fill="black", align="left")
@@ -493,6 +500,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     middle_text = "100 feet per min"
     ts = draw.textsize(middle_text, verysmallfont)
     draw.text((czerox - ts[0]/2, czeroy + 10), middle_text, font=verysmallfont, fill="black", align="left")
+    '''
 
     # right data display
     draw.text((300, 10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
@@ -509,6 +517,10 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((300, 211), "GpsSpd [kts]", font=verysmallfont, fill="black", align="left")
     right_text(draw, 208, "{:1.1f}".format(gps_speed), smallfont, fill="black")
 
+    if error_message is not None:
+        centered_text(draw, 60, error_message, verylargefont, fill="black")
+
+    '''
     scale = 170.0 / 2000.0
     for m in range(-2000, 2100, 100):
         s = math.sin(math.radians(m * scale))
@@ -543,6 +555,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.line((czerox - (csize - vmsize_n - 3) * c, czeroy - (csize - vmsize_n - 3) * s, czerox, czeroy), fill="black",
               width=3)
     draw.ellipse((czerox - 8, czeroy - 8, czerox + 8, czeroy + 8), outline="black", fill="white", width=3)
+    '''
 
     right = "Reset"
     middle = "    Mode"
