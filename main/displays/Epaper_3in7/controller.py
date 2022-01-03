@@ -385,7 +385,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         draw.line(mark, fill="black", width=4)
         # text
         marktext = str(m)
-        w, h = draw.textsize(marktext, largefont)
+        w, h = largefont.getsize(marktext)
         t_center = translate(angle, ((0, -size/2 + big_mark_length + h/2 + text_distance), ), (center_x, center_y))
         draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="black", font=largefont)
         m += marks_distance
@@ -401,10 +401,10 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     draw.ellipse((azerox - 10, azeroy - 10, azerox + 10, azeroy + 10), fill="black")
 
     if middle_text1 is not None:
-        ts = draw.textsize(middle_text1, smallfont)
+        ts = smallfont.getsize(middle_text1)
         draw.text((center_x-ts[0]/2, center_y-ts[1]-20), middle_text1, font=smallfont, fill="black", align="left")
     if middle_text2 is not None:
-        ts = draw.textsize(middle_text2, smallfont)
+        ts = smallfont.getsize(middle_text2)
         draw.text((center_x-ts[0]/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
 
 
@@ -492,17 +492,6 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     middle_text = "100 feet per min"
     ts = draw.textsize(middle_text, verysmallfont)
     draw.text((sizey/2 - ts[0] / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
-    '''
-    draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
-    draw.text((35, czeroy - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
-    draw.text((35, czeroy + 25), "dn", font=verysmallfont, fill="black", align="left")
-    middle_text = "Vertical Speed"
-    ts = draw.textsize(middle_text, verysmallfont)
-    draw.text((czerox - ts[0]/2, czeroy - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
-    middle_text = "100 feet per min"
-    ts = draw.textsize(middle_text, verysmallfont)
-    draw.text((czerox - ts[0]/2, czeroy + 10), middle_text, font=verysmallfont, fill="black", align="left")
-    '''
 
     # right data display
     draw.text((300, 10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
@@ -521,43 +510,6 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
 
     if error_message is not None:
         centered_text(draw, 60, error_message, verylargefont, fill="black")
-
-    '''
-    scale = 170.0 / 2000.0
-    for m in range(-2000, 2100, 100):
-        s = math.sin(math.radians(m * scale))
-        c = math.cos(math.radians(m * scale))
-        if m % 500 != 0:
-            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_n) * c,
-                       czeroy - (csize - vmsize_n) * s), fill="black", width=2)
-        else:
-            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_l) * c,
-                       czeroy - (csize - vmsize_l) * s), fill="black", width=4)
-            mark = str(round(abs(m/100)))
-            w, h = draw.textsize(mark, largefont)
-            if m != 2000 and m != -2000:
-                center = (czerox - (csize-1-vmsize_l-LARGE/2) * c, czeroy - (csize-5-vmsize_l-LARGE/2) * s)
-                draw.text((center[0] - w/2, center[1] - h/2), mark, fill="black", font=largefont)
-            if m == 2000:  # put 2 in the middle at 180 degrees
-                draw.text((czerox + (csize - 1 - vmsize_l - LARGE/2) - w/2, czeroy - 1 - h/2), mark, fill="black",
-                          font=largefont)
-
-    if error_message is not None:
-        centered_text(draw, 60, error_message, verylargefont, fill="black")
-
-    vert_val = vertical_speed * scale   # normalize from -170 to 170 degrees
-    if vert_val > 170.0:   # set max / min values
-        vert_val = 170.0
-    elif vert_val < -170.0:
-        vert_val = -170.0
-    s = math.sin(math.radians(vert_val))
-    c = math.cos(math.radians(vert_val))
-    draw.line((czerox - (csize - vmsize_l - 3) * c, czeroy - (csize - vmsize_l - 3) * s,
-               czerox + 32 * c, czeroy + 32 * s), fill="black", width=6)
-    draw.line((czerox - (csize - vmsize_n - 3) * c, czeroy - (csize - vmsize_n - 3) * s, czerox, czeroy), fill="black",
-              width=3)
-    draw.ellipse((czerox - 8, czeroy - 8, czerox + 8, czeroy + 8), outline="black", fill="white", width=3)
-    '''
 
     right = "Reset"
     middle = "    Mode"
