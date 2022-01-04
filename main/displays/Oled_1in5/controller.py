@@ -321,7 +321,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     small_mark_length = 4
     text_distance = 3
     arrow_line_size = 6  # must be an even number
-    arrow_head_size = 10
+    arrow_head_size = 15
     arrow_distance = 5
     arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + arrow_head_size),
              (0, -size / 2 + arrow_distance), (arrow_line_size / 2, -size / 2 + arrow_head_size), (arrow_line_size / 2, 0))
@@ -372,31 +372,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    # msize = 7
-    # csize = sizex/2-1  # radius of gmeter
-    # t_dist = 3   # distance of text from marks
-
     meter(draw, current, -3, 5, 120, 420, sizex-2, sizex/2, sizex/2, 1, 0.25, "G-Meter", None)
-
-    '''
-    for m in m_marks:
-        s = math.sin(math.radians(m[0]+90))
-        c = math.cos(math.radians(m[0]+90))
-        draw.line((zerox-csize*c, zeroy-csize*s, zerox-(csize-msize)*c, zeroy-(csize-msize)*s),
-                  fill="white", width=2)
-        w, h = draw.textsize(str(m[1]), largefont)
-        center = (zerox - (csize - msize - t_dist - LARGE / 2) * c, zeroy - (csize - msize - t_dist - LARGE / 2) * s)
-        draw.text((center[0]-w/2, center[1]-h/2), m[1], font=largefont, fill="white")
-    draw.arc((zerox-csize, zeroy-csize, zerox+csize, zeroy+csize), 30, 330, width=2, fill="white")
-    draw.ellipse((zerox-3, zeroy-3, zerox+3, zeroy+3), outline="white", fill="white", width=1)
-    gval = (current-1.0)*37.5
-    s = math.sin(math.radians(gval))
-    c = math.cos(math.radians(gval))
-    draw.line((zerox-(csize-msize-5)*c, zeroy-(csize-msize-5)*s, zerox+5*c, zeroy+5*s), fill="white", width=3)
-
-    draw.text((zerox-25, 38), "G-Meter", font=largefont, fill="yellow")
-    '''
-
     draw.text((zerox+8, 52), "max", font=smallfont, fill="cyan")
     right_text(draw, 52, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
     if error_message:
