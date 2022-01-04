@@ -318,10 +318,10 @@ def translate(angle, points, zero):
 def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
           marks_distance, small_marks_distance, middle_text1, middle_text2):
     big_mark_length = 7
-    small_mark_length = 3
+    small_mark_length = 4
     text_distance = 3
-    arrow_line_size = 4  # must be an even number
-    arrow_head_size = 20
+    arrow_line_size = 6  # must be an even number
+    arrow_head_size = 10
     arrow_distance = 5
     arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + arrow_head_size),
              (0, -size / 2 + arrow_distance), (arrow_line_size / 2, -size / 2 + 50), (arrow_line_size / 2, 0))
@@ -365,10 +365,10 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
 
     if middle_text1 is not None:
         ts = smallfont.getsize(middle_text1)
-        draw.text((center_x-ts[0]/2, center_y-ts[1]-20), middle_text1, font=smallfont, fill="yellow", align="left")
+        draw.text((center_x-ts[0]/2, center_y-ts[1]-15), middle_text1, font=smallfont, fill="yellow", align="left")
     if middle_text2 is not None:
         ts = smallfont.getsize(middle_text2)
-        draw.text((center_x-ts[0]/2, center_y+20), middle_text2, font=smallfont, fill="yellow", align="left")
+        draw.text((center_x-ts[0]/2, center_y+15), middle_text2, font=smallfont, fill="yellow", align="left")
 
 
 def gmeter(draw, current, maxg, ming, error_message):
@@ -376,7 +376,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     # csize = sizex/2-1  # radius of gmeter
     # t_dist = 3   # distance of text from marks
 
-    meter(draw, current, -3, 5, 110, 430, sizex, sizex/2, sizex/2, 1, 0.25, "G-Force", None)
+    meter(draw, current, -3, 5, 120, 420, sizex-2, sizex/2, sizex/2, 1, 0.25, "G-Meter", None)
 
     '''
     for m in m_marks:
@@ -397,12 +397,12 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.text((zerox-25, 38), "G-Meter", font=largefont, fill="yellow")
     '''
 
-    draw.text((zerox+5, 63), "max", font=smallfont, fill="cyan")
-    right_text(draw, 63, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
+    draw.text((zerox+8, 52), "max", font=smallfont, fill="cyan")
+    right_text(draw, 52, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
     if error_message:
         centered_text(draw, 57, error_message, largefont, fill="red")
-    draw.text((zerox+5, 75), "min", font=smallfont, fill="cyan")
-    right_text(draw, 75, "{:+1.2f}".format(ming), smallfont, fill="magenta")
+    draw.text((zerox+8, 65), "min", font=smallfont, fill="cyan")
+    right_text(draw, 65, "{:+1.2f}".format(ming), smallfont, fill="magenta")
 
     right = "Reset"
     textsize = draw.textsize(right, smallfont)
