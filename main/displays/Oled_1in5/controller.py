@@ -301,11 +301,85 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
     centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="green")
 
 
-def gmeter(draw, current, maxg, ming, error_message):
-    msize = 7
-    csize = sizex/2-1  # radius of gmeter
-    t_dist = 3   # distance of text from marks
+def turn(sin_a, cos_a, p, zero):
+    # help function which turns a point around zero with degree a, cos_a and sin_a in radians
+    return round(zero[0] + p[0] * cos_a - p[1] * sin_a), round(zero[1] + p[0] * sin_a + p[1] * cos_a)
 
+
+def translate(angle, points, zero):
+    s = math.sin(math.radians(angle))
+    c = math.cos(math.radians(angle))
+    result = ()
+    for p in points:
+        result += (turn(s, c, p, zero),)
+    return result
+
+
+def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
+          marks_distance, small_marks_distance, middle_text1, middle_text2):
+    big_mark_length = 7
+    small_mark_length = 3
+    text_distance = 3
+    arrow_line_size = 4  # must be an even number
+    arrow_head_size = 20
+    arrow_distance = 5
+    arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + arrow_head_size),
+             (0, -size / 2 + arrow_distance), (arrow_line_size / 2, -size / 2 + 50), (arrow_line_size / 2, 0))
+    # points of arrow at angle 0 (pointing up) for line drawing
+
+    deg_per_value = (to_degree - from_degree) / (end_value - start_value)
+
+    draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
+             from_degree-90, to_degree-90, width=2, fill="white")
+    # small marks first
+    line = ((0, -size/2+2), (0, -size/2+small_mark_length))
+    m = start_value
+    while m <= end_value:
+        angle = deg_per_value * (m-start_value) + from_degree
+        mark = translate(angle, line, (center_x, center_y))
+        draw.line(mark, fill="white", width=1)
+        m += small_marks_distance
+    # large marks
+    line = ((0, -size/2+2), (0, -size/2+big_mark_length))
+    m = start_value
+    while m <= end_value:
+        angle = deg_per_value*(m-start_value) + from_degree
+        mark = translate(angle, line, (center_x, center_y))
+        draw.line(mark, fill="white", width=2)
+        # text
+        marktext = str(m)
+        w, h = largefont.getsize(marktext)
+        t_center = translate(angle, ((0, -size/2 + big_mark_length + h/2 + text_distance), ), (center_x, center_y))
+        draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="white", font=largefont)
+        m += marks_distance
+    # arrow
+    if current > end_value:   # normalize values in allowed ranges
+        current = end_value
+    elif current < start_value:
+        current = start_value
+    angle = deg_per_value * (current - start_value) + from_degree
+    ar = translate(angle, arrow, (center_x, center_y))
+    draw.line(ar, fill="white", width=1)
+    # centerpoint
+    draw.ellipse((center_x - 4, center_y - 4, center_x + 4, center_y + 4), fill="white")
+
+    if middle_text1 is not None:
+        ts = smallfont.getsize(middle_text1)
+        draw.text((center_x-ts[0]/2, center_y-ts[1]-20), middle_text1, font=smallfont, fill="yellow", align="left")
+    if middle_text2 is not None:
+        ts = smallfont.getsize(middle_text2)
+        draw.text((center_x-ts[0]/2, center_y+20), middle_text2, font=smallfont, fill="yellow", align="left")
+
+
+def gmeter(draw, current, maxg, ming, error_message):
+    # msize = 7
+    # csize = sizex/2-1  # radius of gmeter
+    # t_dist = 3   # distance of text from marks
+
+    gm_size = sizex/2
+    meter(draw, current, -3, 5, 110, 430, gm_size, gm_size, gm_size, 1, 0.25, "G-Force", None)
+
+    '''
     for m in m_marks:
         s = math.sin(math.radians(m[0]+90))
         c = math.cos(math.radians(m[0]+90))
@@ -322,6 +396,8 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.line((zerox-(csize-msize-5)*c, zeroy-(csize-msize-5)*s, zerox+5*c, zeroy+5*s), fill="white", width=3)
 
     draw.text((zerox-25, 38), "G-Meter", font=largefont, fill="yellow")
+    '''
+
     draw.text((zerox+5, 63), "max", font=smallfont, fill="cyan")
     right_text(draw, 63, "{:+1.2f}".format(maxg), smallfont, fill="magenta")
     if error_message:
