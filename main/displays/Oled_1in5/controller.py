@@ -376,8 +376,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     # csize = sizex/2-1  # radius of gmeter
     # t_dist = 3   # distance of text from marks
 
-    gm_size = sizex/2
-    meter(draw, current, -3, 5, 110, 430, gm_size, gm_size, gm_size, 1, 0.25, "G-Force", None)
+    meter(draw, current, -3, 5, 110, 430, sizex, sizex/2, sizex/2, 1, 0.25, "G-Force", None)
 
     '''
     for m in m_marks:
