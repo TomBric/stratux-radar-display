@@ -324,7 +324,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     arrow_head_size = 10
     arrow_distance = 5
     arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + arrow_head_size),
-             (0, -size / 2 + arrow_distance), (arrow_line_size / 2, -size / 2 + 50), (arrow_line_size / 2, 0))
+             (0, -size / 2 + arrow_distance), (arrow_line_size / 2, -size / 2 + arrow_head_size), (arrow_line_size / 2, 0))
     # points of arrow at angle 0 (pointing up) for line drawing
 
     deg_per_value = (to_degree - from_degree) / (end_value - start_value)
@@ -361,7 +361,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     ar = translate(angle, arrow, (center_x, center_y))
     draw.line(ar, fill="white", width=1)
     # centerpoint
-    draw.ellipse((center_x - 4, center_y - 4, center_x + 4, center_y + 4), fill="white")
+    draw.ellipse((center_x - 5, center_y - 5, center_x + 5, center_y + 5), fill="white")
 
     if middle_text1 is not None:
         ts = smallfont.getsize(middle_text1)
