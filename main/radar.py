@@ -658,7 +658,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 15
                 elif global_mode == 17:  # display flight time
-                    flighttime.draw_status(draw, display_control, ui_changed, global_config)
+                    flighttime.draw_flighttime(draw, display_control, ui_changed, global_config)
                     ui_changed = False
 
             to_delete = []
