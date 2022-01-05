@@ -93,8 +93,8 @@ def read_config():
     # read back last_flights to datetime
     if 'last_flights' in config:
         for i in config['last_flights']:
-            config['lastflights'][i][0] = datetime.fromisoformat(config['lastflights'][i][0])
-            config['lastflights'][i][1] = datetime.fromisoformat(config['lastflights'][i][1])
+            config['lastflights'][i][0] = datetime.datetime.fromisoformat(config['lastflights'][i][0])
+            config['lastflights'][i][1] = datetime.datetime.fromisoformat(config['lastflights'][i][1])
     return config
 
 
