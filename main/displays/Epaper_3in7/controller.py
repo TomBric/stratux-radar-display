@@ -752,13 +752,13 @@ def flighttime(draw, last_flights):
     starty += SMALL + 8
     draw.text((5, starty), "Date", font=verysmallfont, fill="black")
     draw.text((100, starty), "Start", font=verysmallfont, fill="black")
-    round_text(draw, 150, starty, "  Duration  ", "white", out="black")
-    draw.text((200, starty), "Ldg", font=verysmallfont, fill="black")
+    round_text(draw, 200, starty, "  Duration  ", "white", out="black")
+    draw.text((300, starty), "Ldg", font=verysmallfont, fill="black")
     starty += VERYSMALL + 10
 
     for f in last_flights:
         draw.text((5, starty), f[0].strftime("%d.%m.%y"), font=verysmallfont, fill="black")
         draw.text((100, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
-        round_text(draw, 150, starty, (f[1]-f[0]).strftime("%H:%M"), "white", out="black")
-        draw.text((200, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
+        round_text(draw, 200, starty, (f[1]-f[0]).strftime("%H:%M"), "white", out="black")
+        draw.text((300, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
         starty += VERYSMALL + 5
