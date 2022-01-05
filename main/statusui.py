@@ -94,7 +94,8 @@ def read_config():
     except (OSError, IOError, ValueError) as e:
         rlog.debug("StatusUI: Error " + str(e) + " reading " + CONFIG_FILE)
         return None
-    rlog.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " + json.dumps(config, sort_keys=True, indent=4))
+    rlog.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " + json.dumps(config, sort_keys=True, indent=4,
+                                                                                      default=default))
     # read back last_flights to datetime
     if 'last_flights' in config:
         for i in config['last_flights']:
