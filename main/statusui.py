@@ -78,6 +78,11 @@ new_stratux_ip = stratux_ip
 charpos = 0         # position of current input char
 
 
+def default(obj):
+    if isinstance(obj, (datetime.date, datetime.datetime)):
+        return obj.isoformat()
+
+
 def read_config():
     global rlog
 
@@ -93,8 +98,8 @@ def read_config():
     # read back last_flights to datetime
     if 'last_flights' in config:
         for i in config['last_flights']:
-            config['last_flights'][i][0] = datetime.datetime.fromisoformat(config['last_flights'][i][0])
-            config['last_flights'][i][1] = datetime.datetime.fromisoformat(config['last_flights'][i][1])
+            i[0] = datetime.datetime.fromisoformat(i[0])
+            i[1] = datetime.datetime.fromisoformat(i[1])
     return config
 
 
