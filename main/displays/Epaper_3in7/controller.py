@@ -749,7 +749,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
 def flighttime(draw, last_flights):
     starty = 0
     centered_text(draw, 0, "Flight Logs ", smallfont, fill="black")
-    starty += SMALL + 8
+    starty += SMALL + 10
     draw.text((5, starty), "Date", font=verysmallfont, fill="black")
     draw.text((100, starty), "Start", font=verysmallfont, fill="black")
     round_text(draw, 200, starty, "  Duration  ", "white", out="black")
