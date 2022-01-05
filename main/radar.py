@@ -709,7 +709,7 @@ def main():
     statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(display_control, url_status_ws)
-    flighttime.init(measure_flighttime)
+    flighttime.init(measure_flighttime, global_config)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
