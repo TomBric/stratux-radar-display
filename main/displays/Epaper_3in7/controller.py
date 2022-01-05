@@ -743,7 +743,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty += VERYSMALL + 10
     draw.text((5, starty), "sensors", font=verysmallfont, fill="black")
     x = round_text(draw, 100, starty, "IMU", "white", stat['IMUConnected'], out="black")
-    round_text(draw, x, starty, "BMP", "white", yes, out="black")
+    round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
 
 
 def flighttime(draw, last_flights):
