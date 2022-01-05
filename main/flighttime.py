@@ -67,6 +67,10 @@ rlog = None
 g_config = {}
 
 
+def default(obj):
+    if isinstance(obj, (datetime.date, datetime.datetime)):
+        return obj.isoformat()
+
 def init(activated, config):
     global rlog
     global measurement_enabled
@@ -77,7 +81,8 @@ def init(activated, config):
     measurement_enabled = activated
     g_config = config
     if 'last_flights' in config:
-        rlog.debug("Flighttime: Last flights read from config: " + json.dumps(config['last_flights'], indent=4))
+        rlog.debug("Flighttime: Last flights read from config: " + json.dumps(config['last_flights'], indent=4,
+                                                                              default=default))
 
 
 def new_flight(flight):
