@@ -710,3 +710,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     else:
         col = "red"
     round_text(draw, x, starty, "BMP", col)
+
+
+def flighttime(draw, last_flights):
+    pass

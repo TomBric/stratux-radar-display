@@ -179,5 +179,5 @@ def user_input():
     if button == 2 and btime == 2:  # right and long- refresh
         return 16  # start next mode for display driver: refresh called from gmeter
     if button == 1 and (btime == 2 or btime == 1):  # middle
-        return 1  # next mode to be radar
+        return 17  # next mode to be radar
     return 15  # no mode change

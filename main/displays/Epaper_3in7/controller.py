@@ -478,7 +478,7 @@ def compass(draw, heading, error_message):
 
 def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
         error_message):
-    meter(draw, vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2 , sizey/2, 5, 1, None, None)
+    meter(draw, vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
     draw.text((35, sizey/2 - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
     draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill="black", align="left")
     middle_text = "Vertical Speed"
@@ -743,4 +743,22 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty += VERYSMALL + 10
     draw.text((5, starty), "sensors", font=verysmallfont, fill="black")
     x = round_text(draw, 100, starty, "IMU", "white", stat['IMUConnected'], out="black")
-    round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
+    round_text(draw, x, starty, "BMP", "white", yes, out="black")
+
+
+def flighttime(draw, last_flights):
+    starty = 0
+    centered_text(draw, 0, "Flight Logs ", smallfont, fill="black")
+    starty += SMALL + 8
+    draw.text((5, starty), "Date", font=verysmallfont, fill="black")
+    draw.text((100, starty), "Start", font=verysmallfont, fill="black")
+    round_text(draw, 150, starty, "  Duration  ", "white", out="black")
+    draw.text((200, starty), "Ldg", font=verysmallfont, fill="black")
+    starty += VERYSMALL + 10
+
+    for f in last_flights:
+        draw.text((5, starty), f[0].strftime("%d.%m.%y"), font=verysmallfont, fill="black")
+        draw.text((100, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
+        round_text(draw, 150, starty, (f[1]-f[0]).strftime("%H:%M"), "white", out="black")
+        draw.text((200, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
+        starty += VERYSMALL + 5

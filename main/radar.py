@@ -53,6 +53,7 @@ import importlib
 import subprocess
 import radarbuttons
 import stratuxstatus
+import flighttime
 from datetime import datetime, timezone
 
 # constant definitions
@@ -125,6 +126,7 @@ bluetooth = False  # True if bluetooth is enabled by parameter -b
 extsound_active = False   # external sound was successfully activated, if global_config >=0
 bluetooth_active = False   # bluetooth successfully activated
 optical_alive = -1
+measure_flighttime = False   # True if automatic measurement of flighttime is enabled
 
 
 def draw_all_ac(draw, allac):
@@ -456,6 +458,8 @@ def new_situation(json_str):
     if gmeter['min'] != min:
         gmeter['min'] = min
         gmeter['was_changed'] = True
+    # automatic time measurement
+    flighttime.trigger_measurement(situation, ahrs)
 
 
 async def listen_forever(path, name, callback, local_log):
@@ -551,6 +555,8 @@ async def user_interface():
                 next_mode = stratuxstatus.user_input()
                 if next_mode != 0 and next_mode != 15:
                     stratuxstatus.stop()  # stops status_listener
+            elif global_mode == 17:  # display flighttimes
+                next_mode = flighttime.user_input()
 
             if next_mode > 0:
                 ui_changed = True
@@ -651,6 +657,9 @@ async def display_and_cutoff():
                     rlog.debug("StratusStatus: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 15
+                elif global_mode == 17:  # display flight time
+                    flighttime.draw_status(draw, display_control, ui_changed, global_config)
+                    ui_changed = False
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
@@ -700,6 +709,7 @@ def main():
     statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(display_control, url_status_ws)
+    flighttime.init(measure_flighttime)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -744,6 +754,8 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-y", "--extsound", type=int, required=False, help="Ext sound on with volume [0-100]",
                     default=-1)
+    ap.add_argument("-f", "--flighttime", required=False, help="Automatically detect and display flighttime",
+                    action="store_true", default=False)
     args = vars(ap.parse_args())
     # set up logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
@@ -757,6 +769,7 @@ if __name__ == "__main__":
     bluetooth = args['bluetooth']
     basemode = args['north']
     fullcircle = args['fullcircle']
+    measure_flighttime = args['flighttime']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:
@@ -788,6 +801,8 @@ if __name__ == "__main__":
             global_config['distance_warnings'] = saved_config['distance_warnings']
         if 'sound_volume' in saved_config:
             global_config['sound_volume'] = saved_config['sound_volume']
+        if 'last_flights' in saved_config:
+            global_config['last_flights'] = saved_config['last_flights']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_status_ws = "ws://" + url_host_base + "/status"

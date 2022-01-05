@@ -80,7 +80,7 @@ charpos = 0         # position of current input char
 def read_config():
     global rlog
 
-    if rlog == None:   # may be called before init
+    if rlog is None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(CONFIG_FILE) as f:
@@ -88,23 +88,21 @@ def read_config():
     except (OSError, IOError, ValueError) as e:
         rlog.debug("StatusUI: Error " + str(e) + " reading " + CONFIG_FILE)
         return None
-    rlog.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " +
-                  json.dumps(config, sort_keys=True, indent=4))
+    rlog.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " + json.dumps(config, sort_keys=True, indent=4))
     return config
 
 
 def write_config(config):
     global rlog
 
-    if rlog == None:   # may be called before init
+    if rlog is None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(CONFIG_FILE, 'wt') as out:
             json.dump(config, out, sort_keys=True, indent=4)
     except (OSError, IOError, ValueError) as e:
         rlog.debug("StatusUI: Error " + str(e) + " writing " + CONFIG_FILE)
-    rlog.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " +
-                  json.dumps(config, sort_keys=True, indent=4))
+    rlog.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " + json.dumps(config, sort_keys=True, indent=4))
 
 
 def init(display_control, url, target_ip, refresh, config):   # prepare everything
