@@ -106,7 +106,7 @@ def trigger_measurement(valid_gps, situation, ahrs):     # called from situation
 
     if not valid_gps or not measurement_enabled:
         return
-    now = datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
     if not flying:
         if trigger_timestamp is None and situation['gps_speed'] >= SPEED_THRESHOLD_TAKEOFF:
             trigger_timestamp = now
