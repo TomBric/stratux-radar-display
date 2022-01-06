@@ -100,7 +100,8 @@ def read_config():
     if 'last_flights' in config:
         for i in config['last_flights']:
             i[0] = datetime.datetime.fromisoformat(i[0])
-            i[1] = datetime.datetime.fromisoformat(i[1])
+            if i[1] != 0:    # if in the air this is 0
+                i[1] = datetime.datetime.fromisoformat(i[1])
     return config
 
 
