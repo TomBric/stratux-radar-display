@@ -730,7 +730,7 @@ def flighttime(draw, last_flights):
         draw.text((30, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="white")
         if f[1] != 0:  # ==0 means still in the air
             delta = (f[1] - f[0]).total_seconds()
-            draw.text((100, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="red")
+            draw.text((100, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="white")
         else:
             delta = (datetime.datetime.now() - f[0]).total_seconds()
             draw.text((100, starty), "in air", font=verysmallfont, fill="red")
