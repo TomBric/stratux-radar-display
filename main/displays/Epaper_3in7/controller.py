@@ -763,18 +763,14 @@ def flighttime(draw, last_flights):
         draw.text((120, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
         if f[1] != 0:    # ==0 means still in the air
             delta = (f[1]-f[0]).total_seconds()
-            hours, remainder = divmod(delta, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            out='  {:02}:{:02}  '.format(int(hours), int(minutes))
-            round_text(draw, 220, starty, out, "white", out="black")
             draw.text((350, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
         else:
             delta = (datetime.datetime.now() - f[0]).total_seconds()
-            hours, remainder = divmod(delta, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            out = '  {:02}:{:02}  '.format(int(hours), int(minutes))
-            round_text(draw, 220, starty, out, "white", out="black")
             draw.text((350, starty), "in the air", font=verysmallfont, fill="black")
+        hours, remainder = divmod(delta, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        out = '  {:02}:{:02}  '.format(int(hours), int(minutes))
+        round_text(draw, 220, starty, out, "white", out="black")
         starty += VERYSMALL + 5
         maxlines -= 1
         if maxlines <= 0:
