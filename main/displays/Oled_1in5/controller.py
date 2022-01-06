@@ -732,7 +732,7 @@ def flighttime(draw, last_flights):
             delta = (f[1] - f[0]).total_seconds()
             draw.text((100, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="white")
         else:
-            delta = (datetime.datetime.now() - f[0]).total_seconds()
+            delta = (datetime.datetime.now(datetime.timezone.utc) - f[0]).total_seconds()
             draw.text((100, starty), "in air", font=verysmallfont, fill="red")
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)
