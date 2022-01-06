@@ -753,7 +753,7 @@ def flighttime(draw, last_flights):
     draw.text((5, starty), "Date", font=verysmallfont, fill="black")
     draw.text((100, starty), "Start", font=verysmallfont, fill="black")
     draw.text((200, starty), "Duration", font=verysmallfont, fill="black")
-    draw.text((300, starty), "Ldg", font=verysmallfont, fill="black")
+    draw.text((320, starty), "Ldg", font=verysmallfont, fill="black")
     starty += VERYSMALL + 10
 
     maxlines = 8
@@ -765,7 +765,7 @@ def flighttime(draw, last_flights):
         minutes, seconds = divmod(remainder, 60)
         out='  {:02}:{:02}  '.format(int(hours), int(minutes))
         round_text(draw, 200, starty, out, "white", out="black")
-        draw.text((300, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
+        draw.text((320, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
         starty += VERYSMALL + 5
         maxlines -= 1
         if maxlines <= 0:
