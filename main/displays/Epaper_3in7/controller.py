@@ -759,7 +759,7 @@ def flighttime(draw, last_flights):
     for f in last_flights:
         draw.text((5, starty), f[0].strftime("%d.%m.%y"), font=verysmallfont, fill="black")
         draw.text((100, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
-        delta = (f[1]-f[0]).totalseconds()
+        delta = (f[1]-f[0]).total_seconds()
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)
         out='{:02}:{:02}'.format(int(hours), int(minutes))
