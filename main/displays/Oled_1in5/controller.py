@@ -737,7 +737,7 @@ def flighttime(draw, last_flights):
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)
         out = '  {:02}:{:02}  '.format(int(hours), int(minutes))
-        round_text(draw, 70, starty, out, "white", "white")
+        round_text(draw, 70, starty, out, "white")
         starty += VERYSMALL + 1
         maxlines -= 1
         if maxlines <= 0:
