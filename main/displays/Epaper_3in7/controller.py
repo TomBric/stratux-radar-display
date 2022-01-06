@@ -750,22 +750,22 @@ def flighttime(draw, last_flights):
     starty = 0
     centered_text(draw, 0, "Flight Logs ", smallfont, fill="black")
     starty += SMALL + 10
-    draw.text((5, starty), "Date", font=verysmallfont, fill="black")
-    draw.text((100, starty), "Start", font=verysmallfont, fill="black")
-    draw.text((200, starty), "Duration", font=verysmallfont, fill="black")
-    draw.text((320, starty), "Ldg", font=verysmallfont, fill="black")
+    draw.text((20, starty), "Date", font=verysmallfont, fill="black")
+    draw.text((120, starty), "Start", font=verysmallfont, fill="black")
+    draw.text((220, starty), "Duration", font=verysmallfont, fill="black")
+    draw.text((350, starty), "Ldg", font=verysmallfont, fill="black")
     starty += VERYSMALL + 10
 
     maxlines = 8
     for f in last_flights:
-        draw.text((5, starty), f[0].strftime("%d.%m.%y"), font=verysmallfont, fill="black")
-        draw.text((100, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
+        draw.text((20, starty), f[0].strftime("%d.%m.%y"), font=verysmallfont, fill="black")
+        draw.text((120, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
         delta = (f[1]-f[0]).total_seconds()
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)
         out='  {:02}:{:02}  '.format(int(hours), int(minutes))
-        round_text(draw, 200, starty, out, "white", out="black")
-        draw.text((320, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
+        round_text(draw, 220, starty, out, "white", out="black")
+        draw.text((350, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
         starty += VERYSMALL + 5
         maxlines -= 1
         if maxlines <= 0:
