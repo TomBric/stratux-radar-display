@@ -60,7 +60,7 @@ new_flight_info = False   # indicates whether a new flight was recorded, but not
 trigger_timestamp = None    # timestamp when threshold was overrun/underrun
 stop_timestamp = None       # timestamp when stopping after a flight was detected, may start again or stop
 takeoff_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_TAKEOFF)
-landing_delta = datetimetimedelta(seconds=TRIGGER_PERIOD_LANDING)
+landing_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_LANDING)
 stop_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_STOP)
 flighttime_changed = True
 rlog = None
