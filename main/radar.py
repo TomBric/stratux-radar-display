@@ -459,7 +459,7 @@ def new_situation(json_str):
         gmeter['min'] = min
         gmeter['was_changed'] = True
     # automatic time measurement
-    flighttime.trigger_measurement(situation, ahrs)
+    flighttime.trigger_measurement(gps_active, situation, ahrs)
 
 
 async def listen_forever(path, name, callback, local_log):

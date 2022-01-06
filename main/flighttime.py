@@ -95,7 +95,7 @@ def new_flight(flight):
         del g_config['last_flights'][FLIGHT_LIST_LENGTH-1]
 
 
-def trigger_measurement(situation, ahrs):     # called from situationhandler whenever new situation is received
+def trigger_measurement(valid_gps, situation, ahrs):     # called from situationhandler whenever new situation is received
     global trigger_timestamp
     global stop_timestamp
     global takeoff_time
@@ -104,7 +104,7 @@ def trigger_measurement(situation, ahrs):     # called from situationhandler whe
     global new_flight_info
     global flighttime_changed
 
-    if not measurement_enabled:
+    if not valid_gps or not measurement_enabled:
         return
     now = datetime.now(datetime.timezone.utc)
     if not flying:
