@@ -33,6 +33,7 @@
 
 import math
 import time
+import datetime
 from pathlib import Path
 from PIL import Image, ImageFont, ImageDraw
 from . import radar_opts
