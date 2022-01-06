@@ -720,24 +720,24 @@ def flighttime(draw, last_flights):
 
     draw.text((0, starty), "Date", font=verysmallfont, fill="white")
     draw.text((35, starty), "Start", font=verysmallfont, fill="white")
-    draw.text((70, starty), "Duration", font=verysmallfont, fill="white")
+    draw.text((70, starty), "Dur", font=verysmallfont, fill="white")
     draw.text((105, starty), "Ldg", font=verysmallfont, fill="white")
-    starty += VERYSMALL + 10
+    starty += VERYSMALL + 5
 
-    maxlines = 4
+    maxlines = 7
     for f in last_flights:
-        draw.text((0, starty), f[0].strftime("%d.%m.%y"), font=verysmallfont, fill="green")
-        draw.text((35, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="white")
+        draw.text((0, starty), f[0].strftime("%d.%m"), font=verysmallfont, fill="green")
+        draw.text((30, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="white")
         if f[1] != 0:  # ==0 means still in the air
             delta = (f[1] - f[0]).total_seconds()
-            draw.text((105, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="red")
+            draw.text((100, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="red")
         else:
             delta = (datetime.datetime.now() - f[0]).total_seconds()
-            draw.text((105, starty), "in the air", font=verysmallfont, fill="red")
+            draw.text((100, starty), "in air", font=verysmallfont, fill="red")
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)
-        out = '  {:02}:{:02}  '.format(int(hours), int(minutes))
-        round_text(draw, 70, starty, out, "white")
+        out = '{:02}:{:02}'.format(int(hours), int(minutes))
+        round_text(draw, 65, starty, out, "DarkBlue")
         starty += VERYSMALL + 1
         maxlines -= 1
         if maxlines <= 0:
