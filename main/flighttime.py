@@ -106,7 +106,7 @@ def trigger_measurement(situation, ahrs):     # called from situationhandler whe
 
     if not measurement_enabled:
         return
-    now = datetime.now(timezone.utc)
+    now = datetime.now(datetime.timezone.utc)
     if not flying:
         if trigger_timestamp is None and situation['gps_speed'] >= SPEED_THRESHOLD_TAKEOFF:
             trigger_timestamp = now
@@ -137,6 +137,7 @@ def trigger_measurement(situation, ahrs):     # called from situationhandler whe
                 stop_timestamp = None
                 rlog.debug("Flighttime: Stop threshold overrun, trigger resetted at" + str(now))
     else:   # flying
+        flighttime_changed = True   # set in any case so display is refreshed
         if trigger_timestamp is None and situation['gps_speed'] < SPEED_THRESHOLD_LANDING:
             trigger_timestamp = now
             rlog.debug("Flighttime: Landing threshold underrun triggered at" + str(now))
@@ -146,7 +147,6 @@ def trigger_measurement(situation, ahrs):     # called from situationhandler whe
                 rlog.debug("Flighttime: Landing detected at" + str(now))
                 g_config['last_flights'][0][1] = now
                 statusui.write_config(g_config)
-                flighttime_changed = True
                 flying = False
                 new_flight_info = True
                 trigger_timestamp = None
@@ -183,5 +183,5 @@ def user_input():
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long- refresh
-        return 12  # start next mode for display driver: refresh called
-    return 16  # no mode change
+        return 18  # start next mode for display driver: refresh called
+    return 17  # no mode change
