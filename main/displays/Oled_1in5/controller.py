@@ -716,17 +716,17 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
 def flighttime(draw, last_flights):
     starty = 0
     centered_text(draw, 0, "Flight Logs", smallfont, fill="yellow")
-    starty += SMALL + 8
+    starty += SMALL + 5
 
     draw.text((0, starty), "Date", font=verysmallfont, fill="white")
     draw.text((35, starty), "Start", font=verysmallfont, fill="white")
     draw.text((70, starty), "Dur", font=verysmallfont, fill="white")
     draw.text((105, starty), "Ldg", font=verysmallfont, fill="white")
-    starty += VERYSMALL + 5
+    starty += VERYSMALL + 3
 
-    maxlines = 7
+    maxlines = 8
     for f in last_flights:
-        draw.text((0, starty), f[0].strftime("%d.%m"), font=verysmallfont, fill="green")
+        draw.text((0, starty), f[0].strftime("%d.%m."), font=verysmallfont, fill="green")
         draw.text((30, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="white")
         if f[1] != 0:  # ==0 means still in the air
             delta = (f[1] - f[0]).total_seconds()
