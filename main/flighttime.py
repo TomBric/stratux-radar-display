@@ -110,7 +110,7 @@ def trigger_measurement(valid_gps, situation, ahrs):     # called from situation
     if not flying:
         if trigger_timestamp is None and situation['gps_speed'] >= SPEED_THRESHOLD_TAKEOFF:
             trigger_timestamp = now
-            print("Flighttime: Takeoff threshold exceeded triggered at" + str(now))
+            print("Flighttime: Takeoff threshold exceeded triggered at " + str(now))
         elif trigger_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_TAKEOFF:
             if now - trigger_timestamp >= takeoff_delta:
                 takeoff_time = now
@@ -122,11 +122,11 @@ def trigger_measurement(valid_gps, situation, ahrs):     # called from situation
         elif trigger_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_TAKEOFF:
             # reset trigger, not several seconds above threshold
             trigger_timestamp = None
-            print("Flighttime: Threshold underrun, trigger resetted at" + str(now))
+            print("Flighttime: Threshold underrun, trigger resetted at " + str(now))
         if new_flight_info:   # no more flying, check whether stop is done
             if stop_timestamp is None and situation['gps_speed'] < SPEED_THRESHOLD_STOPPED:
                 stop_timestamp = now
-                print("Flighttime: Stop detection triggered at" + str(now))
+                print("Flighttime: Stop detection triggered at " + str(now))
             elif stop_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_STOPPED:
                 if now - stop_timestamp >= stop_delta:
                     print("Flighttime: Stop detected at" + str(now))
@@ -141,11 +141,11 @@ def trigger_measurement(valid_gps, situation, ahrs):     # called from situation
         flighttime_changed = True   # set in any case so display is refreshed
         if trigger_timestamp is None and situation['gps_speed'] < SPEED_THRESHOLD_LANDING:
             trigger_timestamp = now
-            print("Flighttime: Landing threshold underrun triggered at" + str(now))
+            print("Flighttime: Landing threshold underrun triggered at " + str(now))
         elif trigger_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_LANDING:
             if now - trigger_timestamp >= landing_delta:
                 landing_time = now
-                print("Flighttime: Landing detected at" + str(now))
+                print("Flighttime: Landing detected at " + str(now))
                 g_config['last_flights'][0][1] = now
                 statusui.write_config(g_config)
                 flying = False
@@ -154,7 +154,7 @@ def trigger_measurement(valid_gps, situation, ahrs):     # called from situation
         elif trigger_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_LANDING:
             # reset trigger, not several seconds above threshold
             trigger_timestamp = None
-            print("Flighttime: Landing threshold overrun, trigger resetted at" + str(now))
+            print("Flighttime: Landing threshold overrun, trigger resetted at " + str(now))
     return False
 
 
