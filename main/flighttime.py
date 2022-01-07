@@ -131,6 +131,7 @@ def trigger_measurement(valid_gps, situation, ahrs):     # called from situation
                 if now - stop_timestamp >= stop_delta:
                     print("Flighttime: Stop detected at" + str(now))
                     stop_timestamp = None
+                    new_flight_info = False   # stop is only triggered once
                     return True    # flag set to caller that time should be displayed
             elif stop_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_STOPPED:
                 # reset trigger, not several seconds below threshold
