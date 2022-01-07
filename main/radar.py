@@ -356,6 +356,7 @@ def new_situation(json_str):
     global ahrs
     global vertical_max
     global vertical_min
+    global global_mode
 
     rlog.debug("New Situation" + json_str)
     sit = json.loads(json_str)
@@ -459,7 +460,9 @@ def new_situation(json_str):
         gmeter['min'] = min
         gmeter['was_changed'] = True
     # automatic time measurement
-    flighttime.trigger_measurement(gps_active, situation, ahrs)
+    new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, global_mode)
+    if new_mode > 0
+        global_mode = new_mode # automatically change to display of flight times, or back
 
 
 async def listen_forever(path, name, callback, local_log):

@@ -59,6 +59,7 @@ flying = False    # indicates if flying mode was detected and measurement starti
 new_flight_info = False   # indicates whether a new flight was recorded, but not yet displayed
 trigger_timestamp = None    # timestamp when threshold was overrun/underrun
 stop_timestamp = None       # timestamp when stopping after a flight was detected, may start again or stop
+switch_back_mode = 0        # mode to switch back when flying after automatic flighttime display is triggered
 takeoff_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_TAKEOFF)
 landing_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_LANDING)
 stop_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_STOP)
@@ -95,7 +96,8 @@ def new_flight(flight):
         del g_config['last_flights'][FLIGHT_LIST_LENGTH-1]
 
 
-def trigger_measurement(valid_gps, situation, ahrs):     # called from situationhandler whenever new situation is received
+def trigger_measurement(valid_gps, situation, ahrs, current_mode):
+# called from situationhandler whenever new situation is received
     global trigger_timestamp
     global stop_timestamp
     global takeoff_time
@@ -103,9 +105,10 @@ def trigger_measurement(valid_gps, situation, ahrs):     # called from situation
     global flying
     global new_flight_info
     global flighttime_changed
+    global switch_back_mode
 
     if not valid_gps or not measurement_enabled:
-        return
+        return 0
     now = datetime.datetime.now(datetime.timezone.utc)
     if not flying:
         if trigger_timestamp is None and situation['gps_speed'] >= SPEED_THRESHOLD_TAKEOFF:
@@ -114,11 +117,13 @@ def trigger_measurement(valid_gps, situation, ahrs):     # called from situation
         elif trigger_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_TAKEOFF:
             if now - trigger_timestamp >= takeoff_delta:
                 takeoff_time = now
-                print("Flighttime: Takeoff detected at" + str(now))
+                print("Flighttime: Takeoff detected at " + str(now))
                 new_flight([now, 0])  # means not yet finished
                 flighttime_changed = True
                 flying = True
                 trigger_timestamp = None
+                if switch_back_mode != 0:
+                    return switch_back_mode
         elif trigger_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_TAKEOFF:
             # reset trigger, not several seconds above threshold
             trigger_timestamp = None
@@ -129,14 +134,15 @@ def trigger_measurement(valid_gps, situation, ahrs):     # called from situation
                 print("Flighttime: Stop detection triggered at " + str(now))
             elif stop_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_STOPPED:
                 if now - stop_timestamp >= stop_delta:
-                    print("Flighttime: Stop detected at" + str(now))
+                    print("Flighttime: Stop detected at " + str(now))
                     stop_timestamp = None
                     new_flight_info = False   # stop is only triggered once
-                    return True    # flag set to caller that time should be displayed
+                    switch_back_mode = current_mode
+                    return 17    # return mode set to display times
             elif stop_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_STOPPED:
                 # reset trigger, not several seconds below threshold
                 stop_timestamp = None
-                print("Flighttime: Stop threshold overrun, trigger resetted at" + str(now))
+                print("Flighttime: Stop threshold overrun, trigger resetted at " + str(now))
     else:   # flying
         flighttime_changed = True   # set in any case so display is refreshed
         if trigger_timestamp is None and situation['gps_speed'] < SPEED_THRESHOLD_LANDING:
@@ -155,7 +161,7 @@ def trigger_measurement(valid_gps, situation, ahrs):     # called from situation
             # reset trigger, not several seconds above threshold
             trigger_timestamp = None
             print("Flighttime: Landing threshold overrun, trigger resetted at " + str(now))
-    return False
+    return 0
 
 
 def draw_flighttime(draw, display_control, changed, config):
@@ -174,11 +180,13 @@ def draw_flighttime(draw, display_control, changed, config):
 
 def user_input():
     global flighttime_ui_changed
+    global switch_back_mode
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
         return 0  # stay in current mode
     flighttime_ui_changed = True
+    switch_back_mode = 0    # cancel any switchback, if button was pressed
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return 1  # next mode to be radar
     if button == 0 and btime == 2:  # left and long
