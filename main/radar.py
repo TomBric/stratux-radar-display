@@ -461,7 +461,7 @@ def new_situation(json_str):
         gmeter['was_changed'] = True
     # automatic time measurement
     new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, global_mode)
-    if new_mode > 0
+    if new_mode > 0:
         global_mode = new_mode # automatically change to display of flight times, or back
 
 
