@@ -710,6 +710,7 @@ def main():
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
     radarui.init(url_settings_set)
     shutdownui.init(url_shutdown, url_reboot)
+    timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth)
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
     ahrsui.init(display_control)
