@@ -121,7 +121,7 @@ def draw_timer(draw, display_control, refresh_time):
                 ft = flighttime.current_starttime()
                 if ft is not None:
                     lap_head = "Flighttime"
-                    delta = (ft - datetime.datetime.now(datetime.timezone.utc)).total_seconds()
+                    delta = (datetime.datetime.now(datetime.timezone.utc) - ft).total_seconds()
                     hours, remainder = divmod(delta, 3600)
                     minutes, seconds = divmod(remainder, 60)
                     laptimestr = '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
@@ -138,7 +138,7 @@ def draw_timer(draw, display_control, refresh_time):
             ft = flighttime.current_starttime()
             if ft is not None:
                 lap_head = "Flighttime"
-                delta = (ft - datetime.datetime.now(datetime.timezone.utc)).total_seconds()
+                delta = (datetime.datetime.now(datetime.timezone.utc) - ft).total_seconds()
                 hours, remainder = divmod(delta, 3600)
                 minutes, seconds = divmod(remainder, 60)
                 laptimestr = '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
