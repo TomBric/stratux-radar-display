@@ -99,7 +99,7 @@ def new_flight(flight):
 
 def current_starttime():
     if 'last_flights' in g_config and g_config['last_flights'][0][1] == 0:    # means we are in the air
-            return g_config['last_fights'][0][0]
+        return g_config['last_flights'][0][0]
     return None
 
 
