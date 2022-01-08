@@ -37,6 +37,7 @@ import math
 import radarbluez
 import flighttime
 import datetime
+import logging
 
 # constants
 MAX_COUNTDOWN_TIME = 2 * 60 * 60   # maximum time for setting countdown in seconds
@@ -55,6 +56,15 @@ timer_ui_changed = True
 cdown_time = 0.0     # count down time
 cdown_spoken = False  # to speak zero only once
 timer_mode = 0    # 0 = normal, 1 = countdown-set
+g_config = {}
+
+
+def init(config):
+    global g_config
+
+    g_config = config
+    rlog = logging.getLogger('stratux-radar-log')
+    rlog.debug("Timerui: timer initialized")
 
 
 def reset_timer():
