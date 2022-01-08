@@ -108,7 +108,7 @@ def draw_timer(draw, display_control, refresh_time):
                 cdown_spoken = True
                 radarbluez.speak("Countdown finished")
             if cdown_time <= now_in_secs:    # Countdown Finished
-                ft = flighttime.current_flighttime()
+                ft = flighttime.current_starttime()
                 if ft is not None:
                     lap_head = "Flighttime"
                     laptimestr = (ft - datetime.datetime.now(datetime.timezone.utc)).strftime("%H:%M:%SS")
@@ -122,7 +122,7 @@ def draw_timer(draw, display_control, refresh_time):
         else:
             stoptimestr = "--:--:--"
         if cdown_time == 0.0:
-            ft = flighttime.current_flighttime()
+            ft = flighttime.current_starttime()
             if ft is not None:
                 lap_head = "Flighttime"
                 laptimestr = (ft - datetime.datetime.now(datetime.timezone.utc)).strftime("%H:%M:%SS")
