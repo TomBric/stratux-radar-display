@@ -35,6 +35,9 @@ import time
 import radarbuttons
 import math
 import radarbluez
+import flighttime
+import datetime
+import logging
 
 # constants
 MAX_COUNTDOWN_TIME = 2 * 60 * 60   # maximum time for setting countdown in seconds
@@ -53,6 +56,15 @@ timer_ui_changed = True
 cdown_time = 0.0     # count down time
 cdown_spoken = False  # to speak zero only once
 timer_mode = 0    # 0 = normal, 1 = countdown-set
+g_config = {}
+
+
+def init(config):
+    global g_config
+
+    g_config = config
+    rlog = logging.getLogger('stratux-radar-log')
+    rlog.debug("Timerui: timer initialized")
 
 
 def reset_timer():
@@ -88,6 +100,7 @@ def draw_timer(draw, display_control, refresh_time):
     global was_in_secs
     global timer_ui_changed
     global cdown_spoken
+    global lap_head
 
     now_in_secs = math.floor(time.time())
     if not timer_ui_changed and now_in_secs < was_in_secs + math.ceil(refresh_time):
@@ -105,7 +118,15 @@ def draw_timer(draw, display_control, refresh_time):
                 cdown_spoken = True
                 radarbluez.speak("Countdown finished")
             if cdown_time <= now_in_secs:    # Countdown Finished
-                laptimestr = "--:--:--"
+                ft = flighttime.current_starttime()
+                if ft is not None:
+                    lap_head = "Flighttime"
+                    delta = (datetime.datetime.now(datetime.timezone.utc) - ft).total_seconds()
+                    hours, remainder = divmod(delta, 3600)
+                    minutes, seconds = divmod(remainder, 60)
+                    laptimestr = '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+                else:
+                    laptimestr = "--:--:--"
             else:
                 laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time - now_in_secs))
     else:
@@ -114,7 +135,15 @@ def draw_timer(draw, display_control, refresh_time):
         else:
             stoptimestr = "--:--:--"
         if cdown_time == 0.0:
-            laptimestr = "--:--:--"
+            ft = flighttime.current_starttime()
+            if ft is not None:
+                lap_head = "Flighttime"
+                delta = (datetime.datetime.now(datetime.timezone.utc) - ft).total_seconds()
+                hours, remainder = divmod(delta, 3600)
+                minutes, seconds = divmod(remainder, 60)
+                laptimestr = '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+            else:
+                laptimestr = "--:--:--"
         else:
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time))
 

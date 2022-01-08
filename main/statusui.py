@@ -43,6 +43,7 @@ import string
 import ipaddress
 import json
 import os
+import datetime
 
 # constants
 CONFIG_FILE = "stratux-radar.conf"
@@ -77,10 +78,15 @@ new_stratux_ip = stratux_ip
 charpos = 0         # position of current input char
 
 
+def default(obj):
+    if isinstance(obj, (datetime.date, datetime.datetime)):
+        return obj.isoformat()
+
+
 def read_config():
     global rlog
 
-    if rlog == None:   # may be called before init
+    if rlog is None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(CONFIG_FILE) as f:
@@ -88,23 +94,29 @@ def read_config():
     except (OSError, IOError, ValueError) as e:
         rlog.debug("StatusUI: Error " + str(e) + " reading " + CONFIG_FILE)
         return None
-    rlog.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " +
-                  json.dumps(config, sort_keys=True, indent=4))
+    rlog.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " + json.dumps(config, sort_keys=True, indent=4,
+                                                                                      default=default))
+    # read back last_flights to datetime
+    if 'last_flights' in config:
+        for i in config['last_flights']:
+            i[0] = datetime.datetime.fromisoformat(i[0])
+            if i[1] != 0:    # if in the air this is 0
+                i[1] = datetime.datetime.fromisoformat(i[1])
     return config
 
 
 def write_config(config):
     global rlog
 
-    if rlog == None:   # may be called before init
+    if rlog is None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(CONFIG_FILE, 'wt') as out:
-            json.dump(config, out, sort_keys=True, indent=4)
+            json.dump(config, out, sort_keys=True, indent=4, default=default)
     except (OSError, IOError, ValueError) as e:
         rlog.debug("StatusUI: Error " + str(e) + " writing " + CONFIG_FILE)
-    rlog.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " +
-                  json.dumps(config, sort_keys=True, indent=4))
+    rlog.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " + json.dumps(config, sort_keys=True, indent=4,
+                                                                                     default=default))
 
 
 def init(display_control, url, target_ip, refresh, config):   # prepare everything

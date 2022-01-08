@@ -32,6 +32,8 @@ sudo apt install python3-numpy -y
 # get files from repo
 # cd /home/pi && git clone https://github.com/TomBric/stratux-radar-display.git
 
+# disable bluetooth in any case, is not working directly on Stratux
+sed -i 's/-b/ /g' /home/pi/stratux-radar-display/image/stratux_radar.sh
 # include autostart into crontab, so that radar starts on every boot
 echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -
 # only works if crontab is empty, otherwise use

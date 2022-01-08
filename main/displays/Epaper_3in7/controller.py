@@ -35,6 +35,7 @@ from . import epd3in7
 from PIL import Image, ImageDraw, ImageFont
 import math
 import time
+import datetime
 from pathlib import Path
 
 # global constants
@@ -70,11 +71,8 @@ draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
 PITCH_SCALE = 4.0
-azerox = 140  # zero for analogue meter
-azeroy = 140
-asize = 140
 msize = 15  # size of markings
-m_marks = ((180, -3), (202.5, -2), (225, -1), (247.5, 0), (270, 1), (292.5, 2), (315, 3), (337.5, 4), (0, 5))
+
 # compass
 compass_aircraft = None   # image of aircraft for compass-display
 mask = None
@@ -114,7 +112,21 @@ def next_arcposition(old_arcposition):
     return new_arcposition
 
 
-def init(fullcircle = False):
+def turn(sin_a, cos_a, p, zero):
+    # help function which turns a point around zero with degree a, cos_a and sin_a in radians
+    return round(zero[0] + p[0] * cos_a - p[1] * sin_a), round(zero[1] + p[0] * sin_a + p[1] * cos_a)
+
+
+def translate(angle, points, zero):
+    s = math.sin(math.radians(angle))
+    c = math.cos(math.radians(angle))
+    result = ()
+    for p in points:
+        result += (turn(s, c, p, zero),)
+    return result
+
+
+def init(fullcircle=False):
     global sizex
     global sizey
     global zerox
@@ -306,9 +318,9 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     if not connected:
         centered_text(draw, 30, "No Connection!", smallfont, fill="black")
 
-    if extsound or bt_devices>0:
+    if extsound or bt_devices > 0:
         if sound_active:
-            t=""
+            t = ""
             if extsound:
                 t += "\uf028"  # volume symbol
             if bt_devices > 0:
@@ -338,34 +350,80 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
     centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
 
 
-def gmeter(draw, current, maxg, ming, error_message):
-    for m in m_marks:
-        s = math.sin(math.radians(m[0]+90))
-        c = math.cos(math.radians(m[0]+90))
-        draw.line((azerox-asize*c, azeroy-asize*s, azerox-(asize-msize)*c, azeroy-(asize-msize)*s),
-                  fill="black", width=4)
-        draw.text((azerox-(asize-msize-SMALL/2)*c-SMALL/4, azeroy-(asize-msize-SMALL/2)*s-SMALL/2), str(m[1]),
-                  font=smallfont, fill="black")
-    draw.arc((0, 0, azerox*2, azeroy*2), 90, 270, width=6, fill="black")
-    draw.ellipse((azerox-10, azeroy-10, azerox+10, azeroy+10), outline="black", fill="black", width=1)
-    gval = (current-1.0)*22.5
-    s = math.sin(math.radians(gval))
-    c = math.cos(math.radians(gval))
-    draw.line((azerox-(asize-msize-3)*c, azeroy-(asize-msize-3)*s, azerox+32*c, azeroy+32*s), fill="black", width=6)
+def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
+          marks_distance, small_marks_distance, middle_text1, middle_text2):
+    big_mark_length = 20
+    small_mark_length = 10
+    text_distance = 10
+    arrow_line_size = 12  # must be an even number
+    arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + 50),
+             (0, -size / 2 + 10), (arrow_line_size / 2, -size / 2 + 50), (arrow_line_size / 2, 0))
+    # points of arrow at angle 0 (pointing up) for line drawing
 
-    draw.text((zerox-30, 0), "G-Meter", font=verylargefont, fill="black")
-    draw.text((zerox-30, 88), "max", font=smallfont, fill="black")
-    right_text(draw, 85, "{:+1.2f}".format(maxg), largefont, fill="black")
+    deg_per_value = (to_degree - from_degree) / (end_value - start_value)
+
+    draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
+             from_degree-90, to_degree-90, width=6, fill="black")
+    # small marks first
+    line = ((0, -size/2+1), (0, -size/2+small_mark_length))
+    m = start_value
+    while m <= end_value:
+        angle = deg_per_value * (m-start_value) + from_degree
+        mark = translate(angle, line, (center_x, center_y))
+        draw.line(mark, fill="black", width=2)
+        m += small_marks_distance
+    # large marks
+    line = ((0, -size/2+1), (0, -size/2+big_mark_length))
+    m = start_value
+    while m <= end_value:
+        angle = deg_per_value*(m-start_value) + from_degree
+        mark = translate(angle, line, (center_x, center_y))
+        draw.line(mark, fill="black", width=4)
+        # text
+        marktext = str(m)
+        w, h = largefont.getsize(marktext)
+        t_center = translate(angle, ((0, -size/2 + big_mark_length + h/2 + text_distance), ), (center_x, center_y))
+        draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="black", font=largefont)
+        m += marks_distance
+    # arrow
+    if current > end_value:   # normalize values in allowed ranges
+        current = end_value
+    elif current < start_value:
+        current = start_value
+    angle = deg_per_value * (current - start_value) + from_degree
+    ar = translate(angle, arrow, (center_x, center_y))
+    draw.line(ar, fill="black", width=4)
+    # centerpoint
+    draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill="black")
+
+    if middle_text1 is not None:
+        ts = smallfont.getsize(middle_text1)
+        draw.text((center_x-ts[0]/2, center_y-ts[1]-20), middle_text1, font=smallfont, fill="black", align="left")
+    if middle_text2 is not None:
+        ts = smallfont.getsize(middle_text2)
+        draw.text((center_x-ts[0]/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
+
+
+def gmeter(draw, current, maxg, ming, error_message):
+    gm_size = 280
+    meter(draw, current, -3, 5, 110, 430, gm_size, 140, 140, 1, 0.25, "G-Force", None)
+
+    right_center_x = (sizex-gm_size)/2+gm_size    # center of remaining part
+    t = "G-Meter"
+    ts = draw.textsize(t, largefont)
+    draw.text((right_center_x - ts[0] / 2, 30), t, font=largefont, fill="black", align="left")
+    draw.text((gm_size+30, 98), "max", font=smallfont, fill="black")
+    right_text(draw, 95, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
-        draw.text((zerox-30, 138), "current", font=smallfont, fill="black")
-        right_text(draw, 126, "{:+1.2f}".format(current), verylargefont, fill="black")
+        draw.text((gm_size+30, 138), "act", font=smallfont, fill="black")
+        right_text(draw, 135, "{:+1.2f}".format(current), largefont, fill="black")
     else:
-        draw.text((zerox-30, 138), error_message, font=largefont, fill="black")
-    draw.text((zerox-30, 188), "min", font=smallfont, fill="black")
-    right_text(draw, 185, "{:+1.2f}".format(ming), largefont, fill="black")
+        draw.text((gm_size+30, 138), error_message, font=largefont, fill="black")
+    draw.text((gm_size+30, 178), "min", font=smallfont, fill="black")
+    right_text(draw, 175, "{:+1.2f}".format(ming), largefont, fill="black")
 
     right = "Reset"
-    middle = "Mode"
+    middle = "    Mode"
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey-SMALL-3, middle, smallfont, fill="black")
@@ -421,21 +479,15 @@ def compass(draw, heading, error_message):
 
 def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
         error_message):
-    csize = sizey / 2  # radius of compass rose
-    czerox = csize    # move to the left
-    czeroy = sizey / 2
-    vmsize_n = 10
-    vmsize_l = 20
-
-    draw.arc((czerox-csize, 0, czerox+csize-1, sizey - 1), 10, 350, fill="black", width=4)
-    draw.text((35, czeroy - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
-    draw.text((35, czeroy + 25), "dn", font=verysmallfont, fill="black", align="left")
+    meter(draw, vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
+    draw.text((35, sizey/2 - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
+    draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill="black", align="left")
     middle_text = "Vertical Speed"
     ts = draw.textsize(middle_text, verysmallfont)
-    draw.text((czerox - ts[0]/2, czeroy - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
+    draw.text((sizey/2 - ts[0]/2, sizey/2 - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
     middle_text = "100 feet per min"
     ts = draw.textsize(middle_text, verysmallfont)
-    draw.text((czerox - ts[0]/2, czeroy + 10), middle_text, font=verysmallfont, fill="black", align="left")
+    draw.text((sizey/2 - ts[0] / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
 
     # right data display
     draw.text((300, 10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
@@ -452,40 +504,8 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((300, 211), "GpsSpd [kts]", font=verysmallfont, fill="black", align="left")
     right_text(draw, 208, "{:1.1f}".format(gps_speed), smallfont, fill="black")
 
-    scale = 170.0 / 2000.0
-    for m in range(-2000, 2100, 100):
-        s = math.sin(math.radians(m * scale))
-        c = math.cos(math.radians(m * scale))
-        if m % 500 != 0:
-            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_n) * c,
-                       czeroy - (csize - vmsize_n) * s), fill="black", width=2)
-        else:
-            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - vmsize_l) * c,
-                       czeroy - (csize - vmsize_l) * s), fill="black", width=4)
-            mark = str(round(abs(m/100)))
-            w, h = draw.textsize(mark, largefont)
-            if m != 2000 and m != -2000:
-                center = (czerox - (csize-1-vmsize_l-LARGE/2) * c, czeroy - (csize-5-vmsize_l-LARGE/2) * s)
-                draw.text((center[0] - w/2, center[1] - h/2), mark, fill="black", font=largefont)
-            if m == 2000:  # put 2 in the middle at 180 degrees
-                draw.text((czerox + (csize - 1 - vmsize_l - LARGE/2) - w/2, czeroy - 1 - h/2), mark, fill="black",
-                          font=largefont)
-
     if error_message is not None:
         centered_text(draw, 60, error_message, verylargefont, fill="black")
-
-    vert_val = vertical_speed * scale   # normalize from -170 to 170 degrees
-    if vert_val > 170.0:   # set max / min values
-        vert_val = 170.0
-    elif vert_val < -170.0:
-        vert_val = -170.0
-    s = math.sin(math.radians(vert_val))
-    c = math.cos(math.radians(vert_val))
-    draw.line((czerox - (csize - vmsize_l - 3) * c, czeroy - (csize - vmsize_l - 3) * s,
-               czerox + 32 * c, czeroy + 32 * s), fill="black", width=6)
-    draw.line((czerox - (csize - vmsize_n - 3) * c, czeroy - (csize - vmsize_n - 3) * s, czerox, czeroy), fill="black",
-              width=3)
-    draw.ellipse((czerox - 8, czeroy - 8, czerox + 8, czeroy + 8), outline="black", fill="white", width=3)
 
     right = "Reset"
     middle = "    Mode"
@@ -724,4 +744,34 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty += VERYSMALL + 10
     draw.text((5, starty), "sensors", font=verysmallfont, fill="black")
     x = round_text(draw, 100, starty, "IMU", "white", stat['IMUConnected'], out="black")
-    x = round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
+    round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
+
+
+def flighttime(draw, last_flights):
+    starty = 0
+    centered_text(draw, 0, "Flight Logs ", smallfont, fill="black")
+    starty += SMALL + 10
+    draw.text((20, starty), "Date", font=verysmallfont, fill="black")
+    draw.text((120, starty), "Start", font=verysmallfont, fill="black")
+    draw.text((220, starty), "Duration", font=verysmallfont, fill="black")
+    draw.text((350, starty), "Ldg", font=verysmallfont, fill="black")
+    starty += VERYSMALL + 10
+
+    maxlines = 8
+    for f in last_flights:
+        draw.text((20, starty), f[0].strftime("%d.%m.%y"), font=verysmallfont, fill="black")
+        draw.text((120, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
+        if f[1] != 0:    # ==0 means still in the air
+            delta = (f[1]-f[0]).total_seconds()
+            draw.text((350, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
+        else:
+            delta = (datetime.datetime.now(datetime.timezone.utc) - f[0]).total_seconds()
+            draw.text((350, starty), "in the air", font=verysmallfont, fill="black")
+        hours, remainder = divmod(delta, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        out = '  {:02}:{:02}  '.format(int(hours), int(minutes))
+        round_text(draw, 220, starty, out, "white", out="black")
+        starty += VERYSMALL + 5
+        maxlines -= 1
+        if maxlines <= 0:
+            break

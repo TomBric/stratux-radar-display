@@ -114,3 +114,4 @@ mv ${outprefix}-oled${outname} ${outprefix}-epaper${outname}
 zip out/${outprefix}-epaper${outname}.zip ${outprefix}-epaper${outname}
 
 echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
+echo "For mounting USB stick: sudo mount -t exfat /dev/sda1 /media/usb"
