@@ -761,7 +761,7 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-y", "--extsound", type=int, required=False, help="Ext sound on with volume [0-100]",
                     default=-1)
-    ap.add_argument("-f", "--flighttime", required=False, help="Automatically detect and display flighttime",
+    ap.add_argument("-nf", "--no-flighttime", required=False, help="Suppress detection and display of flighttime",
                     action="store_true", default=False)
     args = vars(ap.parse_args())
     # set up logging
@@ -776,7 +776,7 @@ if __name__ == "__main__":
     bluetooth = args['bluetooth']
     basemode = args['north']
     fullcircle = args['fullcircle']
-    measure_flighttime = args['flighttime']
+    measure_flighttime = not args['flighttime']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:
