@@ -40,7 +40,7 @@ import radarbuttons
 
 # constants
 SPEED_THRESHOLD_TAKEOFF = 30    # threshold in kts, when flying is detected or stopped
-SPEED_THRESHOLD_LANDING = 10    # threshold in kts, when landing is detected or stopped
+SPEED_THRESHOLD_LANDING = 15    # threshold in kts, when landing is detected or stopped
 SPEED_THRESHOLD_STOPPED = 5     # threshold in kts, when stopping is detected. Triggers display of flighttime
 TRIGGER_PERIOD_TAKEOFF = 5
 # min time in seconds threshold has to be met before takeoff is triggered (to compensate gps errors)
@@ -120,11 +120,11 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
     if not flying:
         if trigger_timestamp is None and situation['gps_speed'] >= SPEED_THRESHOLD_TAKEOFF:
             trigger_timestamp = now
-            rlog.info("Flighttime: Takeoff threshold exceeded triggered at " + str(now))
+            rlog.debug("Flighttime: Takeoff threshold exceeded triggered at " + str(now))
         elif trigger_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_TAKEOFF:
             if now - trigger_timestamp >= takeoff_delta:
                 takeoff_time = now
-                rlog.info("Flighttime: Takeoff detected at " + str(now))
+                rlog.debug("Flighttime: Takeoff detected at " + str(now))
                 new_flight([now, 0])  # means not yet finished
                 flighttime_changed = True
                 flying = True
@@ -134,14 +134,14 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
         elif trigger_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_TAKEOFF:
             # reset trigger, not several seconds above threshold
             trigger_timestamp = None
-            rlog.info("Flighttime: Threshold underrun, trigger resetted at " + str(now))
+            rlog.debug("Flighttime: Threshold underrun, trigger resetted at " + str(now))
         if new_flight_info:   # no more flying, check whether stop is done
             if stop_timestamp is None and situation['gps_speed'] < SPEED_THRESHOLD_STOPPED:
                 stop_timestamp = now
                 print("Flighttime: Stop detection triggered at " + str(now))
             elif stop_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_STOPPED:
                 if now - stop_timestamp >= stop_delta:
-                    rlog.info("Flighttime: Stop detected at " + str(now))
+                    rlog.debug("Flighttime: Stop detected at " + str(now))
                     stop_timestamp = None
                     new_flight_info = False   # stop is only triggered once
                     switch_back_mode = current_mode
@@ -149,7 +149,7 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
             elif stop_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_STOPPED:
                 # reset trigger, not several seconds below threshold
                 stop_timestamp = None
-                rlog.info("Flighttime: Stop threshold overrun, trigger resetted at " + str(now))
+                rlog.debug("Flighttime: Stop threshold overrun, trigger resetted at " + str(now))
     else:   # flying
         flighttime_changed = True   # set in any case so display is refreshed
         if trigger_timestamp is None and situation['gps_speed'] < SPEED_THRESHOLD_LANDING:
@@ -158,7 +158,7 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
         elif trigger_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_LANDING:
             if now - trigger_timestamp >= landing_delta:
                 landing_time = now
-                rlog.info("Flighttime: Landing detected at " + str(now))
+                rlog.debug("Flighttime: Landing detected at " + str(now))
                 g_config['last_flights'][0][1] = now
                 statusui.write_config(g_config)
                 flying = False
@@ -167,7 +167,7 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
         elif trigger_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_LANDING:
             # reset trigger, not several seconds above threshold
             trigger_timestamp = None
-            rlog.info("Flighttime: Landing threshold overrun, trigger resetted at " + str(now))
+            rlog.debug("Flighttime: Landing threshold overrun, trigger resetted at " + str(now))
     return 0
 
 
