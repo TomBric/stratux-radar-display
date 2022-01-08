@@ -35,6 +35,8 @@ import time
 import radarbuttons
 import math
 import radarbluez
+import flighttime
+import datetime
 
 # constants
 MAX_COUNTDOWN_TIME = 2 * 60 * 60   # maximum time for setting countdown in seconds
@@ -88,6 +90,7 @@ def draw_timer(draw, display_control, refresh_time):
     global was_in_secs
     global timer_ui_changed
     global cdown_spoken
+    global lap_head
 
     now_in_secs = math.floor(time.time())
     if not timer_ui_changed and now_in_secs < was_in_secs + math.ceil(refresh_time):
@@ -105,7 +108,12 @@ def draw_timer(draw, display_control, refresh_time):
                 cdown_spoken = True
                 radarbluez.speak("Countdown finished")
             if cdown_time <= now_in_secs:    # Countdown Finished
-                laptimestr = "--:--:--"
+                ft = flighttime.current_flighttime()
+                if ft is not None:
+                    lap_head = "Flighttime"
+                    laptimestr = (ft - datetime.datetime.now(datetime.timezone.utc)).strftime("%H:%M:%SS")
+                else:
+                    laptimestr = "--:--:--"
             else:
                 laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time - now_in_secs))
     else:
@@ -114,7 +122,12 @@ def draw_timer(draw, display_control, refresh_time):
         else:
             stoptimestr = "--:--:--"
         if cdown_time == 0.0:
-            laptimestr = "--:--:--"
+            ft = flighttime.current_flighttime()
+            if ft is not None:
+                lap_head = "Flighttime"
+                laptimestr = (ft - datetime.datetime.now(datetime.timezone.utc)).strftime("%H:%M:%SS")
+            else:
+                laptimestr = "--:--:--"
         else:
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time))
 

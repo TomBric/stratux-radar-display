@@ -72,6 +72,7 @@ def default(obj):
     if isinstance(obj, (datetime.date, datetime.datetime)):
         return obj.isoformat()
 
+
 def init(activated, config):
     global rlog
     global measurement_enabled
@@ -96,8 +97,14 @@ def new_flight(flight):
         del g_config['last_flights'][FLIGHT_LIST_LENGTH-1]
 
 
+def current_starttime():
+    if 'last_flights' in g_config and g_config[0][1] == 0:    # means we are in the air
+            return g_config[0][0]
+    return None
+
+
 def trigger_measurement(valid_gps, situation, ahrs, current_mode):
-# called from situationhandler whenever new situation is received
+    # called from situationhandler whenever new situation is received
     global trigger_timestamp
     global stop_timestamp
     global takeoff_time
@@ -179,13 +186,13 @@ def draw_flighttime(draw, display_control, changed, config):
 
 
 def user_input():
-    global flighttime_ui_changed
+    global flighttime_changed
     global switch_back_mode
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
         return 0  # stay in current mode
-    flighttime_ui_changed = True
+    flighttime_changed = True
     switch_back_mode = 0    # cancel any switchback, if button was pressed
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return 1  # next mode to be radar
