@@ -776,7 +776,7 @@ if __name__ == "__main__":
     bluetooth = args['bluetooth']
     basemode = args['north']
     fullcircle = args['fullcircle']
-    measure_flighttime = not args['flighttime']
+    measure_flighttime = not args['no-flighttime']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:
