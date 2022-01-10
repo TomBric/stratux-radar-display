@@ -110,6 +110,7 @@ The Oled display uses different GPIO-Pins as the baro-sensor, so there is no con
    ### External Sound output
    
    You can connect your stratux device with your intercom if it has an input for external audio (e.g. TQ KRT2 has one). This is possible on the Pi Zero or the PI3B with an external USB sound card (using the builtin headphone output does not work on the Pi3B). I used a simple "3D USB 5.1 Sound card" available for 4 Euro. The sound volume can be controlled via the option "-y" or can be modified with the pushbuttons under ->Status-> Net/Opt -> External Volume.
+   The following link gives some good hints, which USB sound card can be used and it also shows how to solder it to the Pi Zero, if you do not want an adapter or space is an issue (https://www.raspberrypi-spy.co.uk/2019/06/using-a-usb-audio-device-with-the-raspberry-pi/)
    
    ### Bluetooth devices
    
