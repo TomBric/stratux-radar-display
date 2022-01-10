@@ -13,7 +13,7 @@ sudo pip3 install luma.oled
 sudo pip3 install websockets
 
 # sound configuration for external output
-sudo apt-get install libasound2-dev
+sudo apt-get install libasound2-dev -y
 sudo pip3 install pyalsaaudio
 
 # espeak-ng for sound output

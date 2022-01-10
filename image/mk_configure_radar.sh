@@ -29,7 +29,8 @@ pip3 install py-espeak-ng pyalsaaudio
 # bluetooth configs
 apt-get install libbluetooth-dev -y
 pip3 install pybluez pydbus
-pip3 install --upgrade PILLOW
+pip3 install Pillow==8.4
+# Pillow 9 for now (2022-01-10) crashes on Zero, stay to 8.4 for now
 apt purge piwiz -y
 # necessary to disable bluetoothmessage "To turn on ..."
 
