@@ -5,7 +5,7 @@
 # sudo apt install --yes parted zip unzip zerofree
 # If you want to build on x86 with aarch64 emulation, additionally install qemu-user-static qemu-system-arm
 # Run this script as root.
-# Run with argument "dev" to not clone the stratux repository from remote, but instead copy this current local checkout onto the image
+# Run with argument "dev" to get the dev branch from github, otherwise with main
 # call examples:
 #   sudo /bin/bash mk_stratux_display.sh "Create failed" dev
 #   sudo /bin/bash mk_stratux_display.sh "Create failed" main
@@ -94,6 +94,8 @@ truncate -s $(($bytesEnd + 4096)) $IMGNAME
 
 
 cd $SRCDIR
+# make sure the local version is also on current status
+git pull
 outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 outprefix="stratux-display"
 cd $TMPDIR
