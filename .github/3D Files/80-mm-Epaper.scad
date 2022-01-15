@@ -9,7 +9,6 @@ $fn=96;
 all_parts_for_printing();
 //all_parts_mounted();
 //front_cover();
-//epaper();
 //translate([0,0,-front_plate_thick]) front_plate(front_plate_thick);
 //translate([25,0,cylinder_depth]) rotate([0,0,90]) latch();
 
@@ -41,36 +40,35 @@ ep_thick = 1;
 
 //cutout
 cutout_diameter = 78;
-cutout_holesize = 4.0;
-cutout_hole_distance_y = 60;
-cutout_hole_distance_x = 56;
+cutout_holesize = 4.5;
+cutout_hole_distance = 63;
 cutout_depth = 1;   // for aluminum or other material in instrument panel
 blind_rivet_head_size = 8; // some space for blind-rivets, if used in instrument panel for mounting, here M3
 blind_rivet_head_depth = 1;
 
 //front_plate
 front_plate_x = 80;
-front_plate_y = 73;
-front_plate_thick = 5;
+front_plate_y = 80;
+front_plate_thick = 4.5;
 cylinder_depth = 5;   //depth of round cylinder in front
 
 //front-cover
 cover_overhead = 0.5;  //overlap of front cover (more than plate)
-cover_depth = front_plate_thick + 2 + cover_overhead;
+cover_depth = front_plate_thick + 2.5 + cover_overhead;
 cover_flange_thick = 1.5;
 inner_cover_width = ep_outside_x + 2;   // leave 1 mm on every side_flanges
-inner_cover_height = 80;
+inner_cover_height = 81;
 cover_rounding = 5;
 
 //switches
 switch_posy = -31;
 switch_distance = 10;
 switch_radius = 2;
-switch_case_height = 6.5;
-switch_case_width = 6.5;
+switch_case_height = 6.45;
+switch_case_width = 6.45;
 switch_case_depth = 2;
 switch_length = 10 + switch_case_depth;
-switch_offset = 1.5;
+switch_offset = -3.0;
 //cutout behind switch for welding and fastening
 sw_back_x = 16;
 sw_back_y = 8;
@@ -79,11 +77,10 @@ sw_back_z = 20;  // to keep back open
 
 // flange-section
 flange_thick = 4;
-flange_size_x = 40;
-flange_size_y = 60;
-flange_chamfer = 2;
-flange_height = 10;
-flange_offset_y = -6;
+flange_size_x = 44;
+flange_size_y = 72;
+flange_chamfer = 7;
+flange_height = 15;
 
 // latch to fasten switches
 latch_height = 5;
@@ -102,7 +99,7 @@ hat_screws_x = 10;   //screwholes to fix hat
 hat_screws_y = 25;
 hat_screws_z = 8;   // depth of switch_screwhole
 hat_screws_offset_x = 1.5;
-hat_cutout_x = 25;  //additional cutout for parts on hat
+hat_cutout_x = 18;  //additional cutout for parts on hat
 hat_cutout_y = 18;
 hat_cutout_depth = 1;
 
@@ -128,7 +125,7 @@ module hat() {
         translate([hat_screws_offset_x, 0, 0]) cuboid([hat_cutout_x, hat_cutout_y, hat_depth+hat_cutout_depth], anchor = TOP);
         translate([hat_screws_offset_x, 0, 0]) hat_screws();
         //opening for cable to epaper
-        translate([hat_x-cable_epaper_x/2 + 3,-5,0])
+        translate([hat_x-cable_epaper_x/2,0,0])
             cuboid([cable_epaper_x, cable_epaper_y, cable_epaper_thick], anchor = TOP);
         translate([-cable_epaper_in_x,0,0])
             cuboid([cable_epaper_in_x, cable_epaper_in_y, cable_epaper_in_thick], anchor = TOP);
@@ -150,7 +147,7 @@ module all_parts_mounted() {
     // can be used for illustration purposes
     //color("orange") translate([0,0,front_plate_thick]) epaper();
     //color("red") instrument_panel();
-    color("green") front_plate(front_plate_thick);
+    color("green") front_plate(front_platet_thick);
     color("blue") front_cover();
     color("yellow") latch();
 }
@@ -166,10 +163,10 @@ module front_cover() {
                 rounding = ep_visible_rounding, edges = [BACK + RIGHT, BACK + LEFT, FWD + RIGHT, FWD + LEFT],
                 anchor = BOTTOM);
         front_plate(front_plate_thick + cover_overhead, printing_tolerance);
-        blind_rivet_head(cutout_hole_distance_x, cutout_hole_distance_y, blind_rivet_head_size/2, blind_rivet_head_depth, BOTTOM);
+        blind_rivet_head(cutout_hole_distance, blind_rivet_head_size/2, blind_rivet_head_depth, BOTTOM);
         //epaper inlet
         cuboid([ep_outside_x + printing_tolerance,ep_outside_y + printing_tolerance, cover_depth-1], anchor = BOTTOM);
-        fixing_screws(cutout_hole_distance_x, cutout_hole_distance_y, cutout_holesize/2, cover_depth, BOTTOM);
+        fixing_screws(cutout_hole_distance, cutout_holesize/2, cover_depth, BOTTOM);
         three_switches(switch_distance, switch_posy, switch_offset);
         sd_holder(sd_offset_y);
     }
@@ -207,13 +204,12 @@ module instrument_panel() {   //illustration only, remove for printing
 
 
 module flanges() {
-    translate([0, flange_offset_y, 0])
-        difference() {
-            cuboid([flange_size_x, flange_size_y, flange_height], anchor = TOP, chamfer = flange_chamfer,
-                edges = [BACK + RIGHT, BACK + LEFT, FWD + RIGHT, FWD + LEFT]);
-            cuboid([flange_size_x - flange_thick * 2, flange_size_y - flange_thick * 2, flange_height],
-                anchor = TOP, chamfer = flange_chamfer-flange_thick/2, edges = [BACK + RIGHT, BACK + LEFT, FWD + RIGHT, FWD + LEFT]);
-        }
+    difference() {
+        cuboid([flange_size_x, flange_size_y, flange_height], anchor = TOP, chamfer = flange_chamfer,
+            edges = [BACK + RIGHT, BACK + LEFT, FWD + RIGHT, FWD + LEFT]);
+        cuboid([flange_size_x - flange_thick * 2, flange_size_y - flange_thick * 2, flange_height],
+            anchor = TOP, chamfer = flange_chamfer-flange_thick/2, edges = [BACK + RIGHT, BACK + LEFT, FWD + RIGHT, FWD + LEFT]);
+    }
 }
 
 
@@ -225,13 +221,13 @@ module front_plate(thick, print_tol=0) {
                 rounding=2, edges = [BACK + RIGHT, BACK + LEFT, FWD + RIGHT, FWD + LEFT], anchor = BOTTOM);
             cuboid([ep_outside_x+print_tol, ep_outside_y+print_tol, thick],
                 rounding=2, edges = [BACK + RIGHT, BACK + LEFT, FWD + RIGHT, FWD + LEFT], anchor = BOTTOM);
-            //cylinder(d=cutout_diameter, h=cylinder_depth, anchor=TOP);
+            cylinder(d=cutout_diameter, h=cylinder_depth, anchor=TOP);
             color("magenta") flanges();
         }
         hat();
         switch_screwholes(switch_posy, radius_in_front);
-        fixing_screws(cutout_hole_distance_x, cutout_hole_distance_y, cutout_holesize/2, thick, BOTTOM);
-        blind_rivet_head(cutout_hole_distance_x, cutout_hole_distance_y, blind_rivet_head_size/2, blind_rivet_head_depth, BOTTOM);
+        fixing_screws(cutout_hole_distance, cutout_holesize/2, thick, BOTTOM);
+        blind_rivet_head(cutout_hole_distance, blind_rivet_head_size/2, blind_rivet_head_depth, BOTTOM);
         three_switches(switch_distance, switch_posy, switch_offset);
         sd_holder(sd_offset_y);
     }
@@ -239,33 +235,35 @@ module front_plate(thick, print_tol=0) {
 
 module cutout(anch, d) {
     cylinder(d=cutout_diameter,h=d, anchor=anch);
-    fixing_screws(cutout_hole_distance_x, cutout_hole_distance_y, cutout_holesize/2, d, anch);
+    fixing_screws(cutout_hole_distance, cutout_holesize/2, d, anch);
 }
 
-module fixing_screws(distance_x, distance_y, hole_size, depth, hole_anchor) {
-    // 1 screw in the middle above, 2 centered in distance_x below
+module fixing_screws(distance, hole_size, depth, hole_anchor) {
     // screw holes to fix  board to back from backside
-    translate([0, distance_y / 2 , 0])
+    translate([- distance / 2, - distance / 2 , 0])
         cylinder(r = hole_size, h = depth, anchor = hole_anchor);
-    translate([- distance_x / 2, - distance_y / 2 , 0])
+    translate([- distance / 2, + distance / 2 , 0])
         cylinder(r = hole_size, h = depth, anchor = hole_anchor);
-    translate([+ distance_x/ 2, - distance_y / 2 , 0])
+    translate([+ distance/ 2, - distance / 2 , 0])
+        cylinder(r = hole_size, h = depth, anchor = hole_anchor);
+    translate([+ distance / 2, + distance / 2 , 0])
         cylinder(r = hole_size, h = depth, anchor = hole_anchor);
 }
 
-module blind_rivet_head(distance_x, distance_y, hole_size, depth, hole_anchor) {
-    translate([0, distance_y / 2 , 0])
+module blind_rivet_head(distance, hole_size, depth, hole_anchor) {
+    translate([- distance / 2, - distance / 2 , 0])
         cylinder(r = hole_size, h = depth, anchor = hole_anchor);
-    translate([- distance_x / 2, - distance_y / 2 , 0])
+    translate([- distance / 2, + distance / 2 , 0])
         cylinder(r = hole_size, h = depth, anchor = hole_anchor);
-    translate([+ distance_x/ 2, - distance_y / 2 , 0])
+    translate([+ distance/ 2, - distance / 2 , 0])
+        cylinder(r = hole_size, h = depth, anchor = hole_anchor);
+    translate([+ distance / 2, + distance / 2 , 0])
         cylinder(r = hole_size, h = depth, anchor = hole_anchor);
 }
 
 module epaper() {
     color("blue") cuboid([ep_outside_x,ep_outside_y,ep_thick], anchor = BOTTOM);
-    translate([2.5,0,0]) color("red") cuboid([ep_visible_x,ep_visible_y,ep_thick], anchor = BOTTOM);
-    // epaper is not centered
+    color("red") cuboid([ep_visible_x,ep_visible_y,ep_thick], anchor = BOTTOM);
 }
 
 module three_switches(sw_d, sw_y, sw_z) {
@@ -287,6 +285,8 @@ module switch(x,y,offset) {
 }
 
 module sd_holder(y_offset) {
-    //translate([0,y_offset,cover_depth]) cuboid([sd_width, sd_height, sd_depth], rounding=sd_rounding, edges=[BACK+RIGHT,BACK+LEFT,FWD+RIGHT,FWD+LEFT], anchor=TOP);
+    translate([0,y_offset,cover_depth])
+        cuboid([sd_width, sd_height, sd_depth], rounding=sd_rounding,
+                edges=[BACK+RIGHT,BACK+LEFT,FWD+RIGHT,FWD+LEFT], anchor=TOP);
 }
 
