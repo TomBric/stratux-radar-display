@@ -1,6 +1,7 @@
 # stratux-radar-display
-Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W). Reads the aircraft data from Stratux and displays them on the specified display. The newest version now has a user interface included. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
+Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W). Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
 - update in version 1.4: external sound connection is now supported by using a USB sound card (approx. 4 Euro). With that you can connect your display to your intercom. This external sound output is also functioning on the stratux only, without an additional Zero.
+- update in version 1.5: the display now also supports an automatic logging of your flight times. Flight time is started when your GPS speed is 5 seconds more than 30 kts and stopped if you are 5 secondes below 10 kts. When you stopped the airplane (below 5 kts) the display will automatically display the 8 latest flights. This can be disabled with the option "-nf". You can also switch via middle button ("Mode") several times to the flight display mode. 
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
@@ -101,11 +102,12 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    3. Reboot and log on to your Stratux as user pi, directory /home/pi
    4. Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
    3. Execute the configuration skript: "/bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh". It will take some time.
-   4. Configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7". You can use an simple editor like nano for this: "nano image/stratux_radar.sh". 
+   4. Configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7". You can use a simple editor like nano for this: "nano image/stratux_radar.sh". 
    5. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
 
 The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
    Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry Zero 2 or Zero W.
+   Remark: The ogn receiver is conflicting with some connection lines of the Epaper-display. So if you want to use Epaper and an 868-OGN-receiver, currently you need to install the display on an Pi Zero (or Zero 2) (working to solve this ...)
    
    ### External Sound output
    
@@ -194,7 +196,7 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
 # Shell command parameters
 ```
 usage: radar.py [-h] -d DEVICE [-b] [-sd] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z] [-c CONNECT] [-v] [-r] [-e]
-                [-y EXTSOUND]
+                [-y EXTSOUND] [-nf]
 
 Stratux radar display
 
@@ -219,6 +221,7 @@ optional arguments:
   -e, --fullcircle      Display full circle radar (Epaper only)
   -y EXTSOUND, --extsound EXTSOUND
                         Ext sound on with volume [0-100]
+  -nf, --noflighttime   Suppress detection and display of flighttime
   ```
 
 
