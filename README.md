@@ -101,7 +101,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    3. Reboot and log on to your Stratux as user pi, directory /home/pi
    4. Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
    3. Execute the configuration skript: "/bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh". It will take some time.
-   4. Configure the startup skript "image/stratux-radar.sh": remove the option "-s" and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7"
+   4. Configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7". You can use an simple editor like nano for this: "nano image/stratux_radar.sh". 
    5. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
 
 The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
@@ -109,7 +109,7 @@ The Oled display uses different GPIO-Pins as the baro-sensor, so there is no con
    
    ### External Sound output
    
-   You can connect your stratux device with your intercom if it has an input for external audio (e.g. TQ KRT2 has one). This is possible on the Pi Zero or the PI3B with an external USB sound card (using the builtin headphone output does not work on the Pi3B). I used a simple "3D USB 5.1 Sound card" available for 4 Euro. The sound volume can be controlled via the option "-y" or can be modified with the pushbuttons under ->Status-> Net/Opt -> External Volume.
+   You can connect your stratux device with your intercom if it has an input for external audio (e.g. TQ KRT2 has one). This is possible on the Pi Zero or the PI3B with an external USB sound card (using the builtin headphone output does not work on the Pi3B). I used a simple "3D USB 5.1 Sound card" available for 4 Euro. The sound volume can be controlled via the option "-y 50" or can be modified with the pushbuttons under ->Status-> Net/Opt -> External Volume.
    The following link gives some good hints, which USB sound card can be used and it also shows how to solder it to the Pi Zero, if you do not want an adapter or space is an issue (https://www.raspberrypi-spy.co.uk/2019/06/using-a-usb-audio-device-with-the-raspberry-pi/)
    
    ### Bluetooth devices
