@@ -1,7 +1,7 @@
 # stratux-radar-display
 Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W). Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
 - update in version 1.4: external sound connection is now supported by using a USB sound card (approx. 4 Euro). With that you can connect your display to your intercom. This external sound output is also functioning on the stratux only, without an additional Zero.
-- update in version 1.5: the display now also supports an automatic logging of your flight times. Flight time is started when your GPS speed is 5 seconds more than 30 kts and stopped if you are 5 seconds below 10 kts. When you stopped the airplane (below 5 kts) the display will automatically display the 8 latest flights. This can be disabled with the option "-nf". You can also switch via pressing middle button ("Mode") several times to the flight display mode. 
+- update in version 1.5: the display now also supports an automatic logging of your flight times. Flight time is started when your GPS speed is 5 seconds more than 30 kts and stopped if you are 5 seconds below 10 kts. When you stopped the airplane (below 5 kts) the display will automatically show the 8 latest flights. This can be disabled with the option "-nf". You can also switch via pressing middle button ("Mode") several times to the flight display mode. 
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
@@ -26,7 +26,7 @@ Find below a photo of the current supported displays
 - Oled-Display: Waveshare 14747, 128x128, General 1.5inch RGB OLED display Module
    ![Oled photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Oled_1in5.jpg)
    
- - Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters LM2596. Then you can use the aircraft power supply (up to 40V). Calibrate the LM2596 at home for a power output at 5 V e.g. using an old laptop power supply. LM2596 also work well for the stratux itself. No problems with radio noise.  
+ - Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters LM2596. Then you can use the aircraft power supply (up to 40V). Calibrate the LM2596 at home for a power output at 5 V e.g. using an old laptop power supply. LM2596 also work well for the stratux itself. If you encounter problems with radio noise, please ensure that the power cable to the display is twisted and if necessary use a ferrit-core at the power connection.  
    
  # Hardware connection of the OLED 1.5 inch display
  
@@ -72,14 +72,14 @@ To do that please modify in /home/pi/stratux-radar-display/main/displays/Epaper_
 
 All pushbuttons are used as pull down. Connect the other side of all buttons to GND (PIN39).
    
-   ## Software Installation Instructions
-   ### Standard setup
+## Software Installation Instructions
+### Standard setup
    1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Image with "epaper" is the version for the waveshare 3.7 inch epaper displays. Both versions will support Bluetooth
    2. Flash the image using Raspberry Pi Imager (select "OwnImage") or Win32DiskImager to your SD card (32 GB cards recommended)
    3. Insert the SD into you raspberry and let it boot. It should automatically startup and connect to the Stratux-Europe edition. 
    Remark: Current configuration is for Stratux-Europe on IP address 192.168.10.1. If you have a different configuration please update /home/pi/stratux-radar-display/image/stratux_radar.sh accordingly.
    
-   ### Expert setup 
+### Expert setup 
    1. Configure a clean Raspbian installation on your SD card. E.g. using Raspberry Pi Imager. Image to flash is the standard image "Raspbian Pi OS (recommended)". 
    2. Setup your main stratux in the following way:  Install version eu-027 on ther stratux or newer. Go to "Settings" and set Wifi-Mode: AP+Client. Enable "Internet-Passthrough" as well. Then "Add wifi client network" and add the data of your local home network. This all enables your stratux to have Internet connection and gives the display the possibility to access internet as well. 
    3. Startup your Stratux and boot your new raspberry. Connect your PC/workstation to the standard "stratux WLAN" network and figure out the IP-adress of your display-raspberry, e.g. by using "arp -a".
@@ -92,7 +92,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    8. The configuration skript will make an entry in crontab of user pi, so that radar will start automatically after reboot. 
 
    
-   ### Installation on a standard stratux device (for stratux versions eu027 or newer!)
+### Installation on a standard stratux device (for stratux versions eu027 or newer!)
    stratux-radar-display can run also directly on your stratux device. You can find an example of a case with everything installed in the [wiki](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display)). Connect the displays to the GPIO pins of the Stratux. 
    Installation is only for expert users! To install the software perform the following steps:
    
@@ -106,15 +106,16 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    5. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
 
 The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
-   Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry Zero 2 or Zero W.
-   Remark: The ogn receiver is conflicting with some connection lines of the Epaper-display. So if you want to use Epaper and an 868-OGN-receiver, currently you need to install the display on an Pi Zero (or Zero 2) (working to solve this ...)
+- Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry Zero 2 or Zero W.
+- Remark: The ogn receiver is conflicting with connection lines of the Epaper-display. So if you want to use Epaper and an 868-OGN-receiver, currently you need to install the display on an Pi Zero (or Zero 2) (working to solve this ...)
+
    
-   ### External Sound output
+### External Sound output
    
    You can connect your stratux device with your intercom if it has an input for external audio (e.g. TQ KRT2 has one). This is possible on the Pi Zero or the PI3B with an external USB sound card (using the builtin headphone output does not work on the Pi3B). I used a simple "3D USB 5.1 Sound card" available for 4 Euro. The sound volume can be controlled via the option "-y 50" or can be modified with the pushbuttons under ->Status-> Net/Opt -> External Volume.
    The following link gives some good hints, which USB sound card can be used and it also shows how to solder it to the Pi Zero, if you do not want an adapter or space is an issue (https://www.raspberrypi-spy.co.uk/2019/06/using-a-usb-audio-device-with-the-raspberry-pi/)
    
-   ### Bluetooth devices
+### Bluetooth devices
    
    stratux-radar-display will automatically connect the your headset if their bluetooth is switched on. 
    But once you need to do the pairing of a new bluetooth device. 
@@ -146,11 +147,12 @@ The Oled display uses different GPIO-Pins as the baro-sensor, so there is no con
    
    The bluetooth configuration is now ready and each time the radar has your device in reachability, it will connect. On the display the bluetooth symbol will be visible in the right corner.
    
- # Manual of stratux-radar-display (user interface with 3 pushbuttons) (thanks SiggiS)
+# Manual of stratux-radar-display (user interface with 3 pushbuttons) (thanks SiggiS)
 ### In all screen modes:
-   - middle button (>1 sec): switch to next mode (radar -> timer -> ahrs -> radar)
+   - middle button (>1 sec): switch to next mode (radar -> timer -> ahrs -> gmeter -> compass -> vertical speed -> display status -> stratux statux -> flight logs -> radar)
    - left button (>1 sec): start shutdown, press any other button to cancel shutdown
    - after shutdown, display can be reactivated by switching on/off
+   - Epaper display: right button > 1 sec does a refresh of the display. Sometimes you may have some fragments on the display (because we are using partial refresh). Pressing the right button does a full refresh.
    
 ### Radar screen mode:
    - left button short: change radar range (2nm -> 5nm -> 10nm -> 40nm)
