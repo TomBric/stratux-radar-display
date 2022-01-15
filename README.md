@@ -1,14 +1,14 @@
 # stratux-radar-display
 Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W). Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
 - update in version 1.4: external sound connection is now supported by using a USB sound card (approx. 4 Euro). With that you can connect your display to your intercom. This external sound output is also functioning on the stratux only, without an additional Zero.
-- update in version 1.5: the display now also supports an automatic logging of your flight times. Flight time is started when your GPS speed is 5 seconds more than 30 kts and stopped if you are 5 secondes below 10 kts. When you stopped the airplane (below 5 kts) the display will automatically display the 8 latest flights. This can be disabled with the option "-nf". You can also switch via middle button ("Mode") several times to the flight display mode. 
+- update in version 1.5: the display now also supports an automatic logging of your flight times. Flight time is started when your GPS speed is 5 seconds more than 30 kts and stopped if you are 5 seconds below 10 kts. When you stopped the airplane (below 5 kts) the display will automatically display the 8 latest flights. This can be disabled with the option "-nf". You can also switch via pressing middle button ("Mode") several times to the flight display mode. 
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
 - Epaper Display 3.7 inch (waveshare)
 
 More displays can be integrated.
-You can find 3D printer files for cases of both variants in the repo (no-code). The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. Instructions e.g. how to build the [2 1/4 Oled case](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display) "wiki 2 1/4") or [3 1/8 Epaper instrument](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-for-80-mm-instrument-hole-with-Epaper-display "wiki 3 1/8") can be found in the wiki.
+You can find 3D printer files for cases of both variants in the repo (no-code and .github). The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. Instructions e.g. how to build the [2 1/4 Oled case](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display) "wiki 2 1/4") or [3 1/8 Epaper instrument](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-for-80-mm-instrument-hole-with-Epaper-display "wiki 3 1/8") can be found in the wiki.
 
 Find below a photo of the current supported displays
 - the oled display is relatively small, but can be build into a 2 1/4" or larger instrument mounting hole
