@@ -101,12 +101,12 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    2. Enable a writeable persistent filesystem in the settings tab by setting "Persistent Logging". 
    3. Reboot and log on to your Stratux as user pi, directory /home/pi
    4. Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
-   3. Execute the configuration skript: "/bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh". It will take some time.
-   4. Configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7". You can use a simple editor like nano for this: "nano image/stratux_radar.sh". 
-   5. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
+   5. Execute the configuration skript: "/bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh". It will take some time.
+   6. The script configures stratux to work with the Oled display and without bluetooth or external sound. So if this is your configuration, you are fine. Otherwise you can configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7". You can use a simple editor like nano for this: "nano image/stratux_radar.sh". 
+   7. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
 
 The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
-- Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use Raspian OS Desktop on a Raspberry Zero 2 or Zero W.
+- Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use an additional Raspberry Zero 2 W or Zero W for the display.
 - Remark: The ogn receiver is conflicting with connection lines of the Epaper-display. So if you want to use Epaper and an 868-OGN-receiver, currently you need to install the display on an Pi Zero (or Zero 2) (working to solve this ...)
 
    
@@ -124,7 +124,7 @@ The Oled display uses different GPIO-Pins as the baro-sensor, so there is no con
    
    **Option 1: Directly on the device via buttons:**
    
-   * Change to Status-Mode (long press middle button, to change from Radar-> Timer -> AHRS -> Status)
+   * Change to Status-Mode (long press middle button, to change from Radar-> Timer -> AHRS -> G-Meter -> Compass -> VSI -> Status)
    * Press "scan" (right button). The display now scans 30 secs for new devices. Set your headset as visible and it will be detected (For Bose A20 this is a 5 second press on the Bluetooth-Button until it flashes blue-red)
    * A list of detected devices is shown, press "yes" for the detected device. Sometimes you need to repeat the scan until your headset is detected.
       
@@ -180,21 +180,36 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
 ![Timer](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-TimerMode.jpg)
 
  ### AHRS mode:
- - no special interaction, press long middle for next mode
+ - no special interaction, press middle for next mode
 
 ![AHRS](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-AHRS-Mode.jpg)
 
 ### G-Meter mode:
     - press short right to reset min and max values
-    - press long middle for next mode
+    - press middle for next mode
 
 ![Gmeter](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-G-Meter-Mode.jpg)
 
 ### Compass mode:
-    - press long middle for next mode
+    - press middle for next mode
 
 ![Compass](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper-CompassMode.jpg)
 
+### Vertical speeed indicator mode:
+    - press middle for next mode
+    - on epaper: press right to reset max and min values
+    
+### Display status mode:
+    - press middle for next mode
+    - press right to start bluetooth-scan
+    - press left to show or modify network and other settings, press left again to select Options (external volume, registration, speak distance), press right to modify Network settings (Wifi, passphrase, stratux IP)
+    
+### Stratux status mode:
+    - press middle for next mode
+    
+### Flight log mode:
+    - press middle for next mode
+    
 # Shell command parameters
 ```
 usage: radar.py [-h] -d DEVICE [-b] [-sd] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z] [-c CONNECT] [-v] [-r] [-e]
