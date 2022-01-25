@@ -343,7 +343,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
           marks_distance, small_marks_distance, middle_text1, middle_text2):
     big_mark_length = 15
     small_mark_length = 8
-    text_distance = 8
+    text_distance = 6
     arrow_line_size = 8  # must be an even number
     arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + 50),
              (0, -size / 2 + 10), (arrow_line_size / 2, -size / 2 + 50), (arrow_line_size / 2, 0))
@@ -395,7 +395,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
 
 def gmeter(draw, current, maxg, ming, error_message):
     gm_size = sizex
-    meter(draw, current, -3, 5, 110, 430, gm_size, zerox, zeroy, 1, 0.25, "G-Force", None)
+    meter(draw, current, -3, 5, 120, 420, gm_size, zerox, zeroy, 1, 0.25, "G-Force", None)
 
     draw.text((zerox + 13, 80), "max", font=smallfont, fill="black")
     right_text(draw, 80, "{:+1.2f}".format(maxg), smallfont, fill="black")
