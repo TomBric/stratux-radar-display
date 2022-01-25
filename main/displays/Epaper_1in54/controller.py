@@ -40,8 +40,8 @@ from pathlib import Path
 
 # global constants
 VERYLARGE = 36    # timer
-MORELARGE = 30
-LARGE = 24          # size of height indications of aircraft
+MORELARGE = 32
+LARGE = 28          # size of height indications of aircraft
 SMALL = 20      # size of information indications on top and bottom
 VERYSMALL = 16
 AWESOME_FONTSIZE = 16   # bluetooth indicator
