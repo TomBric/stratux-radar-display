@@ -39,8 +39,8 @@ import datetime
 from pathlib import Path
 
 # global constants
-VERYLARGE = 36    # timer
-MORELARGE = 32
+VERYLARGE = 32    # timer
+MORELARGE = 30
 LARGE = 28          # size of height indications of aircraft
 SMALL = 20      # size of information indications on top and bottom
 VERYSMALL = 16
@@ -608,12 +608,12 @@ def text_screen(draw, headline, subline, text, left_text, middle_text, right_tex
     if subline is not None:
         centered_text(draw, txt_starty, subline, largefont, fill="black")
         txt_starty += LARGE
-    draw.text((5, txt_starty), text, font=smallfont, fill="black")
+    draw.text((0, txt_starty), text, font=smallfont, fill="black")
 
-    draw.text((5, sizey - SMALL - 3), left_text, font=smallfont, fill="black")
-    textsize = draw.textsize(right_text, smallfont)
-    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right_text, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="black")
+    draw.text((0, sizey - SMALL), left_text, font=verysmallfont, fill="black")
+    textsize = draw.textsize(right_text, verysmallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL), right_text, font=verysmallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL, middle_text, verysmallfont, fill="black")
 
 
 def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp, suffix):
