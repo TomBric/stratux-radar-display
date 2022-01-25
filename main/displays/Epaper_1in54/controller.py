@@ -286,9 +286,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     draw.text((0, 0), str(range), font=smallfont, fill="black")
     draw.text((0, SMALL), "nm", font=verysmallfont, fill="black")
 
-    t = "FL"+str(round(ownalt / 100))
-    textsize = draw.textsize(t, verysmallfont)
-    draw.text((sizex - textsize[0] - 5, SMALL+10), t, font=verysmallfont, fill="black")
+    draw.text((0, sizey - SMALL), "FL" + str(round(ownalt / 100)), font=smallfont, fill="black")
 
     if altdifference >= 10000:
         t = str(int(altdifference / 1000)) + "k"
@@ -305,9 +303,9 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="black", align="right")
 
     if not gpsconnected:
-        centered_text(draw, 40, "No GPS", smallfont, fill="black")
+        centered_text(draw, 25, "No GPS", smallfont, fill="black")
     if not connected:
-        centered_text(draw, 20, "No Connection!", smallfont, fill="black")
+        centered_text(draw, 7, "No Connection!", smallfont, fill="black")
 
     if extsound or bt_devices > 0:
         if sound_active:
@@ -322,7 +320,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
 
     # optical keep alive bar at right side
-    draw.line((sizex-4, 80+optical_bar*5, sizex-4, 80+optical_bar*4+4), fill="black", width=2)
+    draw.line((sizex-4, 80+optical_bar*5, sizex-4, 80+optical_bar*4+4), fill="black", width=4)
 
 
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
