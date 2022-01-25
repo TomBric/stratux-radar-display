@@ -320,7 +320,7 @@ class EPD:
 
 # MODIFICATIONS by stratux-radar-display
 
-    def displayPart(self, image):
+    def displayPart_mod(self, image):
         self.send_command(0x24)
         self.send_data2(image)
 
