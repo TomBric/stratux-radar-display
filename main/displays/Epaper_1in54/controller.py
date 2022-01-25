@@ -589,8 +589,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # pointer in the middle
     draw.line((ah_zerox - 90, ah_zeroy, ah_zerox - 30, ah_zeroy), width=4, fill="black")
     draw.line((ah_zerox + 90, ah_zeroy, ah_zerox + 30, ah_zeroy), width=4, fill="black")
-    draw.polygon((ah_zerox, ah_zeroy + 4, ah_zerox - 16, ah_zeroy + 12, ah_zerox + 16, ah_zeroy + 12),
-                 fill="black")
+    draw.polygon((ah_zerox, ah_zeroy + 4, ah_zerox - 16, ah_zeroy + 12, ah_zerox + 16, ah_zeroy + 12), fill="black")
 
     # roll indicator
     rollmarks(draw, roll)
