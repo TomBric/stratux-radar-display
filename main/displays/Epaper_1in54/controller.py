@@ -341,10 +341,10 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
 
 def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
           marks_distance, small_marks_distance, middle_text1, middle_text2):
-    big_mark_length = 20
-    small_mark_length = 10
-    text_distance = 10
-    arrow_line_size = 12  # must be an even number
+    big_mark_length = 15
+    small_mark_length = 8
+    text_distance = 8
+    arrow_line_size = 8  # must be an even number
     arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + 50),
              (0, -size / 2 + 10), (arrow_line_size / 2, -size / 2 + 50), (arrow_line_size / 2, 0))
     # points of arrow at angle 0 (pointing up) for line drawing
@@ -352,7 +352,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     deg_per_value = (to_degree - from_degree) / (end_value - start_value)
 
     draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
-             from_degree-90, to_degree-90, width=6, fill="black")
+             from_degree-90, to_degree-90, width=4, fill="black")
     # small marks first
     line = ((0, -size/2+1), (0, -size/2+small_mark_length))
     m = start_value
@@ -367,7 +367,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     while m <= end_value:
         angle = deg_per_value*(m-start_value) + from_degree
         mark = translate(angle, line, (center_x, center_y))
-        draw.line(mark, fill="black", width=4)
+        draw.line(mark, fill="black", width=3)
         # text
         marktext = str(m)
         w, h = largefont.getsize(marktext)
@@ -397,25 +397,17 @@ def gmeter(draw, current, maxg, ming, error_message):
     gm_size = sizex
     meter(draw, current, -3, 5, 110, 430, gm_size, zerox, zeroy, 1, 0.25, "G-Force", None)
 
-    right_center_x = (sizex-gm_size)/2+gm_size    # center of remaining part
-    t = "G-Meter"
-    ts = draw.textsize(t, largefont)
-    draw.text((right_center_x - ts[0] / 2, 30), t, font=largefont, fill="black", align="left")
-    draw.text((gm_size+30, 98), "max", font=smallfont, fill="black")
-    right_text(draw, 95, "{:+1.2f}".format(maxg), largefont, fill="black")
-    if error_message is None:
-        draw.text((gm_size+30, 138), "act", font=smallfont, fill="black")
-        right_text(draw, 135, "{:+1.2f}".format(current), largefont, fill="black")
-    else:
-        draw.text((gm_size+30, 138), error_message, font=largefont, fill="black")
-    draw.text((gm_size+30, 178), "min", font=smallfont, fill="black")
-    right_text(draw, 175, "{:+1.2f}".format(ming), largefont, fill="black")
+    draw.text((zerox + 8, 80), "max", font=smallfont, fill="black")
+    right_text(draw, 80, "{:+1.2f}".format(maxg), smallfont, fill="black")
+    if error_message:
+        centered_text(draw, 57, error_message, largefont, fill="black")
+    draw.text((zerox + 8, 110), "min", font=smallfont, fill="black")
+    right_text(draw, 110, "{:+1.2f}".format(ming), smallfont, fill="black")
 
     right = "Reset"
-    middle = "    Mode"
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey-SMALL-3, middle, smallfont, fill="black")
+
 
 
 def compass(draw, heading, error_message):
