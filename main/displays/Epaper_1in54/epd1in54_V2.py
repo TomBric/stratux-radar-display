@@ -355,5 +355,12 @@ class EPD:
         self.send_data(0xcF)
         self.send_command(0x20)  # MASTER_ACTIVATION
 
-### END OF FILE ###
 
+    def send_data2(self, data):
+        epdconfig.digital_write(self.dc_pin, 1)
+        epdconfig.digital_write(self.cs_pin, 0)
+        epdconfig.SPI.writebytes2(data)
+        epdconfig.digital_write(self.cs_pin, 1)
+
+
+### END OF FILE ###
