@@ -397,16 +397,16 @@ def gmeter(draw, current, maxg, ming, error_message):
     gm_size = sizex
     meter(draw, current, -3, 5, 110, 430, gm_size, zerox, zeroy, 1, 0.25, "G-Force", None)
 
-    draw.text((zerox + 8, 80), "max", font=smallfont, fill="black")
+    draw.text((zerox + 13, 80), "max", font=smallfont, fill="black")
     right_text(draw, 80, "{:+1.2f}".format(maxg), smallfont, fill="black")
     if error_message:
         centered_text(draw, 57, error_message, largefont, fill="black")
-    draw.text((zerox + 8, 110), "min", font=smallfont, fill="black")
-    right_text(draw, 110, "{:+1.2f}".format(ming), smallfont, fill="black")
+    draw.text((zerox + 13, 102), "min", font=smallfont, fill="black")
+    right_text(draw, 102, "{:+1.2f}".format(ming), smallfont, fill="black")
 
     right = "Reset"
-    textsize = draw.textsize(right, smallfont)
-    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right, font=smallfont, fill="black", align="right")
+    textsize = draw.textsize(right, verysmallfont)
+    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right, font=verysmallfont, fill="black", align="right")
 
 
 
