@@ -333,9 +333,7 @@ class EPD:
 
     def async_displayPart(self, image):
         self.send_command(0x24)
-        for j in range(0, self.height):
-            for i in range(0, int(self.width / 8)):
-                self.send_data(image[i + j * int(self.width / 8)])
+        self.send_data2(image)
 
         self.async_TurnOnDisplayPart()
 
