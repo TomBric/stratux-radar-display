@@ -571,25 +571,25 @@ def slip(draw, slipskid):
 
 def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
-    h1, h2 = linepoints(pitch, roll, 0, 600)  # horizon points
-    h3, h4 = linepoints(pitch, roll, -180, 600)
+    h1, h2 = linepoints(pitch, roll, 0, 300)  # horizon points
+    h3, h4 = linepoints(pitch, roll, -180, 300)
     draw.polygon((h1, h2, h4, h3), fill="white")  # earth
-    h3, h4 = linepoints(pitch, roll, 180, 600)
+    h3, h4 = linepoints(pitch, roll, 180, 300)
     draw.polygon((h1, h2, h4, h3), fill="white")  # sky
     draw.line((h1, h2), fill="black", width=4)  # horizon line
 
     earthfill = 0
     while earthfill > -180:
         earthfill -= 3
-        draw.line((linepoints(pitch, roll, earthfill, 600)), fill="black", width=1)
+        draw.line((linepoints(pitch, roll, earthfill, 300)), fill="black", width=1)
 
     for pm in pitch_posmarks:  # pitchmarks
-        draw.line((linepoints(pitch, roll, pm, 30)), fill="black", width=4)
+        draw.line((linepoints(pitch, roll, pm, 30)), fill="black", width=2)
 
     # pointer in the middle
-    draw.line((ah_zerox - 90, ah_zeroy, ah_zerox - 30, ah_zeroy), width=6, fill="black")
-    draw.line((ah_zerox + 90, ah_zeroy, ah_zerox + 30, ah_zeroy), width=6, fill="black")
-    draw.polygon((ah_zerox, ah_zeroy + 4, ah_zerox - 20, ah_zeroy + 16, ah_zerox + 20, ah_zeroy + 16),
+    draw.line((ah_zerox - 90, ah_zeroy, ah_zerox - 30, ah_zeroy), width=4, fill="black")
+    draw.line((ah_zerox + 90, ah_zeroy, ah_zerox + 30, ah_zeroy), width=4, fill="black")
+    draw.polygon((ah_zerox, ah_zeroy + 4, ah_zerox - 16, ah_zeroy + 12, ah_zerox + 16, ah_zeroy + 12),
                  fill="black")
 
     # roll indicator
