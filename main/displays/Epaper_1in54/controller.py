@@ -149,11 +149,11 @@ def init(fullcircle=False):
 
     device = epd1in54_V2.EPD()
     device.init(0)
-    device.Clear(0xFF, 0)   # necessary to overwrite everything
+    device.Clear(0xFF)   # necessary to overwrite everything
     epaper_image = Image.new('1', (device.height, device.width), 0xFF)
     draw = ImageDraw.Draw(epaper_image)
     device.init(1)
-    device.Clear(0xFF, 1)
+    device.Clear(0xFF)
     sizex = device.height
     sizey = device.width
     zerox = sizex / 2
