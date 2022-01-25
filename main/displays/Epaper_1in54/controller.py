@@ -189,7 +189,7 @@ def cleanup():
     global device
 
     device.init(0)
-    device.Clear(0xFF, 0)
+    device.Clear(0xFF)
     device.sleep()
     device.Dev_exit()
 
@@ -197,7 +197,7 @@ def cleanup():
 def refresh():
     global device
 
-    device.Clear(0xFF, 0)  # necessary to overwrite everything
+    device.Clear(0xFF)  # necessary to overwrite everything
     device.init(1)
 
 
