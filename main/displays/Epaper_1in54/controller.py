@@ -95,7 +95,7 @@ def make_font(name, size):
 def display():
     global device
     global epaper_image
-    device.async_display_1Gray(device.getbuffer_optimized(epaper_image))
+    device.async_displayPart(device.getbuffer_optimized(epaper_image))
 
 
 def is_busy():
