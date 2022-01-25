@@ -356,5 +356,10 @@ class EPD:
         epdconfig.SPI.writebytes2(data)
         epdconfig.digital_write(self.cs_pin, 1)
 
+    def sleep_nowait(self):
+        self.send_command(0x10)  # DEEP_SLEEP_MODE
+        self.send_data(0x01)
+        epdconfig.module_exit()
+
 
 ### END OF FILE ###

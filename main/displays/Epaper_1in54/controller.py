@@ -190,8 +190,7 @@ def cleanup():
 
     device.init(0)
     device.Clear(0xFF)
-    device.sleep()
-    device.module_exit()
+    device.sleep_nowait()
 
 
 def refresh():
