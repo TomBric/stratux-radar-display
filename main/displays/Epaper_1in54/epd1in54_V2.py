@@ -332,9 +332,6 @@ class EPD:
         # 0: idle, 1: busy
 
     def async_displayPart(self, image):
-        if (image == None):
-            return
-
         self.send_command(0x24)
         for j in range(0, self.height):
             for i in range(0, int(self.width / 8)):
