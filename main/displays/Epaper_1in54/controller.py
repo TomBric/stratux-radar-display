@@ -39,13 +39,13 @@ import datetime
 from pathlib import Path
 
 # global constants
-VERYLARGE = 30    # timer
-MORELARGE = 24
-LARGE = 20           # size of height indications of aircraft
-SMALL = 16      # size of information indications on top and bottom
-VERYSMALL = 14
-AWESOME_FONTSIZE = 14   # bluetooth indicator
-AIRCRAFT_SIZE = 4        # size of aircraft arrow
+VERYLARGE = 36    # timer
+MORELARGE = 30
+LARGE = 24          # size of height indications of aircraft
+SMALL = 20      # size of information indications on top and bottom
+VERYSMALL = 16
+AWESOME_FONTSIZE = 16   # bluetooth indicator
+AIRCRAFT_SIZE = 6        # size of aircraft arrow
 MINIMAL_CIRCLE = 10     # minimal size of mode-s circle
 ARCPOSITION_EXCLUDE_FROM = 0
 ARCPOSITION_EXCLUDE_TO = 0
