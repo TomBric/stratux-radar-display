@@ -394,7 +394,7 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
 
 
 def gmeter(draw, current, maxg, ming, error_message):
-    gm_size = 280
+    gm_size = sizex
     meter(draw, current, -3, 5, 110, 430, gm_size, 140, 140, 1, 0.25, "G-Force", None)
 
     right_center_x = (sizex-gm_size)/2+gm_size    # center of remaining part
