@@ -45,7 +45,7 @@ LARGE = 28          # size of height indications of aircraft
 SMALL = 20      # size of information indications on top and bottom
 VERYSMALL = 16
 AWESOME_FONTSIZE = 16   # bluetooth indicator
-AIRCRAFT_SIZE = 6        # size of aircraft arrow
+AIRCRAFT_SIZE = 4        # size of aircraft arrow
 MINIMAL_CIRCLE = 10     # minimal size of mode-s circle
 ARCPOSITION_EXCLUDE_FROM = 0
 ARCPOSITION_EXCLUDE_TO = 0
@@ -320,7 +320,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
 
     # optical keep alive bar at right side
-    draw.line((sizex-6, 110+optical_bar*5, sizex-6, 110+optical_bar*5+6), fill="black", width=4)
+    draw.line((sizex-6, 150+optical_bar*5, sizex-6, 150+optical_bar*5+6), fill="black", width=4)
 
 
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
