@@ -320,6 +320,12 @@ class EPD:
 
 # MODIFICATIONS by stratux-radar-display
 
+    def displayPart(self, image):
+        self.send_command(0x24)
+        self.send_data2(image)
+
+        self.TurnOnDisplayPart()
+
 
     def async_is_busy(self):
         return epdconfig.digital_read(self.busy_pin)
