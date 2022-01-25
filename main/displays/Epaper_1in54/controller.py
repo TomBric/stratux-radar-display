@@ -174,7 +174,7 @@ def init(fullcircle=False):
     # measure time for refresh
     start = time.time()
     # do sync version of display to measure time
-    device.display_1Gray(device.getbuffer_optimized(epaper_image))
+    device.displayPart(device.getbuffer_optimized(epaper_image))
     end = time.time()
     display_refresh = end-start
     # compass
