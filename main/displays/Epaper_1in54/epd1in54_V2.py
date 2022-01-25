@@ -120,9 +120,6 @@ class EPD:
             epdconfig.delay_ms(20)
         logger.debug("e-Paper busy release")
 
-
-
-
     def TurnOnDisplay(self):
         self.send_command(0x22) # DISPLAY_UPDATE_CONTROL_2
         self.send_data(0xc7)
@@ -252,9 +249,6 @@ class EPD:
                 self.send_data(color)
                 
         self.TurnOnDisplay()
-
-
-
         
     def getbuffer(self, image):
         buf = [0xFF] * (int(self.width/8) * self.height)
