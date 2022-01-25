@@ -40,11 +40,11 @@ from pathlib import Path
 
 # global constants
 VERYLARGE = 30    # timer
-MORELARGE = 20
-LARGE = 16           # size of height indications of aircraft
-SMALL = 12      # size of information indications on top and bottom
-VERYSMALL = 10
-AWESOME_FONTSIZE = 10   # bluetooth indicator
+MORELARGE = 24
+LARGE = 20           # size of height indications of aircraft
+SMALL = 16      # size of information indications on top and bottom
+VERYSMALL = 14
+AWESOME_FONTSIZE = 14   # bluetooth indicator
 AIRCRAFT_SIZE = 4        # size of aircraft arrow
 MINIMAL_CIRCLE = 10     # minimal size of mode-s circle
 ARCPOSITION_EXCLUDE_FROM = 0
@@ -157,12 +157,8 @@ def init(fullcircle=False):
     sizex = device.height
     sizey = device.width
     zerox = sizex / 2
-    if not fullcircle:
-        zeroy = 200    # not centered
-        max_pixel = 400
-    else:
-        zeroy = sizey / 2
-        max_pixel = sizey
+    zeroy = sizey / 2
+    max_pixel = sizey
     ah_zeroy = sizey / 2   # zero line for ahrs
     ah_zerox = sizex / 2
     verylargefont = make_font("Font.ttc", VERYLARGE)
