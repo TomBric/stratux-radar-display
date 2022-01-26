@@ -460,38 +460,17 @@ def compass(draw, heading, error_message):
 def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
         error_message):
     meter(draw, vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
-    draw.text((35, sizey/2 - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
-    draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill="black", align="left")
-    middle_text = "Vertical Speed"
+    draw.text((15, sizey/2 - VERYSMALL - 10), "up", font=verysmallfont, fill="black", align="left")
+    draw.text((15, sizey/2 + 10), "dn", font=verysmallfont, fill="black", align="left")
+    middle_text = "Vert Spd"
     ts = draw.textsize(middle_text, verysmallfont)
     draw.text((sizey/2 - ts[0]/2, sizey/2 - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
-    middle_text = "100 feet per min"
+    middle_text = "100 ft/min"
     ts = draw.textsize(middle_text, verysmallfont)
     draw.text((sizey/2 - ts[0] / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
 
-    # right data display
-    draw.text((300, 10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
-    draw.text((330, 31), "act", font=verysmallfont, fill="black", align="left")
-    draw.text((330, 55), "max", font=verysmallfont, fill="black", align="left")
-    draw.text((330, 79), "min", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 28, "{:+1.0f}".format(vertical_speed), smallfont, fill="black")
-    right_text(draw, 52, "{:+1.0f}".format(vertical_max), smallfont, fill="black")
-    right_text(draw, 76, "{:+1.0f}".format(vertical_min), smallfont, fill="black")
-    draw.text((300, 163), "Flight-Level", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 160, "{:1.0f}".format(round(flight_level/100)), smallfont, fill="black")
-    draw.text((300, 187), "GPS-Alt [ft]", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 184, "{:1.0f}".format(gps_altitude), smallfont, fill="black")
-    draw.text((300, 211), "GpsSpd [kts]", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 208, "{:1.1f}".format(gps_speed), smallfont, fill="black")
-
     if error_message is not None:
-        centered_text(draw, 60, error_message, verylargefont, fill="black")
-
-    right = "Reset"
-    middle = "    Mode"
-    textsize = draw.textsize(right, smallfont)
-    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
+        centered_text(draw, 40, error_message, verylargefont, fill="black")
 
 
 def shutdown(draw, countdown, shutdownmode):
