@@ -213,9 +213,9 @@ def right_text(draw, y, text, font, fill):
 def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-150x150.bmp'))
     logo = Image.open(logopath)
-    draw.bitmap((zerox-128/2, 0), logo, fill="black")
+    draw.bitmap((zerox-150/2, 0), logo, fill="black")
     versionstr = "Radar " + version
-    centered_text(draw, 160, versionstr, verylargefont, fill="black")
+    centered_text(draw, 140, versionstr, verylargefont, fill="black")
     display()
     time.sleep(seconds)
 
@@ -735,7 +735,7 @@ def flighttime(draw, last_flights):
     draw.text((0, starty), "Date", font=verysmallfont, fill="black")
     draw.text((50, starty), "Start", font=verysmallfont, fill="black")
     draw.text((100, starty), "Dur", font=verysmallfont, fill="black")
-    draw.text((160, starty), "Ldg", font=verysmallfont, fill="black")
+    draw.text((155, starty), "Ldg", font=verysmallfont, fill="black")
     starty += VERYSMALL + 5
 
     maxlines = 8
@@ -744,10 +744,10 @@ def flighttime(draw, last_flights):
         draw.text((50, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
         if f[1] != 0:  # ==0 means still in the air
             delta = (f[1] - f[0]).total_seconds()
-            draw.text((160, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
+            draw.text((155, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
         else:
             delta = (datetime.datetime.now(datetime.timezone.utc) - f[0]).total_seconds()
-            draw.text((160, starty), "in air", font=verysmallfont, fill="black")
+            draw.text((155, starty), "air", font=verysmallfont, fill="black")
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)
         out = '{:02}:{:02}'.format(int(hours), int(minutes))
