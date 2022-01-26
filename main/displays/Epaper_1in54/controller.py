@@ -602,12 +602,12 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
 
 
 def text_screen(draw, headline, subline, text, left_text, middle_text, right_text):
-    centered_text(draw, 0, headline, verylargefont, fill="black")
-    txt_starty = VERYLARGE
+    centered_text(draw, 0, headline, morelargefont, fill="black")
+    txt_starty = MORELARGE
     if subline is not None:
         centered_text(draw, txt_starty, subline, largefont, fill="black")
         txt_starty += LARGE
-    draw.text((0, txt_starty), text, font=smallfont, fill="black")
+    draw.text((0, txt_starty+2), text, font=smallfont, fill="black")
 
     draw.text((0, sizey - SMALL), left_text, font=verysmallfont, fill="black")
     textsize = draw.textsize(right_text, verysmallfont)
