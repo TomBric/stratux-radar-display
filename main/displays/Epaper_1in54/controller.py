@@ -174,7 +174,7 @@ def init(fullcircle=False):
     end = time.time()
     display_refresh = end-start
     # compass
-    pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
+    pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-96x96.bmp'))
     compass_aircraft = Image.open(pic_path)
     mask = Image.new('1', (LARGE * 2, LARGE * 2))
     cdraw = ImageDraw.Draw(mask)
@@ -211,9 +211,9 @@ def right_text(draw, y, text, font, fill):
 
 
 def startup(draw, version, target_ip, seconds):
-    logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
+    logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-128x128.bmp'))
     logo = Image.open(logopath)
-    draw.bitmap((zerox-64/2, 0), logo, fill="black")
+    draw.bitmap((zerox-128/2, 0), logo, fill="black")
     versionstr = "Epaper-Radar " + version
     centered_text(draw, 160, versionstr, largefont, fill="black")
     centered_text(draw, sizey - 2 * VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
