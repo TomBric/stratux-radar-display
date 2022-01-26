@@ -319,7 +319,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         draw.text((sizex - textsize[0], sizey - 2 * SMALL), t, font=awesomefont, fill="black")
 
     # optical keep alive bar at right side, for the small display only 5 bars
-    draw.line((sizex-6, 30+(optical_bar % 5)*5, sizex-6, 30+(optical_bar % 5)*5+6), fill="black", width=4)
+    draw.line((2, 150+(optical_bar % 5)*5, 2, 150+(optical_bar % 5)*5+6), fill="black", width=4)
 
 
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
