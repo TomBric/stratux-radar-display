@@ -729,29 +729,30 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
 
 def flighttime(draw, last_flights):
     starty = 0
-    centered_text(draw, 0, "Flight Logs ", smallfont, fill="black")
-    starty += SMALL + 10
-    draw.text((20, starty), "Date", font=verysmallfont, fill="black")
-    draw.text((120, starty), "Start", font=verysmallfont, fill="black")
-    draw.text((220, starty), "Duration", font=verysmallfont, fill="black")
-    draw.text((350, starty), "Ldg", font=verysmallfont, fill="black")
-    starty += VERYSMALL + 10
+    centered_text(draw, 0, "Flight Logs", smallfont, fill="black")
+    starty += SMALL + 5
+
+    draw.text((0, starty), "Date", font=verysmallfont, fill="black")
+    draw.text((50, starty), "Start", font=verysmallfont, fill="black")
+    draw.text((100, starty), "Dur", font=verysmallfont, fill="black")
+    draw.text((150, starty), "Ldg", font=verysmallfont, fill="black")
+    starty += VERYSMALL + 5
 
     maxlines = 8
     for f in last_flights:
-        draw.text((20, starty), f[0].strftime("%d.%m.%y"), font=verysmallfont, fill="black")
-        draw.text((120, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
-        if f[1] != 0:    # ==0 means still in the air
-            delta = (f[1]-f[0]).total_seconds()
-            draw.text((350, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
+        draw.text((0, starty), f[0].strftime("%d.%m."), font=verysmallfont, fill="black")
+        draw.text((50, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
+        if f[1] != 0:  # ==0 means still in the air
+            delta = (f[1] - f[0]).total_seconds()
+            draw.text((100, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
         else:
             delta = (datetime.datetime.now(datetime.timezone.utc) - f[0]).total_seconds()
-            draw.text((350, starty), "in the air", font=verysmallfont, fill="black")
+            draw.text((150, starty), "in air", font=verysmallfont, fill="black")
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)
-        out = '  {:02}:{:02}  '.format(int(hours), int(minutes))
-        round_text(draw, 220, starty, out, "white", out="black")
-        starty += VERYSMALL + 5
+        out = '{:02}:{:02}'.format(int(hours), int(minutes))
+        round_text(draw, 110, starty, out, "white", out="black")
+        starty += VERYSMALL + 2
         maxlines -= 1
         if maxlines <= 0:
             break
