@@ -207,7 +207,7 @@ def centered_text(draw, y, text, font, fill):
 
 def right_text(draw, y, text, font, fill):
     ts = draw.textsize(text, font)
-    draw.text((sizex-5-ts[0], y), text, font=font, fill=fill)
+    draw.text((sizex-ts[0], y), text, font=font, fill=fill)
 
 
 def startup(draw, version, target_ip, seconds):
@@ -617,7 +617,7 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
 
 def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0):
     bar_start = 50
-    bar_end = 160
+    bar_end = 150
 
     draw.text((0, y), text, font=verysmallfont, fill="black", align="left")
     right_val = str(int(max_val)) + unit
@@ -682,12 +682,12 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
 
     starty += VERYSMALL+4
     fl = '{:3.0f}'.format(round(altitude) / 100)
-    x = round_text(draw, 0, starty, "FL" + fl, "white", True, out="black")
+    draw.text((0, starty), "FL" + fl, fill="black")
     if stat['GPS_position_accuracy'] < 19999:
         alt = '{:5.0f}'.format(gps_alt)
     else:
         alt = " --- "
-    x = round_text(draw, x+30, starty, "Alt" + alt + "ft", "white", True, out="black")
+    right_text(draw, starty, "Alt" + alt + "ft", verysmallfont, "black")
     starty+=VERYSMALL + 4
     x = round_text(draw, 0, starty, "IMU", "white", stat['IMUConnected'], out="black")
     round_text(draw, x+10, starty, "BMP", "white", stat['BMPConnected'], out="black")
