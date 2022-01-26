@@ -607,7 +607,7 @@ def text_screen(draw, headline, subline, text, left_text, middle_text, right_tex
     if subline is not None:
         centered_text(draw, txt_starty, subline, largefont, fill="black")
         txt_starty += LARGE
-    draw.text((0, txt_starty+2), text, font=smallfont, fill="black")
+    draw.text((0, txt_starty+4), text, font=smallfont, fill="black")
 
     draw.text((0, sizey - SMALL), left_text, font=verysmallfont, fill="black")
     textsize = draw.textsize(right_text, verysmallfont)
