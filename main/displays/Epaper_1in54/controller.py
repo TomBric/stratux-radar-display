@@ -735,7 +735,7 @@ def flighttime(draw, last_flights):
     draw.text((0, starty), "Date", font=verysmallfont, fill="black")
     draw.text((50, starty), "Start", font=verysmallfont, fill="black")
     draw.text((100, starty), "Dur", font=verysmallfont, fill="black")
-    draw.text((150, starty), "Ldg", font=verysmallfont, fill="black")
+    draw.text((160, starty), "Ldg", font=verysmallfont, fill="black")
     starty += VERYSMALL + 5
 
     maxlines = 8
@@ -744,14 +744,14 @@ def flighttime(draw, last_flights):
         draw.text((50, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
         if f[1] != 0:  # ==0 means still in the air
             delta = (f[1] - f[0]).total_seconds()
-            draw.text((150, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
+            draw.text((160, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
         else:
             delta = (datetime.datetime.now(datetime.timezone.utc) - f[0]).total_seconds()
-            draw.text((150, starty), "in air", font=verysmallfont, fill="black")
+            draw.text((160, starty), "in air", font=verysmallfont, fill="black")
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)
         out = '{:02}:{:02}'.format(int(hours), int(minutes))
-        round_text(draw, 100, starty, out, "white", out="black")
+        round_text(draw, 95, starty, out, "white", out="black")
         starty += VERYSMALL + 2
         maxlines -= 1
         if maxlines <= 0:
