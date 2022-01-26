@@ -29,7 +29,6 @@
 
 import logging
 from . import epdconfig
-from PIL import Image
 import numpy
 
 # Display resolution
@@ -117,7 +116,7 @@ class EPD:
     def ReadBusy(self):
         logger.debug("e-Paper busy")
         while(epdconfig.digital_read(self.busy_pin) == 1):
-            epdconfig.delay_ms(20)
+            epdconfig.delay_ms(100)
         logger.debug("e-Paper busy release")
 
     def TurnOnDisplay(self):
@@ -320,10 +319,9 @@ class EPD:
 
 # MODIFICATIONS by stratux-radar-display
 
-    def displayPart_mod(self, image):
+    def displayPart_mod(self, image):    # partial update with sync waiting to measure time once in init
         self.send_command(0x24)
         self.send_data2(image)
-
         self.TurnOnDisplayPart()
 
 
@@ -334,7 +332,6 @@ class EPD:
     def async_displayPart(self, image):
         self.send_command(0x24)
         self.send_data2(image)
-
         self.async_TurnOnDisplayPart()
 
 
