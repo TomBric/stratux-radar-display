@@ -678,7 +678,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
 
     t = "Sat "+ str(stat['GPS_satellites_locked']) + "/" + \
         str(stat['GPS_satellites_seen']) + "/" + str(stat['GPS_satellites_tracked']) + " "
-    draw.text((90, starty), t, font=verysmallfont, fill="black")
+    draw.text((70, starty), t, font=verysmallfont, fill="black")
     if stat['GPS_position_accuracy'] < 19999:
         gps = str(round(stat['GPS_position_accuracy'], 1)) + "m"
     else:
