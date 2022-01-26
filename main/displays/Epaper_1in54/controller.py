@@ -693,7 +693,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     else:
         alt = " --- "
     right_text(draw, starty, "Alt" + alt + " ft", verysmallfont, "black")
-    starty+=VERYSMALL + 4
+    starty+=VERYSMALL + 6
     x = round_text(draw, 0, starty, "IMU", "white", stat['IMUConnected'], out="black")
     round_text(draw, x+10, starty, "BMP", "white", stat['BMPConnected'], out="black")
 
