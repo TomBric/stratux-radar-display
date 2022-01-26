@@ -77,7 +77,7 @@ msize = 15  # size of markings
 compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
-cmsize = 20        # length of compass marks
+cmsize = 14        # length of compass marks
 # end device globals
 
 
@@ -419,11 +419,11 @@ def compass(draw, heading, error_message):
     csize = sizey / 2  # radius of compass rose
 
     draw.ellipse((sizex/2-csize, 0, sizex/2+csize-1, sizey - 1), outline="black", fill="white", width=4)
-    draw.bitmap((zerox - 60, 70), compass_aircraft, fill="black")
-    draw.line((czerox, 20, czerox, 70), fill="black", width=4)
+    draw.bitmap((zerox-96/2, zeroy-96/2), compass_aircraft, fill="black")
+    draw.line((czerox, 20, czerox, 50), fill="black", width=4)
     text = str(heading) + '°'
     textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0] - 100, sizey - textsize[1] - 5), text, font=smallfont, fill="black", align="right")
+    draw.text((sizex - textsize[0], sizey - textsize[1] - 5), text, font=smallfont, fill="black", align="right")
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
@@ -454,7 +454,7 @@ def compass(draw, heading, error_message):
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
             epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
     if error_message is not None:
-        centered_text(draw, 120, error_message, largefont, fill="black")
+        centered_text(draw, 80, error_message, largefont, fill="black")
 
 
 def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
