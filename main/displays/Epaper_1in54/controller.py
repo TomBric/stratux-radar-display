@@ -623,7 +623,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
     right_val = str(int(max_val)) + unit
     textsize = draw.textsize(right_val, verysmallfont)
     draw.text((sizex-textsize[0], y), right_val, font=verysmallfont, fill="black", align="right")
-    draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline="black", width=1)
+    draw.rounded_rectangle([bar_start-3, y-1, bar_end+3, y+VERYSMALL+1], radius=3, fill=None, outline="black", width=1)
     if val < minval:
         val = minval   # to display a minimum bar, valtext should be provided in this case
     if max_val != 0:
@@ -640,7 +640,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
     ts = draw.textsize(t, verysmallfont)
     draw.text(((bar_end-bar_start)/2+bar_start-ts[0]/2, y), t, font=verysmallfont, fill="black",
               stroke_width=1, stroke_fill="white")
-    return y+VERYSMALL+6
+    return y+VERYSMALL+8
 
 
 def round_text(draw, x, y, text, color, yesno=True, out=None):
@@ -676,8 +676,8 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         t = "GPS"
     draw.text((0, starty), t, font=verysmallfont, fill="black")
 
-    t = str(stat['GPS_satellites_locked']) + " sol/" + \
-        str(stat['GPS_satellites_seen']) + " seen/" + str(stat['GPS_satellites_tracked']) + " track"
+    t = str(stat['GPS_satellites_locked']) + "/" + \
+        str(stat['GPS_satellites_seen']) + "/" + str(stat['GPS_satellites_tracked']) + " "
     draw.text((60, starty), t, font=verysmallfont, fill="black")
 
     starty += VERYSMALL+5
