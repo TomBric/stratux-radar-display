@@ -215,7 +215,7 @@ def startup(draw, version, target_ip, seconds):
     logo = Image.open(logopath)
     draw.bitmap((zerox-150/2, 0), logo, fill="black")
     versionstr = "Radar " + version
-    centered_text(draw, 140, versionstr, verylargefont, fill="black")
+    centered_text(draw, 150, versionstr, verylargefont, fill="black")
     display()
     time.sleep(seconds)
 
@@ -419,7 +419,7 @@ def compass(draw, heading, error_message):
     csize = sizey / 2  # radius of compass rose
 
     draw.ellipse((sizex/2-csize, 0, sizex/2+csize-1, sizey - 1), outline="black", fill="white", width=4)
-    draw.bitmap((zerox-96/2+2, zeroy-96/2-2), compass_aircraft, fill="black")
+    draw.bitmap((zerox-96/2+3, zeroy-96/2-2), compass_aircraft, fill="black")
     draw.line((czerox, 15, czerox, 50), fill="black", width=4)
     text = str(heading) + '°'
     textsize = draw.textsize(text, smallfont)
