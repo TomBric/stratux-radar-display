@@ -645,7 +645,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
 
 def round_text(draw, x, y, text, color, yesno=True, out=None):
     ts = draw.textsize(text, verysmallfont)
-    draw.rounded_rectangle([x, y-2, x+ts[0]+3, y+ts[1]+3], radius=4, fill=color, outline=out)
+    draw.rounded_rectangle([x, y-2, x+ts[0]+10, y+ts[1]+3], radius=4, fill=color, outline=out)
     draw.text((x+5, y), text, font=verysmallfont, fill="black")
     if not yesno:
         draw.line([x, y+ts[1]+1, x+ts[0]+5, y-1], fill="black", width=2)
@@ -682,12 +682,12 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
 
     starty += VERYSMALL+4
     fl = '{:3.0f}'.format(round(altitude) / 100)
-    draw.text((0, starty), "FL" + fl, fill="black")
+    draw.text((0, starty), "FL" + fl, font=verysmallfont, fill="black")
     if stat['GPS_position_accuracy'] < 19999:
         alt = '{:5.0f}'.format(gps_alt)
     else:
         alt = " --- "
-    right_text(draw, starty, "Alt" + alt + "ft", verysmallfont, "black")
+    right_text(draw, starty, "Alt" + alt + " ft", verysmallfont, "black")
     starty+=VERYSMALL + 4
     x = round_text(draw, 0, starty, "IMU", "white", stat['IMUConnected'], out="black")
     round_text(draw, x+10, starty, "BMP", "white", stat['BMPConnected'], out="black")
