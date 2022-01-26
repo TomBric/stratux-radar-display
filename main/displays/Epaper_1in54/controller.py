@@ -215,8 +215,8 @@ def startup(draw, version, target_ip, seconds):
     logo = Image.open(logopath)
     draw.bitmap((zerox-128/2, 0), logo, fill="black")
     versionstr = "Epaper-Radar " + version
-    centered_text(draw, 160, versionstr, largefont, fill="black")
-    centered_text(draw, sizey - 2 * VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
+    centered_text(draw, 140, versionstr, verylargefont, fill="black")
+    centered_text(draw, sizey - VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
     display()
     time.sleep(seconds)
 
