@@ -645,10 +645,10 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
 
 def round_text(draw, x, y, text, color, yesno=True, out=None):
     ts = draw.textsize(text, verysmallfont)
-    draw.rounded_rectangle([x-2, y-1, x+ts[0]+2, y+ts[1]+1], radius=4, fill=color, outline=out)
-    draw.text((x, y), text, font=verysmallfont, fill="black")
+    draw.rounded_rectangle([x, y-2, x+ts[0]+3, y+ts[1]+1], radius=4, fill=color, outline=out)
+    draw.text((x+3, y), text, font=verysmallfont, fill="black")
     if not yesno:
-        draw.line([x-2, y+ts[1]+1, x+ts[0]+2, y-1], fill="black", width=2)
+        draw.line([x, y+ts[1]+1, x+ts[0]+5, y-1], fill="black", width=2)
     return x+ts[0]+5
 
 
@@ -673,7 +673,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     elif gps_quality == 2:
         t = "DGNSS "
     else:
-        gps = "NoFix"
+        t = "GPS"
     draw.text((0, starty), t, font=verysmallfont, fill="black")
 
     t = str(stat['GPS_satellites_locked']) + " sol/" + \
