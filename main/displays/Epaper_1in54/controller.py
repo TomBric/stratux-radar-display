@@ -676,9 +676,14 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         t = "GPS"
     draw.text((0, starty), t, font=verysmallfont, fill="black")
 
-    t = str(stat['GPS_satellites_locked']) + "/" + \
+    t = "Sat "+ str(stat['GPS_satellites_locked']) + "/" + \
         str(stat['GPS_satellites_seen']) + "/" + str(stat['GPS_satellites_tracked']) + " "
-    draw.text((60, starty), t, font=verysmallfont, fill="black")
+    draw.text((90, starty), t, font=verysmallfont, fill="black")
+    if stat['GPS_position_accuracy'] < 19999:
+        gps = str(round(stat['GPS_position_accuracy'], 1)) + "m"
+    else:
+        gps = "NoFix"
+    right_text(draw, starty, gps, verysmallfont, "black")
 
     starty += VERYSMALL+4
     fl = '{:3.0f}'.format(round(altitude) / 100)
