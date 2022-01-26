@@ -484,19 +484,19 @@ def shutdown(draw, countdown, shutdownmode):
     message = "in " + str(countdown) + " seonds!"
     centered_text(draw, 40, message, largefont, fill="black")
     message = "Press left button to cancel ..."
-    centered_text(draw, 110, message, smallfont, fill="black")
+    centered_text(draw, 80, message, smallfont, fill="black")
     message = "Press middle for display only ..."
-    centered_text(draw, 140, message, smallfont, fill="black")
+    centered_text(draw, 110, message, smallfont, fill="black")
     message = "Press right for reboot all ..."
-    centered_text(draw, 170, message, smallfont, fill="black")
+    centered_text(draw, 140, message, smallfont, fill="black")
 
-    left_text = "Cancel"
-    middle_text = "Display only"
-    right_text = "Reboot"
-    draw.text((5, sizey - SMALL - 3), left_text, font=smallfont, fill="black")
+    left_text = "Canc"
+    middle_text = "Displ"
+    right_text = "Rebo"
+    draw.text((0, sizey - SMALL), left_text, font=smallfont, fill="black")
     textsize = draw.textsize(right_text, smallfont)
-    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right_text, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="black")
+    draw.text((sizex - textsize[0], sizey - SMALL), right_text, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL, middle_text, smallfont, fill="black")
 
 
 def rollmarks(draw, roll):
@@ -616,15 +616,14 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
 
 
 def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0):
-    bar_start = 100
-    bar_end = 420
+    bar_start = 50
+    bar_end = 160
 
-    draw.text((5, y), text, font=verysmallfont, fill="black", align="left")
+    draw.text((0, y), text, font=verysmallfont, fill="black", align="left")
     right_val = str(int(max_val)) + unit
     textsize = draw.textsize(right_val, verysmallfont)
-    draw.text((sizex - textsize[0]-5, y), right_val, font=verysmallfont, fill="black", align="right")
+    draw.text((sizex-textsize[0], y), right_val, font=verysmallfont, fill="black", align="right")
     draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline="black", width=1)
-    color = "black"
     if val < minval:
         val = minval   # to display a minimum bar, valtext should be provided in this case
     if max_val != 0:
@@ -641,16 +640,16 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
     ts = draw.textsize(t, verysmallfont)
     draw.text(((bar_end-bar_start)/2+bar_start-ts[0]/2, y), t, font=verysmallfont, fill="black",
               stroke_width=1, stroke_fill="white")
-    return y+VERYSMALL+12
+    return y+VERYSMALL+6
 
 
 def round_text(draw, x, y, text, color, yesno=True, out=None):
     ts = draw.textsize(text, verysmallfont)
-    draw.rounded_rectangle([x, y-2, x+ts[0]+10, y+ts[1]+2], radius=4, fill=color, outline=out)
-    draw.text((x+5, y), text, font=verysmallfont, fill="black")
+    draw.rounded_rectangle([x-2, y-1, x+ts[0]+2, y+ts[1]+1], radius=4, fill=color, outline=out)
+    draw.text((x, y), text, font=verysmallfont, fill="black")
     if not yesno:
-        draw.line([x, y+ts[1]+2, x+ts[0]+10, y-2], fill="black", width=2)
-    return x+ts[0]+20
+        draw.line([x-2, y+ts[1]+1, x+ts[0]+2, y-1], fill="black", width=2)
+    return x+ts[0]+5
 
 
 def stratux(draw, stat, altitude, gps_alt, gps_quality):
