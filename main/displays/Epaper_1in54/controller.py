@@ -211,7 +211,7 @@ def right_text(draw, y, text, font, fill):
 
 
 def startup(draw, version, target_ip, seconds):
-    logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-128x128.bmp'))
+    logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-150x150.bmp'))
     logo = Image.open(logopath)
     draw.bitmap((zerox-128/2, 0), logo, fill="black")
     versionstr = "Epaper-Radar " + version
