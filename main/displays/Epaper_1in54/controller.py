@@ -304,7 +304,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     if not gpsconnected:
         centered_text(draw, 15, "No GPS", smallfont, fill="black")
     if not connected:
-        centered_text(draw, 80, "No connection!", smallfont, fill="black")
+        centered_text(draw, 75, "No connection!", smallfont, fill="black")
 
     if extsound or bt_devices > 0:
         if sound_active:
