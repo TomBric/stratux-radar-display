@@ -316,10 +316,10 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         else:
             t = "\uf1f6"  # bell off symbol
         textsize = draw.textsize(t, awesomefont)
-        draw.text((sizex - textsize[0] - 5, sizey - SMALL), t, font=awesomefont, fill="black")
+        draw.text((sizex - textsize[0], sizey - 2 * SMALL), t, font=awesomefont, fill="black")
 
     # optical keep alive bar at right side, for the small display only 5 bars
-    draw.line((sizex-6, 150+(optical_bar%5)*5, sizex-6, 150+(optical_bar%5)*5+6), fill="black", width=4)
+    draw.line((sizex-6, 150+(optical_bar % 5)*5, sizex-6, 150+(optical_bar % 5)*5+6), fill="black", width=4)
 
 
 def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
@@ -406,7 +406,6 @@ def gmeter(draw, current, maxg, ming, error_message):
     right = "Reset"
     textsize = draw.textsize(right, verysmallfont)
     draw.text((sizex-textsize[0], sizey-SMALL), right, font=verysmallfont, fill="black", align="right")
-
 
 
 def compass(draw, heading, error_message):
@@ -693,7 +692,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     else:
         alt = " --- "
     right_text(draw, starty, "Alt" + alt + " ft", verysmallfont, "black")
-    starty+=VERYSMALL + 6
+    starty += VERYSMALL + 6
     x = round_text(draw, 0, starty, "IMU", "white", stat['IMUConnected'], out="black")
     round_text(draw, x+10, starty, "BMP", "white", stat['BMPConnected'], out="black")
 
