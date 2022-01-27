@@ -112,8 +112,8 @@ sed -i 's/Epaper_3in7/TEMP_EP/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/st
 sed -i 's/Oled_1in5/Epaper_3in7 -r/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 sed -i 's/TEMP_EP/Oled_1in5/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 umount mnt
-mv ${outprefix}-oled${outname} ${outprefix}-epaper${outname}
-zip out/${outprefix}-epaper${outname}.zip ${outprefix}-epaper_3in7${outname}
+mv ${outprefix}-oled${outname} ${outprefix}-epaper_3in7${outname}
+zip out/${outprefix}-epaper_3in7${outname}.zip ${outprefix}-epaper_3in7${outname}
 
 # Now create epaper 1.54 version.
 mount -t ext4 -o offset=$partoffset ${outprefix}-oled${outname} mnt/ || die "root-mount failed"
@@ -122,8 +122,8 @@ sed -i 's/Epaper_1in54/TEMP_EP/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/s
 sed -i 's/Epaper_3in7 -r/Epaper_1in54/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 sed -i 's/TEMP_EP/Epaper_1in54/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 umount mnt
-mv ${outprefix}-oled${outname} ${outprefix}-epaper${outname}
-zip out/${outprefix}-epaper${outname}.zip ${outprefix}-epaper_1in54${outname}
+mv ${outprefix}-epaper_3in7${outname} ${outprefix}-epaper_1in54${outname}
+zip out/${outprefix}-epaper_1in54${outname}.zip ${outprefix}-epaper_1in54${outname}
 
 echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
 echo "For mounting USB stick: sudo mount -t exfat /dev/sda1 /media/usb"
