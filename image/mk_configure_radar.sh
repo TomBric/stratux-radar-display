@@ -3,6 +3,14 @@
 # script configures basic libraries and settings necessary for stratux-radar
 # script to be run as root
 # called via configure_radar as sudo via qemu
+# usage /bin/bash mk_configure_radar.sh <branch>
+# <branch> is the github branch to clone, this is optional and set to "main" if not provided
+
+if [ "$#" -lt 1 ]; then
+    branch="main"
+else
+    branch=$1
+fi
 
 # remove desktop packages
 apt purge xserver* lightdm* vlc* lxde* chromium* desktop* gnome* gstreamer* gtk* hicolor-icon-theme* lx* mesa* \
@@ -34,7 +42,7 @@ apt purge piwiz -y
 # necessary to disable bluetoothmessage "To turn on ..."
 
 # get files from repo
-cd /home/pi && git clone https://github.com/TomBric/stratux-radar-display.git
+cd /home/pi && sudo -u pi git clone -b "$branch" https://github.com/TomBric/stratux-radar-display.git
 
 # include autostart into crontab of pi, so that radar starts on every boot
 echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
