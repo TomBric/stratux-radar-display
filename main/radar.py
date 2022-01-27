@@ -756,9 +756,9 @@ if __name__ == "__main__":
                     default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
-    ap.add_argument("-r", "--registration", required=False, help="Display registration no (3.7 Epaper only)",
+    ap.add_argument("-r", "--registration", required=False, help="Display registration no (epaper only)",
                     action="store_true", default=False)
-    ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (Epaper only)",
+    ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (3.7 epaper only)",
                     action="store_true", default=False)
     ap.add_argument("-y", "--extsound", type=int, required=False, help="Ext sound on with volume [0-100]",
                     default=-1)
