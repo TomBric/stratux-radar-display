@@ -57,7 +57,7 @@ import flighttime
 from datetime import datetime, timezone
 
 # constant definitions
-RADAR_VERSION = "1.5"
+RADAR_VERSION = "1.6"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
