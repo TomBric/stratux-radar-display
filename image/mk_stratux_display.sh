@@ -95,7 +95,7 @@ truncate -s $(($bytesEnd + 4096)) $IMGNAME
 
 cd $SRCDIR
 # make sure the local version is also on current status
-git pull
+git pull --rebase
 outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 outprefix="stratux-display"
 cd $TMPDIR
