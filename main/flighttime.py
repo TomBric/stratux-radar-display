@@ -138,7 +138,7 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
         if new_flight_info:   # no more flying, check whether stop is done
             if stop_timestamp is None and situation['gps_speed'] < SPEED_THRESHOLD_STOPPED:
                 stop_timestamp = now
-                print("Flighttime: Stop detection triggered at " + str(now))
+                rlog.debug("Flighttime: Stop detection triggered at " + str(now))
             elif stop_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_STOPPED:
                 if now - stop_timestamp >= stop_delta:
                     rlog.debug("Flighttime: Stop detected at " + str(now))
@@ -154,7 +154,7 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
         flighttime_changed = True   # set in any case so display is refreshed
         if trigger_timestamp is None and situation['gps_speed'] < SPEED_THRESHOLD_LANDING:
             trigger_timestamp = now
-            print("Flighttime: Landing threshold underrun triggered at " + str(now))
+            rlog.debug("Flighttime: Landing threshold underrun triggered at " + str(now))
         elif trigger_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_LANDING:
             if now - trigger_timestamp >= landing_delta:
                 landing_time = now
