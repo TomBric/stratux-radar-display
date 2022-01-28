@@ -67,7 +67,7 @@ mount -t vfat ${lo}p1 mnt/boot || die "boot-mount failed"
 cd mnt/$DISPLAY_SRC
 git clone --recursive -b $2 https://github.com/TomBric/stratux-radar-display.git
 cd ../../../
-chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh
+chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh $2
 mkdir -p out
 
 # copy wpa_config and create empty ssh
@@ -95,7 +95,7 @@ truncate -s $(($bytesEnd + 4096)) $IMGNAME
 
 cd $SRCDIR
 # make sure the local version is also on current status
-git pull
+git pull --rebase
 outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 outprefix="stratux-display"
 cd $TMPDIR
@@ -105,15 +105,25 @@ mv $IMGNAME ${outprefix}-oled${outname}
 zip out/${outprefix}-oled${outname}.zip ${outprefix}-oled${outname}
 
 
-# Now create epaper version.
+# Now create epaper 3.7 version.
 mount -t ext4 -o offset=$partoffset ${outprefix}-oled${outname} mnt/ || die "root-mount failed"
 # save old command line to put it back to oled later
 sed -i 's/Epaper_3in7/TEMP_EP/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 sed -i 's/Oled_1in5/Epaper_3in7 -r/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 sed -i 's/TEMP_EP/Oled_1in5/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 umount mnt
-mv ${outprefix}-oled${outname} ${outprefix}-epaper${outname}
-zip out/${outprefix}-epaper${outname}.zip ${outprefix}-epaper${outname}
+mv ${outprefix}-oled${outname} ${outprefix}-epaper_3in7${outname}
+zip out/${outprefix}-epaper_3in7${outname}.zip ${outprefix}-epaper_3in7${outname}
+
+# Now create epaper 1.54 version.
+mount -t ext4 -o offset=$partoffset ${outprefix}-epaper_3in7${outname} mnt/ || die "root-mount failed"
+# save old command line to put it back to oled later
+sed -i 's/Epaper_1in54/TEMP_EP/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
+sed -i 's/Epaper_3in7 -r/Epaper_1in54/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
+sed -i 's/TEMP_EP/Epaper_1in54/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
+umount mnt
+mv ${outprefix}-epaper_3in7${outname} ${outprefix}-epaper_1in54${outname}
+zip out/${outprefix}-epaper_1in54${outname}.zip ${outprefix}-epaper_1in54${outname}
 
 echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
 echo "For mounting USB stick: sudo mount -t exfat /dev/sda1 /media/usb"
