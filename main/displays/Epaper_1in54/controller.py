@@ -248,7 +248,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     draw.text(tposition, t, font=verylargefont, fill="black")
     if tail is not None:
         tsize = draw.textsize(tail, verysmallfont)
-        draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
+        draw.text((tposition[0], tposition[1] + VERYLARGE), tail, font=verysmallfont, fill="black")
 
 
 def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
@@ -271,9 +271,9 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
     draw.text(tposition, t, font=verylargefont, fill="black")
     if tail is not None:
         tsize = draw.textsize(tail, verysmallfont)
-        draw.rectangle((tposition[0], tposition[1] + LARGE, tposition[0] + tsize[0],
-                        tposition[1] + LARGE + VERYSMALL), fill="white")
-        draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
+        draw.rectangle((tposition[0], tposition[1] + VERYLARGE, tposition[0] + tsize[0],
+                        tposition[1] + VERYLARGE + VERYSMALL), fill="white")
+        draw.text((tposition[0], tposition[1] + VERYLARGE), tail, font=verysmallfont, fill="black")
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
