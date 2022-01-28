@@ -28,6 +28,13 @@ Find below a photo of the current supported displays
 
 - Oled-Display: Waveshare 14747, 128x128, General 1.5inch RGB OLED display Module
    ![Oled photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Oled_1in5.jpg)
+ 
+ - Waveshare 12955 1.54inch epaper Display (hat is included) or waveshare 12561+hat 13512. 
+ 
+| Radar | Stratux-Status | G-Meter | Flightlogs |  
+| :----:|:--------------:|:-------:|:----------:|
+| ![1.54in1](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_radar.jpg) | ![1.54in2](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54.jpg) | ![1.54in3](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_gmeter.jpg) | ![1.54in4](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_logs.jpg) |
+
    
  - Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters LM2596. Then you can use the aircraft power supply (up to 40V). Calibrate the LM2596 at home for a power output at 5 V e.g. using an old laptop power supply. LM2596 also work well for the stratux itself. If you encounter problems with radio noise, please ensure that the power cable to the display is twisted and if necessary use a ferrit-core at the power connection.  
    
