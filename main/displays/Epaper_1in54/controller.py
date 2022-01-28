@@ -238,14 +238,14 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
         t = t + '\u2197'
     if vspeed < 0:
         t = t + '\u2198'
-    tsize = draw.textsize(t, largefont)
+    tsize = draw.textsize(t, morelargefont)
     if tsize[0] + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
         # would draw text outside, move to the left
         tposition = (x - 4 * AIRCRAFT_SIZE - tsize[0], int(y - tsize[1] / 2))
     else:
         tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - tsize[1] / 2))
     # draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
-    draw.text(tposition, t, font=largefont, fill="black")
+    draw.text(tposition, t, font=morelargefont, fill="black")
     if tail is not None:
         tsize = draw.textsize(tail, verysmallfont)
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")

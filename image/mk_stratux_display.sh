@@ -116,7 +116,7 @@ mv ${outprefix}-oled${outname} ${outprefix}-epaper_3in7${outname}
 zip out/${outprefix}-epaper_3in7${outname}.zip ${outprefix}-epaper_3in7${outname}
 
 # Now create epaper 1.54 version.
-mount -t ext4 -o offset=$partoffset ${outprefix}-oled${outname} mnt/ || die "root-mount failed"
+mount -t ext4 -o offset=$partoffset ${outprefix}-epaper_3in7${outname} mnt/ || die "root-mount failed"
 # save old command line to put it back to oled later
 sed -i 's/Epaper_1in54/TEMP_EP/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 sed -i 's/Epaper_3in7 -r/Epaper_1in54/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
