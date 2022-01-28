@@ -265,10 +265,10 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
         t = t + '\u2197'
     if vspeed < 0:
         t = t + '\u2198'
-    tsize = draw.textsize(t, largefont)
+    tsize = draw.textsize(t, verylargefont)
     tposition = (zerox+arctext[0]-tsize[0]/2, zeroy+arctext[1]-tsize[1]/2)
-    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+LARGE)), fill="white")
-    draw.text(tposition, t, font=largefont, fill="black")
+    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+VERYLARGE)), fill="white")
+    draw.text(tposition, t, font=verylargefont, fill="black")
     if tail is not None:
         tsize = draw.textsize(tail, verysmallfont)
         draw.rectangle((tposition[0], tposition[1] + LARGE, tposition[0] + tsize[0],
