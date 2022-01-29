@@ -1,11 +1,14 @@
 # stratux-radar-display
 Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W). Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
+
 - update in version 1.4: external sound connection is now supported by using a USB sound card (approx. 4 Euro). With that you can connect your display to your intercom. This external sound output is also functioning on the stratux only, without an additional Zero.
 - update in version 1.5: the display now also supports an automatic logging of your flight times. Flight time is started when your GPS speed is 5 seconds more than 30 kts and stopped if you are 5 seconds below 10 kts. When you stopped the airplane (below 5 kts) the display will automatically show the 8 latest flights. This can be disabled with the option "-nf". You can also switch via pressing middle button ("Mode") several times to the flight display mode. 
+- update in version 1.6: an additional epaper display is now supported (1.54 epaper Waveshare module 12955 or 12561+hat). This is a good option for the oled display. Perfect visibility in sunlight, but slower than the oled. Can be used in 2 1/4 instrument holes.
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
 - Epaper Display 3.7 inch (waveshare)
+- Epaper Display 1.54 inch (waveshare)
 
 More displays can be integrated.
 You can find 3D printer files for cases of both variants in the repo (no-code and .github). The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. Instructions e.g. how to build an [all-in one 2 1/4 Oled case](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display) "wiki 2 1/4"), or [all-in-one 3 1/8 Epaper instrument](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-for-80-mm-instrument-hole-with-Epaper-display-and-Bluetooth "wiki 3 1/8"), or [Epaper 3 1/8 display only](https://github.com/TomBric/stratux-radar-display/wiki/Epaper-Display-for-80-mm-instrument-hole) can be found in the wiki.
@@ -25,6 +28,13 @@ Find below a photo of the current supported displays
 
 - Oled-Display: Waveshare 14747, 128x128, General 1.5inch RGB OLED display Module
    ![Oled photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Oled_1in5.jpg)
+ 
+ - Waveshare 12955 1.54inch epaper Display (hat is included) or waveshare 12561+hat 13512. 
+ 
+| Radar | Stratux-Status | G-Meter | Flightlogs |  
+| :----:|:--------------:|:-------:|:----------:|
+| ![1.54in1](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_radar.jpg) | ![1.54in2](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54.jpg) | ![1.54in3](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_gmeter.jpg) | ![1.54in4](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_logs.jpg) |
+
    
  - Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters LM2596. Then you can use the aircraft power supply (up to 40V). Calibrate the LM2596 at home for a power output at 5 V e.g. using an old laptop power supply. LM2596 also work well for the stratux itself. If you encounter problems with radio noise, please ensure that the power cable to the display is twisted and if necessary use a ferrit-core at the power connection.  
    
@@ -40,7 +50,7 @@ Find below a photo of the current supported displays
 | DC | 18 | green |
 | RST | 22 | white |
 
-# Hardware connection of the Epaper 3.7 inch display (if not using the hat version)
+# Hardware connection of the Epaper 3.7 inch or 1.54 inch display 
  
 | Connection  | PIN# on Raspberry  |
 |:-----------:|:------------------:|
@@ -74,7 +84,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    
 ## Software Installation Instructions
 ### Standard setup
-   1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Image with "epaper" is the version for the waveshare 3.7 inch epaper displays. Both versions will support Bluetooth
+   1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Image with "epaper_3in7" is the version for the waveshare 3.7 inch epaper display, "epaper_1in54" for the smaller epaper. Both versions will support Bluetooth
    2. Flash the image using Raspberry Pi Imager (select "OwnImage") or Win32DiskImager to your SD card (32 GB cards recommended)
    3. Insert the SD into you raspberry and let it boot. It should automatically startup and connect to the Stratux-Europe edition. 
    Remark: Current configuration is for Stratux-Europe on IP address 192.168.10.1. If you have a different configuration please update /home/pi/stratux-radar-display/image/stratux_radar.sh accordingly.
@@ -87,8 +97,9 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    5. Clone the stratux-radar-display repository by the command: "git clone https://github.com/TomBric/stratux-radar-display.git"
    6. Execute the configuration script as user pi. "/bin/bash /home/pi/stratux-radar-display/image/configure_radar.sh".  This will take some time since it does an update on the pi. 
    7. Depending on your display modify /home/pi/stratux-radar-display/image/stratux_radar.sh. In paramater "-c" enter the IP address of your stratux and in parameter "-d" the device. E.g.
-         - cd /home/pi/stratux-radar-display/main && python3 radar.py -s -d Oled_1in5 -c 192.168.10.1 &            
-         - cd /home/pi/stratux-radar-display/main && python3 radar.py -s -r -d Epaper_3in7 -c 192.168.10.1 & 
+         - cd /home/pi/stratux-radar-display/main && python3 radar.py -b -d Oled_1in5 -c 192.168.10.1 &            
+         - cd /home/pi/stratux-radar-display/main && python3 radar.py -b -r -d Epaper_3in7 -c 192.168.10.1 & 
+         - cd /home/pi/stratux-radar-display/main && python3 radar.py -b -r -d Epaper_1in54 -c 192.168.10.1 & 
    8. The configuration skript will make an entry in crontab of user pi, so that radar will start automatically after reboot. 
 
    
@@ -102,7 +113,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    3. Reboot and log on to your Stratux as user pi, directory /home/pi
    4. Clone the stratux repository by "git clone https://github.com/TomBric/stratux-radar-display.git"
    5. Execute the configuration skript: "/bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh". It will take some time.
-   6. The script configures stratux to work with the Oled display and without bluetooth or external sound. So if this is your configuration, you are fine. Otherwise you can configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5" or "-d Epaper_3in7". You can use a simple editor like nano for this: "nano image/stratux_radar.sh". 
+   6. The script configures stratux to work with the Oled display and without bluetooth or external sound. So if this is your configuration, you are fine. Otherwise you can configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5",  "-d Epaper_3in7" or "-d Epaper_1in54". You can use a simple editor like nano for this: "nano image/stratux_radar.sh". 
    7. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
 
 The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
