@@ -37,7 +37,7 @@ pip3 install py-espeak-ng pyalsaaudio
 # bluetooth configs
 apt-get install libbluetooth-dev -y
 pip3 install pybluez pydbus
-pip3 install Pillow
+pip3 install pillow==8.4
 apt purge piwiz -y
 # necessary to disable bluetoothmessage "To turn on ..."
 
