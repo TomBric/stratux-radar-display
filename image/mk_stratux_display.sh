@@ -65,7 +65,7 @@ mount -t ext4 ${lo}p2 mnt/ || die "root-mount failed"
 mount -t vfat ${lo}p1 mnt/boot || die "boot-mount failed"
 
 cd mnt/$DISPLAY_SRC
-git clone --recursive -b $2 https://github.com/TomBric/stratux-radar-display.git
+sudo -u pi git clone --recursive -b $2 https://github.com/TomBric/stratux-radar-display.git
 cd ../../../
 chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh $2
 mkdir -p out
