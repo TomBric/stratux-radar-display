@@ -196,15 +196,15 @@ def connected_devices():
 
 
 def trust_pair_connect(bt_addr):
-    res = subprocess.run(["sudo", "bluetoothctl", "pair", bt_addr])
+    res = subprocess.run("bluetoothctl", "pair", bt_addr])
     if res.returncode != 0:
         rlog.debug("Bluetooth: pair failed for adr " + str(bt_addr))
         return False
-    res = subprocess.run(["sudo", "bluetoothctl", "connect", bt_addr])
+    res = subprocess.run(["bluetoothctl", "connect", bt_addr])
     if res.returncode != 0:
         rlog.debug("Bluetooth: pair failed for adr " + str(bt_addr))
         return False
-    res = subprocess.run(["sudo", "bluetoothctl", "trust", bt_addr])
+    res = subprocess.run(["bluetoothctl", "trust", bt_addr])
     # trust made at the end due to strange behaviour of bluez
     if res.returncode != 0:
         rlog.debug("Bluetooth: trust failed for adr " + str(bt_addr))

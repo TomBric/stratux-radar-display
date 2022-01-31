@@ -303,7 +303,7 @@ def scan_result(output):
 
 async def bt_scan():
     rlog.debug("Starting Bluetooth-Scan")
-    proc = await asyncio.create_subprocess_exec("sudo", "bluetoothctl", "--timeout", str(BLUETOOTH_SCAN_TIME),
+    proc = await asyncio.create_subprocess_exec("bluetoothctl", "--timeout", str(BLUETOOTH_SCAN_TIME),
                                                 "scan", "on", stdout=asyncio.subprocess.PIPE)
     while True:
         stdout_line, stderr_line = await proc.communicate()
