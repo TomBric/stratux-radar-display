@@ -314,7 +314,7 @@ def scan_result(output):
                 else:
                     bt_name = ''
                 new_devices.append([bt_addr, bt_name])
-                rlog.debug("BT-Scan: new Device detected ", str(bt_addr), " ", bt_name)
+                rlog.debug("BT-Scan: new Device detected ", str(bt_addr), " ", str(bt_name))
 
 
 async def bt_scan():
