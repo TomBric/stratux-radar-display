@@ -314,7 +314,7 @@ def scan_result(output):
                 else:
                     bt_name = ''
                 new_devices.append([bt_addr, bt_name])
-                rlog.debug("BT-Scan: new Device detected ", bt_addr, " ", bt_name)
+                rlog.debug("BT-Scan: new Device detected ", str(bt_addr), " ", bt_name)
 
 
 async def bt_scan():
@@ -461,11 +461,11 @@ def user_input(extsound_active, bluetooth_active):
                 return 7
         if len(new_devices) > 0:
             if button == 0 and btime == 1:  # left short, YES
-                rlog.debug("Connecting:", new_devices[0][1])
+                rlog.debug("Connecting:", str(new_devices[0][1]))
                 trust_pair_connect(new_devices[0][0])
                 del new_devices[0]
             if button == 2 and btime == 1:  # right short, NO
-                rlog.debug("Not Connecting:", new_devices[0][1])
+                rlog.debug("Not Connecting:", str(new_devices[0][1]))
                 remove_device(new_devices[0][0])
                 del new_devices[0]
         if len(new_devices) == 0 or (button == 1 and btime == 1):   # middle short, Cancel
