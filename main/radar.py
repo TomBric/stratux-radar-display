@@ -677,7 +677,7 @@ async def display_and_cutoff():
             cutoff = time.time() - RADAR_CUTOFF
             for icao, ac in all_ac.items():
                 if ac['last_contact_timestamp'] < cutoff:
-                    rlog.debug("Cutting of " + hex(icao))
+                    rlog.log(AIRCRAFT_DEBUG,"Cutting of " + hex(icao))
                     to_delete.append(icao)
                     aircraft_changed = True
             for i in to_delete:

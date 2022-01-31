@@ -278,24 +278,8 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
     display_control.display()
 
 
-def trust_pair_connect(bt_addr):
-    res = subprocess.run(["bluetoothctl", "trust", bt_addr])
-    if res.returncode != 0:
-        rlog.debug("Bluetooth: trust failed for adr" + str(bt_addr))
-        return False
-    res = subprocess.run(["bluetoothctl", "pair", bt_addr])
-    if res.returncode != 0:
-        rlog.debug("Bluetooth: pair failed for adr" + str(bt_addr))
-        return False
-    res = subprocess.run(["bluetoothctl", "connect", bt_addr])
-    if res.returncode != 0:
-        rlog.debug("Bluetooth: connect failed for adr" + str(bt_addr))
-        return False
-    return True
-
-
 def remove_device(bt_addr):
-    res = subprocess.run(["bluetoothctl", "remove", bt_addr])
+    res = subprocess.run(["sudo", "bluetoothctl", "remove", bt_addr])
     if res.returncode != 0:
         return False
 
@@ -319,8 +303,8 @@ def scan_result(output):
 
 async def bt_scan():
     rlog.debug("Starting Bluetooth-Scan")
-    proc = await asyncio.create_subprocess_exec("bluetoothctl", "--timeout", str(BLUETOOTH_SCAN_TIME), "scan", "on",
-                                                stdout=asyncio.subprocess.PIPE)
+    proc = await asyncio.create_subprocess_exec("sudo", "bluetoothctl", "--timeout", str(BLUETOOTH_SCAN_TIME),
+                                                "scan", "on", stdout=asyncio.subprocess.PIPE)
     while True:
         stdout_line, stderr_line = await proc.communicate()
         if proc is not None:   # finished
@@ -462,7 +446,7 @@ def user_input(extsound_active, bluetooth_active):
         if len(new_devices) > 0:
             if button == 0 and btime == 1:  # left short, YES
                 rlog.debug("Connecting: " + new_devices[0][1])
-                trust_pair_connect(new_devices[0][0])
+                radarbluez.trust_pair_connect(new_devices[0][0])
                 del new_devices[0]
             if button == 2 and btime == 1:  # right short, NO
                 rlog.debug("Not Connecting: " + new_devices[0][1])
