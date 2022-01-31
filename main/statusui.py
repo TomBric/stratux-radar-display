@@ -281,12 +281,15 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
 def trust_pair_connect(bt_addr):
     res = subprocess.run(["bluetoothctl", "trust", bt_addr])
     if res.returncode != 0:
+        rlog.debug("Bluetooth: trust failed for adr" + str(bt_addr))
         return False
     res = subprocess.run(["bluetoothctl", "pair", bt_addr])
     if res.returncode != 0:
+        rlog.debug("Bluetooth: pair failed for adr" + str(bt_addr))
         return False
     res = subprocess.run(["bluetoothctl", "connect", bt_addr])
     if res.returncode != 0:
+        rlog.debug("Bluetooth: connect failed for adr" + str(bt_addr))
         return False
     return True
 
