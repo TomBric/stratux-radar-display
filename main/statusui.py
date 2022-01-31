@@ -279,7 +279,7 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
 
 
 def remove_device(bt_addr):
-    res = subprocess.run(["sudo", "bluetoothctl", "remove", bt_addr])
+    res = subprocess.run(["bluetoothctl", "remove", bt_addr])
     if res.returncode != 0:
         return False
 
