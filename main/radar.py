@@ -57,7 +57,13 @@ import flighttime
 from datetime import datetime, timezone
 
 # constant definitions
-RADAR_VERSION = "1.61"
+RADAR_VERSION = "1.7"
+
+# logging
+SITUATION_DEBUG = logging.DEBUG-2   # another low level for debugging, DEBUG is 10
+AIRCRAFT_DEBUG = logging.DEBUG-1    # another low level for debugging below DEBUG
+rlog = None  # radar specific logger
+#
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -79,7 +85,6 @@ OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
 
 # global variables
-rlog = None  # radar specific logger
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
 url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
@@ -165,7 +170,7 @@ def draw_display(draw):
     global optical_alive
     global extsound_active
 
-    rlog.debug("List of all aircraft > " + json.dumps(all_ac))
+    rlog.log(AIRCRAFT_DEBUG, "List of all aircraft > " + json.dumps(all_ac))
     new_alive = int((int(time.time()) % (OPTICAL_ALIVE_BARS * OPTICAL_ALIVE_TIME)) / OPTICAL_ALIVE_TIME)
     if situation['was_changed'] or aircraft_changed or ui_changed or new_alive != optical_alive:
         # display is only triggered if there was a change
@@ -225,7 +230,7 @@ def new_traffic(json_str):
     global aircraft_changed
 
     aircraft_changed = True
-    rlog.debug("New Traffic" + json_str)
+    rlog.log(AIRCRAFT_DEBUG, "New Traffic" + json_str)
     traffic = json.loads(json_str)
     changed = False
     if 'RadarRange' in traffic or 'RadarLimits' in traffic:
@@ -242,7 +247,7 @@ def new_traffic(json_str):
         # ignore rest of message
     if 'Icao_addr' not in traffic:
         # steering message without aircraft content
-        rlog.debug("No Icao_addr in message" + json_str)
+        rlog.log(AIRCRAFT_DEBUG, "No Icao_addr in message" + json_str)
         return
 
     is_new = False
@@ -265,7 +270,7 @@ def new_traffic(json_str):
 
     if traffic['Position_valid'] and situation['gps_active']:
         # adsb traffic and stratux has valid gps signal
-        rlog.debug('RADAR: ADSB traffic ' + hex(traffic['Icao_addr']) + " at height " + str(ac['height']))
+        rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB traffic ' + hex(traffic['Icao_addr']) + " at height " + str(ac['height']))
         if 'circradius' in ac:
             del ac['circradius']
             # was mode-s target before, now invalidate mode-s info
@@ -309,7 +314,7 @@ def new_traffic(json_str):
             return
             # unspecified altitude, nothing displayed for now, leave it as it is
         distcirc = traffic['DistanceEstimated'] / 1852.0
-        rlog.debug("RADAR: Mode-S traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
+        rlog.log(AIRCRAFT_DEBUG, "RADAR: Mode-S traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
         distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
         if is_new or 'circradius' not in ac:
             # calc argposition if new or adsb before
@@ -358,7 +363,7 @@ def new_situation(json_str):
     global vertical_min
     global global_mode
 
-    rlog.debug("New Situation" + json_str)
+    rlog.log(SITUATION_DEBUG, "New Situation" + json_str)
     sit = json.loads(json_str)
     situation['last_update'] = time.time()
     if not situation['connected']:
@@ -462,18 +467,18 @@ def new_situation(json_str):
     # automatic time measurement
     new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, global_mode)
     if new_mode > 0:
-        global_mode = new_mode # automatically change to display of flight times, or back
+        global_mode = new_mode    # automatically change to display of flight times, or back
 
 
-async def listen_forever(path, name, callback, local_log):
-    local_log.debug(name + " waiting for " + path)
+async def listen_forever(path, name, callback):
+    rlog.debug(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
-        local_log.debug(name + " active ...")
+        rlog.debug(name + " active ...")
         try:
             async with websockets.connect(path, ping_timeout=None, ping_interval=None, close_timeout=2) as ws:
                 # stratux does not respond to pings! close timeout set down to get earlier disconnect
-                local_log.debug(name + " connected on " + path)
+                rlog.debug(name + " connected on " + path)
                 while True:
                     # listener loop
                     try:
@@ -481,26 +486,26 @@ async def listen_forever(path, name, callback, local_log):
                         # message = await ws.recv()
                     except asyncio.TimeoutError:
                         # No situation received or traffic in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
-                        local_log.debug(name + ': TimeOut received waiting for message.')
+                        rlog.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
-                            local_log.debug(name + ': Watchdog detected connection loss.' +
-                                            ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
+                            rlog.debug(name + ': Watchdog detected connection loss.' +
+                                       ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                             break
                     except websockets.exceptions.ConnectionClosed:
-                        local_log.debug(
+                        rlog.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                         await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                         break
                     except asyncio.CancelledError:
-                        local_log.debug(name + " shutting down ... ")
+                        rlog.debug(name + " shutting down ... ")
                         return
                     else:
                         callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
         except (socket.error, websockets.exceptions.WebSocketException, asyncio.TimeoutError):
-            local_log.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
+            rlog.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
                 situation['connected'] = False
                 ahrs['was_changed'] = True
@@ -509,7 +514,7 @@ async def listen_forever(path, name, callback, local_log):
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
         except (asyncio.CancelledError):
-            local_log.debug(name + " shutting down in connect ... ")
+            rlog.debug(name + " shutting down in connect ... ")
             return
 
 
@@ -691,8 +696,8 @@ async def display_and_cutoff():
 
 
 async def coroutines():
-    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
-    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic))
+    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation))
     dis_cutoff = asyncio.create_task(display_and_cutoff())
     u_interface = asyncio.create_task(user_interface())
     await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface])
@@ -735,6 +740,15 @@ def quit_gracefully(*args):
     return 0
 
 
+def logging_init():
+    global rlog
+
+    logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
+    rlog = logging.getLogger('stratux-radar-log')
+    logging.addLevelName(SITUATION_DEBUG, 'SITUATION_DEBUG')
+    logging.addLevelName(AIRCRAFT_DEBUG, 'AIRCRAFT_DEBUG')
+
+
 if __name__ == "__main__":
     # parse arguments for different configurations
     ap = argparse.ArgumentParser(description='Stratux radar display')
@@ -755,7 +769,8 @@ if __name__ == "__main__":
     ap.add_argument("-z", "--strx", required=False, help="Start mode is stratux-status", action='store_true',
                     default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
-    ap.add_argument("-v", "--verbose", required=False, help="Debug output on", action="store_true", default=False)
+    ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
+                    default=0)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no (epaper only)",
                     action="store_true", default=False)
     ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (3.7 epaper only)",
@@ -766,12 +781,16 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     args = vars(ap.parse_args())
     # set up logging
-    logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
-    rlog = logging.getLogger('stratux-radar-log')
-    if args['verbose']:
-        rlog.setLevel(logging.DEBUG)
-    else:
+    logging_init()
+    if args['verbose'] == 0:
         rlog.setLevel(logging.INFO)
+    elif args['verbose'] == 1:
+        rlog.setLevel(logging.DEBUG)     # log events without situation and aircraft
+    elif args['verbose'] == 2:
+        rlog.setLevel(AIRCRAFT_DEBUG)    # log including aircraft
+    else:
+        rlog.setLevel(SITUATION_DEBUG)   # log including situation messages
+
     url_host_base = args['connect']
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     bluetooth = args['bluetooth']
@@ -795,7 +814,7 @@ if __name__ == "__main__":
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     global_config['sound_volume'] = args['extsound']    # -1 if not enabled at all
-    if global_config['sound_volume']<-1 or global_config['sound_volume']>100:
+    if global_config['sound_volume'] < -1 or global_config['sound_volume'] > 100:
         global_config['sound_volume'] = 50   # set to a medium value if strange number used
     # check config file, if extistent use config from there
     url_host_base = args['connect']
