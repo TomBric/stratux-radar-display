@@ -486,7 +486,7 @@ async def listen_forever(path, name, callback):
                         # message = await ws.recv()
                     except asyncio.TimeoutError:
                         # No situation received or traffic in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
-                        rlog.debug(name + ': TimeOut received waiting for message.')
+                        # rlog.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
                             rlog.debug(name + ': Watchdog detected connection loss.' +
                                        ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
