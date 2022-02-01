@@ -39,6 +39,7 @@ import radarbuttons
 
 
 # constants
+SAVED_FLIGHTS = "stratux-radar.flights"
 SPEED_THRESHOLD_TAKEOFF = 30    # threshold in kts, when flying is detected or stopped
 SPEED_THRESHOLD_LANDING = 15    # threshold in kts, when landing is detected or stopped
 SPEED_THRESHOLD_STOPPED = 5     # threshold in kts, when stopping is detected. Triggers display of flighttime
@@ -73,7 +74,7 @@ def default(obj):
         return obj.isoformat()
 
 
-def init(activated, config):
+def init(activated):
     global rlog
     global measurement_enabled
     global g_config
@@ -81,9 +82,11 @@ def init(activated, config):
     rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Flighttime: time-measurement initialized")
     measurement_enabled = activated
-    g_config = config
-    if 'last_flights' in config:
-        rlog.debug("Flighttime: Last flights read from config: " + json.dumps(config['last_flights'], indent=4,
+    fl = read_flights()
+    if fl is not None:
+        g_config = fl
+    if 'last_flights' in g_config:
+        rlog.debug("Flighttime: Last flights read from config: " + json.dumps(g_config['last_flights'], indent=4,
                                                                               default=default))
 
 
@@ -95,6 +98,42 @@ def new_flight(flight):
     g_config['last_flights'].insert(0, flight)
     if len(g_config['last_flights']) > FLIGHT_LIST_LENGTH:
         del g_config['last_flights'][FLIGHT_LIST_LENGTH-1]
+
+
+def read_flights():
+    global rlog
+
+    if rlog is None:   # may be called before init
+        rlog = logging.getLogger('stratux-radar-log')
+    try:
+        with open(SAVED_FLIGHTS) as f:
+            config = json.load(f)
+    except (OSError, IOError, ValueError) as e:
+        rlog.debug("FlighttimeUI: Error " + str(e) + " reading " + SAVED_FLIGHTS)
+        return None
+    rlog.debug("FlighttimeUI: Flights read from " + SAVED_FLIGHTS + ": " + json.dumps(config, sort_keys=True, indent=4,
+                                                                                      default=default))
+    # read back last_flights to datetime
+    if 'last_flights' in config:
+        for i in config['last_flights']:
+            i[0] = datetime.datetime.fromisoformat(i[0])
+            if i[1] != 0:    # if in the air this is 0
+                i[1] = datetime.datetime.fromisoformat(i[1])
+    return config
+
+
+def write_flights():
+    global rlog
+
+    if rlog is None:   # may be called before init
+        rlog = logging.getLogger('stratux-radar-log')
+    try:
+        with open(SAVED_FLIGHTS, 'wt') as out:
+            json.dump(g_config, out, sort_keys=True, indent=4, default=default)
+    except (OSError, IOError, ValueError) as e:
+        rlog.debug("FlighttimeUI: Error " + str(e) + " writing " + SAVED_FLIGHTS)
+    rlog.debug("FlighttimeUI: Configuration saved to " + SAVED_FLIGHTS + ": " +
+               json.dumps(g_config, sort_keys=True, indent=4, default=default))
 
 
 def current_starttime():
@@ -160,7 +199,7 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
                 landing_time = now
                 rlog.debug("Flighttime: Landing detected at " + str(now))
                 g_config['last_flights'][0][1] = now
-                statusui.write_config(g_config)
+                statusui.write_flights()
                 flying = False
                 new_flight_info = True
                 trigger_timestamp = None
