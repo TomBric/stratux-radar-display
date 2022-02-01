@@ -199,7 +199,7 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
                 landing_time = now
                 rlog.debug("Flighttime: Landing detected at " + str(now))
                 g_config['last_flights'][0][1] = now
-                statusui.write_flights()
+                write_flights()
                 flying = False
                 new_flight_info = True
                 trigger_timestamp = None
