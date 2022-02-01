@@ -776,7 +776,7 @@ if __name__ == "__main__":
     ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (3.7 epaper only)",
                     action="store_true", default=False)
     ap.add_argument("-y", "--extsound", type=int, required=False, help="Ext sound on with volume [0-100]",
-                    default=-1)
+                    default=0)
     ap.add_argument("-nf", "--noflighttime", required=False, help="Suppress detection and display of flighttime",
                     action="store_true", default=False)
     args = vars(ap.parse_args())
@@ -813,8 +813,8 @@ if __name__ == "__main__":
         global_mode = 15  # start in stratux-status
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
-    global_config['sound_volume'] = args['extsound']    # -1 if not enabled at all
-    if global_config['sound_volume'] < -1 or global_config['sound_volume'] > 100:
+    global_config['sound_volume'] = args['extsound']    # 0 if not enabled
+    if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
         global_config['sound_volume'] = 50   # set to a medium value if strange number used
     # check config file, if extistent use config from there
     url_host_base = args['connect']

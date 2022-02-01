@@ -55,6 +55,7 @@ bluetooth_active = False
 extsound_active = False
 bt_devices = 0          # no of active bluetooth devices last time checked via connected devices
 mixer = None
+global_config = None
 
 def find_mixer():    # searches for a "Audio" mixer, independent whether it was selected
     found = False
@@ -85,23 +86,19 @@ def sound_init(config, bluetooth):
     global e_esng
     global mixer
     global rlog
+    global global_config
 
     extsound_active = False
     bluetooth_active = False
+    global_config = config
     rlog = logging.getLogger('stratux-radar-log')
     card, mixer = find_mixer()   # search for mixer in any case
     if not mixer:
         rlog.debug("Radarbluez: Mixer not found!")
-        extsound_active = False
     else:
-        if config['sound_volume']>=0 :
-            mixer.setvolume(config['sound_volume'])
-            extsound_active = True
-            rlog.debug("Radarbluez: Setting ExtSound to " + str(config['sound_volume']))
-        if config['sound_volume'] == -1:   # audio device and mixer found, but no speaker selected
-            mixer.setvolume(0)
-            extsound_active = False
-            rlog.debug("Radarbluez: Setting ExtSound to 0")
+        mixer.setvolume(global_config['sound_volume'])
+        extsound_active = True
+        rlog.debug("Radarbluez: Setting ExtSound to " + str(global_config['sound_volume']))
     if bluetooth:
         bluetooth_active = bluez_init()
 
@@ -114,7 +111,7 @@ def sound_init(config, bluetooth):
             rlog.debug("Radarbluez: Bluetooth espeak-ng successfully initialized.")
             b_esng.say("Stratux Radar connected")
 
-    if extsound_active and e_esng is None:
+    if mixer is not None and e_esng is None:
         audio = "plughw:" + str(card)
         e_esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev=audio)
         if e_esng is None:  # could not initialize esng
@@ -124,7 +121,7 @@ def sound_init(config, bluetooth):
             rlog.debug("Radarbluez: ExtSound espeak-ng successfully initialized.")
             e_esng.say("Stratux Radar connected")
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
-               " ExtSound volume: " + str(config['sound_volume']) + ".")
+               " ExtSound volume: " + str(global_config['sound_volume']) + ".")
     return extsound_active, bluetooth_active
 
 
@@ -155,14 +152,17 @@ def bluez_init():
 
 def setvolume(new_volume):
     global mixer
-    mixer.setvolume(new_volume)
+    global extsound_active
+
+    if mixer is not None:
+        mixer.setvolume(new_volume)
 
 
 def speak(text):
     global b_esng
     global e_esng
 
-    if extsound_active:
+    if extsound_active and global_config['sound_volume'] > 0:
         e_esng.say(text)
     if bluetooth_active and bt_devices > 0:
         if b_esng is None:   # first initialization failed, may happen with bluetooth, try again
