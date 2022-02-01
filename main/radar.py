@@ -666,7 +666,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 15
                 elif global_mode == 17:  # display flight time
-                    flighttime.draw_flighttime(draw, display_control, ui_changed, global_config)
+                    flighttime.draw_flighttime(draw, display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 18:  # refresh display, only relevant for epaper, mode was flighttime
                     rlog.debug("StratusStatus: Display driver - Refreshing")
