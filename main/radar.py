@@ -131,7 +131,8 @@ sound_on = True  # user may toogle sound off by UI
 global_mode = 1
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
 # 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
-# 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status 0=Init
+# 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status
+# 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 0=Init
 bluetooth = False  # True if bluetooth is enabled by parameter -b
 extsound_active = False   # external sound was successfully activated, if global_config >=0
 bluetooth_active = False   # bluetooth successfully activated
@@ -678,6 +679,13 @@ async def display_and_cutoff():
                     rlog.debug("StratusStatus: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 17
+                elif global_mode == 19:  # co-warner
+                    cowarner.draw_cowarner(draw, display_control, ui_changed)
+                    ui_changed = False
+                elif global_mode == 20:  # refresh display, only relevant for epaper, mode was co-warner
+                    rlog.debug("CO-Warner: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 19
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
