@@ -778,7 +778,7 @@ def flighttime(draw, last_flights):
 
 def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2):
     # no_of_datapoints = number of datapoints to be displayed, if less stop line, if more take first datapoints
-    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=1, fill="white")
+    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=2, fill="white")
     lastpoint = None
     for i in range(0, len(data)):
         y = ypos + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
@@ -798,8 +798,8 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
 
 def cowarner(draw, co_values, co_max, r0, time_window):   # draw graph and co values
     centered_text(draw, 0, "CO Warner ", largefont, fill="black")
-    graph(draw, 0, 30, 400, 200, co_values, 0, 150, 50, 100)
+    graph(draw, 0, 40, 300, 200, co_values, 0, 120, 50, 100)
     if len(co_values) > 0:
-        draw.text((420, 60), "CO Act: " + str(co_values[len(co_values)-1]), font=smallfont, fill="black")
-    draw.text((420, 80), "CO Max: " + str(co_max), font=smallfont, fill="black")
-    draw.text((420, 100), "R0:"+ str(r0), font=smallfont, fill="black")
+        draw.text((350, 60), "CO Act: " + str(co_values[len(co_values)-1]), font=smallfont, fill="black")
+    draw.text((350, 80), "CO Max: " + str(co_max), font=smallfont, fill="black")
+    draw.text((350, 100), "R0:"+ str(r0), font=smallfont, fill="black")
