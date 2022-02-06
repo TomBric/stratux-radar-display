@@ -123,19 +123,17 @@ def init(activate, config, debug_level):
     voltage_factor = ADS.toVoltage()
 
 
-def co_ppm_value():
+async def co_ppm_value():
     ADS.requestADC(0)    # analog 0 input
-    if ADS.isReady():
-        value = ADS.getValue()
-        sensor_volt = value * voltage_factor
-        rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
-        ppm_value = ppm(rs_gas / r0)
-        rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {1:.1f}"
-                 .format(value, sensor_volt, ppm_value))
-        return ppm_value
-    else:
-        rlog.log(value_debug_level, "CO-Warner: ADS not ready, no value read")
-        return None
+    while not ADS.isReady():
+        await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
+    value = ADS.getValue()
+    sensor_volt = value * voltage_factor
+    rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
+    ppm_value = ppm(rs_gas / r0)
+    rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {1:.1f}"
+             .format(value, sensor_volt, ppm_value))
+    return ppm_value
 
 
 def read_co_value():     # called by sensor_read thread
@@ -174,7 +172,7 @@ def draw_cowarner(draw, display_control, changed):
         display_control.display()
 
 
-def calibration():   # called by user-input thread, performs calibration and ends calibration mode
+async def calibration():   # called by user-input thread, performs calibration and ends calibration mode
     global co_warner_status
     global sample_sum
     global no_samples
