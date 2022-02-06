@@ -57,6 +57,7 @@ bt_devices = 0          # no of active bluetooth devices last time checked via c
 mixer = None
 global_config = None
 
+
 def find_mixer():    # searches for a "Audio" mixer, independent whether it was selected
     found = False
     kwargs = {}

@@ -775,3 +775,11 @@ def flighttime(draw, last_flights):
         maxlines -= 1
         if maxlines <= 0:
             break
+
+
+def cowarner(draw, co_values, co_max, r0, time_window):   # draw graph and co values
+    centered_text(draw, 0, "CO Warner ", smallfont, fill="black")
+    if len(co_values) > 0:
+        centered_text(draw, 20, "CO Act: " + str(co_values[len(co_values)-1]), smallfont, fill="black")
+    centered_text(draw, 40, "CO Max: " + str(co_max), smallfont, fill="black")
+    centered_text(draw, 60, "R0:"+ str(r0), smallfont, fill="black")

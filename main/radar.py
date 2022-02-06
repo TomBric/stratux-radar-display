@@ -54,6 +54,7 @@ import subprocess
 import radarbuttons
 import stratuxstatus
 import flighttime
+import cowarner
 from datetime import datetime, timezone
 
 # constant definitions
@@ -83,6 +84,8 @@ OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
+MIN_SENSOR_READ_TIME = 2
+# minimal time in secs when sensor reading thread  is generally started
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -132,6 +135,7 @@ extsound_active = False   # external sound was successfully activated, if global
 bluetooth_active = False   # bluetooth successfully activated
 optical_alive = -1
 measure_flighttime = False   # True if automatic measurement of flighttime is enabled
+co_warner_activated = False   # True if co-warner is activated
 
 
 def draw_all_ac(draw, allac):
@@ -690,17 +694,27 @@ async def display_and_cutoff():
                     situation['was_changed'] = True
                     ahrs['was_changed'] = True
                     gmeter['was_changed'] = True
-                    rlog.debug("WATCHDOG: No update received in " + str(WATCHDOG_TIMER) + " seconds")
+                    rlog.debug("WATCHDOG: No situation update received in " + str(WATCHDOG_TIMER) + " seconds")
     except (asyncio.CancelledError, RuntimeError):
         rlog.debug("Display task terminating ...")
+
+
+async def read_sensors():
+    try:
+        while True:
+            await asyncio.sleep(MIN_SENSOR_READ_TIME)
+            cowarner.read_co_value()
+    except (asyncio.CancelledError, RuntimeError):
+        rlog.debug("Sensor-reading task terminating ...")
 
 
 async def coroutines():
     tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic))
     sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation))
     dis_cutoff = asyncio.create_task(display_and_cutoff())
+    sensor_reader = asyncio.create_task(read_sensors())
     u_interface = asyncio.create_task(user_interface())
-    await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface])
+    await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, read_sensors])
 
 
 def main():
@@ -723,6 +737,7 @@ def main():
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(display_control, url_status_ws)
     flighttime.init(measure_flighttime)
+    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -768,6 +783,8 @@ if __name__ == "__main__":
                     default=False)
     ap.add_argument("-z", "--strx", required=False, help="Start mode is stratux-status", action='store_true',
                     default=False)
+    ap.add_argument("-w", "--cowarner", required=False, help="Start mode is CO warner", action='store_true',
+                    default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
                     default=0)
@@ -778,6 +795,8 @@ if __name__ == "__main__":
     ap.add_argument("-y", "--extsound", type=int, required=False, help="Ext sound on with volume [0-100]",
                     default=0)
     ap.add_argument("-nf", "--noflighttime", required=False, help="Suppress detection and display of flighttime",
+                    action="store_true", default=False)
+    ap.add_argument("-nc", "--nocowarner", required=False, help="Suppress activation of co-warner",
                     action="store_true", default=False)
     args = vars(ap.parse_args())
     # set up logging
@@ -797,6 +816,7 @@ if __name__ == "__main__":
     basemode = args['north']
     fullcircle = args['fullcircle']
     measure_flighttime = not args['noflighttime']
+    co_warner_activated = not args['nocowarner']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:
@@ -811,6 +831,8 @@ if __name__ == "__main__":
         global_mode = 13  # start in vsi mode
     if args['strx']:
         global_mode = 15  # start in stratux-status
+    if args['cowarner']:
+        global_mode = 19  # start in co-warner mode
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     global_config['sound_volume'] = args['extsound']    # 0 if not enabled
@@ -828,6 +850,8 @@ if __name__ == "__main__":
             global_config['distance_warnings'] = saved_config['distance_warnings']
         if 'sound_volume' in saved_config:
             global_config['sound_volume'] = saved_config['sound_volume']
+        if 'CO_warner_R0' in saved_config:
+            global_config['CO_warner_R0'] = saved_config['CO_warner_R0']
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_status_ws = "ws://" + url_host_base + "/status"

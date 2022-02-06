@@ -27,8 +27,8 @@ apt-get install git python3-pip python3-pil -y libjpeg-dev zlib1g-dev libfreetyp
 pip3 install luma.oled
 
 
-#websockets for radar
-pip3 install websockets
+#websockets for radar and ADS1115 analog reader for co warner
+pip3 install websockets ADS1x15-ADC
 
 # espeak-ng for sound output and alsoaudio for external sound
 apt-get install espeak-ng espeak-ng-data libespeak-ng-dev -y
@@ -71,7 +71,8 @@ cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
 systemctl --system enable pulseaudio.service
 # systemctl --system start pulseaudio.service
 
-# enable spi
+# enable spi and i2c (for cowarner)
 raspi-config nonint do_spi 0
+raspi-config nonint do_i2c 0
 echo "Radar configuration finished"
 
