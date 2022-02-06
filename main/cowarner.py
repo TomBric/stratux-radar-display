@@ -107,7 +107,7 @@ def init(activate, config, debug_level):
     g_config = config
     if 'CO_warner_R0' in g_config:
         r0 = g_config['CO_warner_R0']
-        rlog.debug("CO-Warner: found R0 in config, set to {1:.1f} Ohms".format(r0))
+        rlog.debug("CO-Warner: found R0 in config, set to {1:.1f} Ohms".format(r0), r0)
     value_debug_level = debug_level
     ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
     if ADS is None:
