@@ -800,6 +800,6 @@ def cowarner(draw, co_values, co_max, r0, time_window):   # draw graph and co va
     centered_text(draw, 0, "CO Warner ", largefont, fill="black")
     graph(draw, 0, 40, 300, 200, co_values, 0, 120, 50, 100)
     if len(co_values) > 0:
-        draw.text((350, 60), "CO Act: " + str(co_values[len(co_values)-1]), font=smallfont, fill="black")
-    draw.text((350, 80), "CO Max: " + str(co_max), font=smallfont, fill="black")
-    draw.text((350, 100), "R0:"+ str(r0), font=smallfont, fill="black")
+        draw.text((320, 60), "CO Act: " + str(co_values[len(co_values)-1]), font=verysmallfont, fill="black")
+    draw.text((320, 80), "CO Max: " + str(co_max), font=verysmallfont, fill="black")
+    draw.text((320, 100), "R0:"+ str(r0), font=verysmallfont, fill="black")
