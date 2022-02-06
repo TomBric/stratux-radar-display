@@ -207,11 +207,11 @@ def user_input():
     global no_samples
 
     if not cowarner_active:
+        rlog.debug("CO-Warner: not active, switching to radar-mode")
         return 1        # immediately go to next mode, if warner is not activated
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
         return 0  # stay in current mode
-    print("co-warner user input != 0")
     cowarner_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return 1  # next mode to be radar
