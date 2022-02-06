@@ -776,30 +776,32 @@ def flighttime(draw, last_flights):
         if maxlines <= 0:
             break
 
+space = 3  # space between scale figures and zero line
+
 def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2):
 
     ts = draw.textsize(str(maxvalue), verysmallfont)    # for adjusting x and y
     # adjust zero lines to have room for text
-    xpos = xpos + ts[0]
-    xsize = xsize - ts[0]
+    xpos = xpos + ts[0] + space
+    xsize = xsize - ts[0] - space
     ypos = ypos + ts[1]/2
     ysize = ysize - ts[1]
 
     vlmin_y = ypos + ysize - 1
     ts = draw.textsize(str(minvalue), verysmallfont)
-    draw.text((xpos - ts[0], vlmin_y - ts[1] / 2), str(minvalue), font=verysmallfont, fill="black")
+    draw.text((xpos - ts[0] - space, vlmin_y - ts[1] / 2), str(minvalue), font=verysmallfont, fill="black")
 
     vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
     ts = draw.textsize(str(value_line1), verysmallfont)
-    draw.text((xpos - ts[0], vl1_y - ts[1]/2), str(value_line1), font=verysmallfont, fill="black")
+    draw.text((xpos - ts[0] - space, vl1_y - ts[1]/2), str(value_line1), font=verysmallfont, fill="black")
 
     vl2_y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
     ts = draw.textsize(str(value_line2), verysmallfont)
-    draw.text((xpos - ts[0], vl2_y - ts[1]/2), str(value_line2), font=verysmallfont, fill="black")
+    draw.text((xpos - ts[0] - space, vl2_y - ts[1]/2), str(value_line2), font=verysmallfont, fill="black")
 
     vlmax_y = ypos
     ts = draw.textsize(str(maxvalue), verysmallfont)
-    draw.text((xpos - ts[0], vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="black")
+    draw.text((xpos - ts[0] - space, vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="black")
 
     draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=3, fill="white")
     lastpoint = None
