@@ -206,9 +206,9 @@ def user_input():
     global calibration_end
     global sample_sum
     global no_samples
+    global cowarner_active
 
     if not cowarner_active:
-        print("user input, co-warner not active")
         return 1        # immediately go to next mode, if warner is not activated
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
