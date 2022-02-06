@@ -120,6 +120,8 @@ def init(activate, config, debug_level):
     ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
     ADS.setGain(ADS.PGA_4_096V)
     voltage_factor = ADS.toVoltage()
+    cowarner_active = True
+    return cowarner_active
 
 def request_read():
     return ADS.requestADC(0)  # analog 0 input
