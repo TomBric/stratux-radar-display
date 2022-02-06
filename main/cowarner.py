@@ -130,6 +130,7 @@ async def read_co_value():     # called by sensor_read thread
 
     current_time = time.time()
     if current_time - last_read_timestamp < CO_TIMEOUT:  # only read if TIMEOUT is reached
+        print("Timeout not yet reached\n")
         return
     ADS.requestADC(0)  # analog 0 input
     last_read_timestamp = current_time
