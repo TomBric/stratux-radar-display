@@ -787,17 +787,21 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
 
     vlmin_y = ypos + ysize
     ts = draw.textsize(str(minvalue), verysmallfont)
-    draw.text((xpos - ts[0], vlmin_y + ts[1] / 2), str(minvalue), font=verysmallfont, fill="black")
+    draw.text((xpos - ts[0], vlmin_y - ts[1] / 2), str(minvalue), font=verysmallfont, fill="black")
 
     vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
-    ts = draw.textsize(str(value_line2), verysmallfont)
-    draw.text((xpos - ts[0], vl1_y + ts[1]/2), str(value_line1), font=verysmallfont, fill="black")
+    ts = draw.textsize(str(value_line1), verysmallfont)
+    draw.text((xpos - ts[0], vl1_y - ts[1]/2), str(value_line1), font=verysmallfont, fill="black")
 
     vl2_y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
     ts = draw.textsize(str(value_line2), verysmallfont)
-    draw.text((xpos - ts[0], vl2_y + ts[1] / 2), str(value_line2), font=verysmallfont, fill="black")
+    draw.text((xpos - ts[0], vl2_y - ts[1]/2), str(value_line2), font=verysmallfont, fill="black")
 
-    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=2, fill="white")
+    vlmax_y = ypos
+    ts = draw.textsize(str(maxvalue), verysmallfont)
+    draw.text((xpos - ts[0], vlmax_y - ts[1]/2), str(minvalue), font=verysmallfont, fill="black")
+
+    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=3, fill="white")
     lastpoint = None
     for i in range(0, len(data)):
         y = ypos + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
@@ -807,7 +811,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
             x = ypos+ysize-1
         x = xpos + i * xsize / len(data)
         if lastpoint is not None:
-            draw.line([lastpoint, (x,y)], fill="black", width=1)
+            draw.line([lastpoint, (x,y)], fill="black", width=2)
         lastpoint = (x, y)
     # value_line 1
     y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
