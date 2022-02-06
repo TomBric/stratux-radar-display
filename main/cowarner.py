@@ -123,7 +123,7 @@ def init(activate, config, debug_level):
     voltage_factor = ADS.toVoltage()
 
 
-async def co_ppm_value():
+def co_ppm_value():
     ADS.requestADC(0)    # analog 0 input
     while not ADS.isReady():
         await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
@@ -144,11 +144,19 @@ def read_co_value():     # called by sensor_read thread
     current_time = time.time()
     if current_time - last_read_timestamp < CO_TIMEOUT:  # only read if TIMEOUT is reached
         return
+    ADS.requestADC(0)  # analog 0 input
     last_read_timestamp = current_time
-    val = co_ppm_value()
-    if val > co_max:
-        co_max = val
-    co_values.append(val)
+    while not ADS.isReady():
+        await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
+    value = ADS.getValue()
+    sensor_volt = value * voltage_factor
+    rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
+    ppm_value = round(ppm(rs_gas / r0))
+    rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {0:d}"
+             .format(value, sensor_volt, ppm_value))
+    if ppm_value > co_max:
+        co_max = ppm_value
+    co_values.append(ppm_value)
     if len(co_values) > CO_MAX_VALUES:    # sliding window, remove oldest values
         co_values.pop(0)
 
