@@ -114,14 +114,16 @@ def init(activate, config, debug_level):
     ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
     if ADS is None:
         cowarner_active = False
+        rlog.debug("CO-Warner - AD sensor not found")
         return cowarner_active
-    rlog.debug("CO-Warner - AD active. ADS1X15_LIB_VERSION: {}".format(ADS1x15.LIB_VERSION))
     # set gain to 4.096V max
     ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
     ADS.setGain(ADS.PGA_4_096V)
     voltage_factor = ADS.toVoltage()
     cowarner_active = True
+    rlog.debug("CO-Warner - AD converter active. ADS1X15_LIB_VERSION: {}".format(ADS1x15.LIB_VERSION))
     return cowarner_active
+
 
 def request_read():
     return ADS.requestADC(0)  # analog 0 input
@@ -206,6 +208,7 @@ def user_input():
     global no_samples
 
     if not cowarner_active:
+        print("user input, co-warner not active")
         return 1        # immediately go to next mode, if warner is not activated
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
