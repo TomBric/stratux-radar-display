@@ -136,7 +136,7 @@ def co_ppm_value():
     return ppm_value
 
 
-def read_co_value():     # called by sensor_read thread
+async def read_co_value():     # called by sensor_read thread
     global last_read_timestamp
     global co_values
     global co_max
