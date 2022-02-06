@@ -780,20 +780,20 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     # no_of_datapoints = number of datapoints to be displayed, if less stop line, if more take first datapoints
     draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=1, fill="white")
     lastpoint = None
-    for i in data:
-        ypos = ypos + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
-        xpos = i * xsize / len(data)
+    for i in range(0, len(data)):
+        y = ypos + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
+        x = xpos + i * xsize / len(data)
         if lastpoint is not None:
-            draw.line([lastpoint, (xpos,ypos)], fill="black", width=1)
-        lastpoint = (xpos, ypos)
+            draw.line([lastpoint, (x,y)], fill="black", width=1)
+        lastpoint = (x, y)
     # value_line 1
-    ypos = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
+    y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
     for x in range(xpos, xpos+xsize, 6):
-        draw.line([(x, ypos), (x + 3, ypos)], fill="black", width=1)
+        draw.line([(x, y), (x + 3, y)], fill="black", width=1)
     # value_line 2
-    ypos = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
+    y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
     for x in range(xpos, xpos+xsize, 6):
-        draw.line([(x, ypos), (x + 3, ypos)], fill="black", width=1)
+        draw.line([(x, y), (x + 3, y)], fill="black", width=1)
 
 
 def cowarner(draw, co_values, co_max, r0, time_window):   # draw graph and co values
