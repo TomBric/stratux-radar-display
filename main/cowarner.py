@@ -76,7 +76,6 @@ ADS = None
 rlog = None
 g_config = {}
 value_debug_level = 0   # debug level for printing ad-values
-last_read_timestamp = 0.0   # timestamp in UTC of last CO-value reading
 co_values = []    # all values are here in ppm, maximum
 co_max = 0      # max value read during this run or after reset
 co_warner_status = 0     # 0 - nomal status  1 - calibration in progress  2 - calibration done
@@ -131,15 +130,11 @@ def ready():
     return ADS.isReady()
 
 def read_co_value():     # called by sensor_read thread
-    global last_read_timestamp
+    global cowarner_changed
     global co_values
     global co_max
 
-    current_time = time.time()
-    if current_time - last_read_timestamp < CO_TIMEOUT:  # only read if TIMEOUT is reached
-        print("Timeout not yet reached\n")
-        return
-    last_read_timestamp = current_time
+    cowarner_changed = True  # to display new value
     value = ADS.getValue()
     sensor_volt = value * voltage_factor
     rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
@@ -177,12 +172,14 @@ async def calibration():   # called by user-input thread, performs calibration a
     global no_samples
     global r0
     global g_config
+    global cowarner_changed
 
+    cowarner_changed = True  # to display new value
     countdown = math.floor(calibration_end - time.time())
     if countdown > 0:   # continue sensor reading
         ADS.requestADC(0)  # analog 0 input
         while not ADS.isReady():
-            await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
+            await asyncio.sleep(0.01)
         value = ADS.getValue()
         sensor_volt = value * voltage_factor
         rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
