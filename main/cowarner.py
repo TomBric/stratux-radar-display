@@ -100,6 +100,7 @@ def init(activate, config, debug_level):
     global value_debug_level
     global r0
 
+    rlog = logging.getLogger('stratux-radar-log')
     if not activate:
         rlog.debug("CO-Warner - not activated")
         cowarner_active = False
@@ -109,7 +110,6 @@ def init(activate, config, debug_level):
         r0 = g_config['CO_warner_R0']
         rlog.debug("CO-Warner: found R0 in config, set to {1:.1f} Ohms".format(r0))
     value_debug_level = debug_level
-    rlog = logging.getLogger('stratux-radar-log')
     ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
     if ADS is None:
         cowarner_active = False
