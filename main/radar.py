@@ -701,11 +701,12 @@ async def display_and_cutoff():
 
 async def read_sensors():
     try:
+        rlog.debug("Sensor reader active ...")
         while True:
-            await asyncio.sleep(MIN_SENSOR_READ_TIME)
             cowarner.read_co_value()
+            await asyncio.sleep(MIN_SENSOR_READ_TIME)
     except (asyncio.CancelledError, RuntimeError):
-        rlog.debug("Sensor-reading task terminating ...")
+        rlog.debug("Sensor reader terminating ...")
 
 
 async def coroutines():
