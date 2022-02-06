@@ -139,6 +139,10 @@ def read_co_value():     # called by sensor_read thread
     sensor_volt = value * voltage_factor
     rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
     ppm_value = round(ppm(rs_gas / r0))
+
+    # for testing when nothings connected
+    ppm_value = math.floor(time.time()) % 250
+
     rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {0:d}"
              .format(value, sensor_volt, ppm_value))
     if ppm_value > co_max:
