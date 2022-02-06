@@ -714,7 +714,7 @@ async def coroutines():
     dis_cutoff = asyncio.create_task(display_and_cutoff())
     sensor_reader = asyncio.create_task(read_sensors())
     u_interface = asyncio.create_task(user_interface())
-    await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, read_sensors])
+    await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader])
 
 
 def main():
