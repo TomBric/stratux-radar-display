@@ -572,6 +572,8 @@ async def user_interface():
                     stratuxstatus.stop()  # stops status_listener
             elif global_mode == 17:  # display flighttimes
                 next_mode = flighttime.user_input()
+            elif global_mode == 19:  # display flighttimes
+                next_mode = cowarner.user_input()
 
             if next_mode > 0:
                 ui_changed = True
