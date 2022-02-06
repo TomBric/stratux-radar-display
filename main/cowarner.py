@@ -55,7 +55,6 @@ CO_TIMEOUT = 10     # measure ppm value every 10 secs
 CO_MEASUREMENT_WINDOW = 60 * 60   # one hour, sliding window that is stored for display of ppm values
 CO_MAX_VALUES = CO_MEASUREMENT_WINDOW / CO_TIMEOUT    # maximum no of stored values, currently one hour
 CALIBRATION_TIME = 15   # time for calibration of sensor
-MIN_SENSOR_WAIT_TIME = 0.01  # minimal time in secs to wait for sensor during repeated readings in calibration
 
 # Alarm-Levels, SAE AS 412B-2001 gives some hints
 WARNLEVEL = (
@@ -122,8 +121,13 @@ def init(activate, config, debug_level):
     ADS.setGain(ADS.PGA_4_096V)
     voltage_factor = ADS.toVoltage()
 
+def request_read():
+    return ADS.requestADC(0)  # analog 0 input
 
-async def read_co_value():     # called by sensor_read thread
+def ready():
+    return ADS.isReady()
+
+def read_co_value():     # called by sensor_read thread
     global last_read_timestamp
     global co_values
     global co_max
@@ -132,10 +136,7 @@ async def read_co_value():     # called by sensor_read thread
     if current_time - last_read_timestamp < CO_TIMEOUT:  # only read if TIMEOUT is reached
         print("Timeout not yet reached\n")
         return
-    ADS.requestADC(0)  # analog 0 input
     last_read_timestamp = current_time
-    while not ADS.isReady():
-        await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
     value = ADS.getValue()
     sensor_volt = value * voltage_factor
     rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air

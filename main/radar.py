@@ -84,8 +84,10 @@ OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
-MIN_SENSOR_READ_TIME = 2
+MIN_SENSOR_READ_TIME = 10
 # minimal time in secs when sensor reading thread  is generally started
+MIN_SENSOR_WAIT_TIME = 0.01
+# minimal time in secs to wait when sensor is not yet ready
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -703,6 +705,9 @@ async def read_sensors():
     try:
         rlog.debug("Sensor reader active ...")
         while True:
+            cowarner.request_read()
+            while not cowarner.ready():
+                await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
             cowarner.read_co_value()
             await asyncio.sleep(MIN_SENSOR_READ_TIME)
     except (asyncio.CancelledError, RuntimeError):
