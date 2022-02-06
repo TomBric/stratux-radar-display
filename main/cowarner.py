@@ -107,10 +107,9 @@ def init(activate, config, debug_level):
     g_config = config
     if 'CO_warner_R0' in g_config:
         r0 = g_config['CO_warner_R0']
-        rlog.debug("CO-Warner - found R0 in config, set to {1:.1f} Ohms".format(r0))
+        rlog.debug("CO-Warner: found R0 in config, set to {1:.1f} Ohms".format(r0))
     value_debug_level = debug_level
     rlog = logging.getLogger('stratux-radar-log')
-    rlog.debug("CO-Warner: time-measurement initialized")
     ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
     if ADS is None:
         cowarner_active = False
@@ -121,7 +120,7 @@ def init(activate, config, debug_level):
     ADS.setGain(ADS.PGA_4_096V)
     voltage_factor = ADS.toVoltage()
     cowarner_active = True
-    rlog.debug("CO-Warner - AD converter active. ADS1X15_LIB_VERSION: {}".format(ADS1x15.LIB_VERSION))
+    rlog.debug("CO-Warner: AD converter active. ADS1X15_LIB_VERSION: {}".format(ADS1x15.LIB_VERSION))
     return cowarner_active
 
 
@@ -206,13 +205,13 @@ def user_input():
     global calibration_end
     global sample_sum
     global no_samples
-    global cowarner_active
 
     if not cowarner_active:
         return 1        # immediately go to next mode, if warner is not activated
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
         return 0  # stay in current mode
+    print("co-warner user input != 0")
     cowarner_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return 1  # next mode to be radar
