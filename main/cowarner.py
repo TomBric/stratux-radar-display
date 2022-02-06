@@ -136,7 +136,7 @@ async def co_ppm_value():
     return ppm_value
 
 
-def read_co_value():     # called by sensor_read thread
+async def read_co_value():     # called by sensor_read thread
     global last_read_timestamp
     global co_values
     global co_max
@@ -146,12 +146,11 @@ def read_co_value():     # called by sensor_read thread
         return
     last_read_timestamp = current_time
     val = co_ppm_value()
-    if val is not None:
-        if val > co_max:
-            co_max = val
-        co_values.append(val)
-        if len(co_values) > CO_MAX_VALUES:    # sliding window, remove oldest values
-            co_values.pop(0)
+    if val > co_max:
+        co_max = val
+    co_values.append(val)
+    if len(co_values) > CO_MAX_VALUES:    # sliding window, remove oldest values
+        co_values.pop(0)
 
 
 def draw_cowarner(draw, display_control, changed):
@@ -184,7 +183,6 @@ async def calibration():   # called by user-input thread, performs calibration a
         ADS.requestADC(0)  # analog 0 input
         while not ADS.isReady():
             await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
-        read_co_value()
         value = ADS.getValue()
         sensor_volt = value * voltage_factor
         rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
