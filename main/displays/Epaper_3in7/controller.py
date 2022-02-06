@@ -785,7 +785,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     ypos = ypos + ts[1]/2
     ysize = ysize - ts[1]
 
-    vlmin_y = ypos + ysize
+    vlmin_y = ypos + ysize - 1
     ts = draw.textsize(str(minvalue), verysmallfont)
     draw.text((xpos - ts[0], vlmin_y - ts[1] / 2), str(minvalue), font=verysmallfont, fill="black")
 
@@ -799,7 +799,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
 
     vlmax_y = ypos
     ts = draw.textsize(str(maxvalue), verysmallfont)
-    draw.text((xpos - ts[0], vlmax_y - ts[1]/2), str(minvalue), font=verysmallfont, fill="black")
+    draw.text((xpos - ts[0], vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="black")
 
     draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=3, fill="white")
     lastpoint = None
