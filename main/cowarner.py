@@ -51,7 +51,7 @@ RSR0_CLEAN = 3333.0   # 3.3 kOhm
 R_DIVIDER = 10000.0   # Value of divider resistor 10 kOhm
 SENSOR_VOLTAGE = 5.0   # voltage for sensor board and divider
 # Measurement cycle
-CO_TIMEOUT = 10     # measure ppm value every 10 secs
+CO_TIMEOUT = 3     # measure ppm value every 10 secs
 CO_MEASUREMENT_WINDOW = 60 * 60   # one hour, sliding window that is stored for display of ppm values
 CO_MAX_VALUES = CO_MEASUREMENT_WINDOW / CO_TIMEOUT    # maximum no of stored values, currently one hour
 CALIBRATION_TIME = 15   # time for calibration of sensor
