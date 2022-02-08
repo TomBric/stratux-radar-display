@@ -711,24 +711,11 @@ async def display_and_cutoff():
         rlog.debug("Display task terminating ...")
 
 
-async def read_sensors():
-    try:
-        rlog.debug("Sensor reader active ...")
-        while True:
-            cowarner.request_read()
-            while not cowarner.ready():
-                await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
-            cowarner.read_co_value()
-            await asyncio.sleep(MIN_SENSOR_READ_TIME)
-    except (asyncio.CancelledError, RuntimeError):
-        rlog.debug("Sensor reader terminating ...")
-
-
 async def coroutines():
     tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic))
     sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation))
     dis_cutoff = asyncio.create_task(display_and_cutoff())
-    sensor_reader = asyncio.create_task(read_sensors())
+    sensor_reader = asyncio.create_task(cowarner.read_sensors())
     u_interface = asyncio.create_task(user_interface())
     await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader])
 

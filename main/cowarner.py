@@ -174,7 +174,7 @@ def draw_cowarner(draw, display_control, changed):
         display_control.display()
 
 
-async def calibration():   # called by user-input thread, performs calibration and ends calibration mode
+def calibration():   # called by user-input thread, performs calibration and ends calibration mode
     global co_warner_status
     global sample_sum
     global no_samples
@@ -186,9 +186,6 @@ async def calibration():   # called by user-input thread, performs calibration a
     print("Calibration_end " + str(calibration_end) + " ActTime " + str(math.floor(time.time())))
     countdown = calibration_end - math.floor(time.time())
     if countdown > 0:   # continue sensor reading
-        ADS.requestADC(0)  # analog 0 input
-        while not ADS.isReady():
-            await asyncio.sleep(0.01)
         value = ADS.getValue()
         sensor_volt = value * voltage_factor
         rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
@@ -215,9 +212,6 @@ def user_input():
     if not cowarner_active:
         rlog.debug("CO-Warner: not active, switching to radar-mode")
         return 1        # immediately go to next mode, if warner is not activated
-    if co_warner_status == 1:
-        calibration()
-        return 19
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
         return 0  # stay in current mode
@@ -238,3 +232,19 @@ def user_input():
     if button == 2 and btime == 2:  # right and long- refresh
         return 20  # start next mode for display driver: refresh called
     return 19  # no mode change
+
+
+async def read_sensors():
+    try:
+        rlog.debug("Sensor reader active ...")
+        while True:
+            cowarner.request_read()
+            while not cowarner.ready():
+                await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
+            if co_warner_status == 0:   # normal read
+                cowarner.read_co_value()
+            else:
+                calibration()
+            await asyncio.sleep(MIN_SENSOR_READ_TIME)
+    except (asyncio.CancelledError, RuntimeError):
+        rlog.debug("Sensor reader terminating ...")
