@@ -819,9 +819,9 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     offset = math.floor(xsize / no_of_time)
     x = xpos
     acttime = math.floor(time.time())
-    for i in range(0, no_of_time):
-        draw.line((x, ypos+ysize-1-3, x, ypos+ysize-1+3), width=2, fill="black")
-        timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - i * time_offset)))
+    for i in range(0, no_of_time+1):
+        draw.line((x, ypos+ysize-1-5, x, ypos+ysize-1+3), width=2, fill="black")
+        timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time-i) * time_offset)))
         draw.text((x - ts[0]/2, ypos+ysize-1 + 1), timestr, font=verysmallfont, fill="black")
         x = x + offset
 
