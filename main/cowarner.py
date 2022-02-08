@@ -174,7 +174,7 @@ def draw_cowarner(draw, display_control, changed):
         display_control.display()
 
 
-async def calibration():   # called by user-input thread, performs calibration and ends calibration mode
+def calibration():   # called by user-input thread, performs calibration and ends calibration mode
     global co_warner_status
     global sample_sum
     global no_samples
@@ -215,6 +215,9 @@ def user_input():
     if not cowarner_active:
         rlog.debug("CO-Warner: not active, switching to radar-mode")
         return 1        # immediately go to next mode, if warner is not activated
+    if co_warner_status == 1:
+        calibration()
+        return 19
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
         return 0  # stay in current mode
