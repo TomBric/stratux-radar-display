@@ -174,7 +174,7 @@ def draw_cowarner(draw, display_control, changed):
         display_control.display()
 
 
-def calibration():   # called by user-input thread, performs calibration and ends calibration mode
+async def calibration():   # called by user-input thread, performs calibration and ends calibration mode
     global co_warner_status
     global sample_sum
     global no_samples
