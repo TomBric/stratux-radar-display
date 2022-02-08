@@ -858,7 +858,8 @@ def cowarner(draw, co_values, co_max, r0, timeout):   # draw graph and co values
     draw.text((320, 180+SMALL-VERYSMALL), "R0:", font=verysmallfont, fill="black")
     right_text(draw, 180, "{:5.2f}".format(r0), smallfont, fill="black")
 
-    right = "Calibrate"
+    draw.text((8, sizey - SMALL - 3), "Calibrate", font=smallfont, fill="black", align="left")
+    right = "Reset"
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="black")
