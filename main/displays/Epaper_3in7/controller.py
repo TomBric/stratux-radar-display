@@ -848,7 +848,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
 
 def cowarner(draw, co_values, co_max, r0, timeout):   # draw graph and co values
     centered_text(draw, 0, "CO Warner ", largefont, fill="black")
-    graph(draw, 0, 40, 300, 200, co_values, 0, 120, 50, 100)
+    graph(draw, 0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout)
     if len(co_values) > 0:
         draw.text((320, 60), "CO Act: " + str(co_values[len(co_values)-1]), font=verysmallfont, fill="black")
     draw.text((320, 80), "CO Max: " + str(co_max), font=verysmallfont, fill="black")
