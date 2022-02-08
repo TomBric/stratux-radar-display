@@ -788,7 +788,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     # adjust zero lines to have room for text
     xpos = xpos + ts[0] + space
     xsize = xsize - ts[0] - space
-    ypos = ypos - ts[1]
+    ypos = ypos + ts[1]/2
     ysize = ysize - ts[1]
 
     vlmin_y = ypos + ysize - 1
@@ -816,7 +816,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     ts = draw.textsize(timestr, verysmallfont)
     no_of_time = math.floor(xsize / ts[0] / 2)  # calculate maximum number of time indications
     time_offset = full_time / (no_of_time + 1)
-    offset = math.floor(xsize / no_of_time)
+    offset = math.floor((xsize-1) / no_of_time)
     x = xpos
     acttime = math.floor(time.time())
     for i in range(0, no_of_time+1):
@@ -826,13 +826,13 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
         x = x + offset
     lastpoint = None
     for i in range(0, len(data)):
-        y = ypos + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
+        y = ypos-1 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
         if y < ypos:
             y = ypos   # if value is outside
         if y > ypos+ysize-1:
             x = ypos+ysize-1
         if i >= 1:  # we need at least two points before we draw
-            x = xpos + i * xsize / (len(data)-1)
+            x = xpos-1 + i * xsize / (len(data)-1)
             draw.line([lastpoint, (x,y)], fill="black", width=2)
         else:
             x = xpos
