@@ -814,7 +814,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     full_time = timeout * no_of_values   # time for full display in secs
     timestr = time.strftime("%H:%M", time.gmtime())
     ts = draw.textsize(timestr, verysmallfont)
-    no_of_time = math.floor(xsize / ts[0] / 2)  # calculate maximum number of time indications
+    no_of_time = math.floor(xsize / ts[0] / 2) + 1 # calculate maximum number of time indications
     time_offset = full_time / (no_of_time + 1)
     offset = math.floor((xsize-1) / no_of_time)
     x = xpos
