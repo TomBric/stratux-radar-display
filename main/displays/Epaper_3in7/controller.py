@@ -824,7 +824,6 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
         timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time-i) * time_offset)))
         draw.text((x - ts[0]/2, ypos+ysize-1 + 1), timestr, font=verysmallfont, fill="black")
         x = x + offset
-
     lastpoint = None
     for i in range(0, len(data)):
         y = ypos + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
@@ -832,9 +831,11 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
             y = ypos   # if value is outside
         if y > ypos+ysize-1:
             x = ypos+ysize-1
-        x = xpos + i * xsize / len(data)
-        if lastpoint is not None:
+        if i >= 1:  # we need at least two points before we draw
+            x = xpos + i * xsize / (len(data)-1)
             draw.line([lastpoint, (x,y)], fill="black", width=2)
+        else:
+            x = xpos
         lastpoint = (x, y)
     # value_line 1
     y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
