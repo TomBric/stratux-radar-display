@@ -57,8 +57,9 @@ MIN_SENSOR_READ_TIME = 3
 # minimal time in secs when sensor reading thread  is generally started
 MIN_SENSOR_WAIT_TIME = 0.01
 # minimal time in secs to wait when sensor is not yet ready
+MIN_SENSOR_CALIBRATION_WAIT_TIME = 0.5
+# minimal time in secs to wait during calibration and two sensor readings
 
-# Alarm-Levels, SAE AS 412B-2001 gives some hints
 WARNLEVEL = (
     (50, 5 * 60),        # give indication. 50 ppm more than 5 mins
     (70, 3 * 60),        # more than 70 ppm over 3 mins
@@ -247,8 +248,9 @@ async def read_sensors():
                 await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
             if co_warner_status == 0:   # normal read
                 read_co_value()
+                await asyncio.sleep(MIN_SENSOR_READ_TIME)
             else:
                 calibration()
-            await asyncio.sleep(MIN_SENSOR_READ_TIME)
+                await asyncio.sleep(MIN_SENSOR_CALIBRATION_WAIT_TIME)
     except (asyncio.CancelledError, RuntimeError):
         rlog.debug("Sensor reader terminating ...")
