@@ -114,7 +114,7 @@ def init(activate, config, debug_level):
     g_config = config
     if 'CO_warner_R0' in g_config:
         r0 = g_config['CO_warner_R0']
-        rlog.debug("CO-Warner: found R0 in config, set to {1:.1f} Ohms".format(r0), r0)
+        rlog.debug("CO-Warner: found R0 in config, set to {1:.1f} Ohms".format(), r0)
     value_debug_level = debug_level
     co_timeout = MIN_SENSOR_READ_TIME
     co_max_values = math.floor(CO_MEASUREMENT_WINDOW / co_timeout)
