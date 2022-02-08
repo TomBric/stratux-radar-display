@@ -51,9 +51,7 @@ RSR0_CLEAN = 3333.0   # 3.3 kOhm
 R_DIVIDER = 10000.0   # Value of divider resistor 10 kOhm
 SENSOR_VOLTAGE = 5.0   # voltage for sensor board and divider
 # Measurement cycle
-CO_TIMEOUT = 3     # measure ppm value every 10 secs
 CO_MEASUREMENT_WINDOW = 60 * 60   # one hour, sliding window that is stored for display of ppm values
-CO_MAX_VALUES = CO_MEASUREMENT_WINDOW / CO_TIMEOUT    # maximum no of stored values, currently one hour
 CALIBRATION_TIME = 15   # time for calibration of sensor
 
 # Alarm-Levels, SAE AS 412B-2001 gives some hints
@@ -83,6 +81,8 @@ calibration_end = 0.0     # timer for calibration
 sample_sum = 0.0        # sum of sample-values
 no_samples = 0       # no of samples taken during calibration
 cowarner_changed = True   # for display driver, true if there is something to display
+co_timeout = 1.0    # timeout of reader process, time intervall of readings
+co_max_values = 100   # max number of values, is calculated in init
 #
 
 
@@ -90,7 +90,7 @@ def ppm(rsr0):
     return 10 ** (math.log10(rsr0) - B) / M
 
 
-def init(activate, config, debug_level):
+def init(activate, config, debug_level, timeout):
     global rlog
     global cowarner_active
     global voltage_factor
@@ -98,6 +98,8 @@ def init(activate, config, debug_level):
     global g_config
     global value_debug_level
     global r0
+    global co_timeout
+    global co_max_values
 
     rlog = logging.getLogger('stratux-radar-log')
     if not activate:
@@ -109,6 +111,8 @@ def init(activate, config, debug_level):
         r0 = g_config['CO_warner_R0']
         rlog.debug("CO-Warner: found R0 in config, set to {1:.1f} Ohms".format(r0), r0)
     value_debug_level = debug_level
+    co_timeout = timeout
+    co_max_values = math.floor(CO_MEASUREMENT_WINDOW / co_timeout)
     ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
     if ADS is None:
         cowarner_active = False
@@ -148,7 +152,7 @@ def read_co_value():     # called by sensor_read thread
     if ppm_value > co_max:
         co_max = ppm_value
     co_values.append(ppm_value)
-    if len(co_values) > CO_MAX_VALUES:    # sliding window, remove oldest values
+    if len(co_values) > co_max_values:    # sliding window, remove oldest values
         co_values.pop(0)
 
 
@@ -161,7 +165,7 @@ def draw_cowarner(draw, display_control, changed):
         cowarner_changed = False
         display_control.clear(draw)
         if co_warner_status == 0:   # normal mode, display status line
-            display_control.cowarner(draw, co_values, co_max, r0, CO_MEASUREMENT_WINDOW)
+            display_control.cowarner(draw, co_values, co_max, r0, co_timeout)
         elif co_warner_status == 1:   # calibration mode
             countdown = math.floor(calibration_end - time.time())
             timeleft = str(countdown) + " secs"

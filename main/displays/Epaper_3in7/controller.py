@@ -778,18 +778,22 @@ def flighttime(draw, last_flights):
 
 space = 3  # space between scale figures and zero line
 
-def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2):
+def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
+
+    timestr = time.strftime("%H:%M", time.gmtime())
+    ts = draw.textsize(timestr, verysmallfont)
+
 
     ts = draw.textsize(str(maxvalue), verysmallfont)    # for adjusting x and y
     # adjust zero lines to have room for text
     xpos = xpos + ts[0] + space
     xsize = xsize - ts[0] - space
-    ypos = ypos + ts[1]/2
+    ypos = ypos - ts[1]
     ysize = ysize - ts[1]
 
     vlmin_y = ypos + ysize - 1
     ts = draw.textsize(str(minvalue), verysmallfont)
-    draw.text((xpos - ts[0] - space, vlmin_y - ts[1] / 2), str(minvalue), font=verysmallfont, fill="black")
+    draw.text((xpos - ts[0] - space, vlmin_y - ts[1]), str(minvalue), font=verysmallfont, fill="black")
 
     vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
     ts = draw.textsize(str(value_line1), verysmallfont)
@@ -804,6 +808,23 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     draw.text((xpos - ts[0] - space, vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="black")
 
     draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=3, fill="white")
+
+    # values below x-axis
+    no_of_values = len(data)
+    full_time = timeout * no_of_values   # time for full display in secs
+    timestr = time.strftime("%H:%M", time.gmtime())
+    ts = draw.textsize(timestr, verysmallfont)
+    no_of_time = math.floor(xsize / ts[0] / 2)  # calculate maximum number of time indications
+    time_offset = full_time / (no_of_time + 1)
+    offset = math.floor(xsize / no_of_time)
+    x = xpos
+    acttime = math.floor(time.time())
+    for i in range(0, no_of_time):
+        draw.line((x, ypos+ysize-1-3, x, ypos+ysize-1+3), width=2, fill="black")
+        timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - i * time_offset)))
+        draw.text((x - ts[0]/2, ypos+ysize-1 + 1), timestr, font=verysmallfont, fill="black")
+        x = x + offset
+
     lastpoint = None
     for i in range(0, len(data)):
         y = ypos + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
@@ -825,7 +846,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
         draw.line([(x, y), (x + 3, y)], fill="black", width=1)
 
 
-def cowarner(draw, co_values, co_max, r0, time_window):   # draw graph and co values
+def cowarner(draw, co_values, co_max, r0, timeout):   # draw graph and co values
     centered_text(draw, 0, "CO Warner ", largefont, fill="black")
     graph(draw, 0, 40, 300, 200, co_values, 0, 120, 50, 100)
     if len(co_values) > 0:
