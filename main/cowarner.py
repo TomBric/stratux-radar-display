@@ -183,7 +183,7 @@ async def calibration():   # called by user-input thread, performs calibration a
     global cowarner_changed
 
     cowarner_changed = True  # to display new value
-    countdown = calibration_end - math.floor(time.time()))
+    countdown = calibration_end - math.floor(time.time())
     if countdown > 0:   # continue sensor reading
         ADS.requestADC(0)  # analog 0 input
         while not ADS.isReady():
