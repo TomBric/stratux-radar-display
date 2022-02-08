@@ -226,6 +226,7 @@ def user_input():
         return 1  # next mode to be radar
     if button == 0 and btime == 1:  # left and short
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
+        print("Calibration_end " + str(calibration_end) + " ActTime " + str(math.floor(time.time())))
         sample_sum = 0.0
         no_samples = 0
         calibration()
