@@ -832,7 +832,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
         if y > ypos+ysize-1:
             x = ypos+ysize-1
         if i >= 1:  # we need at least two points before we draw
-            x = xpos-1 + i * xsize / (len(data)-1)
+            x = xpos + i * xsize / (len(data)-1)
             draw.line([lastpoint, (x,y)], fill="black", width=2)
         else:
             x = xpos
