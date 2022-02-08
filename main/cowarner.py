@@ -188,7 +188,6 @@ def calibration():   # called by user-input thread, performs calibration and end
     global cowarner_changed
 
     cowarner_changed = True  # to display new value
-    print("Calibration_end " + str(calibration_end) + " ActTime " + str(math.floor(time.time())))
     countdown = calibration_end - math.floor(time.time())
     if countdown > 0:   # continue sensor reading
         value = ADS.getValue()
@@ -225,7 +224,6 @@ def user_input():
         return 1  # next mode to be radar
     if button == 0 and btime == 1:  # left and short
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
-        print("Calibration_end " + str(calibration_end) + " ActTime " + str(math.floor(time.time())))
         sample_sum = 0.0
         no_samples = 0
         calibration()
