@@ -851,11 +851,14 @@ def cowarner(draw, co_values, co_max, r0, timeout):   # draw graph and co values
     centered_text(draw, 0, "CO Warner ", largefont, fill="black")
     graph(draw, 0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout)
     if len(co_values) > 0:
-        draw.text((320, 60), "CO Act: " + str(co_values[len(co_values)-1]), font=verysmallfont, fill="black")
-    draw.text((320, 80), "CO Max: " + str(co_max), font=verysmallfont, fill="black")
-    draw.text((320, 100), "R0:"+ str(r0), font=verysmallfont, fill="black")
+        draw.text((320, 60), "CO Act:", font=verysmallfont, fill="black")
+        right_text(draw, 60, "{:3d}".format(co_values[len(co_values) - 1]), smallfont, fill="black")
+    draw.text((320, 90), "CO Max:", font=verysmallfont, fill="black")
+    right_text(draw, 90, "{:3d}".format(co_max), smallfont, fill="black")
+    draw.text((320, 180), "R0:", font=verysmallfont, fill="black")
+    right_text(draw, 180, "{:5.2f}".format(r0), smallfont, fill="black")
 
     right = "Calibrate"
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL - 8, "Mode", smallfont, fill="black")
+    centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="black")
