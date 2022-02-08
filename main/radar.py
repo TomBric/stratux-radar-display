@@ -84,10 +84,6 @@ OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
-MIN_SENSOR_READ_TIME = 3
-# minimal time in secs when sensor reading thread  is generally started
-MIN_SENSOR_WAIT_TIME = 0.01
-# minimal time in secs to wait when sensor is not yet ready
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -740,7 +736,7 @@ def main():
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(display_control, url_status_ws)
     flighttime.init(measure_flighttime)
-    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, MIN_SENSOR_READ_TIME)
+    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())

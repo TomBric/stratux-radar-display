@@ -53,6 +53,10 @@ SENSOR_VOLTAGE = 5.0   # voltage for sensor board and divider
 # Measurement cycle
 CO_MEASUREMENT_WINDOW = 60 * 60   # one hour, sliding window that is stored for display of ppm values
 CALIBRATION_TIME = 15   # time for calibration of sensor
+MIN_SENSOR_READ_TIME = 3
+# minimal time in secs when sensor reading thread  is generally started
+MIN_SENSOR_WAIT_TIME = 0.01
+# minimal time in secs to wait when sensor is not yet ready
 
 # Alarm-Levels, SAE AS 412B-2001 gives some hints
 WARNLEVEL = (
@@ -90,7 +94,7 @@ def ppm(rsr0):
     return 10 ** (math.log10(rsr0) - B) / M
 
 
-def init(activate, config, debug_level, timeout):
+def init(activate, config, debug_level):
     global rlog
     global cowarner_active
     global voltage_factor
@@ -111,7 +115,7 @@ def init(activate, config, debug_level, timeout):
         r0 = g_config['CO_warner_R0']
         rlog.debug("CO-Warner: found R0 in config, set to {1:.1f} Ohms".format(r0), r0)
     value_debug_level = debug_level
-    co_timeout = timeout
+    co_timeout = MIN_SENSOR_READ_TIME
     co_max_values = math.floor(CO_MEASUREMENT_WINDOW / co_timeout)
     ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
     if ADS is None:
@@ -238,11 +242,11 @@ async def read_sensors():
     try:
         rlog.debug("Sensor reader active ...")
         while True:
-            cowarner.request_read()
-            while not cowarner.ready():
+            request_read()
+            while not ready():
                 await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
             if co_warner_status == 0:   # normal read
-                cowarner.read_co_value()
+                read_co_value()
             else:
                 calibration()
             await asyncio.sleep(MIN_SENSOR_READ_TIME)
