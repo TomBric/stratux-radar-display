@@ -165,8 +165,7 @@ def draw_cowarner(draw, display_control, changed):
     global cowarner_changed
     global co_warner_status
 
-
-    if changed or cowarner_changed:
+    if cowarner_active and (changed or cowarner_changed):
         cowarner_changed = False
         display_control.clear(draw)
         if co_warner_status == 0:   # normal mode, display status line
