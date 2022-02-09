@@ -851,9 +851,9 @@ def cowarner(draw, co_values, co_max, r0, timeout):   # draw graph and co values
     centered_text(draw, 0, "CO Warner ", largefont, fill="black")
     graph(draw, 0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout)
     if len(co_values) > 0:
-        draw.text((320, 60+SMALL-VERYSMALL), "CO Act:", font=verysmallfont, fill="black")
+        draw.text((320, 60+SMALL-VERYSMALL), "CO act:", font=verysmallfont, fill="black")
         right_text(draw, 60, "{:3d}".format(co_values[len(co_values) - 1]), smallfont, fill="black")
-    draw.text((320, 90+SMALL-VERYSMALL), "CO Max:", font=verysmallfont, fill="black")
+    draw.text((320, 90+SMALL-VERYSMALL), "CO max:", font=verysmallfont, fill="black")
     right_text(draw, 90, "{:3d}".format(co_max), smallfont, fill="black")
     draw.text((320, 180+SMALL-VERYSMALL), "R0 [Ohms]:", font=verysmallfont, fill="black")
     right_text(draw, 180, "{:5.2f}".format(r0), smallfont, fill="black")

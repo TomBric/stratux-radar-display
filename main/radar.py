@@ -573,6 +573,7 @@ async def user_interface():
 
             if next_mode > 0:
                 ui_changed = True
+                rlog.debug("User Interface: global mode changing from: "+str(global_mode)+ " to " + str(next_mode))
                 global_mode = next_mode
 
             current_time = time.time()
