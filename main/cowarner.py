@@ -172,10 +172,12 @@ def draw_cowarner(draw, display_control, changed):
         if co_warner_status == 0:   # normal mode, display status line
             display_control.cowarner(draw, co_values, co_max, r0, co_timeout)
         elif co_warner_status == 1:   # calibration mode
-            countdown = math.floor(calibration_end - time.time())
+            countdown = calibration_end - math.floor(time.time())
+            if countdown < 0:
+                countdown = 0   # sometimes draw thread was quicker, thus to avoid -1
             timeleft = str(countdown) + " secs"
-            display_control.text_screen(draw, "CO Warner", "calibration",
-                                        "Keep sensor in fresh air.\n" + timeleft, "", "", "")
+            display_control.text_screen(draw, "CO sensor calibration", timeleft,
+                                        "\n\nKeep sensor in fresh air.\n", "", "", "")
         display_control.display()
 
 
