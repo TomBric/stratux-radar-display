@@ -184,15 +184,15 @@ def read_co_value():     # called by sensor_read thread
 
     # for testing when nothing is s connected
     ppm_value = 20
-    if time.time() - xxx_starttime > 310:
+    if time.time() - xxx_starttime > 20:
         ppm_value = 60
-    elif time.time() - xxx_starttime > 420:
+    if time.time() - xxx_starttime > 310:
         ppm_value = 120
-    elif time.time() - xxx_starttime > 510:
+    if time.time() - xxx_starttime > 510:
         ppm_value = 410
-    elif time.time() - xxx_starttime > 800:
+    if time.time() - xxx_starttime > 800:
         ppm_value = 140
-    elif time.time() - xxx_starttime > 1000:
+    if time.time() - xxx_starttime > 1000:
         ppm_value = 30
 
 
