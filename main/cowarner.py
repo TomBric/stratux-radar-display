@@ -191,7 +191,7 @@ def read_co_value():     # called by sensor_read thread
     co_values.append(ppm_value)
     if len(co_values) > co_max_values:    # sliding window, remove oldest values
         co_values.pop(0)
-    check_alarm_level(co_values[len(co_values)])
+    check_alarm_level(ppm_value)
 
 
 def draw_cowarner(draw, display_control, changed):
