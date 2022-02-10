@@ -183,6 +183,7 @@ def read_co_value():     # called by sensor_read thread
     ppm_value = round(ppm(rs_gas / r0))
 
     # for testing when nothing is s connected
+    ppm_value = 20
     if time.time() - xxx_starttime > 310:
         ppm_value = 60
     elif time.time() - xxx_starttime > 620:
