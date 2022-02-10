@@ -160,7 +160,9 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
                         alarmlevel = i
                         warnlevel[i][0] = None
                         warnlevel[i][1] = None
-        else:   # value below threshold
+
+    for i in range(len(WARNLEVEL)-1, 0, -1):
+        if new_value <= WARNLEVEL[i][0]:
             if warnlevel[i][1] is None:   # not yet triggered, first underrun
                 warnlevel[i][1] = time.time()
                 warnlevel[i][0] = None
@@ -188,7 +190,7 @@ def read_co_value():     # called by sensor_read thread
 
     # for testing when nothing is s connected
     ppm_value = 20
-    if time.time() - xxx_starttime > 10:
+    if time.time() - xxx_starttime > 15:
         ppm_value = 60
     if time.time() - xxx_starttime > 5*60+20:
         ppm_value = 120
