@@ -158,6 +158,8 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
                     if alarmlevel < i:   # only set when level or higher was not yet reached
                         rlog.debug("CO Warner: Alarmlevel "+ str(i) + " reached: " + WARNLEVEL[i][2])
                         alarmlevel = i
+                        warnlevel[i][0] = None
+                        warnlevel[i][1] = None
         else:   # value below threshold
             if warnlevel[i][1] is None:   # not yet triggered, first underrun
                 warnlevel[i][1] = time.time()
@@ -168,6 +170,8 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
                         rlog.debug("CO Warner: Alarmlevel " + str(i) + " underrun. New level: " + str(i-1) +": "
                                     + WARNLEVEL[i-1][2])
                         alarmlevel = i-1
+                        warnlevel[i][0] = None
+                        warnlevel[i][1] = None
 
 xxx_starttime=time.time()
 
