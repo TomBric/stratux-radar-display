@@ -111,8 +111,7 @@ def read_flights():
     except (OSError, IOError, ValueError) as e:
         rlog.debug("FlighttimeUI: Error " + str(e) + " reading " + SAVED_FLIGHTS)
         return None
-    rlog.debug("FlighttimeUI: Flights read from " + SAVED_FLIGHTS + ": " + json.dumps(config, sort_keys=True, indent=4,
-                                                                                      default=default))
+
     # read back last_flights to datetime
     if 'last_flights' in config:
         for i in config['last_flights']:
