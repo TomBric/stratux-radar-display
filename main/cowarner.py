@@ -72,7 +72,7 @@ WARNLEVEL = (
 
 # globals
 alarmlevel = 0   # see above level for warnlevel 0-5
-warnlevel = [(None,None), (None,None), (None, None), (None, None), (None, None), (None, None)]
+warnlevel = [[None,None], [None,None], [None, None], [None, None], [None, None], [None, None]]
 # time when this alarmlevel was first reached or underrun
 r0 = 1.0     # value for R0 in clean air. Calculated during calibration
 cowarner_active = False
