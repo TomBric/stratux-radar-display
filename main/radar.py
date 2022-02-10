@@ -588,6 +588,7 @@ async def user_interface():
                     ui_changed = True
     except asyncio.CancelledError:
         rlog.debug("UI task terminating ...")
+        radarbuttons.cleanup()
 
 
 async def display_and_cutoff():
