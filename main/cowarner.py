@@ -182,7 +182,7 @@ def read_co_value():     # called by sensor_read thread
     ppm_value = round(ppm(rs_gas / r0))
 
     # for testing when nothings connected
-    ppm_value = 400
+    ppm_value = 120
     # math.floor(time.time()) % 140
 
     rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {0:d}"
