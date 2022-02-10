@@ -169,6 +169,7 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
                                     + WARNLEVEL[i-1][2])
                         alarmlevel = i-1
 
+xxx_starttime=time.time()
 
 def read_co_value():     # called by sensor_read thread
     global cowarner_changed
@@ -181,8 +182,19 @@ def read_co_value():     # called by sensor_read thread
     rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
     ppm_value = round(ppm(rs_gas / r0))
 
-    # for testing when nothings connected
-    ppm_value = 120
+    # for testing when nothing is s connected
+    if time.time() - xxx_starttime > 310:
+        ppm_value = 60
+    elif time.time() - xxx_starttime > 620:
+        ppm_value = 120
+    elif time.time() - xxx_starttime > 910:
+        ppm_value = 410
+    elif time.time() - xxx_starttime > 1200:
+        ppm_value = 140
+    elif time.time() - xxx_starttime > 1510:
+        ppm_value = 30
+
+
     # math.floor(time.time()) % 140
 
     rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {0:d}"
