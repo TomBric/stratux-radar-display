@@ -61,17 +61,18 @@ MIN_SENSOR_CALIBRATION_WAIT_TIME = 0.5
 # minimal time in secs to wait during calibration and two sensor readings
 
 WARNLEVEL = (
-    (50, 5 * 60),        # give indication. 50 ppm more than 5 mins
-    (70, 3 * 60),        # more than 70 ppm over 3 mins
-    (100, 2 * 60),       # more than 100 ppm over 2 mins
-    (300, 1 * 60),      # more than 300 ppm over 1 min
-    (400, 0.5 * 60)     # more than 400 ppm over 30 secs
+    (0, 0, "No CO alarm")
+    (50, 5 * 60, "50ppm for more than 5 mins"),
+    (70, 3 * 60, "70 ppm for more than 3 mins"),
+    (100, 2 * 60, "100ppm for more than 2 mins"),
+    (300, 1 * 60, "300ppm for more than 1 min"),
+    (400, 0.5 * 60, "400ppm for more than 30 secs")
 )
-
-ALARM_RESET = (50, 3 * 60)       # reset alarm, if for 3 mins CO level below 50 ppm
 
 
 # globals
+alarmlevel = 0   # see above level for warnlevel 0-5
+warnlevel = [None, None, None, None, None, None]   # time when this alarmlevel was first reached
 r0 = 1.0     # value for R0 in clean air. Calculated during calibration
 cowarner_active = False
 voltage_factor = 1.0
@@ -138,6 +139,36 @@ def request_read():
 def ready():
     return ADS.isReady()
 
+
+def alarm_level():   # to be called from outside, returns 0 if no alarm, 1-5 depending on ALARMLEVEL
+    return alarmlevel, WARNLEVEL[alarmlevel][3]
+
+def check_alarm_level(new_value):   #check wether new alarm level should be reached, called by sensor reader thread
+    global alarmlevel
+
+    #  check whether level is overrun/underrun
+    for i in range(1, len(WARNLEVEL)):    # check all warnleves, e.g. (50, 3*30, "No CO alarm", None)
+        if new_value >= WARNLEVEL[i][0]:
+            if warnlevel[i][0] is None:   # not yet triggered, first overrun
+                warnlevel[i][0] = time.gmtime()
+                warnlevel[i][1] = None
+            else:   # warnlevel was already reached
+                if time.gmtime() - warnlevel[i][0] >= WARNLEVEL[i][1]:
+                    if alarmlevel < i:   # only set when level or higher was not yet reached
+                        rlog.debug("CO Warner: Alarmlevel "+ str(i) + " reached: " + WARNLEVEL[i][2])
+                        alarmlevel = i
+        else:   # value below threshold
+            if warnlevel[i][1] is None:   # not yet triggered, first underrun
+                warnlevel[i][1] = time.gmtime()
+                warnlevel[i][0] = None
+            else:   # warnlevel was already reached
+                if time.gmtime() - warnlevel[i][1] >= WARNLEVEL[i][1]:
+                    if alarmlevel > i:  # only set when level was higher
+                        rlog.debug("CO Warner: Alarmlevel " + str(i) + " underrun. New level: " + str(i-1) +": "
+                                    + WARNLEVEL[i-1][2])
+                        alarmlevel = i-1
+
+
 def read_co_value():     # called by sensor_read thread
     global cowarner_changed
     global co_values
@@ -150,7 +181,8 @@ def read_co_value():     # called by sensor_read thread
     ppm_value = round(ppm(rs_gas / r0))
 
     # for testing when nothings connected
-    ppm_value = math.floor(time.time()) % 140
+    ppm_value = 70
+    # math.floor(time.time()) % 140
 
     rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {0:d}"
              .format(value, sensor_volt, ppm_value))
@@ -159,6 +191,7 @@ def read_co_value():     # called by sensor_read thread
     co_values.append(ppm_value)
     if len(co_values) > co_max_values:    # sliding window, remove oldest values
         co_values.pop(0)
+    check_alarm_level(co_values[len])
 
 
 def draw_cowarner(draw, display_control, changed):
