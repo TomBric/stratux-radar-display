@@ -61,7 +61,7 @@ MIN_SENSOR_CALIBRATION_WAIT_TIME = 0.5
 # minimal time in secs to wait during calibration and two sensor readings
 
 WARNLEVEL = (
-    (0, 0, "No CO alarm")
+    (0, 0, "No CO alarm"),
     (50, 5 * 60, "50ppm for more than 5 mins"),
     (70, 3 * 60, "70 ppm for more than 3 mins"),
     (100, 2 * 60, "100ppm for more than 2 mins"),
