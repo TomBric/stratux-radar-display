@@ -62,11 +62,11 @@ MIN_SENSOR_CALIBRATION_WAIT_TIME = 0.5
 
 WARNLEVEL = (
     (0, 0, "No CO alarm"),
-    (50, 5 * 60, "50ppm for more than 5 mins"),
-    (70, 3 * 60, "70 ppm for more than 3 mins"),
-    (100, 2 * 60, "100ppm for more than 2 mins"),
-    (300, 1 * 60, "300ppm for more than 1 min"),
-    (400, 0.5 * 60, "400ppm for more than 30 secs")
+    (50, 5 * 60, "50ppm more than 5 mins"),
+    (70, 3 * 60, "70 ppm more than 3 mins"),
+    (100, 2 * 60, "100ppm more than 2 mins"),
+    (300, 1 * 60, "300ppm more than 1 min"),
+    (400, 0.5 * 60, "400ppm more than 30 secs")
 )
 
 
@@ -240,7 +240,8 @@ def draw_cowarner(draw, display_control, changed):
         cowarner_changed = False
         display_control.clear(draw)
         if co_warner_status == 0:   # normal mode, display status line
-            display_control.cowarner(draw, co_values, co_max, r0, co_timeout)
+            display_control.cowarner(draw, co_values, co_max, r0, co_timeout, alarmlevel, WARNLEVEL[alarmlevel][0],
+                                     WARNLEVEL[alarmlevel][1])
         elif co_warner_status == 1:   # calibration mode
             countdown = calibration_end - math.floor(time.time())
             if countdown < 0:
