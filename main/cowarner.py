@@ -177,7 +177,7 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
                                     + WARNLEVEL[i-1][2])
                         alarmlevel = i - 1
                         # reset all higher alarmlevels
-                        for j in range(j, 0, -1):
+                        for j in range(i, 0, -1):
                             warnlevel[j][0] = None
                             warnlevel[j][1] = None
 
@@ -208,6 +208,16 @@ def read_co_value():     # called by sensor_read thread
         ppm_value = 140
     if time.time() - xxx_starttime > 15*60+35:
         ppm_value = 30
+    if time.time() - xxx_starttime > 16*60+35:
+        ppm_value = 120
+    if time.time() - xxx_starttime > 17*60+35:
+        ppm_value = 40
+    if time.time() - xxx_starttime > 18 * 60:
+        ppm_value = 310
+    if time.time() - xxx_starttime > 1 * 60:
+        ppm_value = 20
+
+
 
 
     # math.floor(time.time()) % 140
