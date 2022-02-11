@@ -148,6 +148,7 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
     global alarmlevel
 
     #  check whether level is overrun/underrun
+    print("warnlevel: " + str(warnlevel))
     for i in range(alarmlevel+1, len(WARNLEVEL)):    # check all warnleves above, e.g. (50, 3*30, "No CO alarm", None)
         if new_value >= WARNLEVEL[i][0]:
             if warnlevel[i][0] is None:   # not yet triggered, first overrun
@@ -157,6 +158,7 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
                 if time.time() - warnlevel[i][0] >= WARNLEVEL[i][1]:
                     if alarmlevel < i:   # only set when level or higher was not yet reached
                         rlog.debug("CO Warner: Alarmlevel "+ str(i) + " reached: " + WARNLEVEL[i][2])
+                        print("warnlevel: " + str(warnlevel))
                         warnlevel[i][0] = None
                         warnlevel[i][1] = None
                         alarmlevel = i
@@ -171,6 +173,7 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
                     if alarmlevel > i:  # only set when level was higher
                         rlog.debug("CO Warner: Alarmlevel " + str(i) + " underrun. New level: " + str(i-1) +": "
                                     + WARNLEVEL[i-1][2])
+                        print("warnlevel: " + str(warnlevel))
                         warnlevel[i][0] = None
                         warnlevel[i][1] = None
                         alarmlevel = i - 1
