@@ -848,19 +848,18 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
 
 
 def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
-    centered_text(draw, 0, "CO Warner ", largefont, fill="black")
+    if alarmlevel == 0:
+        centered_text(draw, 0, "CO Warner: No CO alarm", largefont, fill="black")
+    else:
+        if alarmperiod > 60:
+            alarmstr = "CO: {:d} ppm longer {:d} min".format(alarmppm,math.floor(alarmperiod/60))
+        else:
+            alarmstr = "CO: {:d} ppm longer {:d} sec".format(alarmppm, math.floor(alarmperiod))
+        centered_text(draw, 0, alarmstr, largefont, fill="black")
     graph(draw, 0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout)
     draw.text((320, 50 + SMALL - VERYSMALL), "Warnlevel:", font=verysmallfont, fill="black")
     right_text(draw, 50, "{:3d}".format(alarmlevel), smallfont, fill="black")
 
-    if alarmlevel == 0:
-        draw.text((320, 80), "No CO alarm", font=verysmallfont, fill="black")
-    else:
-        if alarmperiod > 60:
-            alarmstr = "{:d} min".format(math.floor(alarmperiod/60))
-        else:
-            alarmstr = "{:d} sec".format(alarmperiod)
-        draw.text((320, 80), "{:d}ppm longer {:s}".format(alarmppm, alarmstr), font=verysmallfont, fill="black")
     if len(co_values) > 0:
         draw.text((320, 120+SMALL-VERYSMALL), "CO act:", font=verysmallfont, fill="black")
         right_text(draw, 120, "{:3d}".format(co_values[len(co_values) - 1]), smallfont, fill="black")
