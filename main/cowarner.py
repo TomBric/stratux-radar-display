@@ -214,7 +214,7 @@ def read_co_value():     # called by sensor_read thread
         ppm_value = 40
     if time.time() - xxx_starttime > 18 * 60:
         ppm_value = 310
-    if time.time() - xxx_starttime > 1 * 60:
+    if time.time() - xxx_starttime > 19 * 60:
         ppm_value = 20
 
 
