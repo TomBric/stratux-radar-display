@@ -66,8 +66,8 @@ WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time betwe
     (50, 5 * 60, "50ppm more than 5 mins", 1 * 60),
     (70, 3 * 60, "70 ppm more than 3 mins", 1 * 60),
     (100, 2 * 60, "100ppm more than 2 mins", 30),
-    (300, 1 * 60, "300ppm more than 1 min", 30),
-    (400, 0.5 * 60, "400ppm more than 30 secs", 20)
+    (300, 1 * 60, "300ppm more than 1 min", 15),
+    (400, 0.5 * 60, "400ppm more than 30 secs", 10)
 )
 
 
