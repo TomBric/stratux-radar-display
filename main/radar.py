@@ -182,7 +182,7 @@ def draw_display(draw):
         display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
                                   sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
-                                  basemode, extsound_active)
+                                  basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1])
         draw_all_ac(draw, all_ac)
         display_control.display()
         situation['was_changed'] = False

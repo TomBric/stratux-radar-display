@@ -39,6 +39,7 @@ import ADS1x15
 import time
 import asyncio
 import statusui
+import radarbluez
 
 
 # constants
@@ -60,19 +61,19 @@ MIN_SENSOR_WAIT_TIME = 0.01
 MIN_SENSOR_CALIBRATION_WAIT_TIME = 0.5
 # minimal time in secs to wait during calibration and two sensor readings
 
-WARNLEVEL = (
+WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time between repeats for spoken warning
     (0, 0, "No CO alarm"),
-    (50, 5 * 60, "50ppm more than 5 mins"),
-    (70, 3 * 60, "70 ppm more than 3 mins"),
-    (100, 2 * 60, "100ppm more than 2 mins"),
-    (300, 1 * 60, "300ppm more than 1 min"),
-    (400, 0.5 * 60, "400ppm more than 30 secs")
+    (50, 5 * 60, "50ppm more than 5 mins", 3 * 60),
+    (70, 3 * 60, "70 ppm more than 3 mins", 2 * 60),
+    (100, 2 * 60, "100ppm more than 2 mins", 1 * 60),
+    (300, 1 * 60, "300ppm more than 1 min", 1 * 60),
+    (400, 0.5 * 60, "400ppm more than 30 secs", 30)
 )
 
 
 # globals
 alarmlevel = 0   # see above level for warnlevel 0-5
-warnlevel = [[None,None], [None,None], [None, None], [None, None], [None, None], [None, None]]
+warnlevel = [[None, None], [None, None], [None, None], [None, None], [None, None], [None, None]]
 # time when this alarmlevel was first reached or underrun
 r0 = 1.0     # value for R0 in clean air. Calculated during calibration
 cowarner_active = False
@@ -90,6 +91,9 @@ no_samples = 0       # no of samples taken during calibration
 cowarner_changed = True   # for display driver, true if there is something to display
 co_timeout = 1.0    # timeout of reader process, time intervall of readings
 co_max_values = 100   # max number of values, is calculated in init
+speak_warning = True
+last_warning = 0.0   # timestamp of last warning
+
 #
 
 
@@ -137,14 +141,16 @@ def init(activate, config, debug_level):
 def request_read():
     return ADS.requestADC(0)  # analog 0 input
 
+
 def ready():
     return ADS.isReady()
 
 
-def alarm_level():   # to be called from outside, returns 0 if no alarm, 1-5 depending on ALARMLEVEL
+def alarm_level():   # to be called from outside, returns 0 if no alarm, 1-5 depending on ALARMLEVEL and alarmstring
     return alarmlevel, WARNLEVEL[alarmlevel][3]
 
-def check_alarm_level(new_value):   #check wether new alarm level should be reached, called by sensor reader thread
+
+def check_alarm_level(new_value):   # check wether new alarm level should be reached, called by sensor reader thread
     global alarmlevel
 
     #  check whether level is overrun/underrun
@@ -157,7 +163,7 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
             else:   # warnlevel was already reached
                 if time.time() - warnlevel[i][0] >= WARNLEVEL[i][1]:
                     if alarmlevel < i:   # only set when level or higher was not yet reached
-                        rlog.debug("CO Warner: Alarmlevel "+ str(i) + " reached: " + WARNLEVEL[i][2])
+                        rlog.debug("CO Warner: Alarmlevel " + str(i) + " reached: " + WARNLEVEL[i][2])
                         alarmlevel = i
                         warnlevel[i][0] = None  # reset indicator
         else:
@@ -167,13 +173,14 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
             else:   # warnlevel was already reached
                 if time.time() - warnlevel[i][1] >= WARNLEVEL[i][1]:
                     if alarmlevel > i-1:  # only set when level was higher
-                        rlog.debug("CO Warner: Alarmlevel " + str(i) + " underrun. New level: " + str(i-1) +": "
-                                    + WARNLEVEL[i-1][2])
+                        rlog.debug("CO Warner: Alarmlevel " + str(i) + " underrun. New level: " + str(i-1) + ": "
+                                   + WARNLEVEL[i-1][2])
                         alarmlevel = i - 1
                         warnlevel[i][1] = None
 
 
 xxx_starttime=time.time()
+
 
 def read_co_value():     # called by sensor_read thread
     global cowarner_changed
@@ -208,9 +215,6 @@ def read_co_value():     # called by sensor_read thread
         ppm_value = 310
     if time.time() - xxx_starttime > 19 * 60:
         ppm_value = 20
-
-
-
 
     # math.floor(time.time()) % 140
 
@@ -302,6 +306,14 @@ def user_input():
     return 19  # no mode change
 
 
+def speak_co_warning():
+    global last_warning
+    if speak_warning and alarmlevel > 0:
+        if time.time() - last_warning >= WARNLEVEL[alarmlevel][3]:
+            radarbluez.speak("CO Alarm " + WARNLEVEL[alarmlevel][2])
+            last_warning = time.time()
+
+
 async def read_sensors():
     try:
         rlog.debug("Sensor reader active ...")
@@ -311,6 +323,7 @@ async def read_sensors():
                 await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
             if co_warner_status == 0:   # normal read
                 read_co_value()
+                speak_co_warning()
                 await asyncio.sleep(MIN_SENSOR_READ_TIME)
             else:
                 calibration()
