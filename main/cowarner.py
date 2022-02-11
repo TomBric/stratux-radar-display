@@ -148,7 +148,7 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
     global alarmlevel
 
     #  check whether level is overrun/underrun
-    print("warnlevel: " + str(warnlevel))
+    # print("warnlevel: " + str(warnlevel))
     for i in range(1, len(WARNLEVEL)):    # check all warnleves  e.g. (50, 3*30, "No CO alarm", None)
         if new_value >= WARNLEVEL[i][0]:
             warnlevel[i][1] = None  # reset indicator for below
