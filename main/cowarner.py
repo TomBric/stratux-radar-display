@@ -149,12 +149,11 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
 
     #  check whether level is overrun/underrun
     print("warnlevel: " + str(warnlevel))
-    for i in range(0, len(WARNLEVEL)):    # check all warnleves  e.g. (50, 3*30, "No CO alarm", None)
+    for i in range(1, len(WARNLEVEL)):    # check all warnleves  e.g. (50, 3*30, "No CO alarm", None)
         if new_value >= WARNLEVEL[i][0]:
             warnlevel[i][1] = None  # reset indicator for below
             if warnlevel[i][0] is None:   # not yet triggered, first overrun
                 warnlevel[i][0] = time.time()
-                warnlevel[i][1] = None
             else:   # warnlevel was already reached
                 if time.time() - warnlevel[i][0] >= WARNLEVEL[i][1]:
                     if alarmlevel < i:   # only set when level or higher was not yet reached
