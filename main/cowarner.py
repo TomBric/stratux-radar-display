@@ -314,7 +314,7 @@ def speak_co_warning(changed):
     global last_warning
     if speak_warning and alarmlevel > 0:
         if changed or time.time() - last_warning >= WARNLEVEL[alarmlevel][3]:
-            radarbluez.speak("CO Alarm!" + str(WARNLEVEL[alarmlevel][0]) + " ppm")
+            radarbluez.speak("CO Alarm! " + str(WARNLEVEL[alarmlevel][0]) + " ppm")
             last_warning = time.time()
 
 
