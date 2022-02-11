@@ -149,8 +149,9 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
 
     #  check whether level is overrun/underrun
     print("warnlevel: " + str(warnlevel))
-    for i in range(alarmlevel+1, len(WARNLEVEL)):    # check all warnleves above, e.g. (50, 3*30, "No CO alarm", None)
+    for i in range(0, len(WARNLEVEL)):    # check all warnleves  e.g. (50, 3*30, "No CO alarm", None)
         if new_value >= WARNLEVEL[i][0]:
+            warnlevel[i][1] = None  # reset indicator for below
             if warnlevel[i][0] is None:   # not yet triggered, first overrun
                 warnlevel[i][0] = time.time()
                 warnlevel[i][1] = None
@@ -159,27 +160,19 @@ def check_alarm_level(new_value):   #check wether new alarm level should be reac
                     if alarmlevel < i:   # only set when level or higher was not yet reached
                         rlog.debug("CO Warner: Alarmlevel "+ str(i) + " reached: " + WARNLEVEL[i][2])
                         alarmlevel = i
-                        # reset all lower alarm levels
-                        for j in range(0, i+1):
-                            warnlevel[j][0] = None
-                            warnlevel[j][1] = None
-
-
-    for i in range(alarmlevel, 0, -1):
-        if new_value <= WARNLEVEL[i][0]:
+                        warnlevel[i][0] = None  # reset indicator
+        else:
+            warnlevel[i][0] = None  # reset indicator for above
             if warnlevel[i][1] is None:   # not yet triggered, first underrun
                 warnlevel[i][1] = time.time()
-                warnlevel[i][0] = None
             else:   # warnlevel was already reached
                 if time.time() - warnlevel[i][1] >= WARNLEVEL[i][1]:
                     if alarmlevel > i-1:  # only set when level was higher
                         rlog.debug("CO Warner: Alarmlevel " + str(i) + " underrun. New level: " + str(i-1) +": "
                                     + WARNLEVEL[i-1][2])
                         alarmlevel = i - 1
-                        # reset all higher alarmlevels
-                        for j in range(i, 0, -1):
-                            warnlevel[j][0] = None
-                            warnlevel[j][1] = None
+                        warnlevel[i][1] = None
+
 
 xxx_starttime=time.time()
 
