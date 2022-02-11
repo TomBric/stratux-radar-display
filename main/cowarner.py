@@ -62,7 +62,7 @@ MIN_SENSOR_CALIBRATION_WAIT_TIME = 0.5
 # minimal time in secs to wait during calibration and two sensor readings
 
 WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time between repeats for spoken warning
-    (0, 0, "No CO alarm"),
+    (0, 0, "No CO alarm", 0),
     (50, 5 * 60, "50ppm more than 5 mins", 3 * 60),
     (70, 3 * 60, "70 ppm more than 3 mins", 2 * 60),
     (100, 2 * 60, "100ppm more than 2 mins", 1 * 60),
@@ -147,7 +147,7 @@ def ready():
 
 
 def alarm_level():   # to be called from outside, returns 0 if no alarm, 1-5 depending on ALARMLEVEL and alarmstring
-    return alarmlevel, WARNLEVEL[alarmlevel][3]
+    return alarmlevel, WARNLEVEL[alarmlevel][2]
 
 
 def check_alarm_level(new_value):   # check wether new alarm level should be reached, called by sensor reader thread
