@@ -26,14 +26,11 @@ if [ "$#" -lt 2 ]; then
     echo "Usage: " $0 "  <fail output> dev|main [v64]"
     exit 1
 fi
-if [ "$#" -lt 3 ]; then
-    IMAGE_VERSION="armhf"
-    outprefix="stratux-display"
-else
-    if [[ $2 == "v64" ]]; then
-      IMAGE_VERSION="arm64"
-      outprefix="stratux-display64"
-    fi
+IMAGE_VERSION="armhf"
+outprefix="stratux-display"
+if [ "$#" -gt 2 ] &&  [ $2 == "v64" ]; then
+    IMAGE_VERSION="arm64"
+    outprefix="stratux-display64"
 fi
 
 BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2022-01-28/2022-01-28-raspios-bullseye-armhf.zip"
