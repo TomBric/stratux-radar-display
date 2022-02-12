@@ -57,9 +57,9 @@ if [[ $bootoffset == "*" ]]; then
 fi
 bootoffset=$(( 512*bootoffset ))
 
-# Original image partition is too small to hold our stuff.. resize it to 4000 Mb
+# Original image partition is too small to hold our stuff.. resize it to 5120 Mb
 # Append one GB and truncate to size
-truncate -s 4000M $IMGNAME || die "Image resize failed"
+truncate -s 5120M $IMGNAME || die "Image resize failed"
 lo=$(losetup -f)
 losetup $lo $IMGNAME
 partprobe $lo
