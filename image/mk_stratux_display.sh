@@ -6,9 +6,11 @@
 # If you want to build on x86 with aarch64 emulation, additionally install qemu-user-static qemu-system-arm
 # Run this script as root.
 # Run with argument "dev" to get the dev branch from github, otherwise with main
+# Run with optional argument "v64" to create 64 bit based images for zero2
 # call examples:
 #   sudo /bin/bash mk_stratux_display.sh "Create failed" dev
 #   sudo /bin/bash mk_stratux_display.sh "Create failed" main
+# sudo /bin/bash mk_stratux_display.sh "Create failed" main v64
 
 set -x
 BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2022-01-28/2022-01-28-raspios-bullseye-armhf.zip"
@@ -24,8 +26,17 @@ die() {
 }
 
 if [ "$#" -lt 2 ]; then
-    echo "Usage: " $0 "  <fail output> dev|main"
+    echo "Usage: " $0 "  <fail output> dev|main [v64]"
     exit 1
+fi
+if [ "$#" -lt 3 ]; then
+    IMAGE_VERSION="armhf"
+    outprefix="stratux-display"
+else
+    if [[ $2 == "v64" ]]; then
+      IMAGE_VERSION="arm64"
+      outprefix="stratux-display64"
+    fi
 fi
 
 # cd to script directory
@@ -97,7 +108,6 @@ cd $SRCDIR
 # make sure the local version is also on current status
 sudo -u pi git pull --rebase
 outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
-outprefix="stratux-display"
 cd $TMPDIR
 
 # Rename and zip oled version
