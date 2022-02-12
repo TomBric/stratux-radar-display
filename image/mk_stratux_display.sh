@@ -33,7 +33,7 @@ if [ "$#" -gt 2 ] &&  [ $3 == "v64" ]; then
     outprefix="stratux-display64"
 fi
 
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2022-01-28/2022-01-28-raspios-bullseye-armhf.zip"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2022-01-28/2022-01-28-raspios-bullseye-$IMAGE_VERSION.zip"
 ZIPNAME="2022-01-28-raspios-bullseye-$IMAGE_VERSION.zip"
 IMGNAME="${ZIPNAME%.*}.img"
 
