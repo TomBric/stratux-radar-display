@@ -328,8 +328,8 @@ def speak_co_warning(changed):
             last_warning = time.time()
 
 
-def set_co_indication():
-    if indicate_co_warning:
+def set_co_indication(changed):
+    if changed and indicate_co_warning:
         if alarmlevel > 0 :
             GPIO.output(IOPIN, GPIO.HIGH)
             rlog.debug("CO-Warner: setting GPIO Pin " + str(IOPIN) + " to HIGH for co-alarm")
@@ -348,7 +348,7 @@ async def read_sensors():
             if co_warner_status == 0:   # normal read
                 changed = read_co_value()
                 speak_co_warning(changed)
-                set_co_indication()
+                set_co_indication(changed)
                 await asyncio.sleep(MIN_SENSOR_READ_TIME)
             else:
                 calibration()
