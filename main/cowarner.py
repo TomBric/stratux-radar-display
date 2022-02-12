@@ -144,6 +144,7 @@ def init(activate, config, debug_level, co_indication):
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         GPIO.setup(IOPIN, GPIO.OUT, initial=GPIO.LOW)
+        rlog.debug("CO-Warner: indication for co alarm on PIN " + str(IOPIN) + " activated")
     return cowarner_active
 
 
