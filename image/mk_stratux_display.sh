@@ -13,10 +13,7 @@
 # sudo /bin/bash mk_stratux_display.sh "Create failed" main v64
 
 set -x
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2022-01-28/2022-01-28-raspios-bullseye-armhf.zip"
-ZIPNAME="2022-01-28-raspios-bullseye-armhf.zip"
-IMGNAME="${ZIPNAME%.*}.img"
-TMPDIR="/home/pi/stratux-display-tmp"
+TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 
 
@@ -38,6 +35,10 @@ else
       outprefix="stratux-display64"
     fi
 fi
+
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2022-01-28/2022-01-28-raspios-bullseye-armhf.zip"
+ZIPNAME="2022-01-28-raspios-bullseye-$IMAGE_VERSION.zip"
+IMGNAME="${ZIPNAME%.*}.img"
 
 # cd to script directory
 cd "$(dirname "$0")"
