@@ -135,6 +135,7 @@ bluetooth_active = False   # bluetooth successfully activated
 optical_alive = -1
 measure_flighttime = False   # True if automatic measurement of flighttime is enabled
 co_warner_activated = False   # True if co-warner is activated
+co_indication = False       # True if indication via GPIO Pin 16 is on for co
 
 
 def draw_all_ac(draw, allac):
@@ -738,7 +739,7 @@ def main():
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(display_control, url_status_ws)
     flighttime.init(measure_flighttime)
-    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG)
+    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -799,6 +800,8 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-nc", "--nocowarner", required=False, help="Suppress activation of co-warner",
                     action="store_true", default=False)
+    ap.add_argument("-ci", "--coindicate", required=False, help="Indicate co warning via GPIO16",
+                    action="store_true", default=False)
     args = vars(ap.parse_args())
     # set up logging
     logging_init()
@@ -818,6 +821,7 @@ if __name__ == "__main__":
     fullcircle = args['fullcircle']
     measure_flighttime = not args['noflighttime']
     co_warner_activated = not args['nocowarner']
+    co_indication = args['coindicate']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:

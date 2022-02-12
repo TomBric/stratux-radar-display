@@ -40,6 +40,7 @@ import time
 import asyncio
 import statusui
 import radarbluez
+import RPi.GPIO as GPIO
 
 
 # constants
@@ -60,6 +61,7 @@ MIN_SENSOR_WAIT_TIME = 0.01
 # minimal time in secs to wait when sensor is not yet ready
 MIN_SENSOR_CALIBRATION_WAIT_TIME = 0.5
 # minimal time in secs to wait during calibration and two sensor readings
+IOPIN = 16   # GPIO16 for indication of co warning, high on alarm (physical #36, connect to ground #34)
 
 WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time between repeats for spoken warning
     (0, 0, "No CO alarm", 0),
@@ -92,6 +94,7 @@ cowarner_changed = True   # for display driver, true if there is something to di
 co_timeout = 1.0    # timeout of reader process, time intervall of readings
 co_max_values = 100   # max number of values, is calculated in init
 speak_warning = True
+indicate_co_warning = False    # GPIO 16 indication
 last_warning = 0.0   # timestamp of last warning
 
 #
@@ -101,7 +104,7 @@ def ppm(rsr0):
     return 10 ** (math.log10(rsr0) - B) / M
 
 
-def init(activate, config, debug_level):
+def init(activate, config, debug_level, co_indication):
     global rlog
     global cowarner_active
     global voltage_factor
@@ -128,13 +131,18 @@ def init(activate, config, debug_level):
     if ADS is None:
         cowarner_active = False
         rlog.debug("CO-Warner - AD sensor not found")
-        return cowarner_active
+        return False
     # set gain to 4.096V max
     ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
     ADS.setGain(ADS.PGA_4_096V)
     voltage_factor = ADS.toVoltage()
     cowarner_active = True
     rlog.debug("CO-Warner: AD converter active. ADS1X15_LIB_VERSION: {}".format(ADS1x15.LIB_VERSION))
+    if co_indication:
+        indicate_co_warning = True
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+        GPIO.setup(IOPIN, GPIO.OUT, initial=GPIO.LOW)
     return cowarner_active
 
 
@@ -318,6 +326,16 @@ def speak_co_warning(changed):
             last_warning = time.time()
 
 
+def set_co_indication():
+    if indicate_co_warning:
+        if alarmlevel > 0 :
+            GPIO.output(IOPIN, GPIO.HIGH)
+            rlog.debug("CO-Warner: setting GPIO Pin " + str(IOPIN) + " to HIGH for co-alarm")
+        else:
+            GPIO.output(IOPIN, GPIO.LOW)
+            rlog.debug("CO-Warner: setting GPIO Pin " + str(IOPIN) + " to LOW for no co-alarm")
+
+
 async def read_sensors():
     try:
         rlog.debug("Sensor reader active ...")
@@ -328,6 +346,7 @@ async def read_sensors():
             if co_warner_status == 0:   # normal read
                 changed = read_co_value()
                 speak_co_warning(changed)
+                set_co_indication()
                 await asyncio.sleep(MIN_SENSOR_READ_TIME)
             else:
                 calibration()
