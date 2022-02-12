@@ -28,7 +28,7 @@ if [ "$#" -lt 2 ]; then
 fi
 IMAGE_VERSION="armhf"
 outprefix="stratux-display"
-if [ "$#" -gt 2 ] &&  [ $2 == "v64" ]; then
+if [ "$#" -gt 2 ] &&  [ $3 == "v64" ]; then
     IMAGE_VERSION="arm64"
     outprefix="stratux-display64"
 fi
