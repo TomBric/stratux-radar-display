@@ -35,7 +35,7 @@ apt-get install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak
 pip3 install py-espeak-ng pyalsaaudio
 
 # bluetooth configs
-apt-get install bluetooth bluez libbluetooth-dev libbluetooth3 python3-dev -y
+apt-get install pi-bluetooth bluetooth libbluetooth-dev libbluetooth3 python3-dev -y
 pip3 install pybluez pydbus
 pip3 install pillow==8.4
 apt purge piwiz -y
