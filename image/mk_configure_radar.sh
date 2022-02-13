@@ -31,7 +31,7 @@ pip3 install luma.oled
 pip3 install websockets ADS1x15-ADC
 
 # espeak-ng for sound output and alsoaudio for external sound
-apt-get install libasound-dev espeak-ng espeak-ng-data libespeak-ng-dev -y
+apt-get install libasound2-dev espeak-ng espeak-ng-data libespeak-ng-dev -y
 pip3 install py-espeak-ng pyalsaaudio
 
 # bluetooth configs
