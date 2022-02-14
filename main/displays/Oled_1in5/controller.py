@@ -742,3 +742,95 @@ def flighttime(draw, last_flights):
         maxlines -= 1
         if maxlines <= 0:
             break
+
+
+def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
+    ts = draw.textsize(str(maxvalue), verysmallfont)    # for adjusting x and y
+    # adjust zero lines to have room for text
+    xpos = xpos + ts[0] + space
+    xsize = xsize - ts[0] - space
+    ypos = ypos + ts[1]/2
+    ysize = ysize - ts[1]
+
+    vlmin_y = ypos + ysize - 1
+    ts = draw.textsize(str(minvalue), verysmallfont)
+    draw.text((xpos - ts[0] - space, vlmin_y - ts[1]), str(minvalue), font=verysmallfont, fill="white")
+
+    vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
+    ts = draw.textsize(str(value_line1), verysmallfont)
+    draw.text((xpos - ts[0] - space, vl1_y - ts[1]/2), str(value_line1), font=verysmallfont, fill="white")
+
+    vl2_y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
+    ts = draw.textsize(str(value_line2), verysmallfont)
+    draw.text((xpos - ts[0] - space, vl2_y - ts[1]/2), str(value_line2), font=verysmallfont, fill="white")
+
+    vlmax_y = ypos
+    ts = draw.textsize(str(maxvalue), verysmallfont)
+    draw.text((xpos - ts[0] - space, vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="white")
+
+    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=3, fill="black")
+
+    # values below x-axis
+    no_of_values = len(data)
+    full_time = timeout * no_of_values   # time for full display in secs
+    timestr = time.strftime("%H:%M", time.gmtime())
+    ts = draw.textsize(timestr, verysmallfont)
+    no_of_time = math.floor(xsize / ts[0] / 2) + 1 # calculate maximum number of time indications
+    time_offset = full_time / no_of_time
+    offset = math.floor((xsize-1) / no_of_time)
+    x = xpos
+    acttime = math.floor(time.time())
+    for i in range(0, no_of_time+1):
+        draw.line((x, ypos+ysize-1-5, x, ypos+ysize-1+3), width=2, fill="black")
+        timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time-i) * time_offset)))
+        draw.text((x - ts[0]/2, ypos+ysize-1 + 1), timestr, font=verysmallfont, fill="white")
+        x = x + offset
+    lastpoint = None
+    for i in range(0, len(data)):
+        y = ypos-1 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
+        if y < ypos:
+            y = ypos   # if value is outside
+        if y > ypos+ysize-1:
+            x = ypos+ysize-1
+        if i >= 1:  # we need at least two points before we draw
+            x = xpos + i * xsize / (len(data)-1)
+            draw.line([lastpoint, (x,y)], fill="white", width=1)
+        else:
+            x = xpos
+        lastpoint = (x, y)
+    # value_line 1
+    y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
+    for x in range(xpos, xpos+xsize, 6):
+        draw.line([(x, y), (x + 3, y)], fill="white", width=1)
+    # value_line 2
+    y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
+    for x in range(xpos, xpos+xsize, 6):
+        draw.line([(x, y), (x + 3, y)], fill="white", width=1)
+
+
+def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
+    if alarmlevel == 0:
+        centered_text(draw, 0, "CO: No CO alarm", largefont, fill="white")
+    else:
+        if alarmperiod > 60:
+            alarmstr = "CO: {:d}ppm>{:d}min".format(alarmppm,math.floor(alarmperiod/60))
+        else:
+            alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
+        centered_text(draw, 0, alarmstr, largefont, fill="yellow")
+    graph(draw, 0, 20, sizex, 200, co_values, 0, 120, 50, 100, timeout)
+    # draw.text((320, 50 + SMALL - VERYSMALL), "Warnlevel:", font=verysmallfont, fill="black")
+    # right_text(draw, 50, "{:3d}".format(alarmlevel), smallfont, fill="black")
+
+    if len(co_values) > 0:
+        draw.text((20, 20+SMALL-VERYSMALL), "CO act:", font=verysmallfont, fill="yellow")
+        right_text(draw, 120, "{:3d}".format(co_values[len(co_values) - 1]), smallfont, fill="yellow")
+    draw.text((320, 140+SMALL-VERYSMALL), "CO max:", font=verysmallfont, fill="yellow")
+    right_text(draw, 140, "{:3d}".format(co_max), smallfont, fill="yellow")
+    draw.text((320, 196+SMALL-VERYSMALL), "R0 [Ohms]:", font=verysmallfont, fill="yellow")
+    right_text(draw, 196, "{:5.2f}".format(r0), smallfont, fill="yellow")
+
+    draw.text((8, sizey - SMALL - 3), "Calibrate", font=smallfont, fill="green", align="left")
+    right = "Reset"
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")

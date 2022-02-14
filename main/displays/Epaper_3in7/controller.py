@@ -78,6 +78,8 @@ compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
 cmsize = 20        # length of compass marks
+# co warner
+space = 3  # space between scale figures and zero line
 # end device globals
 
 
@@ -778,14 +780,8 @@ def flighttime(draw, last_flights):
         if maxlines <= 0:
             break
 
-space = 3  # space between scale figures and zero line
 
 def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
-
-    timestr = time.strftime("%H:%M", time.gmtime())
-    ts = draw.textsize(timestr, verysmallfont)
-
-
     ts = draw.textsize(str(maxvalue), verysmallfont)    # for adjusting x and y
     # adjust zero lines to have room for text
     xpos = xpos + ts[0] + space
