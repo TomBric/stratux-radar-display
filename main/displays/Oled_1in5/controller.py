@@ -814,14 +814,14 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
 
 def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
     if alarmlevel == 0:
-        centered_text(draw, 0, "CO: No CO alarm", largefont, fill="white")
+        centered_text(draw, 0, "CO: No CO alarm", smallfont, fill="yellow")
     else:
         if alarmperiod > 60:
             alarmstr = "CO: {:d}ppm>{:d}min".format(alarmppm,math.floor(alarmperiod/60))
         else:
             alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
-        centered_text(draw, 0, alarmstr, largefont, fill="yellow")
-    graph(draw, 0, 20, sizex, 200, co_values, 0, 120, 50, 100, timeout)
+        centered_text(draw, 0, alarmstr, smallfont, fill="orange")
+    graph(draw, 0, SMALL, sizex, sizey-SMALL-VERYSMALL, co_values, 0, 120, 50, 100, timeout)
     # draw.text((320, 50 + SMALL - VERYSMALL), "Warnlevel:", font=verysmallfont, fill="black")
     # right_text(draw, 50, "{:3d}".format(alarmlevel), smallfont, fill="black")
 
@@ -833,8 +833,10 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     draw.text((320, 196+SMALL-VERYSMALL), "R0 [Ohms]:", font=verysmallfont, fill="yellow")
     right_text(draw, 196, "{:5.2f}".format(r0), smallfont, fill="yellow")
 
-    draw.text((8, sizey - SMALL - 3), "Calibrate", font=smallfont, fill="green", align="left")
+    left = "Cal"
     right = "Reset"
+    middle = "Mode"
+    draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
     textsize = draw.textsize(right, smallfont)
-    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
-    centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="green")
+    draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
