@@ -821,7 +821,7 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
         else:
             alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
         centered_text(draw, 0, alarmstr, smallfont, fill="red")
-    graph(draw, 0, SMALL, sizex-10, sizey-SMALL-VERYSMALL-10, co_values, 0, 120, 50, 100, timeout)
+    graph(draw, 0, SMALL+5, sizex-1, sizey-40, co_values, 0, 120, 50, 100, timeout)
     # draw.text((320, 50 + SMALL - VERYSMALL), "Warnlevel:", font=verysmallfont, fill="black")
     # right_text(draw, 50, "{:3d}".format(alarmlevel), smallfont, fill="black")
 
