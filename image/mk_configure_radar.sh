@@ -15,7 +15,7 @@ fi
 # remove desktop packages
 apt purge xserver* lightdm* vlc* lxde* chromium* desktop* gnome* gstreamer* gtk* hicolor-icon-theme* lx* mesa* \
 python3-pygame pocketsphinx-en-us libllvm11 libgtk-3-common libflite1 libgtk2.0-common poppler-data \
-libqt5gui5 qttranslations5-l10n libc6-dbg geany-common gdb libqt5core5a libstdc++-10-dev libgcc-10-dev python3-jedi \
+libqt5gui5 qttranslations5-l10n libc6-dbg geany-common gdb libqt5core5a libstdc++-10-dev python3-jedi \
 libpython3.9-dev -y
 apt-get remove realvnc-vnc-server -y
 apt-get autoremove -y
