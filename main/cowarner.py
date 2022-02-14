@@ -339,19 +339,22 @@ def set_co_indication(changed):
 
 
 async def read_sensors():
-    try:
-        rlog.debug("Sensor reader active ...")
-        while True:
-            request_read()
-            while not ready():
-                await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
-            if co_warner_status == 0:   # normal read
-                changed = read_co_value()
-                speak_co_warning(changed)
-                set_co_indication(changed)
-                await asyncio.sleep(MIN_SENSOR_READ_TIME)
-            else:
-                calibration()
-                await asyncio.sleep(MIN_SENSOR_CALIBRATION_WAIT_TIME)
-    except (asyncio.CancelledError, RuntimeError):
-        rlog.debug("Sensor reader terminating ...")
+    if cowarner_active:
+        try:
+            rlog.debug("Sensor reader active ...")
+            while True:
+                request_read()
+                while not ready():
+                    await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
+                if co_warner_status == 0:   # normal read
+                    changed = read_co_value()
+                    speak_co_warning(changed)
+                    set_co_indication(changed)
+                    await asyncio.sleep(MIN_SENSOR_READ_TIME)
+                else:
+                    calibration()
+                    await asyncio.sleep(MIN_SENSOR_CALIBRATION_WAIT_TIME)
+        except (asyncio.CancelledError, RuntimeError):
+            rlog.debug("Sensor reader terminating ...")
+    else:
+        rlog.debug("No co-sensor active ...")
