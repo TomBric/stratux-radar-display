@@ -74,6 +74,8 @@ cmsize = 10        # length of compass marks
 # gmeter
 m_marks = ((120, ""), (157.5, "-2"), (195, "-1"), (232.5, "0"), (270, "+1"), (307.5, "+2"), (345, "+3"),
            (382.5, "+4"), (420, ""))
+# co warner
+space = 3  # space between scale figures and zero line
 # end device globals
 
 
