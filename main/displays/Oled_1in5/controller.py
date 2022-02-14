@@ -772,7 +772,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     ts = draw.textsize(str(maxvalue), verysmallfont)
     draw.text((xpos - ts[0] - space, vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="white")
 
-    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="white", width=3, fill="black")
+    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="white", width=1, fill="black")
 
     # values below x-axis
     no_of_values = len(data)
@@ -785,7 +785,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     x = xpos
     acttime = math.floor(time.time())
     for i in range(0, no_of_time+1):
-        draw.line((x, ypos+ysize-1-5, x, ypos+ysize-1+3), width=2, fill="white")
+        draw.line((x, ypos+ysize-1-5, x, ypos+ysize-1+3), width=1, fill="white")
         timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time-i) * time_offset)))
         draw.text((x - ts[0]/2, ypos+ysize-1 + 1), timestr, font=verysmallfont, fill="white")
         x = x + offset
@@ -820,7 +820,7 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
             alarmstr = "CO: {:d}ppm>{:d}min".format(alarmppm,math.floor(alarmperiod/60))
         else:
             alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
-        centered_text(draw, 0, alarmstr, smallfont, fill="orange")
+        centered_text(draw, 0, alarmstr, smallfont, fill="red")
     graph(draw, 0, SMALL, sizex-10, sizey-SMALL-VERYSMALL-10, co_values, 0, 120, 50, 100, timeout)
     # draw.text((320, 50 + SMALL - VERYSMALL), "Warnlevel:", font=verysmallfont, fill="black")
     # right_text(draw, 50, "{:3d}".format(alarmlevel), smallfont, fill="black")
@@ -836,7 +836,7 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     left = "Cal"
     right = "Reset"
     middle = "Mode"
-    draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
+    draw.text((0, sizey - SMALL), left, font=smallfont, fill="green")
     textsize = draw.textsize(right, smallfont)
-    draw.text((sizex - textsize[0], sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
+    draw.text((sizex - textsize[0], sizey - SMALL), right, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL, middle, smallfont, fill="green")
