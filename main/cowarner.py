@@ -128,8 +128,9 @@ def init(activate, config, debug_level, co_indication):
     value_debug_level = debug_level
     co_timeout = MIN_SENSOR_READ_TIME
     co_max_values = math.floor(CO_MEASUREMENT_WINDOW / co_timeout)
-    ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
-    if ADS is None:
+    try:
+        ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
+    except OSError:
         cowarner_active = False
         rlog.debug("CO-Warner - AD sensor not found")
         return False
