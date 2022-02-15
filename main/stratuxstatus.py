@@ -38,6 +38,7 @@ import asyncio
 import json
 
 # constants
+SITUATION_DEBUG = logging.DEBUG-2
 
 # globals
 status = {}
@@ -132,7 +133,7 @@ def draw_status(draw, display_control, ui_changed, connected, altitude, gps_alt,
 def status_callback(json_str):
     global strx
 
-    rlog.debug("New status" + json_str)
+    rlog.log(SITUATION_DEBUG,"New status" + json_str)
     stat = json.loads(json_str)
 
     strx['was_changed'] = True
