@@ -827,9 +827,9 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     # right_text(draw, 50, "{:3d}".format(alarmlevel), smallfont, fill="black")
 
     if len(co_values) > 0:
-        draw.text((0, sizey-2*SMALL-5), "CO act: {:3d}".format(co_values[len(co_values) - 1]),
-                  font=smallfont, fill="cyan")
-    right_text(draw, sizey-2*SMALL-5, "CO max {:3d}".format(co_max), smallfont, fill="cyan")
+        draw.text((0, sizey-2*SMALL-5), "CO act:{:3d}".format(co_values[len(co_values) - 1]),
+                  font=smallfont, fill="yellow")
+    right_text(draw, sizey-2*SMALL-5, "CO max:{:3d}".format(co_max), smallfont, fill="yellow")
 
     left = "Cal"
     right = "Reset"
