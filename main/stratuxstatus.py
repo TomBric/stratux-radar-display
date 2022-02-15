@@ -75,7 +75,6 @@ def start():  # start listening on status websocket
             rlog.debug("Error: Stratux status listener not started.")
 
 
-
 def stop():  # stop listening on status websocket
     global status_listener
 

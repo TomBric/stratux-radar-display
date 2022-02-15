@@ -475,6 +475,8 @@ def new_situation(json_str):
 
 
 async def listen_forever(path, name, callback):
+    global rlog
+
     rlog.debug(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
