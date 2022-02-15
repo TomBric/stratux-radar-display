@@ -828,18 +828,16 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
 
     if len(co_values) > 0:
         act = co_values[len(co_values) - 1]
-        color = "red"
         if act < 50:
             color = "green"
-        elif act < 100:
-            color = "DarkOrange"
-        round_text(draw, 0, sizey-2*SMALL-5, "CO act:{:3d}".format(act), color)
-    color = "red"
+        else:
+            color = "red"
+        round_text(draw, 5, sizey-2*SMALL-5, "CO act:{:3d}".format(act), color)
     if co_max < 50:
         color = "green"
-    elif co_max < 100:
-        color = "DarkOrange"
-    round_text(draw, sizex/2, sizey - 2 * SMALL - 5, "CO Max:{:3d}".format(co_max), color)
+    else:
+        color = "red"
+    round_text(draw, sizex/2+5, sizey - 2 * SMALL - 5, "CO ax:{:3d}".format(co_max), color)
 
     left = "Cal"
     right = "Reset"
