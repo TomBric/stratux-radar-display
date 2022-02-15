@@ -71,6 +71,9 @@ def start():  # start listening on status websocket
     if status_listener is None:
         loop = asyncio.get_event_loop()
         status_listener = loop.create_task(radar.listen_forever(status_url, "StatusListener", status_callback))
+        if status_listener is None:
+            rlog.debug("Error: Stratux status listener not started.")
+
 
 
 def stop():  # stop listening on status websocket
