@@ -583,7 +583,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
 
 
 def text_screen(draw, headline, subline, text, left, middle, right):
-    centered_text(draw, 0, headline, largefont, fill="yellow")
+    centered_text(draw, 0, headline, mediumfont, fill="yellow")
     txt_starty = LARGE
     if subline is not None:
         centered_text(draw, LARGE, subline, smallfont, fill="yellow")
@@ -596,7 +596,7 @@ def text_screen(draw, headline, subline, text, left, middle, right):
 
 
 def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp, suffix):
-    centered_text(draw, 0, headline, largefont, fill="yellow")
+    centered_text(draw, 0, headline, mediumfont, fill="yellow")
     txt_starty = LARGE
     if subline is not None:
         centered_text(draw, LARGE, subline, smallfont, fill="yellow")
