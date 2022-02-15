@@ -278,7 +278,8 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     if not connected:
         centered_text(draw, zeroy, "No Connection!", smallfont, fill="red")
     if co_alarmlevel > 0:
-        centered_text(draw, sizey-2*SMALL, "CO Alarm: " + co_alarmstring, smallfont, fill="red")
+        centered_text(draw, sizey-3*SMALL, "CO Alarm!", smallfont, fill="red")
+        centered_text(draw, sizey-2*SMALL, co_alarmstring, smallfont, fill="red")
     if basemode:
         text = "Ground mode"
         textsize = draw.textsize(text, smallfont)
@@ -798,7 +799,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
             x = ypos+ysize-1
         if i >= 1:  # we need at least two points before we draw
             x = xpos + i * xsize / (len(data)-1)
-            draw.line([lastpoint, (x,y)], fill="white", width=2)
+            draw.line([lastpoint, (x,y)], fill="cyan", width=2)
         else:
             x = xpos
         lastpoint = (x, y)
@@ -821,14 +822,14 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
         else:
             alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
         centered_text(draw, 0, alarmstr, smallfont, fill="red")
-    graph(draw, 0, SMALL+5, sizex-12, sizey-80, co_values, 0, 120, 50, 100, timeout)
+    graph(draw, 0, SMALL+5, sizex-12, sizey-60, co_values, 0, 120, 50, 100, timeout)
     # draw.text((320, 50 + SMALL - VERYSMALL), "Warnlevel:", font=verysmallfont, fill="black")
     # right_text(draw, 50, "{:3d}".format(alarmlevel), smallfont, fill="black")
 
     if len(co_values) > 0:
-        draw.text((0, sizey-2*VERYSMALL), "CO act: {:3d}".format(co_values[len(co_values) - 1]),
-                  font=verysmallfont, fill="yellow")
-    right_text(draw, sizey-2*VERYSMALL, "CO max: {:3d}".format(co_max), verysmallfont, fill="yellow")
+        draw.text((0, sizey-2*VERYSMALL-5), "CO act: {:3d}".format(co_values[len(co_values) - 1]),
+                  font=verysmallfont, fill="cyan")
+    right_text(draw, sizey-2*VERYSMALL-5, "CO max {:3d}".format(co_max), verysmallfont, fill="cyan")
 
     left = "Cal"
     right = "Reset"
