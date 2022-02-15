@@ -258,7 +258,7 @@ def draw_cowarner(draw, display_control, changed):
             if countdown < 0:
                 countdown = 0   # sometimes draw thread was quicker, thus to avoid -1
             timeleft = str(countdown) + " secs"
-            display_control.text_screen(draw, "CO sensor calibration", timeleft,
+            display_control.text_screen(draw, "Calibrate sensor", timeleft,
                                         "\n\nKeep sensor in fresh air.\n", "", "", "")
         display_control.display()
 
