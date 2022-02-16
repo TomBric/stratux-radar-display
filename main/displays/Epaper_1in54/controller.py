@@ -804,11 +804,11 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
         else:
             alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
         centered_text(draw, 0, alarmstr, smallfont, fill="black")
-    graph(draw, 0, SMALL+5, sizex-12, sizey-55, co_values, 0, 120, 50, 100, timeout)
+    graph(draw, 0, SMALL+5, sizex-12, sizey-80, co_values, 0, 120, 50, 100, timeout)
 
     if len(co_values) > 0:
-        round_text(draw, 5, sizey-2*SMALL-5, "CO act: {:3d}".format(co_values[len(co_values)-1]), "black")
-    round_text(draw, sizex/2+5, sizey - 2 * SMALL - 5, "CO max: {:3d}".format(co_max), "black")
+        round_text(draw, 5, sizey-2*SMALL-5, "CO act: {:3d}".format(co_values[len(co_values)-1]), "white", out="black")
+    round_text(draw, sizex/2+5, sizey - 2 * SMALL - 5, "CO max: {:3d}".format(co_max), "white", out="black")
 
     left = "Cal"
     right = "Reset"
