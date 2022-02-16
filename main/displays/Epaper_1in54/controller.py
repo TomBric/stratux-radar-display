@@ -284,7 +284,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
 
     draw.text((0, 0), str(range), font=smallfont, fill="black")
-    draw.text((0, SMALL), "nm", font=smallfont, fill="black")
+    draw.text((0, SMALL), "nm", font=verysmallfont, fill="black")
 
     draw.text((0, sizey - SMALL), "FL" + str(round(ownalt / 100)), font=smallfont, fill="black")
 
@@ -295,8 +295,8 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     textsize = draw.textsize(t, smallfont)
     draw.text((sizex - textsize[0], 0), t, font=smallfont, fill="black", align="right")
     text = "ft"
-    textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0], SMALL), text, font=smallfont, fill="black", align="right")
+    textsize = draw.textsize(text, verysmallfont)
+    draw.text((sizex - textsize[0], SMALL), text, font=verysmallfont, fill="black", align="right")
 
     text = str(course) + '°'
     textsize = draw.textsize(text, smallfont)
