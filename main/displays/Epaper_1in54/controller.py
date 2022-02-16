@@ -307,7 +307,8 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     if not connected:
         centered_text(draw, 75, "No connection!", smallfont, fill="black")
     if co_alarmlevel > 0:
-        centered_text(draw, sizey-2*SMALL, "CO Alarm: " + co_alarmstring, smallfont, fill="black")
+        centered_text(draw, sizey - 3 * SMALL, "CO Alarm!", smallfont, fill="black")
+        centered_text(draw, sizey - 2 * SMALL, co_alarmstring, smallfont, fill="black")
 
     if extsound or bt_devices > 0:
         if sound_active:
