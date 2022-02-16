@@ -277,7 +277,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy, optical_bar, basemode, extsound):
+              gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2-2, zeroy+max_pixel/2-2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4-1, zeroy+max_pixel/4-1), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
@@ -305,6 +305,8 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         centered_text(draw, 15, "No GPS", smallfont, fill="black")
     if not connected:
         centered_text(draw, 75, "No connection!", smallfont, fill="black")
+    if co_alarmlevel > 0:
+        centered_text(draw, sizey-2*SMALL, "CO Alarm: " + co_alarmstring, smallfont, fill="black")
 
     if extsound or bt_devices > 0:
         if sound_active:
@@ -726,3 +728,27 @@ def flighttime(draw, last_flights):
         maxlines -= 1
         if maxlines <= 0:
             break
+
+
+def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
+    if alarmlevel == 0:
+        centered_text(draw, 0, "CO: No CO alarm", smallfont, fill="black")
+    else:
+        if alarmperiod > 60:
+            alarmstr = "CO: {:d}ppm>{:d}min".format(alarmppm,math.floor(alarmperiod/60))
+        else:
+            alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
+        centered_text(draw, 0, alarmstr, smallfont, fill="black")
+    graph(draw, 0, SMALL+5, sizex-12, sizey-55, co_values, 0, 120, 50, 100, timeout)
+
+    if len(co_values) > 0:
+        round_text(draw, 5, sizey-2*SMALL-5, "CO act: {:3d}".format(act), "black")
+    round_text(draw, sizex/2+5, sizey - 2 * SMALL - 5, "CO max: {:3d}".format(co_max), "black")
+
+    left = "Cal"
+    right = "Reset"
+    middle = "Mode"
+    draw.text((0, sizey - SMALL), left, font=smallfont, fill="black")
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
