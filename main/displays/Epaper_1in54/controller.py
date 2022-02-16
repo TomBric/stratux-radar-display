@@ -78,6 +78,7 @@ compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
 cmsize = 14        # length of compass marks
+space = 2
 # end device globals
 
 
@@ -730,6 +731,70 @@ def flighttime(draw, last_flights):
             break
 
 
+def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
+    ts = draw.textsize(str(maxvalue), verysmallfont)    # for adjusting x and y
+    # adjust zero lines to have room for text
+    xpos = xpos + ts[0] + space
+    xsize = xsize - ts[0] - space
+    ypos = ypos + ts[1]/2
+    ysize = ysize - ts[1]
+
+    vlmin_y = ypos + ysize - 1
+    ts = draw.textsize(str(minvalue), verysmallfont)
+    draw.text((xpos - ts[0] - space, vlmin_y - ts[1]), str(minvalue), font=verysmallfont, fill="black")
+
+    vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
+    ts = draw.textsize(str(value_line1), verysmallfont)
+    draw.text((xpos - ts[0] - space, vl1_y - ts[1]/2), str(value_line1), font=verysmallfont, fill="black")
+
+    vl2_y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
+    ts = draw.textsize(str(value_line2), verysmallfont)
+    draw.text((xpos - ts[0] - space, vl2_y - ts[1]/2), str(value_line2), font=verysmallfont, fill="black")
+
+    vlmax_y = ypos
+    ts = draw.textsize(str(maxvalue), verysmallfont)
+    draw.text((xpos - ts[0] - space, vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="black")
+
+    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=3, fill="white")
+
+    # values below x-axis
+    no_of_values = len(data)
+    full_time = timeout * no_of_values   # time for full display in secs
+    timestr = time.strftime("%H:%M", time.gmtime())
+    ts = draw.textsize(timestr, verysmallfont)
+    no_of_time = math.floor(xsize / ts[0] / 2) + 1 # calculate maximum number of time indications
+    time_offset = full_time / no_of_time
+    offset = math.floor((xsize-1) / no_of_time)
+    x = xpos
+    acttime = math.floor(time.time())
+    for i in range(0, no_of_time+1):
+        draw.line((x, ypos+ysize-1-5, x, ypos+ysize-1+3), width=2, fill="black")
+        timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time-i) * time_offset)))
+        draw.text((x - ts[0]/2, ypos+ysize-1 + 1), timestr, font=verysmallfont, fill="black")
+        x = x + offset
+    lastpoint = None
+    for i in range(0, len(data)):
+        y = ypos-1 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
+        if y < ypos:
+            y = ypos   # if value is outside
+        if y > ypos+ysize-1:
+            x = ypos+ysize-1
+        if i >= 1:  # we need at least two points before we draw
+            x = xpos + i * xsize / (len(data)-1)
+            draw.line([lastpoint, (x,y)], fill="black", width=2)
+        else:
+            x = xpos
+        lastpoint = (x, y)
+    # value_line 1
+    y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
+    for x in range(xpos, xpos+xsize, 6):
+        draw.line([(x, y), (x + 3, y)], fill="black", width=1)
+    # value_line 2
+    y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
+    for x in range(xpos, xpos+xsize, 6):
+        draw.line([(x, y), (x + 3, y)], fill="black", width=1)
+
+
 def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
     if alarmlevel == 0:
         centered_text(draw, 0, "CO: No CO alarm", smallfont, fill="black")
@@ -742,7 +807,7 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     graph(draw, 0, SMALL+5, sizex-12, sizey-55, co_values, 0, 120, 50, 100, timeout)
 
     if len(co_values) > 0:
-        round_text(draw, 5, sizey-2*SMALL-5, "CO act: {:3d}".format(act), "black")
+        round_text(draw, 5, sizey-2*SMALL-5, "CO act: {:3d}".format(co_values[len(co_values)-1]), "black")
     round_text(draw, sizex/2+5, sizey - 2 * SMALL - 5, "CO max: {:3d}".format(co_max), "black")
 
     left = "Cal"
