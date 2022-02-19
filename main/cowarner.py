@@ -235,8 +235,8 @@ def read_co_value():     # called by sensor_read thread
     '''
 
     print("C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {0:d}".format(value, sensor_volt, ppm_value))
-    rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {0:d}"
-             .format(value, sensor_volt, ppm_value))
+    rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {1:.3f} RS_gas/R0: {1:.3f} PPM value: {0:d}"
+             .format(value, sensor_volt, rs_gas, rs_gas/r0, ppm_value))
     if ppm_value > co_max:
         co_max = ppm_value
     co_values.append(ppm_value)
