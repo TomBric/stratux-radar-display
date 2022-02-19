@@ -49,7 +49,7 @@ import RPi.GPIO as GPIO
 # a good explanation can be found e.g. on https://jayconsystems.com/blog/understanding-a-gas-sensor
 M = -0.867
 B = 0.6
-RSR0_CLEAN = 3333.0   # 3.3 kOhm
+RSR0_CLEAN = 3.333   # 3.3 kOhm
 R_DIVIDER = 10000.0   # Value of divider resistor 10 kOhm
 SENSOR_VOLTAGE = 5.0   # voltage for sensor board and divider
 # Measurement cycle
@@ -234,7 +234,7 @@ def read_co_value():     # called by sensor_read thread
         ppm_value = 20
     '''
 
-
+    print("C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {0:d}".format(value, sensor_volt, ppm_value))
     rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  PPM value: {0:d}"
              .format(value, sensor_volt, ppm_value))
     if ppm_value > co_max:
@@ -278,8 +278,11 @@ def calibration():   # called by user-input thread, performs calibration and end
     if countdown > 0:   # continue sensor reading
         value = ADS.getValue()
         sensor_volt = value * voltage_factor
+        print("Sensor_volt: " + str(sensor_volt))
         rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
+        print("rs_air: " + str(rs_air))
         r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
+        print("r0: " + str(r0_act))
         sample_sum += r0_act
         no_samples += 1
     else:
