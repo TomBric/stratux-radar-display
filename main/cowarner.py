@@ -238,7 +238,7 @@ def read_co_value():     # called by sensor_read thread
         ppm_value = 20
     '''
 
-    print("C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {1:.3f} RS_gas/R0: {1:.3f} PPM value: {0:d}"
+    print("C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {2:.3f} RS_gas/R0: {3:.3f} PPM value: {4:d}"
           .format(value, sensor_volt, rs_gas, rs_gas / r0, ppm_value))
     rlog.log(value_debug_level,
              "C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {2:.3f} RS_gas/R0: {3:.3f} PPM value: {4:d}"
