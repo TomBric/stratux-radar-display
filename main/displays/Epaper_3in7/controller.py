@@ -864,7 +864,7 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     draw.text((320, 140+SMALL-VERYSMALL), "CO max:", font=verysmallfont, fill="black")
     right_text(draw, 140, "{:3d}".format(co_max), smallfont, fill="black")
     draw.text((320, 196), "R0:", font=verysmallfont, fill="black")
-    right_text(draw, 196, "{1:.1f}".format(r0), verysmallfont, fill="black")
+    right_text(draw, 196, "{:.1f}".format(r0), verysmallfont, fill="black")
 
     draw.text((8, sizey - SMALL - 3), "Calibrate", font=smallfont, fill="black", align="left")
     right = "Reset"
