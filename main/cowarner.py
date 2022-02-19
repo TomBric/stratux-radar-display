@@ -194,9 +194,6 @@ def check_alarm_level(new_value):   # check wether new alarm level should be rea
     return changed
 
 
-xxx_starttime = time.time()
-
-
 def read_co_value():     # called by sensor_read thread
     global cowarner_changed
     global co_values
@@ -207,34 +204,6 @@ def read_co_value():     # called by sensor_read thread
     sensor_volt = value * voltage_factor
     rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
     ppm_value = round(ppm(rs_gas / r0))
-
-    '''
-    # for testing when nothing is s connected
-    ppm_value = 20
-    if time.time() - xxx_starttime > 15:
-        ppm_value = 60
-    if time.time() - xxx_starttime > 5*60+20:
-        ppm_value = 120
-    if time.time() - xxx_starttime > 7*60+25:
-        ppm_value = 410
-    if time.time() - xxx_starttime > 8*60+32:
-        ppm_value = 330
-    if time.time() - xxx_starttime > 9*60+34:
-        ppm_value = 140
-    if time.time() - xxx_starttime > 15*60+35:
-        ppm_value = 30
-    if time.time() - xxx_starttime > 16*60+35:
-        ppm_value = 120
-    if time.time() - xxx_starttime > 17*60+35:
-        ppm_value = 40
-    if time.time() - xxx_starttime > 18 * 60:
-        ppm_value = 310
-    if time.time() - xxx_starttime > 19 * 60:
-        ppm_value = 20
-    '''
-
-    print("C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {2:.3f} RS_gas/R0: {3:.3f} PPM value: {4:d}"
-          .format(value, sensor_volt, rs_gas, rs_gas / r0, ppm_value))
     rlog.log(value_debug_level,
              "C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {2:.3f} RS_gas/R0: {3:.3f} PPM value: {4:d}"
              .format(value, sensor_volt, rs_gas, rs_gas/r0, ppm_value))
@@ -279,11 +248,8 @@ def calibration():   # called by user-input thread, performs calibration and end
     if countdown > 0:   # continue sensor reading
         value = ADS.getValue()
         sensor_volt = value * voltage_factor
-        print("Sensor_volt: " + str(sensor_volt))
         rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
-        print("rs_air: " + str(rs_air))
         r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
-        print("r0: " + str(r0_act))
         sample_sum += r0_act
         no_samples += 1
     else:

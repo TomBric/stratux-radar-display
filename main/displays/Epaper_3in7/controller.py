@@ -863,8 +863,8 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
         right_text(draw, 120, "{:3d}".format(co_values[len(co_values) - 1]), smallfont, fill="black")
     draw.text((320, 140+SMALL-VERYSMALL), "CO max:", font=verysmallfont, fill="black")
     right_text(draw, 140, "{:3d}".format(co_max), smallfont, fill="black")
-    draw.text((320, 196+SMALL-VERYSMALL), "R0 [Ohms]:", font=verysmallfont, fill="black")
-    right_text(draw, 196, "{:5.2f}".format(r0), smallfont, fill="black")
+    draw.text((320, 196+SMALL-VERYSMALL), "R0:", font=verysmallfont, fill="black")
+    right_text(draw, 196, "{:4f}".format(r0), verysmallfont, fill="black")
 
     draw.text((8, sizey - SMALL - 3), "Calibrate", font=smallfont, fill="black", align="left")
     right = "Reset"
