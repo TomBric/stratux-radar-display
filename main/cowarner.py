@@ -77,7 +77,7 @@ WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time betwe
 alarmlevel = 0   # see above level for warnlevel 0-5
 warnlevel = [[None, None], [None, None], [None, None], [None, None], [None, None], [None, None]]
 # time when this alarmlevel was first reached or underrun
-r0 = 1.0     # value for R0 in clean air. Calculated during calibration
+r0 = 150.0     # value for R0 in clean air. Calculated during calibration, 150 is a good starting point
 cowarner_active = False
 voltage_factor = 1.0
 ADS = None
@@ -164,7 +164,6 @@ def check_alarm_level(new_value):   # check wether new alarm level should be rea
     global alarmlevel
 
     #  check whether level is overrun/underrun
-    # print("warnlevel: " + str(warnlevel))
     changed = False
     for i in range(1, len(WARNLEVEL)):    # check all warnleves  e.g. (50, 3*30, "No CO alarm", None)
         if new_value >= WARNLEVEL[i][0]:
