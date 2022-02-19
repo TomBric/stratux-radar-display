@@ -96,7 +96,6 @@ co_max_values = 100   # max number of values, is calculated in init
 speak_warning = True
 indicate_co_warning = False    # GPIO 16 indication
 last_warning = 0.0   # timestamp of last warning
-
 #
 
 
