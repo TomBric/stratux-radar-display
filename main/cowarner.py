@@ -101,7 +101,7 @@ last_warning = 0.0   # timestamp of last warning
 
 
 def ppm(rsr0):
-    return 10 ** (math.log10(rsr0) - B) / M
+    return 10 ** ((math.log10(rsr0) - B) / M)
 
 
 def init(activate, config, debug_level, co_indication):
@@ -204,14 +204,9 @@ def read_co_value():     # called by sensor_read thread
 
     cowarner_changed = True  # to display new value
     value = ADS.getValue()
-    print("value: "+str(value))
     sensor_volt = value * voltage_factor
-    print("Sensorvolt: " + str(sensor_volt))
     rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
-    print("RS_gs: " + str(rs_gas))
     ppm_value = round(ppm(rs_gas / r0))
-    print("RS_gas/r0: " + str(rs_gas/r0))
-    print("PPM Value" + str(ppm_value))
 
     '''
     # for testing when nothing is s connected
