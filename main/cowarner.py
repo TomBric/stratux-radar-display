@@ -194,7 +194,7 @@ def check_alarm_level(new_value):   # check wether new alarm level should be rea
     return changed
 
 
-xxx_starttime=time.time()
+xxx_starttime = time.time()
 
 
 def read_co_value():     # called by sensor_read thread
@@ -212,7 +212,6 @@ def read_co_value():     # called by sensor_read thread
     ppm_value = round(ppm(rs_gas / r0))
     print("RS_gas/r0: " + str(rs_gas/r0))
     print("PPM Value" + str(ppm_value))
-
 
     '''
     # for testing when nothing is s connected
@@ -240,8 +239,9 @@ def read_co_value():     # called by sensor_read thread
     '''
 
     print("C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {1:.3f} RS_gas/R0: {1:.3f} PPM value: {0:d}"
-             .format(value, sensor_volt, rs_gas, rs_gas / r0, ppm_value))
-    rlog.log(value_debug_level, "C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {1:.3f} RS_gas/R0: {1:.3f} PPM value: {0:d}"
+          .format(value, sensor_volt, rs_gas, rs_gas / r0, ppm_value))
+    rlog.log(value_debug_level,
+             "C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {2:.3f} RS_gas/R0: {3:.3f} PPM value: {4:d}"
              .format(value, sensor_volt, rs_gas, rs_gas/r0, ppm_value))
     if ppm_value > co_max:
         co_max = ppm_value
@@ -342,7 +342,7 @@ def speak_co_warning(changed):
 
 def set_co_indication(changed):
     if changed and indicate_co_warning:
-        if alarmlevel > 0 :
+        if alarmlevel > 0:
             GPIO.output(IOPIN, GPIO.HIGH)
             rlog.debug("CO-Warner: setting GPIO Pin " + str(IOPIN) + " to HIGH for co-alarm")
         else:
