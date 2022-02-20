@@ -271,7 +271,7 @@ def user_input():
         rlog.debug("CO-Warner: not active, switching to radar-mode")
         return 1        # immediately go to next mode, if warner is not activated
     btime, button = radarbuttons.check_buttons()
-    if btime == 0:
+    if btime == 0 or co_warner_status == 1:   # in calibration mode, do not react
         return 0  # stay in current mode
     cowarner_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
