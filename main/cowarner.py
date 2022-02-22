@@ -138,7 +138,7 @@ def init(activate, config, debug_level, co_indication):
     ADS.setGain(ADS.PGA_4_096V)
     voltage_factor = ADS.toVoltage()
     cowarner_active = True
-    rlog.debug("CO-Warner: AD converter active. ADS1X15_LIB_VERSION: {}".format(ADS1x15.LIB_VERSION))
+    rlog.debug("CO-Warner: AD converter active.")
     if co_indication:
         indicate_co_warning = True
         GPIO.setmode(GPIO.BCM)
