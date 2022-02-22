@@ -136,7 +136,7 @@ def init(activate, config, debug_level, co_indication):
     # set gain to 4.096V max
     ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
     ADS.setGain(ADS.PGA_4_096V)
-    voltage_factor = ADS.toVoltage() * 2    # error in ADS1x15-ADC, values are only half
+    voltage_factor = ADS.toVoltage()
     cowarner_active = True
     rlog.debug("CO-Warner: AD converter active. ADS1X15_LIB_VERSION: {}".format(ADS1x15.LIB_VERSION))
     if co_indication:
