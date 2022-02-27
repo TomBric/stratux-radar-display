@@ -41,6 +41,7 @@ import asyncio
 import statusui
 import radarbluez
 import RPi.GPIO as GPIO
+import numpy
 
 
 # constants
@@ -75,7 +76,6 @@ WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time betwe
 
 # globals
 alarmlevel = 0   # see above level for warnlevel 0-5
-warnlevel = [[None, None], [None, None], [None, None], [None, None], [None, None], [None, None]]
 # time when this alarmlevel was first reached or underrun
 r0 = 150.0     # value for R0 in clean air. Calculated during calibration, 150 is a good starting point
 cowarner_active = False
@@ -160,36 +160,16 @@ def alarm_level():   # to be called from outside, returns 0 if no alarm, 1-5 dep
     return alarmlevel, WARNLEVEL[alarmlevel][2]
 
 
-def check_alarm_level(new_value):   # check wether new alarm level should be reached, called by sensor reader thread
+def check_alarm_level():   # check wether new alarm level should be reached, called by sensor reader thread
     global alarmlevel
 
-    #  check whether level is overrun/underrun
-    changed = False
-    for i in range(1, len(WARNLEVEL)):    # check all warnleves  e.g. (50, 3*30, "No CO alarm", None)
-        if new_value >= WARNLEVEL[i][0]:
-            warnlevel[i][1] = None  # reset indicator for below
-            if warnlevel[i][0] is None:   # not yet triggered, first overrun
-                warnlevel[i][0] = time.time()
-            else:   # warnlevel was already reached
-                if time.time() - warnlevel[i][0] >= WARNLEVEL[i][1]:
-                    if alarmlevel < i:   # only set when level or higher was not yet reached
-                        rlog.debug("CO Warner: Alarmlevel " + str(i) + " reached: " + WARNLEVEL[i][2])
-                        alarmlevel = i
-                        warnlevel[i][0] = None  # reset indicator
-                        changed = True
-        else:
-            warnlevel[i][0] = None  # reset indicator for above
-            if warnlevel[i][1] is None:   # not yet triggered, first underrun
-                warnlevel[i][1] = time.time()
-            else:   # warnlevel was already reached
-                if time.time() - warnlevel[i][1] >= WARNLEVEL[i][1]:
-                    if alarmlevel > i-1:  # only set when level was higher
-                        rlog.debug("CO Warner: Alarmlevel " + str(i) + " underrun. New level: " + str(i-1) + ": "
-                                   + WARNLEVEL[i-1][2])
-                        alarmlevel = i - 1
-                        warnlevel[i][1] = None
-                        changed = True
-    return changed
+    for i in range(len(WARNLEVEL+1), 0, -1):    # check all warnleves starting high e.g. (50, 3*30, "No CO alarm", None)
+        num_values = math.floor(WARNLEVEL[i][1] / MIN_SENSOR_READ_TIME)   # number of values to take into account
+        if len(co_values) >= num_values:   # if less values available, do not alarm
+            average = numpy.average(co_values[len(co_values)-num_values : len(co_values)])
+            if average >= WARNLEVEL[i][0]:
+                return i
+    return 0
 
 
 def read_co_value():     # called by sensor_read thread
@@ -212,7 +192,7 @@ def read_co_value():     # called by sensor_read thread
     co_values.append(ppm_value)
     if len(co_values) > co_max_values:    # sliding window, remove oldest values
         co_values.pop(0)
-    return check_alarm_level(ppm_value)
+    return check_alarm_level()
 
 
 def draw_cowarner(draw, display_control, changed):
