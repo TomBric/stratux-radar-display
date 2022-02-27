@@ -35,7 +35,7 @@
 import logging
 import math
 import radarbuttons
-import ADS1x15
+import ADS1x15       # https://github.com/chandrawi/ADS1x15-ADC
 import time
 import asyncio
 import statusui
@@ -49,7 +49,7 @@ import RPi.GPIO as GPIO
 # a good explanation can be found e.g. on https://jayconsystems.com/blog/understanding-a-gas-sensor
 M = -0.867
 B = 0.6
-RSR0_CLEAN = 3.333   # 3.3 kOhm
+RSR0_CLEAN = 3.333   # 3.3 ppm, see data sheet auf MICS-5524
 R_DIVIDER = 10.0   # Value of divider resistor 10 kOhm
 SENSOR_VOLTAGE = 5.0   # voltage for sensor board and divider
 # Measurement cycle
@@ -200,11 +200,13 @@ def read_co_value():     # called by sensor_read thread
     cowarner_changed = True  # to display new value
     value = ADS.getValue()
     sensor_volt = value * voltage_factor
-    rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
+    rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
     ppm_value = round(ppm(rs_gas / r0))
     rlog.log(value_debug_level,
              "C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {2:.3f} RS_gas/R0: {3:.3f} PPM value: {4:d}"
              .format(value, sensor_volt, rs_gas, rs_gas/r0, ppm_value))
+    print("C0-Warner: Analog0: {0:d}\t{1:.3f} V  RS_gas: {2:.3f} RS_gas/R0: {3:.3f} PPM value: {4:d}"
+          .format(value, sensor_volt, rs_gas, rs_gas / r0, ppm_value))
     if ppm_value > co_max:
         co_max = ppm_value
     co_values.append(ppm_value)
@@ -252,7 +254,7 @@ def calibration():   # called by user-input thread, performs calibration and end
         no_samples += 1
     else:
         r0 = sample_sum / no_samples
-        rlog.debug("CO-Warner: Calibration finished. # samples: {0:d} r0: {1:.1f} Ohms"
+        rlog.debug("CO-Warner: Calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
                    .format(no_samples, r0))
         g_config['CO_warner_R0'] = r0
         statusui.write_config(g_config)
