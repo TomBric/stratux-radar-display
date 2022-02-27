@@ -169,7 +169,7 @@ def check_alarm_level():   # check wether new alarm level should be reached, cal
             average = numpy.average(co_values[len(co_values)-num_values : len(co_values)])
             if average >= WARNLEVEL[i][0]:
                 return i
-            print("Average " + str(WARNLEVEL[0]) +  ": " + str(average) + " ppm")
+            print("Average " + str(WARNLEVEL[i]) ": "+ str(num_values) + " values " +  str(average) + " ppm")
     return 0
 
 
