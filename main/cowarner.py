@@ -163,7 +163,7 @@ def alarm_level():   # to be called from outside, returns 0 if no alarm, 1-5 dep
 def check_alarm_level():   # check wether new alarm level should be reached, called by sensor reader thread
     global alarmlevel
 
-    for i in range(len(WARNLEVEL+1), 0, -1):    # check all warnleves starting high e.g. (50, 3*30, "No CO alarm", None)
+    for i in range(len(WARNLEVEL)-1, 0, -1):    # check all warnleves starting high e.g. (50, 3*30, "No CO alarm", None)
         num_values = math.floor(WARNLEVEL[i][1] / MIN_SENSOR_READ_TIME)   # number of values to take into account
         if len(co_values) >= num_values:   # if less values available, do not alarm
             average = numpy.average(co_values[len(co_values)-num_values : len(co_values)])
