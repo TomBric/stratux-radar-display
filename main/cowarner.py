@@ -191,9 +191,9 @@ def read_co_value():     # called by sensor_read thread
     rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
     ppm_value = round(ppm(rs_gas / r0))
     rlog.log(value_debug_level,
-             "C0-Warner: Analog0: {0:5d}  {1:.3f} V  RS_gas: {2:.3f} RS_gas/R0: {3:.3f} PPM value: {4:d}"
+             "C0-Warner: Analog0: {0:5d}  {1:.3f} V  RS_gas: {2:5.3f} RS_gas/R0: {3:3.3f} PPM value: {4:d}"
              .format(value, sensor_volt, rs_gas, rs_gas/r0, ppm_value))
-    print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:3.3f}    RS_gas/R0: {3:3.3f}    PPM value: {4:d}"
+    print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f}    RS_gas/R0: {3:3.3f}    PPM value: {4:d}"
           .format(value, sensor_volt, rs_gas, rs_gas / r0, ppm_value))
     if ppm_value > co_max:
         co_max = ppm_value
