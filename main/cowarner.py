@@ -167,7 +167,7 @@ def check_alarm_level():   # check wether new alarm level should be reached, cal
         num_values = math.floor(WARNLEVEL[i][1] / MIN_SENSOR_READ_TIME)   # number of values to take into account
         if len(co_values) >= num_values:   # if less values available, do not alarm
             average = numpy.average(co_values[len(co_values)-num_values : len(co_values)])
-            print("Average " + str(WARNLEVEL[i]) + ": " + str(num_values) + " values " + str(average) + " ppm")
+            # print("Average " + str(WARNLEVEL[i]) + ": " + str(num_values) + " values " + str(average) + " ppm")
             if average >= WARNLEVEL[i][0]:
                 if alarmlevel != i:
                     alarmlevel = i
@@ -177,7 +177,6 @@ def check_alarm_level():   # check wether new alarm level should be reached, cal
     if alarmlevel != 0:
         alarmlevel = 0
         return True
-
     return False
 
 
