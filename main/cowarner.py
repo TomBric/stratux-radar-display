@@ -45,13 +45,13 @@ import numpy
 
 
 # constants
-# Remark: Sensor graphics of MICS 5524 shows a logarithmic scael.
-# Deriving the function for this give the linear equation 10**(RS/R0) = -0.867 (10**ppm) + 0.6
+# Remark: Sensor graphics of MICS 5524 shows a logarithmic scale.
+# Deriving the function for this gives the linear equation 10**(RS/R0) = -0.867 (10**ppm) + 0.6
 # a good explanation can be found e.g. on https://jayconsystems.com/blog/understanding-a-gas-sensor
 M = -0.867
 B = 0.6
-RSR0_CLEAN = 3.333   # 3.3 ppm, see data sheet auf MICS-5524
-R_DIVIDER = 10.0   # Value of divider resistor 10 kOhm
+RSR0_CLEAN = 3.333   # 3.3 ppm, see data sheet of MICS-5524
+R_DIVIDER = 10000.0   # Value of divider resistor 10 kOhm
 SENSOR_VOLTAGE = 5.0   # voltage for sensor board and divider
 # Measurement cycle
 CO_MEASUREMENT_WINDOW = 60 * 60   # one hour, sliding window that is stored for display of ppm values
