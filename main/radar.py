@@ -329,7 +329,7 @@ def new_traffic(json_str):
 
         if ac['gps_distance'] <= situation['RadarRange'] / 2:
             if not ac['was_spoken']:
-                speaktraffic(ac['height'], round(ac['gps_distance']))
+                speaktraffic(ac['height'], None, round(ac['gps_distance']))
                 ac['was_spoken'] = True
         else:
             # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius

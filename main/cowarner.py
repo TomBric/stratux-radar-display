@@ -319,3 +319,49 @@ async def read_sensors():
             rlog.debug("Sensor reader terminating ...")
     else:
         rlog.debug("No co-sensor active ...")
+
+''' BME280 integration tbd
+
+r_star = 8314.3  # J/(kmol*K) (universelle Gaskonstante)
+mw = 18.016      # kg/kmol (Molekulargewicht des Wasserdampfes)
+
+def sdd(temp, a, b):
+    return 6.1078 * math.pow(10, (a*temp)/(b+temp))
+
+
+def dewpoint(hum, temp, press):
+    if temp >= 0:
+        a = 7.5
+        b = 237.3
+    else:
+        a = 7.6
+        b = 240.7
+
+    sdd = 6.1078 * math.pow(10, (a*temp)/(b+temp))
+    dd = hum/100 * sdd
+    v = math.log10(dd/6.1078)
+    return  b*v/(a-v)
+
+
+bme280.load_calibration_params(bus, address=0x76)  # or 0x77
+fmt = '{0:5d}:  {1}  {2:0.3f} deg C,  {3:0.2f} hPa,  {4:0.2f} %'
+counter = 1
+data = bme280.sample(bus, address=0x76)  # or 0x77
+
+    altoffset = 0
+    altitude = 145366.45 * (1.0 - math.pow(data.pressure/1013.25, 0.190284)) + altoffset
+
+    # print(fmt.format(counter, data.timestamp, data.temperature, data.pressure, data.humidity))
+    with canvas(oled_device) as draw:
+        draw.text((0, 0), text=data.timestamp.strftime("%Y-%m-%d %H:%M:%S"), fill="white")
+        draw.line((0, 12, 128, 12), fill=255)
+        draw.text((0, 14), text='{0:0.3f} deg C'.format(data.temperature), fill="white")
+        draw.text((0, 24), text='{0:0.2f} hPa'.format(data.pressure), fill="white")
+        draw.text((0, 34), text='{0:0.2f} % rH'.format(data.humidity), fill="white")
+        draw.text((0, 64), text='FL {0:2.1f}'.format(altitude/100), fill="white")
+        draw.text((0, 80), text='Dewpoint {0:2.3f}'.format(dewpoint(data.humidity, data.temperature, data.pressure)), fill="white")
+
+
+
+
+'''
