@@ -805,14 +805,14 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     ts = draw.textsize(str(maxvalue), verysmallfont)
     draw.text((xpos - ts[0] - space, vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="black")
 
-    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=3, fill="white")
+    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize-1), outline="black", width=3, fill="white")
 
     # values below x-axis
     no_of_values = len(data)
     full_time = timeout * no_of_values   # time for full display in secs
     timestr = time.strftime("%H:%M", time.gmtime())
     ts = draw.textsize(timestr, verysmallfont)
-    no_of_time = math.floor(xsize / ts[0] / 2) + 1 # calculate maximum number of time indications
+    no_of_time = math.floor(xsize / ts[0] / 2) + 1  # calculate maximum number of time indications
     time_offset = full_time / no_of_time
     offset = math.floor((xsize-1) / no_of_time)
     x = xpos
@@ -831,7 +831,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
             x = ypos+ysize-1
         if i >= 1:  # we need at least two points before we draw
             x = xpos + i * xsize / (len(data)-1)
-            draw.line([lastpoint, (x,y)], fill="black", width=2)
+            draw.line([lastpoint, (x, y)], fill="black", width=2)
         else:
             x = xpos
         lastpoint = (x, y)
@@ -850,7 +850,7 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
         centered_text(draw, 0, "CO Warner: No CO alarm", largefont, fill="black")
     else:
         if alarmperiod > 60:
-            alarmstr = "CO: {:d} ppm longer {:d} min".format(alarmppm,math.floor(alarmperiod/60))
+            alarmstr = "CO: {:d} ppm longer {:d} min".format(alarmppm, math.floor(alarmperiod/60))
         else:
             alarmstr = "CO: {:d} ppm longer {:d} sec".format(alarmppm, math.floor(alarmperiod))
         centered_text(draw, 0, alarmstr, largefont, fill="black")
@@ -879,22 +879,38 @@ def data_item(draw, leftx, y, rightx, text, value):
     draw.text((rightx - ts[0], y), value, font=smallfont, fill="black")
 
 
+def dashboard(draw, x, y, sizex, rounding, headline, *lines):
+    # dashboard, arguments are lines = ("text", "value"), ....
+    starty = y
+    for line in lines:
+        draw.text((x + 2, starty + (SMALL - VERYSMALL) / 2), line[0], font=verysmallfont, fill="black", align="left")
+        ts = draw.textsize(line[1], smallfont)
+        draw.text((x + sizex - 2 - ts[0], starty), line[1], font=smallfont, fill="black")
+        starty += SMALL + 3
+    if rounding:
+        draw.rounded_rectangle([x, y, x + sizex, starty], radius=3, fill=None, outline="black", width=2)
+        ts = draw.textsize(headline, smallfont)
+        draw.rectangle([x + 20, y - SMALL/2, x + 20 + ts[0], y + SMALL/2], fill="white", outline=None)
+    draw.text((x+20, y - SMALL/2), headline, font=smallfont, fill="black")
+    return starty
+
+
 def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
               vert_speed_valid, vert_speed, error_message):
-    starty: int = 0
+
     centered_text(draw, 0, "Situation at {:0>2d}:{:0>2d}:{:0>2d},{:1d} UTC".format(now.hour, now.minute, now.second,
         math.floor(now.microsecond/100000)), smallfont, fill="black")
-    starty += SMALL + 8
 
+    lines = (
+        ("GPS-Distance [m]", "---"),
+        ("GPS-Speed [kts]", "---"),
+    )
     if gps_valid:
-        data_item(draw, 5, starty, 220, "GPS-Distance [m]", "{:4.0f}".format(gps_distance))
-    else:
-        data_item(draw, 5, starty, 220, "GPS-Distance [m]", "--")
-    starty += SMALL + 4
+        lines[0][1] = "{:4.0f}".format(gps_distance)
     if gps_valid:
-        data_item(draw, 5, starty, 220, "GPS-Speed [kts]", "{:3.1f}".format(gps_speed))
-    else:
-        data_item(draw, 5, starty, 220, "GPS-Speed [kts]", "--")
+        lines[1][1] = "{:3.1f}".format(gps_speed)
+    starty = dashboard(draw, 20, 0, 230, True, "GPS", lines)
+
     starty += SMALL + 4
     starty += SMALL + 4
     if baro_valid:
