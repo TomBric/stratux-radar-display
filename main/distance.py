@@ -80,7 +80,9 @@ def draw_situation(draw, display_control, was_changed, connected, situation):
     if was_changed:
         error_message = None
         gps_valid = False
+        gps_distance = 0.0
         alt_diff_valid = False
+        alt_diff = 0.0
         if not connected:
             error_message = MSG_NO_CONNECTION
         else:
