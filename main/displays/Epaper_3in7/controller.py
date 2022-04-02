@@ -883,15 +883,15 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
     # dashboard, arguments are lines = ("text", "value"), ....
     starty = y
     for line in lines:
-        draw.text((x + 2, starty + (SMALL - VERYSMALL) / 2), line[0], font=verysmallfont, fill="black", align="left")
+        draw.text((x + 5, starty + (SMALL - VERYSMALL) / 2), line[0], font=verysmallfont, fill="black", align="left")
         ts = draw.textsize(line[1], smallfont)
-        draw.text((x + sizex - 2 - ts[0], starty), line[1], font=smallfont, fill="black")
+        draw.text((x + sizex - 5 - ts[0], starty), line[1], font=smallfont, fill="black")
         starty += SMALL + 3
     if rounding:
-        draw.rounded_rectangle([x, y, x + sizex, starty], radius=3, fill=None, outline="black", width=2)
+        draw.rounded_rectangle([x, y, x + sizex, starty], radius=3, fill=None, outline="black", width=3)
         ts = draw.textsize(headline, smallfont)
         draw.rectangle([x + 20, y - SMALL/2, x + 20 + ts[0], y + SMALL/2], fill="white", outline=None)
-    draw.text((x+20, y - SMALL/2), headline, font=smallfont, fill="black")
+    draw.text((x+20, y - VERYSMALL/2), headline, font=verysmallfont, fill="black")
     return starty
 
 
@@ -909,7 +909,7 @@ def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_alt
         lines[0][1] = "{:4.0f}".format(gps_distance)
     if gps_valid:
         lines[1][1] = "{:3.1f}".format(gps_speed)
-    starty = dashboard(draw, 20, 0, 230, True, "GPS", lines)
+    starty = dashboard(draw, 0, 30, 230, True, "GPS", lines)
 
     starty += SMALL + 4
     starty += SMALL + 4
