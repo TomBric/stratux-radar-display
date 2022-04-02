@@ -888,6 +888,7 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
         draw.text((x + sizex - 7 - ts[0], starty), line[1], font=smallfont, fill="black")
         starty += SMALL + 3
     if rounding:
+        starty += VERYSMALL/2
         draw.rounded_rectangle([x, y, x + sizex, starty], radius=5, fill=None, outline="black", width=3)
         ts = draw.textsize(headline, smallfont)
         draw.rectangle([x + 20, y - SMALL/2, x + 20 + ts[0], y + SMALL/2], fill="white", outline=None)
@@ -909,7 +910,7 @@ def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_alt
         lines[0][1] = "{:4.0f}".format(gps_distance)
     if gps_valid:
         lines[1][1] = "{:3.1f}".format(gps_speed)
-    starty = dashboard(draw, 3, 30, 235, True, "GPS", lines)
+    starty = dashboard(draw, 5, 40, 235, True, "GPS", lines)
 
     starty += SMALL + 4
     starty += SMALL + 4
