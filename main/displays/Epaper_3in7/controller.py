@@ -907,7 +907,7 @@ def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_alt
     else:
         data_item(draw, 5, starty, 220, "Baro-Diff [ft]", "--")
     starty += SMALL + 4
-    if vert_speed_valid_valid:
+    if vert_speed_valid:
         data_item(draw, 5, starty, 220, "Vert Speed [ft]", "{:4.0f}".format(vert_speed_valid))
     else:
         data_item(draw, 5, starty, 220, "Vert Speed [ft]", "--")
