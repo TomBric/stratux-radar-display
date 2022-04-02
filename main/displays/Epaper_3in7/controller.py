@@ -897,7 +897,6 @@ def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_alt
 
     if error_message is not None:
         centered_text(draw, 60, error_message, verylargefont, fill="black")
-
     right = "Reset"
     middle = "Mode"
     textsize = draw.textsize(right, smallfont)
