@@ -879,7 +879,7 @@ def data_item(draw, leftx, y, rightx, text, value):
     draw.text((rightx - ts[0], y), value, font=smallfont, fill="black")
 
 
-def dashboard(draw, x, y, sizex, rounding, headline, *lines):
+def dashboard(draw, x, y, sizex, rounding, headline, lines):
     # dashboard, arguments are lines = ("text", "value"), ....
     starty = y
     for line in lines:
