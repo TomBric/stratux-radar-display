@@ -55,7 +55,7 @@ import radarbuttons
 import stratuxstatus
 import flighttime
 import cowarner
-import situation
+import distance
 from datetime import datetime, timezone
 
 # constant definitions
@@ -573,9 +573,9 @@ async def user_interface():
             elif global_mode == 19:  # co warner
                 next_mode = cowarner.user_input()
             elif global_mode == 21:  # situation
-                next_mode, reset_situation = situation.user_input()
+                next_mode, reset_situation = distance.user_input()
                 if reset_situation:
-                    situation.reset_values(situation)
+                    distance.reset_values(situation)
             if next_mode > 0:
                 ui_changed = True
                 rlog.debug("User Interface: global mode changing from: " + str(global_mode) + " to " + str(next_mode))
@@ -692,7 +692,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 19
                 elif global_mode == 21:  # situation
-                    situation.draw_situation(draw, display_control, situation['was_changed'] or ui_changed,
+                    distance.draw_situation(draw, display_control, situation['was_changed'] or ui_changed,
                                              situation['connected'], situation)
                     ui_changed = False
                 elif global_mode == 22:  # refresh display, only relevant for epaper, mode was situation
