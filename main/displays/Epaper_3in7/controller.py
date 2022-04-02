@@ -875,7 +875,7 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
 
 def data_item(draw, leftx, y, rightx, text, value):
     draw.text((leftx, y + (SMALL-VERYSMALL) / 2), text, font=verysmallfont, fill="black", align="left")
-    ts = draw.textsize(text, smallfont)
+    ts = draw.textsize(value, smallfont)
     draw.text((rightx - ts[0], y), value, font=smallfont, fill="black")
 
 
