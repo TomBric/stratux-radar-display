@@ -55,6 +55,7 @@ import radarbuttons
 import stratuxstatus
 import flighttime
 import cowarner
+import situation
 from datetime import datetime, timezone
 
 # constant definitions
