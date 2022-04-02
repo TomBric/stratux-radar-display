@@ -77,29 +77,29 @@ def reset_values(situation):
 
 
 def draw_situation(draw, display_control, was_changed, connected, situation):
-    if was_changed:
-        error_message = None
-        gps_valid = False
-        gps_distance = 0.0
-        alt_diff_valid = False
-        alt_diff = 0.0
-        if not connected:
-            error_message = MSG_NO_CONNECTION
-        else:
-            if situation['baro_valid'] and baro_diff_zero['baro_valid']:
-                pressure_alt = situation['own_altitude']
-                alt_diff = pressure_alt - baro_diff_zero['own_altitude']
-                alt_diff_valid = True
-            if situation['gps_active'] and gps_distance_zero['gps_active']:
-                gps_valid = True
-                gps_distance = calc_gps_distance_meters(gps_distance_zero['latitude'], gps_distance_zero['longitude'],
-                                                        situation['latitude'], situation['longitude'])
-        now = datetime.datetime.now(datetime.timezone.utc)
-        display_control.clear(draw)
-        display_control.situation(draw, now, gps_valid, gps_distance, situation['gps_speed'],
-                                  situation['baro_valid'], situation['own_altitude'], alt_diff_valid, alt_diff,
-                                  situation['baro_valid'], situation['vertical_speed'], error_message)
-        display_control.display()
+    # display in any case, even if there is no change, since time is running anyhow
+    error_message = None
+    gps_valid = False
+    gps_distance = 0.0
+    alt_diff_valid = False
+    alt_diff = 0.0
+    if not connected:
+        error_message = MSG_NO_CONNECTION
+    else:
+        if situation['baro_valid'] and baro_diff_zero['baro_valid']:
+            pressure_alt = situation['own_altitude']
+            alt_diff = pressure_alt - baro_diff_zero['own_altitude']
+            alt_diff_valid = True
+        if situation['gps_active'] and gps_distance_zero['gps_active']:
+            gps_valid = True
+            gps_distance = calc_gps_distance_meters(gps_distance_zero['latitude'], gps_distance_zero['longitude'],
+                                                    situation['latitude'], situation['longitude'])
+    now = datetime.datetime.now(datetime.timezone.utc)
+    display_control.clear(draw)
+    display_control.situation(draw, now, gps_valid, gps_distance, situation['gps_speed'],
+                              situation['baro_valid'], situation['own_altitude'], alt_diff_valid, alt_diff,
+                              situation['baro_valid'], situation['vertical_speed'], error_message)
+    display_control.display()
 
 
 def user_input():
