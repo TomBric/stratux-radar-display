@@ -881,7 +881,7 @@ def data_item(draw, leftx, y, rightx, text, value):
 
 def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
               vert_speed_valid, vert_speed, error_message):
-    starty = 0
+    starty: int = 0
     centered_text(draw, 0, "Situation at {:2d}:{:2d}:{:2d},{:1d} UTC".format(now.hour, now.minute, now.second,
         math.floor(now.microsecond/100000)), smallfont, fill="black")
     starty += SMALL + 8
@@ -902,10 +902,15 @@ def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_alt
     else:
         data_item(draw, 5, starty, 220, "Baro-Altitude [ft]", "--")
     starty += SMALL + 4
-    if baro_valid:
-        data_item(draw, 5, starty, 220, "Baro-Diff [ft]", "{:5.0f}".format(own_altitude))
+    if alt_diff_valid:
+        data_item(draw, 5, starty, 220, "Baro-Diff [ft]", "{:5.0f}".format(alt_diff))
     else:
         data_item(draw, 5, starty, 220, "Baro-Diff [ft]", "--")
+    starty += SMALL + 4
+    if vert_speed_valid_valid:
+        data_item(draw, 5, starty, 220, "Vert Speed [ft]", "{:4.0f}".format(vert_speed_valid))
+    else:
+        data_item(draw, 5, starty, 220, "Vert Speed [ft]", "--")
 
     if error_message is not None:
         centered_text(draw, 60, error_message, verylargefont, fill="black")
