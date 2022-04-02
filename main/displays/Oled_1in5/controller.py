@@ -846,3 +846,8 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0], sizey - SMALL), right, font=smallfont, fill="green", align="right")
     centered_text(draw, sizey - SMALL, middle, smallfont, fill="green")
+
+
+def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
+              vert_speed_valid, vert_speed, error_message):
+    pass

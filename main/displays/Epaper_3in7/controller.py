@@ -871,3 +871,35 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL - 3, "Mode", smallfont, fill="black")
+
+
+def data_item(draw, leftx, y, rightx, text, value):
+    draw.text((leftx, y + (smallfont-verysmallfont) / 2), text, font=verysmallfont, fill="black", align="left")
+    ts = draw.textsize(text, smallfont)
+    draw.text((rightx - ts[0], y), value, font=smallfont, fill="black")
+
+
+def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
+              vert_speed_valid, vert_speed, error_message):
+    starty = 0
+    centered_text(draw, 0, "Situation at {:2d}:{:2d}:{2d},{:1d} UTC".format(now.hour, now.minute, now.second,
+        math.floor(now.microsecond/100000)), smallfont, fill="black")
+    starty += SMALL + 8
+
+    data_item(draw, starty, 5, 220, "GPS-Distance [m]", "{:4.0f}".format(gps_distance))
+    starty += smallfont + 4
+    data_item(draw, starty, 5, 220, "GPS-Speed [kts]", "{:3.1f}".format(gps_speed))
+    starty += smallfont + 4
+    starty += smallfont + 4
+    data_item(draw, starty, 5, 220, "Baro-Altitude [ft]", "{:5.0f}".format(own_altitude))
+    starty += smallfont + 4
+    data_item(draw, starty, 5, 220, "Baro-Diff [ft]", "{:5.0f}".format(own_altitude))
+
+    if error_message is not None:
+        centered_text(draw, 60, error_message, verylargefont, fill="black")
+
+    right = "Reset"
+    middle = "Mode"
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")

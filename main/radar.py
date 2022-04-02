@@ -104,7 +104,7 @@ situation = {'was_changed': True, 'last_update': 0.0, 'connected': False, 'gps_a
              'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
              'vertical_speed': 0.0, 'baro_valid': False}
 vertical_max = 0.0  # max value for vertical speed
-vertical_min = 0.0  # min valud for vertical speed
+vertical_min = 0.0  # min valud for vertical spee
 
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
         'ahrs_sensor': False}
@@ -128,7 +128,7 @@ global_mode = 1
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
 # 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
 # 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status
-# 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 0=Init
+# 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 21=situation 22=refresh situation 0=Init
 bluetooth = False  # True if bluetooth is enabled by parameter -b
 extsound_active = False   # external sound was successfully activated, if global_config >=0
 bluetooth_active = False   # bluetooth successfully activated
@@ -493,7 +493,7 @@ async def listen_forever(path, name, callback, logger):
                         # rlog.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
                             logger.debug(name + ': Watchdog detected connection loss.' +
-                                       ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
+                                        ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                             break
                     except websockets.exceptions.ConnectionClosed:
@@ -517,7 +517,7 @@ async def listen_forever(path, name, callback, logger):
                 gmeter['was_changed'] = True
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
-        except (asyncio.CancelledError):
+        except asyncio.CancelledError:
             logger.debug(name + " shutting down in connect ... ")
             return
 
@@ -569,12 +569,15 @@ async def user_interface():
                     stratuxstatus.stop()  # stops status_listener
             elif global_mode == 17:  # display flighttimes
                 next_mode = flighttime.user_input()
-            elif global_mode == 19:  # display flighttimes
+            elif global_mode == 19:  # co warner
                 next_mode = cowarner.user_input()
-
+            elif global_mode == 21:  # situation
+                next_mode, reset_situation = situation.user_input()
+                if reset_situation:
+                    situation.reset_values(situation)
             if next_mode > 0:
                 ui_changed = True
-                rlog.debug("User Interface: global mode changing from: "+str(global_mode)+ " to " + str(next_mode))
+                rlog.debug("User Interface: global mode changing from: " + str(global_mode) + " to " + str(next_mode))
                 global_mode = next_mode
 
             current_time = time.time()
@@ -687,12 +690,20 @@ async def display_and_cutoff():
                     rlog.debug("CO-Warner: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 19
+                elif global_mode == 21:  # situation
+                    situation.draw_situation(draw, display_control, situation['was_changed'] or ui_changed,
+                                             situation['connected'], situation)
+                    ui_changed = False
+                elif global_mode == 22:  # refresh display, only relevant for epaper, mode was situation
+                    rlog.debug("Situation: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 21
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
             for icao, ac in all_ac.items():
                 if ac['last_contact_timestamp'] < cutoff:
-                    rlog.log(AIRCRAFT_DEBUG,"Cutting of " + hex(icao))
+                    rlog.log(AIRCRAFT_DEBUG, "Cutting of " + hex(icao))
                     to_delete.append(icao)
                     aircraft_changed = True
             for i in to_delete:
@@ -787,6 +798,8 @@ if __name__ == "__main__":
                     default=False)
     ap.add_argument("-w", "--cowarner", required=False, help="Start mode is CO warner", action='store_true',
                     default=False)
+    ap.add_argument("-sit", "--situation", required=False, help="Start mode situation display", action='store_true',
+                    default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
                     default=0)
@@ -838,6 +851,8 @@ if __name__ == "__main__":
         global_mode = 15  # start in stratux-status
     if args['cowarner']:
         global_mode = 19  # start in co-warner mode
+    if args['situation']:
+        global_mode = 21  # start in situation
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     global_config['sound_volume'] = args['extsound']    # 0 if not enabled
