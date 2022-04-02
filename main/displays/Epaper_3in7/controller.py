@@ -887,25 +887,25 @@ def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_alt
     starty += SMALL + 8
 
     if gps_valid:
-        data_item(draw, starty, 5, 220, "GPS-Distance [m]", "{:4.0f}".format(gps_distance))
+        data_item(draw, 5, starty, 220, "GPS-Distance [m]", "{:4.0f}".format(gps_distance))
     else:
-        data_item(draw, starty, 5, 220, "GPS-Distance [m]", "--")
+        data_item(draw, 5, starty, 220, "GPS-Distance [m]", "--")
     starty += SMALL + 4
     if gps_valid:
-        data_item(draw, starty, 5, 220, "GPS-Speed [kts]", "{:3.1f}".format(gps_speed))
+        data_item(draw, 5, starty, 220, "GPS-Speed [kts]", "{:3.1f}".format(gps_speed))
     else:
-        data_item(draw, starty, 5, 220, "GPS-Speed [kts]", "--")
+        data_item(draw, 5, starty, 220, "GPS-Speed [kts]", "--")
     starty += SMALL + 4
     starty += SMALL + 4
     if baro_valid:
-        data_item(draw, starty, 5, 220, "Baro-Altitude [ft]", "{:5.0f}".format(own_altitude))
+        data_item(draw, 5, starty, 220, "Baro-Altitude [ft]", "{:5.0f}".format(own_altitude))
     else:
-        data_item(draw, starty, 5, 220, "Baro-Altitude [ft]", "--")
+        data_item(draw, 5, starty, 220, "Baro-Altitude [ft]", "--")
     starty += SMALL + 4
     if baro_valid:
-        data_item(draw, starty, 5, 220, "Baro-Diff [ft]", "{:5.0f}".format(own_altitude))
+        data_item(draw, 5, starty, 220, "Baro-Diff [ft]", "{:5.0f}".format(own_altitude))
     else:
-        data_item(draw, starty, 5, 220, "Baro-Diff [ft]", "--")
+        data_item(draw, 5, starty, 220, "Baro-Diff [ft]", "--")
 
     if error_message is not None:
         centered_text(draw, 60, error_message, verylargefont, fill="black")
