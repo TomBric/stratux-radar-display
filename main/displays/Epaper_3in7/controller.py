@@ -896,7 +896,7 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
     return starty
 
 
-def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
+def distance(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
               vert_speed_valid, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
 
     centered_text(draw, 0, "Situation", smallfont, fill="black")

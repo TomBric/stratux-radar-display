@@ -76,7 +76,7 @@ def reset_values(situation):
     baro_diff_zero['own_altitude'] = situation['own_altitude']
 
 
-def draw_situation(draw, display_control, was_changed, connected, situation, ahrs):
+def draw_distance(draw, display_control, was_changed, connected, situation, ahrs):
     # display in any case, even if there is no change, since time is running anyhow
     error_message = None
     gps_valid = False
@@ -96,7 +96,7 @@ def draw_situation(draw, display_control, was_changed, connected, situation, ahr
                                                     situation['latitude'], situation['longitude'])
     now = datetime.datetime.now(datetime.timezone.utc)
     display_control.clear(draw)
-    display_control.situation(draw, now, gps_valid, gps_distance, situation['gps_speed'],
+    display_control.distance(draw, now, gps_valid, gps_distance, situation['gps_speed'],
                               situation['baro_valid'], situation['own_altitude'], alt_diff_valid, alt_diff,
                               situation['baro_valid'], situation['vertical_speed'], ahrs['ahrs_sensor'],
                               ahrs['pitch'], ahrs['roll'], error_message)

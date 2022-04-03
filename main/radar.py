@@ -692,7 +692,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 19
                 elif global_mode == 21:  # situation
-                    distance.draw_situation(draw, display_control, situation['was_changed'] or ui_changed,
+                    distance.draw_distance(draw, display_control, situation['was_changed'] or ui_changed,
                                              situation['connected'], situation, ahrs)
                     ui_changed = False
                 elif global_mode == 22:  # refresh display, only relevant for epaper, mode was situation
