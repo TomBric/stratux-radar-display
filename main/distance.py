@@ -108,7 +108,7 @@ def user_input():
     if btime == 0:
         return 0, False  # stay in current mode
     if button == 1 and (btime == 2 or btime == 1):  # middle
-        return 0, False  # next mode to be radar
+        return 1, False  # next mode to be radar
     if button == 0 and btime == 2:  # left and long
         return 3, False  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short- reset values
