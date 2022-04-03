@@ -820,6 +820,6 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
 
 
-def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
-              vert_speed_valid, vert_speed, error_message):
+def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
+            own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
     pass

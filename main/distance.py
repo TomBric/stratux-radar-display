@@ -31,9 +31,16 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# This mode is for flight testing. It enables to measure the starting distance.
+# Just press "Start" before starting runup and then check when you are airborne,
+# or to measure 15m obstacle clearance, check till 1.3*Vs1 is reached
+# (see flight-testing handbook). You need to video record your EFIS or speed indicator
+# along with the display
+
 import math
 import radarbuttons
 import datetime
+
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
