@@ -896,7 +896,7 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
     return starty
 
 
-def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
+def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
               vert_speed_valid, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
 
     centered_text(draw, 0, "Situation", smallfont, fill="black")
@@ -906,7 +906,7 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, gps_distance, gp
         ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
                                                        math.floor(now.microsecond/100000)))
     )
-    starty = dashboard(draw, 5, 40, 235, True, "Date/Time", lines)
+    starty = dashboard(draw, 5, 40, 225, True, "Date/Time", lines)
 
     t = "GPS-NoFix"
     accuracy=""
@@ -921,11 +921,18 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, gps_distance, gp
         ("GPS-Speed [kts]", "---"),
         (t,accuracy)
     )
+    gps_dist_str = "---"
+    gps_speed_str = "---"
+    if distance_valid:
+        gps_dist_str = "{:4.0f}".format(gps_distance)
     if gps_valid:
-        lines[0][1] = "{:4.0f}".format(gps_distance)
-    if gps_valid:
-        lines[1][1] = "{:3.1f}".format(gps_speed)
-    dashboard(draw, 5, starty+10, 235, True, "GPS", lines)
+        gps_speed_str = "{:3.1f}".format(gps_speed)
+    lines = (
+        ("GPS-Distance [m]", gps_dist_str),
+        ("GPS-Speed [kts]", gps_speed_str),
+        (t, accuracy)
+    )
+    dashboard(draw, 5, starty+20, 225, True, "GPS", lines)
 
     b_alt = "--"
     if baro_valid:
@@ -941,13 +948,13 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, gps_distance, gp
         ("Baro-Altitude [ft]",b_alt),
         ("Vert Speed [ft]", v_spd)
     )
-    starty = dashboard(draw, 240, 30, 235, True, "Baro", lines)
+    starty = dashboard(draw, 250, 30, 225, True, "Baro", lines)
     if ahrs_valid:
         lines = (
             ("Pitch [deg]", "{:2.2f}".format(ahrs_pitch)),
             ("Roll [deg]", "{:2.2f}".format(ahrs_roll))
         )
-        dashboard(draw, 240, starty + 10, 235, True, "AHRS", lines)
+        dashboard(draw, 250, starty + 20, 225, True, "AHRS", lines)
 
 
     if error_message is not None:
