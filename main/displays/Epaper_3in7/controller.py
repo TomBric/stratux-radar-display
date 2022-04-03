@@ -916,11 +916,6 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     elif gps_quality == 2:
         t = "DGNSS"
         accuracy = str(round(gps_h_accuracy, 1)) + "m"
-    lines = (
-        ("GPS-Distance [m]", "---"),
-        ("GPS-Speed [kts]", "---"),
-        (t,accuracy)
-    )
     gps_dist_str = "---"
     gps_speed_str = "---"
     if distance_valid:
@@ -936,8 +931,8 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
 
     if ahrs_valid:
         lines = (
-            ("Pitch [deg]", "{:2d}".format(ahrs_pitch)),
-            ("Roll [deg]", "{:2d}".format(ahrs_roll))
+            ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
+            ("Roll [deg]", "{:+2d}".format(ahrs_roll))
         )
         starty = dashboard(draw, 250, 40, 225, True, "AHRS", lines)
     else:
@@ -945,9 +940,9 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
 
     if baro_valid:
         lines = (
-            ("Baro-Diff [ft]", "{:5.1f}".format(alt_diff)),
+            ("Baro-Diff [ft]", "{:+5.1f}".format(alt_diff)),
             ("Baro-Altitude [ft]","{:5.0f}".format(own_altitude)),
-            ("Vert Speed [ft]", "{:4.0f}".format(vert_speed))
+            ("Vert Speed [ft]", "{:+4.0f}".format(vert_speed))
         )
         dashboard(draw, 250, starty + 20, 225, True, "Baro", lines)
 

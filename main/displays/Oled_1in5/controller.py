@@ -877,14 +877,14 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     starty = dashboard(draw, 0, SMALL+2, sizex, lines)
     if baro_valid:
         lines = (
-            ("BaroDiff[ft]", "{:5.1f}".format(alt_diff)),
+            ("BaroDiff[ft]", "{:+5.1f}".format(alt_diff)),
             ("BaroAlt[ft]", "{:5.0f}".format(own_altitude)),
-            ("VSpd [ft]", "{:4.0f}".format(vert_speed))
+            ("VSpd [ft]", "{:+4.0f}".format(vert_speed))
         )
         starty = dashboard(draw, 0, starty, sizex, lines)
     if ahrs_valid:
         lines = (
-            ("Pitch [deg]", "{:2d}".format(ahrs_pitch)),
+            ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
         )
         dashboard(draw, 0, starty, sizex, lines)
 
