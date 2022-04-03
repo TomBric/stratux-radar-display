@@ -76,7 +76,7 @@ def reset_values(situation):
     baro_diff_zero['own_altitude'] = situation['own_altitude']
 
 
-def draw_situation(draw, display_control, was_changed, connected, situation):
+def draw_situation(draw, display_control, was_changed, connected, situation, ahrs):
     # display in any case, even if there is no change, since time is running anyhow
     error_message = None
     gps_valid = False
