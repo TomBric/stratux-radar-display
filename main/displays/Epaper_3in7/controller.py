@@ -902,7 +902,7 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     centered_text(draw, 0, "Situation", smallfont, fill="black")
 
     lines = (
-        ("Date", "{:0>2d}-{:0>2d}-{:0>4d}".format(now.day, now.month, now.year)),
+        ("Date", "{:0>2d}.{:0>2d}.{:0>4d}".format(now.day, now.month, now.year)),
         ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
                                                        math.floor(now.microsecond/100000)))
     )
@@ -934,12 +934,21 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     )
     dashboard(draw, 5, starty+20, 225, True, "GPS", lines)
 
+    if ahrs_valid:
+        lines = (
+            ("Pitch [deg]", "{:2.2f}".format(ahrs_pitch)),
+            ("Roll [deg]", "{:2.2f}".format(ahrs_roll))
+        )
+        starty = dashboard(draw, 250, 40, 225, True, "AHRS", lines)
+    else:
+        starty = 20
+
     b_alt = "--"
     if baro_valid:
         b_alt = "{:5.0f}".format(own_altitude)
     b_diff = "--"
     if alt_diff_valid:
-        b_diff = "{:5.0f}".format(alt_diff)
+        b_diff = "{:5.1f}".format(alt_diff)
     v_spd = "--"
     if vert_speed_valid:
         v_spd = "{:4.0f}".format(vert_speed)
@@ -948,14 +957,7 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
         ("Baro-Altitude [ft]",b_alt),
         ("Vert Speed [ft]", v_spd)
     )
-    starty = dashboard(draw, 250, 30, 225, True, "Baro", lines)
-    if ahrs_valid:
-        lines = (
-            ("Pitch [deg]", "{:2.2f}".format(ahrs_pitch)),
-            ("Roll [deg]", "{:2.2f}".format(ahrs_roll))
-        )
-        dashboard(draw, 250, starty + 20, 225, True, "AHRS", lines)
-
+    dashboard(draw, 250, starty + 20, 225, True, "Baro", lines)
 
     if error_message is not None:
         centered_text(draw, 60, error_message, verylargefont, fill="black")
