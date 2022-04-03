@@ -881,7 +881,13 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
             ("BaroAlt[ft]", "{:5.0f}".format(own_altitude)),
             ("VSpd [ft]", "{:4.0f}".format(vert_speed))
         )
+        starty = dashboard(draw, 0, starty, sizex, lines)
+    if ahrs_valid:
+        lines = (
+            ("Pitch [deg]", "{:2.2f}".format(ahrs_pitch)),
+        )
         dashboard(draw, 0, starty, sizex, lines)
+
 
     if error_message is not None:
         centered_text(draw, 80, error_message, verylargefont, fill="red")
