@@ -40,7 +40,7 @@ MSG_NO_CONNECTION = "No Connection!"
 # globals
 gps_distance_zero = {'gps_active': False, 'longitude': 0.0, 'latitude': 0.0}
 # gps-starting point in meters for situation and flight testing
-baro_diff_zero = {'baro_altitude': 0.0}
+baro_diff_zero = {'own_altitude': 0.0}
 # height starting point based on baro in feet for situation and flight testing
 
 
@@ -79,7 +79,6 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
     # display in any case, even if there is no change, since time is running anyhow
     error_message = None
     gps_distance = 0.0
-    alt_diff_valid = False
     alt_diff = 0.0
     if not connected:
         error_message = MSG_NO_CONNECTION
