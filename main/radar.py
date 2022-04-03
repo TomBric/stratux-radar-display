@@ -693,7 +693,7 @@ async def display_and_cutoff():
                     global_mode = 19
                 elif global_mode == 21:  # situation
                     distance.draw_situation(draw, display_control, situation['was_changed'] or ui_changed,
-                                             situation['connected'], situation)
+                                             situation['connected'], situation, ahrs)
                     ui_changed = False
                 elif global_mode == 22:  # refresh display, only relevant for epaper, mode was situation
                     rlog.debug("Situation: Display driver - Refreshing")

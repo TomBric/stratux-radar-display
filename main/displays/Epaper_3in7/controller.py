@@ -892,42 +892,64 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
         draw.rounded_rectangle([x, y, x + sizex, starty], radius=5, fill=None, outline="black", width=3)
         ts = draw.textsize(headline, smallfont)
         draw.rectangle([x + 20, y - SMALL/2, x + 20 + ts[0], y + SMALL/2], fill="white", outline=None)
-    draw.text((x+20+VERYSMALL/2, y - VERYSMALL/2), headline, font=verysmallfont, fill="black")
+    draw.text((x+20+4, y - VERYSMALL/2), headline, font=verysmallfont, fill="black")
     return starty
 
 
 def situation(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
-              vert_speed_valid, vert_speed, error_message):
+              vert_speed_valid, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
 
-    centered_text(draw, 0, "Situation at {:0>2d}:{:0>2d}:{:0>2d},{:1d} UTC".format(now.hour, now.minute, now.second,
-        math.floor(now.microsecond/100000)), smallfont, fill="black")
+    centered_text(draw, 0, "Situation", smallfont, fill="black")
 
+    lines = (
+        ("Date", "{:0>2d}-{:0>2d}-{:0>4d}".format(now.day, now.month, now.year)),
+        ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
+                                                       math.floor(now.microsecond/100000)))
+    )
+    starty = dashboard(draw, 5, 40, 235, True, "Date/Time", lines)
+
+    t = "GPS-NoFix"
+    accuracy=""
+    if situation['gps_quality'] == 1:
+        t = "3D GPS"
+        accuracy=str(round(situation['gps_h_accuracy'], 1)) + "m"
+    elif situation['gps_quality'] == 2:
+        t = "DGNSS"
+        accuracy = str(round(situation['gps_h_accuracy'], 1)) + "m"
     lines = (
         ("GPS-Distance [m]", "---"),
         ("GPS-Speed [kts]", "---"),
+        (t,accuracy)
     )
     if gps_valid:
         lines[0][1] = "{:4.0f}".format(gps_distance)
     if gps_valid:
         lines[1][1] = "{:3.1f}".format(gps_speed)
-    starty = dashboard(draw, 5, 40, 235, True, "GPS", lines)
+    dashboard(draw, starty+10, 40, 235, True, "GPS", lines)
 
-    starty += SMALL + 4
-    starty += SMALL + 4
+    b_alt = "--"
     if baro_valid:
-        data_item(draw, 5, starty, 220, "Baro-Altitude [ft]", "{:5.0f}".format(own_altitude))
-    else:
-        data_item(draw, 5, starty, 220, "Baro-Altitude [ft]", "--")
-    starty += SMALL + 4
+        b_alt = "{:5.0f}".format(own_altitude)
+    b_diff = "--"
     if alt_diff_valid:
-        data_item(draw, 5, starty, 220, "Baro-Diff [ft]", "{:5.0f}".format(alt_diff))
-    else:
-        data_item(draw, 5, starty, 220, "Baro-Diff [ft]", "--")
-    starty += SMALL + 4
+        b_diff = "{:5.0f}".format(alt_diff)
+    v_spd = "--"
     if vert_speed_valid:
-        data_item(draw, 5, starty, 220, "Vert Speed [ft]", "{:4.0f}".format(vert_speed_valid))
-    else:
-        data_item(draw, 5, starty, 220, "Vert Speed [ft]", "--")
+        v_spd = "{:4.0f}".format(vert_speed)
+    lines = (
+        ("Baro-Diff [ft]", b_diff),
+        ("Baro-Altitude [ft]",b_alt),
+        ("Vert Speed [ft]", v_spd)
+    )
+    starty = dashboard(draw, 30, 245, 475, True, "Baro", lines)
+
+    if ahrs_valid:
+        lines = (
+            ("Pitch [deg]", "{:2,2f}".format(ahrs_pitch)),
+            ("Roll [deg]", "{:2,2f}".format(ahrs_roll))
+        )
+        dashboard(draw, starty + 10, 245, 475, True, "AHRS", lines)
+
 
     if error_message is not None:
         centered_text(draw, 60, error_message, verylargefont, fill="black")
