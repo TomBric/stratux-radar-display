@@ -896,7 +896,7 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
     return starty
 
 
-def distance(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
+def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
               vert_speed_valid, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
 
     centered_text(draw, 0, "Situation", smallfont, fill="black")
@@ -910,12 +910,12 @@ def distance(draw, now, gps_valid, gps_distance, gps_speed, baro_valid, own_alti
 
     t = "GPS-NoFix"
     accuracy=""
-    if situation['gps_quality'] == 1:
+    if gps_quality == 1:
         t = "3D GPS"
-        accuracy=str(round(situation['gps_h_accuracy'], 1)) + "m"
-    elif situation['gps_quality'] == 2:
+        accuracy=str(round(gps_h_accuracy, 1)) + "m"
+    elif gps_quality == 2:
         t = "DGNSS"
-        accuracy = str(round(situation['gps_h_accuracy'], 1)) + "m"
+        accuracy = str(round(gps_h_accuracy, 1)) + "m"
     lines = (
         ("GPS-Distance [m]", "---"),
         ("GPS-Speed [kts]", "---"),
