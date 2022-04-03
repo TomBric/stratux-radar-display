@@ -756,14 +756,14 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     ts = draw.textsize(str(maxvalue), verysmallfont)
     draw.text((xpos - ts[0] - space, vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="black")
 
-    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize- 1), outline="black", width=3, fill="white")
+    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize-1), outline="black", width=3, fill="white")
 
     # values below x-axis
     no_of_values = len(data)
     full_time = timeout * no_of_values   # time for full display in secs
     timestr = time.strftime("%H:%M", time.gmtime())
     ts = draw.textsize(timestr, verysmallfont)
-    no_of_time = math.floor(xsize / ts[0] / 2) + 1 # calculate maximum number of time indications
+    no_of_time = math.floor(xsize / ts[0] / 2) + 1   # calculate maximum number of time indications
     time_offset = full_time / no_of_time
     offset = math.floor((xsize-1) / no_of_time)
     x = xpos
@@ -782,7 +782,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
             x = ypos+ysize-1
         if i >= 1:  # we need at least two points before we draw
             x = xpos + i * xsize / (len(data)-1)
-            draw.line([lastpoint, (x,y)], fill="black", width=2)
+            draw.line([lastpoint, (x, y)], fill="black", width=2)
         else:
             x = xpos
         lastpoint = (x, y)
@@ -801,7 +801,7 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
         centered_text(draw, 0, "CO: No CO alarm", smallfont, fill="black")
     else:
         if alarmperiod > 60:
-            alarmstr = "CO: {:d}ppm>{:d}min".format(alarmppm,math.floor(alarmperiod/60))
+            alarmstr = "CO: {:d}ppm>{:d}min".format(alarmppm, math.floor(alarmperiod/60))
         else:
             alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
         centered_text(draw, 0, alarmstr, smallfont, fill="black")
@@ -820,6 +820,52 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
 
 
+def dashboard(draw, x, y, sizex, lines):
+    # dashboard, arguments are lines = ("text", "value"), ....
+    starty = y
+    for line in lines:
+        draw.text((x, starty), line[0], font=smallfont, fill="black", align="left")
+        ts = draw.textsize(line[1], smallfont)
+        draw.text((x+sizex-ts[0], starty), line[1], font=smallfont, fill="black")
+        starty += SMALL+2
+    return starty
+
+
 def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
-            own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
-    pass
+             own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
+    centered_text(draw, 0, "GPS-Distance", smallfont, fill="black")
+    gps_dist_str = "---"
+    gps_speed_str = "---"
+    if distance_valid:
+        gps_dist_str = "{:4.0f}".format(gps_distance)
+    if gps_valid:
+        gps_speed_str = "{:3.1f}".format(gps_speed)
+    lines = (
+        ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
+                                                       math.floor(now.microsecond / 100000))),
+        ("GPS-Dist[m]", gps_dist_str),
+        ("GPS-Spd[kts]", gps_speed_str),
+    )
+    starty = dashboard(draw, 0, SMALL+2, sizex, lines)
+    if baro_valid:
+        lines = (
+            ("BaroDiff[ft]", "{:+5.1f}".format(alt_diff)),
+            ("BaroAlt[ft]", "{:5.0f}".format(own_altitude)),
+            ("VSpd [ft]", "{:+4.0f}".format(vert_speed))
+        )
+        starty = dashboard(draw, 0, starty, sizex, lines)
+    if ahrs_valid:
+        lines = (
+            ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
+        )
+        dashboard(draw, 0, starty, sizex, lines)
+
+    if error_message is not None:
+        centered_text(draw, 80, error_message, verylargefont, fill="black")
+    left = ""
+    right = "Start"
+    middle = "Mode"
+    draw.text((0, sizey - SMALL), left, font=smallfont, fill="black")
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
