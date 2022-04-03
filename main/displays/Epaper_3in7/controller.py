@@ -899,7 +899,7 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
 def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
               vert_speed_valid, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
 
-    centered_text(draw, 0, "Situation", smallfont, fill="black")
+    centered_text(draw, 0, "GPS Distance", smallfont, fill="black")
 
     lines = (
         ("Date", "{:0>2d}.{:0>2d}.{:0>4d}".format(now.day, now.month, now.year)),
