@@ -945,8 +945,8 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
 
     if baro_valid:
         lines = (
-            ("Baro-Diff [ft]", "{:5.0f}".format(own_altitude)),
-            ("Baro-Altitude [ft]","{:5.1f}".format(alt_diff)),
+            ("Baro-Diff [ft]", "{:5.0f}".format(alt_diff)),
+            ("Baro-Altitude [ft]","{:5.1f}".format(own_altitude)),
             ("Vert Speed [ft]", "{:4.0f}".format(vert_speed))
         )
         dashboard(draw, 250, starty + 20, 225, True, "Baro", lines)
