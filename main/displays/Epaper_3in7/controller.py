@@ -891,7 +891,7 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
         starty += VERYSMALL/2
         draw.rounded_rectangle([x, y, x + sizex, starty], radius=6, fill=None, outline="black", width=2)
         ts = draw.textsize(headline, verysmallfont)
-        draw.rectangle([x + 20, y - SMALL/2, x + 20 + ts[0], y + SMALL/2], fill="white", outline=None)
+        draw.rectangle([x + 20, y - SMALL/2, x + 20 + ts[0] + 8, y + SMALL/2], fill="white", outline=None)
     draw.text((x+20+4, y - VERYSMALL/2), headline, font=verysmallfont, fill="black")
     return starty
 
