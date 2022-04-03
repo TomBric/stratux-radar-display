@@ -945,8 +945,8 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, gps_distance, gp
 
     if ahrs_valid:
         lines = (
-            ("Pitch [deg]", "{:2,2f}".format(ahrs_pitch)),
-            ("Roll [deg]", "{:2,2f}".format(ahrs_roll))
+            ("Pitch [deg]", "{:2.2f}".format(ahrs_pitch)),
+            ("Roll [deg]", "{:2.2f}".format(ahrs_roll))
         )
         dashboard(draw, starty + 10, 245, 475, True, "AHRS", lines)
 
