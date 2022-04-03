@@ -925,7 +925,7 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, gps_distance, gp
         lines[0][1] = "{:4.0f}".format(gps_distance)
     if gps_valid:
         lines[1][1] = "{:3.1f}".format(gps_speed)
-    dashboard(draw, starty+10, 40, 235, True, "GPS", lines)
+    dashboard(draw, 5, starty+10, 235, True, "GPS", lines)
 
     b_alt = "--"
     if baro_valid:
@@ -941,14 +941,13 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, gps_distance, gp
         ("Baro-Altitude [ft]",b_alt),
         ("Vert Speed [ft]", v_spd)
     )
-    starty = dashboard(draw, 30, 245, 475, True, "Baro", lines)
-
+    starty = dashboard(draw, 240, 30, 235, True, "Baro", lines)
     if ahrs_valid:
         lines = (
             ("Pitch [deg]", "{:2.2f}".format(ahrs_pitch)),
             ("Roll [deg]", "{:2.2f}".format(ahrs_roll))
         )
-        dashboard(draw, starty + 10, 245, 475, True, "AHRS", lines)
+        dashboard(draw, 240, starty + 10, 235, True, "AHRS", lines)
 
 
     if error_message is not None:
