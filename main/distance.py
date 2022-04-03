@@ -40,7 +40,7 @@ MSG_NO_CONNECTION = "No Connection!"
 # globals
 gps_distance_zero = {'gps_active': False, 'longitude': 0.0, 'latitude': 0.0}
 # gps-starting point in meters for situation and flight testing
-baro_diff_zero = {'baro_valid': False, 'baro_altitude': 0.0}
+baro_diff_zero = {'baro_altitude': 0.0}
 # height starting point based on baro in feet for situation and flight testing
 
 
@@ -72,7 +72,6 @@ def reset_values(situation):
     gps_distance_zero['gps_active'] = situation['gps_active']
     gps_distance_zero['longitude'] = situation['longitude']
     gps_distance_zero['latitude'] = situation['latitude']
-    baro_diff_zero['baro_valid'] = situation['baro_valid']
     baro_diff_zero['own_altitude'] = situation['own_altitude']
 
 
@@ -85,10 +84,9 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
     if not connected:
         error_message = MSG_NO_CONNECTION
     else:
-        if situation['baro_valid'] and baro_diff_zero['baro_valid']:
+        if situation['baro_valid']:
             pressure_alt = situation['own_altitude']
             alt_diff = pressure_alt - baro_diff_zero['own_altitude']
-            alt_diff_valid = True
         if situation['gps_active'] and gps_distance_zero['gps_active']:
             gps_distance = calc_gps_distance_meters(gps_distance_zero['latitude'], gps_distance_zero['longitude'],
                                                     situation['latitude'], situation['longitude'])
@@ -96,8 +94,8 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
     display_control.clear(draw)
     display_control.distance(draw, now, situation['gps_active'], situation['gps_quality'], situation['gps_h_accuracy'],
                               gps_distance_zero['gps_active'], gps_distance, situation['gps_speed'],
-                              situation['baro_valid'], situation['own_altitude'], alt_diff_valid, alt_diff,
-                              situation['baro_valid'], situation['vertical_speed'], ahrs['ahrs_sensor'],
+                              situation['baro_valid'], situation['own_altitude'], alt_diff,
+                              situation['vertical_speed'], ahrs['ahrs_sensor'],
                               ahrs['pitch'], ahrs['roll'], error_message)
     display_control.display()
 

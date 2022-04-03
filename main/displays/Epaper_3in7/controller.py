@@ -896,8 +896,8 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
     return starty
 
 
-def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid, own_altitude, alt_diff_valid, alt_diff,
-              vert_speed_valid, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
+def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
+            own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
 
     centered_text(draw, 0, "GPS Distance", smallfont, fill="black")
 
@@ -943,25 +943,17 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     else:
         starty = 20
 
-    b_alt = "--"
     if baro_valid:
-        b_alt = "{:5.0f}".format(own_altitude)
-    b_diff = "--"
-    if alt_diff_valid:
-        b_diff = "{:5.1f}".format(alt_diff)
-    v_spd = "--"
-    if vert_speed_valid:
-        v_spd = "{:4.0f}".format(vert_speed)
-    lines = (
-        ("Baro-Diff [ft]", b_diff),
-        ("Baro-Altitude [ft]",b_alt),
-        ("Vert Speed [ft]", v_spd)
-    )
-    dashboard(draw, 250, starty + 20, 225, True, "Baro", lines)
+        lines = (
+            ("Baro-Diff [ft]", "{:5.0f}".format(own_altitude)),
+            ("Baro-Altitude [ft]","{:5.1f}".format(alt_diff)),
+            ("Vert Speed [ft]", "{:4.0f}".format(vert_speed))
+        )
+        dashboard(draw, 250, starty + 20, 225, True, "Baro", lines)
 
     if error_message is not None:
         centered_text(draw, 60, error_message, verylargefont, fill="black")
-    right = "Reset"
+    right = "Start"
     middle = "Mode"
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
