@@ -852,7 +852,7 @@ def dashboard(draw, x, y, sizex, lines):
     # dashboard, arguments are lines = ("text", "value"), ....
     starty = y
     for line in lines:
-        draw.text((x, starty+(SMALL-VERYSMALL)/2), line[0], font=verysmallfont, fill="white", align="left")
+        draw.text((x, starty), line[0], font=smallfont, fill="white", align="left")
         ts = draw.textsize(line[1], smallfont)
         draw.text((x+sizex-ts[0], starty), line[1], font=smallfont, fill="white")
         starty += SMALL+2
