@@ -597,7 +597,8 @@ async def user_interface():
             if bluetooth_active and current_time > last_bt_checktime + BLUEZ_CHECK_TIME:
                 last_bt_checktime = current_time
                 new_devices, devnames = radarbluez.connected_devices()
-                rlog.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
+                if new_devices > 0:
+                    rlog.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
                 if new_devices != bt_devices:
                     if new_devices > bt_devices:  # new or additional device
                         radarbluez.speak("Radar connected")
