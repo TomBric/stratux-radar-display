@@ -897,7 +897,8 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
 
 
 def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
-             own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, grounddistance, error_message):
+             own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, ground_distance_valid,
+             grounddistance, error_message):
 
     centered_text(draw, 0, "GPS Distance", smallfont, fill="black")
 
@@ -928,10 +929,12 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
         (t, accuracy)
     )
     starty = dashboard(draw, 5, starty, 225, True, "GPS", lines)
-    lines = (
-        ("Ground[cm]", "{:+3.1f}".format(grounddistance/10))
-    )
-    dashboard(draw, 5, starty, 470, True, "Ground Sensor", lines)
+    if ground_distance_valid:
+        lines = (
+            ("Ground Distance [cm]", "{:+3.1f}".format(grounddistance/10)),
+            ("", "-")
+        )
+        dashboard(draw, 5, starty, 470, True, "Ground Sensor", lines)
 
     if ahrs_valid:
         lines = (

@@ -106,7 +106,8 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
                               gps_distance_zero['gps_active'], gps_distance, situation['gps_speed'],
                               situation['baro_valid'], situation['own_altitude'], alt_diff,
                               situation['vertical_speed'], ahrs['ahrs_sensor'],
-                              ahrs['pitch'], ahrs['roll'], situation['g_distance'], error_message)
+                              ahrs['pitch'], ahrs['roll'], situation['g_distance_valid'], situation['g_distance'],
+                              error_message)
     display_control.display()
 
 

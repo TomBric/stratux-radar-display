@@ -120,6 +120,7 @@ async def read_ground_sensor():
                 next_read = now + (1/MEASUREMENTS_PER_SECOND)
                 distance = distance_sensor.get_measurement()   # distance in mm, call is blocking!
                 rlog.log(value_debug_level, 'Ground Distance: {0:5.2f} cm'.format(distance/10))
+                global_situation['g_distance_valid'] = True
                 global_situation['g_distance'] = distance
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
