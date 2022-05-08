@@ -30,6 +30,9 @@ pip3 install luma.oled
 #websockets for radar and ADS1115 analog reader for co warner
 pip3 install websockets ADS1x15-ADC
 
+# library for vl53l1x range sensor
+pip3 install melopero-vl53l1x
+
 # espeak-ng for sound output and alsoaudio for external sound
 apt-get install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data libespeak-ng-dev -y
 pip3 install py-espeak-ng pyalsaaudio

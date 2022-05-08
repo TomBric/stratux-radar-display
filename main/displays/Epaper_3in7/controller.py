@@ -897,7 +897,7 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
 
 
 def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
-            own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
+             own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, grounddistance, error_message):
 
     centered_text(draw, 0, "GPS Distance", smallfont, fill="black")
 
@@ -906,13 +906,13 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
         ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
                                                        math.floor(now.microsecond/100000)))
     )
-    starty = dashboard(draw, 5, 40, 225, True, "Date/Time", lines)
+    starty = dashboard(draw, 5, 35, 225, True, "Date/Time", lines)
 
     t = "GPS-NoFix"
-    accuracy=""
+    accuracy = ""
     if gps_quality == 1:
         t = "3D GPS"
-        accuracy=str(round(gps_h_accuracy, 1)) + "m"
+        accuracy = str(round(gps_h_accuracy, 1)) + "m"
     elif gps_quality == 2:
         t = "DGNSS"
         accuracy = str(round(gps_h_accuracy, 1)) + "m"
@@ -927,14 +927,18 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
         ("GPS-Speed [kts]", gps_speed_str),
         (t, accuracy)
     )
-    dashboard(draw, 5, starty+20, 225, True, "GPS", lines)
+    starty = dashboard(draw, 5, starty+15, 225, True, "GPS", lines)
+    lines = (
+        ("Ground Distance [cm]", "{:3.1f}".format(grounddistance/10))
+    )
+    starty = dashboard(draw, 5, starty + 15, 470, True, "Ground Sensor", lines)
 
     if ahrs_valid:
         lines = (
             ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
             ("Roll [deg]", "{:+2d}".format(ahrs_roll))
         )
-        starty = dashboard(draw, 250, 40, 225, True, "AHRS", lines)
+        starty = dashboard(draw, 250, 35, 225, True, "AHRS", lines)
     else:
         starty = 20
 
@@ -944,7 +948,7 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
             ("Baro-Altitude [ft]","{:5.0f}".format(own_altitude)),
             ("Vert Speed [ft]", "{:+4.0f}".format(vert_speed))
         )
-        dashboard(draw, 250, starty + 20, 225, True, "Baro", lines)
+        dashboard(draw, 250, starty+15, 225, True, "Baro", lines)
 
     if error_message is not None:
         centered_text(draw, 60, error_message, verylargefont, fill="black")

@@ -56,10 +56,11 @@ import stratuxstatus
 import flighttime
 import cowarner
 import distance
+import grounddistance
 from datetime import datetime, timezone
 
 # constant definitions
-RADAR_VERSION = "1.7"
+RADAR_VERSION = "1.8"
 
 # logging
 SITUATION_DEBUG = logging.DEBUG-2   # another low level for debugging, DEBUG is 10
@@ -85,6 +86,7 @@ OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
+INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -103,7 +105,7 @@ ui_changed = True
 situation = {'was_changed': True, 'last_update': 0.0, 'connected': False, 'gps_active': False, 'course': 0,
              'own_altitude': -99.0, 'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000,
              'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
-             'vertical_speed': 0.0, 'baro_valid': False}
+             'vertical_speed': 0.0, 'baro_valid': False, 'g_distance': INVALID_GDISTANCE}
 vertical_max = 0.0  # max value for vertical speed
 vertical_min = 0.0  # min valud for vertical spee
 
@@ -137,6 +139,8 @@ optical_alive = -1
 measure_flighttime = False   # True if automatic measurement of flighttime is enabled
 co_warner_activated = False   # True if co-warner is activated
 co_indication = False       # True if indication via GPIO Pin 16 is on for co
+grounddistance_activated = False  # True if measurement of grounddistance via VL53L1x is activated
+groundbeep = False  # True if indication of ground distance via audio
 
 
 def draw_all_ac(draw, allac):
@@ -238,104 +242,107 @@ def new_traffic(json_str):
     rlog.log(AIRCRAFT_DEBUG, "New Traffic" + json_str)
     traffic = json.loads(json_str)
     changed = False
-    if 'RadarRange' in traffic or 'RadarLimits' in traffic:
-        if situation['RadarRange'] != traffic['RadarRange']:
-            situation['RadarRange'] = traffic['RadarRange']
-            changed = True
-        if situation['RadarLimits'] != traffic['RadarLimits']:
-            situation['RadarLimits'] = traffic['RadarLimits']
-            changed = True
-        if changed:
-            # refresh all_ac
-            all_ac.clear()
-        return
-        # ignore rest of message
-    if 'Icao_addr' not in traffic:
-        # steering message without aircraft content
-        rlog.log(AIRCRAFT_DEBUG, "No Icao_addr in message" + json_str)
-        return
+    try:
+        if 'RadarRange' in traffic or 'RadarLimits' in traffic:
+            if situation['RadarRange'] != traffic['RadarRange']:
+                situation['RadarRange'] = traffic['RadarRange']
+                changed = True
+            if situation['RadarLimits'] != traffic['RadarLimits']:
+                situation['RadarLimits'] = traffic['RadarLimits']
+                changed = True
+            if changed:
+                # refresh all_ac
+                all_ac.clear()
+            return
+            # ignore rest of message
+        if 'Icao_addr' not in traffic:
+            # steering message without aircraft content
+            rlog.log(AIRCRAFT_DEBUG, "No Icao_addr in message" + json_str)
+            return
 
-    is_new = False
-    if traffic['Icao_addr'] not in all_ac.keys():
-        # new traffic, insert
-        all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'was_spoken': False}
-        is_new = True
-    ac = all_ac[traffic['Icao_addr']]
-    if traffic['Age'] <= traffic['AgeLastAlt']:
-        ac['last_contact_timestamp'] = time.time() - traffic['Age']
-    else:
-        ac['last_contact_timestamp'] = time.time() - traffic['AgeLastAlt']
-    ac['height'] = round((traffic['Alt'] - situation['own_altitude']) / 100)
+        is_new = False
+        if traffic['Icao_addr'] not in all_ac.keys():
+            # new traffic, insert
+            all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'was_spoken': False}
+            is_new = True
+        ac = all_ac[traffic['Icao_addr']]
+        if traffic['Age'] <= traffic['AgeLastAlt']:
+            ac['last_contact_timestamp'] = time.time() - traffic['Age']
+        else:
+            ac['last_contact_timestamp'] = time.time() - traffic['AgeLastAlt']
+        ac['height'] = round((traffic['Alt'] - situation['own_altitude']) / 100)
 
-    if traffic['Speed_valid']:
-        ac['nspeed'] = traffic['Speed']
-    ac['vspeed'] = traffic['Vvel']
-    if traffic['Tail']:
-        ac['tail'] = traffic['Tail']
+        if traffic['Speed_valid']:
+            ac['nspeed'] = traffic['Speed']
+        ac['vspeed'] = traffic['Vvel']
+        if traffic['Tail']:
+            ac['tail'] = traffic['Tail']
 
-    if traffic['Position_valid'] and situation['gps_active']:
-        # adsb traffic and stratux has valid gps signal
-        rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB traffic ' + hex(traffic['Icao_addr']) + " at height " + str(ac['height']))
-        if 'circradius' in ac:
-            del ac['circradius']
-            # was mode-s target before, now invalidate mode-s info
-        gps_rad, gps_angle = calc_gps_distance(traffic['Lat'], traffic['Lng'])
-        ac['gps_distance'] = gps_rad
-        if 'Track' in traffic:
-            ac['direction'] = traffic['Track'] - situation['course']
-            # sometimes track is missing, than leave it as it is
-        if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= round(situation['RadarLimits']/100):
-            res_angle = gps_angle - situation['course']
-            gpsx = math.sin(math.radians(res_angle)) * gps_rad
-            gpsy = - math.cos(math.radians(res_angle)) * gps_rad
-            ac['x'] = round(max_pixel / 2 * gpsx / situation['RadarRange'] + zerox)
-            ac['y'] = round(max_pixel / 2 * gpsy / situation['RadarRange'] + zeroy)
-            if 'nspeed' in ac:
-                nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
-                ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
-            # speech output
-            if gps_rad <= situation['RadarRange'] / 2:
-                oclock = round(res_angle / 30)
-                if oclock <= 0:
-                    oclock += 12
-                if oclock > 12:
-                    oclock -= 12
+        if traffic['Position_valid'] and situation['gps_active']:
+            # adsb traffic and stratux has valid gps signal
+            rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB traffic ' + hex(traffic['Icao_addr']) + " at height " + str(ac['height']))
+            if 'circradius' in ac:
+                del ac['circradius']
+                # was mode-s target before, now invalidate mode-s info
+            gps_rad, gps_angle = calc_gps_distance(traffic['Lat'], traffic['Lng'])
+            ac['gps_distance'] = gps_rad
+            if 'Track' in traffic:
+                ac['direction'] = traffic['Track'] - situation['course']
+                # sometimes track is missing, than leave it as it is
+            if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= round(situation['RadarLimits']/100):
+                res_angle = gps_angle - situation['course']
+                gpsx = math.sin(math.radians(res_angle)) * gps_rad
+                gpsy = - math.cos(math.radians(res_angle)) * gps_rad
+                ac['x'] = round(max_pixel / 2 * gpsx / situation['RadarRange'] + zerox)
+                ac['y'] = round(max_pixel / 2 * gpsy / situation['RadarRange'] + zeroy)
+                if 'nspeed' in ac:
+                    nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
+                    ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
+                # speech output
+                if gps_rad <= situation['RadarRange'] / 2:
+                    oclock = round(res_angle / 30)
+                    if oclock <= 0:
+                        oclock += 12
+                    if oclock > 12:
+                        oclock -= 12
+                    if not ac['was_spoken']:
+                        speaktraffic(ac['height'], oclock, round(gps_rad))
+                        ac['was_spoken'] = True
+                else:
+                    # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
+                    if gps_rad >= situation['RadarRange'] * 0.75:
+                        ac['was_spoken'] = False
+            else:
+                # do not display
+                ac['x'] = -1
+                ac['y'] = -1
+
+        else:
+            # mode-s traffic or no valid GPS position of stratux
+            # unspecified altitude, nothing displayed for now, leave it as it is
+            if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
+                return
+                # unspecified altitude, nothing displayed for now, leave it as it is
+            distcirc = traffic['DistanceEstimated'] / 1852.0
+            rlog.log(AIRCRAFT_DEBUG, "RADAR: Mode-S traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
+            distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
+            if is_new or 'circradius' not in ac:
+                # calc argposition if new or adsb before
+                last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
+                ac['arcposition'] = last_arcposition
+            ac['gps_distance'] = distcirc
+            ac['circradius'] = distx
+
+            if ac['gps_distance'] <= situation['RadarRange'] / 2:
                 if not ac['was_spoken']:
-                    speaktraffic(ac['height'], oclock, round(gps_rad))
+                    speaktraffic(ac['height'], None, round(ac['gps_distance']))
                     ac['was_spoken'] = True
             else:
                 # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
-                if gps_rad >= situation['RadarRange'] * 0.75:
+                if ac['gps_distance'] > situation['RadarRange'] * 0.75:
                     ac['was_spoken'] = False
-        else:
-            # do not display
-            ac['x'] = -1
-            ac['y'] = -1
-
-    else:
-        # mode-s traffic or no valid GPS position of stratux
-        # unspecified altitude, nothing displayed for now, leave it as it is
-        if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
-            return
-            # unspecified altitude, nothing displayed for now, leave it as it is
-        distcirc = traffic['DistanceEstimated'] / 1852.0
-        rlog.log(AIRCRAFT_DEBUG, "RADAR: Mode-S traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
-        distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
-        if is_new or 'circradius' not in ac:
-            # calc argposition if new or adsb before
-            last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
-            ac['arcposition'] = last_arcposition
-        ac['gps_distance'] = distcirc
-        ac['circradius'] = distx
-
-        if ac['gps_distance'] <= situation['RadarRange'] / 2:
-            if not ac['was_spoken']:
-                speaktraffic(ac['height'], None, round(ac['gps_distance']))
-                ac['was_spoken'] = True
-        else:
-            # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
-            if ac['gps_distance'] > situation['RadarRange'] * 0.75:
-                ac['was_spoken'] = False
+    except KeyError:     # to be safe in case keys are changed in Stratux
+        rlog.log(AIRCRAFT_DEBUG, "KeyError decoding:" + json_str)
 
 
 def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
@@ -345,7 +352,8 @@ def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
         gps_datetime = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
     except ValueError:
         # stratux will deliver "0001-01-01T00:00:00Z" if not time signal is valid, this will also raise an ValueError
-        rlog.debug("Radar: ERROR converting GPS-Time: " + time_str)
+        # rlog.debug("Radar: ERROR converting GPS-Time: " + time_str)
+        # also full seconds, will not give fractions and raise this, but it's ok
         return
     gps_datetime = gps_datetime.replace(tzinfo=timezone.utc)  # make sure that time is interpreted as utc
     if abs(time.time() - gps_datetime.timestamp()) > MAX_TIMER_OFFSET:
@@ -370,109 +378,113 @@ def new_situation(json_str):
 
     rlog.log(SITUATION_DEBUG, "New Situation" + json_str)
     sit = json.loads(json_str)
-    situation['last_update'] = time.time()
-    if not situation['connected']:
-        situation['connected'] = True
-        situation['was_changed'] = True
-        ahrs['was_changed'] = True  # connection also relevant for ahrs
-        gmeter['was_changed'] = True  # connection also relevant for ahrs
-    gps_active = sit['GPSHorizontalAccuracy'] < 19999
-    if situation['gps_active'] != gps_active:
-        situation['gps_active'] = gps_active
-        situation['was_changed'] = True
-    if not basemode:
-        if situation['course'] != round(sit['GPSTrueCourse']):
-            situation['course'] = round(sit['GPSTrueCourse'])
+    try:
+        situation['last_update'] = time.time()
+        if not situation['connected']:
+            situation['connected'] = True
             situation['was_changed'] = True
-    if situation['own_altitude'] != sit['BaroPressureAltitude']:
-        situation['own_altitude'] = sit['BaroPressureAltitude']
-        situation['was_changed'] = True
-    if situation['latitude'] != sit['GPSLatitude']:
-        situation['latitude'] = sit['GPSLatitude']
-        situation['was_changed'] = True
-    if situation['longitude'] != sit['GPSLongitude']:
-        situation['longitude'] = sit['GPSLongitude']
-        situation['was_changed'] = True
-    if situation['gps_quality'] != sit['GPSFixQuality']:
-        situation['gps_quality'] = sit['GPSFixQuality']
-        situation['was_changed'] = True
-    if situation['gps_h_accuracy'] != sit['GPSHorizontalAccuracy']:
-        situation['gps_h_accuracy'] = sit['GPSHorizontalAccuracy']
-        situation['was_changed'] = True
-    if situation['gps_speed'] != sit['GPSGroundSpeed']:
-        situation['gps_speed'] = sit['GPSGroundSpeed']
-        situation['was_changed'] = True
-    if situation['gps_altitude'] != sit['GPSAltitudeMSL']:
-        situation['gps_altitude'] = sit['GPSAltitudeMSL']
-        situation['was_changed'] = True
+            ahrs['was_changed'] = True  # connection also relevant for ahrs
+            gmeter['was_changed'] = True  # connection also relevant for ahrs
+        gps_active = sit['GPSHorizontalAccuracy'] < 19999
+        if situation['gps_active'] != gps_active:
+            situation['gps_active'] = gps_active
+            situation['was_changed'] = True
+        if not basemode:
+            if situation['course'] != round(sit['GPSTrueCourse']):
+                situation['course'] = round(sit['GPSTrueCourse'])
+                situation['was_changed'] = True
+        if situation['own_altitude'] != sit['BaroPressureAltitude']:
+            situation['own_altitude'] = sit['BaroPressureAltitude']
+            situation['was_changed'] = True
+        if situation['latitude'] != sit['GPSLatitude']:
+            situation['latitude'] = sit['GPSLatitude']
+            situation['was_changed'] = True
+        if situation['longitude'] != sit['GPSLongitude']:
+            situation['longitude'] = sit['GPSLongitude']
+            situation['was_changed'] = True
+        if situation['gps_quality'] != sit['GPSFixQuality']:
+            situation['gps_quality'] = sit['GPSFixQuality']
+            situation['was_changed'] = True
+        if situation['gps_h_accuracy'] != sit['GPSHorizontalAccuracy']:
+            situation['gps_h_accuracy'] = sit['GPSHorizontalAccuracy']
+            situation['was_changed'] = True
+        if situation['gps_speed'] != sit['GPSGroundSpeed']:
+            situation['gps_speed'] = sit['GPSGroundSpeed']
+            situation['was_changed'] = True
+        if situation['gps_altitude'] != sit['GPSAltitudeMSL']:
+            situation['gps_altitude'] = sit['GPSAltitudeMSL']
+            situation['was_changed'] = True
 
-    if sit['BaroSourceType'] == 1 or sit['BaroSourceType'] == 2 or sit['BaroSourceType'] == 3:
-        # 1 = BMP280, 2 = OGN device, 3 = NMEA device
-        if situation['vertical_speed'] != sit['BaroVerticalSpeed']:
-            situation['vertical_speed'] = sit['BaroVerticalSpeed']
-            situation['was_changed'] = True
-            if situation['vertical_speed'] > vertical_max:
-                vertical_max = situation['vertical_speed']
-            if situation['vertical_speed'] < vertical_min:
-                vertical_min = situation['vertical_speed']
-        if not situation['baro_valid']:
-            situation['baro_valid'] = True
-            situation['was_changed'] = True
-            vertical_max = 0  # invalidate min/max
-            vertical_min = 0
-    else:  # no baro (=0) or ADSB estimation (=4), not enough data for vertical speed
-        if situation['baro_valid']:
-            situation['baro_valid'] = False
-            situation['vertical_speed'] = 0.0
-            situation['was_changed'] = True
-            vertical_max = 0  # invalidate min/max
-            vertical_min = 0
-    # set system time if not synchronized properly
-    if situation['gps_active']:
-        if sit['GPSLastFixLocalTime'].split('.')[0] == sit['GPSLastGPSTimeStratuxTime'].split('.')[0]:
-            # take GPSTime only if last fix time and last stratux time match (in seconds), sometimes a fix is there, but
-            # not yet an update time value from GPS, but the old one is transmitted by stratux
-            update_time(sit['GPSTime'])
-    # ahrs
-    if ahrs['pitch'] != round(sit['AHRSPitch']):
-        ahrs['pitch'] = round(sit['AHRSPitch'])
-        ahrs['was_changed'] = True
-    if ahrs['roll'] != round(sit['AHRSRoll']):
-        ahrs['roll'] = round(sit['AHRSRoll'])
-        ahrs['was_changed'] = True
-    if ahrs['heading'] != round(sit['AHRSGyroHeading']):
-        ahrs['heading'] = round(sit['AHRSGyroHeading'])
-        ahrs['was_changed'] = True
-    if ahrs['slipskid'] != round(sit['AHRSSlipSkid']):
-        ahrs['slipskid'] = round(sit['AHRSSlipSkid'])
-        ahrs['was_changed'] = True
-    if ahrs['gps_hor_accuracy'] != round(sit['GPSHorizontalAccuracy']):
-        ahrs['gps_hor_accuracy'] = round(sit['GPSHorizontalAccuracy'])
-        ahrs['was_changed'] = True
-    if sit['AHRSStatus'] & 0x02:
-        ahrs_flag = True
-    else:
-        ahrs_flag = False
-    if ahrs['ahrs_sensor'] != ahrs_flag:
-        ahrs['ahrs_sensor'] = ahrs_flag
-        ahrs['was_changed'] = True
+        if sit['BaroSourceType'] == 1 or sit['BaroSourceType'] == 2 or sit['BaroSourceType'] == 3:
+            # 1 = BMP280, 2 = OGN device, 3 = NMEA device
+            if situation['vertical_speed'] != sit['BaroVerticalSpeed']:
+                situation['vertical_speed'] = sit['BaroVerticalSpeed']
+                situation['was_changed'] = True
+                if situation['vertical_speed'] > vertical_max:
+                    vertical_max = situation['vertical_speed']
+                if situation['vertical_speed'] < vertical_min:
+                    vertical_min = situation['vertical_speed']
+            if not situation['baro_valid']:
+                situation['baro_valid'] = True
+                situation['was_changed'] = True
+                vertical_max = 0  # invalidate min/max
+                vertical_min = 0
+        else:  # no baro (=0) or ADSB estimation (=4), not enough data for vertical speed
+            if situation['baro_valid']:
+                situation['baro_valid'] = False
+                situation['vertical_speed'] = 0.0
+                situation['was_changed'] = True
+                vertical_max = 0  # invalidate min/max
+                vertical_min = 0
+        # set system time if not synchronized properly
+        if situation['gps_active']:
+            if sit['GPSLastFixLocalTime'].split('.')[0] == sit['GPSLastGPSTimeStratuxTime'].split('.')[0]:
+                # take GPSTime only if last fix time and last stratux time match (in seconds), sometimes a fix is there, but
+                # not yet an update time value from GPS, but the old one is transmitted by stratux
+                update_time(sit['GPSTime'])
+        # ahrs
+        if ahrs['pitch'] != round(sit['AHRSPitch']):
+            ahrs['pitch'] = round(sit['AHRSPitch'])
+            ahrs['was_changed'] = True
+        if ahrs['roll'] != round(sit['AHRSRoll']):
+            ahrs['roll'] = round(sit['AHRSRoll'])
+            ahrs['was_changed'] = True
+        if ahrs['heading'] != round(sit['AHRSGyroHeading']):
+            ahrs['heading'] = round(sit['AHRSGyroHeading'])
+            ahrs['was_changed'] = True
+        if ahrs['slipskid'] != round(sit['AHRSSlipSkid']):
+            ahrs['slipskid'] = round(sit['AHRSSlipSkid'])
+            ahrs['was_changed'] = True
+        if ahrs['gps_hor_accuracy'] != round(sit['GPSHorizontalAccuracy']):
+            ahrs['gps_hor_accuracy'] = round(sit['GPSHorizontalAccuracy'])
+            ahrs['was_changed'] = True
+        if sit['AHRSStatus'] & 0x02:
+            ahrs_flag = True
+        else:
+            ahrs_flag = False
+        if ahrs['ahrs_sensor'] != ahrs_flag:
+            ahrs['ahrs_sensor'] = ahrs_flag
+            ahrs['was_changed'] = True
 
-    current = round(sit['AHRSGLoad'], 2)
-    if gmeter['current'] != current:
-        gmeter['current'] = current
-        gmeter['was_changed'] = True
-    max = round(sit['AHRSGLoadMax'], 2)
-    if gmeter['max'] != max:
-        gmeter['max'] = max
-        gmeter['was_changed'] = True
-    min = round(sit['AHRSGLoadMin'], 2)
-    if gmeter['min'] != min:
-        gmeter['min'] = min
-        gmeter['was_changed'] = True
-    # automatic time measurement
-    new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, global_mode)
-    if new_mode > 0:
-        global_mode = new_mode    # automatically change to display of flight times, or back
+        current = round(sit['AHRSGLoad'], 2)
+        if gmeter['current'] != current:
+            gmeter['current'] = current
+            gmeter['was_changed'] = True
+        max = round(sit['AHRSGLoadMax'], 2)
+        if gmeter['max'] != max:
+            gmeter['max'] = max
+            gmeter['was_changed'] = True
+        min = round(sit['AHRSGLoadMin'], 2)
+        if gmeter['min'] != min:
+            gmeter['min'] = min
+            gmeter['was_changed'] = True
+        # automatic time measurement
+        new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, global_mode)
+        if new_mode > 0:
+            global_mode = new_mode    # automatically change to display of flight times, or back
+
+    except KeyError:   # to be safe when stratux changes its message-format
+        rlog.log(SITUATION_DEBUG, "KeyError decoding situation:" + json_str)
 
 
 async def listen_forever(path, name, callback, logger):
@@ -494,7 +506,7 @@ async def listen_forever(path, name, callback, logger):
                         # rlog.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
                             logger.debug(name + ': Watchdog detected connection loss.' +
-                                        ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
+                                         ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                             break
                     except websockets.exceptions.ConnectionClosed:
@@ -693,7 +705,7 @@ async def display_and_cutoff():
                     global_mode = 19
                 elif global_mode == 21:  # situation
                     distance.draw_distance(draw, display_control, situation['was_changed'] or ui_changed,
-                                             situation['connected'], situation, ahrs)
+                                           situation['connected'], situation, ahrs)
                     ui_changed = False
                 elif global_mode == 22:  # refresh display, only relevant for epaper, mode was situation
                     rlog.debug("Situation: Display driver - Refreshing")
@@ -727,8 +739,9 @@ async def coroutines():
     sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
     dis_cutoff = asyncio.create_task(display_and_cutoff())
     sensor_reader = asyncio.create_task(cowarner.read_sensors())
+    ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
     u_interface = asyncio.create_task(user_interface())
-    await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader])
+    await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader])
 
 
 def main():
@@ -752,6 +765,7 @@ def main():
     stratuxstatus.init(display_control, url_status_ws)
     flighttime.init(measure_flighttime)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
+    grounddistance.init(grounddistance_activated, SITUATION_DEBUG, groundbeep, situation)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -816,6 +830,10 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-ci", "--coindicate", required=False, help="Indicate co warning via GPIO16",
                     action="store_true", default=False)
+    ap.add_argument("-ng", "--nogrounddistance", required=False, help="Suppress activation of ground distances sensor",
+                    action="store_true", default=False)
+    ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
+                    action="store_true", default=False)
     args = vars(ap.parse_args())
     # set up logging
     logging_init()
@@ -836,6 +854,8 @@ if __name__ == "__main__":
     measure_flighttime = not args['noflighttime']
     co_warner_activated = not args['nocowarner']
     co_indication = args['coindicate']
+    grounddistance_activated = not args['nogrounddistance']
+    groundbeep = args['groundbeep']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:

@@ -39,6 +39,7 @@
 
 import math
 import radarbuttons
+import grounddistance
 import datetime
 
 
@@ -46,6 +47,7 @@ import datetime
 MSG_NO_CONNECTION = "No Connection!"
 # globals
 gps_distance_zero = {'gps_active': False, 'longitude': 0.0, 'latitude': 0.0}
+start_distance = 0.0    # runway needed till airborne, starts when "start" button is pressed
 # gps-starting point in meters for situation and flight testing
 baro_diff_zero = {'own_altitude': 0.0}
 # height starting point based on baro in feet for situation and flight testing
@@ -83,6 +85,8 @@ def reset_values(situation):
 
 
 def draw_distance(draw, display_control, was_changed, connected, situation, ahrs):
+    global start_distance
+
     # display in any case, even if there is no change, since time is running anyhow
     error_message = None
     gps_distance = 0.0
@@ -102,7 +106,7 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
                               gps_distance_zero['gps_active'], gps_distance, situation['gps_speed'],
                               situation['baro_valid'], situation['own_altitude'], alt_diff,
                               situation['vertical_speed'], ahrs['ahrs_sensor'],
-                              ahrs['pitch'], ahrs['roll'], error_message)
+                              ahrs['pitch'], ahrs['roll'], situation['g_distance'], error_message)
     display_control.display()
 
 
@@ -120,3 +124,4 @@ def user_input():
     if button == 2 and btime == 2:  # right and long- refresh
         return 22, False  # start next mode for display driver: refresh called from vsi
     return 21, False  # no mode change for any other interaction
+
