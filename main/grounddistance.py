@@ -49,8 +49,8 @@ SAVED_STATISTICS = "stratux-radar.stat"
 DISTANCE_BEEP_MAX = 60              # in cm, where beeper starts with a low tone
 DISTANCE_BEEP_MIN = 10              # in cm, where beeper stops with a high tone
 # GPS-Measurement of start-distance
-DISTANCE_START_DETECTED = 20        # in cm where measurement assumes that plane is in the air
-DISTANCE_LANDING_DETECTED = 7.5     # in cm where measurement assumes to be landed
+DISTANCE_START_DETECTED = 20 * 10       # in mm where measurement assumes that plane is in the air
+DISTANCE_LANDING_DETECTED = 7.5 * 10    # in mm where measurement assumes to be landed
 # start distance with groundsensor
 STATS_PER_SECOND = 5    # how many statistics are written per second
 STATS_TOTAL_TIME = 120   # time in seconds how long statistic window is
@@ -108,6 +108,7 @@ def init(activate, debug_level, distance_indication, situation):
     value_debug_level = debug_level
     global_situation = situation   # to be able to read and store situation info
     rlog.debug("Ground Distance Measurement - VL53L1X active.")
+    zero_distance = distance_sensor.get_measurement()  # distance in mm, call is blocking, this is zero
     zero_distance = distance_sensor.get_measurement()  # distance in mm, call is blocking, this is zero
     rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
     if distance_indication:
@@ -197,7 +198,7 @@ def evaluate_statistics(latest_stat):
         if is_airborne():
             fly_status = 1   # start detected
             start_situation = latest_stat   # store this value
-            rlog.debug("Grounddistance: Start detected" +
+            rlog.debug("Grounddistance: Start detected " +
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
             for stat in reversed(statistics): # ... find begin of start where gps_speed <= STOP_SPEED
                 if stat['gps_speed'] <= STOP_SPEED:
@@ -207,7 +208,7 @@ def evaluate_statistics(latest_stat):
         if latest_stat['own_altitude'] >= start_situation['own_altitude'] + OBSTACLE_HEIGHT:
             fly_status = 2
             obstacle_up_clear = latest_stat
-            rlog.debug("Grounddistance: Obstacle clearance up detected" +
+            rlog.debug("Grounddistance: Obstacle clearance up detected " +
                        json.dumps(obstacle_up_clear, indent=4, sort_keys=True, default=str))
     elif fly_status == 2:    # obstacle was cleared, waiting for landing
         if has_landed():
@@ -216,14 +217,14 @@ def evaluate_statistics(latest_stat):
             for stat in reversed(statistics):
                 if stat['own_altitude'] >= latest_stat['own_altitude'] + OBSTACLE_HEIGHT:
                     obstacle_down_clear = stat
-                    rlog.debug("Grounddistance: Obstacle clearance down found" +
+                    rlog.debug("Grounddistance: Obstacle clearance down found " +
                                json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                     break
     elif fly_status == 3:   # landing detected, waiting for stop to calculate distance
         if latest_stat['gps_speed'] <= STOP_SPEED:
             fly_status = 0
             stop_situation = latest_stat
-            rlog.debug("Grounddistance: Obstacle clearance down found" +
+            rlog.debug("Grounddistance: Obstacle clearance down found " +
                        json.dumps(stop_situation, indent=4, sort_keys=True, default=str))
             write_stats()
 
