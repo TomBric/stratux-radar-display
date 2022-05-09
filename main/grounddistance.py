@@ -108,7 +108,8 @@ def init(activate, debug_level, distance_indication, situation):
     value_debug_level = debug_level
     global_situation = situation   # to be able to read and store situation info
     rlog.debug("Ground Distance Measurement - VL53L1X active.")
-    zero_distance = distance_sensor.get_measurement()  # distance in mm, call is blocking, this is zero
+    for i in range(1,10):
+        distance_sensor.get_measurement()  # first measurements are not accurate, so do itseveral times
     zero_distance = distance_sensor.get_measurement()  # distance in mm, call is blocking, this is zero
     rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
     if distance_indication:
