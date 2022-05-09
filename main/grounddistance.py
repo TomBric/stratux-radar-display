@@ -237,6 +237,8 @@ def evaluate_statistics(latest_stat):
         if has_landed():
             fly_status = 2
             landing_situation = latest_stat
+            rlog.debug("Grounddistance: Landing detected " +
+                       json.dumps(landing_situation, indent=4, sort_keys=True, default=str))
             if obstacle_down_clear is None:
                 for stat in reversed(statistics):
                     if stat['own_altitude'] >= latest_stat['own_altitude'] + OBSTACLE_HEIGHT:
@@ -248,7 +250,7 @@ def evaluate_statistics(latest_stat):
         if latest_stat['gps_speed'] <= STOP_SPEED:
             fly_status = 0
             stop_situation = latest_stat
-            rlog.debug("Grounddistance: Obstacle clearance down found " +
+            rlog.debug("Grounddistance: Stop detected " +
                        json.dumps(stop_situation, indent=4, sort_keys=True, default=str))
             write_stats()
 
