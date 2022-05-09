@@ -149,7 +149,7 @@ def write_stats():
     try:
         with open(SAVED_STATISTICS, 'wt') as out:
             for l in calculate_output_values():
-                print(l[0] + "     " + l[1] + "\n", file=out)
+                print(l[0], l[1], file=out)
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + SAVED_STATISTICS)
     rlog.debug("Grounddistance: Statistics saved to " + SAVED_STATISTICS)
