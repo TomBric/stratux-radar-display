@@ -193,17 +193,17 @@ def calculate_output_values():   # return output lines
         output.append(('Start time:', start_situation['Time']))
         if start_situation['baro_valid']:
             output.append(('- alt [ft]:', start_situation['own_altitude']))
-        if runup_situation is not None and runup_situation['gps_valid'] and start_situation['gps_valid']:
+        if runup_situation is not None and runup_situation['gps_active'] and start_situation['gps_active']:
             output.append(('- takeoff dist [m]:', calc_gps_distance_meters(start_situation, runup_situation)))
-        if obstacle_up_clear is not None and obstacle_up_clear['gps_valid'] and start_situation['gps_valid']:
+        if obstacle_up_clear is not None and obstacle_up_clear['gps_active'] and start_situation['gps_active']:
             output.append(('- obstacle dist [m]', calc_gps_distance_meters(obstacle_up_clear, runup_situation) ))
     if stop_situation is not None and landing_situation is not None:
         output.append(('Landing time:', landing_situation['Time']))
         if landing_situation['baro_valid']:
             output.append(('- alt [ft]:', landing_situation['own_altitude']))
-        if landing_situation['gps_valid'] and stop_situation['gps_valid']:
+        if landing_situation['gps_active'] and stop_situation['gps_active']:
             output.append(('- landing dist [m]:', calc_gps_distance_meters(stop_situation, landing_situation)))
-        if obstacle_down_clear is not None and obstacle_down_clear['gps_valid'] and stop_situation['gps_valid']:
+        if obstacle_down_clear is not None and obstacle_down_clear['gps_active'] and stop_situation['gps_active']:
             output.append(('- obstacle dist [m]', calc_gps_distance_meters(stop_situation, obstacle_down_clear)))
     return output
 
