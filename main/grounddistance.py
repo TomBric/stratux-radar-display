@@ -229,22 +229,22 @@ def evaluate_statistics(latest_stat):
                     runup_situation = stat
                     break
     elif fly_status == 1:   # start was detected
-        if latest_stat['own_altitude'] >= start_situation['own_altitude'] + OBSTACLE_HEIGHT:
-            fly_status = 2
-            obstacle_up_clear = latest_stat
-            rlog.debug("Grounddistance: Obstacle clearance up detected " +
-                       json.dumps(obstacle_up_clear, indent=4, sort_keys=True, default=str))
-    elif fly_status == 2:    # obstacle was cleared, waiting for landing
+        if obstacle_up_clear is None:   # do not search for if already set
+            if latest_stat['own_altitude'] >= start_situation['own_altitude'] + OBSTACLE_HEIGHT:
+                obstacle_up_clear = latest_stat
+                rlog.debug("Grounddistance: Obstacle clearance up detected " +
+                           json.dumps(obstacle_up_clear, indent=4, sort_keys=True, default=str))
         if has_landed():
-            fly_status = 3
+            fly_status = 2
             landing_situation = latest_stat
-            for stat in reversed(statistics):
-                if stat['own_altitude'] >= latest_stat['own_altitude'] + OBSTACLE_HEIGHT:
-                    obstacle_down_clear = stat
-                    rlog.debug("Grounddistance: Obstacle clearance down found " +
-                               json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
-                    break
-    elif fly_status == 3:   # landing detected, waiting for stop to calculate distance
+            if obstacle_down_clear is None:
+                for stat in reversed(statistics):
+                    if stat['own_altitude'] >= latest_stat['own_altitude'] + OBSTACLE_HEIGHT:
+                        obstacle_down_clear = stat
+                        rlog.debug("Grounddistance: Obstacle clearance down found " +
+                                   json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
+                        break
+    elif fly_status == 2:   # landing detected, waiting for stop to calculate distance
         if latest_stat['gps_speed'] <= STOP_SPEED:
             fly_status = 0
             stop_situation = latest_stat
