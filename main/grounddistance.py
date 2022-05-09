@@ -85,6 +85,7 @@ def reset_values():
     global landing_situation
     global stop_situation
     global zero_distance
+    global fly_status
 
     runup_situation = None
     start_situation = None
@@ -92,6 +93,8 @@ def reset_values():
     obstacle_down_clear = None
     landing_situation = None
     stop_situation = None
+    fly_status = 0
+
     if distance_sensor is not None:
         zero_distance = distance_sensor.get_measurement()
         rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
