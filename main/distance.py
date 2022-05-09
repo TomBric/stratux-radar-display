@@ -98,6 +98,10 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
         if situation['baro_valid']:
             pressure_alt = situation['own_altitude']
             alt_diff = pressure_alt - baro_diff_zero['own_altitude']
+            if grounddistance.takeoff_alt() is not None:
+                alt_diff_takeoff = pressure_alt - grounddistance.takeoff_alt()
+            else:
+                alt_diff_takeoff = None
         if situation['gps_active'] and gps_distance_zero['gps_active']:
             gps_distance = calc_gps_distance_meters(gps_distance_zero['latitude'], gps_distance_zero['longitude'],
                                                     situation['latitude'], situation['longitude'])
@@ -105,7 +109,7 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
     display_control.clear(draw)
     display_control.distance(draw, now, situation['gps_active'], situation['gps_quality'], situation['gps_h_accuracy'],
                               gps_distance_zero['gps_active'], gps_distance, situation['gps_speed'],
-                              situation['baro_valid'], situation['own_altitude'], alt_diff,
+                              situation['baro_valid'], situation['own_altitude'], alt_diff, alt_diff_takeoff,
                               situation['vertical_speed'], ahrs['ahrs_sensor'],
                               ahrs['pitch'], ahrs['roll'], situation['g_distance_valid'], situation['g_distance'],
                               error_message)

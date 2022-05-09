@@ -187,6 +187,13 @@ def calc_gps_distance_meters(fr, to):
     return distance
 
 
+def takeoff_alt():
+    if start_situation is not None and start_situation['baro_valid']:
+        return start_situation['own_altitude']
+    else:
+        return None
+
+
 def calculate_output_values():   # return output lines
     output = []
     if start_situation is not None:

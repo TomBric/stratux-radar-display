@@ -897,7 +897,7 @@ def dashboard(draw, x, y, sizex, rounding, headline, lines):
 
 
 def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
-             own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, ground_distance_valid,
+             own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, ground_distance_valid,
              grounddistance, error_message):
 
     centered_text(draw, 0, "GPS Distance", smallfont, fill="black")
@@ -938,17 +938,22 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     if ahrs_valid:
         lines = (
             ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
-            ("Roll [deg]", "{:+2d}".format(ahrs_roll))
+            ("Roll [deg]", "{:+2d}".format(ahrs_roll)),
         )
         starty = dashboard(draw, 250, 35, 225, True, "AHRS", lines)
     else:
         starty = 20
 
     if baro_valid:
+        if alt_diff_takeoff is not None:
+            takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
+        else:
+            takeoff_str = "---"
         lines = (
-            ("Baro-Diff [ft]", "{:+5.1f}".format(alt_diff)),
             ("Baro-Altitude [ft]","{:5.0f}".format(own_altitude)),
-            ("Vert Speed [ft]", "{:+4.0f}".format(vert_speed))
+            ("Vert Speed [ft]", "{:+4.0f}".format(vert_speed)),
+            ("Ba-Diff runup [ft]", "{:+5.1f}".format(alt_diff)),
+            ("Ba-Diff tof [ft]", takeoff_str),
         )
         dashboard(draw, 250, starty, 225, True, "Baro", lines)
 
