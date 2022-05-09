@@ -949,10 +949,14 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
             takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
         else:
             takeoff_str = "---"
+        if alt_diff is not None:
+            alt_diff_str = "{:+5.1f}".format(alt_diff)
+        else:
+            alt_diff_str = "---"
         lines = (
             ("Baro-Altitude [ft]","{:5.0f}".format(own_altitude)),
             ("Vert Speed [ft]", "{:+4.0f}".format(vert_speed)),
-            ("Ba-Diff runup [ft]", "{:+5.1f}".format(alt_diff)),
+            ("Ba-Diff r-up [ft]", alt_diff_str),
             ("Ba-Diff tof [ft]", takeoff_str),
         )
         dashboard(draw, 250, starty, 225, True, "Baro", lines)

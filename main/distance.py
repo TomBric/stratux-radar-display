@@ -48,7 +48,7 @@ MSG_NO_CONNECTION = "No Connection!"
 gps_distance_zero = {'gps_active': False, 'longitude': 0.0, 'latitude': 0.0}
 start_distance = 0.0    # runway needed till airborne, starts when "start" button is pressed
 # gps-starting point in meters for situation and flight testing
-baro_diff_zero = {'own_altitude': 0.0}
+baro_diff_zero = None
 # height starting point based on baro in feet for situation and flight testing
 
 
@@ -97,7 +97,10 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
     else:
         if situation['baro_valid']:
             pressure_alt = situation['own_altitude']
-            alt_diff = pressure_alt - baro_diff_zero['own_altitude']
+            if baro_diff_zero is not None:
+                alt_diff = pressure_alt - baro_diff_zero['own_altitude']
+            else:
+                alt_diff = None
             if grounddistance.takeoff_alt() is not None:
                 alt_diff_takeoff = pressure_alt - grounddistance.takeoff_alt()
             else:
