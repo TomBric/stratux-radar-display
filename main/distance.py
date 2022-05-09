@@ -80,7 +80,7 @@ def reset_values(situation):
     gps_distance_zero['gps_active'] = situation['gps_active']
     gps_distance_zero['longitude'] = situation['longitude']
     gps_distance_zero['latitude'] = situation['latitude']
-    baro_diff_zero['own_altitude'] = situation['own_altitude']
+    baro_diff_zero = {'own_altitude': situation['own_altitude']}
 
     grounddistance.reset_values()
 
