@@ -42,7 +42,6 @@ import radarbuttons
 import grounddistance
 import datetime
 
-
 # constants
 MSG_NO_CONNECTION = "No Connection!"
 # globals

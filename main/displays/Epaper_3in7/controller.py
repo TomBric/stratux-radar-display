@@ -931,7 +931,7 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     starty = dashboard(draw, 5, starty, 225, True, "GPS", lines)
     if ground_distance_valid:
         lines = (
-            ("Ground Dist [cm]", "{:+3.1f}".format(grounddistance/10)),
+            ("Grd Dist [cm]", "{:+3.1f}".format(grounddistance/10)),
         )
         dashboard(draw, 5, starty, 225, True, "Ground Sensor", lines)
 
