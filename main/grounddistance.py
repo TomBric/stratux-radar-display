@@ -78,6 +78,25 @@ landing_situation = None    # situation when wheels touch the ground
 stop_situation = None       # siuation values when the aircraft is stopped on the runway
 
 
+def reset_values():
+    global runup_situation
+    global start_situation
+    global obstacle_up_clear
+    global landing_situation
+    global stop_situation
+    global zero_distance
+
+    runup_situation = None
+    start_situation = None
+    obstacle_up_clear = None
+    obstacle_down_clear = None
+    landing_situation = None
+    stop_situation = None
+    if distance_sensor is not None:
+        zero_distance = distance_sensor.get_measurement()
+        rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
+
+
 def init(activate, debug_level, distance_indication, situation):
     global rlog
     global ground_distance_active

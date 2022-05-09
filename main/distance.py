@@ -82,6 +82,8 @@ def reset_values(situation):
     gps_distance_zero['latitude'] = situation['latitude']
     baro_diff_zero['own_altitude'] = situation['own_altitude']
 
+    grounddistance.reset_values()
+
 
 def draw_distance(draw, display_control, was_changed, connected, situation, ahrs):
     global start_distance
