@@ -82,6 +82,7 @@ def reset_values():
     global runup_situation
     global start_situation
     global obstacle_up_clear
+    global obstacle_down_clear
     global landing_situation
     global stop_situation
     global zero_distance
