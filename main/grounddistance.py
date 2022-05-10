@@ -147,7 +147,7 @@ def write_stats():
     if rlog is None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
-        with open(SAVED_STATISTICS, 'wt') as out:
+        with open(SAVED_STATISTICS, 'at') as out:
             for l in calculate_output_values():
                 print(l[0], l[1], file=out)
     except (OSError, IOError, ValueError) as e:
