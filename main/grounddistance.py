@@ -148,7 +148,7 @@ def write_stats():
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(SAVED_STATISTICS, 'at') as out:
-            json.dump(calculate_output_values(), out, sort_keys=True, indent=4, default=str)
+            json.dump(calculate_output_values(), out, indent=4, default=str)
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + SAVED_STATISTICS)
     rlog.debug("Grounddistance: Statistics saved to " + SAVED_STATISTICS)
