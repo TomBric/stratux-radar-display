@@ -961,8 +961,10 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
 
     if error_message is not None:
         centered_text(draw, 60, error_message, verylargefont, fill="black")
+    left = "Stats"
     right = "Start"
     middle = "Mode"
+    draw.text((5, sizey - SMALL - 3), left, font=smallfont, fill="black")
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
@@ -1002,7 +1004,7 @@ def distance_statistics(draw, values):
         ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
         ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
     )
-    starty = dashboard(draw, 250, starty, 225, True, "Landing", lines)
+    starty = dashboard(draw, 250, 35, 225, True, "Landing", lines)
 
     middle = "Back"
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
