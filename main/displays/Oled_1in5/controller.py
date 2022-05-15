@@ -903,3 +903,40 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     draw.text((sizex - textsize[0], sizey - SMALL), right, font=smallfont, fill="green", align="right")
     centered_text(draw, sizey - SMALL, middle, smallfont, fill="green")
 
+
+def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
+    if key in values:
+        return format_str.format(values[key])
+    else:
+        return '---'
+
+
+def distance_statistics(draw, values):
+    centered_text(draw, 0, "Start-/Landing", smallfont, fill="yellow")
+
+    st = '---'
+    if 'start_time' in values:
+        st = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['start_time'].hour, values['start_time'].minute,
+                                                    values['start_time'].second,
+                                                    math.floor(values['start_time'].microsecond / 100000))
+    lines = (
+        ("t-off time", st),
+        ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
+        ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
+    )
+    starty = dashboard(draw, 0, SMALL + 2, sizex, lines)
+
+    lt = '---'
+    if 'landing_time' in values:
+        lt = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['landing_time'].hour, values['landing_time'].minute,
+                                                    values['landing_time'].second,
+                                                    math.floor(values['landing_time'].microsecond / 100000))
+    lines = (
+        ("ldg time", lt),
+        ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
+        ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
+    )
+    dashboard(draw, 0, starty, sizex, lines)
+
+    middle = "Back"
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
