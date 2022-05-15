@@ -881,27 +881,21 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
             takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
         else:
             takeoff_str = "---"
-        if alt_diff is not None:
-            alt_diff_str = "{:+5.1f}".format(alt_diff)
-        else:
-            alt_diff_str = "---"
         lines = (
-            ("BaroAlt [ft]", "{:5.0f}".format(own_altitude)),
             ("VSpeed [ft]", "{:+4.0f}".format(vert_speed)),
-            ("BaDif rup [ft]", alt_diff_str),
             ("BaDif tof [ft]", takeoff_str),
         )
         starty = dashboard(draw, 0, starty, sizex, lines)
-    if ahrs_valid:
+    if ground_distance_valid:
         lines = (
-            ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
+            ("GrdDist [cm]", "{:+3.1f}".format(grounddistance/10)),
         )
         dashboard(draw, 0, starty, sizex, lines)
 
 
     if error_message is not None:
         centered_text(draw, 80, error_message, verylargefont, fill="red")
-    left = ""
+    left = "Stats"
     right = "Start"
     middle = "Mode"
     draw.text((0, sizey - SMALL), left, font=smallfont, fill="green")
