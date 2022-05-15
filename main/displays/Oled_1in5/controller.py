@@ -877,10 +877,19 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     )
     starty = dashboard(draw, 0, SMALL+2, sizex, lines)
     if baro_valid:
+        if alt_diff_takeoff is not None:
+            takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
+        else:
+            takeoff_str = "---"
+        if alt_diff is not None:
+            alt_diff_str = "{:+5.1f}".format(alt_diff)
+        else:
+            alt_diff_str = "---"
         lines = (
-            ("BaroDiff[ft]", "{:+5.1f}".format(alt_diff)),
-            ("BaroAlt[ft]", "{:5.0f}".format(own_altitude)),
-            ("VSpd [ft]", "{:+4.0f}".format(vert_speed))
+            ("BaroAlt [ft]", "{:5.0f}".format(own_altitude)),
+            ("VSpeed [ft]", "{:+4.0f}".format(vert_speed)),
+            ("BaDif rup [ft]", alt_diff_str),
+            ("BaDif tof [ft]", takeoff_str),
         )
         starty = dashboard(draw, 0, starty, sizex, lines)
     if ahrs_valid:
