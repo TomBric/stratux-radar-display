@@ -939,4 +939,4 @@ def distance_statistics(draw, values):
     dashboard(draw, 0, starty, sizex, lines)
 
     middle = "Back"
-    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
