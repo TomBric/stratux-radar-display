@@ -984,12 +984,12 @@ def distance_statistics(draw, values):
                                                     values['start_time'].second,
                                                     math.floor(values['start_time'].microsecond / 100000))
     lines = (
-        ("start time", st),
-        ("takeoff alt [ft]", form_line(values, 'start_altitude', "{:5.1f}")),
-        ("takeoff dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
-        ("obstacle dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
+        ("t-off time", st),
+        ("t-off alt [ft]", form_line(values, 'start_altitude', "{:5.1f}")),
+        ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
+        ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
     )
-    starty = dashboard(draw, 5, 35, 475, True, "Takeoff", lines)
+    starty = dashboard(draw, 5, 35, 225, True, "Takeoff", lines)
 
     lt = '---'
     if 'landing_time' in values:
@@ -1000,9 +1000,9 @@ def distance_statistics(draw, values):
         ("ldg time", lt),
         ("ldg alt [ft]", form_line(values, 'landing_altitude', "{:5.1f}")),
         ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
-        ("obstacle dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
+        ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
     )
-    starty = dashboard(draw, 5, starty, 475, True, "Landing", lines)
+    starty = dashboard(draw, 250, starty, 225, True, "Landing", lines)
 
     middle = "Back"
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
