@@ -47,6 +47,7 @@ MSG_NO_CONNECTION = "No Connection!"
 # globals
 gps_distance_zero = {'gps_active': False, 'longitude': 0.0, 'latitude': 0.0}
 start_distance = 0.0    # runway needed till airborne, starts when "start" button is pressed
+dist_user_mode = 0      # user input mode for distance display, 0 = normal, start   1=statistics display
 # gps-starting point in meters for situation and flight testing
 baro_diff_zero = None
 # height starting point based on baro in feet for situation and flight testing
@@ -89,48 +90,62 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
     global start_distance
 
     # display in any case, even if there is no change, since time is running anyhow
-    error_message = None
-    gps_distance = 0.0
-    alt_diff = 0.0
-    if not connected:
-        error_message = MSG_NO_CONNECTION
-    else:
-        if situation['baro_valid']:
-            pressure_alt = situation['own_altitude']
-            if baro_diff_zero is not None:
-                alt_diff = pressure_alt - baro_diff_zero['own_altitude']
-            else:
-                alt_diff = None
-            if grounddistance.takeoff_alt() is not None:
-                alt_diff_takeoff = pressure_alt - grounddistance.takeoff_alt()
-            else:
-                alt_diff_takeoff = None
-        if situation['gps_active'] and gps_distance_zero['gps_active']:
-            gps_distance = calc_gps_distance_meters(gps_distance_zero['latitude'], gps_distance_zero['longitude'],
-                                                    situation['latitude'], situation['longitude'])
-    now = datetime.datetime.now(datetime.timezone.utc)
-    display_control.clear(draw)
-    display_control.distance(draw, now, situation['gps_active'], situation['gps_quality'], situation['gps_h_accuracy'],
-                              gps_distance_zero['gps_active'], gps_distance, situation['gps_speed'],
-                              situation['baro_valid'], situation['own_altitude'], alt_diff, alt_diff_takeoff,
-                              situation['vertical_speed'], ahrs['ahrs_sensor'],
-                              ahrs['pitch'], ahrs['roll'], situation['g_distance_valid'], situation['g_distance'],
-                              error_message)
-    display_control.display()
+    if dist_user_mode == 0:
+        error_message = None
+        gps_distance = 0.0
+        alt_diff = 0.0
+        if not connected:
+            error_message = MSG_NO_CONNECTION
+        else:
+            if situation['baro_valid']:
+                pressure_alt = situation['own_altitude']
+                if baro_diff_zero is not None:
+                    alt_diff = pressure_alt - baro_diff_zero['own_altitude']
+                else:
+                    alt_diff = None
+                if grounddistance.takeoff_alt() is not None:
+                    alt_diff_takeoff = pressure_alt - grounddistance.takeoff_alt()
+                else:
+                    alt_diff_takeoff = None
+            if situation['gps_active'] and gps_distance_zero['gps_active']:
+                gps_distance = calc_gps_distance_meters(gps_distance_zero['latitude'], gps_distance_zero['longitude'],
+                                                        situation['latitude'], situation['longitude'])
+        now = datetime.datetime.now(datetime.timezone.utc)
+        display_control.clear(draw)
+        display_control.distance(draw, now, situation['gps_active'], situation['gps_quality'], situation['gps_h_accuracy'],
+                                 gps_distance_zero['gps_active'], gps_distance, situation['gps_speed'],
+                                 situation['baro_valid'], situation['own_altitude'], alt_diff, alt_diff_takeoff,
+                                 situation['vertical_speed'], ahrs['ahrs_sensor'],
+                                 ahrs['pitch'], ahrs['roll'], situation['g_distance_valid'], situation['g_distance'],
+                                 error_message)
+        display_control.display()
+    elif dist_user_mode == 1:   # show statistics
+        display_control.clear(draw)
+        display_control.distance_statistics(draw, grounddistance.calculate_output_values())
+        display_control.display()
 
 
 def user_input():
+    global dist_user_mode
     btime, button = radarbuttons.check_buttons()
     # start of situation global behaviour, status is 21
     if btime == 0:
         return 0, False  # stay in current mode
-    if button == 1 and (btime == 2 or btime == 1):  # middle
-        return 1, False  # next mode to be radar
-    if button == 0 and btime == 2:  # left and long
-        return 3, False  # start next mode shutdown!
-    if button == 2 and btime == 1:  # right and short- reset values
-        return 21, True  # reset values in radar.py
-    if button == 2 and btime == 2:  # right and long- refresh
-        return 22, False  # start next mode for display driver: refresh called from vsi
-    return 21, False  # no mode change for any other interaction
-
+    if dist_user_mode == 0:
+        if button == 1 and (btime == 2 or btime == 1):  # middle
+            return 1, False  # next mode to be radar
+        if button == 0 and btime == 2:  # left and long
+            return 3, False  # start next mode shutdown!
+        if button == 0 and btime == 1:  # left and short- display statistics
+            dist_user_mode = 1
+            return 21, True  # reset values in radar.py
+        if button == 2 and btime == 1:  # right and short- reset values
+            return 21, True  # reset values in radar.py
+        if button == 2 and btime == 2:  # right and long- refresh
+            return 22, False  # start next mode for display driver: refresh called from vsi
+        return 21, False  # no mode change for any other interaction
+    elif dist_user_mode == 1:
+        if button == 1 and btime == 1:  # middle and short- return to display mode
+            dist_user_mode = 0
+            return 21, True  # reset values in radar.py
+        return 21, False  # no mode change for any other interaction
