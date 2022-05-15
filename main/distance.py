@@ -138,7 +138,7 @@ def user_input():
             return 3, False  # start next mode shutdown!
         if button == 0 and btime == 1:  # left and short- display statistics
             dist_user_mode = 1
-            return 21, True  # reset values in radar.py
+            return 21, False
         if button == 2 and btime == 1:  # right and short- reset values
             return 21, True  # reset values in radar.py
         if button == 2 and btime == 2:  # right and long- refresh
@@ -147,5 +147,5 @@ def user_input():
     elif dist_user_mode == 1:
         if button == 1 and btime == 1:  # middle and short- return to display mode
             dist_user_mode = 0
-            return 21, True  # reset values in radar.py
+            return 21, False
         return 21, False  # no mode change for any other interaction
