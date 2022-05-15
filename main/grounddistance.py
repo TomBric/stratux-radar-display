@@ -122,7 +122,7 @@ def init(activate, debug_level, distance_indication, situation):
         distance_sensor.set_measurement_timing_budget(50)
         # shorter values do not optimize timing
         # typical measure timing takes 70 ms on a Zero2
-    except OSError:
+    except (OSError, mp.VL53L1_ERROR_CALIBRATION_WARNING):
         ground_distance_active = False
         rlog.debug("Ground Distance Measurement - VL53L1X sensor not found")
         return False
