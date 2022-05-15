@@ -860,7 +860,8 @@ def dashboard(draw, x, y, sizex, lines):
 
 
 def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
-             own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
+             own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
+             ground_distance_valid, grounddistance, error_message):
     centered_text(draw, 0, "GPS-Distance", smallfont, fill="yellow")
     gps_dist_str = "---"
     gps_speed_str = "---"
