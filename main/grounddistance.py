@@ -117,6 +117,7 @@ def init(activate, debug_level, distance_indication, situation):
         return False
     try:
         distance_sensor = mp.VL53L1X()
+        print("Distance sensor initialized")
         distance_sensor.start_ranging(mp.VL53L1X.SHORT_DST_MODE)
         # short distance mode is better in ambient light conditions and the range is up to 130 cm
         distance_sensor.set_measurement_timing_budget(50)
