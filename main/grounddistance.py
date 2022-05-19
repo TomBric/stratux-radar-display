@@ -116,10 +116,12 @@ def init(activate, debug_level, distance_indication, situation):
         ground_distance_active = False
         return False
     try:
+        rlog.debug("Ground Distance Measurement - activating VL53L1X")
         distance_sensor = mp.VL53L1X()
-        print("Distance sensor initialized")
+        rlog.debug("Ground Distance Measurement - start ranging")
         distance_sensor.start_ranging(mp.VL53L1X.SHORT_DST_MODE)
         # short distance mode is better in ambient light conditions and the range is up to 130 cm
+        rlog.debug("Ground Distance Measurement - timing budget")
         distance_sensor.set_measurement_timing_budget(50)
         # shorter values do not optimize timing, typical measure timing takes 70 ms on a Zero2
     except Exception as e:
