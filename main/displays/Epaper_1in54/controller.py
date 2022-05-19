@@ -832,7 +832,8 @@ def dashboard(draw, x, y, sizex, lines):
 
 
 def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
-             own_altitude, alt_diff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll, error_message):
+             own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
+             ground_distance_valid, grounddistance, error_message):
     centered_text(draw, 0, "GPS-Distance", smallfont, fill="black")
     gps_dist_str = "---"
     gps_speed_str = "---"
@@ -848,24 +849,64 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     )
     starty = dashboard(draw, 0, SMALL+2, sizex, lines)
     if baro_valid:
+        if alt_diff_takeoff is not None:
+            takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
+        else:
+            takeoff_str = "---"
         lines = (
-            ("BaroDiff[ft]", "{:+5.1f}".format(alt_diff)),
-            ("BaroAlt[ft]", "{:5.0f}".format(own_altitude)),
-            ("VSpd [ft]", "{:+4.0f}".format(vert_speed))
+            ("VSpeed [ft]", "{:+4.0f}".format(vert_speed)),
+            ("BaDif tof [ft]", takeoff_str),
         )
         starty = dashboard(draw, 0, starty, sizex, lines)
-    if ahrs_valid:
+    if ground_distance_valid:
         lines = (
-            ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
+            ("GrdDist [cm]", "{:+3.1f}".format(grounddistance/10)),
         )
         dashboard(draw, 0, starty, sizex, lines)
-
     if error_message is not None:
         centered_text(draw, 80, error_message, verylargefont, fill="black")
-    left = ""
+    left = "Stats"
     right = "Start"
     middle = "Mode"
     draw.text((0, sizey - SMALL), left, font=smallfont, fill="black")
     textsize = draw.textsize(right, smallfont)
     draw.text((sizex - textsize[0], sizey - SMALL), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
+
+
+def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
+    if key in values:
+        return format_str.format(values[key])
+    else:
+        return '---'
+
+
+def distance_statistics(draw, values):
+    centered_text(draw, 0, "Start-/Landing", smallfont, fill="black")
+
+    st = '---'
+    if 'start_time' in values:
+        st = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['start_time'].hour, values['start_time'].minute,
+                                                    values['start_time'].second,
+                                                    math.floor(values['start_time'].microsecond / 100000))
+    lines = (
+        ("t-off time", st),
+        ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
+        ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
+    )
+    starty = dashboard(draw, 0, SMALL + 2, sizex, lines)
+
+    lt = '---'
+    if 'landing_time' in values:
+        lt = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['landing_time'].hour, values['landing_time'].minute,
+                                                    values['landing_time'].second,
+                                                    math.floor(values['landing_time'].microsecond / 100000))
+    lines = (
+        ("ldg time", lt),
+        ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
+        ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
+    )
+    dashboard(draw, 0, starty, sizex, lines)
+
+    middle = "Back"
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
