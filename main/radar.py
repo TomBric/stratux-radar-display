@@ -831,7 +831,7 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-ci", "--coindicate", required=False, help="Indicate co warning via GPIO16",
                     action="store_true", default=False)
-    ap.add_argument("-ng", "--nogrounddistance", required=False, help="Suppress activation of ground distances sensor",
+    ap.add_argument("-gd", "--grounddistance", required=False, help="Activate ground distance sensor",
                     action="store_true", default=False)
     ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
                     action="store_true", default=False)
@@ -855,7 +855,7 @@ if __name__ == "__main__":
     measure_flighttime = not args['noflighttime']
     co_warner_activated = not args['nocowarner']
     co_indication = args['coindicate']
-    grounddistance_activated = not args['nogrounddistance']
+    grounddistance_activated = args['grounddistance']
     groundbeep = args['groundbeep']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
