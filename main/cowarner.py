@@ -318,7 +318,7 @@ async def read_sensors():
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Sensor reader terminating ...")
     else:
-        rlog.debug("No co-sensor active ...")
+        rlog.debug("No co-sensor active.")
 
 
 

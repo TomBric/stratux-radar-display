@@ -299,4 +299,4 @@ async def read_ground_sensor():
             distance_sensor.stop_ranging()
             distance_sensor.close_connection()
     else:
-        rlog.debug("No ground distance sensor active ...")
+        rlog.debug("No ground distance sensor active.")
