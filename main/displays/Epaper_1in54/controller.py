@@ -844,8 +844,8 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     lines = (
         ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
                                                        math.floor(now.microsecond / 100000))),
-        ("GPS-Dist[m]", gps_dist_str),
-        ("GPS-Spd[kts]", gps_speed_str),
+        ("GPS-Dist [m]", gps_dist_str),
+        ("GPS-Spd [kts]", gps_speed_str),
     )
     starty = dashboard(draw, 0, SMALL+2, sizex, lines)
     if baro_valid:
