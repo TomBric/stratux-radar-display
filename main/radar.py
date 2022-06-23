@@ -72,7 +72,7 @@ RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
 RADAR_CUTOFF = 29
 UI_REACTION_TIME = 0.1
-MINIMAL_WAIT_TIME = 0.01  # give other coroutines some time to to their jobs
+MINIMAL_WAIT_TIME = 0.01  # give other coroutines some time to do their jobs
 BLUEZ_CHECK_TIME = 3.0
 SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 WATCHDOG_TIMER = 3.0  # time after "no connection" is assumed, if no new situation is received
@@ -90,6 +90,7 @@ INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
+DEFAULT_MIXER = "Speaker"   # default mixer name to be used for sound output
 url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
 url_radar_ws = ""
@@ -288,7 +289,7 @@ def new_traffic(json_str):
             ac['gps_distance'] = gps_rad
             if 'Track' in traffic:
                 ac['direction'] = traffic['Track'] - situation['course']
-                # sometimes track is missing, than leave it as it is
+                # sometimes track is missing, then leave it as it is
             if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= round(situation['RadarLimits']/100):
                 res_angle = (gps_angle - situation['course']) % 360
                 gpsx = math.sin(math.radians(res_angle)) * gps_rad
@@ -758,7 +759,7 @@ def main():
     radarui.init(url_settings_set)
     shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
-    extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth)
+    extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
     draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
     ahrsui.init(display_control)
     statusui.init(display_control, url_status_get, url_host_base, display_refresh_time, global_config)
@@ -835,6 +836,8 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
                     action="store_true", default=False)
+    ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
+                    default=DEFAULT_MIXER)
     args = vars(ap.parse_args())
     # set up logging
     logging_init()
@@ -875,6 +878,7 @@ if __name__ == "__main__":
         global_mode = 19  # start in co-warner mode
     if args['situation']:
         global_mode = 21  # start in situation
+    sound_mixer = args['mixer']
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     global_config['sound_volume'] = args['extsound']    # 0 if not enabled

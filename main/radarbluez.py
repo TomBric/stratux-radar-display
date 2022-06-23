@@ -42,7 +42,6 @@ import alsaaudio
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
 ADAPTER_PATH = '/org/bluez/hci0'
-MIXERNAME = "Speaker"     # this is the name, when you plug in a usb device
 
 # global variables
 rlog = None
@@ -58,14 +57,14 @@ mixer = None
 global_config = None
 
 
-def find_mixer():    # searches for a "Audio" mixer, independent whether it was selected
+def find_mixer(mixer_name):    # searches for a "Audio" mixer, independent whether it was selected
     found = False
     kwargs = {}
     for cardno in alsaaudio.card_indexes():
         kwargs = {'cardindex': cardno}
         for m in alsaaudio.mixers(**kwargs):
             rlog.debug("Audio: Available Card:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
-            if m == MIXERNAME:
+            if m == mixer_name:
                 rlog.debug("Audio: Selected Mixer:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
                 found = True
                 break
@@ -73,14 +72,14 @@ def find_mixer():    # searches for a "Audio" mixer, independent whether it was 
         return -1, None
 
     try:
-        mix = alsaaudio.Mixer(MIXERNAME, **kwargs)
+        mix = alsaaudio.Mixer(mixer_name, **kwargs)
     except alsaaudio.ALSAAudioError:
-        rlog.debug("Radarbluez: Could not get mixer '" + MIXERNAME + "'")
-    rlog.debug("Radarbluez: Mixer '" + MIXERNAME + "' selected")
+        rlog.debug("Radarbluez: Could not get mixer '" + mixer_name + "'")
+    rlog.debug("Radarbluez: Mixer '" + mixer_name + "' selected")
     return cardno, mix
 
 
-def sound_init(config, bluetooth):
+def sound_init(config, bluetooth, mixer_name):
     global bluetooth_active
     global extsound_active
     global b_esng
@@ -93,7 +92,7 @@ def sound_init(config, bluetooth):
     bluetooth_active = False
     global_config = config
     rlog = logging.getLogger('stratux-radar-log')
-    card, mixer = find_mixer()   # search for mixer in any case
+    card, mixer = find_mixer(mixer_name)   # search for mixer in any case
     if not mixer:
         rlog.debug("Radarbluez: Mixer not found!")
     else:

@@ -524,7 +524,7 @@ def shutdown(draw, countdown, shutdownmode):
     elif shutdownmode == 2:
         message = "Reboot"
     centered_text(draw, 10, message, largefont, fill="black")
-    message = "in " + str(countdown) + " seonds!"
+    message = "in " + str(countdown) + " seconds!"
     centered_text(draw, 40, message, largefont, fill="black")
     message = "Press left button to cancel ..."
     centered_text(draw, 110, message, smallfont, fill="black")
