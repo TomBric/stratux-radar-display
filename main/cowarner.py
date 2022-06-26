@@ -99,7 +99,18 @@ last_warning = 0.0   # timestamp of last warning
 #
 
 
-def ppm(rsr0):
+def ppm(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__MEMS_Gas_Sensor___MiCS-5524_SKU_SEN0440
+    if rsr0 > 0.425:
+        return 0.0
+    co = (0.425 - rsr0) / 0.000405
+    if co > 1000.0:
+        return 1000.0
+    if co < 1.0:
+        return 0.0
+    return co
+
+
+def ppm_old(rsr0):
     return 10 ** ((math.log10(rsr0) - B) / M)
 
 
@@ -190,11 +201,12 @@ def read_co_value():     # called by sensor_read thread
     sensor_volt = value * voltage_factor
     rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
     ppm_value = round(ppm(rs_gas / r0))
+    ppm_old_value = round(ppm_old(rs_gas / r0))
     rlog.log(value_debug_level,
              "C0-Warner: Analog0: {0:5d}  {1:.3f} V  RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}    PPM value: {4:d}"
              .format(value, sensor_volt, rs_gas/1000, rs_gas/r0, ppm_value))
-    print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}    PPM value: {4:d}"
-          .format(value, sensor_volt, rs_gas/1000, rs_gas / r0, ppm_value))
+    print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}    PPM value: {4:d} PPM old value: {4:d}"
+          .format(value, sensor_volt, rs_gas/1000, rs_gas / r0, ppm_value, ppm_old_value))
     if ppm_value > co_max:
         co_max = ppm_value
     co_values.append(ppm_value)
@@ -322,7 +334,23 @@ async def read_sensors():
 
 
 
-''' BME280 integration tbd
+''' 
+MICS5524 Tests:
+
+rs_r0_red_data = float(rs_r0_red_data) / float(self.__r0_red)
+return self.getCarbonMonoxide(rs_r0_red_data)
+
+  def getCarbonMonoxide(self, data):
+    if data > 0.425:
+      return 0.0
+    co = (0.425 - data) / 0.000405
+    if co > 1000.0:
+      return 1000.0
+    if co < 1.0:
+      return 0.0
+    return co
+
+BME280 integration tbd
 
 r_star = 8314.3  # J/(kmol*K) (universelle Gaskonstante)
 mw = 18.016      # kg/kmol (Molekulargewicht des Wasserdampfes)
