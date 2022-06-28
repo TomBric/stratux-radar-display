@@ -126,7 +126,7 @@ def init(activate, config, debug_level, co_indication):
     global co_timeout
     global co_max_values
     global indicate_co_warning
-    globel power_value
+    global power_value
 
     rlog = logging.getLogger('stratux-radar-log')
     if not activate:
