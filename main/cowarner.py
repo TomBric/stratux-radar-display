@@ -99,7 +99,7 @@ last_warning = 0.0   # timestamp of last warning
 #
 
 
-def ppm(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__MEMS_Gas_Sensor___MiCS-5524_SKU_SEN0440
+def ppm_alt(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__MEMS_Gas_Sensor___MiCS-5524_SKU_SEN0440
     if rsr0 > 0.425:
         return 0.0
     co = (0.425 - rsr0) / 0.000405
@@ -110,7 +110,7 @@ def ppm(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__MEMS_
     return co
 
 
-def ppm_old(rsr0):
+def ppm(rsr0):
     return 10 ** ((math.log10(rsr0) - B) / M)
 
 
@@ -199,9 +199,10 @@ def read_co_value():     # called by sensor_read thread
     cowarner_changed = True  # to display new value
     value = ADS.getValue()
     sensor_volt = value * voltage_factor
-    rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
+    rs_gas = sensor_volt
+    # rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
     ppm_value = round(ppm(rs_gas / r0))
-    ppm_old_value = round(ppm_old(rs_gas / r0))
+    ppm_old_value = round(ppm_alt(rs_gas / r0))
     rlog.log(value_debug_level,
              "C0-Warner: Analog0: {0:5d}  {1:.3f} V  RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}    PPM value: {4:d}"
              .format(value, sensor_volt, rs_gas/1000, rs_gas/r0, ppm_value))
@@ -248,7 +249,8 @@ def calibration():   # called by user-input thread, performs calibration and end
     if countdown > 0:   # continue sensor reading
         value = ADS.getValue()
         sensor_volt = value * voltage_factor
-        rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
+        # rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
+        rs_air = sensor_volt
         r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
         sample_sum += r0_act
         no_samples += 1
