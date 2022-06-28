@@ -80,6 +80,7 @@ alarmlevel = 0   # see above level for warnlevel 0-5
 r0 = 150.0     # value for R0 in clean air. Calculated during calibration, 150 is a good starting point
 cowarner_active = False
 voltage_factor = 1.0
+power_value = 1   # ADC value for SENSOR_VOLTAGE
 ADS = None
 rlog = None
 g_config = {}
@@ -125,6 +126,7 @@ def init(activate, config, debug_level, co_indication):
     global co_timeout
     global co_max_values
     global indicate_co_warning
+    globel power_value
 
     rlog = logging.getLogger('stratux-radar-log')
     if not activate:
@@ -146,8 +148,9 @@ def init(activate, config, debug_level, co_indication):
         return False
     # set gain to 4.096V max
     ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
-    ADS.setGain(ADS.PGA_4_096V)
+    ADS.setGain(ADS.PGA_6_144V)
     voltage_factor = ADS.toVoltage()
+    power_value = SENSOR_VOLTAGE / voltage_factor
     cowarner_active = True
     rlog.debug("CO-Warner: AD converter active.")
     if co_indication:
@@ -199,7 +202,7 @@ def read_co_value():     # called by sensor_read thread
     cowarner_changed = True  # to display new value
     value = ADS.getValue()
     sensor_volt = value * voltage_factor
-    rs_gas = SENSOR_VOLTAGE - sensor_volt
+    rs_gas = power_value - value
     # rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
     ppm_value = round(ppm(rs_gas / r0))
     ppm_old_value = round(ppm_alt(rs_gas / r0))
@@ -250,7 +253,7 @@ def calibration():   # called by user-input thread, performs calibration and end
         value = ADS.getValue()
         sensor_volt = value * voltage_factor
         # rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
-        rs_air = SENSOR_VOLTAGE - sensor_volt
+        rs_air = power_value - value
         r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
         sample_sum += r0_act
         no_samples += 1
