@@ -199,7 +199,7 @@ def read_co_value():     # called by sensor_read thread
     cowarner_changed = True  # to display new value
     value = ADS.getValue()
     sensor_volt = value * voltage_factor
-    rs_gas = sensor_volt
+    rs_gas = SENSOR_VOLTAGE - sensor_volt
     # rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
     ppm_value = round(ppm(rs_gas / r0))
     ppm_old_value = round(ppm_alt(rs_gas / r0))
@@ -250,7 +250,7 @@ def calibration():   # called by user-input thread, performs calibration and end
         value = ADS.getValue()
         sensor_volt = value * voltage_factor
         # rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
-        rs_air = sensor_volt
+        rs_air = SENSOR_VOLTAGE - sensor_volt
         r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
         sample_sum += r0_act
         no_samples += 1
