@@ -80,7 +80,6 @@ alarmlevel = 0   # see above level for warnlevel 0-5
 r0 = 150.0     # value for R0 in clean air. Calculated during calibration, 150 is a good starting point
 cowarner_active = False
 voltage_factor = 1.0
-power_value = 1   # ADC value for SENSOR_VOLTAGE
 ADS = None
 rlog = None
 g_config = {}
@@ -112,7 +111,8 @@ def ppm_alt(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__M
 
 
 def ppm(rsr0):
-    return 10 ** ((math.log10(rsr0) - B) / M)
+    return pow(rsr0, -1.177) * 4.4638   # https://github.com/eNBeWe/MiCS6814-I2C-Library/blob/master/src/MiCS6814-I2C.cpp
+    # return 10 ** ((math.log10(rsr0) - B) / M)
 
 
 def init(activate, config, debug_level, co_indication):
@@ -126,7 +126,6 @@ def init(activate, config, debug_level, co_indication):
     global co_timeout
     global co_max_values
     global indicate_co_warning
-    global power_value
 
     rlog = logging.getLogger('stratux-radar-log')
     if not activate:
@@ -148,9 +147,8 @@ def init(activate, config, debug_level, co_indication):
         return False
     # set gain to 4.096V max
     ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
-    ADS.setGain(ADS.PGA_1_024V)
+    ADS.setGain(ADS.PGA_4_096V)
     voltage_factor = ADS.toVoltage()
-    power_value = SENSOR_VOLTAGE / voltage_factor
     cowarner_active = True
     rlog.debug("CO-Warner: AD converter active.")
     if co_indication:
@@ -202,15 +200,14 @@ def read_co_value():     # called by sensor_read thread
     cowarner_changed = True  # to display new value
     value = ADS.getValue()
     sensor_volt = value * voltage_factor
-    rs_gas = power_value - value
-    # rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
+    rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
     ppm_value = round(ppm(rs_gas / r0))
     ppm_old_value = round(ppm_alt(rs_gas / r0))
     rlog.log(value_debug_level,
              "C0-Warner: Analog0: {0:5d}  {1:.3f} V  RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}    PPM value: {4:d}"
              .format(value, sensor_volt, rs_gas/1000, rs_gas/r0, ppm_value))
-    print("C0-Warner: PowerValue: {6:6.1f} Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}  PPM value: {4:d} PPM old value: {5:d}"
-          .format(value, sensor_volt, rs_gas/1000, rs_gas / r0, ppm_value, ppm_old_value, power_value))
+    print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}  PPM value: {4:d} PPM old value: {5:d}"
+          .format(value, sensor_volt, rs_gas/1000, rs_gas / r0, ppm_value, ppm_old_value))
     if ppm_value > co_max:
         co_max = ppm_value
     co_values.append(ppm_value)
@@ -252,8 +249,7 @@ def calibration():   # called by user-input thread, performs calibration and end
     if countdown > 0:   # continue sensor reading
         value = ADS.getValue()
         sensor_volt = value * voltage_factor
-        # rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
-        rs_air = power_value - value
+        rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
         r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
         sample_sum += r0_act
         no_samples += 1
