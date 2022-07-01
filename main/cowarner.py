@@ -148,7 +148,7 @@ def init(activate, config, debug_level, co_indication):
         return False
     # set gain to 4.096V max
     ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
-    ADS.setGain(ADS.PGA_6_144V)
+    ADS.setGain(ADS.PGA_1_024V)
     voltage_factor = ADS.toVoltage()
     power_value = SENSOR_VOLTAGE / voltage_factor
     cowarner_active = True
