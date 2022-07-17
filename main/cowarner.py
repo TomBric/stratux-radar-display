@@ -111,11 +111,12 @@ def ppm_alt(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__M
 
 
 def ppm(rsr0):
-    if rsr0 > 3.333:
+    val = pow(rsr0, -1.177) * 80 - 20
+    if val < 1:
         return 1
-    elif rsr0 < 0.1:
+    if val > 1000:
         return 1000
-    return pow(rsr0, -1.177) * 80 - 20
+    return val
     # based on several mesaurements
 
     # return pow(rsr0, -1.177) * 4.4638 https://github.com/eNBeWe/MiCS6814-I2C-Library/blob/master/src/MiCS6814-I2C.cpp
