@@ -111,7 +111,7 @@ def ppm_alt(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__M
 
 
 def ppm(rsr0):
-    if rsr0 > 3.0:
+    if rsr0 > 3.2:
         return 1
     elif rsr0 < 0.1:
         return 1000
