@@ -111,7 +111,10 @@ def ppm_alt(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__M
 
 
 def ppm(rsr0):
-    return pow(rsr0, -1.177) * 4.4638   # https://github.com/eNBeWe/MiCS6814-I2C-Library/blob/master/src/MiCS6814-I2C.cpp
+    return pow(rsr0, -1.3) * 30
+    # based on several mesaurements
+
+    # return pow(rsr0, -1.177) * 4.4638 https://github.com/eNBeWe/MiCS6814-I2C-Library/blob/master/src/MiCS6814-I2C.cpp
     # return 10 ** ((math.log10(rsr0) - B) / M)
 
 
