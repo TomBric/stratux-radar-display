@@ -213,8 +213,8 @@ def read_co_value():     # called by sensor_read thread
     rlog.log(value_debug_level,
              "C0-Warner: Analog0: {0:5d}  {1:.3f} V  RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}    PPM value: {4:d}"
              .format(value, sensor_volt, rs_gas/1000, rs_gas/r0, ppm_value))
-    print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}  PPM value: {4:d} PPM old value: {5:d}"
-          .format(value, sensor_volt, rs_gas/1000, rs_gas / r0, ppm_value, ppm_old_value))
+    print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}  PPM value: {4:d}"
+          .format(value, sensor_volt, rs_gas/1000, rs_gas / r0, ppm_value))
     if ppm_value > co_max:
         co_max = ppm_value
     co_values.append(ppm_value)
@@ -272,6 +272,7 @@ def calibration():   # called by user-input thread, performs calibration and end
 def user_input():
     global cowarner_changed
     global co_max
+    global co_values
     global co_warner_status
     global calibration_end
     global sample_sum
@@ -296,6 +297,7 @@ def user_input():
         return 3  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, reset max value
         co_max = 0
+        co_values.clear()  # clear all history
     if button == 2 and btime == 2:  # right and long- refresh
         return 20  # start next mode for display driver: refresh called
     return 19  # no mode change
@@ -343,21 +345,6 @@ async def read_sensors():
 
 
 ''' 
-MICS5524 Tests:
-
-rs_r0_red_data = float(rs_r0_red_data) / float(self.__r0_red)
-return self.getCarbonMonoxide(rs_r0_red_data)
-
-  def getCarbonMonoxide(self, data):
-    if data > 0.425:
-      return 0.0
-    co = (0.425 - data) / 0.000405
-    if co > 1000.0:
-      return 1000.0
-    if co < 1.0:
-      return 0.0
-    return co
-
 BME280 integration tbd
 
 r_star = 8314.3  # J/(kmol*K) (universelle Gaskonstante)
