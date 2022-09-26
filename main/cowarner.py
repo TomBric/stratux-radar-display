@@ -63,6 +63,7 @@ MIN_SENSOR_WAIT_TIME = 0.01
 MIN_SENSOR_CALIBRATION_WAIT_TIME = 0.5
 # minimal time in secs to wait during calibration and two sensor readings
 IOPIN = 16   # GPIO16 for indication of co warning, high on alarm (physical #36, connect to ground #34)
+INDICATION_TEST_TIME = 1   # time during startup when indication will be switched on for test
 
 WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time between repeats for spoken warning
     (0, 0, "No CO alarm", 0),
@@ -326,6 +327,11 @@ async def read_sensors():
     if cowarner_active:
         try:
             rlog.debug("Sensor reader active ...")
+            if indicate_co_warning:
+                rlog.debug("CO-Warner: Flashing GPIO Pin " + str(IOPIN) + " to test indication")
+                GPIO.output(IOPIN, GPIO.HIGH)
+                await asyncio.sleep(INDICATION_TEST_TIME)
+                GPIO.output(IOPIN, GPIO.LOW)
             while True:
                 request_read()
                 while not ready():
