@@ -60,7 +60,7 @@ import grounddistance
 from datetime import datetime, timezone
 
 # constant definitions
-RADAR_VERSION = "1.8"
+RADAR_VERSION = "1.81"
 
 # logging
 SITUATION_DEBUG = logging.DEBUG-2   # another low level for debugging, DEBUG is 10
