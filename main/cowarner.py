@@ -45,9 +45,10 @@ import numpy
 
 
 # constants
-# Remark: Sensor graphics of MICS 5524 shows a logarithmic scale.
+# Remark: Sensoror graphics of MICS 5524 shows a logarithmic scale.
 # Deriving the function for this gives the linear equation 10**(RS/R0) = -0.867 (10**ppm) + 0.6
 # a good explanation can be found e.g. on https://jayconsystems.com/blog/understanding-a-gas-sensor
+# My own measurements revealed:    ppm = 10^((rsro-3.3)/-1.4)
 M = -0.867
 B = 0.6
 RSR0_CLEAN = 3.333   # 3.3 ppm, see data sheet of MICS-5524
@@ -112,7 +113,8 @@ def ppm_alt(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__M
 
 
 def ppm(rsr0):
-    val = pow(rsr0, -1.177) * 80 - 20
+    ppm = 10 ** ((rsr0 - 3.3) / -1.4)
+    # val = pow(rsr0, -1.177) * 80 - 20
     if val < 1:
         return 1
     if val > 1000:
