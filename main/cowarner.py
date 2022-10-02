@@ -113,7 +113,7 @@ def ppm_alt(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__M
 
 
 def ppm(rsr0):
-    ppm = 10 ** ((rsr0 - 3.3) / -1.4)
+    val = 10 ** ((rsr0 - 3.3) / -1.4)
     # val = pow(rsr0, -1.177) * 80 - 20
     if val < 1:
         return 1
