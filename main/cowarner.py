@@ -48,9 +48,8 @@ import numpy
 # Remark: Sensoror graphics of MICS 5524 shows a logarithmic scale.
 # Deriving the function for this gives the linear equation 10**(RS/R0) = -0.867 (10**ppm) + 0.6
 # a good explanation can be found e.g. on https://jayconsystems.com/blog/understanding-a-gas-sensor
-# My own measurements revealed:    ppm = 10^((rsro-3.3)/-1.4)
-M = -0.867
-B = 0.6
+# But sensor behaves not according data sheet. My own measurements revealed:    ppm = 10^(((RS/RO)-3.3)/-1.4)
+
 RSR0_CLEAN = 3.333   # 3.3 ppm, see data sheet of MICS-5524
 R_DIVIDER = 10000.0   # Value of divider resistor 10 kOhm
 SENSOR_VOLTAGE = 5.0   # voltage for sensor board and divider
@@ -79,7 +78,7 @@ WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time betwe
 # globals
 alarmlevel = 0   # see above level for warnlevel 0-5
 # time when this alarmlevel was first reached or underrun
-r0 = 150.0     # value for R0 in clean air. Calculated during calibration, 150 is a good starting point
+r0 = 900.0     # value for R0 in clean air. Calculated during calibration, 900 is a good starting point
 cowarner_active = False
 voltage_factor = 1.0
 ADS = None
@@ -101,29 +100,14 @@ last_warning = 0.0   # timestamp of last warning
 #
 
 
-def ppm_alt(rsr0):   # from DFRobot library, https://wiki.dfrobot.com/Fermion__MEMS_Gas_Sensor___MiCS-5524_SKU_SEN0440
-    if rsr0 > 0.425:
-        return 0.0
-    co = (0.425 - rsr0) / 0.000405
-    if co > 1000.0:
-        return 1000.0
-    if co < 1.0:
-        return 0.0
-    return co
-
-
 def ppm(rsr0):
     val = 10 ** ((rsr0 - 3.3) / -1.33)
-    # val = pow(rsr0, -1.177) * 80 - 20
     if val < 1:
         return 1
     if val > 1000:
         return 1000
     return val
-    # based on several mesaurements
-
-    # return pow(rsr0, -1.177) * 4.4638 https://github.com/eNBeWe/MiCS6814-I2C-Library/blob/master/src/MiCS6814-I2C.cpp
-    # return 10 ** ((math.log10(rsr0) - B) / M)
+    # based on own measurements compared with a CO warner
 
 
 def init(activate, config, debug_level, co_indication):
@@ -213,12 +197,10 @@ def read_co_value():     # called by sensor_read thread
     sensor_volt = value * voltage_factor
     rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
     ppm_value = round(ppm(rs_gas / r0))
-    ppm_old_value = round(ppm_alt(rs_gas / r0))
     rlog.log(value_debug_level,
              "C0-Warner: Analog0: {0:5d}  {1:.3f} V  RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}    PPM value: {4:d}"
              .format(value, sensor_volt, rs_gas/1000, rs_gas/r0, ppm_value))
-    print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}  PPM value: {4:d}"
-          .format(value, sensor_volt, rs_gas/1000, rs_gas / r0, ppm_value))
+    # print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}  PPM value: {4:d}".format(value, sensor_volt, rs_gas/1000, rs_gas / r0, ppm_value))
     if ppm_value > co_max:
         co_max = ppm_value
     co_values.append(ppm_value)
