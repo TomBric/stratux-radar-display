@@ -101,9 +101,10 @@ last_warning = 0.0   # timestamp of last warning
 
 
 def ppm(rsr0):
-    val = 10 ** ((rsr0 - 3.3) / -1.33)
-    if val < 1:
-        return 1
+    val = 10 ** ((math.log10(rsr0) - 0.9) / -0.75)
+    # val = 10 ** ((rsr0 - 3.3) / -1.33)
+    if val < 5:
+        return 0    # no valid measurements below 5
     if val > 1000:
         return 1000
     return val
