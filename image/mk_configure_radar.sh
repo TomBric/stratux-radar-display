@@ -15,7 +15,7 @@ fi
 # remove desktop packages
 apt purge xserver* lightdm* vlc* lxde* chromium* desktop* gnome* gstreamer* gtk* hicolor-icon-theme* lx* mesa* \
 python3-pygame pocketsphinx-en-us libllvm11 libgtk-3-common libflite1 libgtk2.0-common poppler-data \
-libqt5gui5 qttranslations5-l10n libc6-dbg geany-common gdb libqt5core5a libstdc++-10-dev libgcc-10-dev python3-jedi \
+libqt5gui5 qttranslations5-l10n libc6-dbg geany-common gdb libqt5core5a libstdc++-10-dev python3-jedi \
 libpython3.9-dev -y
 apt-get remove realvnc-vnc-server -y
 apt-get autoremove -y
@@ -27,15 +27,18 @@ apt-get install git python3-pip python3-pil -y libjpeg-dev zlib1g-dev libfreetyp
 pip3 install luma.oled
 
 
-#websockets for radar
-pip3 install websockets
+#websockets for radar and ADS1115 analog reader for co warner
+pip3 install websockets ADS1x15-ADC
+
+# library for vl53l1x range sensor
+pip3 install melopero-vl53l1x
 
 # espeak-ng for sound output and alsoaudio for external sound
-apt-get install espeak-ng espeak-ng-data libespeak-ng-dev -y
+apt-get install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data libespeak-ng-dev -y
 pip3 install py-espeak-ng pyalsaaudio
 
 # bluetooth configs
-apt-get install libbluetooth-dev -y
+apt-get install pi-bluetooth bluetooth libbluetooth-dev libbluetooth3 python3-dev -y
 pip3 install pybluez pydbus
 pip3 install pillow==8.4
 apt purge piwiz -y
@@ -71,7 +74,8 @@ cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
 systemctl --system enable pulseaudio.service
 # systemctl --system start pulseaudio.service
 
-# enable spi
+# enable spi and i2c (for cowarner)
 raspi-config nonint do_spi 0
+raspi-config nonint do_i2c 0
 echo "Radar configuration finished"
 

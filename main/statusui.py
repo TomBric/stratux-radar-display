@@ -94,14 +94,8 @@ def read_config():
     except (OSError, IOError, ValueError) as e:
         rlog.debug("StatusUI: Error " + str(e) + " reading " + CONFIG_FILE)
         return None
-    rlog.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " + json.dumps(config, sort_keys=True, indent=4,
-                                                                                      default=default))
-    # read back last_flights to datetime
-    if 'last_flights' in config:
-        for i in config['last_flights']:
-            i[0] = datetime.datetime.fromisoformat(i[0])
-            if i[1] != 0:    # if in the air this is 0
-                i[1] = datetime.datetime.fromisoformat(i[1])
+    rlog.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " +
+               json.dumps(config, sort_keys=True, indent=4, default=default))
     return config
 
 
@@ -278,19 +272,6 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
     display_control.display()
 
 
-def trust_pair_connect(bt_addr):
-    res = subprocess.run(["bluetoothctl", "trust", bt_addr])
-    if res.returncode != 0:
-        return False
-    res = subprocess.run(["bluetoothctl", "pair", bt_addr])
-    if res.returncode != 0:
-        return False
-    res = subprocess.run(["bluetoothctl", "connect", bt_addr])
-    if res.returncode != 0:
-        return False
-    return True
-
-
 def remove_device(bt_addr):
     res = subprocess.run(["bluetoothctl", "remove", bt_addr])
     if res.returncode != 0:
@@ -311,13 +292,13 @@ def scan_result(output):
                 else:
                     bt_name = ''
                 new_devices.append([bt_addr, bt_name])
-                rlog.debug("BT-Scan: new Device detected ", bt_addr, " ", bt_name)
+                rlog.debug("BT-Scan: new Device detected " + str(bt_addr) + " " + bt_name)
 
 
 async def bt_scan():
     rlog.debug("Starting Bluetooth-Scan")
-    proc = await asyncio.create_subprocess_exec("bluetoothctl", "--timeout", str(BLUETOOTH_SCAN_TIME), "scan", "on",
-                                                stdout=asyncio.subprocess.PIPE)
+    proc = await asyncio.create_subprocess_exec("bluetoothctl", "--timeout", str(BLUETOOTH_SCAN_TIME),
+                                                "scan", "on", stdout=asyncio.subprocess.PIPE)
     while True:
         stdout_line, stderr_line = await proc.communicate()
         if proc is not None:   # finished
@@ -458,11 +439,11 @@ def user_input(extsound_active, bluetooth_active):
                 return 7
         if len(new_devices) > 0:
             if button == 0 and btime == 1:  # left short, YES
-                rlog.debug("Connecting:", new_devices[0][1])
-                trust_pair_connect(new_devices[0][0])
+                rlog.debug("Connecting: " + new_devices[0][1])
+                radarbluez.trust_pair_connect(new_devices[0][0])
                 del new_devices[0]
             if button == 2 and btime == 1:  # right short, NO
-                rlog.debug("Not Connecting:", new_devices[0][1])
+                rlog.debug("Not Connecting: " + new_devices[0][1])
                 remove_device(new_devices[0][0])
                 del new_devices[0]
         if len(new_devices) == 0 or (button == 1 and btime == 1):   # middle short, Cancel

@@ -38,6 +38,7 @@ import asyncio
 import json
 
 # constants
+SITUATION_DEBUG = logging.DEBUG-2
 
 # globals
 status = {}
@@ -71,6 +72,8 @@ def start():  # start listening on status websocket
     if status_listener is None:
         loop = asyncio.get_event_loop()
         status_listener = loop.create_task(radar.listen_forever(status_url, "StatusListener", status_callback, rlog))
+        if status_listener is None:
+            rlog.debug("Error: Stratux status listener not started.")
 
 
 def stop():  # stop listening on status websocket
@@ -130,7 +133,7 @@ def draw_status(draw, display_control, ui_changed, connected, altitude, gps_alt,
 def status_callback(json_str):
     global strx
 
-    rlog.debug("New status" + json_str)
+    rlog.log(SITUATION_DEBUG,"New status" + json_str)
     stat = json.loads(json_str)
 
     strx['was_changed'] = True

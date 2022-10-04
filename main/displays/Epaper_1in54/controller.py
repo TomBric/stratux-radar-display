@@ -78,6 +78,7 @@ compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
 cmsize = 14        # length of compass marks
+space = 2
 # end device globals
 
 
@@ -277,7 +278,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
 
 
 def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy, optical_bar, basemode, extsound):
+              gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2-2, zeroy+max_pixel/2-2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4-1, zeroy+max_pixel/4-1), outline="black")
     draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
@@ -294,7 +295,7 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     textsize = draw.textsize(t, smallfont)
     draw.text((sizex - textsize[0], 0), t, font=smallfont, fill="black", align="right")
     text = "ft"
-    textsize = draw.textsize(text, smallfont)
+    textsize = draw.textsize(text, verysmallfont)
     draw.text((sizex - textsize[0], SMALL), text, font=verysmallfont, fill="black", align="right")
 
     text = str(course) + '°'
@@ -305,6 +306,9 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         centered_text(draw, 15, "No GPS", smallfont, fill="black")
     if not connected:
         centered_text(draw, 75, "No connection!", smallfont, fill="black")
+    if co_alarmlevel > 0:
+        centered_text(draw, sizey - 3 * SMALL, "CO Alarm!", smallfont, fill="black")
+        centered_text(draw, sizey - 2 * SMALL, co_alarmstring, smallfont, fill="black")
 
     if extsound or bt_devices > 0:
         if sound_active:
@@ -480,7 +484,7 @@ def shutdown(draw, countdown, shutdownmode):
     elif shutdownmode == 2:
         message = "Reboot"
     centered_text(draw, 0, message, largefont, fill="black")
-    message = "in " + str(countdown) + " seonds!"
+    message = "in " + str(countdown) + " seconds!"
     centered_text(draw, 30, message, largefont, fill="black")
     message = "Left to cancel ..."
     centered_text(draw, 80, message, smallfont, fill="black")
@@ -726,3 +730,183 @@ def flighttime(draw, last_flights):
         maxlines -= 1
         if maxlines <= 0:
             break
+
+
+def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
+    ts = draw.textsize(str(maxvalue), verysmallfont)    # for adjusting x and y
+    # adjust zero lines to have room for text
+    xpos = xpos + ts[0] + space
+    xsize = xsize - ts[0] - space
+    ypos = ypos + ts[1]/2
+    ysize = ysize - ts[1]
+
+    vlmin_y = ypos + ysize - 1
+    ts = draw.textsize(str(minvalue), verysmallfont)
+    draw.text((xpos - ts[0] - space, vlmin_y - ts[1]), str(minvalue), font=verysmallfont, fill="black")
+
+    vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
+    ts = draw.textsize(str(value_line1), verysmallfont)
+    draw.text((xpos - ts[0] - space, vl1_y - ts[1]/2), str(value_line1), font=verysmallfont, fill="black")
+
+    vl2_y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
+    ts = draw.textsize(str(value_line2), verysmallfont)
+    draw.text((xpos - ts[0] - space, vl2_y - ts[1]/2), str(value_line2), font=verysmallfont, fill="black")
+
+    vlmax_y = ypos
+    ts = draw.textsize(str(maxvalue), verysmallfont)
+    draw.text((xpos - ts[0] - space, vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="black")
+
+    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize-1), outline="black", width=3, fill="white")
+
+    # values below x-axis
+    no_of_values = len(data)
+    full_time = timeout * no_of_values   # time for full display in secs
+    timestr = time.strftime("%H:%M", time.gmtime())
+    ts = draw.textsize(timestr, verysmallfont)
+    no_of_time = math.floor(xsize / ts[0] / 2) + 1   # calculate maximum number of time indications
+    time_offset = full_time / no_of_time
+    offset = math.floor((xsize-1) / no_of_time)
+    x = xpos
+    acttime = math.floor(time.time())
+    for i in range(0, no_of_time+1):
+        draw.line((x, ypos+ysize-1-5, x, ypos+ysize-1+3), width=2, fill="black")
+        timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time-i) * time_offset)))
+        draw.text((x - ts[0]/2, ypos+ysize-1 + 1), timestr, font=verysmallfont, fill="black")
+        x = x + offset
+    lastpoint = None
+    for i in range(0, len(data)):
+        y = ypos-1 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
+        if y < ypos:
+            y = ypos   # if value is outside
+        if y > ypos+ysize-1:
+            x = ypos+ysize-1
+        if i >= 1:  # we need at least two points before we draw
+            x = xpos + i * xsize / (len(data)-1)
+            draw.line([lastpoint, (x, y)], fill="black", width=2)
+        else:
+            x = xpos
+        lastpoint = (x, y)
+    # value_line 1
+    y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
+    for x in range(xpos, xpos+xsize, 6):
+        draw.line([(x, y), (x + 3, y)], fill="black", width=1)
+    # value_line 2
+    y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
+    for x in range(xpos, xpos+xsize, 6):
+        draw.line([(x, y), (x + 3, y)], fill="black", width=1)
+
+
+def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
+    if alarmlevel == 0:
+        centered_text(draw, 0, "CO: No CO alarm", smallfont, fill="black")
+    else:
+        if alarmperiod > 60:
+            alarmstr = "CO: {:d}ppm>{:d}min".format(alarmppm, math.floor(alarmperiod/60))
+        else:
+            alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
+        centered_text(draw, 0, alarmstr, smallfont, fill="black")
+    graph(draw, 0, SMALL+5, sizex-19, sizey-80, co_values, 0, 120, 50, 100, timeout)
+
+    if len(co_values) > 0:
+        round_text(draw, 5, sizey-2*SMALL, "act: {:3d}".format(co_values[len(co_values)-1]), "white", out="black")
+    round_text(draw, sizex/2+5, sizey-2*SMALL, "max: {:3d}".format(co_max), "white", out="black")
+
+    left = "Cal"
+    right = "Reset"
+    middle = "Mode"
+    draw.text((0, sizey - SMALL), left, font=smallfont, fill="black")
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
+
+
+def dashboard(draw, x, y, sizex, lines):
+    # dashboard, arguments are lines = ("text", "value"), ....
+    starty = y
+    for line in lines:
+        draw.text((x, starty), line[0], font=smallfont, fill="black", align="left")
+        ts = draw.textsize(line[1], smallfont)
+        draw.text((x+sizex-ts[0], starty), line[1], font=smallfont, fill="black")
+        starty += SMALL+2
+    return starty
+
+
+def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
+             own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
+             ground_distance_valid, grounddistance, error_message):
+    centered_text(draw, 0, "GPS-Distance", smallfont, fill="black")
+    gps_dist_str = "---"
+    gps_speed_str = "---"
+    if distance_valid:
+        gps_dist_str = "{:4.0f}".format(gps_distance)
+    if gps_valid:
+        gps_speed_str = "{:3.1f}".format(gps_speed)
+    lines = (
+        ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
+                                                       math.floor(now.microsecond / 100000))),
+        ("GPS-Dist [m]", gps_dist_str),
+        ("GPS-Spd [kts]", gps_speed_str),
+    )
+    starty = dashboard(draw, 0, SMALL+2, sizex, lines)
+    if baro_valid:
+        if alt_diff_takeoff is not None:
+            takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
+        else:
+            takeoff_str = "---"
+        lines = (
+            ("VSpeed [ft]", "{:+4.0f}".format(vert_speed)),
+            ("BaDif tof [ft]", takeoff_str),
+        )
+        starty = dashboard(draw, 0, starty, sizex, lines)
+    if ground_distance_valid:
+        lines = (
+            ("GrdDist [cm]", "{:+3.1f}".format(grounddistance/10)),
+        )
+        dashboard(draw, 0, starty, sizex, lines)
+    if error_message is not None:
+        centered_text(draw, 80, error_message, verylargefont, fill="black")
+    left = "Stats"
+    right = "Start"
+    middle = "Mode"
+    draw.text((0, sizey - SMALL), left, font=smallfont, fill="black")
+    textsize = draw.textsize(right, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
+
+
+def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
+    if key in values:
+        return format_str.format(values[key])
+    else:
+        return '---'
+
+
+def distance_statistics(draw, values):
+    centered_text(draw, 0, "Start-/Landing", smallfont, fill="black")
+
+    st = '---'
+    if 'start_time' in values:
+        st = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['start_time'].hour, values['start_time'].minute,
+                                                    values['start_time'].second,
+                                                    math.floor(values['start_time'].microsecond / 100000))
+    lines = (
+        ("t-off time", st),
+        ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
+        ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
+    )
+    starty = dashboard(draw, 0, SMALL + 2, sizex, lines)
+
+    lt = '---'
+    if 'landing_time' in values:
+        lt = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['landing_time'].hour, values['landing_time'].minute,
+                                                    values['landing_time'].second,
+                                                    math.floor(values['landing_time'].microsecond / 100000))
+    lines = (
+        ("ldg time", lt),
+        ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
+        ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
+    )
+    dashboard(draw, 0, starty, sizex, lines)
+
+    middle = "Back"
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")

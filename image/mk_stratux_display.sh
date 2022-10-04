@@ -6,15 +6,14 @@
 # If you want to build on x86 with aarch64 emulation, additionally install qemu-user-static qemu-system-arm
 # Run this script as root.
 # Run with argument "dev" to get the dev branch from github, otherwise with main
+# Run with optional argument "v64" to create 64 bit based images for zero2
 # call examples:
 #   sudo /bin/bash mk_stratux_display.sh "Create failed" dev
 #   sudo /bin/bash mk_stratux_display.sh "Create failed" main
+# sudo /bin/bash mk_stratux_display.sh "Create failed" main v64
 
 set -x
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-11-08/2021-10-30-raspios-bullseye-armhf.zip"
-ZIPNAME="2021-10-30-raspios-bullseye-armhf.zip"
-IMGNAME="${ZIPNAME%.*}.img"
-TMPDIR="/home/pi/stratux-display-tmp"
+TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 
 
@@ -24,9 +23,19 @@ die() {
 }
 
 if [ "$#" -lt 2 ]; then
-    echo "Usage: " $0 "  <fail output> dev|main"
+    echo "Usage: " $0 "  <fail output> dev|main [v64]"
     exit 1
 fi
+IMAGE_VERSION="armhf"
+outprefix="stratux-display"
+if [ "$#" -gt 2 ] &&  [ $3 == "v64" ]; then
+    IMAGE_VERSION="arm64"
+    outprefix="stratux-display64"
+fi
+
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2022-01-28/2022-01-28-raspios-bullseye-$IMAGE_VERSION.zip"
+ZIPNAME="2022-01-28-raspios-bullseye-$IMAGE_VERSION.zip"
+IMGNAME="${ZIPNAME%.*}.img"
 
 # cd to script directory
 cd "$(dirname "$0")"
@@ -48,9 +57,9 @@ if [[ $bootoffset == "*" ]]; then
 fi
 bootoffset=$(( 512*bootoffset ))
 
-# Original image partition is too small to hold our stuff.. resize it to 4000 Mb
+# Original image partition is too small to hold our stuff.. resize it to 5120 Mb
 # Append one GB and truncate to size
-truncate -s 4000M $IMGNAME || die "Image resize failed"
+truncate -s 5120M $IMGNAME || die "Image resize failed"
 lo=$(losetup -f)
 losetup $lo $IMGNAME
 partprobe $lo
@@ -97,7 +106,6 @@ cd $SRCDIR
 # make sure the local version is also on current status
 sudo -u pi git pull --rebase
 outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
-outprefix="stratux-display"
 cd $TMPDIR
 
 # Rename and zip oled version

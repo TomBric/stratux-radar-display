@@ -74,7 +74,7 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        return 1, False
+        return 0, False
     if button == 0:
         if btime == 2:    # left and long
             return 3, False  # start next mode shutdown!
