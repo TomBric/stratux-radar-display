@@ -323,5 +323,5 @@ def read_simulation_data():    # return False, 0, 0, 0 with error, else True, gr
         rlog.debug("Grounddistance: Error " + str(e) + " reading " + SIM_DATA_FILE)
         return False, 0, 0, 0
     rlog.debug("GroundDistance: Simulation data read from " + SIM_DATA_FILE + ": " +
-               json.dumps(sim_data, sort_keys=True, indent=4, default=default))
+               json.dumps(sim_data, sort_keys=True, indent=4))
     return True, sim_data['distance'], sim_data['speed'], sim_data['altitude']
