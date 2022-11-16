@@ -142,6 +142,7 @@ co_warner_activated = False   # True if co-warner is activated
 co_indication = False       # True if indication via GPIO Pin 16 is on for co
 grounddistance_activated = False  # True if measurement of grounddistance via VL53L1x is activated
 groundbeep = False  # True if indication of ground distance via audio
+simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
 
 
 def draw_all_ac(draw, allac):
@@ -767,7 +768,7 @@ def main():
     stratuxstatus.init(display_control, url_status_ws)
     flighttime.init(measure_flighttime)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
-    grounddistance.init(grounddistance_activated, SITUATION_DEBUG, groundbeep, situation)
+    grounddistance.init(grounddistance_activated, SITUATION_DEBUG, groundbeep, situation, simulation_mode)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -836,6 +837,8 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
                     action="store_true", default=False)
+    ap.add_argument("-sim", "--simulation", required=False, help="Simulation mode for testing",
+                    action="store_true", default=False)
     ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
                     default=DEFAULT_MIXER)
     args = vars(ap.parse_args())
@@ -860,6 +863,7 @@ if __name__ == "__main__":
     co_indication = args['coindicate']
     grounddistance_activated = args['grounddistance']
     groundbeep = args['groundbeep']
+    simulation_mode = args['simulation']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:

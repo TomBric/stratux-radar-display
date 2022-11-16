@@ -63,6 +63,7 @@ indicate_distance = False   # True if audio indication for ground distance is ac
 distance_sensor = None
 zero_distance = 0.0    # distance of sensor when aircraft is on ground
 value_debug_level = 0    # set during init
+simulation_mode  = False   # set during init
 # statistics for calculating values
 statistics = []   # values for calculating everything
 stats_max_values = STATS_PER_SECOND * STATS_TOTAL_TIME
@@ -101,7 +102,7 @@ def reset_values():
         rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
 
 
-def init(activate, debug_level, distance_indication, situation):
+def init(activate, debug_level, distance_indication, situation, sim_mode):
     global rlog
     global ground_distance_active
     global indicate_distance
@@ -109,7 +110,9 @@ def init(activate, debug_level, distance_indication, situation):
     global value_debug_level
     global global_situation
     global zero_distance
+    global simulation_mode
 
+    simulation_mode = sim_mode
     rlog = logging.getLogger('stratux-radar-log')
     if not activate:
         rlog.debug("Ground Distance Measurement - not activated.")
@@ -271,6 +274,14 @@ def store_statistics(sit):
                       'gps_active': sit['gps_active'], 'longitude': sit['longitude'], 'latitude': sit['latitude'],
                       'gps_speed': sit['gps_speed'], 'g_distance_valid': sit['g_distance_valid'],
                       'g_distance':sit['g_distance'] }
+        if simulation_mode:
+            gd = 0
+            sp = 0
+            alt = 0
+            if read_simulation_data(gd, sp, alt):
+                stat_value['g_distance'] = gd
+                stat_value['gps_speed'] = sp
+                stat_value['own_altitude'] = alt
         statistics.append(stat_value)
         if len(statistics) > stats_max_values:  # sliding window, remove oldest values
             statistics.pop(0)
@@ -300,3 +311,19 @@ async def read_ground_sensor():
             distance_sensor.close_connection()
     else:
         rlog.debug("No ground distance sensor active.")
+
+
+def read_simulation_data(ground_distance, gps_speed, altitude):
+    SIM_DATA_FILE = "simulation_data.json"
+    try:
+        with open(SIM_DATA_FILE) as f:
+            sim_data = json.load(f)
+    except (OSError, IOError, ValueError) as e:
+        rlog.debug("StatusUI: Error " + str(e) + " reading " + SIM_DATA_FILE)
+        return False
+    rlog.debug("GroundDistance: Simulation data read from " + SIM_DATA_FILE + ": " +
+               json.dumps(sim_data, sort_keys=True, indent=4, default=default))
+    ground_distance = sim_data['distance']
+    gps_speed = sim_data['speed']
+    altitude = sim_data['altitude']
+    return True
