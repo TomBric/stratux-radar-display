@@ -263,6 +263,10 @@ def evaluate_statistics(latest_stat):
                        json.dumps(stop_situation, indent=4, sort_keys=True, default=str))
             write_stats()
             statistics.clear()    # start fresh with statistics
+            obstacle_down_clear = None   # in case a second start is done
+            obstacle_up_clear = None
+            start_situation = None
+            landing_situation = None
 
 
 def store_statistics(sit):
