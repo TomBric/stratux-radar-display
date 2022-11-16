@@ -268,6 +268,15 @@ def store_statistics(sit):
     global stats_next_store
     global statistics
 
+    if simulation_mode:
+        success, gd, sp, alt = read_simulation_data()
+        if success:
+            sit['g_distance'] = gd
+            sit['g_distance_valid'] = True
+            sit['gps_speed'] = sp
+            sit['gps_active'] = True
+            sit['own_altitude'] = alt
+            sit['baro_valid'] = True
     if time.perf_counter() > stats_next_store:
         stats_next_store = time.perf_counter() + (1 / STATS_PER_SECOND)
         now = datetime.datetime.now(datetime.timezone.utc)
@@ -275,12 +284,6 @@ def store_statistics(sit):
                       'gps_active': sit['gps_active'], 'longitude': sit['longitude'], 'latitude': sit['latitude'],
                       'gps_speed': sit['gps_speed'], 'g_distance_valid': sit['g_distance_valid'],
                       'g_distance': sit['g_distance']}
-        if simulation_mode:
-            success, gd, sp, alt = read_simulation_data()
-            if success:
-                stat_value['g_distance'] = gd
-                stat_value['gps_speed'] = sp
-                stat_value['own_altitude'] = alt
         statistics.append(stat_value)
         if len(statistics) > stats_max_values:   # sliding window, remove oldest values
             statistics.pop(0)
