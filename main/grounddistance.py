@@ -57,6 +57,7 @@ STATS_TOTAL_TIME = 120   # time in seconds how long statistic window is
 OBSTACLE_HEIGHT = 50     # in feet, height value to calculate as obstacle clearance, 15 meters
 STOP_SPEED = 3           # in kts, speed when before runup or after landing a stop is assumed
 SIM_DATA_FILE = "simulation_data.json"
+# file with JSON content, e.g.:   {"g_distance": 10,"gps_speed": 0,"own_altitude": 10}
 
 # globals
 ground_distance_active = False    # True if sensor is found and activated
@@ -231,6 +232,9 @@ def evaluate_statistics(latest_stat):
         if is_airborne():
             fly_status = 1   # start detected
             start_situation = latest_stat   # store this value
+            obstacle_down_clear = None  # in case a second start is done, clear all values
+            obstacle_up_clear = None
+            landing_situation = None
             rlog.debug("Grounddistance: Start detected " +
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
             for stat in reversed(statistics):  # ... find begin of start where gps_speed <= STOP_SPEED
@@ -263,10 +267,6 @@ def evaluate_statistics(latest_stat):
                        json.dumps(stop_situation, indent=4, sort_keys=True, default=str))
             write_stats()
             statistics.clear()    # start fresh with statistics
-            obstacle_down_clear = None   # in case a second start is done
-            obstacle_up_clear = None
-            start_situation = None
-            landing_situation = None
 
 
 def store_statistics(sit):
