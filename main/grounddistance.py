@@ -56,6 +56,7 @@ STATS_PER_SECOND = 5    # how many statistics are written per second
 STATS_TOTAL_TIME = 120   # time in seconds how long statistic window is
 OBSTACLE_HEIGHT = 50     # in feet, height value to calculate as obstacle clearance, 15 meters
 STOP_SPEED = 3           # in kts, speed when before runup or after landing a stop is assumed
+SIM_DATA_FILE = "simulation_data.json"
 
 # globals
 ground_distance_active = False    # True if sensor is found and activated
@@ -63,14 +64,14 @@ indicate_distance = False   # True if audio indication for ground distance is ac
 distance_sensor = None
 zero_distance = 0.0    # distance of sensor when aircraft is on ground
 value_debug_level = 0    # set during init
-simulation_mode  = False   # set during init
+simulation_mode = False   # set during init
 # statistics for calculating values
 statistics = []   # values for calculating everything
 stats_max_values = STATS_PER_SECOND * STATS_TOTAL_TIME
 stats_next_store = 0
 global_situation = None
-fly_status = 0   # status for evaluating statistics 0 = run up  1 = start_detected 2 = 15 m detected
-                 # 3 = landing detected  4 = stop detected
+fly_status = 0  # status for evaluating statistics 0 = run up  1 = start_detected 2 = 15 m detected
+# 3 = landing detected  4 = stop detected
 runup_situation = None      # situation values, for accelleration on runway started
 start_situation = None      # situation values when wheels leave the ground
 obstacle_up_clear = None    # situation values when obstacle clearance was reached when taking off
@@ -133,7 +134,7 @@ def init(activate, debug_level, distance_indication, situation, sim_mode):
     value_debug_level = debug_level
     global_situation = situation   # to be able to read and store situation info
     rlog.debug("Ground Distance Measurement - VL53L1X active.")
-    for i in range(1,10):
+    for i in range(1, 10):
         distance_sensor.get_measurement()  # first measurements are not accurate, so do itseveral times
     zero_distance = distance_sensor.get_measurement()  # distance in mm, call is blocking, this is zero
     rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
@@ -206,7 +207,7 @@ def calculate_output_values():   # return output lines
         if obstacle_up_clear is not None and obstacle_up_clear['gps_active'] and start_situation['gps_active']:
             output['obstacle_distance_start'] = calc_gps_distance_meters(obstacle_up_clear, runup_situation)
     if stop_situation is not None and landing_situation is not None:
-        output['landing_time'] =  landing_situation['Time']
+        output['landing_time'] = landing_situation['Time']
         if landing_situation['baro_valid']:
             output['landing_altitude'] = landing_situation['own_altitude']
         if landing_situation['gps_active'] and stop_situation['gps_active']:
@@ -232,7 +233,7 @@ def evaluate_statistics(latest_stat):
             start_situation = latest_stat   # store this value
             rlog.debug("Grounddistance: Start detected " +
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
-            for stat in reversed(statistics): # ... find begin of start where gps_speed <= STOP_SPEED
+            for stat in reversed(statistics):  # ... find begin of start where gps_speed <= STOP_SPEED
                 if stat['gps_speed'] <= STOP_SPEED:
                     runup_situation = stat
                     break
@@ -273,17 +274,15 @@ def store_statistics(sit):
         stat_value = {'Time': now, 'baro_valid': sit['baro_valid'], 'own_altitude': sit['own_altitude'],
                       'gps_active': sit['gps_active'], 'longitude': sit['longitude'], 'latitude': sit['latitude'],
                       'gps_speed': sit['gps_speed'], 'g_distance_valid': sit['g_distance_valid'],
-                      'g_distance':sit['g_distance'] }
+                      'g_distance': sit['g_distance']}
         if simulation_mode:
-            gd = 0
-            sp = 0
-            alt = 0
-            if read_simulation_data(gd, sp, alt):
+            success, gd, sp, alt = read_simulation_data()
+            if success:
                 stat_value['g_distance'] = gd
                 stat_value['gps_speed'] = sp
                 stat_value['own_altitude'] = alt
         statistics.append(stat_value)
-        if len(statistics) > stats_max_values:  # sliding window, remove oldest values
+        if len(statistics) > stats_max_values:   # sliding window, remove oldest values
             statistics.pop(0)
         evaluate_statistics(stat_value)
 
@@ -313,17 +312,13 @@ async def read_ground_sensor():
         rlog.debug("No ground distance sensor active.")
 
 
-def read_simulation_data(ground_distance, gps_speed, altitude):
-    SIM_DATA_FILE = "simulation_data.json"
+def read_simulation_data():    # return False, 0, 0, 0 with error, else True, ground_distance, gps_speed, altitude
     try:
         with open(SIM_DATA_FILE) as f:
             sim_data = json.load(f)
     except (OSError, IOError, ValueError) as e:
-        rlog.debug("StatusUI: Error " + str(e) + " reading " + SIM_DATA_FILE)
-        return False
+        rlog.debug("Grounddistance: Error " + str(e) + " reading " + SIM_DATA_FILE)
+        return False, 0, 0, 0
     rlog.debug("GroundDistance: Simulation data read from " + SIM_DATA_FILE + ": " +
                json.dumps(sim_data, sort_keys=True, indent=4, default=default))
-    ground_distance = sim_data['distance']
-    gps_speed = sim_data['speed']
-    altitude = sim_data['altitude']
-    return True
+    return True, sim_data['distance'], sim_data['speed'], sim_data['altitude']
