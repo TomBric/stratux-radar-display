@@ -262,6 +262,7 @@ def evaluate_statistics(latest_stat):
             rlog.debug("Grounddistance: Stop detected " +
                        json.dumps(stop_situation, indent=4, sort_keys=True, default=str))
             write_stats()
+            statistics.clear()    # start fresh with statistics
 
 
 def store_statistics(sit):
