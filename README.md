@@ -223,8 +223,8 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
     
 # Shell command parameters
 ```
-usage: radar.py [-h] -d DEVICE [-b] [-sd] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z] [-c CONNECT] [-v] [-r] [-e]
-                [-y EXTSOUND] [-nf]
+usage: radar.py [-h] -d DEVICE [-b] [-sd] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z] [-w] [-sit] [-c CONNECT]
+                [-v VERBOSE] [-r] [-e] [-y EXTSOUND] [-nf] [-nc] [-ci] [-gd] [-gb] [-mx MIXER]
 
 Stratux radar display
 
@@ -242,14 +242,23 @@ optional arguments:
   -o, --compass         Start mode is compass
   -i, --vsi             Start mode is vertical speed indicator
   -z, --strx            Start mode is stratux-status
+  -w, --cowarner        Start mode is CO warner
+  -sit, --situation     Start mode situation display
   -c CONNECT, --connect CONNECT
                         Connect to Stratux-IP
-  -v, --verbose         Debug output on
-  -r, --registration    Display registration no (Epaper only)
-  -e, --fullcircle      Display full circle radar (Epaper only)
+  -v VERBOSE, --verbose VERBOSE
+                        Debug output level [0-3]
+  -r, --registration    Display registration no (epaper only)
+  -e, --fullcircle      Display full circle radar (3.7 epaper only)
   -y EXTSOUND, --extsound EXTSOUND
                         Ext sound on with volume [0-100]
   -nf, --noflighttime   Suppress detection and display of flighttime
-  ```
+  -nc, --nocowarner     Suppress activation of co-warner
+  -ci, --coindicate     Indicate co warning via GPIO16
+  -gd, --grounddistance
+                        Activate ground distance sensor
+  -gb, --groundbeep     Indicate ground distance via sound
+  -mx MIXER, --mixer MIXER
+                        Mixer name to be used for sound output
 
 
