@@ -118,8 +118,8 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
 
 The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
 - Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use an additional Raspberry Zero 2 W or Zero W for the display.
-- Remark: The ogn receiver is conflicting with connection lines of the Epaper-display. So if you want to use Epaper and an 868-OGN-receiver, currently you need to install the display on an Pi Zero (or Zero 2) (working to solve this ...)
-
+- Remark: The ogn receiver is potentially conflicting with connection lines of the Epaper-display. Starting with Stratux 
+Version EU28 there is a setting availabe to resolve the conflict: Go to Stratux settings and disable "OGN Transmission via I²C/GPIO HAT".
    
 ### External Sound output
    

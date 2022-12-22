@@ -33,4 +33,4 @@ sudo make -C /root/stratux install
 
 # installing radar-display
 cd /home/pi && git clone -b "$branch" https://github.com/TomBric/stratux-radar-display.git
-/bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux
+/bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh
