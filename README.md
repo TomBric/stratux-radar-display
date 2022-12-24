@@ -10,6 +10,10 @@ Current supported displays are:
 - Epaper Display 3.7 inch (waveshare)
 - Epaper Display 1.54 inch (waveshare)
 
+| Example with 3.7inch epaer      |        1.54 Epaper with stratux and everything inside        |      Oled Version      |
+|---------------------------------|--------------------------------------------------------------|------------------------|
+| ![](https://github.com/TomBric/stratux-radar-display/blob/main/.github/images/All-in-one%20Epaper%201.jpg) | ![](https://github.com/TomBric/stratux-radar-display/blob/main/.github/images/1.54-front2.jpg) | ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/All-in-one%20OLED%205.jpg) |
+
 More displays can be integrated.
 You can find 3D printer files for cases of both variants in the repo (no-code and .github). The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. Instructions e.g. how to build an [all-in one 2 1/4 Oled case](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display) "wiki 2 1/4"), or [all-in-one 3 1/8 Epaper instrument](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-for-80-mm-instrument-hole-with-Epaper-display-and-Bluetooth "wiki 3 1/8"), or [Epaper 3 1/8 display only](https://github.com/TomBric/stratux-radar-display/wiki/Epaper-Display-for-80-mm-instrument-hole) can be found in the wiki.
 
