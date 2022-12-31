@@ -273,7 +273,7 @@ def user_input():
         return 0  # stay in current mode
     cowarner_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return 1  # next mode to be radar
+        return 21  # next mode to be distance
     if button == 0 and btime == 1:  # left and short
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
         sample_sum = 0.0
