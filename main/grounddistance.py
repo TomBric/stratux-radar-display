@@ -50,7 +50,7 @@ DISTANCE_BEEP_MAX = 60              # in cm, where beeper starts with a low tone
 DISTANCE_BEEP_MIN = 10              # in cm, where beeper stops with a high tone
 # GPS-Measurement of start-distance
 DISTANCE_START_DETECTED = 30 * 10       # in mm where measurement assumes that plane is in the air
-DISTANCE_LANDING_DETECTED = 7.5 * 10    # in mm where measurement assumes to be landed
+DISTANCE_LANDING_DETECTED = 10 * 10    # in mm where measurement assumes to be landed
 # start distance with groundsensor
 STATS_PER_SECOND = 5    # how many statistics are written per second
 STATS_TOTAL_TIME = 120   # time in seconds how long statistic window is
