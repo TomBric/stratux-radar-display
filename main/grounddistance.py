@@ -41,7 +41,7 @@ import json
 import math
 
 # constants
-MEASUREMENTS_PER_SECOND = 5   # number of distance ranging meaurements per second
+MEASUREMENTS_PER_SECOND = 10   # number of distance ranging meaurements per second
 VL53L1X_TIMING_BUDGET = 60   # 60 ms timing for reading distance, shorter values did not improve performance
 # statistic file
 SAVED_STATISTICS = "stratux-radar.stat"
@@ -49,10 +49,11 @@ SAVED_STATISTICS = "stratux-radar.stat"
 DISTANCE_BEEP_MAX = 60              # in cm, where beeper starts with a low tone
 DISTANCE_BEEP_MIN = 10              # in cm, where beeper stops with a high tone
 # GPS-Measurement of start-distance
-DISTANCE_START_DETECTED = 30 * 10       # in mm where measurement assumes that plane is in the air
-DISTANCE_LANDING_DETECTED = 10 * 10    # in mm where measurement assumes to be landed
+DISTANCE_START_DETECTED = 60 * 10       # in mm where measurement assumes that plane is in the air
+DISTANCE_LANDING_DETECTED = 15 * 10    # in mm where measurement assumes to be landed
 # start distance with groundsensor
-STATS_PER_SECOND = 5    # how many statistics are written per second
+STATS_PER_SECOND = 10    # how many statistics are written per second
+STATS_FOR_SITUATION_CHANGE = 3   # no of values in a row before a situation is changed (landing/flying)
 STATS_TOTAL_TIME = 120   # time in seconds how long statistic window is
 OBSTACLE_HEIGHT = 50     # in feet, height value to calculate as obstacle clearance, 15 meters
 STOP_SPEED = 3           # in kts, speed when before runup or after landing a stop is assumed
@@ -79,6 +80,10 @@ obstacle_up_clear = None    # situation values when obstacle clearance was reach
 obstacle_down_clear = None  # situation values when obstacle clearance was last reached when landing
 landing_situation = None    # situation when wheels touch the ground
 stop_situation = None       # siuation values when the aircraft is stopped on the runway
+
+stats_before_airborne = 0
+stats_before_landing = 0
+stats_before_stop = 0
 
 
 def reset_values():
@@ -166,11 +171,42 @@ def distance_beeper(distance):
 
 
 def is_airborne():
-    return global_situation['g_distance'] >= DISTANCE_START_DETECTED
+    global stats_before_airborne
+
+    if global_situation['g_distance'] >= DISTANCE_START_DETECTED:
+        stats_before_airborne += 1
+        if stats_before_airborne >= STATS_FOR_SITUATION_CHANGE:
+            stats_before_airborne = 0
+            return True
+    else:
+        stats_before_airborne = 0
+    return False
 
 
 def has_landed():
-    return global_situation['g_distance'] <= DISTANCE_LANDING_DETECTED
+    global stats_before_landing
+
+    if global_situation['g_distance'] <= DISTANCE_LANDING_DETECTED:
+        stats_before_landing += 1
+        if stats_before_landing >= STATS_FOR_SITUATION_CHANGE:
+            stats_before_landing = 0
+            return True
+    else:
+        stats_before_landing = 0
+    return False
+
+
+def has_stopped():
+    global stats_before_stop
+
+    if global_situation['gps_speed'] <= STOP_SPEED:
+        stats_before_stop += 1
+        if stats_before_stop >= STATS_FOR_SITUATION_CHANGE:
+            stats_before_stop = 0
+            return True
+    else:
+        stats_before_stop = 0
+    return False
 
 
 def radians_rel(angle):
@@ -260,13 +296,17 @@ def evaluate_statistics(latest_stat):
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                         break
     elif fly_status == 2:   # landing detected, waiting for stop to calculate distance
-        if latest_stat['gps_speed'] <= STOP_SPEED:
+        if has_stopped():
             fly_status = 0
             stop_situation = latest_stat
             rlog.debug("Grounddistance: Stop detected " +
                        json.dumps(stop_situation, indent=4, sort_keys=True, default=str))
             write_stats()
             statistics.clear()    # start fresh with statistics
+        elif is_airborne():    # touch and go performed!
+            fly_status = 1   # go back to flying mode
+            landing_situation = None    # clear landing situation, only last landing is recorded
+            obstacle_down_clear = None    # clear obstacle down, only last landing is recorded
 
 
 def store_statistics(sit):
