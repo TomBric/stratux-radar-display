@@ -307,6 +307,8 @@ def evaluate_statistics(latest_stat):
             fly_status = 1   # go back to flying mode
             landing_situation = None    # clear landing situation, only last landing is recorded
             obstacle_down_clear = None    # clear obstacle down, only last landing is recorded
+            rlog.debug("Grounddistance: Re-Start detected without stop, keeping first start " +
+                       json.dumps(start_situation, indent=4, sort_keys=True, default=str))
 
 
 def store_statistics(sit):
