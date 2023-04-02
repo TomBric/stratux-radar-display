@@ -98,7 +98,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
 ### Expert setup 
    1. Configure a clean Raspbian installation on your SD card. E.g. using Raspberry Pi Imager. Image to flash is the standard image "Raspbian Pi OS (recommended)". 
    2. Setup your main stratux in the following way:  Install version eu-027 on ther stratux or newer. Go to "Settings" and set Wifi-Mode: AP+Client. Enable "Internet-Passthrough" as well. Then "Add wifi client network" and add the data of your local home network. This all enables your stratux to have Internet connection and gives the display the possibility to access internet as well. 
-   3. Startup your Stratux and boot your new raspberry. Connect your PC/workstation to the standard "stratux WLAN" network and figure out the IP-adress of your display-raspberry, e.g. by using "arp -a".
+   3. Startup your Stratux and boot your new raspberry. Connect your PC/workstation to the standard "stratux" wifi network and figure out the IP-adress of your display-raspberry, e.g. by using "arp -a".
    4. From your workstation open a remote shell on the display-raspberry:  ssh pi@192.168.x.x. Password is standard for the pi.
    5. Clone the stratux-radar-display repository by the command: "git clone https://github.com/TomBric/stratux-radar-display.git"
    6. Execute the configuration script as user pi. "/bin/bash /home/pi/stratux-radar-display/image/configure_radar.sh".  This will take some time since it does an update on the pi. 
