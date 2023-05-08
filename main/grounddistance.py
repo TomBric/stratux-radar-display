@@ -41,6 +41,7 @@ import json
 import math
 
 # constants
+MAX_DISTANCE = 130   # maximum distance, is also set if sensor gets no valid distance
 MEASUREMENTS_PER_SECOND = 10   # number of distance ranging meaurements per second
 VL53L1X_TIMING_BUDGET = 60   # 60 ms timing for reading distance, shorter values did not improve performance
 # statistic file
@@ -350,6 +351,9 @@ async def read_ground_sensor():
                 await asyncio.sleep(next_read - now)   # wait for next time of measurement
                 next_read = now + (1/MEASUREMENTS_PER_SECOND)
                 distance = distance_sensor.get_measurement()   # distance in mm, call is blocking!
+                if distance < 0:
+                    distance = MAX_DISTANCE
+                    rlog.debug("Grounddistance: GetMeasurement got invalid result. Setting max value")
                 global_situation['g_distance_valid'] = True
                 global_situation['g_distance'] = distance - zero_distance
                 rlog.log(value_debug_level, 'Ground Distance: {0:5.2f} cm'.format(global_situation['g_distance'] / 10))
