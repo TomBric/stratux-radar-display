@@ -41,7 +41,6 @@ import json
 import math
 
 # constants
-MAX_DISTANCE = 130   # maximum distance, is also set if sensor gets no valid distance
 MEASUREMENTS_PER_SECOND = 10   # number of distance ranging meaurements per second
 VL53L1X_TIMING_BUDGET = 60   # 60 ms timing for reading distance, shorter values did not improve performance
 # statistic file
@@ -128,7 +127,7 @@ def init(activate, debug_level, distance_indication, situation, sim_mode):
         return False
     try:
         distance_sensor = mp.VL53L1X()
-        distance_sensor.start_ranging(mp.VL53L1X.SHORT_DST_MODE)
+        distance_sensor.start_ranging(mp.VL53L1X.LONG_DST_MODE)
         # short distance mode is better in ambient light conditions and the range is up to 130 cm
         distance_sensor.set_measurement_timing_budget(50)
         # shorter values do not optimize timing, typical measure timing takes 70 ms on a Zero2
@@ -351,9 +350,6 @@ async def read_ground_sensor():
                 await asyncio.sleep(next_read - now)   # wait for next time of measurement
                 next_read = now + (1/MEASUREMENTS_PER_SECOND)
                 distance = distance_sensor.get_measurement()   # distance in mm, call is blocking!
-                if distance < 0:
-                    distance = MAX_DISTANCE
-                    rlog.debug("Grounddistance: GetMeasurement got invalid result. Setting max value")
                 global_situation['g_distance_valid'] = True
                 global_situation['g_distance'] = distance - zero_distance
                 rlog.log(value_debug_level, 'Ground Distance: {0:5.2f} cm'.format(global_situation['g_distance'] / 10))
