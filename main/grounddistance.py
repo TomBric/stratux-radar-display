@@ -52,7 +52,7 @@ DISTANCE_BEEP_MIN = 10              # in cm, where beeper stops with a high tone
 DISTANCE_START_DETECTED = 60 * 10       # in mm where measurement assumes that plane is in the air
 DISTANCE_LANDING_DETECTED = 15 * 10    # in mm where measurement assumes to be landed
 # start distance with groundsensor
-STATS_PER_SECOND = 10    # how many statistics are written per second
+STATS_PER_SECOND = 5    # how many statistics are written per second
 STATS_FOR_SITUATION_CHANGE = 3   # no of values in a row before a situation is changed (landing/flying)
 STATS_TOTAL_TIME = 120   # time in seconds how long statistic window is
 OBSTACLE_HEIGHT = 50     # in feet, height value to calculate as obstacle clearance, 15 meters
@@ -128,8 +128,8 @@ def init(activate, debug_level, distance_indication, situation, sim_mode):
     try:
         distance_sensor = mp.VL53L1X()
         distance_sensor.start_ranging(mp.VL53L1X.LONG_DST_MODE)
-        # short distance mode is better in ambient light conditions and the range is up to 130 cm
-        distance_sensor.set_measurement_timing_budget(50)
+        # long distance mode is better if ground is far away, short mode resulted in oszillation when far away
+        distance_sensor.set_measurement_timing_budget(200)
         # shorter values do not optimize timing, typical measure timing takes 70 ms on a Zero2
     except Exception as e:
         ground_distance_active = False
