@@ -133,6 +133,7 @@ global_mode = 1
 # 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
 # 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status
 # 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 21=situation 22=refresh situation 0=Init
+mode_sequence = []    # list of modes to display
 bluetooth = False  # True if bluetooth is enabled by parameter -b
 extsound_active = False   # external sound was successfully activated, if global_config >=0
 bluetooth_active = False   # bluetooth successfully activated
@@ -795,6 +796,42 @@ def logging_init():
     logging.addLevelName(AIRCRAFT_DEBUG, 'AIRCRAFT_DEBUG')
 
 
+def mode_codes(c):
+    modes = {
+        "R": 1,
+        "T": 2,
+        "A": 5,
+        "D": 7,
+        "G": 9,
+        "K": 11,
+        "V": 13,
+        "S": 15,
+        "I": 17,
+        "C": 19,
+        "M": 21
+    }
+    return modes.get(c, 0)
+
+
+
+def parse_modes(modes):
+    global mode_sequence
+    mode_sequence = []
+    for c in modes:
+        mode_no = mode_codes(c)
+        if mode_no > 0:
+            mode_sequence.append(mode_no)
+
+def next_mode_sequence(current_mode):
+    global mode_sequence
+    iterator = iter(mode_sequence)
+    next_mode = mode_sequence[0]   # return to first mode, if old mode not found, error proof
+    for value in iterator:
+        if value == current_mode:
+            next_mode = next(iterator, mode_sequence[0])
+    return next_mode
+
+
 if __name__ == "__main__":
     # parse arguments for different configurations
     ap = argparse.ArgumentParser(description='Stratux radar display')
@@ -841,6 +878,10 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
                     default=DEFAULT_MIXER)
+    ap.add_argument("-modes", "--display-modes", required=False, help="Select display modes that you want to see "
+        "R=radar T=timer A=ahrs D=display-status G=g-meter K=compass V=vsi S=stratux-status C=co-sensor "
+        "M=distance measurement   Example: -modes RADCM", default="RTAGKVCMDS")
+
     args = vars(ap.parse_args())
     # set up logging
     logging_init()
@@ -883,6 +924,7 @@ if __name__ == "__main__":
     if args['situation']:
         global_mode = 21  # start in situation
     sound_mixer = args['mixer']
+    parse_modes(args['display-modes'])
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     global_config['sound_volume'] = args['extsound']    # 0 if not enabled

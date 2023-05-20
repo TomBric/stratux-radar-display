@@ -38,6 +38,7 @@ import radarbluez
 import flighttime
 import datetime
 import logging
+from radar import next_mode_sequence
 
 # constants
 MAX_COUNTDOWN_TIME = 2 * 60 * 60   # maximum time for setting countdown in seconds
@@ -171,7 +172,7 @@ def user_input():
         return 0  # stay in timer mode
     timer_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
-        return 5  # next mode to be ahrs
+        return next_mode_sequence(2)  # Timer mode was 2
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
 
