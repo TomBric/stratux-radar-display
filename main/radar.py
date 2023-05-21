@@ -824,6 +824,7 @@ def parse_modes(modes):
 
 def next_mode_sequence(current_mode):
     global mode_sequence
+    print("Mode-Sequence: ", mode_sequence)
     iterator = iter(mode_sequence)
     next_mode = mode_sequence[0]   # return to first mode, if old mode not found, error proof
     for value in iterator:
