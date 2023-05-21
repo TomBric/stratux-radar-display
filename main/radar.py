@@ -57,6 +57,7 @@ import flighttime
 import cowarner
 import distance
 import grounddistance
+import radarmodes
 from datetime import datetime, timezone
 
 # constant definitions
@@ -796,44 +797,6 @@ def logging_init():
     logging.addLevelName(AIRCRAFT_DEBUG, 'AIRCRAFT_DEBUG')
 
 
-def mode_codes(c):
-    modes = {
-        "R": 1,
-        "T": 2,
-        "A": 5,
-        "D": 7,
-        "G": 9,
-        "K": 11,
-        "V": 13,
-        "S": 15,
-        "I": 17,
-        "C": 19,
-        "M": 21
-    }
-    return modes.get(c, 0)
-
-
-def parse_modes(modes):
-    global mode_sequence
-    mode_sequence = []
-    for c in modes:
-        mode_no = mode_codes(c)
-        print(mode_no)
-        if mode_no > 0:
-            mode_sequence.append(mode_no)
-    print("Mode-Sequence: ", mode_sequence)
-
-def next_mode_sequence(current_mode):
-    global mode_sequence
-    print("Mode-Sequence: ", mode_sequence)
-    iterator = iter(mode_sequence)
-    next_mode = mode_sequence[0]   # return to first mode, if old mode not found, error proof
-    for value in iterator:
-        if value == current_mode:
-            next_mode = next(iterator, mode_sequence[0])
-    return next_mode
-
-
 if __name__ == "__main__":
     # parse arguments for different configurations
     ap = argparse.ArgumentParser(description='Stratux radar display')
@@ -926,8 +889,7 @@ if __name__ == "__main__":
     if args['situation']:
         global_mode = 21  # start in situation
     sound_mixer = args['mixer']
-    parse_modes(args['displaymodes'])
-    next_mode_sequence(2)
+    radarmodes.parse_modes(args['displaymodes'])
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     global_config['sound_volume'] = args['extsound']    # 0 if not enabled
