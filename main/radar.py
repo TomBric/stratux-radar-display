@@ -890,6 +890,8 @@ if __name__ == "__main__":
         global_mode = 21  # start in situation
     sound_mixer = args['mixer']
     radarmodes.parse_modes(args['displaymodes'])
+    if global_mode == 1: # no mode override set, take first mode in mode_sequence
+        global_mode = radarmodes.first_mode_sequence()
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     global_config['sound_volume'] = args['extsound']    # 0 if not enabled

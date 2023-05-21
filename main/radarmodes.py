@@ -63,7 +63,6 @@ def parse_modes(modes):
     mode_sequence = []
     for c in modes:
         mode_no = mode_codes(c)
-        print(mode_no)
         if mode_no > 0:
             mode_sequence.append(mode_no)
 
@@ -80,4 +79,4 @@ def next_mode_sequence(current_mode):
 
 def first_mode_sequence():
     global mode_sequence
-    return mode_sequence[0]  # # return to first mode
+    return mode_sequence[0]  # return to first mode
