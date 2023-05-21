@@ -813,12 +813,12 @@ def mode_codes(c):
     return modes.get(c, 0)
 
 
-
 def parse_modes(modes):
     global mode_sequence
     mode_sequence = []
     for c in modes:
         mode_no = mode_codes(c)
+        print(mode_no)
         if mode_no > 0:
             mode_sequence.append(mode_no)
 
@@ -924,7 +924,6 @@ if __name__ == "__main__":
     if args['situation']:
         global_mode = 21  # start in situation
     sound_mixer = args['mixer']
-    print("Displaymodes: ", args['displaymodes'])
     parse_modes(args['displaymodes'])
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
