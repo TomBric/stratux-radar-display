@@ -821,6 +821,7 @@ def parse_modes(modes):
         print(mode_no)
         if mode_no > 0:
             mode_sequence.append(mode_no)
+    print("Mode-Sequence: ", mode_sequence)
 
 def next_mode_sequence(current_mode):
     global mode_sequence
