@@ -60,7 +60,7 @@ import grounddistance
 from datetime import datetime, timezone
 
 # constant definitions
-RADAR_VERSION = "1.83"
+RADAR_VERSION = "1.9"
 
 # logging
 SITUATION_DEBUG = logging.DEBUG-2   # another low level for debugging, DEBUG is 10
@@ -924,6 +924,7 @@ if __name__ == "__main__":
     if args['situation']:
         global_mode = 21  # start in situation
     sound_mixer = args['mixer']
+    print("Displaymodes: ", args['displaymodes'])
     parse_modes(args['displaymodes'])
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
