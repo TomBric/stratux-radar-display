@@ -927,6 +927,7 @@ if __name__ == "__main__":
         global_mode = 21  # start in situation
     sound_mixer = args['mixer']
     parse_modes(args['displaymodes'])
+    next_mode_sequence(2)
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     global_config['sound_volume'] = args['extsound']    # 0 if not enabled
