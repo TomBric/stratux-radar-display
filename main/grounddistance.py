@@ -41,7 +41,7 @@ import json
 import math
 
 # constants
-MEASUREMENTS_PER_SECOND = 10   # number of distance ranging meaurements per second
+MEASUREMENTS_PER_SECOND = 5   # number of distance ranging meaurements per second
 VL53L1X_TIMING_BUDGET = 60   # 60 ms timing for reading distance, shorter values did not improve performance
 # statistic file
 SAVED_STATISTICS = "stratux-radar.stat"
@@ -129,7 +129,7 @@ def init(activate, debug_level, distance_indication, situation, sim_mode):
         distance_sensor = mp.VL53L1X()
         distance_sensor.start_ranging(mp.VL53L1X.LONG_DST_MODE)
         # long distance mode is better if ground is far away, short mode resulted in oszillation when far away
-        distance_sensor.set_measurement_timing_budget(200)
+        distance_sensor.set_measurement_timing_budget(70)
         # shorter values do not optimize timing, typical measure timing takes 70 ms on a Zero2
     except Exception as e:
         ground_distance_active = False
