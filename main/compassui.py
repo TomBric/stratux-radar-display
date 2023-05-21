@@ -32,6 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import radarbuttons
+import radarmodes
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -65,7 +66,7 @@ def user_input():
         return 0  # stay in current mode
     compassui_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return 13  # next mode to be vsi
+        return radarmodes.next_mode_sequence(11) # next mode
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long- refresh

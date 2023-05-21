@@ -66,15 +66,18 @@ def parse_modes(modes):
         print(mode_no)
         if mode_no > 0:
             mode_sequence.append(mode_no)
-    print("Mode-Sequence: ", mode_sequence)
 
 
 def next_mode_sequence(current_mode):
     global mode_sequence
-    print("Mode-Sequence: ", mode_sequence)
     iterator = iter(mode_sequence)
     next_mode = mode_sequence[0]   # return to first mode, if old mode not found, error proof
     for value in iterator:
         if value == current_mode:
             next_mode = next(iterator, mode_sequence[0])
     return next_mode
+
+
+def first_mode_sequence():
+    global mode_sequence
+    return mode_sequence[0]  # # return to first mode

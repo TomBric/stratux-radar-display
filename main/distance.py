@@ -41,6 +41,7 @@ import math
 import radarbuttons
 import grounddistance
 import datetime
+import radarmodes
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -134,7 +135,7 @@ def user_input():
         return 0, False  # stay in current mode
     if dist_user_mode == 0:
         if button == 1 and (btime == 2 or btime == 1):  # middle
-            return 1, False  # next mode to be radar
+            return radarmodes.next_mode_sequence(21), False  # next mode to be radar
         if button == 0 and btime == 2:  # left and long
             return 3, False  # start next mode shutdown!
         if button == 0 and btime == 1:  # left and short - display statistics

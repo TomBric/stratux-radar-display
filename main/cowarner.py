@@ -42,6 +42,7 @@ import statusui
 import radarbluez
 import RPi.GPIO as GPIO
 import numpy
+import radarmodes
 
 
 # constants
@@ -267,13 +268,13 @@ def user_input():
 
     if not cowarner_active:
         rlog.debug("CO-Warner: not active, switching to next mode")
-        return 21        # immediately go to next mode, if warner is not activated
+        return radarmodes.next_mode_sequence(19)     # immediately go to next mode, if warner is not activated
     btime, button = radarbuttons.check_buttons()
     if btime == 0 or co_warner_status == 1:   # in calibration mode, do not react
         return 0  # stay in current mode
     cowarner_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return 21  # next mode to be distance
+        return radarmodes.next_mode_sequence(19) # next mode
     if button == 0 and btime == 1:  # left and short
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
         sample_sum = 0.0

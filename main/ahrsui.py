@@ -32,6 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import radarbuttons
+import radarmodes
 
 # constants
 # globals
@@ -75,7 +76,7 @@ def user_input():
         return 0  # stay in timer mode
     ahrs_ui_changed = True
     if button == 1 and (btime == 2 or btime == 1):  # middle in any case
-        return 9  # next mode to be gmeter
+        return radarmodes.next_mode_sequence(5)  # next mode
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long- refresh
