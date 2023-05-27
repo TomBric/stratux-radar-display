@@ -159,7 +159,7 @@ def reset_values():
     global stop_situation
     global zero_distance
     global fly_status
-    global distance_sensor
+    global ground_distance_active
 
     runup_situation = None
     start_situation = None
@@ -169,9 +169,9 @@ def reset_values():
     stop_situation = None
     fly_status = 0
 
-    if distance_sensor is not None:
+    if ground_distance_active:
         zero_distance = distance_sensor.last_distance()   # take last value, sensor reader is always calculating that
-        print(zero_distance)
+        print("NewZero: " + str(zero_distance))
         if zero_distance > 0:
             rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:
