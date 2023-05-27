@@ -33,57 +33,121 @@
 
 
 import logging
-import melopero_vl53l1x as mp   # https://github.com/melopero/Melopero_VL53L1X
 import time
 import datetime
 import asyncio
 import json
 import math
+import serial
 
 # constants
-MEASUREMENTS_PER_SECOND = 5   # number of distance ranging meaurements per second
-VL53L1X_TIMING_BUDGET = 60   # 60 ms timing for reading distance, shorter values did not improve performance
+MEASUREMENTS_PER_SECOND = 10  # number of distance ranging meaurements per second
+UART_WAIT_TIME = 0.01  # time in seconds to wait for enough uart characters
+UART_BREAK_TIME = 1.00  # time in seconds when waiting is stopped
 # statistic file
 SAVED_STATISTICS = "stratux-radar.stat"
 # BEEP VALUES
-DISTANCE_BEEP_MAX = 60              # in cm, where beeper starts with a low tone
-DISTANCE_BEEP_MIN = 10              # in cm, where beeper stops with a high tone
+DISTANCE_BEEP_MAX = 60  # in cm, where beeper starts with a low tone
+DISTANCE_BEEP_MIN = 10  # in cm, where beeper stops with a high tone
 # GPS-Measurement of start-distance
-DISTANCE_START_DETECTED = 60 * 10       # in mm where measurement assumes that plane is in the air
-DISTANCE_LANDING_DETECTED = 15 * 10    # in mm where measurement assumes to be landed
+DISTANCE_START_DETECTED = 60 * 10  # in mm where measurement assumes that plane is in the air
+DISTANCE_LANDING_DETECTED = 15 * 10  # in mm where measurement assumes to be landed
 # start distance with groundsensor
-STATS_PER_SECOND = 5    # how many statistics are written per second
-STATS_FOR_SITUATION_CHANGE = 3   # no of values in a row before a situation is changed (landing/flying)
-STATS_TOTAL_TIME = 120   # time in seconds how long statistic window is
-OBSTACLE_HEIGHT = 50     # in feet, height value to calculate as obstacle clearance, 15 meters
-STOP_SPEED = 3           # in kts, speed when before runup or after landing a stop is assumed
+STATS_PER_SECOND = 5  # how many statistics are written per second
+STATS_FOR_SITUATION_CHANGE = 3  # no of values in a row before a situation is changed (landing/flying)
+STATS_TOTAL_TIME = 120  # time in seconds how long statistic window is
+OBSTACLE_HEIGHT = 50  # in feet, height value to calculate as obstacle clearance, 15 meters
+STOP_SPEED = 3  # in kts, speed when before runup or after landing a stop is assumed
 SIM_DATA_FILE = "simulation_data.json"
 # file with JSON content, e.g.:   {"g_distance": 10,"gps_speed": 0,"own_altitude": 10}
 
 # globals
-ground_distance_active = False    # True if sensor is found and activated
-indicate_distance = False   # True if audio indication for ground distance is active
+ground_distance_active = False  # True if sensor is found and activated
+indicate_distance = False  # True if audio indication for ground distance is active
 distance_sensor = None
-zero_distance = 0.0    # distance of sensor when aircraft is on ground
-value_debug_level = 0    # set during init
-simulation_mode = False   # set during init
+zero_distance = 0.0  # distance of sensor when aircraft is on ground
+value_debug_level = 0  # set during init
+simulation_mode = False  # set during init
 # statistics for calculating values
-statistics = []   # values for calculating everything
+statistics = []  # values for calculating everything
 stats_max_values = STATS_PER_SECOND * STATS_TOTAL_TIME
 stats_next_store = 0
 global_situation = None
 fly_status = 0  # status for evaluating statistics 0 = run up  1 = start_detected 2 = 15 m detected
 # 3 = landing detected  4 = stop detected
-runup_situation = None      # situation values, for accelleration on runway started
-start_situation = None      # situation values when wheels leave the ground
-obstacle_up_clear = None    # situation values when obstacle clearance was reached when taking off
+runup_situation = None  # situation values, for accelleration on runway started
+start_situation = None  # situation values when wheels leave the ground
+obstacle_up_clear = None  # situation values when obstacle clearance was reached when taking off
 obstacle_down_clear = None  # situation values when obstacle clearance was last reached when landing
-landing_situation = None    # situation when wheels touch the ground
-stop_situation = None       # siuation values when the aircraft is stopped on the runway
+landing_situation = None  # situation when wheels touch the ground
+stop_situation = None  # siuation values when the aircraft is stopped on the runway
 
 stats_before_airborne = 0
 stats_before_landing = 0
 stats_before_stop = 0
+
+
+class UsonicSensor:   # definition adapted from DFRobot code
+    distance_max = 4500
+    distance_min = 0
+    range_max = 4500
+    ser = None
+    distance = 0
+
+    def init(self):
+        self.ser = serial.Serial("/dev/ttyAMA0", 9600)
+        if not self.ser.isOpen():
+            return False
+        return True
+
+    def set_dis_range(self, min, max):
+        self.distance_max = max
+        self.distance_min = min
+
+    @staticmethod
+    def _check_sum(le):
+        return (le[0] + le[1] + le[2]) & 0x00ff
+
+    def last_distance(self):
+        return self.distance
+
+    async def calc_distance(self):
+        data = [0] * 4
+        timenow = time.time()
+
+        self.distance = 0
+        while self.ser.inWaiting() < 4:
+            await asyncio.sleep(UART_WAIT_TIME)
+            if (time.time() - timenow) > UART_BREAK_TIME:
+                break
+        rlt = self.ser.read(self.ser.inWaiting())
+        if len(rlt) >= 4:
+            index = len(rlt) - 4
+            while True:
+                try:
+                    data[0] = ord(rlt[index])
+                except TypeError:
+                    data[0] = rlt[index]
+                if data[0] == 0xFF:
+                    break
+                elif index > 0:
+                    index = index - 1
+                else:
+                    break
+            if data[0] == 0xFF:
+                try:
+                    data[1] = ord(rlt[index + 1])
+                    data[2] = ord(rlt[index + 2])
+                    data[3] = ord(rlt[index + 3])
+                except TypeError:
+                    data[1] = rlt[index + 1]
+                    data[2] = rlt[index + 2]
+                    data[3] = rlt[index + 3]
+                sum = self._check_sum(data)
+                if sum == data[3]:
+                    self.distance = data[1] * 256 + data[2]
+                    if self.distance > self.distance_max or self.distance < self.distance_min:
+                        self.distance = 0
 
 
 def reset_values():
@@ -105,8 +169,12 @@ def reset_values():
     fly_status = 0
 
     if distance_sensor is not None:
-        zero_distance = distance_sensor.get_measurement()
-        rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
+        distance_sensor.calc_distance()
+        zero_distance = distance_sensor.last_distance()
+        if zero_distance > 0:
+            rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
+        else:
+            rlog.debug('Error resetting gound zero distance')
 
 
 def init(activate, debug_level, distance_indication, situation, sim_mode):
@@ -126,23 +194,24 @@ def init(activate, debug_level, distance_indication, situation, sim_mode):
         ground_distance_active = False
         return False
     try:
-        distance_sensor = mp.VL53L1X()
-        distance_sensor.start_ranging(mp.VL53L1X.LONG_DST_MODE)
-        # long distance mode is better if ground is far away, short mode resulted in oszillation when far away
-        distance_sensor.set_measurement_timing_budget(70)
+        distance_sensor = UsonicSensor()
+        if not distance_sensor.init():
+            rlog.debug("Ground Distance Measurement - Error init ultrasonic sensor, serial not found")
+            ground_distance_active = False
+            return False
+        distance_sensor.set_dis_range(35, 2000)  # rand between 35 mm and 2 meter
         # shorter values do not optimize timing, typical measure timing takes 70 ms on a Zero2
     except Exception as e:
         ground_distance_active = False
-        rlog.debug("Ground Distance Measurement - VL53L1X sensor not found: " + str(e))
+        rlog.debug("Ground Distance Measurement - Ultrasonic sensor not found: " + str(e))
         return False
 
     ground_distance_active = True
     value_debug_level = debug_level
-    global_situation = situation   # to be able to read and store situation info
-    rlog.debug("Ground Distance Measurement - VL53L1X active.")
-    for i in range(1, 10):
-        distance_sensor.get_measurement()  # first measurements are not accurate, so do itseveral times
-    zero_distance = distance_sensor.get_measurement()  # distance in mm, call is blocking, this is zero
+    global_situation = situation  # to be able to read and store situation info
+    rlog.debug("Ground Distance Measurement - Ultrasonic sensor active.")
+    distance_sensor.calc_distance()
+    zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
     rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
     if distance_indication:
         indicate_distance = True
@@ -153,7 +222,7 @@ def init(activate, debug_level, distance_indication, situation, sim_mode):
 def write_stats():
     global rlog
 
-    if rlog is None:   # may be called before init
+    if rlog is None:  # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(SAVED_STATISTICS, 'at') as out:
@@ -233,7 +302,7 @@ def takeoff_alt():
         return None
 
 
-def calculate_output_values():   # return output lines
+def calculate_output_values():  # return output lines
     output = {}
     if start_situation is not None:
         output['start_time'] = start_situation['Time']
@@ -264,10 +333,10 @@ def evaluate_statistics(latest_stat):
     global obstacle_down_clear
     global stop_situation
 
-    if fly_status == 0:    # run up
+    if fly_status == 0:  # run up
         if is_airborne():
-            fly_status = 1   # start detected
-            start_situation = latest_stat   # store this value
+            fly_status = 1  # start detected
+            start_situation = latest_stat  # store this value
             obstacle_down_clear = None  # in case a second start is done, clear all values
             obstacle_up_clear = None
             landing_situation = None
@@ -277,8 +346,8 @@ def evaluate_statistics(latest_stat):
                 if stat['gps_speed'] <= STOP_SPEED:
                     runup_situation = stat
                     break
-    elif fly_status == 1:   # start was detected
-        if obstacle_up_clear is None:   # do not search for if already set
+    elif fly_status == 1:  # start was detected
+        if obstacle_up_clear is None:  # do not search for if already set
             if latest_stat['own_altitude'] >= start_situation['own_altitude'] + OBSTACLE_HEIGHT:
                 obstacle_up_clear = latest_stat
                 rlog.debug("Grounddistance: Obstacle clearance up detected " +
@@ -295,18 +364,18 @@ def evaluate_statistics(latest_stat):
                         rlog.debug("Grounddistance: Obstacle clearance down found " +
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                         break
-    elif fly_status == 2:   # landing detected, waiting for stop to calculate distance
+    elif fly_status == 2:  # landing detected, waiting for stop to calculate distance
         if has_stopped():
             fly_status = 0
             stop_situation = latest_stat
             rlog.debug("Grounddistance: Stop detected " +
                        json.dumps(stop_situation, indent=4, sort_keys=True, default=str))
             write_stats()
-            statistics.clear()    # start fresh with statistics
-        elif is_airborne():    # touch and go performed!
-            fly_status = 1   # go back to flying mode
-            landing_situation = None    # clear landing situation, only last landing is recorded
-            obstacle_down_clear = None    # clear obstacle down, only last landing is recorded
+            statistics.clear()  # start fresh with statistics
+        elif is_airborne():  # touch and go performed!
+            fly_status = 1  # go back to flying mode
+            landing_situation = None  # clear landing situation, only last landing is recorded
+            obstacle_down_clear = None  # clear obstacle down, only last landing is recorded
             rlog.debug("Grounddistance: Re-Start detected without stop, keeping first start " +
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
 
@@ -332,7 +401,7 @@ def store_statistics(sit):
                       'gps_speed': sit['gps_speed'], 'g_distance_valid': sit['g_distance_valid'],
                       'g_distance': sit['g_distance']}
         statistics.append(stat_value)
-        if len(statistics) > stats_max_values:   # sliding window, remove oldest values
+        if len(statistics) > stats_max_values:     # sliding window, remove old values
             statistics.pop(0)
         evaluate_statistics(stat_value)
 
@@ -344,25 +413,28 @@ async def read_ground_sensor():
     if ground_distance_active:
         try:
             rlog.debug("Ground distance reader active ...")
-            next_read = time.perf_counter() + (1/MEASUREMENTS_PER_SECOND)
+            next_read = time.perf_counter() + (1 / MEASUREMENTS_PER_SECOND)
             while True:
                 now = time.perf_counter()
-                await asyncio.sleep(next_read - now)   # wait for next time of measurement
-                next_read = now + (1/MEASUREMENTS_PER_SECOND)
-                distance = distance_sensor.get_measurement()   # distance in mm, call is blocking!
-                global_situation['g_distance_valid'] = True
-                global_situation['g_distance'] = distance - zero_distance
-                rlog.log(value_debug_level, 'Ground Distance: {0:5.2f} cm'.format(global_situation['g_distance'] / 10))
-                store_statistics(global_situation)
+                await asyncio.sleep(next_read - now)  # wait for next time of measurement
+                next_read = now + (1 / MEASUREMENTS_PER_SECOND)
+                distance_sensor.calc_distance()   # asynchronous, may wait
+                distance = distance_sensor.last_distance()  # distance in mm
+                if distance > 0:
+                    global_situation['g_distance_valid'] = True
+                    global_situation['g_distance'] = distance - zero_distance
+                    rlog.log(value_debug_level,
+                             'Ground Distance: {0:5.2f} cm'.format(global_situation['g_distance'] / 10))
+                    store_statistics(global_situation)
+                else:
+                    rlog.log(value_debug_level, 'Ground Distance: Sensor value invalid, maybe out of range')
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
-            distance_sensor.stop_ranging()
-            distance_sensor.close_connection()
     else:
         rlog.debug("No ground distance sensor active.")
 
 
-def read_simulation_data():    # return False, 0, 0, 0 with error, else True, ground_distance, gps_speed, altitude
+def read_simulation_data():  # return False, 0, 0, 0 with error, else True, ground_distance, gps_speed, altitude
     try:
         with open(SIM_DATA_FILE) as f:
             sim_data = json.load(f)
