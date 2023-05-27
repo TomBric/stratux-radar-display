@@ -159,6 +159,7 @@ def reset_values():
     global stop_situation
     global zero_distance
     global fly_status
+    global distance_sensor
 
     runup_situation = None
     start_situation = None
