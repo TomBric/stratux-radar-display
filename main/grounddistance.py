@@ -169,7 +169,6 @@ def reset_values():
 
     if ground_distance_active:
         zero_distance = distance_sensor.last_distance()   # take last value, sensor reader is always calculating that
-        print("NewZero: " + str(zero_distance))
         if zero_distance > 0:
             rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:
@@ -405,6 +404,7 @@ def store_statistics(sit):
 async def read_ground_sensor():
     global distance_sensor
     global global_situation
+    global zero_distance
 
     if ground_distance_active:
         rlog.debug("Ground distance reader active ...")
