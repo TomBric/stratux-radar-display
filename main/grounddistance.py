@@ -177,7 +177,7 @@ async def reset_values():
             rlog.debug('Error resetting gound zero distance')
 
 
-async def init(activate, debug_level, distance_indication, situation, sim_mode):
+def init(activate, debug_level, distance_indication, situation, sim_mode):
     global rlog
     global ground_distance_active
     global indicate_distance
@@ -210,9 +210,7 @@ async def init(activate, debug_level, distance_indication, situation, sim_mode):
     value_debug_level = debug_level
     global_situation = situation  # to be able to read and store situation info
     rlog.debug("Ground Distance Measurement - Ultrasonic sensor active.")
-    await distance_sensor.calc_distance()
-    zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
-    rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
+
     if distance_indication:
         indicate_distance = True
         rlog.debug("Ground Distance Measurement: indication distance activated")
@@ -411,8 +409,11 @@ async def read_ground_sensor():
     global global_situation
 
     if ground_distance_active:
+        rlog.debug("Ground distance reader active ...")
+        await distance_sensor.calc_distance()
+        zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
+        rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
         try:
-            rlog.debug("Ground distance reader active ...")
             next_read = time.perf_counter() + (1 / MEASUREMENTS_PER_SECOND)
             while True:
                 now = time.perf_counter()
