@@ -171,6 +171,7 @@ def reset_values():
 
     if distance_sensor is not None:
         zero_distance = distance_sensor.last_distance()   # take last value, sensor reader is always calculating that
+        print(zero_distance)
         if zero_distance > 0:
             rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:
@@ -199,8 +200,7 @@ def init(activate, debug_level, distance_indication, situation, sim_mode):
             rlog.debug("Ground Distance Measurement - Error init ultrasonic sensor, serial not found")
             ground_distance_active = False
             return False
-        distance_sensor.set_dis_range(35, 2000)  # rand between 35 mm and 2 meter
-        # shorter values do not optimize timing, typical measure timing takes 70 ms on a Zero2
+        distance_sensor.set_dis_range(35, 2000)  # range between 35 mm and 2 meter
     except Exception as e:
         ground_distance_active = False
         rlog.debug("Ground Distance Measurement - Ultrasonic sensor not found: " + str(e))
