@@ -114,8 +114,6 @@ class UsonicSensor:   # definition adapted from DFRobot code
     async def calc_distance(self):
         data = [0] * 4
         timenow = time.time()
-
-        self.distance = 0
         while self.ser.inWaiting() < 4:
             await asyncio.sleep(UART_WAIT_TIME)
             if (time.time() - timenow) > UART_BREAK_TIME:
