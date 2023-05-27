@@ -150,7 +150,7 @@ class UsonicSensor:   # definition adapted from DFRobot code
                         self.distance = 0
 
 
-async def reset_values():
+def reset_values():
     global runup_situation
     global start_situation
     global obstacle_up_clear
@@ -169,8 +169,7 @@ async def reset_values():
     fly_status = 0
 
     if distance_sensor is not None:
-        await distance_sensor.calc_distance()
-        zero_distance = distance_sensor.last_distance()
+        zero_distance = distance_sensor.last_distance()   # take last value, sensor reader is always calculating that
         if zero_distance > 0:
             rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:

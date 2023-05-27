@@ -588,7 +588,7 @@ async def user_interface():
                 next_mode = flighttime.user_input()
             elif global_mode == 19:  # co warner
                 next_mode = cowarner.user_input()
-            elif global_mode == 21:  # situation
+            elif global_mode == 21:  # ground distance
                 next_mode, reset_situation = distance.user_input()
                 if reset_situation:
                     distance.reset_values(situation)
