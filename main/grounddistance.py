@@ -150,7 +150,7 @@ class UsonicSensor:   # definition adapted from DFRobot code
                         self.distance = 0
 
 
-def reset_values():
+async def reset_values():
     global runup_situation
     global start_situation
     global obstacle_up_clear
@@ -177,7 +177,7 @@ def reset_values():
             rlog.debug('Error resetting gound zero distance')
 
 
-def init(activate, debug_level, distance_indication, situation, sim_mode):
+async def init(activate, debug_level, distance_indication, situation, sim_mode):
     global rlog
     global ground_distance_active
     global indicate_distance
