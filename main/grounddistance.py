@@ -111,7 +111,7 @@ class UsonicSensor:   # definition adapted from DFRobot code
     def last_distance(self):
         return self.distance
 
-    def calc_distance(self):
+    async def calc_distance(self):
         data = [0] * 4
         timenow = time.time()
 
@@ -169,7 +169,7 @@ def reset_values():
     fly_status = 0
 
     if distance_sensor is not None:
-        distance_sensor.calc_distance()
+        await distance_sensor.calc_distance()
         zero_distance = distance_sensor.last_distance()
         if zero_distance > 0:
             rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
@@ -210,7 +210,7 @@ def init(activate, debug_level, distance_indication, situation, sim_mode):
     value_debug_level = debug_level
     global_situation = situation  # to be able to read and store situation info
     rlog.debug("Ground Distance Measurement - Ultrasonic sensor active.")
-    distance_sensor.calc_distance()
+    await distance_sensor.calc_distance()
     zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
     rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
     if distance_indication:
@@ -418,7 +418,7 @@ async def read_ground_sensor():
                 now = time.perf_counter()
                 await asyncio.sleep(next_read - now)  # wait for next time of measurement
                 next_read = now + (1 / MEASUREMENTS_PER_SECOND)
-                distance_sensor.calc_distance()   # asynchronous, may wait
+                await distance_sensor.calc_distance()   # asynchronous, may wait
                 distance = distance_sensor.last_distance()  # distance in mm
                 if distance > 0:
                     global_situation['g_distance_valid'] = True
