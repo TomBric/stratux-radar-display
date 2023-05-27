@@ -111,7 +111,7 @@ class UsonicSensor:   # definition adapted from DFRobot code
     def last_distance(self):
         return self.distance
 
-    async def calc_distance(self):
+    def calc_distance(self):
         data = [0] * 4
         timenow = time.time()
 
