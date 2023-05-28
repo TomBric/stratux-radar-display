@@ -60,6 +60,7 @@ OBSTACLE_HEIGHT = 50  # in feet, height value to calculate as obstacle clearance
 STOP_SPEED = 3  # in kts, speed when before runup or after landing a stop is assumed
 SIM_DATA_FILE = "simulation_data.json"
 # file with JSON content, e.g.:   {"g_distance": 10,"gps_speed": 0,"own_altitude": 10}
+INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
 
 # globals
 ground_distance_active = False  # True if sensor is found and activated
@@ -237,7 +238,7 @@ def distance_beeper(distance):
 def is_airborne():
     global stats_before_airborne
 
-    if global_situation['g_distance'] >= DISTANCE_START_DETECTED:
+    if global_situation['g_distance_valid'] and global_situation['g_distance'] >= DISTANCE_START_DETECTED:
         stats_before_airborne += 1
         if stats_before_airborne >= STATS_FOR_SITUATION_CHANGE:
             stats_before_airborne = 0
@@ -250,7 +251,7 @@ def is_airborne():
 def has_landed():
     global stats_before_landing
 
-    if global_situation['g_distance'] <= DISTANCE_LANDING_DETECTED:
+    if global_situation['g_distance_valid'] and global_situation['g_distance'] <= DISTANCE_LANDING_DETECTED:
         stats_before_landing += 1
         if stats_before_landing >= STATS_FOR_SITUATION_CHANGE:
             stats_before_landing = 0
@@ -424,9 +425,11 @@ async def read_ground_sensor():
                     global_situation['g_distance'] = distance - zero_distance
                     rlog.log(value_debug_level,
                              'Ground Distance: {0:5.2f} cm'.format(global_situation['g_distance'] / 10))
-                    store_statistics(global_situation)
                 else:
+                    global_situation['g_distance_valid'] = False
+                    global_situation['g_distance'] = INVALID_GDISTANCE   # just to be safe
                     rlog.log(value_debug_level, 'Ground Distance: Sensor value invalid, maybe out of range')
+                store_statistics(global_situation)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
     else:
