@@ -83,6 +83,11 @@ mkdir -p out
 cp mnt/$DISPLAY_SRC/stratux-radar-display/image/wpa_supplicant.conf mnt/boot
 touch mnt/boot/ssh
 
+# configuration to use uart for ultrasonic ground sensor
+echo "# modification for ultrasonic ground sensor" >> mnt/boot/config.txt
+echo "enable_uart=1" >> mnt/boot/config.txt
+echo "dtoverlay=miniuart-bt" >> mnt/boot/config.txt
+
 umount mnt/boot
 umount mnt
 
