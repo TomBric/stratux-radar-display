@@ -49,15 +49,17 @@ SAVED_STATISTICS = "stratux-radar.stat"
 # BEEP VALUES
 DISTANCE_BEEP_MAX = 60  # in cm, where beeper starts with a low tone
 DISTANCE_BEEP_MIN = 10  # in cm, where beeper stops with a high tone
+
 # GPS-Measurement of start-distance
 DISTANCE_START_DETECTED = 60 * 10  # in mm where measurement assumes that plane is in the air
 DISTANCE_LANDING_DETECTED = 15 * 10  # in mm where measurement assumes to be landed
+OBSTACLE_HEIGHT = 50  # in feet, height value to calculate as obstacle clearance, 15 meters
+STOP_SPEED = 3  # in kts, speed when before runup or after landing a stop is assumed
+
 # start distance with groundsensor
 STATS_PER_SECOND = 5  # how many statistics are written per second
 STATS_FOR_SITUATION_CHANGE = 3  # no of values in a row before a situation is changed (landing/flying)
 STATS_TOTAL_TIME = 120  # time in seconds how long statistic window is
-OBSTACLE_HEIGHT = 50  # in feet, height value to calculate as obstacle clearance, 15 meters
-STOP_SPEED = 3  # in kts, speed when before runup or after landing a stop is assumed
 SIM_DATA_FILE = "simulation_data.json"
 # file with JSON content, e.g.:   {"g_distance": 10,"gps_speed": 0,"own_altitude": 10}
 INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
