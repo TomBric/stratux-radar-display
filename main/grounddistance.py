@@ -41,7 +41,9 @@ import math
 import serial
 
 # constants
-MEASUREMENTS_PER_SECOND = 10  # number of distance ranging meaurements per second
+MEASUREMENTS_PER_SECOND = 10    # number of distance ranging meaurements per second
+# DRFobot usonic sensor allows approx. 10 per second
+
 UART_WAIT_TIME = 0.01  # time in seconds to wait for enough uart characters
 UART_BREAK_TIME = 1.00  # time in seconds when waiting is stopped
 # statistic file
@@ -92,7 +94,7 @@ stats_before_stop = 0
 
 class UsonicSensor:   # definition adapted from DFRobot code
     distance_max = 4500
-    distance_min = 0
+    distance_min = 20
     range_max = 4500
     ser = None
     distance = 0
@@ -171,8 +173,9 @@ def reset_values():
     fly_status = 0
 
     if ground_distance_active:
-        zero_distance = distance_sensor.last_distance()   # take last value, sensor reader is always calculating that
-        if zero_distance > 0:
+        new_zero_distance = distance_sensor.last_distance()   # take last value, don't wait (no async function)
+        if new_zero_distance > 0:
+            zero_distance = new_zero_distance
             rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:
             rlog.debug('Error resetting gound zero distance')
@@ -412,8 +415,12 @@ async def read_ground_sensor():
     if ground_distance_active:
         rlog.debug("Ground distance reader active ...")
         await distance_sensor.calc_distance()
-        zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
-        rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
+        new_zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
+        if new_zero_distance > 0:
+            zero_distance = new_zero_distance  # distance in mm this is zero
+            rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
+        else:
+            rlog.debug('Ground Zero Distance: Error reading ground distance, not set')
         try:
             next_read = time.perf_counter() + (1 / MEASUREMENTS_PER_SECOND)
             while True:
