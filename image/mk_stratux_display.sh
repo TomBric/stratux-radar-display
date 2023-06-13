@@ -45,7 +45,7 @@ cd $TMPDIR || die "cd failed"
 
 # Download/extract image
 wget -c $BASE_IMAGE_URL || die "Download failed"
-xz $ZIPNAME || die "Extracting image failed"
+xz -d $ZIPNAME || die "Extracting image failed"
 
 
 # Check where in the image the root partition begins:
