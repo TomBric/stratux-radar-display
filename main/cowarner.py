@@ -175,7 +175,7 @@ def check_alarm_level():   # check wether new alarm level should be reached, cal
     for i in range(len(WARNLEVEL)-1, 0, -1):    # check all warnleves starting high e.g. (50, 3*30, "No CO alarm", None)
         num_values = math.floor(WARNLEVEL[i][1] / MIN_SENSOR_READ_TIME)   # number of values to take into account
         if len(co_values) >= num_values:   # if less values available, do not alarm
-            average = numpy.average(co_values[len(co_values)-num_values : len(co_values)])
+            average = numpy.average(co_values[len(co_values)-num_values: len(co_values)])
             # print("Average " + str(WARNLEVEL[i]) + ": " + str(num_values) + " values " + str(average) + " ppm")
             if average >= WARNLEVEL[i][0]:
                 if alarmlevel != i:
@@ -202,11 +202,12 @@ def read_co_value():     # called by sensor_read thread
     rlog.log(value_debug_level,
              "C0-Warner: Analog0: {0:5d}  {1:.3f} V  RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}    PPM value: {4:d}"
              .format(value, sensor_volt, rs_gas/1000, rs_gas/r0, ppm_value))
-    # print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f} kOhms   RS_gas/R0: {3:3.3f}  PPM value: {4:d}".format(value, sensor_volt, rs_gas/1000, rs_gas / r0, ppm_value))
+    # print("C0-Warner: Analog0: {0:5d}  {1:2.3f} V    RS_gas: {2:5.3f} kOhms
+    # RS_gas/R0: {3:3.3f}  PPM value: {4:d}".format(value, sensor_volt, rs_gas/1000, rs_gas / r0, ppm_value))
     if ppm_value > co_max:
         co_max = ppm_value
     co_values.append(ppm_value)
-    if len(co_values) > co_max_values:    # sliding window, remove oldest values
+    if len(co_values) > co_max_values:    # sliding window, remove the oldest values
         co_values.pop(0)
     return check_alarm_level()
 
@@ -274,7 +275,7 @@ def user_input():
         return 0  # stay in current mode
     cowarner_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return radarmodes.next_mode_sequence(19) # next mode
+        return radarmodes.next_mode_sequence(19)    # next mode
     if button == 0 and btime == 1:  # left and short
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
         sample_sum = 0.0
@@ -286,7 +287,7 @@ def user_input():
     if button == 2 and btime == 1:  # right and short, reset max value
         co_max = 0
         co_values.clear()  # clear all history
-    if button == 2 and btime == 2:  # right and long- refresh
+    if button == 2 and btime == 2:  # right and long: refresh
         return 20  # start next mode for display driver: refresh called
     return 19  # no mode change
 
@@ -334,52 +335,3 @@ async def read_sensors():
             rlog.debug("Sensor reader terminating ...")
     else:
         rlog.debug("No co-sensor active.")
-
-
-
-''' 
-BME280 integration tbd
-
-r_star = 8314.3  # J/(kmol*K) (universelle Gaskonstante)
-mw = 18.016      # kg/kmol (Molekulargewicht des Wasserdampfes)
-
-def sdd(temp, a, b):
-    return 6.1078 * math.pow(10, (a*temp)/(b+temp))
-
-
-def dewpoint(hum, temp, press):
-    if temp >= 0:
-        a = 7.5
-        b = 237.3
-    else:
-        a = 7.6
-        b = 240.7
-
-    sdd = 6.1078 * math.pow(10, (a*temp)/(b+temp))
-    dd = hum/100 * sdd
-    v = math.log10(dd/6.1078)
-    return  b*v/(a-v)
-
-
-bme280.load_calibration_params(bus, address=0x76)  # or 0x77
-fmt = '{0:5d}:  {1}  {2:0.3f} deg C,  {3:0.2f} hPa,  {4:0.2f} %'
-counter = 1
-data = bme280.sample(bus, address=0x76)  # or 0x77
-
-    altoffset = 0
-    altitude = 145366.45 * (1.0 - math.pow(data.pressure/1013.25, 0.190284)) + altoffset
-
-    # print(fmt.format(counter, data.timestamp, data.temperature, data.pressure, data.humidity))
-    with canvas(oled_device) as draw:
-        draw.text((0, 0), text=data.timestamp.strftime("%Y-%m-%d %H:%M:%S"), fill="white")
-        draw.line((0, 12, 128, 12), fill=255)
-        draw.text((0, 14), text='{0:0.3f} deg C'.format(data.temperature), fill="white")
-        draw.text((0, 24), text='{0:0.2f} hPa'.format(data.pressure), fill="white")
-        draw.text((0, 34), text='{0:0.2f} % rH'.format(data.humidity), fill="white")
-        draw.text((0, 64), text='FL {0:2.1f}'.format(altitude/100), fill="white")
-        draw.text((0, 80), text='Dewpoint {0:2.3f}'.format(dewpoint(data.humidity, data.temperature, data.pressure)), fill="white")
-
-
-
-
-'''

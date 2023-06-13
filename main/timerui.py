@@ -54,7 +54,7 @@ laptime = 0
 timer_running = False
 was_in_secs = 0.0       # last time displayed
 timer_ui_changed = True
-cdown_time = 0.0     # count down time
+cdown_time = 0.0     # count down
 cdown_spoken = False  # to speak zero only once
 timer_mode = 0    # 0 = normal, 1 = countdown-set
 g_config = {}
@@ -88,7 +88,7 @@ def reset_timer():
     timer_running = False
     was_in_secs = 0.0  # last time displayed
     timer_ui_changed = True
-    cdown_time = 0.0  # count down time
+    cdown_time = 0.0  # count down
     cdown_spoken = False  # to speak zero only once
     timer_mode = 0  # 0 = normal, 1 = countdown-set
     lap_head = "Laptimer"

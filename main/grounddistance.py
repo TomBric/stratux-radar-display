@@ -108,9 +108,9 @@ class UsonicSensor:   # definition adapted from DFRobot code
             return False
         return True
 
-    def set_dis_range(self, min, max):
-        self.distance_max = max
-        self.distance_min = min
+    def set_dis_range(self, mini, maxi):
+        self.distance_max = maxi
+        self.distance_min = mini
 
     @staticmethod
     def _check_sum(le):
@@ -149,8 +149,8 @@ class UsonicSensor:   # definition adapted from DFRobot code
                     data[1] = rlt[index + 1]
                     data[2] = rlt[index + 2]
                     data[3] = rlt[index + 3]
-                sum = self._check_sum(data)
-                if sum == data[3]:
+                sumd = self._check_sum(data)
+                if sumd == data[3]:
                     self.distance = data[1] * 256 + data[2]
                     if self.distance > self.distance_max or self.distance < self.distance_min:
                         self.distance = 0
@@ -240,6 +240,7 @@ def distance_beeper(distance):
     if indicate_distance:
         if DISTANCE_BEEP_MIN <= distance <= DISTANCE_BEEP_MAX:
             # to do tone_pitch = radarbluez.beep()
+            # generate tone on raspberry
             pass
 
 
@@ -455,5 +456,6 @@ def read_simulation_data():  # return False, 0, 0, 0 with error, else True, grou
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Grounddistance: Error " + str(e) + " reading " + SIM_DATA_FILE)
         return False, 0, 0, 0
-    # rlog.debug("GroundDistance: Simulation data read from " + SIM_DATA_FILE + ": " +json.dumps(sim_data, sort_keys=True, indent=4))
+    # rlog.debug("GroundDistance: Simulation data read from " + SIM_DATA_FILE
+    # + ": " +json.dumps(sim_data, sort_keys=True, indent=4))
     return True, sim_data['g_distance'], sim_data['gps_speed'], sim_data['own_altitude']

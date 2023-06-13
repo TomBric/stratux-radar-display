@@ -223,7 +223,7 @@ def calc_gps_distance(lat, lng):
     return distradius, angle
 
 
-def speaktraffic(hdiff, direction=None, distance=None):
+def speaktraffic(hdiff, direction=None, dist=None):
     if sound_on:
         feet = hdiff * 100
         sign = 'plus'
@@ -233,8 +233,8 @@ def speaktraffic(hdiff, direction=None, distance=None):
         if direction:
             txt += str(direction) + ' o\'clock '
         txt += sign + ' ' + str(abs(feet)) + ' feet'
-        if global_config['distance_warnings'] and distance:
-            txt += str(distance) + ' miles '
+        if global_config['distance_warnings'] and dist:
+            txt += str(dist) + ' miles '
         radarbluez.speak(txt)
 
 
@@ -284,7 +284,8 @@ def new_traffic(json_str):
 
         if traffic['Position_valid'] and situation['gps_active']:
             # adsb traffic and stratux has valid gps signal
-            rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB traffic ' + hex(traffic['Icao_addr']) + " at height " + str(ac['height']))
+            rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB traffic ' + hex(traffic['Icao_addr'])
+                     + " at height " + str(ac['height']))
             if 'circradius' in ac:
                 del ac['circradius']
                 # was mode-s target before, now invalidate mode-s info
@@ -328,7 +329,8 @@ def new_traffic(json_str):
                 return
                 # unspecified altitude, nothing displayed for now, leave it as it is
             distcirc = traffic['DistanceEstimated'] / 1852.0
-            rlog.log(AIRCRAFT_DEBUG, "RADAR: Mode-S traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
+            rlog.log(AIRCRAFT_DEBUG, "RADAR: Mode-S traffic " + hex(traffic['Icao_addr'])
+                     + " in " + str(distcirc) + " nm")
             distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
             if is_new or 'circradius' not in ac:
                 # calc argposition if new or adsb before
@@ -443,7 +445,8 @@ def new_situation(json_str):
         # set system time if not synchronized properly
         if situation['gps_active']:
             if sit['GPSLastFixLocalTime'].split('.')[0] == sit['GPSLastGPSTimeStratuxTime'].split('.')[0]:
-                # take GPSTime only if last fix time and last stratux time match (in seconds), sometimes a fix is there, but
+                # take GPSTime only if last fix time and last stratux time match (in seconds),
+                # sometimes a fix is there, but
                 # not yet an update time value from GPS, but the old one is transmitted by stratux
                 update_time(sit['GPSTime'])
         # ahrs
@@ -474,13 +477,13 @@ def new_situation(json_str):
         if gmeter['current'] != current:
             gmeter['current'] = current
             gmeter['was_changed'] = True
-        max = round(sit['AHRSGLoadMax'], 2)
-        if gmeter['max'] != max:
-            gmeter['max'] = max
+        maxv = round(sit['AHRSGLoadMax'], 2)
+        if gmeter['max'] != maxv:
+            gmeter['max'] = maxv
             gmeter['was_changed'] = True
-        min = round(sit['AHRSGLoadMin'], 2)
-        if gmeter['min'] != min:
-            gmeter['min'] = min
+        minv = round(sit['AHRSGLoadMin'], 2)
+        if gmeter['min'] != minv:
+            gmeter['min'] = minv
             gmeter['was_changed'] = True
         # automatic time measurement
         new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, global_mode)
@@ -890,7 +893,7 @@ if __name__ == "__main__":
         global_mode = 21  # start in situation
     sound_mixer = args['mixer']
     radarmodes.parse_modes(args['displaymodes'])
-    if global_mode == 1: # no mode override set, take first mode in mode_sequence
+    if global_mode == 1:   # no mode override set, take first mode in mode_sequence
         global_mode = radarmodes.first_mode_sequence()
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set

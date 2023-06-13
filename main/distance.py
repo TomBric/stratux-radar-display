@@ -114,7 +114,8 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
                                                         situation['latitude'], situation['longitude'])
         now = datetime.datetime.now(datetime.timezone.utc)
         display_control.clear(draw)
-        display_control.distance(draw, now, situation['gps_active'], situation['gps_quality'], situation['gps_h_accuracy'],
+        display_control.distance(draw, now, situation['gps_active'], situation['gps_quality'],
+                                 situation['gps_h_accuracy'],
                                  gps_distance_zero['gps_active'], gps_distance, situation['gps_speed'],
                                  situation['baro_valid'], situation['own_altitude'], alt_diff, alt_diff_takeoff,
                                  situation['vertical_speed'], ahrs['ahrs_sensor'],

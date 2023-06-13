@@ -72,8 +72,8 @@ def user_input():
         return radarmodes.next_mode_sequence(13), False  # next mode
     if button == 0 and btime == 2:  # left and long
         return 3, False  # start next mode shutdown!
-    if button == 2 and btime == 1:  # right and short- reset values
+    if button == 2 and btime == 1:  # right and short: reset values
         return 13, True
-    if button == 2 and btime == 2:  # right and long- refresh
+    if button == 2 and btime == 2:  # right and long: refresh
         return 14, False  # start next mode for display driver: refresh called from vsi
     return 13, False  # no mode change for any other interaction

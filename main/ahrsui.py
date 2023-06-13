@@ -79,6 +79,6 @@ def user_input():
         return radarmodes.next_mode_sequence(5)  # next mode
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long- refresh
+    if button == 2 and btime == 2:  # right and long: refresh
         return 6  # start next mode for display driver: refresh called from ahrs
     return 5  # no mode change

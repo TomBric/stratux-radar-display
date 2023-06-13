@@ -63,7 +63,7 @@ def init():
     GPIO.setwarnings(False)
 
     for iopin in io_status:
-        GPIO.setup(iopin, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+        GPIO.setup(iopin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.add_event_detect(iopin, GPIO.FALLING, bouncetime=300)
 
     rlog = logging.getLogger('stratux-radar-log')
@@ -123,5 +123,5 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
     return 0, 0
 
 
-def cleanup():    #shutdown
+def cleanup():    # shutdown
     GPIO.cleanup()
