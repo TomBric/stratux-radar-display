@@ -35,7 +35,7 @@ fi
 
 BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2023-05-03/2023-05-03-raspios-bullseye-$IMAGE_VERSION.img.xz"
 ZIPNAME="2023-05-03-raspios-bullseye-$IMAGE_VERSION.img.xz"
-IMGNAME="${ZIPNAME%.*}.img"
+IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
