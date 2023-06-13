@@ -41,7 +41,7 @@ IMGNAME="${ZIPNAME%.*}"
 cd "$(dirname "$0")" || die "cd failed"
 SRCDIR="$(realpath "$(pwd)"/..)"
 mkdir -p $TMPDIR
-cd $TMPDIR ||
+cd $TMPDIR || die "cd failed"
 
 # Download/extract image
 wget -c $BASE_IMAGE_URL || die "Download failed"
