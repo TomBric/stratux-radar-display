@@ -33,8 +33,8 @@ if [ "$#" -gt 2 ] &&  [ "$3" == "v64" ]; then
     outprefix="stratux-display64"
 fi
 
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2023-05-03/2023-05-03-raspios-bullseye-$IMAGE_VERSION.zip"
-ZIPNAME="2023-05-03-raspios-bullseye-$IMAGE_VERSION.zip"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2023-05-03/2023-05-03-raspios-bullseye-$IMAGE_VERSION.img.xz"
+ZIPNAME="2023-05-03-raspios-bullseye-$IMAGE_VERSION.img.xz"
 IMGNAME="${ZIPNAME%.*}.img"
 
 # cd to script directory
@@ -45,7 +45,7 @@ cd $TMPDIR ||
 
 # Download/extract image
 wget -c $BASE_IMAGE_URL || die "Download failed"
-unzip $ZIPNAME || die "Extracting image failed"
+xz $ZIPNAME || die "Extracting image failed"
 
 
 # Check where in the image the root partition begins:
