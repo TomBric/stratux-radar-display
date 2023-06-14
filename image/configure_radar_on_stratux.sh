@@ -12,9 +12,6 @@ sudo pip3 install luma.oled
 #websockets for radar
 sudo pip3 install websockets ADS1x15-ADC
 
-# library for vl53l1x range sensor
-sudo pip3 install melopero-vl53l1x
-
 # sound configuration for external output
 sudo apt-get install libasound2-dev -y
 sudo pip3 install pyalsaaudio
