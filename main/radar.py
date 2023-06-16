@@ -37,6 +37,7 @@ import json
 import asyncio
 import socket
 import websockets
+import logging
 import math
 import time
 import radarbluez
