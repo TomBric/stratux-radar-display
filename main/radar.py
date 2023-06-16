@@ -60,6 +60,7 @@ import grounddistance
 import radarmodes
 from datetime import datetime, timezone
 
+rlog = None  # radar specific logger
 # constant definitions
 RADAR_VERSION = "1.9"
 
