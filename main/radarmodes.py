@@ -38,6 +38,12 @@
 # 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status
 # 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 21=situation 22=refresh situation 0=Init
 
+# logging
+SITUATION_DEBUG = logging.DEBUG-2   # another low level for debugging, DEBUG is 10
+AIRCRAFT_DEBUG = logging.DEBUG-1    # another low level for debugging below DEBUG
+rlog = None  # radar specific logger
+#
+
 mode_sequence = []    # list of modes to display
 
 
