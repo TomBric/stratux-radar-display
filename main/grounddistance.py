@@ -132,7 +132,7 @@ class UsonicSensor:   # definition adapted from DFRobot code
                 break
         rlt = self.ser.read(self.ser.inWaiting())
         if len(rlt) >= 4:
-            rlog.log(SITUATION_DEBUG, 'Data read from GroundSensor {0:02x} {1:02x} {2:02x} {3:02x}',
+            rlog.log(SITUATION_DEBUG, 'Data read from GroundSensor {0:02x} {1:02x} {2:02x} {3:02x}'.
                      format(rlt[len(rlt)-4], rlt[len(rlt)-3], rlt[len(rlt)-2], rlt[len(rlt)-1]))
             index = len(rlt) - 4
             while True:
