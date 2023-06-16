@@ -44,6 +44,9 @@ import json
 import math
 import serial
 
+rlog = None  # radar specific logger
+SITUATION_DEBUG = logging.DEBUG-2   # another low level for debugging, DEBUG is 10
+
 # constants
 MEASUREMENTS_PER_SECOND = 10    # number of distance ranging meaurements per second
 # DRFobot usonic sensor allows approx. 10 per second

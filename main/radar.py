@@ -60,7 +60,12 @@ import grounddistance
 import radarmodes
 from datetime import datetime, timezone
 
+# logging
+SITUATION_DEBUG = logging.DEBUG-2   # another low level for debugging, DEBUG is 10
+AIRCRAFT_DEBUG = logging.DEBUG-1    # another low level for debugging below DEBUG
 rlog = None  # radar specific logger
+#
+
 # constant definitions
 RADAR_VERSION = "1.9"
 
