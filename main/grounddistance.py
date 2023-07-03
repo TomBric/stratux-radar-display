@@ -106,7 +106,8 @@ class UsonicSensor:   # definition adapted from DFRobot code
     distance = 0
 
     def init(self):
-        self.ser = serial.Serial("/dev/ttyAMA0", 9600)
+        self.ser = serial.Serial("/dev/ttyAMA0", 115200)     # A22 module has 115200 baud
+        self.ser.flushInput()
         if not self.ser.isOpen():
             return False
         return True
