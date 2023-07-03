@@ -99,9 +99,9 @@ stats_before_stop = 0
 
 
 class UsonicSensor:   # definition adapted from DFRobot code
-    distance_max = 4500
-    distance_min = 20
-    range_max = 4500
+    distance_max = 3000
+    distance_min = 5
+    range_max = 3000
     ser = None
     distance = 0
 
@@ -352,7 +352,7 @@ def evaluate_statistics(latest_stat):
             rlog.debug("Grounddistance: Start detected " +
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
             for stat in reversed(statistics):  # ... find begin of start where gps_speed <= STOP_SPEED
-                if stat['gps_speed'] <= STOP_SPEED:
+                if stat['gps_active'] and stat['gps_speed'] <= STOP_SPEED:
                     runup_situation = stat
                     break
     elif fly_status == 1:  # start was detected
@@ -368,7 +368,7 @@ def evaluate_statistics(latest_stat):
                        json.dumps(landing_situation, indent=4, sort_keys=True, default=str))
             if obstacle_down_clear is None:
                 for stat in reversed(statistics):
-                    if stat['own_altitude'] >= latest_stat['own_altitude'] + OBSTACLE_HEIGHT:
+                    if stat['baro_valid'] and stat['own_altitude'] >= latest_stat['own_altitude'] + OBSTACLE_HEIGHT:
                         obstacle_down_clear = stat
                         rlog.debug("Grounddistance: Obstacle clearance down found " +
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
