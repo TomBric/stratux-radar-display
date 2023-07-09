@@ -26,7 +26,7 @@ sudo apt-get install libbluetooth-dev -y
 sudo pip3 install pybluez
 sudo pip3 install pydbus
 mkdir -p /home/pi/tmp
-sudo TMPDIR=/home/pi/tmp pip3 install --upgrade PILLOW
+sudo TMPDIR=/home/pi/tmp pip3 install PILLOW==9.5
 sudo apt install python3-numpy -y
 
 # get files from repo

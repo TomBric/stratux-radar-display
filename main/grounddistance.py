@@ -47,8 +47,8 @@ import serial
 rlog = None  # radar specific logger
 
 # constants
-MEASUREMENTS_PER_SECOND = 10    # number of distance ranging meaurements per second
-# DRFobot usonic sensor allows approx. 10 per second
+MEASUREMENTS_PER_SECOND = 5    # number of distance ranging meaurements per second
+# A22 usonic sensor allows approx. 10 per second
 
 UART_WAIT_TIME = 0.01  # time in seconds to wait for enough uart characters
 UART_BREAK_TIME = 1.00  # time in seconds when waiting is stopped

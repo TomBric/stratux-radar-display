@@ -202,13 +202,13 @@ def clear(draw):
 
 
 def centered_text(draw, y, text, font, fill):
-    ts = draw.textsize(text, font)
+    ts = draw.textlength(text, font)
     draw.text((zerox - ts[0] / 2, y), text, font=font, fill=fill)
 
 
 def right_text(draw, y, text, font, fill):
-    ts = draw.textsize(text, font)
-    draw.text((sizex-ts[0], y), text, font=font, fill=fill)
+    ts = draw.textlength(text, font)
+    draw.text((sizex - ts[0], y), text, font=font, fill=fill)
 
 
 def startup(draw, version, target_ip, seconds):
@@ -248,7 +248,6 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     # draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
     draw.text(tposition, t, font=verylargefont, fill="black")
     if tail is not None:
-        tsize = draw.textsize(tail, verysmallfont)
         draw.text((tposition[0], tposition[1] + VERYLARGE), tail, font=verysmallfont, fill="black")
 
 
