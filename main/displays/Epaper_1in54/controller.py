@@ -202,12 +202,12 @@ def clear(draw):
 
 
 def centered_text(draw, y, text, font, fill):
-    ts = draw.textlength(text, font)
+    ts = draw.textsize(text, font)
     draw.text((zerox - ts[0] / 2, y), text, font=font, fill=fill)
 
 
 def right_text(draw, y, text, font, fill):
-    ts = draw.textlength(text, font)
+    ts = draw.textsize(text, font)
     draw.text((sizex - ts[0], y), text, font=font, fill=fill)
 
 
