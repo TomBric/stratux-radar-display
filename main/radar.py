@@ -847,8 +847,8 @@ if __name__ == "__main__":
     ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
                     default=DEFAULT_MIXER)
     ap.add_argument("-modes", "--displaymodes", required=False, help="Select display modes that you want to see "
-        "R=radar T=timer A=ahrs D=display-status G=g-meter K=compass V=vsi S=stratux-status C=co-sensor "
-        "M=distance measurement   Example: -modes RADCM", default="RTAGKVCMDS")
+        "R=radar T=timer A=ahrs D=display-status G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "
+        "M=distance measurement   Example: -modes RADCM", default="RTAGKVICMDS")
 
     args = vars(ap.parse_args())
     # set up logging
