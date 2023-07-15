@@ -713,11 +713,11 @@ def flighttime(draw, last_flights):
 
     maxlines = 8
     for f in last_flights:
-        f[0] = f[0].replace(second=0, microsecond=0)   #  round down start time to minutes
+        f[0] = f[0].replace(second=0, microsecond=0)   # round down start time to minutes
         draw.text((0, starty), f[0].strftime("%d.%m."), font=verysmallfont, fill="black")
         draw.text((50, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
         if f[1] != 0:  # ==0 means still in the air
-            f[1] = f[1].replace(second=0, microsecond=0)   ##  round down
+            f[1] = f[1].replace(second=0, microsecond=0)   # round down
             delta = (f[1] - f[0]).total_seconds()
             draw.text((155, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
         else:
