@@ -89,6 +89,9 @@ touch mnt/boot/ssh
   echo "enable_uart=1"
   echo "dtoverlay=miniuart-bt"
 } >> mnt/boot/config.txt
+# disable ssh over serial otherwise UART is not working properly, change entries in cmdline if console is enabled there
+sed -i mnt/boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
+sed -i mnt/boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 
 umount mnt/boot
 umount mnt
