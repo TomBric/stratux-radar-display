@@ -396,8 +396,12 @@ def store_statistics(sit):
     if simulation_mode:
         success, gd, sp, alt = read_simulation_data()
         if success:
-            sit['g_distance'] = gd
-            sit['g_distance_valid'] = True
+            if gd > 0:
+                sit['g_distance_valid'] = True
+                sit['g_distance'] = gd
+            else:
+                sit['g_distance_valid'] = False
+                sit['g_distance'] = INVALID_GDISTANCE
             sit['gps_speed'] = sp
             sit['gps_active'] = True
             sit['own_altitude'] = alt
