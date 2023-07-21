@@ -59,7 +59,7 @@ DISTANCE_BEEP_MAX = 60  # in cm, where beeper starts with a low tone
 DISTANCE_BEEP_MIN = 10  # in cm, where beeper stops with a high tone
 
 # GPS-Measurement of start-distance
-DISTANCE_START_DETECTED = 60 * 10  # in mm where measurement assumes that plane is in the air
+DISTANCE_START_DETECTED = 30 * 10  # in mm where measurement assumes that plane is in the air
 DISTANCE_LANDING_DETECTED = 15 * 10  # in mm where measurement assumes to be landed
 OBSTACLE_HEIGHT = 50  # in feet, height value to calculate as obstacle clearance, 15 meters
 STOP_SPEED = 3  # in kts, speed when before runup or after landing a stop is assumed
