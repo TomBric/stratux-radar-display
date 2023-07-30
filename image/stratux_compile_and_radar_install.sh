@@ -24,9 +24,9 @@ sudo systemctl stop systemd-timesyncd
 
 sudo -i PWD=/root git clone --recursive https://github.com/b3nn0/stratux.git
 sudo apt install build-essential -y
-sudo -i PWD=/root wget https://golang.org/dl/go1.17.1.linux-arm64.tar.gz
-sudo -i PWD=/root tar xzf go1.17.1.linux-arm64.tar.gz
-sudo -i PWD=/root rm go1.17.1.linux-arm64.tar.gz
+sudo -i PWD=/root wget https://golang.org/dl/go1.20.1.linux-arm64.tar.gz
+sudo -i PWD=/root tar xzf go1.20.1.linux-arm64.tar.gz
+sudo -i PWD=/root rm go1.20.1.linux-arm64.tar.gz
 
 sudo make -C /root/stratux
 sudo make -C /root/stratux install
