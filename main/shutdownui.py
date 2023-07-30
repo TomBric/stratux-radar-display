@@ -112,7 +112,7 @@ def user_input():
     if button == 0:  # left
         shutdown_mode = 0
         shutdown_time = 0.0
-        return radarmodes.first_mode_sequence  # go back to first mode selected
+        return radarmodes.first_mode_sequence()  # go back to first mode selected
     if button == 1:  # middle, display only shutdown
         shutdown_mode = 1
         shutdown_time = 0.0
