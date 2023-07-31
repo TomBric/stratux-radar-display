@@ -90,19 +90,18 @@ hardware = [
     "Serial port",   # 1
     "Prolific USB-serial bridge",  # 2
     "OGN Tracker",  # 3
-    "unknown",  # 4
-    "unknown",  # 5
+    "Not installed",  # 4
+    "Not installed",  # 5
     "USB u-blox 6 GPS receiver",  # 6
     "USB u-blox 7 GNSS receiver",  # 7
     "USB u-blox 8 GNSS receiver",  # 8
     "USB u-blox 9 GNSS receiver",  # 9
     "USB Serial IN",  # 10
     "SoftRF Dongle",  # 11
-    "Network"  # 12
-    "unknown", # 13
-    "unknown", # 14
+    "Network",  # 12
+    "Not installed", # 13
+    "Not installed", # 14
     "GxAirCom", # 15
-    "NMEA protocol", # 16
 ]
 
 
