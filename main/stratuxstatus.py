@@ -99,6 +99,10 @@ hardware = [
     "USB Serial IN",  # 10
     "SoftRF Dongle",  # 11
     "Network"  # 12
+    "unknown", # 13
+    "unknown", # 14
+    "GxAirCom", # 15
+    "NMEA protocol", # 16
 ]
 
 
