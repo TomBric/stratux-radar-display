@@ -28,8 +28,8 @@ sudo -i PWD=/root wget https://golang.org/dl/go1.20.1.linux-arm64.tar.gz
 sudo -i PWD=/root tar xzf go1.20.1.linux-arm64.tar.gz
 sudo -i PWD=/root rm go1.20.1.linux-arm64.tar.gz
 
-sudo make -C /root/stratux
-sudo make -C /root/stratux install
+sudo -i PWD=/root make -C /root/stratux
+sudo -i PWD=/root make -C /root/stratux install
 
 # installing radar-display
 cd /home/pi && git clone -b "$branch" https://github.com/TomBric/stratux-radar-display.git
