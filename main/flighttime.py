@@ -183,7 +183,8 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
                     stop_timestamp = None
                     new_flight_info = False   # stop is only triggered once
                     switch_back_mode = current_mode
-                    return 17    # return mode set to display times
+                    if radarmodes.is_mode_contained(17):  # only switch to flighttime display if flighttime is selected
+                        return 17    # return mode set to display times
             elif stop_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_STOPPED:
                 # reset trigger, not several seconds below threshold
                 stop_timestamp = None
