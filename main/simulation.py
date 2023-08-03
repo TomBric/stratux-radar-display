@@ -52,8 +52,8 @@ def init(sim_mode):
     simulation_mode = sim_mode
     rlog = logging.getLogger('stratux-radar-log')
     if simulation_mode:
-        rlog.debug('Simulation mode activated - Reading sim data from' + SIM_DATA_FILE + '.')
-        sim_data = read_simulation_data;
+        rlog.debug('Simulation mode activated - Reading sim data from: ' + SIM_DATA_FILE + '.')
+        sim_data = read_simulation_data();
         if sim_data is not None:
             rlog.debug('Initial simulation data: ' + json.dumps(sim_data))
         else:
