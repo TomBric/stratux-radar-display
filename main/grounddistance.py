@@ -395,7 +395,7 @@ def store_statistics(sit):
     if simulation_mode:
         sim_data = simulation.read_simulation_data()
         if sim_data is not None:
-            if 'gd' in sim_data and sim_data['gd'] > 0:
+            if 'g_distance' in sim_data and sim_data['g_distance'] > 0:
                 sit['g_distance_valid'] = True
                 sit['g_distance'] = sim_data['gd']
             else:

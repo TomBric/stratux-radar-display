@@ -62,8 +62,8 @@ import simulation
 from datetime import datetime, timezone
 
 # logging
-SITUATION_DEBUG = logging.DEBUG-2   # another low level for debugging, DEBUG is 10
-AIRCRAFT_DEBUG = logging.DEBUG-1    # another low level for debugging below DEBUG
+SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
+AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBUG
 rlog = None  # radar specific logger
 #
 
@@ -91,7 +91,7 @@ OPTICAL_ALIVE_TIME = 3
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
-DEFAULT_MIXER = "Speaker"   # default mixer name to be used for sound output
+DEFAULT_MIXER = "Speaker"  # default mixer name to be used for sound output
 url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
 url_radar_ws = ""
@@ -135,14 +135,14 @@ global_mode = 1
 # 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
 # 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status
 # 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 21=situation 22=refresh situation 0=Init
-mode_sequence = []    # list of modes to display
+mode_sequence = []  # list of modes to display
 bluetooth = False  # True if bluetooth is enabled by parameter -b
-extsound_active = False   # external sound was successfully activated, if global_config >=0
-bluetooth_active = False   # bluetooth successfully activated
+extsound_active = False  # external sound was successfully activated, if global_config >=0
+bluetooth_active = False  # bluetooth successfully activated
 optical_alive = -1
-measure_flighttime = False   # True if automatic measurement of flighttime is enabled
-co_warner_activated = False   # True if co-warner is activated
-co_indication = False       # True if indication via GPIO Pin 16 is on for co
+measure_flighttime = False  # True if automatic measurement of flighttime is enabled
+co_warner_activated = False  # True if co-warner is activated
+co_indication = False  # True if indication via GPIO Pin 16 is on for co
 grounddistance_activated = False  # True if measurement of grounddistance via VL53L1x is activated
 groundbeep = False  # True if indication of ground distance via audio
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
@@ -295,7 +295,7 @@ def new_traffic(json_str):
             if 'Track' in traffic:
                 ac['direction'] = traffic['Track'] - situation['course']
                 # sometimes track is missing, then leave it as it is
-            if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= round(situation['RadarLimits']/100):
+            if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= round(situation['RadarLimits'] / 100):
                 res_angle = (gps_angle - situation['course']) % 360
                 gpsx = math.sin(math.radians(res_angle)) * gps_rad
                 gpsy = - math.cos(math.radians(res_angle)) * gps_rad
@@ -348,7 +348,7 @@ def new_traffic(json_str):
                 # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
                 if ac['gps_distance'] > situation['RadarRange'] * 0.75:
                     ac['was_spoken'] = False
-    except KeyError:     # to be safe in case keys are changed in Stratux
+    except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.log(AIRCRAFT_DEBUG, "KeyError decoding:" + json_str)
 
 
@@ -490,15 +490,17 @@ def new_situation(json_str):
         if simulation_mode:
             sim_data = simulation.read_simulation_data()
             if sim_data is not None:
-                if 'gps_speed' in sim_data: situation['gps_speed'] = sim_data['gps_speed']
-                if 'own_altitude' in sim_data: situation['own_altitude'] = sim_data['own_altitude']
+                if 'gps_speed' in sim_data:
+                    situation['gps_speed'] = sim_data['gps_speed']
+                if 'own_altitude' in sim_data:
+                    situation['own_altitude'] = sim_data['own_altitude']
 
         # automatic time measurement
         new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, global_mode)
         if new_mode > 0:
-            global_mode = new_mode    # automatically change to display of flight times, or back
+            global_mode = new_mode  # automatically change to display of flight times, or back
 
-    except KeyError:   # to be safe when stratux changes its message-format
+    except KeyError:  # to be safe when stratux changes its message-format
         rlog.log(SITUATION_DEBUG, "KeyError decoding situation:" + json_str)
 
 
@@ -856,8 +858,9 @@ if __name__ == "__main__":
     ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
                     default=DEFAULT_MIXER)
     ap.add_argument("-modes", "--displaymodes", required=False, help="Select display modes that you want to see "
-        "R=radar T=timer A=ahrs D=display-status G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "
-        "M=distance measurement   Example: -modes RADCM", default="RTAGKVICMDS")
+                                                                     "R=radar T=timer A=ahrs D=display-status G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "
+                                                                     "M=distance measurement   Example: -modes RADCM",
+                    default="RTAGKVICMDS")
 
     args = vars(ap.parse_args())
     # set up logging
@@ -865,11 +868,11 @@ if __name__ == "__main__":
     if args['verbose'] == 0:
         rlog.setLevel(logging.INFO)
     elif args['verbose'] == 1:
-        rlog.setLevel(logging.DEBUG)     # log events without situation and aircraft
+        rlog.setLevel(logging.DEBUG)  # log events without situation and aircraft
     elif args['verbose'] == 2:
-        rlog.setLevel(AIRCRAFT_DEBUG)    # log including aircraft
+        rlog.setLevel(AIRCRAFT_DEBUG)  # log including aircraft
     else:
-        rlog.setLevel(SITUATION_DEBUG)   # log including situation messages
+        rlog.setLevel(SITUATION_DEBUG)  # log including situation messages
 
     url_host_base = args['connect']
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
@@ -902,13 +905,13 @@ if __name__ == "__main__":
         global_mode = 21  # start in situation
     sound_mixer = args['mixer']
     radarmodes.parse_modes(args['displaymodes'])
-    if global_mode == 1:   # no mode override set, take first mode in mode_sequence
+    if global_mode == 1:  # no mode override set, take first mode in mode_sequence
         global_mode = radarmodes.first_mode_sequence()
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
-    global_config['sound_volume'] = args['extsound']    # 0 if not enabled
+    global_config['sound_volume'] = args['extsound']  # 0 if not enabled
     if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
-        global_config['sound_volume'] = 50   # set to a medium value if strange number used
+        global_config['sound_volume'] = 50  # set to a medium value if strange number used
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()

@@ -45,6 +45,7 @@ simulation_mode = False
 SIM_DATA_FILE = "simulation_data.json"
 # file with JSON content, e.g.:   {"g_distance": 10,"gps_speed": 0,"own_altitude": 10}
 
+
 def init(sim_mode):
     global rlog
     global simulation_mode
@@ -53,11 +54,11 @@ def init(sim_mode):
     rlog = logging.getLogger('stratux-radar-log')
     if simulation_mode:
         rlog.debug('Simulation mode activated - Reading sim data from: ' + SIM_DATA_FILE + '.')
-        sim_data = read_simulation_data();
+        sim_data = read_simulation_data()
         if sim_data is not None:
             rlog.debug('Initial simulation data: ' + json.dumps(sim_data))
         else:
-            rlog.debug('Error reading simulation data in file '+ SIM_DATA_FILE + '.')
+            rlog.debug('Error reading simulation data in file ' + SIM_DATA_FILE + '.')
 
 
 def read_simulation_data():  # returns dictionary with all contents of the SIM_DATA_FILE, None if file operation failed
