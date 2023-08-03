@@ -43,6 +43,7 @@ import asyncio
 import json
 import math
 import serial
+import simulation
 
 rlog = None  # radar specific logger
 
@@ -68,8 +69,6 @@ STOP_SPEED = 3  # in kts, speed when before runup or after landing a stop is ass
 STATS_PER_SECOND = 5  # how many statistics are written per second
 STATS_FOR_SITUATION_CHANGE = 3  # no of values in a row before a situation is changed (landing/flying)
 STATS_TOTAL_TIME = 120  # time in seconds how long statistic window is
-SIM_DATA_FILE = "simulation_data.json"
-# file with JSON content, e.g.:   {"g_distance": 10,"gps_speed": 0,"own_altitude": 10}
 INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
 
 # globals
@@ -394,15 +393,15 @@ def store_statistics(sit):
     global statistics
 
     if simulation_mode:
-        success, gd, sp, alt = read_simulation_data()
-        if success:
-            if gd > 0:
+        sim_data = simulation.read_simulation_data()
+        if sim_data is not None:
+            if 'gd' in sim_data and sim_data['gd'] > 0:
                 sit['g_distance_valid'] = True
-                sit['g_distance'] = gd
+                sit['g_distance'] = sim_data['gd']
             else:
                 sit['g_distance_valid'] = False
                 sit['g_distance'] = INVALID_GDISTANCE
-            sit['gps_speed'] = sp
+            if 'gps_speed' in sim_data: sit['gps_speed'] = sim_data['gps_speed']
             sit['gps_active'] = True
             sit['own_altitude'] = alt
             sit['baro_valid'] = True
@@ -455,15 +454,3 @@ async def read_ground_sensor():
             rlog.debug("Ground distance reader terminating ...")
     else:
         rlog.debug("No ground distance sensor active.")
-
-
-def read_simulation_data():  # return False, 0, 0, 0 with error, else True, ground_distance, gps_speed, altitude
-    try:
-        with open(SIM_DATA_FILE) as f:
-            sim_data = json.load(f)
-    except (OSError, IOError, ValueError) as e:
-        rlog.debug("Grounddistance: Error " + str(e) + " reading " + SIM_DATA_FILE)
-        return False, 0, 0, 0
-    # rlog.debug("GroundDistance: Simulation data read from " + SIM_DATA_FILE
-    # + ": " +json.dumps(sim_data, sort_keys=True, indent=4))
-    return True, sim_data['g_distance'], sim_data['gps_speed'], sim_data['own_altitude']

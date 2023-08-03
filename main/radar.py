@@ -58,6 +58,7 @@ import cowarner
 import distance
 import grounddistance
 import radarmodes
+import simulation
 from datetime import datetime, timezone
 
 # logging
@@ -485,6 +486,13 @@ def new_situation(json_str):
         if gmeter['min'] != minv:
             gmeter['min'] = minv
             gmeter['was_changed'] = True
+
+        if simulation_mode:
+            sim_data = simulation.read_simulation_data()
+            if sim_data is not None:
+                if 'gps_speed' in sim_data: situation['gps_speed'] = sim_data['gps_speed']
+                if 'own_altitude' in sim_data: situation['own_altitude'] = sim_data['own_altitude']
+
         # automatic time measurement
         new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, global_mode)
         if new_mode > 0:
@@ -774,6 +782,7 @@ def main():
     flighttime.init(measure_flighttime)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
     grounddistance.init(grounddistance_activated, SITUATION_DEBUG, groundbeep, situation, simulation_mode)
+    simulation.init(simulation_mode)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
