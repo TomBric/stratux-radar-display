@@ -401,10 +401,12 @@ def store_statistics(sit):
             else:
                 sit['g_distance_valid'] = False
                 sit['g_distance'] = INVALID_GDISTANCE
-            if 'gps_speed' in sim_data: sit['gps_speed'] = sim_data['gps_speed']
-            sit['gps_active'] = True
-            sit['own_altitude'] = alt
-            sit['baro_valid'] = True
+            if 'gps_speed' in sim_data:
+                sit['gps_speed'] = sim_data['gps_speed']
+                sit['gps_active'] = True
+            if 'own_altitude' in sim_data:
+                sit['own_altitude'] = sim_data['own_altitude']
+                sit['baro_valid'] = True
     if time.perf_counter() > stats_next_store:
         stats_next_store = time.perf_counter() + (1 / STATS_PER_SECOND)
         now = datetime.datetime.now(datetime.timezone.utc)
