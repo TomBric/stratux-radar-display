@@ -37,7 +37,7 @@ import radarbuttons
 import radarmodes
 
 # status variables for state machine
-display_radius = (2, 5, 10, 20, 40)
+display_radius = (2, 3, 5, 10, 20, 40)
 height_diff = (1000, 2000, 5000, 10000, 50000)
 sound_on = True
 
