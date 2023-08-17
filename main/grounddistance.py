@@ -95,6 +95,7 @@ stop_situation = None  # siuation values when the aircraft is stopped on the run
 stats_before_airborne = 0
 stats_before_landing = 0
 stats_before_stop = 0
+stats_before_obstacle_clear = 0
 
 
 class UsonicSensor:   # definition adapted from DFRobot code
@@ -286,6 +287,22 @@ def has_stopped():
     return False
 
 
+def obstacle_is_clear(alt_to_clear, current_alt):
+    global stats_before_obstacle_clear
+
+    if current_alt >= alt_to_clear:
+        stats_before_obstacle_clear += 1
+        if stats_before_obstacle_clear >= STATS_FOR_SITUATION_CHANGE:
+            stats_before_obstacle_clear = 0
+            return True
+    else:
+        stats_before_obstacle_clear = 0
+    return False
+
+
+
+
+
 def radians_rel(angle):
     if angle > 180:
         angle = angle - 360
@@ -356,7 +373,8 @@ def evaluate_statistics(latest_stat):
                     break
     elif fly_status == 1:  # start was detected
         if obstacle_up_clear is None:  # do not search for if already set
-            if latest_stat['own_altitude'] >= start_situation['own_altitude'] + OBSTACLE_HEIGHT:
+            if latest_stat['baro_valid'] and start_situation['baro_valid'] and \
+                    obstacle_is_clear(lastest_stat['own_altitude'], start_situation['own_altitude'] + OBSTACLE_HEIGHT):
                 obstacle_up_clear = latest_stat
                 rlog.debug("Grounddistance: Obstacle clearance up detected " +
                            json.dumps(obstacle_up_clear, indent=4, sort_keys=True, default=str))
@@ -367,7 +385,8 @@ def evaluate_statistics(latest_stat):
                        json.dumps(landing_situation, indent=4, sort_keys=True, default=str))
             if obstacle_down_clear is None:
                 for stat in reversed(statistics):
-                    if stat['baro_valid'] and stat['own_altitude'] >= latest_stat['own_altitude'] + OBSTACLE_HEIGHT:
+                    if stat['baro_valid'] and landing_situation['baro_valid'] and \
+                            obstacle_is_clear(landing_situation['own_altitude'] + OBSTACLE_HEIGHT, stat['own_altitude']):
                         obstacle_down_clear = stat
                         rlog.debug("Grounddistance: Obstacle clearance down found " +
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
