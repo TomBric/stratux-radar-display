@@ -332,7 +332,8 @@ def calculate_output_values():  # return output lines
             output['start_altitude'] = start_situation['own_altitude']
         if runup_situation is not None and runup_situation['gps_active'] and start_situation['gps_active']:
             output['takeoff_distance'] = calc_gps_distance_meters(start_situation, runup_situation)
-        if obstacle_up_clear is not None and obstacle_up_clear['gps_active'] and start_situation['gps_active']:
+        if runup_situation is not None and obstacle_up_clear is not None and\
+                obstacle_up_clear['gps_active'] and runup_situation['gps_active']:
             output['obstacle_distance_start'] = calc_gps_distance_meters(obstacle_up_clear, runup_situation)
     if stop_situation is not None and landing_situation is not None:
         output['landing_time'] = landing_situation['Time']
