@@ -335,13 +335,14 @@ def calculate_output_values():  # return output lines
         if runup_situation is not None and obstacle_up_clear is not None and\
                 obstacle_up_clear['gps_active'] and runup_situation['gps_active']:
             output['obstacle_distance_start'] = calc_gps_distance_meters(obstacle_up_clear, runup_situation)
-    if stop_situation is not None and landing_situation is not None:
+    if landing_situation is not None:
         output['landing_time'] = landing_situation['Time']
         if landing_situation['baro_valid']:
             output['landing_altitude'] = landing_situation['own_altitude']
-        if landing_situation['gps_active'] and stop_situation['gps_active']:
+        if stop_situation is not None and landing_situation['gps_active'] and stop_situation['gps_active']:
             output['landing_distance'] = calc_gps_distance_meters(stop_situation, landing_situation)
-        if obstacle_down_clear is not None and obstacle_down_clear['gps_active'] and stop_situation['gps_active']:
+        if stop_situation is not None and obstacle_down_clear is not None and \
+                obstacle_down_clear['gps_active'] and stop_situation['gps_active']:
             output['obstacle_distance_landing'] = calc_gps_distance_meters(stop_situation, obstacle_down_clear)
     return output
 
