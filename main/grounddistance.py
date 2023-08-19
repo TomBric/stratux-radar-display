@@ -383,7 +383,7 @@ def evaluate_statistics(latest_stat):
             if obstacle_down_clear is None:
                 for stat in reversed(statistics):
                     if stat['baro_valid'] and landing_situation['baro_valid'] and \
-                            obstacle_is_clear(landing_situation['own_altitude'], stat['own_altitude'] + OBSTACLE_HEIGHT):
+                      obstacle_is_clear(stat['own_altitude'], landing_situation['own_altitude'] + OBSTACLE_HEIGHT):
                         obstacle_down_clear = stat
                         rlog.debug("Grounddistance: Obstacle clearance down found " +
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
