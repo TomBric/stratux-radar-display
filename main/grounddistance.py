@@ -363,6 +363,7 @@ def evaluate_statistics(latest_stat):
             obstacle_down_clear = None  # in case a second start is done, clear all values
             obstacle_up_clear = None
             landing_situation = None
+            stop_situation = None
             rlog.debug("Grounddistance: Start detected " +
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
             for stat in reversed(statistics):  # ... find begin of start where gps_speed <= STOP_SPEED
