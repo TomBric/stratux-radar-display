@@ -287,7 +287,7 @@ def has_stopped():
     return False
 
 
-def obstacle_is_clear(alt_to_clear, current_alt):
+def obstacle_is_clear(current_alt, alt_to_clear):
     global stats_before_obstacle_clear
 
     if current_alt >= alt_to_clear:
@@ -298,9 +298,6 @@ def obstacle_is_clear(alt_to_clear, current_alt):
     else:
         stats_before_obstacle_clear = 0
     return False
-
-
-
 
 
 def radians_rel(angle):
@@ -386,7 +383,7 @@ def evaluate_statistics(latest_stat):
             if obstacle_down_clear is None:
                 for stat in reversed(statistics):
                     if stat['baro_valid'] and landing_situation['baro_valid'] and \
-                            obstacle_is_clear(landing_situation['own_altitude'] + OBSTACLE_HEIGHT, stat['own_altitude']):
+                            obstacle_is_clear(landing_situation['own_altitude'], stat['own_altitude'] + OBSTACLE_HEIGHT):
                         obstacle_down_clear = stat
                         rlog.debug("Grounddistance: Obstacle clearance down found " +
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
