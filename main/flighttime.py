@@ -34,8 +34,8 @@
 import datetime
 import logging
 import json
-import statusui
 import radarbuttons
+import radarmodes
 
 
 # constants
@@ -183,7 +183,8 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
                     stop_timestamp = None
                     new_flight_info = False   # stop is only triggered once
                     switch_back_mode = current_mode
-                    return 17    # return mode set to display times
+                    if radarmodes.is_mode_contained(17):  # only switch to flighttime display if flighttime is selected
+                        return 17    # return mode set to display times
             elif stop_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_STOPPED:
                 # reset trigger, not several seconds below threshold
                 stop_timestamp = None
@@ -233,9 +234,9 @@ def user_input():
     flighttime_changed = True
     switch_back_mode = 0    # cancel any switchback, if button was pressed
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return 19  # next mode to be cowarner
+        return radarmodes.next_mode_sequence(17)  # next mode
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long- refresh
+    if button == 2 and btime == 2:  # right and long, refresh
         return 18  # start next mode for display driver: refresh called
     return 17  # no mode change

@@ -36,6 +36,7 @@ import radar
 import radarbuttons
 import asyncio
 import json
+import radarmodes
 
 # constants
 SITUATION_DEBUG = logging.DEBUG-2
@@ -89,15 +90,18 @@ hardware = [
     "Serial port",   # 1
     "Prolific USB-serial bridge",  # 2
     "OGN Tracker",  # 3
-    "unknown",  # 4
-    "unknown",  # 5
+    "Not installed",  # 4
+    "Not installed",  # 5
     "USB u-blox 6 GPS receiver",  # 6
     "USB u-blox 7 GNSS receiver",  # 7
     "USB u-blox 8 GNSS receiver",  # 8
     "USB u-blox 9 GNSS receiver",  # 9
     "USB Serial IN",  # 10
     "SoftRF Dongle",  # 11
-    "Network"  # 12
+    "Network",  # 12
+    "Not installed", # 13
+    "Not installed", # 14
+    "GxAirCom", # 15
 ]
 
 
@@ -133,7 +137,7 @@ def draw_status(draw, display_control, ui_changed, connected, altitude, gps_alt,
 def status_callback(json_str):
     global strx
 
-    rlog.log(SITUATION_DEBUG,"New status" + json_str)
+    rlog.log(SITUATION_DEBUG, "New status" + json_str)
     stat = json.loads(json_str)
 
     strx['was_changed'] = True
@@ -179,8 +183,8 @@ def user_input():
         return 0  # stay in current mode
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long- refresh
+    if button == 2 and btime == 2:  # right and long, refresh
         return 16  # start next mode for display driver: refresh called from gmeter
     if button == 1 and (btime == 2 or btime == 1):  # middle
-        return 17  # next mode to be radar
+        return radarmodes.next_mode_sequence(15)
     return 15  # no mode change

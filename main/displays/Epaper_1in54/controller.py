@@ -208,7 +208,7 @@ def centered_text(draw, y, text, font, fill):
 
 def right_text(draw, y, text, font, fill):
     ts = draw.textsize(text, font)
-    draw.text((sizex-ts[0], y), text, font=font, fill=fill)
+    draw.text((sizex - ts[0], y), text, font=font, fill=fill)
 
 
 def startup(draw, version, target_ip, seconds):
@@ -248,7 +248,6 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     # draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
     draw.text(tposition, t, font=verylargefont, fill="black")
     if tail is not None:
-        tsize = draw.textsize(tail, verysmallfont)
         draw.text((tposition[0], tposition[1] + VERYLARGE), tail, font=verysmallfont, fill="black")
 
 
@@ -714,13 +713,16 @@ def flighttime(draw, last_flights):
 
     maxlines = 8
     for f in last_flights:
+        f[0] = f[0].replace(second=0, microsecond=0)   # round down start time to minutes
         draw.text((0, starty), f[0].strftime("%d.%m."), font=verysmallfont, fill="black")
         draw.text((50, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
         if f[1] != 0:  # ==0 means still in the air
+            f[1] = f[1].replace(second=0, microsecond=0)   # round down
             delta = (f[1] - f[0]).total_seconds()
             draw.text((155, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
         else:
-            delta = (datetime.datetime.now(datetime.timezone.utc) - f[0]).total_seconds()
+            delta = (datetime.datetime.now(datetime.timezone.utc).replace(second=0, microsecond=0)
+                     - f[0]).total_seconds()
             draw.text((155, starty), "air", font=verysmallfont, fill="black")
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)

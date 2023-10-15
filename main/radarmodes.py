@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 #
 # BSD 3-Clause License
-# Copyright (c) 2021, Thomas Breitbach
+# Copyright (c) 2020, Thomas Breitbach
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,44 +31,58 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import radarbuttons
-import radarmodes
+# radar mode definitions
 
-# constants
-MSG_NO_CONNECTION = "No Connection!"
-# globals
-compassui_changed = True
-
-
-def init(url):
-    pass   # nothing to do right now
+# 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
+# 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
+# 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status
+# 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 21=situation 22=refresh situation 0=Init
 
 
-def draw_compass(draw, display_control, changed, connected, heading):
-    global compassui_changed
-
-    if changed or compassui_changed:
-        error_message = None
-        compassui_changed = False
-        if not connected:
-            error_message = MSG_NO_CONNECTION
-        display_control.clear(draw)
-        display_control.compass(draw, heading, error_message)
-        display_control.display()
+mode_sequence = []    # list of modes to display
 
 
-def user_input():
-    global compassui_changed
+def mode_codes(c):
+    modes = {
+        "R": 1,
+        "T": 2,
+        "A": 5,
+        "D": 7,
+        "G": 9,
+        "K": 11,
+        "V": 13,
+        "S": 15,
+        "I": 17,
+        "C": 19,
+        "M": 21
+    }
+    return modes.get(c, 0)
 
-    btime, button = radarbuttons.check_buttons()
-    # start of ahrs global behaviour
-    if btime == 0:
-        return 0  # stay in current mode
-    compassui_changed = True
-    if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return radarmodes.next_mode_sequence(11)    # next mode
-    if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long: refresh
-        return 12  # start next mode for display driver: refresh called
-    return 11  # no mode change
+
+def parse_modes(modes):
+    global mode_sequence
+    mode_sequence = []
+    for c in modes:
+        mode_no = mode_codes(c)
+        if mode_no > 0:
+            mode_sequence.append(mode_no)
+
+
+def next_mode_sequence(current_mode):
+    global mode_sequence
+    iterator = iter(mode_sequence)
+    next_mode = mode_sequence[0]   # return to first mode, if old mode not found, error proof
+    for value in iterator:
+        if value == current_mode:
+            next_mode = next(iterator, mode_sequence[0])
+    return next_mode
+
+
+def first_mode_sequence():
+    global mode_sequence
+    return mode_sequence[0]  # return to first mode
+
+def is_mode_contained(mode):
+    global mode_sequence
+    return mode in mode_sequence  # return true is mode is in mode sequence, false otherwise
+

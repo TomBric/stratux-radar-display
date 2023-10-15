@@ -9,7 +9,7 @@
 # <branch> is the github branch from stratux-radar display o clone, this is optional and set to "main" if not provided
 # example:  /bin/bash stratux_compile_and_radar_install
 # for main branch
-# example:  /bin/bash stratux_compile_and_radar_install dev
+# example:  /bin/bash stratux_compile_and_radar_install.sh dev
 # for dev branch
 
 
@@ -22,15 +22,15 @@ sudo systemctl start systemd-timesyncd
 sleep 2
 sudo systemctl stop systemd-timesyncd
 
-sudo -i PWD=/root git clone --recursive https://github.com/b3nn0/stratux.git
+sudo -i PWD=/root git clone --recursive https://github.com/b3nn0/stratux.git || sudo -i PWD=/root git -C /root/stratux pull
 sudo apt install build-essential -y
-sudo -i PWD=/root wget https://golang.org/dl/go1.17.1.linux-arm64.tar.gz
-sudo -i PWD=/root tar xzf go1.17.1.linux-arm64.tar.gz
-sudo -i PWD=/root rm go1.17.1.linux-arm64.tar.gz
+sudo -i PWD=/root wget https://golang.org/dl/go1.20.1.linux-arm64.tar.gz
+sudo -i PWD=/root tar xzf go1.20.1.linux-arm64.tar.gz
+sudo -i PWD=/root rm go1.20.1.linux-arm64.tar.gz
 
-sudo make -C /root/stratux
-sudo make -C /root/stratux install
+sudo -i PWD=/root make -C /root/stratux
+sudo -i PWD=/root make -C /root/stratux install
 
 # installing radar-display
-cd /home/pi && git clone -b "$branch" https://github.com/TomBric/stratux-radar-display.git
-/bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux
+cd /home/pi && git clone -b "$branch" https://github.com/TomBric/stratux-radar-display.git || git pull
+/bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh

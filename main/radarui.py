@@ -34,9 +34,10 @@
 import logging
 import requests
 import radarbuttons
+import radarmodes
 
 # status variables for state machine
-display_radius = (2, 5, 10, 20, 40)
+display_radius = (2, 3, 5, 10, 20, 40)
 height_diff = (1000, 2000, 5000, 10000, 50000)
 sound_on = True
 
@@ -84,7 +85,7 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
                 radius = 0
             communicate_limits(display_radius[radius], height_diff[height])
     elif button == 2:
-        if btime == 2:   # right and long- refresh
+        if btime == 2:   # right and long, refresh
             return 4, False   # start next mode for display driver: refresh
         else:
             height += 1
@@ -93,7 +94,7 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
             communicate_limits(display_radius[radius], height_diff[height])
     elif button == 1:
         if btime == 2:    # middle and long
-            return 2, False  # start next mode timer
+            return radarmodes.next_mode_sequence(1), False  # start next mode
         else:          # middle and short
             rlog.debug("Sound  toggled by UI")
             return 1, True

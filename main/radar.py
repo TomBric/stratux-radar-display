@@ -57,16 +57,18 @@ import flighttime
 import cowarner
 import distance
 import grounddistance
+import radarmodes
+import simulation
 from datetime import datetime, timezone
 
-# constant definitions
-RADAR_VERSION = "1.81"
-
 # logging
-SITUATION_DEBUG = logging.DEBUG-2   # another low level for debugging, DEBUG is 10
-AIRCRAFT_DEBUG = logging.DEBUG-1    # another low level for debugging below DEBUG
+SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
+AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBUG
 rlog = None  # radar specific logger
 #
+
+# constant definitions
+RADAR_VERSION = "1.9"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -86,11 +88,10 @@ OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
-INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
 
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
-DEFAULT_MIXER = "Speaker"   # default mixer name to be used for sound output
+DEFAULT_MIXER = "Speaker"  # default mixer name to be used for sound output
 url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
 url_radar_ws = ""
@@ -106,7 +107,8 @@ ui_changed = True
 situation = {'was_changed': True, 'last_update': 0.0, 'connected': False, 'gps_active': False, 'course': 0,
              'own_altitude': -99.0, 'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000,
              'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
-             'vertical_speed': 0.0, 'baro_valid': False, 'g_distance_valid': False, 'g_distance': INVALID_GDISTANCE}
+             'vertical_speed': 0.0, 'baro_valid': False, 'g_distance_valid': False,
+             'g_distance': grounddistance.INVALID_GDISTANCE}
 vertical_max = 0.0  # max value for vertical speed
 vertical_min = 0.0  # min valud for vertical spee
 
@@ -133,15 +135,17 @@ global_mode = 1
 # 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
 # 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status
 # 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 21=situation 22=refresh situation 0=Init
+mode_sequence = []  # list of modes to display
 bluetooth = False  # True if bluetooth is enabled by parameter -b
-extsound_active = False   # external sound was successfully activated, if global_config >=0
-bluetooth_active = False   # bluetooth successfully activated
+extsound_active = False  # external sound was successfully activated, if global_config >=0
+bluetooth_active = False  # bluetooth successfully activated
 optical_alive = -1
-measure_flighttime = False   # True if automatic measurement of flighttime is enabled
-co_warner_activated = False   # True if co-warner is activated
-co_indication = False       # True if indication via GPIO Pin 16 is on for co
+measure_flighttime = False  # True if automatic measurement of flighttime is enabled
+co_warner_activated = False  # True if co-warner is activated
+co_indication = False  # True if indication via GPIO Pin 16 is on for co
 grounddistance_activated = False  # True if measurement of grounddistance via VL53L1x is activated
 groundbeep = False  # True if indication of ground distance via audio
+simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
 
 
 def draw_all_ac(draw, allac):
@@ -220,7 +224,7 @@ def calc_gps_distance(lat, lng):
     return distradius, angle
 
 
-def speaktraffic(hdiff, direction=None, distance=None):
+def speaktraffic(hdiff, direction=None, dist=None):
     if sound_on:
         feet = hdiff * 100
         sign = 'plus'
@@ -230,8 +234,8 @@ def speaktraffic(hdiff, direction=None, distance=None):
         if direction:
             txt += str(direction) + ' o\'clock '
         txt += sign + ' ' + str(abs(feet)) + ' feet'
-        if global_config['distance_warnings'] and distance:
-            txt += str(distance) + ' miles '
+        if global_config['distance_warnings'] and dist:
+            txt += str(dist) + ' miles '
         radarbluez.speak(txt)
 
 
@@ -281,7 +285,8 @@ def new_traffic(json_str):
 
         if traffic['Position_valid'] and situation['gps_active']:
             # adsb traffic and stratux has valid gps signal
-            rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB traffic ' + hex(traffic['Icao_addr']) + " at height " + str(ac['height']))
+            rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB traffic ' + hex(traffic['Icao_addr'])
+                     + " at height " + str(ac['height']))
             if 'circradius' in ac:
                 del ac['circradius']
                 # was mode-s target before, now invalidate mode-s info
@@ -290,7 +295,7 @@ def new_traffic(json_str):
             if 'Track' in traffic:
                 ac['direction'] = traffic['Track'] - situation['course']
                 # sometimes track is missing, then leave it as it is
-            if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= round(situation['RadarLimits']/100):
+            if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= round(situation['RadarLimits'] / 100):
                 res_angle = (gps_angle - situation['course']) % 360
                 gpsx = math.sin(math.radians(res_angle)) * gps_rad
                 gpsy = - math.cos(math.radians(res_angle)) * gps_rad
@@ -325,7 +330,8 @@ def new_traffic(json_str):
                 return
                 # unspecified altitude, nothing displayed for now, leave it as it is
             distcirc = traffic['DistanceEstimated'] / 1852.0
-            rlog.log(AIRCRAFT_DEBUG, "RADAR: Mode-S traffic " + hex(traffic['Icao_addr']) + " in " + str(distcirc) + " nm")
+            rlog.log(AIRCRAFT_DEBUG, "RADAR: Mode-S traffic " + hex(traffic['Icao_addr'])
+                     + " in " + str(distcirc) + " nm")
             distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
             if is_new or 'circradius' not in ac:
                 # calc argposition if new or adsb before
@@ -342,7 +348,7 @@ def new_traffic(json_str):
                 # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
                 if ac['gps_distance'] > situation['RadarRange'] * 0.75:
                     ac['was_spoken'] = False
-    except KeyError:     # to be safe in case keys are changed in Stratux
+    except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.log(AIRCRAFT_DEBUG, "KeyError decoding:" + json_str)
 
 
@@ -440,7 +446,8 @@ def new_situation(json_str):
         # set system time if not synchronized properly
         if situation['gps_active']:
             if sit['GPSLastFixLocalTime'].split('.')[0] == sit['GPSLastGPSTimeStratuxTime'].split('.')[0]:
-                # take GPSTime only if last fix time and last stratux time match (in seconds), sometimes a fix is there, but
+                # take GPSTime only if last fix time and last stratux time match (in seconds),
+                # sometimes a fix is there, but
                 # not yet an update time value from GPS, but the old one is transmitted by stratux
                 update_time(sit['GPSTime'])
         # ahrs
@@ -471,20 +478,29 @@ def new_situation(json_str):
         if gmeter['current'] != current:
             gmeter['current'] = current
             gmeter['was_changed'] = True
-        max = round(sit['AHRSGLoadMax'], 2)
-        if gmeter['max'] != max:
-            gmeter['max'] = max
+        maxv = round(sit['AHRSGLoadMax'], 2)
+        if gmeter['max'] != maxv:
+            gmeter['max'] = maxv
             gmeter['was_changed'] = True
-        min = round(sit['AHRSGLoadMin'], 2)
-        if gmeter['min'] != min:
-            gmeter['min'] = min
+        minv = round(sit['AHRSGLoadMin'], 2)
+        if gmeter['min'] != minv:
+            gmeter['min'] = minv
             gmeter['was_changed'] = True
+
+        if simulation_mode:
+            sim_data = simulation.read_simulation_data()
+            if sim_data is not None:
+                if 'gps_speed' in sim_data:
+                    situation['gps_speed'] = sim_data['gps_speed']
+                if 'own_altitude' in sim_data:
+                    situation['own_altitude'] = sim_data['own_altitude']
+
         # automatic time measurement
         new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, global_mode)
         if new_mode > 0:
-            global_mode = new_mode    # automatically change to display of flight times, or back
+            global_mode = new_mode  # automatically change to display of flight times, or back
 
-    except KeyError:   # to be safe when stratux changes its message-format
+    except KeyError:  # to be safe when stratux changes its message-format
         rlog.log(SITUATION_DEBUG, "KeyError decoding situation:" + json_str)
 
 
@@ -585,7 +601,7 @@ async def user_interface():
                 next_mode = flighttime.user_input()
             elif global_mode == 19:  # co warner
                 next_mode = cowarner.user_input()
-            elif global_mode == 21:  # situation
+            elif global_mode == 21:  # ground distance
                 next_mode, reset_situation = distance.user_input()
                 if reset_situation:
                     distance.reset_values(situation)
@@ -767,7 +783,8 @@ def main():
     stratuxstatus.init(display_control, url_status_ws)
     flighttime.init(measure_flighttime)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
-    grounddistance.init(grounddistance_activated, SITUATION_DEBUG, groundbeep, situation)
+    grounddistance.init(grounddistance_activated, SITUATION_DEBUG, groundbeep, situation, simulation_mode)
+    simulation.init(simulation_mode)
     display_control.startup(draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -836,19 +853,26 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
                     action="store_true", default=False)
+    ap.add_argument("-sim", "--simulation", required=False, help="Simulation mode for testing",
+                    action="store_true", default=False)
     ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
                     default=DEFAULT_MIXER)
+    ap.add_argument("-modes", "--displaymodes", required=False, help="Select display modes that you want to see "
+                                                                     "R=radar T=timer A=ahrs D=display-status G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "
+                                                                     "M=distance measurement   Example: -modes RADCM",
+                    default="RTAGKVICMDS")
+
     args = vars(ap.parse_args())
     # set up logging
     logging_init()
     if args['verbose'] == 0:
         rlog.setLevel(logging.INFO)
     elif args['verbose'] == 1:
-        rlog.setLevel(logging.DEBUG)     # log events without situation and aircraft
+        rlog.setLevel(logging.DEBUG)  # log events without situation and aircraft
     elif args['verbose'] == 2:
-        rlog.setLevel(AIRCRAFT_DEBUG)    # log including aircraft
+        rlog.setLevel(AIRCRAFT_DEBUG)  # log including aircraft
     else:
-        rlog.setLevel(SITUATION_DEBUG)   # log including situation messages
+        rlog.setLevel(SITUATION_DEBUG)  # log including situation messages
 
     url_host_base = args['connect']
     display_control = importlib.import_module('displays.' + args['device'] + '.controller')
@@ -860,6 +884,7 @@ if __name__ == "__main__":
     co_indication = args['coindicate']
     grounddistance_activated = args['grounddistance']
     groundbeep = args['groundbeep']
+    simulation_mode = args['simulation']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:
@@ -879,11 +904,14 @@ if __name__ == "__main__":
     if args['situation']:
         global_mode = 21  # start in situation
     sound_mixer = args['mixer']
+    radarmodes.parse_modes(args['displaymodes'])
+    if global_mode == 1:  # no mode override set, take first mode in mode_sequence
+        global_mode = radarmodes.first_mode_sequence()
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
-    global_config['sound_volume'] = args['extsound']    # 0 if not enabled
+    global_config['sound_volume'] = args['extsound']  # 0 if not enabled
     if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
-        global_config['sound_volume'] = 50   # set to a medium value if strange number used
+        global_config['sound_volume'] = 50  # set to a medium value if strange number used
     # check config file, if extistent use config from there
     url_host_base = args['connect']
     saved_config = statusui.read_config()

@@ -38,6 +38,7 @@ import radarbluez
 import flighttime
 import datetime
 import logging
+import radarmodes
 
 # constants
 MAX_COUNTDOWN_TIME = 2 * 60 * 60   # maximum time for setting countdown in seconds
@@ -53,7 +54,7 @@ laptime = 0
 timer_running = False
 was_in_secs = 0.0       # last time displayed
 timer_ui_changed = True
-cdown_time = 0.0     # count down time
+cdown_time = 0.0     # count down
 cdown_spoken = False  # to speak zero only once
 timer_mode = 0    # 0 = normal, 1 = countdown-set
 g_config = {}
@@ -87,7 +88,7 @@ def reset_timer():
     timer_running = False
     was_in_secs = 0.0  # last time displayed
     timer_ui_changed = True
-    cdown_time = 0.0  # count down time
+    cdown_time = 0.0  # count down
     cdown_spoken = False  # to speak zero only once
     timer_mode = 0  # 0 = normal, 1 = countdown-set
     lap_head = "Laptimer"
@@ -171,7 +172,7 @@ def user_input():
         return 0  # stay in timer mode
     timer_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
-        return 5  # next mode to be ahrs
+        return radarmodes.next_mode_sequence(2)  # Timer mode was 2
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
 

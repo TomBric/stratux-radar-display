@@ -34,6 +34,7 @@
 import radarbuttons
 import logging
 import requests
+import radarmodes
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -83,10 +84,10 @@ def user_input():
     rlog.debug("GMeter UI: button pressed")
     gmeterui_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return 11  # next mode to be compass
+        return radarmodes.next_mode_sequence(9)
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long- refresh
+    if button == 2 and btime == 2:  # right and long, refresh
         return 10  # start next mode for display driver: refresh called from gmeter
     if button == 2 and btime == 1:  # right and short - reset
         reset_gmeter()

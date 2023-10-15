@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 #
 # BSD 3-Clause License
-# Copyright (c) 2021, Thomas Breitbach
+# Copyright (c) 2023, Thomas Breitbach
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,44 +31,41 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import radarbuttons
-import radarmodes
+# To use Ultrasonic sensor, which is connected via UART add the following lines to /boot/config.txt
+# enable_uart=1
+# dtoverlay=miniuart-bt
+
+import logging
+import json
+
+rlog = None  # radar specific logger
+simulation_mode = False
 
 # constants
-MSG_NO_CONNECTION = "No Connection!"
-# globals
-compassui_changed = True
+SIM_DATA_FILE = "simulation_data.json"
+# file with JSON content, e.g.:   {"g_distance": 10,"gps_speed": 0,"own_altitude": 10}
 
 
-def init(url):
-    pass   # nothing to do right now
+def init(sim_mode):
+    global rlog
+    global simulation_mode
+
+    simulation_mode = sim_mode
+    rlog = logging.getLogger('stratux-radar-log')
+    if simulation_mode:
+        rlog.debug('Simulation mode activated - Reading sim data from: ' + SIM_DATA_FILE + '.')
+        sim_data = read_simulation_data()
+        if sim_data is not None:
+            rlog.debug('Initial simulation data: ' + json.dumps(sim_data))
+        else:
+            rlog.debug('Error reading simulation data in file ' + SIM_DATA_FILE + '.')
 
 
-def draw_compass(draw, display_control, changed, connected, heading):
-    global compassui_changed
-
-    if changed or compassui_changed:
-        error_message = None
-        compassui_changed = False
-        if not connected:
-            error_message = MSG_NO_CONNECTION
-        display_control.clear(draw)
-        display_control.compass(draw, heading, error_message)
-        display_control.display()
-
-
-def user_input():
-    global compassui_changed
-
-    btime, button = radarbuttons.check_buttons()
-    # start of ahrs global behaviour
-    if btime == 0:
-        return 0  # stay in current mode
-    compassui_changed = True
-    if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return radarmodes.next_mode_sequence(11)    # next mode
-    if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long: refresh
-        return 12  # start next mode for display driver: refresh called
-    return 11  # no mode change
+def read_simulation_data():  # returns dictionary with all contents of the SIM_DATA_FILE, None if file operation failed
+    try:
+        with open(SIM_DATA_FILE) as f:
+            sim_data = json.load(f)
+    except (OSError, IOError, ValueError) as e:
+        rlog.debug("Simulation: Error " + str(e) + " reading " + SIM_DATA_FILE)
+        return None
+    return sim_data
