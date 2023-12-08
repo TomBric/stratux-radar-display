@@ -208,7 +208,7 @@ def clear(draw):
 
 
 def centered_text(draw, y, text, font, fill):
-    tl = draw.textlenth(text, font)
+    tl = draw.textlength(text, font)
     draw.text((zerox - tl / 2, y), text, font=font, fill=fill)
 
 
