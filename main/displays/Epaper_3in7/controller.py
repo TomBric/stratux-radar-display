@@ -251,9 +251,9 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     h = bottom - top
     if w + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
         # would draw text outside, move to the left
-        tposition = (x - 4 * AIRCRAFT_SIZE - w, int(y - h / 2))
+        tposition = (x - 4 * AIRCRAFT_SIZE - w, int(y - h))
     else:
-        tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - h / 2))
+        tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - h))
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
@@ -276,7 +276,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
     left, top, right, bottom = largefont.getbbox(t)
     w = right - left
     h = bottom - top
-    tposition = (zerox+arctext[0]-w/2, zeroy+arctext[1]-h/2)
+    tposition = (zerox+arctext[0]-w/2, zeroy+arctext[1]-h)
     draw.rectangle((tposition, (tposition[0]+w, tposition[1]+LARGE)), fill="white")
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
