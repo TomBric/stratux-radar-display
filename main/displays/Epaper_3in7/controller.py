@@ -706,7 +706,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
 
 
 def round_text(draw, x, y, text, color, yesno=True, out=None):
-    ts = draw.textbbox(text, verysmallfont)
+    ts = draw.textbbox((text), verysmallfont)
     draw.rounded_rectangle([x, y-2, x+ts[0]+10, y+ts[1]+2], radius=4, fill=color, outline=out)
     draw.text((x+5, y), text, font=verysmallfont, fill="black")
     if not yesno:
