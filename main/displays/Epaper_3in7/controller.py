@@ -246,12 +246,14 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
         t = t + '\u2197'
     if vspeed < 0:
         t = t + '\u2198'
-    tsize = draw.textbbox(t, largefont)
-    if tsize[0] + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
+    left, top, right, bottom = largefont.getbbox(t)
+    w = right - left
+    h = bottom - top
+    if w + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
         # would draw text outside, move to the left
-        tposition = (x - 4 * AIRCRAFT_SIZE - tsize[0], int(y - tsize[1] / 2))
+        tposition = (x - 4 * AIRCRAFT_SIZE - w, int(y - h / 2))
     else:
-        tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - tsize[1] / 2))
+        tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - h / 2))
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
