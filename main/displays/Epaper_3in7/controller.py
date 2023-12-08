@@ -383,7 +383,9 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         draw.line(mark, fill="black", width=4)
         # text
         marktext = str(m)
-        w, h = largefont.getbbox(marktext)
+        left, top, right, bottom = largefont.getbbox(marktext)
+        w = right - left
+        h = bottom - top
         t_center = translate(angle, ((0, -size/2 + big_mark_length + h/2 + text_distance), ), (center_x, center_y))
         draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="black", font=largefont)
         m += marks_distance
@@ -399,11 +401,15 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill="black")
 
     if middle_text1 is not None:
-        ts = smallfont.getbbox(middle_text1)
-        draw.text((center_x-ts[0]/2, center_y-ts[1]-20), middle_text1, font=smallfont, fill="black", align="left")
+        left, top, right, bottom = smallfont.getbbox(middle_text1)
+        w = right - left
+        h = bottom - top
+        draw.text((center_x - w/2, center_y - h - 20), middle_text1, font=smallfont, fill="black", align="left")
     if middle_text2 is not None:
-        ts = smallfont.getbbox(middle_text2)
-        draw.text((center_x-ts[0]/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
+        left, top, right, bottom = smallfont.getbbox(middle_text2)
+        w = right - left
+        h = bottom - top
+        draw.text((center_x-w/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
 
 
 def gmeter(draw, current, maxg, ming, error_message):
