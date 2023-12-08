@@ -499,11 +499,15 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((35, sizey/2 - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
     draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill="black", align="left")
     middle_text = "Vertical Speed"
-    ts = draw.textbbox(middle_text, verysmallfont)
-    draw.text((sizey/2 - ts[0]/2, sizey/2 - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
+    left, top, right, bottom = verysmallfont.getbbox(middle_text)
+    w = right - left
+    h = bottom - top
+    draw.text((sizey/2 - w/2, sizey/2 - h - 10), middle_text, font=verysmallfont, fill="black", align="left")
     middle_text = "100 feet per min"
-    ts = draw.textbbox(middle_text, verysmallfont)
-    draw.text((sizey/2 - ts[0] / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
+    left, top, right, bottom = verysmallfont.getbbox(middle_text)
+    w = right - left
+    h = bottom - top
+    draw.text((sizey/2 - w / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
 
     # right data display
     draw.text((300, 10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
