@@ -452,8 +452,10 @@ def compass(draw, heading, error_message):
     draw.bitmap((zerox - 60, 70), compass_aircraft, fill="black")
     draw.line((czerox, 20, czerox, 70), fill="black", width=4)
     text = str(heading) + '°'
-    textsize = draw.textbbox(text, smallfont)
-    draw.text((sizex - textsize[0] - 100, sizey - textsize[1] - 5), text, font=smallfont, fill="black", align="right")
+    left, top, right, bottom = smallfont.getbbox(text)
+    w = right - left
+    h = bottom - top
+    draw.text((sizex - w - 100, sizey - h - 5), text, font=smallfont, fill="black", align="right")
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
@@ -475,10 +477,14 @@ def compass(draw, heading, error_message):
             else:
                 mark = str(int(m / 10))
             if m % 90 != 0:
-                w, h = draw.textbbox(mark, largefont)
+                left, top, right, bottom = largefont.getbbox(mark)
+                w = right - left
+                h = bottom - top
                 cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
             else:
-                w, h = draw.textbbox(mark, morelargefont)
+                left, top, right, bottom = morelargefont.getbbox(mark)
+                w = right - left
+                h = bottom - top
                 cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=morelargefont)
             rotmask = mask.rotate(-m + heading, expand=False)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
