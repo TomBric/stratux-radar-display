@@ -246,17 +246,15 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
         t = t + '\u2197'
     if vspeed < 0:
         t = t + '\u2198'
-    left, top, right, bottom = largefont.getbbox(t)
-    w = right - left
-    h = bottom - top
-    if w + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
+    tsize = draw.textbbox((t), largefont)
+    if tsize[0] + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
         # would draw text outside, move to the left
-        tposition = (x - 4 * AIRCRAFT_SIZE - w, int(y - h/2))
+        tposition = (x - 4 * AIRCRAFT_SIZE - tsize[0], int(y - tsize[1] / 2))
     else:
-        tposition = (x + 4 * AIRCRAFT_SIZE, int(y - h/2))
+        tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - tsize[1] / 2))
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
-        draw.text((tposition[0], tposition[1]), tail, font=verysmallfont, fill="black")
+        draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
 def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
