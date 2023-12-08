@@ -706,12 +706,14 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
 
 
 def round_text(draw, x, y, text, color, yesno=True, out=None):
-    ts = draw.textbbox((text), verysmallfont)
-    draw.rounded_rectangle([x, y-2, x+ts[0]+10, y+ts[1]+2], radius=4, fill=color, outline=out)
+    left, top, right, bottom = verysmallfont.getbbox(text)
+    w = right - left
+    h = bottom - top
+    draw.rounded_rectangle([x, y-2, x+w+10, y+h+2], radius=4, fill=color, outline=out)
     draw.text((x+5, y), text, font=verysmallfont, fill="black")
     if not yesno:
-        draw.line([x, y+ts[1]+2, x+ts[0]+10, y-2], fill="black", width=2)
-    return x+ts[0]+20
+        draw.line([x, y+h+2, x+w+10, y-2], fill="black", width=2)
+    return x+w+20
 
 
 def stratux(draw, stat, altitude, gps_alt, gps_quality):
