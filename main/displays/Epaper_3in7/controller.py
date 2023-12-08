@@ -421,7 +421,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     right_center_x = (sizex-gm_size)/2+gm_size    # center of remaining part
     t = "G-Meter"
     tl = draw.textlength(t, largefont)
-    draw.text((right_center_x - ts[0] / 2, 30), t, font=largefont, fill="black", align="left")
+    draw.text((right_center_x - tl / 2, 30), t, font=largefont, fill="black", align="left")
     draw.text((gm_size+30, 98), "max", font=smallfont, fill="black")
     right_text(draw, 95, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
