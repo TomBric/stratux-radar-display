@@ -273,7 +273,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
         t = t + '\u2198'
     w = draw.textlength(t, largefont)
     tposition = (zerox+arctext[0]-w/2, zeroy+arctext[1]-LARGE/2)
-    draw.rectangle((tposition, (tposition[0]+w, tposition[1]+LARGE)), fill="white")
+    draw.rectangle((tposition, (tposition[0]+w, tposition[1]+LARGE+2)), fill="white")
     draw.text(tposition, t, font=largefont, fill="black")
     if tail is not None:
         tl = draw.textlength(tail, verysmallfont)
