@@ -457,7 +457,7 @@ def compass(draw, heading, error_message):
     left, top, right, bottom = smallfont.getbbox(text)
     w = right - left
     h = bottom - top
-    draw.text((sizex - w - 100, sizey - h - 5), text, font=smallfont, fill="black", align="right")
+    draw.text((sizex - w - 100, sizey - h - 10), text, font=smallfont, fill="black", align="right")
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
