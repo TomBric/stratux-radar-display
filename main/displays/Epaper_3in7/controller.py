@@ -783,28 +783,27 @@ def flighttime(draw, last_flights):
 
 
 def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
-    ts = draw.textbbox(str(maxvalue), verysmallfont)    # for adjusting x and y
+    tl = draw.textlength(str(maxvalue), verysmallfont)    # for adjusting x and y
     # adjust zero lines to have room for text
-    xpos = xpos + ts[0] + space
-    xsize = xsize - ts[0] - space
-    ypos = ypos + ts[1]/2
-    ysize = ysize - ts[1]
+    xpos = xpos + tl + space
+    xsize = xsize - tl - space
+    ypos = ypos + VERYSMALL/2
+    ysize = ysize - VERYSMALL
 
     vlmin_y = ypos + ysize - 1
-    ts = draw.textbbox(str(minvalue), verysmallfont)
-    draw.text((xpos - ts[0] - space, vlmin_y - ts[1]), str(minvalue), font=verysmallfont, fill="black")
+    tl = draw.textlength(str(minvalue), verysmallfont)
+    draw.text((xpos - tl - space, vlmin_y - VERYSMALL), str(minvalue), font=verysmallfont, fill="black")
 
     vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
-    ts = draw.textbbox(str(value_line1), verysmallfont)
-    draw.text((xpos - ts[0] - space, vl1_y - ts[1]/2), str(value_line1), font=verysmallfont, fill="black")
-
+    tl = draw.textlength(str(value_line1), verysmallfont)
+    draw.text((xpos - tl - space, vl1_y - VERYSMALL/2), str(value_line1), font=verysmallfont, fill="black")
     vl2_y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
-    ts = draw.textbbox(str(value_line2), verysmallfont)
-    draw.text((xpos - ts[0] - space, vl2_y - ts[1]/2), str(value_line2), font=verysmallfont, fill="black")
+    tl = draw.textlength(str(value_line2), verysmallfont)
+    draw.text((xpos - tl - space, vl2_y - VERYSMALL/2), str(value_line2), font=verysmallfont, fill="black")
 
     vlmax_y = ypos
-    ts = draw.textbbox(str(maxvalue), verysmallfont)
-    draw.text((xpos - ts[0] - space, vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="black")
+    tl = draw.textlength(str(maxvalue), verysmallfont)
+    draw.text((xpos - tl - space, vlmax_y - VERYSMALL/2), str(maxvalue), font=verysmallfont, fill="black")
 
     draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize-1), outline="black", width=3, fill="white")
 
