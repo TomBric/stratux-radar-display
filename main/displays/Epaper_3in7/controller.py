@@ -383,11 +383,9 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         draw.line(mark, fill="black", width=4)
         # text
         marktext = str(m)
-        left, top, right, bottom = largefont.getbbox(marktext)
-        w = right - left
-        h = bottom - top
-        t_center = translate(angle, ((0, -size/2 + big_mark_length + h/2 + text_distance), ), (center_x, center_y))
-        draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="black", font=largefont)
+        tl = draw.textlength(marktext, largefont)
+        t_center = translate(angle, ((0, -size/2 + big_mark_length + LARGE/2 + text_distance), ), (center_x, center_y))
+        draw.text((t_center[0][0]-tl/2, t_center[0][1]-LARGE/2), marktext, fill="black", font=largefont)
         m += marks_distance
     # arrow
     if current > end_value:   # normalize values in allowed ranges
@@ -401,15 +399,11 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill="black")
 
     if middle_text1 is not None:
-        left, top, right, bottom = smallfont.getbbox(middle_text1)
-        w = right - left
-        h = bottom - top
-        draw.text((center_x - w/2, center_y - h - 20), middle_text1, font=smallfont, fill="black", align="left")
+        tl = draw.textlength(middle_text1, smallfont)
+        draw.text((center_x - tl/2, center_y - SMALL - 20), middle_text1, font=smallfont, fill="black", align="left")
     if middle_text2 is not None:
-        left, top, right, bottom = smallfont.getbbox(middle_text2)
-        w = right - left
-        h = bottom - top
-        draw.text((center_x-w/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
+        tl = draw.textlength(middle_text2, smallfont)
+        draw.text((center_x-tl/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
 
 
 def gmeter(draw, current, maxg, ming, error_message):
@@ -450,10 +444,8 @@ def compass(draw, heading, error_message):
     draw.bitmap((zerox - 60, 70), compass_aircraft, fill="black")
     draw.line((czerox, 20, czerox, 70), fill="black", width=4)
     text = str(heading) + '°'
-    left, top, right, bottom = smallfont.getbbox(text)
-    w = right - left
-    h = bottom - top
-    draw.text((sizex - w - 100, sizey - h - 10), text, font=smallfont, fill="black", align="right")
+    tl = draw.textlength(text, smallfont)
+    draw.text((sizex - tl - 100, sizey - SMALL - 10), text, font=smallfont, fill="black", align="right")
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
@@ -475,15 +467,11 @@ def compass(draw, heading, error_message):
             else:
                 mark = str(int(m / 10))
             if m % 90 != 0:
-                left, top, right, bottom = largefont.getbbox(mark)
-                w = right - left
-                h = bottom - top
-                cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
+                tl = draw.textlength(mark, largefont)
+                cdraw.text(((LARGE * 2 - tl) / 2, LARGE / 2), mark, 1, font=largefont)
             else:
-                left, top, right, bottom = morelargefont.getbbox(mark)
-                w = right - left
-                h = bottom - top
-                cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=morelargefont)
+                tl = draw.textlength(mark, morelargefont)
+                cdraw.text(((LARGE * 2 - tl) / 2, (LARGE * 2 - MORELARGE) / 2), mark, 1, font=morelargefont)
             rotmask = mask.rotate(-m + heading, expand=False)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
             epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
@@ -497,15 +485,11 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((35, sizey/2 - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
     draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill="black", align="left")
     middle_text = "Vertical Speed"
-    left, top, right, bottom = verysmallfont.getbbox(middle_text)
-    w = right - left
-    h = bottom - top
-    draw.text((sizey/2 - w/2, sizey/2 - h - 10), middle_text, font=verysmallfont, fill="black", align="left")
+    tl = draw.textlength(middle_text, verysmallfont)
+    draw.text((sizey/2 - tl / 2, sizey/2 - VERYSMALL - 10), middle_text, font=verysmallfont, fill="black", align="left")
     middle_text = "100 feet per min"
-    left, top, right, bottom = verysmallfont.getbbox(middle_text)
-    w = right - left
-    h = bottom - top
-    draw.text((sizey/2 - w / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
+    tl = draw.textlength(middle_text, verysmallfont)
+    draw.text((sizey/2 - tl / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
 
     # right data display
     draw.text((300, 10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
@@ -704,14 +688,12 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
 
 
 def round_text(draw, x, y, text, color, yesno=True, out=None):
-    left, top, right, bottom = verysmallfont.getbbox(text)
-    w = right - left
-    h = bottom - top
-    draw.rounded_rectangle([x, y, x+w+10, y+h+6], radius=4, fill=color, outline=out)
+    tl = draw.textlength(text, verysmallfont)
+    draw.rounded_rectangle([x, y, x+tl+10, y+VERYSMALL+6], radius=4, fill=color, outline=out)
     draw.text((x+5, y), text, font=verysmallfont, fill="black")
     if not yesno:
-        draw.line([x, y+h+6, x+w+10, y], fill="black", width=2)
-    return x+w+20
+        draw.line([x, y+VERYSMALL+6, x+tl+10, y], fill="black", width=2)
+    return x+tl+20
 
 
 def stratux(draw, stat, altitude, gps_alt, gps_quality):
