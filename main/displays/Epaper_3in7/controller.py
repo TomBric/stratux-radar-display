@@ -689,10 +689,10 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
 
 def round_text(draw, x, y, text, color, yesno=True, out=None):
     tl = draw.textlength(text, verysmallfont)
-    draw.rounded_rectangle([x, y, x+tl+10, y+VERYSMALL+6], radius=4, fill=color, outline=out)
+    draw.rounded_rectangle([x, y, x+tl+10, y+VERYSMALL+2], radius=4, fill=color, outline=out)
     draw.text((x+5, y), text, font=verysmallfont, fill="black")
     if not yesno:
-        draw.line([x, y+VERYSMALL+6, x+tl+10, y], fill="black", width=2)
+        draw.line([x, y+VERYSMALL+2, x+tl+10, y], fill="black", width=2)
     return x+tl+20
 
 
