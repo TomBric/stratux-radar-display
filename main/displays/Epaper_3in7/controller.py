@@ -805,7 +805,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     tl = draw.textlength(str(maxvalue), verysmallfont)
     draw.text((xpos - tl - space, vlmax_y - VERYSMALL/2), str(maxvalue), font=verysmallfont, fill="black")
 
-    draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize-1), outline="black", width=3, fill="white")
+    draw.rectangle((xpos, ypos, xpos+xsize, ypos+ysize), outline="black", width=3, fill="white")
 
     # values below x-axis
     no_of_values = len(data)
