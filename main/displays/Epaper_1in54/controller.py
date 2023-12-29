@@ -372,9 +372,9 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         draw.line(mark, fill="black", width=3)
         # text
         marktext = str(m)
-        w, h = largefont.getsize(marktext)
-        t_center = translate(angle, ((0, -size/2 + big_mark_length + h/2 + text_distance), ), (center_x, center_y))
-        draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="black", font=largefont)
+        tl = draw.textlength(marktext, largefont)
+        t_center = translate(angle, ((0, -size/2 + big_mark_length + LARGE/2 + text_distance), ), (center_x, center_y))
+        draw.text((t_center[0][0]-zl/2, t_center[0][1]-LARGE/2), marktext, fill="black", font=largefont)
         m += marks_distance
     # arrow
     if current > end_value:   # normalize values in allowed ranges
