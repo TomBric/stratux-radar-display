@@ -679,9 +679,9 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     else:
         t = "GPS"
     draw.text((0, starty), t, font=verysmallfont, fill="white")
-    draw.rounded_rectangle([35, starty, 55, starty + VERYSMALL], radius=4, fill="green", outline=None)
-    draw.rounded_rectangle([55, starty, 75, starty + VERYSMALL], radius=4, fill="DarkOrange", outline=None)
-    draw.rounded_rectangle([75, starty, 95, starty + VERYSMALL], radius=4, fill="red", outline=None)
+    draw.rounded_rectangle([35, starty, 55, starty + VERYSMALL + 1], radius=4, fill="green", outline=None)
+    draw.rounded_rectangle([55, starty, 75, starty + VERYSMALL + 1], radius=4, fill="DarkOrange", outline=None)
+    draw.rounded_rectangle([75, starty, 95, starty + VERYSMALL + 1], radius=4, fill="red", outline=None)
     t = str(stat['GPS_satellites_locked'])
     tl = draw.textlength(t, verysmallfont)
     draw.text((48-tl/2, starty), t, font=verysmallfont, fill="white", align="middle")
