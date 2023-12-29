@@ -354,9 +354,9 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         draw.line(mark, fill="white", width=2)
         # text
         marktext = str(m)
-        w, h = largefont.getsize(marktext)
-        t_center = translate(angle, ((0, -size/2 + big_mark_length + h/2 + text_distance), ), (center_x, center_y))
-        draw.text((t_center[0][0]-w/2, t_center[0][1]-h/2), marktext, fill="white", font=largefont)
+        tl = draw.textlength(marktext, largefont)
+        t_center = translate(angle, ((0, -size/2 + big_mark_length + LARGE/2 + text_distance), ), (center_x, center_y))
+        draw.text((t_center[0][0]-tl/2, t_center[0][1]-LARGE/2), marktext, fill="white", font=largefont)
         m += marks_distance
     # arrow
     if current > end_value:   # normalize values in allowed ranges
@@ -370,11 +370,11 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     draw.ellipse((center_x - 5, center_y - 5, center_x + 5, center_y + 5), fill="white")
 
     if middle_text1 is not None:
-        ts = smallfont.getsize(middle_text1)
-        draw.text((center_x-ts[0]/2, center_y-ts[1]-15), middle_text1, font=smallfont, fill="yellow", align="left")
+        tl = draw.textlength(middle_text1, smallfont)
+        draw.text((center_x-tl/2, center_y-SMALL-15), middle_text1, font=smallfont, fill="yellow", align="left")
     if middle_text2 is not None:
-        ts = smallfont.getsize(middle_text2)
-        draw.text((center_x-ts[0]/2, center_y+15), middle_text2, font=smallfont, fill="yellow", align="left")
+        tl = draw.textlength(smiddle_text2, smallfont)
+        draw.text((center_x-tl/2, center_y+15), middle_text2, font=smallfont, fill="yellow", align="left")
 
 
 def gmeter(draw, current, maxg, ming, error_message):
