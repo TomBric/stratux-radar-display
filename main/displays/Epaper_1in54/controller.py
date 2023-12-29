@@ -207,7 +207,7 @@ def centered_text(draw, y, text, font, fill):
 
 
 def right_text(draw, y, text, font, fill):
-    ts = draw.textlength(text, font)
+    tl = draw.textlength(text, font)
     draw.text((sizex - tl, y), text, font=font, fill=fill)
 
 
