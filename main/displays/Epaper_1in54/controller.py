@@ -202,13 +202,13 @@ def clear(draw):
 
 
 def centered_text(draw, y, text, font, fill):
-    ts = draw.textsize(text, font)
-    draw.text((zerox - ts[0] / 2, y), text, font=font, fill=fill)
+    tl = draw.textlength(text, font)
+    draw.text((zerox - tl / 2, y), text, font=font, fill=fill)
 
 
 def right_text(draw, y, text, font, fill):
-    ts = draw.textsize(text, font)
-    draw.text((sizex - ts[0], y), text, font=font, fill=fill)
+    ts = draw.textlength(text, font)
+    draw.text((sizex - tl, y), text, font=font, fill=fill)
 
 
 def startup(draw, version, target_ip, seconds):
@@ -239,12 +239,12 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
         t = t + '\u2197'
     if vspeed < 0:
         t = t + '\u2198'
-    tsize = draw.textsize(t, verylargefont)
+    tl = draw.textlength(t, verylargefont)
     if tsize[0] + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
         # would draw text outside, move to the left
-        tposition = (x - 4 * AIRCRAFT_SIZE - tsize[0], int(y - tsize[1] / 2))
+        tposition = (x - 4 * AIRCRAFT_SIZE - tl, int(y - VERYLARGE / 2))
     else:
-        tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - tsize[1] / 2))
+        tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - VERYLARGE / 2))
     # draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
     draw.text(tposition, t, font=verylargefont, fill="black")
     if tail is not None:
@@ -265,13 +265,13 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
         t = t + '\u2197'
     if vspeed < 0:
         t = t + '\u2198'
-    tsize = draw.textsize(t, verylargefont)
-    tposition = (zerox+arctext[0]-tsize[0]/2, zeroy+arctext[1]-tsize[1]/2)
+    tl = draw.textlength(t, verylargefont)
+    tposition = (zerox+arctext[0]-tl/2, zeroy+arctext[1]-VERYLARGE/2)
     draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+VERYLARGE)), fill="white")
     draw.text(tposition, t, font=verylargefont, fill="black")
     if tail is not None:
-        tsize = draw.textsize(tail, verysmallfont)
-        draw.rectangle((tposition[0], tposition[1] + VERYLARGE, tposition[0] + tsize[0],
+        tl = draw.textlength(tail, verysmallfont)
+        draw.rectangle((tposition[0], tposition[1] + VERYLARGE, tposition[0] + tl,
                         tposition[1] + VERYLARGE + VERYSMALL), fill="white")
         draw.text((tposition[0], tposition[1] + VERYLARGE), tail, font=verysmallfont, fill="black")
 
@@ -291,15 +291,15 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
         t = str(int(altdifference / 1000)) + "k"
     else:
         t = str(altdifference)
-    textsize = draw.textsize(t, smallfont)
-    draw.text((sizex - textsize[0], 0), t, font=smallfont, fill="black", align="right")
+    tl = draw.textlength(t, smallfont)
+    draw.text((sizex - tl, 0), t, font=smallfont, fill="black", align="right")
     text = "ft"
-    textsize = draw.textsize(text, verysmallfont)
-    draw.text((sizex - textsize[0], SMALL), text, font=verysmallfont, fill="black", align="right")
+    tl = draw.textlength(text, verysmallfont)
+    draw.text((sizex - tl, SMALL), text, font=verysmallfont, fill="black", align="right")
 
     text = str(course) + '°'
-    textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0], sizey - textsize[1]), text, font=smallfont, fill="black", align="right")
+    tl = draw.textlength(text, smallfont)
+    draw.text((sizex - tl, sizey - SMALL), text, font=smallfont, fill="black", align="right")
 
     if not gpsconnected:
         centered_text(draw, 15, "No GPS", smallfont, fill="black")
@@ -318,8 +318,8 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
                 t += "\uf293"  # bluetooth symbol
         else:
             t = "\uf1f6"  # bell off symbol
-        textsize = draw.textsize(t, awesomefont)
-        draw.text((sizex - textsize[0], sizey - 2 * SMALL), t, font=awesomefont, fill="black")
+        tl = draw.textlength(t, awesomefont)
+        draw.text((sizex - tl, sizey - 2 * SMALL), t, font=awesomefont, fill="black")
 
     # optical keep alive bar at right side, for the small display only 5 bars
     draw.line((2, 150+(optical_bar % 5)*5, 2, 150+(optical_bar % 5)*5+6), fill="black", width=4)
@@ -336,8 +336,8 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
             centered_text(draw, 3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
 
     draw.text((5, sizey-SMALL-3), left_text, font=smallfont, fill="black")
-    textsize = draw.textsize(right_t, smallfont)
-    draw.text((sizex-textsize[0]-8, sizey-SMALL-3), right_t, font=smallfont, fill="black", align="right")
+    tl = draw.textlength(right_t, smallfont)
+    draw.text((sizex-tl-8, sizey-SMALL-3), right_t, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
 
 
@@ -407,8 +407,8 @@ def gmeter(draw, current, maxg, ming, error_message):
     right_text(draw, 102, "{:+1.2f}".format(ming), smallfont, fill="black")
 
     right = "Reset"
-    textsize = draw.textsize(right, verysmallfont)
-    draw.text((sizex-textsize[0], sizey-SMALL), right, font=verysmallfont, fill="black", align="right")
+    tl = draw.textlength(right, verysmallfont)
+    draw.text((sizex-tl, sizey-SMALL), right, font=verysmallfont, fill="black", align="right")
 
 
 def compass(draw, heading, error_message):
@@ -424,8 +424,8 @@ def compass(draw, heading, error_message):
     draw.bitmap((zerox-96/2+3, zeroy-96/2-2), compass_aircraft, fill="black")
     draw.line((czerox, 15, czerox, 50), fill="black", width=4)
     text = str(heading) + '°'
-    textsize = draw.textsize(text, smallfont)
-    draw.text((sizex - textsize[0], sizey - textsize[1] - 5), text, font=smallfont, fill="black", align="right")
+    tl = draw.textlength(text, smallfont)
+    draw.text((sizex - tl, sizey - SMALL - 5), text, font=smallfont, fill="black", align="right")
     for m in range(0, 360, 10):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
@@ -447,11 +447,11 @@ def compass(draw, heading, error_message):
             else:
                 mark = str(int(m / 10))
             if m % 90 != 0:
-                w, h = draw.textsize(mark, largefont)
-                cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=largefont)
+                tl = draw.textlength(mark, largefont)
+                cdraw.text(((LARGE * 2 - tl) / 2, LARGE / 2), mark, 1, font=largefont)
             else:
-                w, h = draw.textsize(mark, morelargefont)
-                cdraw.text(((LARGE * 2 - w) / 2, (LARGE * 2 - h) / 2), mark, 1, font=morelargefont)
+                tl = draw.textlength(mark, morelargefont)
+                cdraw.text(((LARGE * 2 - tl) / 2, LARGE / 2), mark, 1, font=morelargefont)
             rotmask = mask.rotate(-m + heading, expand=False)
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
             epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
@@ -465,17 +465,18 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((15, sizey/2 - VERYSMALL - 10), "up", font=verysmallfont, fill="black", align="left")
     draw.text((15, sizey/2 + 10), "dn", font=verysmallfont, fill="black", align="left")
     middle_text = "Vert Spd"
-    ts = draw.textsize(middle_text, verysmallfont)
-    draw.text((sizey/2 - ts[0]/2, sizey/2 - ts[1] - 10), middle_text, font=verysmallfont, fill="black", align="left")
+    tl = draw.textlength(middle_text, verysmallfont)
+    draw.text((sizey/2 - tl/2, sizey/2 - VERYSMALL - 10), middle_text, font=verysmallfont, fill="black", align="left")
     middle_text = "100 ft/min"
-    ts = draw.textsize(middle_text, verysmallfont)
-    draw.text((sizey/2 - ts[0] / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
+    tl = draw.textlength(middle_text, verysmallfont)
+    draw.text((sizey/2 - tl / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
 
     if error_message is not None:
         centered_text(draw, 40, error_message, verylargefont, fill="black")
 
 
 def shutdown(draw, countdown, shutdownmode):
+    message = ""
     if shutdownmode == 0:   # shutdown stratux + display
         message = "Shutdown all"
     elif shutdownmode == 1:
@@ -496,8 +497,8 @@ def shutdown(draw, countdown, shutdownmode):
     middle_text = "Displ"
     right_text = "Rebo"
     draw.text((0, sizey - SMALL), left_text, font=smallfont, fill="black")
-    textsize = draw.textsize(right_text, smallfont)
-    draw.text((sizex - textsize[0], sizey - SMALL), right_text, font=smallfont, fill="black", align="right")
+    tl = draw.textlength(right_text, smallfont)
+    draw.text((sizex - tl, sizey - SMALL), right_text, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL, middle_text, smallfont, fill="black")
 
 
@@ -591,8 +592,8 @@ def text_screen(draw, headline, subline, text, left_text, middle_text, right_tex
     draw.text((0, txt_starty+4), text, font=smallfont, fill="black")
 
     draw.text((0, sizey - SMALL), left_text, font=verysmallfont, fill="black")
-    textsize = draw.textsize(right_text, verysmallfont)
-    draw.text((sizex - textsize[0], sizey - SMALL), right_text, font=verysmallfont, fill="black", align="right")
+    tl = draw.textlength(right_text, verysmallfont)
+    draw.text((sizex - tl, sizey - SMALL), right_text, font=verysmallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL, middle_text, verysmallfont, fill="black")
 
 
@@ -612,8 +613,8 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     draw.text((bbox_rect[2], bbox[3]), suffix, font=smallfont, fill="black")
 
     draw.text((5, sizey - SMALL - 3), left, font=smallfont, fill="black")
-    textsize = draw.textsize(right, smallfont)
-    draw.text((sizex - textsize[0] - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
+    tl = draw.textlength(right, smallfont)
+    draw.text((sizex - tl - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL - 8, middle, smallfont, fill="black")
 
 
@@ -623,8 +624,8 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
 
     draw.text((0, y), text, font=verysmallfont, fill="black", align="left")
     right_val = str(int(max_val)) + unit
-    textsize = draw.textsize(right_val, verysmallfont)
-    draw.text((sizex-textsize[0], y), right_val, font=verysmallfont, fill="black", align="right")
+    tl = draw.textlength(right_val, verysmallfont)
+    draw.text((sizex-tl, y), right_val, font=verysmallfont, fill="black", align="right")
     draw.rounded_rectangle([bar_start-3, y-1, bar_end+3, y+VERYSMALL+1], radius=3, fill=None, outline="black", width=1)
     if val < minval:
         val = minval   # to display a minimum bar, valtext should be provided in this case
@@ -639,15 +640,15 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
         t = valtext
     else:
         t = str(val)
-    ts = draw.textsize(t, verysmallfont)
-    draw.text(((bar_end-bar_start)/2+bar_start-ts[0]/2, y), t, font=verysmallfont, fill="black",
+    tl = draw.textlength(t, verysmallfont)
+    draw.text(((bar_end-bar_start)/2+bar_start-tl/2, y), t, font=verysmallfont, fill="black",
               stroke_width=1, stroke_fill="white")
     return y+VERYSMALL+6
 
 
 def round_text(draw, x, y, text, color, yesno=True, out=None):
-    ts = draw.textsize(text, verysmallfont)
-    draw.rounded_rectangle([x, y-2, x+ts[0]+10, y+ts[1]+3], radius=4, fill=color, outline=out)
+    tl = draw.textlength(text, verysmallfont)
+    draw.rounded_rectangle([x, y-2, x+tl+10, y+VERYSMALL+3], radius=4, fill=color, outline=out)
     draw.text((x+5, y), text, font=verysmallfont, fill="black")
     if not yesno:
         draw.line([x, y+ts[1]+1, x+ts[0]+5, y-1], fill="black", width=2)
@@ -735,28 +736,28 @@ def flighttime(draw, last_flights):
 
 
 def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
-    ts = draw.textsize(str(maxvalue), verysmallfont)    # for adjusting x and y
+    tl = draw.textlength(str(maxvalue), verysmallfont)    # for adjusting x and y
     # adjust zero lines to have room for text
-    xpos = xpos + ts[0] + space
-    xsize = xsize - ts[0] - space
-    ypos = ypos + ts[1]/2
-    ysize = ysize - ts[1]
+    xpos = xpos + tl + space
+    xsize = xsize - tl - space
+    ypos = ypos + VERYSMALL/2
+    ysize = ysize - VERYSMALL
 
     vlmin_y = ypos + ysize - 1
-    ts = draw.textsize(str(minvalue), verysmallfont)
-    draw.text((xpos - ts[0] - space, vlmin_y - ts[1]), str(minvalue), font=verysmallfont, fill="black")
+    tl = draw.textlength(str(minvalue), verysmallfont)
+    draw.text((xpos - tl - space, vlmin_y - VERYSMALL), str(minvalue), font=verysmallfont, fill="black")
 
     vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
-    ts = draw.textsize(str(value_line1), verysmallfont)
-    draw.text((xpos - ts[0] - space, vl1_y - ts[1]/2), str(value_line1), font=verysmallfont, fill="black")
+    tl = draw.textlength(str(value_line1), verysmallfont)
+    draw.text((xpos - tl - space, vl1_y - VERYSMALL/2), str(value_line1), font=verysmallfont, fill="black")
 
     vl2_y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
-    ts = draw.textsize(str(value_line2), verysmallfont)
-    draw.text((xpos - ts[0] - space, vl2_y - ts[1]/2), str(value_line2), font=verysmallfont, fill="black")
+    tl = draw.textlength(str(value_line2), verysmallfont)
+    draw.text((xpos - tl - space, vl2_y - VERYSMALL/2), str(value_line2), font=verysmallfont, fill="black")
 
     vlmax_y = ypos
-    ts = draw.textsize(str(maxvalue), verysmallfont)
-    draw.text((xpos - ts[0] - space, vlmax_y - ts[1]/2), str(maxvalue), font=verysmallfont, fill="black")
+    tl = draw.textlength(str(maxvalue), verysmallfont)
+    draw.text((xpos - tl - space, vlmax_y - VERYSMALL/2), str(maxvalue), font=verysmallfont, fill="black")
 
     draw.rectangle((xpos, ypos, xpos+xsize-1, ypos+ysize-1), outline="black", width=3, fill="white")
 
@@ -764,8 +765,8 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     no_of_values = len(data)
     full_time = timeout * no_of_values   # time for full display in secs
     timestr = time.strftime("%H:%M", time.gmtime())
-    ts = draw.textsize(timestr, verysmallfont)
-    no_of_time = math.floor(xsize / ts[0] / 2) + 1   # calculate maximum number of time indications
+    tl = draw.textlength(timestr, verysmallfont)
+    no_of_time = math.floor(xsize / tl / 2) + 1   # calculate maximum number of time indications
     time_offset = full_time / no_of_time
     offset = math.floor((xsize-1) / no_of_time)
     x = xpos
@@ -817,8 +818,8 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     right = "Reset"
     middle = "Mode"
     draw.text((0, sizey - SMALL), left, font=smallfont, fill="black")
-    textsize = draw.textsize(right, smallfont)
-    draw.text((sizex - textsize[0], sizey - SMALL), right, font=smallfont, fill="black", align="right")
+    tl = draw.textlength(right, smallfont)
+    draw.text((sizex - tl, sizey - SMALL), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
 
 
@@ -827,8 +828,8 @@ def dashboard(draw, x, y, sizex, lines):
     starty = y
     for line in lines:
         draw.text((x, starty), line[0], font=smallfont, fill="black", align="left")
-        ts = draw.textsize(line[1], smallfont)
-        draw.text((x+sizex-ts[0], starty), line[1], font=smallfont, fill="black")
+        tl = draw.textlength(line[1], smallfont)
+        draw.text((x+sizex-tl, starty), line[1], font=smallfont, fill="black")
         starty += SMALL+2
     return starty
 
@@ -871,8 +872,8 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
     right = "Start"
     middle = "Mode"
     draw.text((0, sizey - SMALL), left, font=smallfont, fill="black")
-    textsize = draw.textsize(right, smallfont)
-    draw.text((sizex - textsize[0], sizey - SMALL), right, font=smallfont, fill="black", align="right")
+    tl = draw.textlength(right, smallfont)
+    draw.text((sizex - tl, sizey - SMALL), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
 
 
