@@ -651,8 +651,8 @@ def round_text(draw, x, y, text, color, yesno=True, out=None):
     draw.rounded_rectangle([x, y-2, x+tl+10, y+VERYSMALL+3], radius=4, fill=color, outline=out)
     draw.text((x+5, y), text, font=verysmallfont, fill="black")
     if not yesno:
-        draw.line([x, y+ts[1]+1, x+ts[0]+5, y-1], fill="black", width=2)
-    return x+ts[0]+12
+        draw.line([x, y+VERSMALL+1, x+tl+5, y-1], fill="black", width=2)
+    return x+tl+12
 
 
 def stratux(draw, stat, altitude, gps_alt, gps_quality):
@@ -774,7 +774,7 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
     for i in range(0, no_of_time+1):
         draw.line((x, ypos+ysize-1-5, x, ypos+ysize-1+3), width=2, fill="black")
         timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time-i) * time_offset)))
-        draw.text((x - ts[0]/2, ypos+ysize-1 + 1), timestr, font=verysmallfont, fill="black")
+        draw.text((x - tl/2, ypos+ysize-1 + 1), timestr, font=verysmallfont, fill="black")
         x = x + offset
     lastpoint = None
     for i in range(0, len(data)):
