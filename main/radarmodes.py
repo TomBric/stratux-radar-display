@@ -82,7 +82,7 @@ def first_mode_sequence():
     global mode_sequence
     return mode_sequence[0]  # return to first mode
 
+
 def is_mode_contained(mode):
     global mode_sequence
     return mode in mode_sequence  # return true is mode is in mode sequence, false otherwise
-
