@@ -240,12 +240,12 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
     if vspeed < 0:
         t = t + '\u2198'
     tl = draw.textlength(t, verylargefont)
-    if tsize[0] + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
+    if tl + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
         # would draw text outside, move to the left
         tposition = (x - 4 * AIRCRAFT_SIZE - tl, int(y - VERYLARGE / 2))
     else:
         tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - VERYLARGE / 2))
-    # draw.rectangle((tposition, (tposition[0] + tsize[0], tposition[1] + LARGE)), fill="white")
+    # draw.rectangle((tposition, (tposition[0] + tl, tposition[1] + LARGE)), fill="white")
     draw.text(tposition, t, font=verylargefont, fill="black")
     if tail is not None:
         draw.text((tposition[0], tposition[1] + VERYLARGE), tail, font=verysmallfont, fill="black")
@@ -267,7 +267,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
         t = t + '\u2198'
     tl = draw.textlength(t, verylargefont)
     tposition = (zerox+arctext[0]-tl/2, zeroy+arctext[1]-VERYLARGE/2)
-    draw.rectangle((tposition, (tposition[0]+tsize[0], tposition[1]+VERYLARGE)), fill="white")
+    draw.rectangle((tposition, (tposition[0]+tl, tposition[1]+VERYLARGE)), fill="white")
     draw.text(tposition, t, font=verylargefont, fill="black")
     if tail is not None:
         tl = draw.textlength(tail, verysmallfont)
