@@ -388,11 +388,11 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill="black")
 
     if middle_text1 is not None:
-        ts = smallfont.getsize(middle_text1)
-        draw.text((center_x-ts[0]/2, center_y-ts[1]-20), middle_text1, font=smallfont, fill="black", align="left")
+        tl = draw.textlength(middle_text1, smallfont)
+        draw.text((center_x-tl/2, center_y-SMALL-20), middle_text1, font=smallfont, fill="black", align="left")
     if middle_text2 is not None:
-        ts = smallfont.getsize(middle_text2)
-        draw.text((center_x-ts[0]/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
+        tl = draw.textlength(middle_text2, smallfont)
+        draw.text((center_x-tl/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
 
 
 def gmeter(draw, current, maxg, ming, error_message):
