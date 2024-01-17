@@ -47,7 +47,6 @@ import datetime
 import radarmodes
 
 # constants
-CONFIG_FILE = "stratux-radar.conf"
 STATUS_TIMEOUT = 0.3
 BLUETOOTH_SCAN_TIME = 30.0
 BT_SCAN_WAIT = 0.2
@@ -59,6 +58,7 @@ MAX_WIFI_LENGTH = 16
 
 # globals
 rlog = None
+g_config_file = None   #  filename of config file, set in init
 global_config = {}
 status_url = ""
 stratux_ip = "0.0.0.0"
@@ -114,7 +114,7 @@ def write_config(config):
                                                                                      default=default))
 
 
-def init(display_control, url, target_ip, refresh, config):   # prepare everything
+def init(display_control, config_file, url, target_ip, refresh, config):   # prepare everything
     global status_url
     global stratux_ip
     global refresh_time
@@ -123,7 +123,9 @@ def init(display_control, url, target_ip, refresh, config):   # prepare everythi
     global new_pass
     global new_wifi
     global rlog
+    global g_config_file
 
+    g_config_file = config_file
     status_url = url
     stratux_ip = target_ip
     rlog = logging.getLogger('stratux-radar-log')

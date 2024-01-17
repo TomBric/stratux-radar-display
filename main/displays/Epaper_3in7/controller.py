@@ -67,7 +67,6 @@ verysmallfont = ""
 awesomefont = ""
 device = None
 epaper_image = None
-draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
 PITCH_SCALE = 4.0
@@ -144,7 +143,6 @@ def init(fullcircle=False):
     global awesomefont
     global device
     global epaper_image
-    global draw
     global compass_aircraft
     global mask
     global cdraw
@@ -215,6 +213,13 @@ def centered_text(draw, y, text, font, fill):
 def right_text(draw, y, text, font, fill):
     tl = draw.textlength(text, font)
     draw.text((sizex-5-tl, y), text, font=font, fill=fill)
+
+
+def bottom_line(draw, left, middle, right):
+    draw.text((5, sizey - SMALL - 3), left, font=smallfont, fill="black")
+    textlength = draw.textlength(right, smallfont)
+    draw.text((sizex - textlength - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
 
 
 def startup(draw, version, target_ip, seconds):
@@ -879,17 +884,17 @@ def data_item(draw, leftx, y, rightx, text, value):
     draw.text((rightx - tl, y), value, font=smallfont, fill="black")
 
 
-def dashboard(draw, x, y, sizex, rounding, headline, lines):
+def dashboard(draw, x, y, dsizex, rounding, headline, lines):
     # dashboard, arguments are lines = ("text", "value"), ....
     starty = y + VERYSMALL/2
     for line in lines:
         draw.text((x + 7, starty + (SMALL - VERYSMALL) / 2), line[0], font=verysmallfont, fill="black", align="left")
         tl = draw.textlength(line[1], smallfont)
-        draw.text((x + sizex - 7 - tl, starty), line[1], font=smallfont, fill="black")
+        draw.text((x + dsizex - 7 - tl, starty), line[1], font=smallfont, fill="black")
         starty += SMALL + 3
     if rounding:
         starty += VERYSMALL/2
-        draw.rounded_rectangle([x, y, x + sizex, starty], radius=6, fill=None, outline="black", width=2)
+        draw.rounded_rectangle([x, y, x + dsizex, starty], radius=6, fill=None, outline="black", width=2)
         tl = draw.textlength(headline, verysmallfont)
         draw.rectangle([x + 20, y - SMALL/2, x + 20 + tl + 8, y + SMALL/2], fill="white", outline=None)
     draw.text((x+20+4, y - VERYSMALL/2), headline, font=verysmallfont, fill="black")
@@ -1010,3 +1015,44 @@ def distance_statistics(draw, values):
 
     middle = "Back"
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
+
+
+def checklist_topic(draw, ypos, topic, highlighted=False):
+    xpos = 10
+    xpos_remark = 100
+    xpos_sub = 50
+    draw.text((xpos, ypos), topic.iloc[1], font=smallfont, fill="black")    # Topic
+    right_text(draw, ypos, topic.iloc[2], font=smallfont, fill="black")     # Check
+    y = ypos + SMALL
+    if topic.iloc[3] != '':   # remark
+        draw.text((xpos_remark, y), topic.iloc[3], font=verysmallfont, fill="black")  # remark
+        y = y + VERYSMALL
+    if topic.iloc[4] != '':    # subtopic
+        draw.text((xpos_sub, y), topic.iloc[4], font=smallfont, fill="black")  # subtopic
+        right_text(draw, y, topic.iloc[5], font=smallfont, fill="black")  # subtopic check
+        y = y + SMALL
+    if topic.iloc[6] != '':   # subtopic2
+        draw.text((xpos_sub, y), topic.iloc[6], font=smallfont, fill="black")  # subtopic
+        right_text(draw, y, topic.iloc[7], font=smallfont, fill="black")  # subtopic check
+        y = y + SMALL
+    if topic.iloc[8] != '':   # subtopic2
+        draw.text((xpos_sub, y), topic.iloc[8], font=smallfont, fill="black")  # subtopic
+        right_text(draw, y, topic.iloc[9], font=smallfont, fill="black")  # subtopic check
+        y = y + SMALL
+    if highlighted:   # draw frame around whole topic
+        draw.rounded_rectangle([0, ypos, sizex-4, y+2], radius=4, fill="white", outline="black")
+    return y
+
+
+def checklist(draw, checklist_name, topi, currenti, nexti, next_nexti):
+    centered_text(draw, 0, "Checklist: " + checklist_name, smallfont, fill="black")
+    ypos = SMALL + 6
+    if topi:
+        ypos = checklist_topic(draw, ypos, topi, highlighted=False)
+    if currenti:
+        ypos = checklist_topic(draw, ypos, currenti, highlighted=True)
+    if nexti:
+        ypos = checklist_topic(draw, ypos, nexti, highlighted=False)
+    if next_nexti:
+        ypos = checklist_topic(draw, ypos, next_next, highlighted=False)
+    bottom_line(draw, "Prev", "NextList", "CheckItem")

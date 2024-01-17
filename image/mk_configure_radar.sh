@@ -74,5 +74,11 @@ systemctl --system enable pulseaudio.service
 # enable spi and i2c (for cowarner)
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
-echo "Radar configuration finished"
 
+# for groundsensor, disable ssh over serial cause it is needed for the sensor
+# disable ssh over serial otherwise
+sudo sed -i /boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
+sudo sed -i /boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
+sudo sed -i /boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
+
+echo "Radar configuration finished"

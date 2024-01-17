@@ -35,6 +35,24 @@
 # enable_uart=1
 # dtoverlay=miniuart-bt
 
+# start and landing statistics are stored in stratux-radar.stat
+# This file has json coded statistics for every flight, see this example
+# {
+#    "start_time": "2023-01-15 12:57:21.873912+00:00",
+#    "start_altitude": 879.8726,
+#    "takeoff_distance": 0.0,
+#    "landing_time": "2023-01-15 12:57:22.106499+00:00",
+#    "landing_altitude": 879.8606,
+#    "landing_distance": 0.0
+# }{
+#    "start_time": "2023-01-15 12:57:28.223856+00:00",
+#    "start_altitude": 880.92865,
+#    "takeoff_distance": 0.0,
+#    "landing_time": "2023-01-15 12:57:28.444494+00:00",
+#    "landing_altitude": 880.77216,
+#    "landing_distance": 0.0
+#}
+
 import logging
 import radarmodes
 import time

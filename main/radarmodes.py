@@ -54,7 +54,8 @@ def mode_codes(c):
         "S": 15,
         "I": 17,
         "C": 19,
-        "M": 21
+        "M": 21,
+        "L": 23
     }
     return modes.get(c, 0)
 
