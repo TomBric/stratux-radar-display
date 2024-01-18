@@ -62,7 +62,6 @@ def init(checklist_xml):
     except Exception as e:
         rlog.debug("Checklist - Error '{0}' reading '{1}.".format(e, checklist_xml))
         return
-    rlog.debug("Checklist - Read following checklist from '{0}': {1}".format(checklist_xml, raw_list))
     try:
         xml_dict = xmltodict.parse(xml_string)
     except Exception as e:
