@@ -35,9 +35,8 @@
 import logging
 import radarmodes
 import radarbuttons
+import xmltodict
 import json
-import pandas   # to read excel files
-import xlrd     # to understand and convert excel
 
 rlog = None  # radar specific logger
 # constants
@@ -47,32 +46,51 @@ g_checklist = None   # global checklist, is a list of (list_name, panda.DataFram
 g_checklist_iterator = [0, 0]   # current position of checklist [checklist number, item no in this list]
 
 
-def init(checklist_xls):
+def init(checklist_xml):
     global rlog
-    global checklist_iterator
+    global g_checklist_iterator
     global g_checklist
 
     rlog = logging.getLogger('stratux-radar-log')
+    g_checklist_iterator = [0, 0]  # start in checklist 0 at item 0
     try:
-        raw_list = pandas.read_excel(checklist_xls, None, na_filter=False)
-        # generates a dict of panda_df for an Excel with several tabs
+        with open(checklist_xml, "r") as f:
+            xml_string = f.read()
     except FileNotFoundError:
         rlog.debug("Checklist - Excel file '{0}' not found.".format(checklist_xls))
         return
     except Exception as e:
-        rlog.debug("Checklist - Error '{0}' reading '{1}.".format(e, checklist_xls))
+        rlog.debug("Checklist - Error '{0}' reading '{1}.".format(e, checklist_xml))
         return
-    rlog.debug("Checklist - Read following checklist from '{0}': {1}".format(checklist_xls, raw_list))
-    g_checklist = list(raw_list.items())
-    # g_checklist is now a list consisting of checklist-name and dataframe with items
-    # to obtain an item use:  l =  l[list_no][1].iloc[item_no]
-    # to obtain list_name use: l = l[list_no, 0]
-    checklist_iterator = [0, 0]    # start in checklist 0 at position 0
-    return g_checklist
+    rlog.debug("Checklist - Read following checklist from '{0}': {1}".format(checklist_xml, raw_list))
+    try:
+        xml_dict = xmltodict.parse(xml_string)
+    except Exception as e:
+        rlog.debug("Checklist - Parsing of xml-checklist failed with error <{0}>".format(e))
+        return
+    try:
+        g_checklist = xml_dict['ALL_CHECKLISTS']['CHECKLIST']
+    except KeyError:
+        rlog.debug("Checklist - KeyError understanding dict from xml")
+
+    # g_checklist is now a list of checklists
+    # [{'ITEM': [{'CHECK': 'Done',
+    #            'REMARK': 'Please use preflight checklist',
+    #            'TASK': 'Pre flight inspection'},
+    #           {'CHECK': 'Locked', 'TASK': 'Seat Adjustment'}],
+    #  'TITLE': 'Before Engine Start'},
+    # {'ITEM': [{'CHECK': 'ON', 'TASK': 'Strobes'},
+    #          {'CHECK': 'ON (SOUND)', 'TASK': 'Electr. Fuel Pump'},
+    #           {'CHECK1': 'IDLE',
+    #            'CHECK2': '1cm forward',
+    #            'TASK': 'Power Setting',
+    #           'TASK1': 'Cold Engine',
+    #            'TASK2': 'Warm Enging'}],
+    #  'TITLE': 'Engine Start'}]
 
 
 def next_item(iterator):     # switch to next item topic in checklist
-    if iterator[1] < len(g_checklist[iterator[0][1]]):
+    if iterator[1] < len(g_checklist[0]['ITEM']):
         iterator[1] = iterator[1] + 1
     else:
         iterator[1] = 0
@@ -91,7 +109,7 @@ def previous_item(iterator):
             iterator[0] = iterator[0] - 1
         else:
             iterator[0] = len(g_checklist)
-        iterator[1] = len(g_checklist[iterator[0][1]])  # set to last item in this list
+        iterator[1] = len(g_checklist[0]['ITEM'])  # set to last item in this list
     return iterator
 
 
@@ -103,23 +121,23 @@ def draw_checklist(draw, display_control, ui_changed):
     if ui_changed or checklist_changed:
         checklist_changed = False
         display_control.clear(draw)
-        currenti = g_checklist[iterator[0]][1].iloc[iterator[1]]
+        currenti = g_checklist[iterator[0]]['ITEM'][iterator[1]]
         topi = None
         nexti = None
         next_nexti = None
-        checklist_name = g_checklist[iterator[0]][0]
+        checklist_name = g_checklist[iterator[0]]['TITLE']
         if iterator[1] >= 1:
-            topi = g_checklist[iterator[0]][1].iloc[iterator[1] - 1]
-        if iterator[1] + 1 < len(g_checklist[iterator[0]][1]):
-            nexti = g_checklist[iterator[0]][1].iloc[iterator[1] + 1]
-        if iterator[1] + 2 < len(g_checklist[iterator[0]][1]):
-            next_nexti = g_checklist[iterator[0]][1].iloc[iterator[1] + 2]
+            topi = g_checklist[iterator[0]]['ITEM'][iterator[1]-1]
+        if iterator[1] + 1 < len(g_checklist[iterator[0]]['ITEM']):
+            nexti = g_checklist[iterator[0]]['ITEM'][iterator[1] + 1]
+        if iterator[1] + 2 < len(g_checklist[iterator[0]]['ITEM']):
+            next_nexti = g_checklist[iterator[0]]['ITEM'][iterator[1] + 2]
         display_control.checklist(draw, checklist_name, topi, currenti, nexti, next_nexti)
         display_control.display()
 
 
 def user_input():
-    global checklist_iterator
+    global g_checklist_iterator
     global checklist_changed
 
     btime, button = radarbuttons.check_buttons()
@@ -131,10 +149,10 @@ def user_input():
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, next item
-        checklist_iterator = next_item(checklist_iterator)
+        g_checklist_iterator = next_item(g_checklist_iterator)
         return 23
     if button == 0 and btime == 1:  # left and short, previous item
-        checklist_iterator = previous_item(checklist_iterator)
+        g_checklist_iterator = previous_item(g_checklist_iterator)
         return 23
     if button == 2 and btime == 2:  # right and long, refresh
         return 24  # start next mode for display driver: refresh called
