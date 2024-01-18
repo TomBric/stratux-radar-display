@@ -1059,5 +1059,5 @@ def checklist(draw, checklist_name, topi, currenti, nexti, next_nexti):
     if nexti:
         ypos = checklist_topic(draw, ypos, nexti, highlighted=False)
     if next_nexti:
-        ypos = checklist_topic(draw, ypos, next_next, highlighted=False)
+        ypos = checklist_topic(draw, ypos, next_nexti, highlighted=False)
     bottom_line(draw, "Prev", "NextList", "CheckItem")
