@@ -1021,37 +1021,45 @@ def checklist_topic(draw, ypos, topic, highlighted=False):
     xpos = 10
     xpos_remark = 100
     xpos_sub = 50
+    topic_offset = 12
+    subtopic_offset = 6
+    remark_offset = 4
+
     if 'TASK' in topic:
         draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill="black")    # Topic
     if 'CHECK' in topic:
         right_text(draw, ypos, topic['CHECK'], font=smallfont, fill="black")     # Check
-    y = ypos + SMALL
+    y = ypos + SMALL + 6
     if 'REMARK' in topic:   # remark
+        y= y + remark_offset
         draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill="black")  # remark
         y = y + VERYSMALL
     if 'TASK1' in topic:    # subtopic
+        y = y + subtopic_offset
         draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill="black")  # subtopic
         if 'CHECK1' in topic:
             right_text(draw, y, topic['CHECK1'], font=smallfont, fill="black")  # subtopic check
         y = y + SMALL
     if 'TASK2' in topic:   # subtopic2
+        y = y + subtopic_offset
         draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill="black")  # subtopic
         if 'CHECK2' in topic:
             right_text(draw, y, topic['CHECK2'], font=smallfont, fill="black")  # subtopic check
         y = y + SMALL
     if 'TASK3' in topic:   # subtopic3
+        y = y + subtopic_offset
         draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="black")  # subtopic
         if 'CHECK3' in topic:
             right_text(draw, y, topic['CHECK3'], font=smallfont, fill="black")  # subtopic check
         y = y + SMALL
     if highlighted:   # draw frame around whole topic
-        draw.rounded_rectangle([0, ypos, sizex-4, y+2], radius=4, fill="white", outline="black")
-    return y
+        draw.rounded_rectangle([0, ypos, sizex-4, y+2], radius=4, outline="black")
+    return y + topic_offset
 
 
 def checklist(draw, checklist_name, topi, currenti, nexti, next_nexti):
     centered_text(draw, 0, "Checklist: " + checklist_name, smallfont, fill="black")
-    ypos = SMALL + 6
+    ypos = SMALL + 12
     if topi:
         ypos = checklist_topic(draw, ypos, topi, highlighted=False)
     if currenti:
