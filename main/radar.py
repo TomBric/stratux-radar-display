@@ -856,7 +856,7 @@ if __name__ == "__main__":
                     default=False)
     ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use", action='store_true',
                     default=DEFAULT_CHECKLIST)
-    p.add_argument("-stc", "--startchecklist", required=False, help="Start mode is checklist", action='store_true',
+    ap.add_argument("-stc", "--startchecklist", required=False, help="Start mode is checklist", action='store_true',
                    default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
