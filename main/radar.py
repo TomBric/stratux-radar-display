@@ -93,9 +93,9 @@ OPTICAL_ALIVE_TIME = 3
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
 DEFAULT_MIXER = "Speaker"  # default mixer name to be used for sound output
-CONFIG_DIR = "../../"
+CONFIG_DIR = "../config/"
 CONFIG_FILE = CONFIG_DIR + "stratux-radar.conf"
-DEFAULT_CHECKLIST = CONFIG_DIR + "checklist.xls"
+DEFAULT_CHECKLIST = CONFIG_DIR + "checklist.xml"
 SAVED_FLIGHTS = CONFIG_DIR + "stratux-radar.flights"
 
 url_host_base = DEFAULT_URL_HOST_BASE
