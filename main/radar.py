@@ -929,7 +929,7 @@ if __name__ == "__main__":
         global_config['sound_volume'] = 50  # set to a medium value if strange number used
     # check config file, if extistent use config from there
     url_host_base = args['connect']
-    saved_config = statusui.read_config()
+    saved_config = statusui.read_config(CONFIG_FILE)
     if saved_config is not None:
         if 'stratux_ip' in saved_config:
             url_host_base = saved_config['stratux_ip']  # set stratux ip if interactively changed one time
