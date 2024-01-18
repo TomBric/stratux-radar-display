@@ -1021,23 +1021,28 @@ def checklist_topic(draw, ypos, topic, highlighted=False):
     xpos = 10
     xpos_remark = 100
     xpos_sub = 50
-    draw.text((xpos, ypos), topic.iloc[1], font=smallfont, fill="black")    # Topic
-    right_text(draw, ypos, topic.iloc[2], font=smallfont, fill="black")     # Check
+    if TASK in topic:
+        draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill="black")    # Topic
+    if CHECK in topic:
+        right_text(draw, ypos, topic['CHECK'], font=smallfont, fill="black")     # Check
     y = ypos + SMALL
-    if topic.iloc[3] != '':   # remark
-        draw.text((xpos_remark, y), topic.iloc[3], font=verysmallfont, fill="black")  # remark
+    if REMARK in topic:   # remark
+        draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill="black")  # remark
         y = y + VERYSMALL
-    if topic.iloc[4] != '':    # subtopic
-        draw.text((xpos_sub, y), topic.iloc[4], font=smallfont, fill="black")  # subtopic
-        right_text(draw, y, topic.iloc[5], font=smallfont, fill="black")  # subtopic check
+    if TASK1 in topic:    # subtopic
+        draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill="black")  # subtopic
+        if CHECK1 in topic:
+            right_text(draw, y, topic['CHECK1'], font=smallfont, fill="black")  # subtopic check
         y = y + SMALL
-    if topic.iloc[6] != '':   # subtopic2
-        draw.text((xpos_sub, y), topic.iloc[6], font=smallfont, fill="black")  # subtopic
-        right_text(draw, y, topic.iloc[7], font=smallfont, fill="black")  # subtopic check
+    if TASK2 in topic:   # subtopic2
+        draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill="black")  # subtopic
+        if CHECK2 in topic:
+            right_text(draw, y, topic['CHECK2'], font=smallfont, fill="black")  # subtopic check
         y = y + SMALL
-    if topic.iloc[8] != '':   # subtopic2
-        draw.text((xpos_sub, y), topic.iloc[8], font=smallfont, fill="black")  # subtopic
-        right_text(draw, y, topic.iloc[9], font=smallfont, fill="black")  # subtopic check
+    if TASK3 in topic:   # subtopic3
+        draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="black")  # subtopic
+        if CHECK3 in topic:
+            right_text(draw, y, topic['CHECK3'], font=smallfont, fill="black")  # subtopic check
         y = y + SMALL
     if highlighted:   # draw frame around whole topic
         draw.rounded_rectangle([0, ypos, sizex-4, y+2], radius=4, fill="white", outline="black")
