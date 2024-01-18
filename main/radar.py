@@ -785,7 +785,7 @@ def main():
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
     g_draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
     ahrsui.init(display_control)
-    statusui.init(display_control, CONFIG_FILE, url_host_base, display_refresh_time, global_config)
+    statusui.init(display_control, CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(display_control, url_status_ws)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
