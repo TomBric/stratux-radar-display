@@ -90,12 +90,12 @@ def read_config():
     if rlog is None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
-        with open(CONFIG_FILE) as f:
+        with open(g_config_file) as f:
             config = json.load(f)
     except (OSError, IOError, ValueError) as e:
-        rlog.debug("StatusUI: Error " + str(e) + " reading " + CONFIG_FILE)
+        rlog.debug("StatusUI: Error " + str(e) + " reading " + g_config_file)
         return None
-    rlog.debug("StatusUI: Configuration read from " + CONFIG_FILE + ": " +
+    rlog.debug("StatusUI: Configuration read from " + g_config_file + ": " +
                json.dumps(config, sort_keys=True, indent=4, default=default))
     return config
 
