@@ -43,16 +43,16 @@ rlog = None  # radar specific logger
 
 # globals
 g_checklist = None   # global checklist, is a list of (list_name, panda.DataFrame)
-g_checklist_iterator = [0, 0]   # current position of checklist [checklist number, item no in this list]
+g_iterator = [0, 0]   # current position of checklist [checklist number, item no in this list]
 
 
 def init(checklist_xml):
     global rlog
-    global g_checklist_iterator
+    global g_iterator
     global g_checklist
 
     rlog = logging.getLogger('stratux-radar-log')
-    g_checklist_iterator = [0, 0]  # start in checklist 0 at item 0
+    g_iterator = [0, 0]  # start in checklist 0 at item 0
     try:
         with open(checklist_xml, "r") as f:
             xml_string = f.read()
@@ -113,30 +113,30 @@ def previous_item(iterator):
 
 
 def draw_checklist(draw, display_control, ui_changed):
-    global g_checklist_iterator
+    global g_iterator
     global g_checklist
     global checklist_changed
 
     if ui_changed or checklist_changed:
         checklist_changed = False
         display_control.clear(draw)
-        currenti = g_checklist[iterator[0]]['ITEM'][iterator[1]]
+        currenti = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1]]
         topi = None
         nexti = None
         next_nexti = None
-        checklist_name = g_checklist[iterator[0]]['TITLE']
-        if iterator[1] >= 1:
-            topi = g_checklist[iterator[0]]['ITEM'][iterator[1]-1]
-        if iterator[1] + 1 < len(g_checklist[iterator[0]]['ITEM']):
-            nexti = g_checklist[iterator[0]]['ITEM'][iterator[1] + 1]
-        if iterator[1] + 2 < len(g_checklist[iterator[0]]['ITEM']):
-            next_nexti = g_checklist[iterator[0]]['ITEM'][iterator[1] + 2]
+        checklist_name = g_checklist[g_iterator[0]]['TITLE']
+        if g_iterator[1] >= 1:
+            topi = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1]-1]
+        if g_iterator[1] + 1 < len(g_checklist[g_iterator[0]]['ITEM']):
+            nexti = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1] + 1]
+        if g_iterator[1] + 2 < len(g_checklist[g_iterator[0]]['ITEM']):
+            next_nexti = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1] + 2]
         display_control.checklist(draw, checklist_name, topi, currenti, nexti, next_nexti)
         display_control.display()
 
 
 def user_input():
-    global g_checklist_iterator
+    global g_iterator
     global checklist_changed
 
     btime, button = radarbuttons.check_buttons()
@@ -148,10 +148,10 @@ def user_input():
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, next item
-        g_checklist_iterator = next_item(g_checklist_iterator)
+        g_iterator = next_item(g_iterator)
         return 23
     if button == 0 and btime == 1:  # left and short, previous item
-        g_checklist_iterator = previous_item(g_checklist_iterator)
+        g_iterator = previous_item(g_iterator)
         return 23
     if button == 2 and btime == 2:  # right and long, refresh
         return 24  # start next mode for display driver: refresh called
