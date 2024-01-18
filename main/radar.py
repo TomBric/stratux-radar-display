@@ -792,7 +792,7 @@ def main():
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
     grounddistance.init(grounddistance_activated, SITUATION_DEBUG, groundbeep, situation, simulation_mode)
     simulation.init(simulation_mode)
-    checklist.init(checklist)
+    checklist.init(excel_checklist)
     display_control.startup(g_draw, RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -897,7 +897,7 @@ if __name__ == "__main__":
     grounddistance_activated = args['grounddistance']
     groundbeep = args['groundbeep']
     simulation_mode = args['simulation']
-    checklist = args['checklist']
+    excel_checklist = args['checklist']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:
