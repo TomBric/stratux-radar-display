@@ -34,6 +34,7 @@
 
 import logging
 import radarmodes
+import radarbuttons
 import json
 import pandas   # to read excel files
 import xlrd     # to understand and convert excel
