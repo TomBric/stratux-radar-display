@@ -612,6 +612,8 @@ async def user_interface():
                 next_mode, reset_situation = distance.user_input()
                 if reset_situation:
                     distance.reset_values(situation)
+            elif global_mode == 23:  # display checklist
+                next_mode = checklist.user_input()
             if next_mode > 0:
                 ui_changed = True
                 rlog.debug("User Interface: global mode changing from: " + str(global_mode) + " to " + str(next_mode))
