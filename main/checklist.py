@@ -89,7 +89,7 @@ def init(checklist_xml):
 
 
 def next_item(iterator):     # switch to next item topic in checklist
-    if iterator[1] < len(g_checklist[0]['ITEM']):
+    if iterator[1] < len(g_checklist[g_iterator[0]]['ITEM']):
         iterator[1] = iterator[1] + 1
     else:
         iterator[1] = 0
@@ -108,7 +108,7 @@ def previous_item(iterator):
             iterator[0] = iterator[0] - 1
         else:
             iterator[0] = len(g_checklist)
-        iterator[1] = len(g_checklist[0]['ITEM'])  # set to last item in this list
+        iterator[1] = len(g_checklist[g_iterator[0]]['ITEM']) # set to last item in this list
     return iterator
 
 

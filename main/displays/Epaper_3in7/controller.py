@@ -1054,7 +1054,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False):
             right_text(draw, y, topic['CHECK3'], font=smallfont, fill="black", offset=topic_right_offset)  # subtopic check
         y = y + SMALL
     if highlighted:   # draw frame around whole topic
-        draw.rounded_rectangle([3, ypos, sizex-4, y+2], width=3, radius=4, outline="black")
+        draw.rounded_rectangle([3, ypos, sizex-topic_offset, y+2], width=3, radius=5, outline="black")
     return y + topic_offset
 
 
