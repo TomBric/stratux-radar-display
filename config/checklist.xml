@@ -11,6 +11,22 @@
                         <TASK> Seat Adjustment </TASK>
                         <CHECK> Locked </CHECK>
                 </ITEM>
+                <ITEM>
+                        <TASK> Seatbelt </TASK>
+                        <CHECK> Fastened </CHECK>
+                </ITEM>
+                <ITEM>
+                        <TASK> Ballistic Rec. System </TASK>
+                        <CHECK> Unlocked </CHECK>
+                </ITEM>
+                <ITEM>
+                        <TASK> Control Stick </TASK>
+                        <CHECK> free/deflection </CHECK>
+                </ITEM>
+                <ITEM>
+                        <TASK> Fuel Valves </TASK>
+                        <CHECK> both open </CHECK>
+                </ITEM>
         </CHECKLIST>
         <CHECKLIST>
                 <TITLE> Engine Start </TITLE>
