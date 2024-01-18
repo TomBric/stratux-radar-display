@@ -736,6 +736,13 @@ async def display_and_cutoff():
                     rlog.debug("Situation: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 21
+                elif global_mode == 23:  # checklist
+                    checklist.draw_checklist(g_draw, display_control, situation['was_changed'] or ui_changed)
+                    ui_changed = False
+                elif global_mode == 24:  # refresh display, only relevant for epaper, mode was situation
+                    rlog.debug("Checklist: Display driver - Refreshing")
+                    display_control.refresh()
+                    global_mode = 23
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
