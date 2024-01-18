@@ -854,8 +854,10 @@ if __name__ == "__main__":
                     default=False)
     ap.add_argument("-sit", "--situation", required=False, help="Start mode situation display", action='store_true',
                     default=False)
-    ap.add_argument("-chl", "--checklist", required=False, help="Start mode checklist display", action='store_true',
+    ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use", action='store_true',
                     default=DEFAULT_CHECKLIST)
+    p.add_argument("-stc", "--startchecklist", required=False, help="Start mode is checklist", action='store_true',
+                   default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
                     default=0)
@@ -925,7 +927,7 @@ if __name__ == "__main__":
         global_mode = 19  # start in co-warner mode
     if args['situation']:
         global_mode = 21  # start in situation
-    if args['checklist']:
+    if args['startchecklist']:
         global_mode = 23  # start in checklist
     sound_mixer = args['mixer']
     radarmodes.parse_modes(args['displaymodes'])
