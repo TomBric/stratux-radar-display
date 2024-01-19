@@ -131,7 +131,7 @@ def draw_checklist(draw, display_control, ui_changed):
         display_control.clear(draw)
         checklist_name = g_checklist[g_iterator[0]]['TITLE']
         checklist_items = g_checklist[g_iterator[0]]['ITEM']
-        last_item = (g_iterator == (len(g_checklist[iterator[0]]['ITEM']) - 1, len(g_checklist)-1))
+        last_item = (g_iterator == (len(g_checklist)-1, len(g_checklist[g_iterator[0]]['ITEM']) - 1))
         display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1], last_item)
         display_control.display()
 
