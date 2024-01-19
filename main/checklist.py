@@ -154,7 +154,7 @@ def user_input():
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, next item
-        last_item = (g_iterator == (len(g_checklist) - 1, len(g_checklist[g_iterator[0]]['ITEM']) - 1))
+        last_item = (g_iterator == [len(g_checklist) - 1, len(g_checklist[g_iterator[0]]['ITEM']) - 1])
         if not last_item:
             g_iterator = next_item(g_iterator)
         return 23
