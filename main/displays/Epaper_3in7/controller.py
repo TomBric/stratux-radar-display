@@ -1026,11 +1026,12 @@ def checklist_topic(draw, ypos, topic, highlighted=False):
     remark_offset = 4
     topic_right_offset = 6
 
+    y = ypos
     if 'TASK' in topic:
         draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill="black")    # Topic
     if 'CHECK' in topic:
         right_text(draw, ypos, topic['CHECK'], font=smallfont, fill="black", offset=topic_right_offset)     # Check
-        y = ypos + SMALL
+    y = y + SMALL
     if 'REMARK' in topic:   # remark
         y= y + remark_offset
         draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill="black")  # remark
@@ -1054,7 +1055,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False):
             right_text(draw, y, topic['CHECK3'], font=smallfont, fill="black", offset=topic_right_offset)  # subtopic check
         y = y + SMALL
     if highlighted:   # draw frame around whole topic
-        draw.rounded_rectangle([3, ypos-topic_offset+2, sizex-2, y+2], width=3, radius=5, outline="black")
+        draw.rounded_rectangle([3, ypos-4, sizex-2, y+4], width=3, radius=5, outline="black")
     return y + topic_offset
 
 
