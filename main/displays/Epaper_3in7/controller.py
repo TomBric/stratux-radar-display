@@ -1091,7 +1091,7 @@ def checklist(draw, checklist_name, checklist_items, current_index):
     y = checklist_y['from']
     item = top_index
     while y <= checklist_y['to']:
-        if item > len(checklist_items):
+        if item >= len(checklist_items):
             break
         y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
         item = item + 1
