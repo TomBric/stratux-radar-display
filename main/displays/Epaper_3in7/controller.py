@@ -1081,7 +1081,7 @@ def checklist(draw, checklist_name, checklist_items, current_index):
     size = checklist_y['from']
     while True:
         for item in range(top_index, current_index + 2):   # check if also next element fits on screen
-            size = checklist_topic(draw, size, checklist_items[item], highlighted=False, print=False)
+            size = checklist_topic(draw, size, checklist_items[item], highlighted=False, toprint=False)
         if size <= checklist_y['to']:  # fits in screen, no reason to scroll
             break
         else:
@@ -1089,7 +1089,7 @@ def checklist(draw, checklist_name, checklist_items, current_index):
     # now display everything
     y = checklist_y['from']
     for item in range(top_index, current_index):   # print from top to current-1
-        y = checklist_topic(draw, y, checklist_items[item], highlighted=False, print=True)
-    y = checklist_topic(draw, y, checklist_items[current_index], highlighted=True, print=True)  # print highlighted
-    checklist_topic(draw, y, checklist_items[current_index + 1], highlighted=False, print=True)
+        y = checklist_topic(draw, y, checklist_items[item], highlighted=False, toprint=True)
+    y = checklist_topic(draw, y, checklist_items[current_index], highlighted=True, toprint=True)  # print highlighted
+    checklist_topic(draw, y, checklist_items[current_index + 1], highlighted=False, toprint=True)
     bottom_line(draw, "Prev", "NextList", "CheckItem")
