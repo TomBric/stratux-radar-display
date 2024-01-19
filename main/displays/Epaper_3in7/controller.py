@@ -1085,6 +1085,7 @@ def checklist(draw, checklist_name, checklist_items, current_index):
         if size <= checklist_y['to']:  # fits in screen, no reason to scroll
             break
         else:
+            size = checklist_y['from']
             top_index = top_index + 1   # scroll, ignore top element
     # now display everything
     y = checklist_y['from']
