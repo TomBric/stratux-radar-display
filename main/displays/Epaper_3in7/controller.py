@@ -1089,8 +1089,8 @@ def checklist(draw, checklist_name, checklist_items, current_index):
             top_index = top_index + 1   # scroll, ignore top element
     # now display everything
     y = checklist_y['from']
-    for item in range(top_index, current_index):   # print from top to current-1
-        y = checklist_topic(draw, y, checklist_items[item], highlighted=False, toprint=True)
-    y = checklist_topic(draw, y, checklist_items[current_index], highlighted=True, toprint=True)  # print highlighted
-    checklist_topic(draw, y, checklist_items[current_index + 1], highlighted=False, toprint=True)
+    item = top_index
+    while y <= checklist_y['to']:
+        y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
+        item = item + 1
     bottom_line(draw, "Prev", "NextList", "CheckItem")
