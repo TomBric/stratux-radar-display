@@ -1047,7 +1047,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
             draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill="black")  # subtopic
         if 'CHECK1' in topic:
             if toprint:
-                right_text(draw, y, topic['CHECK1'], font=smallfont, fill="black", offset=topic_right_offset)  # subtopic check
+                right_text(draw, y, topic['CHECK1'], font=smallfont, fill="black", offset=topic_right_offset)
         y = y + SMALL
     if 'TASK2' in topic:   # subtopic2
         y = y + subtopic_offset
@@ -1055,7 +1055,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
             draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill="black")  # subtopic
         if 'CHECK2' in topic:
             if toprint:
-                right_text(draw, y, topic['CHECK2'], font=smallfont, fill="black", offset=topic_right_offset)  # subtopic check
+                right_text(draw, y, topic['CHECK2'], font=smallfont, fill="black", offset=topic_right_offset)
         y = y + SMALL
     if 'TASK3' in topic:   # subtopic3
         y = y + subtopic_offset
@@ -1063,7 +1063,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
             draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="black")  # subtopic
         if 'CHECK3' in topic:
             if toprint:
-                right_text(draw, y, topic['CHECK3'], font=smallfont, fill="black", offset=topic_right_offset)  # subtopic check
+                right_text(draw, y, topic['CHECK3'], font=smallfont, fill="black", offset=topic_right_offset)
         y = y + SMALL
     if highlighted:   # draw frame around whole topic
         if toprint:
@@ -1071,7 +1071,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     return y + topic_offset
 
 
-def checklist(draw, checklist_name, checklist_items, current_index, last_item):
+def checklist(draw, checklist_name, checklist_items, current_index, last_item, last_list):
     checklist_y = {'from': LARGE + 8, 'to': sizey - 2 * SMALL - 12}
     global top_index
 
@@ -1097,6 +1097,8 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_item):
         y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
         item = item + 1
     if last_item:
+        bottom_line(draw, "Prev", "Mode", "")
+    elif last_list:
         bottom_line(draw, "Prev", "Mode", "Checked")
     else:
         bottom_line(draw, "Prev", "NextList", "Checked")

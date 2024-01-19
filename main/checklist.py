@@ -132,7 +132,8 @@ def draw_checklist(draw, display_control, ui_changed):
         checklist_name = g_checklist[g_iterator[0]]['TITLE']
         checklist_items = g_checklist[g_iterator[0]]['ITEM']
         last_item = (g_iterator == (len(g_checklist)-1, len(g_checklist[g_iterator[0]]['ITEM']) - 1))
-        display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1], last_item)
+        last_list = (g_iterator[0] == len(g_checklist) - 1)
+        display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1], last_item, last_list)
         display_control.display()
 
 
@@ -145,15 +146,17 @@ def user_input():
         return 0  # stay in current mode
     checklist_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        if g_iterator == (len(g_checklist)-1, len(g_checklist[g_iterator[0]]['ITEM']) - 1):   # last topic
+        if g_iterator[0] == len(g_checklist)-1:   # last list
             return radarmodes.next_mode_sequence(23)  # next mode
         else:
-            g_iterator = next_list(iterator)
+            g_iterator = next_list(g_iterator)
             return 23
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, next item
-        g_iterator = next_item(g_iterator)
+        last_item = (g_iterator == (len(g_checklist) - 1, len(g_checklist[g_iterator[0]]['ITEM']) - 1))
+        if not last_item:
+            g_iterator = next_item(g_iterator)
         return 23
     if button == 0 and btime == 1:  # left and short, previous item
         g_iterator = previous_item(g_iterator)
