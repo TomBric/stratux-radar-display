@@ -1081,7 +1081,8 @@ def checklist(draw, checklist_name, checklist_items, current_index):
     size = checklist_y['from']
     while True:
         for item in range(top_index, current_index + 2):   # check if also next element fits on screen
-            size = checklist_topic(draw, size, checklist_items[item], highlighted=False, toprint=False)
+            if item < len(checklist_items):
+                size = checklist_topic(draw, size, checklist_items[item], highlighted=False, toprint=False)
         if size <= checklist_y['to']:  # fits in screen, no reason to scroll
             break
         else:
