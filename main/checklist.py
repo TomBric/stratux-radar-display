@@ -94,7 +94,7 @@ def next_item(iterator):     # switch to next item topic in checklist
     else:
         iterator[1] = 0
         if iterator[0] < len(g_checklist) - 1:
-            iterator [0] = iterator[0] + 1
+            iterator[0] = iterator[0] + 1
         else:
             iterator[0] = 0
     return iterator
@@ -108,7 +108,16 @@ def previous_item(iterator):
             iterator[0] = iterator[0] - 1
         else:
             iterator[0] = len(g_checklist) - 1
-        iterator[1] = len(g_checklist[iterator[0]]['ITEM']) - 1 # set to last item in this list
+        iterator[1] = len(g_checklist[iterator[0]]['ITEM']) - 1   # set to last item in this list
+    return iterator
+
+
+def next_list(iterator):
+    iterator[1] = 0
+    if iterator[0] < len(g_checklist) - 1:
+        iterator[0] = iterator[0] + 1
+    else:
+        iterator[0] = 0
     return iterator
 
 
@@ -120,10 +129,10 @@ def draw_checklist(draw, display_control, ui_changed):
     if ui_changed or checklist_changed:
         checklist_changed = False
         display_control.clear(draw)
-        checklist_items = g_checklist[g_iterator[0]]['ITEM']
         checklist_name = g_checklist[g_iterator[0]]['TITLE']
         checklist_items = g_checklist[g_iterator[0]]['ITEM']
-        display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1])
+        last_item = (g_iterator == (len(g_checklist[iterator[0]]['ITEM']) - 1, len(g_checklist)-1))
+        display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1], last_item)
         display_control.display()
 
 
@@ -136,7 +145,11 @@ def user_input():
         return 0  # stay in current mode
     checklist_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return radarmodes.next_mode_sequence(23)  # next mode
+        if g_iterator == (len(g_checklist[iterator[0]]['ITEM']) - 1, len(g_checklist)-1):   # last topic
+            return radarmodes.next_mode_sequence(23)  # next mode
+        else:
+            g_iterator = next_list(iterator)
+            return 23
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, next item
