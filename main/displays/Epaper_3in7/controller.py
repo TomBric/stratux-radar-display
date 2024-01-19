@@ -81,6 +81,8 @@ cmsize = 20        # length of compass marks
 space = 3  # space between scale figures and zero line
 # end device globals
 
+top_index = 0    # top index being displayed in checklist
+
 
 def posn(angle, arm_length):
     dx = round(math.cos(math.radians(270+angle)) * arm_length)
@@ -1017,7 +1019,7 @@ def distance_statistics(draw, values):
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
 
 
-def checklist_topic(draw, ypos, topic, highlighted=False):
+def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     xpos = 10
     xpos_remark = 100
     xpos_sub = 50
@@ -1028,43 +1030,66 @@ def checklist_topic(draw, ypos, topic, highlighted=False):
 
     y = ypos
     if 'TASK' in topic:
-        draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill="black")    # Topic
+        if toprint:
+            draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill="black")    # Topic
     if 'CHECK' in topic:
-        right_text(draw, ypos, topic['CHECK'], font=smallfont, fill="black", offset=topic_right_offset)     # Check
+        if toprint:
+            right_text(draw, ypos, topic['CHECK'], font=smallfont, fill="black", offset=topic_right_offset)     # Check
     y = y + SMALL
     if 'REMARK' in topic:   # remark
-        y= y + remark_offset
-        draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill="black")  # remark
+        y = y + remark_offset
+        if toprint:
+            draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill="black")  # remark
         y = y + VERYSMALL
     if 'TASK1' in topic:    # subtopic
         y = y + subtopic_offset
-        draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill="black")  # subtopic
+        if toprint:
+            draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill="black")  # subtopic
         if 'CHECK1' in topic:
-            right_text(draw, y, topic['CHECK1'], font=smallfont, fill="black", offset = topic_right_offset)  # subtopic check
+            if toprint:
+                right_text(draw, y, topic['CHECK1'], font=smallfont, fill="black", offset=topic_right_offset)  # subtopic check
         y = y + SMALL
     if 'TASK2' in topic:   # subtopic2
         y = y + subtopic_offset
-        draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill="black")  # subtopic
+        if toprint:
+            draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill="black")  # subtopic
         if 'CHECK2' in topic:
-            right_text(draw, y, topic['CHECK2'], font=smallfont, fill="black", offset=topic_right_offset)  # subtopic check
+            if toprint:
+                right_text(draw, y, topic['CHECK2'], font=smallfont, fill="black", offset=topic_right_offset)  # subtopic check
         y = y + SMALL
     if 'TASK3' in topic:   # subtopic3
         y = y + subtopic_offset
-        draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="black")  # subtopic
+        if toprint:
+            draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="black")  # subtopic
         if 'CHECK3' in topic:
-            right_text(draw, y, topic['CHECK3'], font=smallfont, fill="black", offset=topic_right_offset)  # subtopic check
+            if toprint:
+                right_text(draw, y, topic['CHECK3'], font=smallfont, fill="black", offset=topic_right_offset)  # subtopic check
         y = y + SMALL
     if highlighted:   # draw frame around whole topic
-        draw.rounded_rectangle([3, ypos-4, sizex-2, y+4], width=3, radius=5, outline="black")
+        if toprint:
+            draw.rounded_rectangle([3, ypos-4, sizex-2, y+4], width=3, radius=5, outline="black")
     return y + topic_offset
 
 
-def checklist(draw, checklist_name, topi, currenti, nexti):
+def checklist(draw, checklist_name, current_index):
+    checklist_y = {'from': SMALL + 6, 'to': sizey - SMALL - 6}
+    global top_index
+
+    if current_index == 0:
+        top_index = 0     # new list, reset top index
     centered_text(draw, 0, "Checklist: " + checklist_name, smallfont, fill="black")
-    if topi:
-        checklist_topic(draw, 30, topi, highlighted=False)
-    if currenti:
-        checklist_topic(draw, 102 , currenti, highlighted=True)
-    if nexti:
-        checklist_topic(draw, 172, nexti, highlighted=False)
+    size = checklist_y['from']
+    while True:
+        for item in range(top_index, current_index + 2):   # check if also next element fits on screen
+            size = checklist_topic(draw, size, item, highlighted=False, print=False)
+        if size <= checklist_y['to']:  # fits in screen, no reason to scroll
+            break
+        else:
+            top_index = top_index + 1   # scroll, ignore top element
+    # now display everything
+    y = checklist_y['from']
+    for item in range(top_index, current_index):   # print from top to current-1
+        y = checklist_topic(draw, y, item, highlighted=False, print=True)
+    y = checklist_topic(draw, y, current_index, highlighted=True, print=True)  # print current highlighted
+    checklist_topic(draw, y, current_index + 1, highlighted=False, print=True)
     bottom_line(draw, "Prev", "NextList", "CheckItem")
