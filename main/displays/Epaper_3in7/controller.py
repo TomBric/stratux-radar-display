@@ -1067,17 +1067,17 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
         y = y + SMALL
     if highlighted:   # draw frame around whole topic
         if toprint:
-            draw.rounded_rectangle([3, ypos-4, sizex-2, y+4], width=3, radius=5, outline="black")
+            draw.rounded_rectangle([3, ypos-4, sizex-2, y+6], width=3, radius=5, outline="black")
     return y + topic_offset
 
 
 def checklist(draw, checklist_name, checklist_items, current_index):
-    checklist_y = {'from': SMALL + 12, 'to': sizey - 2 * SMALL - 12}
+    checklist_y = {'from': LARGE + 8, 'to': sizey - 2 * SMALL - 12}
     global top_index
 
     if current_index == 0:
         top_index = 0     # new list, reset top index
-    centered_text(draw, 0, "Checklist: " + checklist_name, smallfont, fill="black")
+    centered_text(draw, 0, checklist_name, largefont, fill="black")
     size = checklist_y['from']
     while True:
         for item in range(top_index, current_index + 2):   # check if also next element fits on screen
