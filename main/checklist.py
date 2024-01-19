@@ -123,15 +123,13 @@ def draw_checklist(draw, display_control, ui_changed):
         currenti = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1]]
         topi = None
         nexti = None
-        next_nexti = None
         checklist_name = g_checklist[g_iterator[0]]['TITLE']
         if g_iterator[1] >= 1:
             topi = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1]-1]
         if g_iterator[1] + 1 < len(g_checklist[g_iterator[0]]['ITEM']):
             nexti = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1] + 1]
-        if g_iterator[1] + 2 < len(g_checklist[g_iterator[0]]['ITEM']):
-            next_nexti = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1] + 2]
-        display_control.checklist(draw, checklist_name, topi, currenti, nexti, next_nexti)
+
+        display_control.checklist(draw, checklist_name, topi, currenti, nexti)
         display_control.display()
 
 

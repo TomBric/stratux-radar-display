@@ -1059,15 +1059,12 @@ def checklist_topic(draw, ypos, topic, highlighted=False):
     return y + topic_offset
 
 
-def checklist(draw, checklist_name, topi, currenti, nexti, next_nexti):
+def checklist(draw, checklist_name, topi, currenti, nexti):
     centered_text(draw, 0, "Checklist: " + checklist_name, smallfont, fill="black")
-    ypos = SMALL + 12
     if topi:
-        ypos = checklist_topic(draw, ypos, topi, highlighted=False)
+        checklist_topic(draw, 30, topi, highlighted=False)
     if currenti:
-        ypos = checklist_topic(draw, ypos, currenti, highlighted=True)
+        checklist_topic(draw, 102 , currenti, highlighted=True)
     if nexti:
-        ypos = checklist_topic(draw, ypos, nexti, highlighted=False)
-    if next_nexti:
-        ypos = checklist_topic(draw, ypos, next_nexti, highlighted=False)
+        checklist_topic(draw, 172, nexti, highlighted=False)
     bottom_line(draw, "Prev", "NextList", "CheckItem")
