@@ -1072,7 +1072,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
 
 
 def checklist(draw, checklist_name, checklist_items, current_index):
-    checklist_y = {'from': SMALL + 6, 'to': sizey - SMALL - 6}
+    checklist_y = {'from': SMALL + 12, 'to': sizey - SMALL - 12}
     global top_index
 
     if current_index == 0:
