@@ -120,16 +120,10 @@ def draw_checklist(draw, display_control, ui_changed):
     if ui_changed or checklist_changed:
         checklist_changed = False
         display_control.clear(draw)
-        currenti = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1]]
-        topi = None
-        nexti = None
+        checklist_items = g_checklist[g_iterator[0]]['ITEM']
         checklist_name = g_checklist[g_iterator[0]]['TITLE']
-        if g_iterator[1] >= 1:
-            topi = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1]-1]
-        if g_iterator[1] + 1 < len(g_checklist[g_iterator[0]]['ITEM']):
-            nexti = g_checklist[g_iterator[0]]['ITEM'][g_iterator[1] + 1]
-
-        display_control.checklist(draw, checklist_name, topi, currenti, nexti)
+        checklist_items = g_checklist[g_iterator[0]]['ITEM']
+        display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1])
         display_control.display()
 
 
