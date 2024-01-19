@@ -94,10 +94,9 @@ def next_item(iterator):     # switch to next item topic in checklist
     else:
         iterator[1] = 0
         if iterator[0] < len(g_checklist) - 1:
-            iterator = iterator[0] + 1
+            iterator [0] = iterator[0] + 1
         else:
             iterator[0] = 0
-    rlog.debug("New Iterator {0}".format(iterator))
     return iterator
 
 
