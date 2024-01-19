@@ -145,7 +145,7 @@ def user_input():
         return 0  # stay in current mode
     checklist_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        if g_iterator == (len(g_checklist[iterator[0]]['ITEM']) - 1, len(g_checklist)-1):   # last topic
+        if g_iterator == (len(g_checklist)-1, len(g_checklist[g_iterator[0]]['ITEM']) - 1):   # last topic
             return radarmodes.next_mode_sequence(23)  # next mode
         else:
             g_iterator = next_list(iterator)
