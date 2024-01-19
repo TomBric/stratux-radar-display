@@ -107,7 +107,7 @@ def previous_item(iterator):
         if iterator[0] > 0:
             iterator[0] = iterator[0] - 1
         else:
-            iterator[0] = len(g_checklist)
+            iterator[0] = len(g_checklist) - 1
         iterator[1] = len(g_checklist[iterator[0]]['ITEM']) - 1 # set to last item in this list
     return iterator
 
