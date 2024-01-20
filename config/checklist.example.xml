@@ -1,69 +1,61 @@
 <?xml version="1.0"?>
-<!--Example checklist for Cessna 172, simplified-->
+<!--Example checklist for Cessna 172, simplified, input from freechecklists.net-->
 <ALL_CHECKLISTS>
         <CHECKLIST>
                 <TITLE> Starting Engine </TITLE>
-                <ITEM> <TASK> 1. Mixture                </TASK><CHECK> RICH             </CHECK> </ITEM>
-                <ITEM> <TASK> 2. Carb heat              </TASK><CHECK> COLD             </CHECK> </ITEM>
-                <ITEM> <TASK> 3. Master switch          </TASK><CHECK> ON               </CHECK> </ITEM>
-                <ITEM> <TASK> 4. Beacon Light           </TASK><CHECK> ON               </CHECK> </ITEM>
-                <ITEM> <TASK> 5. Prime                  </TASK><CHECK> AS REQUIRED      </CHECK> </ITEM>
-                <ITEM> <TASK> 6. Throttle               </TASK><CHECK> OPEN 1/8”        </CHECK> </ITEM>
-                <ITEM> <TASK> 7. Prop Area              </TASK><CHECK> CLEAR            </CHECK> </ITEM>
-                <ITEM> <TASK> 8. Ignition               </TASK><CHECK> CHK              </CHECK> </ITEM>
-                <ITEM> <TASK> 9. Oil Pressure           </TASK><CHECK> COLD             </CHECK> </ITEM>
-                <ITEM> <TASK> 10. Avionics switch       </TASK><CHECK> ON               </CHECK> </ITEM>
-                <ITEM> <TASK> 11. Radio(s)              </TASK><CHECK> ON/SET           </CHECK> </ITEM>
+                <ITEM> <TASK> 1. Mixture                </TASK><CHECK> Rich             </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Carburator heat        </TASK><CHECK> Cold             </CHECK> </ITEM>
+                <ITEM> <TASK> 3. Prime                  </TASK><CHECK> As Required, In + Locked  </CHECK> </ITEM>
+                <ITEM> <TASK> 4. Throttle               </TASK><CHECK> Pump Once, Open 1/2 inch </CHECK> </ITEM>
+                <ITEM> <TASK> 5. Master Switch          </TASK><CHECK>On                </CHECK> </ITEM>
+                <ITEM> <TASK> 6. Rotating Beacon        </TASK><CHECK> On               </CHECK> </ITEM>
+                <ITEM> <TASK> 7. Prop Area              </TASK><CHECK> Clear            </CHECK> </ITEM>
+                <ITEM> <TASK> 8. Ignition Switch        </TASK><CHECK> Start            </CHECK> </ITEM>
+                <ITEM> <TASK> 9. Throttle               </TASK><CHECK> Adjust 1000 RPM or less</CHECK> </ITEM>
+                <ITEM> <TASK> 10. Oil Pressure          </TASK><CHECK> Check            </CHECK> </ITEM>
+                <ITEM> <TASK> 11. Radio(s), Avionics Power </TASK><CHECK> ON           </CHECK> </ITEM>
                 <ITEM> <TASK> 12. Transponder           </TASK><CHECK> ON/ALT           </CHECK> </ITEM>
                 <ITEM> <TASK> 13. Wing Flaps            </TASK><CHECK> UP               </CHECK> </ITEM>
-                <ITEM> <TASK> 14. Mixture               </TASK><CHECK> LEAN             </CHECK> </ITEM>
-                <ITEM> <TASK> 15. READY TO TAXI         </TASK><CHECK>                  </CHECK> </ITEM>
+                <ITEM> <TASK> 14. Lights                </TASK><CHECK> On (as req.)     </CHECK> </ITEM>
+                <ITEM> <TASK> 15. READY FOR TAXI        </TASK><CHECK>                  </CHECK> </ITEM>
         </CHECKLIST>
         <CHECKLIST>
-                <TITLE> Starting Engine </TITLE>
-                <ITEM> <TASK> 1. Mixture                </TASK><CHECK> RICH             </CHECK> </ITEM>
-                <ITEM> <TASK> 2. Carb heat              </TASK><CHECK> COLD             </CHECK> </ITEM>
-                <ITEM> <TASK> 3. Master switch          </TASK><CHECK> ON               </CHECK> </ITEM>
-                <ITEM> <TASK> 5. Prime                  </TASK><CHECK> AS REQUIRED      </CHECK> </ITEM>
-                <ITEM> <TASK> 6. Throttle               </TASK><CHECK> OPEN 1/8”        </CHECK> </ITEM>
-                <ITEM> <TASK> 7. Prop Area              </TASK><CHECK> CLEAR            </CHECK> </ITEM>
-                <ITEM> <TASK> 8. Ignition               </TASK><CHECK> CHK              </CHECK> </ITEM>
-                <ITEM> <TASK> 9. Oil Pressure           </TASK><CHECK> COLD             </CHECK> </ITEM>
-                <ITEM> <TASK> 10. Avionics switch       </TASK><CHECK> ON               </CHECK> </ITEM>
-                <ITEM> <TASK> 11. Radio(s)              </TASK><CHECK> ON/SET           </CHECK> </ITEM>
-                <ITEM> <TASK> 12. Transponder           </TASK><CHECK> ON/ALT           </CHECK> </ITEM>
-                <ITEM> <TASK> 13. Wing Flaps            </TASK><CHECK> UP               </CHECK> </ITEM>
-                <ITEM> <TASK> 14. Mixture               </TASK><CHECK> LEAN             </CHECK> </ITEM>
-                <ITEM> <TASK> 15. READY TO TAXI         </TASK><CHECK>                  </CHECK> </ITEM>
+                <TITLE> Taxi </TITLE>
+                <ITEM> <TASK> 1. Check obstacles        </TASK><CHECK>                  </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Attitude Indicator        </TASK><CHECK> Stable        </CHECK> </ITEM>
+                <ITEM> <TASK> 3. Turn Coordinator          </TASK><CHECK> Working       </CHECK> </ITEM>
+                <ITEM> <TASK> 4. Directional Gyro          </TASK><CHECK> Working       </CHECK> </ITEM>
+                <ITEM> <TASK> 5. Suction/Vacuum            </TASK><CHECK> Working       </CHECK> </ITEM>
+                <ITEM> <TASK> 6. Electrical (Ammeter)      </TASK><CHECK> Check         </CHECK> </ITEM>
+                <ITEM> <TASK> TAXI FINISHED                </TASK><CHECK>               </CHECK></ITEM>
         </CHECKLIST>
         <CHECKLIST>
                 <TITLE> Before Takeoff </TITLE>
-                <ITEM> <TASK> 1. Doors                  </TASK><CHECK> CLOSED/LATCHED   </CHECK> </ITEM>
-                <ITEM> <TASK> 2. Brakes                 </TASK><CHECK> ON               </CHECK> </ITEM>
-                <ITEM> <TASK> 3. Flight controls        </TASK><CHECK> FREE + CORRECT   </CHECK> </ITEM>
-                <ITEM> <TASK> 4. Flight instruments     </TASK><CHECK> SET              </CHECK> </ITEM>
-                <ITEM> <TASK> 5. Fuel valve             </TASK><CHECK> CHECK ON         </CHECK> </ITEM>
-                <ITEM> <TASK> 6. Mixture                </TASK><CHECK> RICH             </CHECK> </ITEM>
-                <ITEM> <TASK> 7. Trim                   </TASK><CHECK> SET FOR TAKEOFF  </CHECK> </ITEM>
-                <ITEM> <TASK> 8. Throttle               </TASK><CHECK> 1700 RPM         </CHECK> </ITEM>
-                <ITEM> <TASK> -  Mags                   </TASK><CHECK> 125 DROP/50 DIFF </CHECK> </ITEM>
-                <ITEM> <TASK> -  Carb heat              </TASK><CHECK> CHK              </CHECK> </ITEM>
-                <ITEM> <TASK> -  Engine instr.          </TASK><CHECK> CHK              </CHECK> </ITEM>
-                <ITEM> <TASK> -  Ammeter                </TASK><CHECK> CHK              </CHECK> </ITEM>
-                <ITEM> <TASK> -  Suction                </TASK><CHECK> CHK              </CHECK> </ITEM>
-                <ITEM> <TASK> -  Idle                   </TASK><CHECK> CHK              </CHECK> </ITEM>
-                <ITEM> <TASK> 9. Throttle               </TASK><CHECK> BELOW 1000 RPM   </CHECK> </ITEM>
-                <ITEM> <TASK> 10. Radios                </TASK><CHECK> SET              </CHECK> </ITEM>
-                <ITEM> <TASK> 11. Transponder           </TASK><CHECK> ON ALT           </CHECK> </ITEM>
-                <ITEM> <TASK> 12. Lights                </TASK><CHECK> ON               </CHECK> </ITEM>
-                <ITEM> <TASK> 13. Throttle friction lock</TASK><CHECK> ADJ              </CHECK> </ITEM>
+                <ITEM> <TASK> 1. Parking Brake          </TASK><CHECK> Set              </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Cabin Doors / Seatbelts</TASK><CHECK> Closed + Latched </CHECK> </ITEM>
+                <ITEM> <TASK> 3. Flaps + Trim Tab       </TASK><CHECK>Take-off setting </CHECK> </ITEM>
+                <ITEM> <TASK> 4. Flight Controls        </TASK><CHECK> Free + Correct   </CHECK> </ITEM>
+                <ITEM> <TASK> 5. Flight Instruments     </TASK><CHECK> Set              </CHECK> </ITEM>
+                <ITEM> <TASK> 6. Fuel Selector Valve    </TASK><CHECK> Both             </CHECK> </ITEM>
+                <ITEM> <TASK> 7. Throttle               </TASK><CHECK> 1700 RPM         </CHECK> </ITEM>
+                <ITEM> <TASK>    a. Mixture                </TASK><CHECK> Lean for Max RPM's</CHECK>
+                    <REMARK> Rich below 3000 ft      </REMARK>                                   </ITEM>
+                <ITEM> <TASK>    b. Magnetos            </TASK><CHECK> 100 RPM Drop/50 RPM Diff </CHECK> </ITEM>
+                <ITEM> <TASK>    c. Carburator heat     </TASK><CHECK> Check for drop   </CHECK> </ITEM>
+                <ITEM> <TASK>    d. Engine instrument   </TASK><CHECK> Check            </CHECK> </ITEM>
+                <ITEM> <TASK>    e. Ammeter             </TASK><CHECK> Check            </CHECK> </ITEM>
+                <ITEM> <TASK>    f. Suction Gauge       </TASK><CHECK> Check            </CHECK> </ITEM>
+                <ITEM> <TASK> 8. Throttle               </TASK><CHECK> Idle then 800 Rpm</CHECK> </ITEM>
+                <ITEM> <TASK> 9. Throttle Friction Lock </TASK><CHECK> Adjust           </CHECK> </ITEM>
+                <ITEM> <TASK> 10. Parking Brake         </TASK><CHECK> Release          </CHECK> </ITEM>
+                <ITEM> <TASK> READY FOR TAKEOFF         </TASK><CHECK>                  </CHECK> </ITEM>
         </CHECKLIST>
         <CHECKLIST>
                 <TITLE> Normal Takeoff </TITLE>
-                <ITEM> <TASK> 1. Wing flaps             </TASK><CHECK> 0 DEG            </CHECK> </ITEM>
-                <ITEM> <TASK> 2. Carb heat              </TASK><CHECK> COLD             </CHECK> </ITEM>
-                <ITEM> <TASK> 3. Throttle               </TASK><CHECK> FULL OPEN        </CHECK> </ITEM>
-                <ITEM> <TASK> 4. Elevator               </TASK><CHECK> ROTATE 55 KIAS   </CHECK> </ITEM>
-                <ITEM> <TASK> 5. Climb Speed            </TASK><CHECK> 70-80 KIAS        </CHECK> </ITEM>
+                <ITEM> <TASK> 1. Wing flaps             </TASK><CHECK> Up               </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Carburator heat        </TASK><CHECK> Cold             </CHECK> </ITEM>
+                <ITEM> <TASK> 3. Throttle               </TASK><CHECK> Full Open        </CHECK> </ITEM>
+                <ITEM> <TASK> 4. Elevator               </TASK><CHECK> Rotate at 60 KIAS</CHECK> </ITEM>
+                <ITEM> <TASK> 5. Climb Speed            </TASK><CHECK> 80-90 KIAS        </CHECK> </ITEM>
         </CHECKLIST>
 </ALL_CHECKLISTS>

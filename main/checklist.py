@@ -113,7 +113,6 @@ def previous_item(iterator):
 
 
 def previous_list(iterator):
-
     if iterator[0] > 0:
         iterator[0] -= 1
     else:
