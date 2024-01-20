@@ -1101,4 +1101,4 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_item, l
     elif last_list:
         bottom_line(draw, "Prev", "Mode", "Checked")
     else:
-        bottom_line(draw, "Prev", "NextList", "Checked")
+        bottom_line(draw, "Prev", "NxtList/Mode", "Checked")

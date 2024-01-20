@@ -145,12 +145,14 @@ def user_input():
     if btime == 0:
         return 0  # stay in current mode
     checklist_changed = True
-    if button == 1 and (btime == 1 or btime == 2):  # middle in any case
+    if button == 1 and btime == 1 :  # short
         if g_iterator[0] == len(g_checklist)-1:   # last list
             return radarmodes.next_mode_sequence(23)  # next mode
         else:
             g_iterator = next_list(g_iterator)
             return 23
+    if button == 1 and btime == 2:  # middle long
+        return radarmodes.next_mode_sequence(23)  # next mode
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, next item
