@@ -1048,6 +1048,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
         if 'CHECK1' in topic:
             if toprint:
                 right_text(draw, y, topic['CHECK1'], font=smallfont, fill="black", offset=topic_right_offset)
+
         y = y + SMALL
     if 'TASK2' in topic:   # subtopic2
         y = y + subtopic_offset
