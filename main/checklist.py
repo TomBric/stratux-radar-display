@@ -164,7 +164,7 @@ def user_input():
             g_iterator = previous_list(g_iterator)
         else:
             g_iterator = previous_item(g_iterator)
-        return 23
+        return 0
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 1 and btime == 1:  # middle and short
@@ -172,14 +172,14 @@ def user_input():
             return radarmodes.next_mode_sequence(23)  # next mode
         else:
             g_iterator = next_list(g_iterator)
-            return 23
+            return 0
     if button == 1 and btime == 2:  # middle long
         return radarmodes.next_mode_sequence(23)  # next mode
     if button == 2 and btime == 1:  # right and short, next item
         last_item = (g_iterator == [len(g_checklist) - 1, len(g_checklist[g_iterator[0]]['ITEM']) - 1])
         if not last_item:
             g_iterator = next_item(g_iterator)
-        return 23
+        return 0
     if button == 2 and btime == 2:  # right and long, refresh
         return 24  # start next mode for display driver: refresh called
-    return 23  # no mode change
+    return 0  # no mode change
