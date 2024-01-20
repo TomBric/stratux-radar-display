@@ -1075,19 +1075,22 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_item, l
     checklist_y = {'from': LARGE + 8, 'to': sizey - 2 * SMALL - 12}
     global top_index
 
+    centered_text(draw, 0, checklist_name, largefont, fill="black")
     if current_index == 0:
         top_index = 0     # new list, reset top index
-    centered_text(draw, 0, checklist_name, largefont, fill="black")
-    size = checklist_y['from']
-    while True:
-        for item in range(top_index, current_index + 2):   # check if also next element fits on screen
-            if item < len(checklist_items):
-                size = checklist_topic(draw, size, checklist_items[item], highlighted=False, toprint=False)
-        if size <= checklist_y['to']:  # fits in screen, no reason to scroll
-            break
-        else:
-            size = checklist_y['from']
-            top_index = top_index + 1   # scroll, ignore top element
+    if current_index < top_index:
+        top_index = current_index    # scroll up
+    else:       # check if scroll-down is needed
+        size = checklist_y['from']
+        while True:
+            for item in range(top_index, current_index + 2):   # check if also next element fits on screen
+                if item < len(checklist_items):
+                    size = checklist_topic(draw, size, checklist_items[item], highlighted=False, toprint=False)
+            if size <= checklist_y['to']:  # fits in screen, no reason to scroll
+                break
+            else:
+                size = checklist_y['from']
+                top_index = top_index + 1   # scroll, ignore top element
     # now display everything
     y = checklist_y['from']
     item = top_index

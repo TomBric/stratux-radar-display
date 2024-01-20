@@ -145,7 +145,7 @@ def user_input():
     if btime == 0:
         return 0  # stay in current mode
     checklist_changed = True
-    if button == 1 and btime == 1 :  # short
+    if button == 1 and btime == 1:  # short
         if g_iterator[0] == len(g_checklist)-1:   # last list
             return radarmodes.next_mode_sequence(23)  # next mode
         else:
