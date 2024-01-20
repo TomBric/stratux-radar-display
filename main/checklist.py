@@ -90,11 +90,11 @@ def init(checklist_xml):
 
 def next_item(iterator):     # switch to next item topic in checklist
     if iterator[1] < len(g_checklist[iterator[0]]['ITEM']) - 1:
-        iterator[1] = iterator[1] + 1
+        iterator[1] += 1
     else:
         iterator[1] = 0
         if iterator[0] < len(g_checklist) - 1:
-            iterator[0] = iterator[0] + 1
+            iterator[0] += 1
         else:
             iterator[0] = 0
     return iterator
@@ -102,20 +102,30 @@ def next_item(iterator):     # switch to next item topic in checklist
 
 def previous_item(iterator):
     if iterator[1] > 0:
-        iterator[1] = iterator[1] - 1
+        iterator[1] -= - 1
     else:
         if iterator[0] > 0:
-            iterator[0] = iterator[0] - 1
+            iterator[0] -= 1
         else:
             iterator[0] = len(g_checklist) - 1
         iterator[1] = len(g_checklist[iterator[0]]['ITEM']) - 1   # set to last item in this list
     return iterator
 
 
+def previous_list(iterator):
+
+    if iterator[0] > 0:
+        iterator[0] -= 1
+    else:
+        iterator[0] = len(g_checklist) - 1
+    iterator[1] = 0  # go to beginning of list anyhow
+    return iterator
+
+
 def next_list(iterator):
     iterator[1] = 0
     if iterator[0] < len(g_checklist) - 1:
-        iterator[0] = iterator[0] + 1
+        iterator[0] += 1
     else:
         iterator[0] = 0
     return iterator
@@ -134,7 +144,8 @@ def draw_checklist(draw, display_control, ui_changed):
         last_item = (g_iterator == [len(g_checklist)-1, len(g_checklist[g_iterator[0]]['ITEM']) - 1])
         first_item = (g_iterator[1] == 0)
         last_list = (g_iterator[0] == len(g_checklist) - 1)
-        display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1], first_item, last_item, last_list)
+        display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1],
+                                  first_item, last_item, last_list)
         display_control.display()
 
 
@@ -146,7 +157,7 @@ def user_input():
     if btime == 0:
         return 0  # stay in current mode
     checklist_changed = True
-    if button == 1 and btime == 1:  # short
+    if button == 1 and btime == 1:  # middle and short
         if g_iterator[0] == len(g_checklist)-1:   # last list
             return radarmodes.next_mode_sequence(23)  # next mode
         else:
@@ -162,7 +173,10 @@ def user_input():
             g_iterator = next_item(g_iterator)
         return 23
     if button == 0 and btime == 1:  # left and short, previous item
-        g_iterator = previous_item(g_iterator)
+        if g_iterator[1] == 0:  # first item, goto next list beginning
+            g_iterator = previous_list(g_iterator)
+        else:
+            g_iterator = previous_item(g_iterator)
         return 23
     if button == 2 and btime == 2:  # right and long, refresh
         return 24  # start next mode for display driver: refresh called
