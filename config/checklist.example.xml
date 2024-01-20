@@ -14,7 +14,7 @@
                 <ITEM> <TASK> 9. Oil Pressure           </TASK><CHECK> COLD             </CHECK> </ITEM>
                 <ITEM> <TASK> 10. Avionics switch       </TASK><CHECK> ON               </CHECK> </ITEM>
                 <ITEM> <TASK> 11. Radio(s)              </TASK><CHECK> ON/SET           </CHECK> </ITEM>
-                <ITEM> <TASK> 12. Transponder           </TASK><CHECK> ON / ALT         </CHECK> </ITEM>
+                <ITEM> <TASK> 12. Transponder           </TASK><CHECK> ON/ALT           </CHECK> </ITEM>
                 <ITEM> <TASK> 13. Wing Flaps            </TASK><CHECK> UP               </CHECK> </ITEM>
                 <ITEM> <TASK> 14. Mixture               </TASK><CHECK> LEAN             </CHECK> </ITEM>
                 <ITEM> <TASK> 15. READY TO TAXI         </TASK><CHECK>                  </CHECK> </ITEM>
