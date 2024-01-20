@@ -40,7 +40,7 @@
                 <TITLE> Before Takeoff </TITLE>
                 <ITEM> <TASK> 1. Doors                  </TASK><CHECK> CLOSED/LATCHED   </CHECK> </ITEM>
                 <ITEM> <TASK> 2. Brakes                 </TASK><CHECK> ON               </CHECK> </ITEM>
-                <ITEM> <TASK> 3. Flight controls        </TASK><CHECK> FREE & CORRECT   </CHECK> </ITEM>
+                <ITEM> <TASK> 3. Flight controls        </TASK><CHECK> FREE + CORRECT   </CHECK> </ITEM>
                 <ITEM> <TASK> 4. Flight instruments     </TASK><CHECK> SET              </CHECK> </ITEM>
                 <ITEM> <TASK> 5. Fuel valve             </TASK><CHECK> CHECK ON         </CHECK> </ITEM>
                 <ITEM> <TASK> 6. Mixture                </TASK><CHECK> RICH             </CHECK> </ITEM>
