@@ -102,7 +102,7 @@ def next_item(iterator):     # switch to next item topic in checklist
 
 def previous_item(iterator):
     if iterator[1] > 0:
-        iterator[1] -= - 1
+        iterator[1] -= 1
     else:
         if iterator[0] > 0:
             iterator[0] -= 1
