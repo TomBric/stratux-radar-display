@@ -1071,7 +1071,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     return y + topic_offset
 
 
-def checklist(draw, checklist_name, checklist_items, current_index, last_item, last_list):
+def checklist(draw, checklist_name, checklist_items, current_index, first_item, last_item, last_list):
     checklist_y = {'from': LARGE + 8, 'to': sizey - 2 * SMALL - 12}
     global top_index
 
@@ -1099,9 +1099,13 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_item, l
             break
         y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
         item = item + 1
+    if first_item:
+        left = "PrevList"
+    else:
+        left = "Prev"
     if last_item:
         bottom_line(draw, "Prev", "Mode", "")
     elif last_list:
-        bottom_line(draw, "Prev", "Mode", "Checked")
+        bottom_line(draw, left, "Mode", "Checked")
     else:
-        bottom_line(draw, "Prev", "NxtList/Mode", "Checked")
+        bottom_line(draw, left, "NxtList/Mode", "Checked")
