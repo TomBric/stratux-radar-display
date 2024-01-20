@@ -1021,7 +1021,7 @@ def distance_statistics(draw, values):
 
 def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     xpos = 10
-    xpos_remark = 100
+    xpos_remark = 50
     xpos_sub = 50
     topic_offset = 12
     subtopic_offset = 6

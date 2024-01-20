@@ -13,9 +13,9 @@
                 <ITEM> <TASK> 8. Ignition Switch        </TASK><CHECK> Start            </CHECK> </ITEM>
                 <ITEM> <TASK> 9. Throttle               </TASK><CHECK> Adjust 1000 RPM or less</CHECK> </ITEM>
                 <ITEM> <TASK> 10. Oil Pressure          </TASK><CHECK> Check            </CHECK> </ITEM>
-                <ITEM> <TASK> 11. Radio(s), Avionics Power </TASK><CHECK> ON           </CHECK> </ITEM>
-                <ITEM> <TASK> 12. Transponder           </TASK><CHECK> ON/ALT           </CHECK> </ITEM>
-                <ITEM> <TASK> 13. Wing Flaps            </TASK><CHECK> UP               </CHECK> </ITEM>
+                <ITEM> <TASK> 11. Radio(s), Avionics Power </TASK><CHECK> On            </CHECK> </ITEM>
+                <ITEM> <TASK> 12. Transponder           </TASK><CHECK> On/Alt           </CHECK> </ITEM>
+                <ITEM> <TASK> 13. Wing Flaps            </TASK><CHECK> Up               </CHECK> </ITEM>
                 <ITEM> <TASK> 14. Lights                </TASK><CHECK> On (as req.)     </CHECK> </ITEM>
                 <ITEM> <TASK> 15. READY FOR TAXI        </TASK><CHECK>                  </CHECK> </ITEM>
         </CHECKLIST>
@@ -32,7 +32,7 @@
         <CHECKLIST>
                 <TITLE> Before Takeoff </TITLE>
                 <ITEM> <TASK> 1. Parking Brake          </TASK><CHECK> Set              </CHECK> </ITEM>
-                <ITEM> <TASK> 2. Cabin Doors / Seatbelts</TASK><CHECK> Closed + Latched </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Cabin Doors / Seatbelts</TASK><CHECK> Closed+Latched   </CHECK> </ITEM>
                 <ITEM> <TASK> 3. Flaps + Trim Tab       </TASK><CHECK>Take-off setting </CHECK> </ITEM>
                 <ITEM> <TASK> 4. Flight Controls        </TASK><CHECK> Free + Correct   </CHECK> </ITEM>
                 <ITEM> <TASK> 5. Flight Instruments     </TASK><CHECK> Set              </CHECK> </ITEM>

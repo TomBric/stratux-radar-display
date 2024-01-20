@@ -739,7 +739,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 21
                 elif global_mode == 23:  # checklist
-                    checklist.draw_checklist(g_draw, display_control, situation['was_changed'] or ui_changed)
+                    checklist.draw_checklist(g_draw, display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 24:  # refresh display, only relevant for epaper, mode was situation
                     rlog.debug("Checklist: Display driver - Refreshing")
