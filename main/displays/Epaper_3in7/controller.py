@@ -1029,43 +1029,42 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     topic_right_offset = 6
 
     y = ypos
-    if 'TASK' in topic:
+    if 'TASK' in topic and topic['TASK'] is not None:
         if toprint:
             draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill="black")    # Topic
-    if 'CHECK' in topic:
+    if 'CHECK' in topic and topic['CHECK'] is not None:
         if toprint:
             right_text(draw, ypos, topic['CHECK'], font=smallfont, fill="black", offset=topic_right_offset)     # Check
-    y = y + SMALL
-    if 'REMARK' in topic:   # remark
-        y = y + remark_offset
+    y += SMALL
+    if 'REMARK' in topic and topic['REMARK'] is not None:   # remark
+        y += remark_offset
         if toprint:
             draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill="black")  # remark
-        y = y + VERYSMALL
-    if 'TASK1' in topic:    # subtopic
-        y = y + subtopic_offset
+        y += VERYSMALL
+    if 'TASK1' in topic and topic['TASK1'] is not None:    # subtopic
+        y += subtopic_offset
         if toprint:
             draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill="black")  # subtopic
-        if 'CHECK1' in topic:
+        if 'CHECK1' in topic and topic['CHECK1'] is not None:
             if toprint:
                 right_text(draw, y, topic['CHECK1'], font=smallfont, fill="black", offset=topic_right_offset)
-
-        y = y + SMALL
-    if 'TASK2' in topic:   # subtopic2
-        y = y + subtopic_offset
+        y += SMALL
+    if 'TASK2' in topic and topic['TASK2'] is not None:   # subtopic2
+        y += subtopic_offset
         if toprint:
             draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill="black")  # subtopic
-        if 'CHECK2' in topic:
+        if 'CHECK2' in topic and topic['CHECK2'] is not None:
             if toprint:
                 right_text(draw, y, topic['CHECK2'], font=smallfont, fill="black", offset=topic_right_offset)
-        y = y + SMALL
-    if 'TASK3' in topic:   # subtopic3
-        y = y + subtopic_offset
+        y += SMALL
+    if 'TASK3' in topic and topic['TASK3'] is not None:   # subtopic3
+        y += subtopic_offset
         if toprint:
             draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="black")  # subtopic
-        if 'CHECK3' in topic:
+        if 'CHECK3' in topic and topic['CHECK3'] is not None:
             if toprint:
                 right_text(draw, y, topic['CHECK3'], font=smallfont, fill="black", offset=topic_right_offset)
-        y = y + SMALL
+        y += SMALL
     if highlighted:   # draw frame around whole topic
         if toprint:
             draw.rounded_rectangle([3, ypos-4, sizex-2, y+6], width=3, radius=5, outline="black")
