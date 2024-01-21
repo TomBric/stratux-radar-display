@@ -1095,7 +1095,7 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
                 break    # everything fits to the end of the list
             size = checklist_topic(draw, size, checklist_items[last_item], highlighted=False, toprint=False)
             if size > checklist_y['to']:   # last item did not fit
-                rlog.debug("{} did not fit. Size was {0}".format(last_item, size))
+                rlog.debug("{0} did not fit. Size was {1}".format(last_item, size))
                 last_item -= 1
                 break
         rlog.debug("Last item that fits is {0}".format(last_item))
