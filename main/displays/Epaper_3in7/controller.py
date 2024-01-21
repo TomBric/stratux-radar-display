@@ -1097,12 +1097,15 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
             if size > checklist_y['to']:   # last item did not fit
                 last_item -= 1
                 break
+        rlog.debug("Last item that fits is {0}".format(last_item))
         # last item now shows the last one that fits
         if current_index + 1 <= last_item: # next item would also fit on screen
             break
         else:      # next item would not fit
+            rlog.debug("Next item {0} would not fit. Scroll ".format(current_index + 1))
             top_index += 1  # need to scroll, but now test again what would fit
             if current_index == len(checklist_items):  # list is finished
+                rlog.debug("List is finished at current_index {0} ".format(current_index))
                 break
     # now display everything
     rlog.debug("now display: from {0} current {1} to {2}".format(top_index, current_index, last_item))
