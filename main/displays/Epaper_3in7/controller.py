@@ -1104,7 +1104,7 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
         else:      # next item would not fit
             rlog.debug("Next item {0} would not fit. Scroll ".format(current_index + 1))
             top_index += 1  # need to scroll, but now test again what would fit
-            if current_index == len(checklist_items):  # list is finished
+            if current_index == len(checklist_items) - 1:  # list is finished
                 rlog.debug("List is finished at current_index {0} ".format(current_index))
                 break
     # now display everything
