@@ -61,6 +61,7 @@ import radarmodes
 import simulation
 import checklist
 from datetime import datetime, timezone
+from pathlib import Path
 
 # logging
 SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
@@ -93,10 +94,12 @@ OPTICAL_ALIVE_TIME = 3
 # global variables
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
 DEFAULT_MIXER = "Speaker"  # default mixer name to be used for sound output
-CONFIG_DIR = "../config/"
-CONFIG_FILE = CONFIG_DIR + "stratux-radar.conf"
-DEFAULT_CHECKLIST = CONFIG_DIR + "checklist.xml"
-SAVED_FLIGHTS = CONFIG_DIR + "stratux-radar.flights"
+
+# str(Path(__file__).resolve().parent.joinpath('CONFIG_DIR', name))
+CONFIG_DIR = "config"
+CONFIG_FILE = str(Path(__file__).resolve().parent.joinpath(CONFIG_DIR, "stratux-radar.conf"))
+DEFAULT_CHECKLIST = str(Path(__file__).resolve().parent.joinpath(CONFIG_DIR, "checklist.xml"))
+SAVED_FLIGHTS = str(Path(__file__).resolve().parent.joinpath(CONFIG_DIR, "stratux-radar.flights"))
 
 url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""

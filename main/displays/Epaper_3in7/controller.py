@@ -37,6 +37,7 @@ import math
 import time
 import datetime
 from pathlib import Path
+import logging
 
 # global constants
 VERYLARGE = 48    # timer
@@ -82,6 +83,7 @@ space = 3  # space between scale figures and zero line
 # end device globals
 
 top_index = 0    # top index being displayed in checklist
+rlog = None
 
 
 def posn(angle, arm_length):
@@ -148,7 +150,9 @@ def init(fullcircle=False):
     global compass_aircraft
     global mask
     global cdraw
+    global rlog
 
+    rlog = logging.getLogger('stratux-radar-log')
     device = epd3in7.EPD()
     device.init(0)
     device.Clear(0xFF, 0)   # necessary to overwrite everything
@@ -1074,6 +1078,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
 def checklist(draw, checklist_name, checklist_items, current_index, first_item, last_item, last_list):
     checklist_y = {'from': LARGE + 8, 'to': sizey - 2 * SMALL - 12}
     global top_index
+    global rlog
 
     centered_text(draw, 0, checklist_name, largefont, fill="black")
     if current_index == 0:
