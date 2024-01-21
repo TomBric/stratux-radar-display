@@ -1094,7 +1094,7 @@ def checklist(draw, checklist_name, checklist_items, current_index, first_item, 
     # now display everything
     y = checklist_y['from']
     item = top_index
-    while y <= checklist_y['to']:
+    while y < checklist_y['to']:
         if item >= len(checklist_items):
             break
         y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
