@@ -1083,6 +1083,7 @@ def checklist(draw, checklist_name, checklist_items, current_index, first_item, 
     else:       # check if scroll-down is needed
         size = checklist_y['from']
         while True:
+            rlog.debug("Checking screen fit from item {0} to {1}".format(top_index, current_index+1))
             for item in range(top_index, current_index + 2):   # check if also next element fits on screen
                 if item < len(checklist_items):
                     size = checklist_topic(draw, size, checklist_items[item], highlighted=False, toprint=False)
