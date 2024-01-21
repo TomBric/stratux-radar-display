@@ -1077,6 +1077,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
 
 def checklist(draw, checklist_name, checklist_items, current_index, last_list):
     checklist_y = {'from': LARGE + 8, 'to': sizey - 2 * SMALL - 8}
+    rlog_debug("Printing range from x {0} to {1}".format(checklist_y['from'], checklist_y['to']))
     global top_index
     global rlog
 
