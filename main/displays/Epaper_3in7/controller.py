@@ -1098,6 +1098,7 @@ def checklist(draw, checklist_name, checklist_items, current_index, first_item, 
                 size = checklist_y['from']
                 top_index = top_index + 1   # scroll, ignore top element
     # now display everything
+    y = checklist_y['from']
     for item in range(top_index, current_index + 2):
         if item < len(checklist_items):
             y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
