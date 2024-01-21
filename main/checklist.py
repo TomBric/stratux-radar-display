@@ -151,8 +151,8 @@ def draw_checklist(draw, display_control, ui_changed):
             display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1],
                                   first_item, last_item, last_list)
         else:
-            display_control.text_screen(draw, "Error reading checklist", "Press button to continue",
-                                        "", "", "Next Mode", "")
+            display_control.text_screen(draw, "", "Error reading checklist",
+                                        "Press button to continue", "", "Next Mode", "")
         display_control.display()
 
 
@@ -165,6 +165,8 @@ def user_input():
     if btime == 0:
         return 0  # stay in current mode
     g_checklist_changed = True
+    if g_checklist is None:    # xml reading failed
+        return radarmodes.next_mode_sequence(23)  # next mode after any press
     if button == 0 and btime == 1:  # left and short, previous item
         if g_iterator[1] == 0:  # first item, goto next list beginning
             g_iterator = previous_list(g_iterator)
