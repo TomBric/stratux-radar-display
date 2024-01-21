@@ -1097,6 +1097,7 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
         else:      # next item would not fit
             top_index += 1  # need to scroll, but now test again what would fit
     # now display everything
+    rlog.debug("now display: from {0} current {1} to {2}".format(top_index, current_index, last_item-1))
     y = checklist_y['from']
     for item in range(top_index, last_item):
         if item < len(checklist_items):
