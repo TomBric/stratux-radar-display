@@ -1076,7 +1076,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
 
 
 def checklist(draw, checklist_name, checklist_items, current_index, last_list):
-    checklist_y = {'from': LARGE + 8, 'to': sizey - 2 * SMALL - 12}
+    checklist_y = {'from': LARGE + 8, 'to': sizey - 2 * SMALL - 8}
     global top_index
     global rlog
 
@@ -1085,8 +1085,7 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
         top_index = 0     # new list, reset top index
     if current_index < top_index:
         top_index = current_index    # scroll up
-        # check what would fit on the screen
-    while True:
+    while True:  # check what would fit on the screen
         last_item = top_index
         size = checklist_topic(draw, checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
         while True:
@@ -1099,10 +1098,12 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
                 last_item -= 1
                 break
         # last item now shows the last one that fits
-        if current_index + 1 <= last_item:   # next item would also fit on screen
+        if current_index + 1 <= last_item: # next item would also fit on screen
             break
         else:      # next item would not fit
             top_index += 1  # need to scroll, but now test again what would fit
+            if last_item == len(checklist_items):  # list is finished
+                break
     # now display everything
     rlog.debug("now display: from {0} current {1} to {2}".format(top_index, current_index, last_item))
     y = checklist_y['from']
