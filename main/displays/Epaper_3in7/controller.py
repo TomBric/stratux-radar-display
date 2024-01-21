@@ -1075,7 +1075,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     return y + topic_offset
 
 
-def checklist(draw, checklist_name, checklist_items, current_index, first_item, last_item, last_list):
+def checklist(draw, checklist_name, checklist_items, current_index, last_list):
     checklist_y = {'from': LARGE + 8, 'to': sizey - 2 * SMALL - 12}
     global top_index
     global rlog
@@ -1093,7 +1093,7 @@ def checklist(draw, checklist_name, checklist_items, current_index, first_item, 
             while size <= checklist_y['to'] and last_item < len(checklist_items):
                 size = checklist_topic(draw, size, checklist_items[last_item], highlighted=False, toprint=False)
                 last_item += 1
-            if current_index + 1 > last_item:   # next item would not fit
+            if last_item <= current_index + 1:   # next item would not fit
                 top_index += 1  # need to scroll, but now test again what would fit
                 size = checklist_y['from']
                 last_item = top_index
@@ -1104,11 +1104,11 @@ def checklist(draw, checklist_name, checklist_items, current_index, first_item, 
     for item in range(top_index, last_item):
         if item < len(checklist_items):
             y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
-    if first_item:
+    if current_index == 0:  # first item
         left = "PrevList"
     else:
         left = "Prev"
-    if last_item:
+    if last_list and current_index == len(checklist_items) - 1:  # last_item
         bottom_line(draw, "Prev", "Mode", "")
     elif last_list:
         bottom_line(draw, left, "Mode", "Checked")

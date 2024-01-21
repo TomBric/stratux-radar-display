@@ -143,11 +143,9 @@ def draw_checklist(draw, display_control, ui_changed):
         if g_checklist is not None:
             checklist_name = g_checklist[g_iterator[0]]['TITLE']
             checklist_items = g_checklist[g_iterator[0]]['ITEM']
-            last_item = (g_iterator == [len(g_checklist)-1, len(g_checklist[g_iterator[0]]['ITEM']) - 1])
-            first_item = (g_iterator[1] == 0)
             last_list = (g_iterator[0] == len(g_checklist) - 1)
             rlog.debug("Calling display: current {0}, first_item {1}, last_item {2}, last_list {3}"
-                   .format(g_iterator[1], first_item, last_item, last_list))
+                   .format(g_iterator[1], last_list))
             display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1],
                                   first_item, last_item, last_list)
         else:
