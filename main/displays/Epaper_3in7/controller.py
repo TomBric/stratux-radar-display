@@ -1027,7 +1027,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     xpos = 10
     xpos_remark = 50
     xpos_sub = 50
-    topic_offset = 12
+    topic_offset = 8
     subtopic_offset = 6
     remark_offset = 4
     topic_right_offset = 6
