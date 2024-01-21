@@ -1089,19 +1089,21 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
     while True:
         last_item = top_index
         size = checklist_topic(draw, checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
-        while last_item + 1 < len(checklist_items):
-            last_item += 1
+        while size <= checklist_y['to']:
+            if last_item + 1 < len(checklist_items):
+                last_item += 1
+            else:
+                break    # everything fits to the end of the list
             size = checklist_topic(draw, size, checklist_items[last_item], highlighted=False, toprint=False)
-            if size > checklist_y['to']:
-                break    # last item now shows the last one, that does not fit
-        if current_index + 1 <= last_item:   # next item would also fit on screen
+        # last item now shows the first one that does not fit
+        if current_index + 1 < last_item:   # next item would also fit on screen
             break
         else:      # next item would not fit
             top_index += 1  # need to scroll, but now test again what would fit
     # now display everything
-    rlog.debug("now display: from {0} current {1} to {2}".format(top_index, current_index, last_item-1))
+    rlog.debug("now display: from {0} current {1} to {2}".format(top_index, current_index, last_item))
     y = checklist_y['from']
-    for item in range(top_index, last_item):
+    for item in range(top_index, last_item + 1):
         if item < len(checklist_items):
             y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
     if current_index == 0:  # first item
