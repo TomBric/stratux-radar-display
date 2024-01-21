@@ -1089,7 +1089,7 @@ def checklist(draw, checklist_name, checklist_items, current_index, first_item, 
         # check what would fit on the screen
         size = checklist_y['from']
         last_item = top_index
-        while true:
+        while True:
             while size <= checklist_y['to'] and last_item < len(checklist_items):
                 size = checklist_topic(draw, size, checklist_items[last_item], highlighted=False, toprint=False)
                 last_item += 1
