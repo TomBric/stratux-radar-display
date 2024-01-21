@@ -44,6 +44,7 @@ rlog = None  # radar specific logger
 # globals
 g_checklist = None   # global checklist, is a list of (list_name, panda.DataFrame)
 g_iterator = [0, 0]   # current position of checklist [checklist number, item no in this list]
+g_checklist_changed = True
 
 
 def init(checklist_xml):
@@ -133,11 +134,11 @@ def next_list(iterator):
 def draw_checklist(draw, display_control, ui_changed):
     global g_iterator
     global g_checklist
-    global checklist_changed
+    global g_checklist_changed
 
-    rlog.debug("draw_checklist: ui-changed {0} checklist_changed {1}".format(ui_changed, checklist_changed))
-    if ui_changed or checklist_changed:
-        checklist_changed = False
+    rlog.debug("draw_checklist: ui-changed {0} g_checklist_changed {1}".format(ui_changed, g_checklist_changed))
+    if ui_changed or g_checklist_changed:
+        g_checklist_changed = False
         display_control.clear(draw)
         checklist_name = g_checklist[g_iterator[0]]['TITLE']
         checklist_items = g_checklist[g_iterator[0]]['ITEM']
@@ -153,12 +154,12 @@ def draw_checklist(draw, display_control, ui_changed):
 
 def user_input():
     global g_iterator
-    global checklist_changed
+    global g_checklist_changed
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
         return 0  # stay in current mode
-    checklist_changed = True
+    g_checklist_changed = True
     if button == 0 and btime == 1:  # left and short, previous item
         if g_iterator[1] == 0:  # first item, goto next list beginning
             g_iterator = previous_list(g_iterator)
