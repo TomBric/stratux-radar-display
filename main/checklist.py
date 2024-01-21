@@ -135,7 +135,7 @@ def draw_checklist(draw, display_control, ui_changed):
     global g_checklist
     global checklist_changed
 
-    rlog.debug("draw_checklist: ui-changed {0} checklist_changed {1]".format(ui_changed, checklist_changed))
+    rlog.debug("draw_checklist: ui-changed {0} checklist_changed {1}".format(ui_changed, checklist_changed))
     if ui_changed or checklist_changed:
         checklist_changed = False
         display_control.clear(draw)
