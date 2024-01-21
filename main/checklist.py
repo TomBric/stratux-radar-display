@@ -136,7 +136,7 @@ def draw_checklist(draw, display_control, ui_changed):
     global g_checklist
     global g_checklist_changed
 
-    rlog.debug("draw_checklist: ui-changed {0} g_checklist_changed {1}".format(ui_changed, g_checklist_changed))
+    # rlog.debug("draw_checklist: ui-changed {0} g_checklist_changed {1}".format(ui_changed, g_checklist_changed))
     if ui_changed or g_checklist_changed:
         g_checklist_changed = False
         display_control.clear(draw)
@@ -151,8 +151,7 @@ def draw_checklist(draw, display_control, ui_changed):
             display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1],
                                   first_item, last_item, last_list)
         else:
-            display_control.text_screen(draw, "", "Error reading checklist",
-                                        "Press button to continue", "", "Next Mode", "")
+            display_control.text_screen(draw, "", "Error reading checklist", "", "", "Next Mode", "")
         display_control.display()
 
 
