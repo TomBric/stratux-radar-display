@@ -99,6 +99,7 @@ CONFIG_DIR = "config"
 CONFIG_FILE = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "stratux-radar.conf"))
 DEFAULT_CHECKLIST = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "checklist.xml"))
 SAVED_FLIGHTS = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "stratux-radar.flights"))
+SAVED_STATISTICS = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "stratux-radar.stat"))
 
 url_host_base = DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
@@ -801,7 +802,8 @@ def main():
     stratuxstatus.init(display_control, url_status_ws)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
-    grounddistance.init(grounddistance_activated, SITUATION_DEBUG, groundbeep, situation, simulation_mode)
+    grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
+                        groundbeep, situation, simulation_mode)
     simulation.init(simulation_mode)
     checklist.init(excel_checklist)
     display_control.startup(g_draw, RADAR_VERSION, url_host_base, 4)
