@@ -620,14 +620,14 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
         centered_text(draw, 80, error_message, smallfont, fill="black")
 
 
-def text_screen(draw, headline, subline, text, left_text, middle_text, right_text):
+def text_screen(draw, headline, subline, text, left_text, middle_text, r_text):
     centered_text(draw, 0, headline, verylargefont, fill="black")
     txt_starty = VERYLARGE
     if subline is not None:
         centered_text(draw, txt_starty, subline, largefont, fill="black")
         txt_starty += LARGE
     draw.text((5, txt_starty), text, font=smallfont, fill="black")
-    bottom_line(draw, left_text, middle_text, right_text)
+    bottom_line(draw, left_text, middle_text, r_text)
 
 
 def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp, suffix):
@@ -1044,9 +1044,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
 
 
 def checklist(draw, checklist_name, checklist_items, current_index, last_list):
-    global rlog
     checklist_y = {'from': LARGE + 8, 'to': sizey - SMALL - 6}
-    rlog.debug("Printing range from x {0} to {1}".format(checklist_y['from'], checklist_y['to']))
     global top_index
 
     centered_text(draw, 0, checklist_name, largefont, fill="black")
@@ -1064,22 +1062,17 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
                 break    # everything fits to the end of the list
             size = checklist_topic(draw, size, checklist_items[last_item], highlighted=False, toprint=False)
             if size > checklist_y['to']:   # last item did not fit
-                rlog.debug("{0} did not fit. Size was {1}".format(last_item, size))
                 last_item -= 1
                 break
-        rlog.debug("Last item that fits is {0}".format(last_item))
         # last item now shows the last one that fits
-        if current_index + 1 <= last_item or last_item +1 == len(checklist_items):
+        if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
             # next item would also fit on screen or list is fully displayed
             break
         else:      # next item would not fit
-            rlog.debug("Next item {0} would not fit. Scroll ".format(current_index + 1))
             top_index += 1  # need to scroll, but now test again what would fit
             if current_index == len(checklist_items) - 1:  # list is finished
-                rlog.debug("List is finished at current_index {0} ".format(current_index))
                 break
     # now display everything
-    rlog.debug("now display: from {0} current {1} to {2}".format(top_index, current_index, last_item))
     y = checklist_y['from']
     for item in range(top_index, last_item + 1):
         if item < len(checklist_items):

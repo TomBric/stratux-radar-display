@@ -72,7 +72,7 @@ def init(checklist_xml):
         g_checklist = xml_dict['ALL_CHECKLISTS']['CHECKLIST']
     except KeyError:
         rlog.debug("Checklist - KeyError understanding dict from xml")
-    rlog.debug("Checklist read: {0}".format(g_checklist))
+    # rlog.debug("Checklist read: {0}".format(g_checklist))
     # g_checklist is now a list of checklists
     # [{'ITEM': [{'CHECK': 'Done',
     #            'REMARK': 'Please use preflight checklist',
@@ -136,7 +136,6 @@ def draw_checklist(draw, display_control, ui_changed):
     global g_checklist
     global g_checklist_changed
 
-    # rlog.debug("draw_checklist: ui-changed {0} g_checklist_changed {1}".format(ui_changed, g_checklist_changed))
     if ui_changed or g_checklist_changed:
         g_checklist_changed = False
         display_control.clear(draw)
@@ -144,8 +143,6 @@ def draw_checklist(draw, display_control, ui_changed):
             checklist_name = g_checklist[g_iterator[0]]['TITLE']
             checklist_items = g_checklist[g_iterator[0]]['ITEM']
             last_list = (g_iterator[0] == len(g_checklist) - 1)
-            rlog.debug("Calling display: current {0}, last_list {1}"
-                   .format(g_iterator[1],last_list))
             display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1], last_list)
         else:
             display_control.text_screen(draw, "", "Error reading checklist", "", "", "Next Mode", "")
