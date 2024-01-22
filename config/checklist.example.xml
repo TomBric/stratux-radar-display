@@ -48,7 +48,7 @@
                 <ITEM> <TASK> 8. Throttle               </TASK><CHECK> Idle then 800 Rpm</CHECK> </ITEM>
                 <ITEM> <TASK> 9. Throttle Friction Lock </TASK><CHECK> Adjust           </CHECK> </ITEM>
                 <ITEM> <TASK> 10. Parking Brake         </TASK><CHECK> Release          </CHECK> </ITEM>
-                <ITEM> <TASK> READY FOR TAKEOFF         </TASK><CHECK>                  </CHECK> </ITEM>
+                <ITEM> <TASK> READY FOR TAKEOFF CHECK   </TASK><CHECK>                  </CHECK> </ITEM>
         </CHECKLIST>
         <CHECKLIST>
                 <TITLE> Normal Takeoff </TITLE>
@@ -57,5 +57,6 @@
                 <ITEM> <TASK> 3. Throttle               </TASK><CHECK> Full Open        </CHECK> </ITEM>
                 <ITEM> <TASK> 4. Elevator               </TASK><CHECK> Rotate at 60 KIAS</CHECK> </ITEM>
                 <ITEM> <TASK> 5. Climb Speed            </TASK><CHECK> 80-90 KIAS        </CHECK> </ITEM>
+                <ITEM> <TASK> READY FOR TAKEOFF         </TASK><CHECK> 80-90 KIAS        </CHECK> </ITEM>
         </CHECKLIST>
 </ALL_CHECKLISTS>

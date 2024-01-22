@@ -164,7 +164,7 @@ def user_input():
     if g_checklist is None:    # xml reading failed
         return radarmodes.next_mode_sequence(23)  # next mode after any press
     if button == 0 and btime == 1:  # left and short, previous item
-        if g_iterator[1] == 0:  # first item, goto next list beginning
+        if g_iterator[1] == 0:  # first item, goto next list
             g_iterator = previous_list(g_iterator)
         else:
             g_iterator = previous_item(g_iterator)
