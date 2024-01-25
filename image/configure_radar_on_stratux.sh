@@ -12,8 +12,8 @@ sudo pip3 install luma.oled
 #websockets for radar
 sudo pip3 install websockets ADS1x15-ADC
 
-# for checklist display and excel reading
-pip3 install pandas xlrd
+# for checklist display xml parsing
+sudo pip3 install xmltodict
 
 # sound configuration for external output
 sudo apt-get install libasound2-dev -y
@@ -31,7 +31,6 @@ sudo pip3 install pydbus
 mkdir -p /home/pi/tmp
 sudo TMPDIR=/home/pi/tmp pip3 install PILLOW==9.5
 sudo apt install python3-numpy -y
-sudo apt install python3-pandas -y
 
 # get files from repo
 # cd /home/pi && git clone https://github.com/TomBric/stratux-radar-display.git

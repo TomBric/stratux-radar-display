@@ -30,8 +30,8 @@ pip3 install luma.oled
 #websockets for radar and ADS1115 analog reader for co warner
 pip3 install websockets ADS1x15-ADC
 
-# for checklist display and excel reading
-pip3 install pandas xlrd
+# for checklist display and xml parsing
+pip3 install xmltodict
 
 # espeak-ng for sound output and alsoaudio for external sound
 apt-get install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data libespeak-ng-dev -y
