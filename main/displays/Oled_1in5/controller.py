@@ -963,7 +963,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
             draw.text((xpos, ypos), topic['TASK'], font=verysmallfont, fill="white")  # Topic
     if 'CHECK' in topic and topic['CHECK'] is not None:
         if toprint:
-            right_text(draw, ypos, topic['CHECK'], font=verysmallfont, fill="yellow", offset=topic_right_offset)  # Check
+            right_text(draw, ypos, topic['CHECK'], font=verysmallfont, fill="yellow", offset=topic_right_offset) # Check
     y += SMALL
     if 'REMARK' in topic and topic['REMARK'] is not None:  # remark
         y += remark_offset
