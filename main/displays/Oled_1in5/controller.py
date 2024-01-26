@@ -952,18 +952,18 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     xpos = 10
     xpos_remark = 50
     xpos_sub = 50
-    topic_offset = 8
-    subtopic_offset = 6
-    remark_offset = 4
-    topic_right_offset = 6
+    topic_offset = 3
+    subtopic_offset = 3
+    remark_offset = 2
+    topic_right_offset = 3
 
     y = ypos
     if 'TASK' in topic and topic['TASK'] is not None:
         if toprint:
-            draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill="white")  # Topic
+            draw.text((xpos, ypos), topic['TASK'], font=verysmallfont, fill="white")  # Topic
     if 'CHECK' in topic and topic['CHECK'] is not None:
         if toprint:
-            right_text(draw, ypos, topic['CHECK'], font=smallfont, fill="yellow", offset=topic_right_offset)  # Check
+            right_text(draw, ypos, topic['CHECK'], font=verysmallfont, fill="yellow", offset=topic_right_offset)  # Check
     y += SMALL
     if 'REMARK' in topic and topic['REMARK'] is not None:  # remark
         y += remark_offset
@@ -973,35 +973,35 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     if 'TASK1' in topic and topic['TASK1'] is not None:  # subtopic
         y += subtopic_offset
         if toprint:
-            draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill="white")  # subtopic
+            draw.text((xpos_sub, y), topic['TASK1'], font=verysmallfont, fill="white")  # subtopic
         if 'CHECK1' in topic and topic['CHECK1'] is not None:
             if toprint:
                 right_text(draw, y, topic['CHECK1'], font=smallfont, fill="yellow", offset=topic_right_offset)
-        y += SMALL
+        y += VERYSMALL
     if 'TASK2' in topic and topic['TASK2'] is not None:  # subtopic2
         y += subtopic_offset
         if toprint:
-            draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill="white")  # subtopic
+            draw.text((xpos_sub, y), topic['TASK2'], font=verysmallfont, fill="white")  # subtopic
         if 'CHECK2' in topic and topic['CHECK2'] is not None:
             if toprint:
-                right_text(draw, y, topic['CHECK2'], font=smallfont, fill="yellow", offset=topic_right_offset)
-        y += SMALL
+                right_text(draw, y, topic['CHECK2'], font=verysmallfont, fill="yellow", offset=topic_right_offset)
+        y += VERYSMALL
     if 'TASK3' in topic and topic['TASK3'] is not None:  # subtopic3
         y += subtopic_offset
         if toprint:
-            draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="white")  # subtopic
+            draw.text((xpos_sub, y), topic['TASK3'], font=verysmallfont, fill="white")  # subtopic
         if 'CHECK3' in topic and topic['CHECK3'] is not None:
             if toprint:
-                right_text(draw, y, topic['CHECK3'], font=smallfont, fill="yellow", offset=topic_right_offset)
-        y += SMALL
+                right_text(draw, y, topic['CHECK3'], font=verysmallfont, fill="yellow", offset=topic_right_offset)
+        y += VERYSMALL
     if highlighted:  # draw frame around whole topic
         if toprint:
-            draw.rounded_rectangle([3, ypos - 4, sizex - 2, y + 6], width=3, radius=5, outline="white")
+            draw.rounded_rectangle([3, ypos - 2, sizex - 2, y + 3], width=2, radius=3, outline="white")
     return y + topic_offset
 
 
 def checklist(draw, checklist_name, checklist_items, current_index, last_list):
-    checklist_y = {'from': LARGE + 8, 'to': sizey - SMALL - 6}
+    checklist_y = {'from': LARGE + 8, 'to': sizey - VERYSMALL - 6}
     global top_index
 
     centered_text(draw, 0, checklist_name, largefont, fill="yellow")
