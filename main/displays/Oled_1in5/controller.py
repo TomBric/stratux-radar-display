@@ -996,15 +996,15 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
         y += VERYSMALL
     if highlighted:  # draw frame around whole topic
         if toprint:
-            draw.rounded_rectangle([0, ypos - 2, sizex, y + 3], width=1, radius=3, outline="white")
+            draw.rounded_rectangle([0, ypos - 2, sizex-1, y + 1], width=1, radius=3, outline="white")
     return y + topic_offset
 
 
 def checklist(draw, checklist_name, checklist_items, current_index, last_list):
-    checklist_y = {'from': LARGE + 8, 'to': sizey - VERYSMALL - 6}
+    checklist_y = {'from': SMALL + 8, 'to': sizey - VERYSMALL - 6}
     global top_index
 
-    centered_text(draw, 0, checklist_name, largefont, fill="yellow")
+    centered_text(draw, 0, checklist_name, smallfont, fill="yellow")
     if current_index == 0:
         top_index = 0     # new list, reset top index
     if current_index < top_index:
@@ -1035,7 +1035,7 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
         if item < len(checklist_items):
             y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
     if current_index == 0:  # first item
-        left = "PrevList"
+        left = "PrevL"
     else:
         left = "Prev"
     if last_list and current_index == len(checklist_items) - 1:  # last_item
@@ -1043,4 +1043,4 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
     elif last_list:
         bottom_line(draw, left, "Mode", "Checked")
     else:
-        bottom_line(draw, left, "NextList/Mode", "Checked")
+        bottom_line(draw, left, "NxtList", "Checked")
