@@ -151,7 +151,7 @@ def bottom_line(draw, left, middle, right):
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 
-def right_text(draw, y, text, font, fill):
+def right_text(draw, y, text, font, fill, offset=0):
     tl = draw.textlength(text, font)
     draw.text((sizex - tl, y), text, font=font, fill=fill)
 
