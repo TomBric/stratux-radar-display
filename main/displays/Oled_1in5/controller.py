@@ -144,6 +144,13 @@ def centered_text(draw, y, text, font, fill):
     draw.text((zerox - tl / 2, y), text, font=font, fill=fill)
 
 
+def bottom_line(draw, left, middle, right):
+    draw.text((5, sizey - SMALL - 3), left, font=smallfont, fill="green")
+    textlength = draw.textlength(right, smallfont)
+    draw.text((sizex - textlength - 8, sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
+
+
 def right_text(draw, y, text, font, fill):
     tl = draw.textlength(text, font)
     draw.text((sizex - tl, y), text, font=font, fill=fill)
@@ -892,7 +899,6 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
         )
         dashboard(draw, 0, starty, sizex, lines)
 
-
     if error_message is not None:
         centered_text(draw, 80, error_message, verylargefont, fill="red")
     left = "Stats"
@@ -940,3 +946,101 @@ def distance_statistics(draw, values):
 
     middle = "Back"
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
+
+
+def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
+    xpos = 10
+    xpos_remark = 50
+    xpos_sub = 50
+    topic_offset = 8
+    subtopic_offset = 6
+    remark_offset = 4
+    topic_right_offset = 6
+
+    y = ypos
+    if 'TASK' in topic and topic['TASK'] is not None:
+        if toprint:
+            draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill="white")  # Topic
+    if 'CHECK' in topic and topic['CHECK'] is not None:
+        if toprint:
+            right_text(draw, ypos, topic['CHECK'], font=smallfont, fill="yellow", offset=topic_right_offset)  # Check
+    y += SMALL
+    if 'REMARK' in topic and topic['REMARK'] is not None:  # remark
+        y += remark_offset
+        if toprint:
+            draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill="white")  # remark
+        y += VERYSMALL
+    if 'TASK1' in topic and topic['TASK1'] is not None:  # subtopic
+        y += subtopic_offset
+        if toprint:
+            draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill="white")  # subtopic
+        if 'CHECK1' in topic and topic['CHECK1'] is not None:
+            if toprint:
+                right_text(draw, y, topic['CHECK1'], font=smallfont, fill="yellow", offset=topic_right_offset)
+        y += SMALL
+    if 'TASK2' in topic and topic['TASK2'] is not None:  # subtopic2
+        y += subtopic_offset
+        if toprint:
+            draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill="white")  # subtopic
+        if 'CHECK2' in topic and topic['CHECK2'] is not None:
+            if toprint:
+                right_text(draw, y, topic['CHECK2'], font=smallfont, fill="yellow", offset=topic_right_offset)
+        y += SMALL
+    if 'TASK3' in topic and topic['TASK3'] is not None:  # subtopic3
+        y += subtopic_offset
+        if toprint:
+            draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="white")  # subtopic
+        if 'CHECK3' in topic and topic['CHECK3'] is not None:
+            if toprint:
+                right_text(draw, y, topic['CHECK3'], font=smallfont, fill="yellow", offset=topic_right_offset)
+        y += SMALL
+    if highlighted:  # draw frame around whole topic
+        if toprint:
+            draw.rounded_rectangle([3, ypos - 4, sizex - 2, y + 6], width=3, radius=5, outline="white")
+    return y + topic_offset
+
+
+def checklist(draw, checklist_name, checklist_items, current_index, last_list):
+    checklist_y = {'from': LARGE + 8, 'to': sizey - SMALL - 6}
+    global top_index
+
+    centered_text(draw, 0, checklist_name, largefont, fill="yellow")
+    if current_index == 0:
+        top_index = 0     # new list, reset top index
+    if current_index < top_index:
+        top_index = current_index    # scroll up
+    while True:  # check what would fit on the screen
+        last_item = top_index
+        size = checklist_topic(draw, checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
+        while True:
+            if last_item + 1 < len(checklist_items):
+                last_item += 1
+            else:
+                break    # everything fits to the end of the list
+            size = checklist_topic(draw, size, checklist_items[last_item], highlighted=False, toprint=False)
+            if size > checklist_y['to']:   # last item did not fit
+                last_item -= 1
+                break
+        # last item now shows the last one that fits
+        if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
+            # next item would also fit on screen or list is fully displayed
+            break
+        else:      # next item would not fit
+            top_index += 1  # need to scroll, but now test again what would fit
+            if current_index == len(checklist_items) - 1:  # list is finished
+                break
+    # now display everything
+    y = checklist_y['from']
+    for item in range(top_index, last_item + 1):
+        if item < len(checklist_items):
+            y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
+    if current_index == 0:  # first item
+        left = "PrevList"
+    else:
+        left = "Prev"
+    if last_list and current_index == len(checklist_items) - 1:  # last_item
+        bottom_line(draw, "Prev", "Mode", "")
+    elif last_list:
+        bottom_line(draw, left, "Mode", "Checked")
+    else:
+        bottom_line(draw, left, "NextList/Mode", "Checked")
