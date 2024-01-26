@@ -55,7 +55,7 @@
                 <ITEM> <TASK> 1. Wing flaps             </TASK><CHECK> Up               </CHECK> </ITEM>
                 <ITEM> <TASK> 2. Carburator heat        </TASK><CHECK> Cold             </CHECK> </ITEM>
                 <ITEM> <TASK> 3. Throttle               </TASK><CHECK> Full Open        </CHECK> </ITEM>
-                <ITEM> <TASK> 4. Elevator               </TASK><CHECK> Rotate 60 <KIAS></KIAS></CHECK> </ITEM>
+                <ITEM> <TASK> 4. Elevator               </TASK><CHECK> Rotate 60        </CHECK> </ITEM>
                 <ITEM> <TASK> 5. Climb Speed            </TASK><CHECK> 80-90 KIAS        </CHECK> </ITEM>
                 <ITEM> <TASK> READY FOR TAKEOFF         </TASK><CHECK>                   </CHECK> </ITEM>
         </CHECKLIST>
