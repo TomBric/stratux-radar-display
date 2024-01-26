@@ -153,7 +153,7 @@ def bottom_line(draw, left, middle, right):
 
 def right_text(draw, y, text, font, fill, offset=0):
     tl = draw.textlength(text, font)
-    draw.text((sizex - tl, y), text, font=font, fill=fill)
+    draw.text((sizex - tl - offset, y), text, font=font, fill=fill)
 
 
 def display():
