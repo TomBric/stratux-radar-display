@@ -145,9 +145,9 @@ def centered_text(draw, y, text, font, fill):
 
 
 def bottom_line(draw, left, middle, right):
-    draw.text((5, sizey - SMALL - 3), left, font=smallfont, fill="green")
+    draw.text((0, sizey - SMALL - 3), left, font=smallfont, fill="green")
     textlength = draw.textlength(right, smallfont)
-    draw.text((sizex - textlength - 8, sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
+    draw.text((sizex - textlength, sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
     centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
 
 
@@ -1043,4 +1043,4 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
     elif last_list:
         bottom_line(draw, left, "Mode", "Checked")
     else:
-        bottom_line(draw, left, "NxtList", "Checked")
+        bottom_line(draw, left, "NxtList", "Check")
