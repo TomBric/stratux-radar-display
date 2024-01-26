@@ -57,6 +57,6 @@
                 <ITEM> <TASK> 3. Throttle               </TASK><CHECK> Full Open        </CHECK> </ITEM>
                 <ITEM> <TASK> 4. Elevator               </TASK><CHECK> Rotate at 60 KIAS</CHECK> </ITEM>
                 <ITEM> <TASK> 5. Climb Speed            </TASK><CHECK> 80-90 KIAS        </CHECK> </ITEM>
-                <ITEM> <TASK> READY FOR TAKEOFF         </TASK><CHECK> 80-90 KIAS        </CHECK> </ITEM>
+                <ITEM> <TASK> READY FOR TAKEOFF         </TASK><CHECK>                   </CHECK> </ITEM>
         </CHECKLIST>
 </ALL_CHECKLISTS>
