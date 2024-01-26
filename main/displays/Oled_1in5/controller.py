@@ -949,13 +949,13 @@ def distance_statistics(draw, values):
 
 
 def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
-    xpos = 10
-    xpos_remark = 50
-    xpos_sub = 50
-    topic_offset = 3
+    xpos = 2
+    xpos_remark = 20
+    xpos_sub = 20
+    topic_offset = 2
     subtopic_offset = 3
     remark_offset = 2
-    topic_right_offset = 3
+    topic_right_offset = 2
 
     y = ypos
     if 'TASK' in topic and topic['TASK'] is not None:
@@ -996,7 +996,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
         y += VERYSMALL
     if highlighted:  # draw frame around whole topic
         if toprint:
-            draw.rounded_rectangle([3, ypos - 2, sizex - 2, y + 3], width=2, radius=3, outline="white")
+            draw.rounded_rectangle([0, ypos - 2, sizex, y + 3], width=1, radius=3, outline="white")
     return y + topic_offset
 
 
