@@ -955,7 +955,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     topic_offset = 2
     subtopic_offset = 3
     remark_offset = 2
-    topic_right_offset = 2
+    topic_right_offset = 3
 
     y = ypos
     if 'TASK' in topic and topic['TASK'] is not None:
