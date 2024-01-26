@@ -48,7 +48,7 @@
                 <ITEM> <TASK> 8. Throttle               </TASK><CHECK> Idle,800 Rpm</CHECK> </ITEM>
                 <ITEM> <TASK> 9. Throttle Frict.  </TASK><CHECK> Adjust           </CHECK> </ITEM>
                 <ITEM> <TASK> 10. Parking Brake         </TASK><CHECK> Release          </CHECK> </ITEM>
-                <ITEM> <TASK> READY TAKEOFF CHECK       </TASK><CHECK>                  </CHECK> </ITEM>
+                <ITEM> <TASK> READY TAKEOFF CHECK       </TASK><CHECK> ok              </CHECK> </ITEM>
         </CHECKLIST>
         <CHECKLIST>
                 <TITLE> Normal Takeoff </TITLE>
