@@ -996,7 +996,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
         y += VERYSMALL
     if highlighted:  # draw frame around whole topic
         if toprint:
-            draw.rounded_rectangle([0, ypos - 2, sizex-1, y + 1], width=1, radius=3, outline="white")
+            draw.rounded_rectangle([0, ypos - 1, sizex-1, y + 1], width=1, radius=3, outline="white")
     return y + topic_offset
 
 
