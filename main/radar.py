@@ -122,7 +122,7 @@ vertical_max = 0.0  # max value for vertical speed
 vertical_min = 0.0  # min valud for vertical spee
 
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
-        'ahrs_sensor': False, 'ahrs_caging': False}
+        'ahrs_sensor': False, 'is_caging': False}
 # ahrs information, values are all rounded to integer
 gmeter = {'was_changed': True, 'current': 0.0, 'max': 0.0, 'min': 0.0}
 # status information as received from stratux
