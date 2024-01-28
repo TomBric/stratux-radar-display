@@ -675,7 +675,7 @@ async def display_and_cutoff():
                 elif global_mode == 5:  # ahrs'
                     ahrsui.draw_ahrs(g_draw, display_control, situation['connected'], ui_changed or ahrs['was_changed'],
                                      ahrs['pitch'], ahrs['roll'], ahrs['heading'], ahrs['slipskid'],
-                                     ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'], ahrs_['is_caging'])
+                                     ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'], ahrs['is_caging'])
                     ahrs['was_changed'] = False
                     ui_changed = False
                 elif global_mode == 6:  # refresh display, only relevant for epaper, mode was radar
