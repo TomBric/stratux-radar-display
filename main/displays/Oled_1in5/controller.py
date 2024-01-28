@@ -591,8 +591,8 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     left_text = "Cali"
     right_text = "Cage"
     draw.text((0, sizey - SMALL - 3), left_text, font=smallfont, fill="floralwhite")
-    textsize = draw.textsize(right_text, smallfont)
-    draw.text((sizex - textsize[0], sizey - SMALL - 3), right_text, font=smallfont, fill="floralwhite", align="right")
+    tl = draw.textlength(right_text, smallfont)
+    draw.text((sizex - tl, sizey - SMALL - 3), right_text, font=smallfont, fill="floralwhite", align="right")
 
 
 def text_screen(draw, headline, subline, text, left, middle, right):
