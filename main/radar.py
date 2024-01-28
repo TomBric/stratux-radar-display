@@ -972,6 +972,7 @@ if __name__ == "__main__":
     url_settings_get = "http://" + url_host_base + "/getSettings"
     url_gmeter_reset = "http://" + url_host_base + "/resetGMeter"
     url_status_get = "http://" + url_host_base + "/getStatus"
+    url_status_set = "http://" + url_host_base + "/setStatus"
     url_caging = "http://" + url_host_base + "/cageAHRS"
     url_calibrate = "http://" + url_host_base + "/calibrateAHRS"
 
