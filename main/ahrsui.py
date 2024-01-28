@@ -37,18 +37,27 @@ import radarmodes
 # constants
 # globals
 ahrs_ui_changed = True
+calibrate_url = ""   # url of stratux to initiate AHRS calibration
+cage_url = ""        # url of stratux to initation Zero Drift
+
 
 MSG_GROUND_TEST = "No GPS,Ground ONLY!"
 MSG_PSEUDO_AHRS = "PSEUDO AHRS ONLY!"
 MSG_NO_AHRS = "NO IMU OR GPS!"
 MSG_NO_CONNECTION = "NO CONNECTION!"
+MSG_CALIBRATING = "CALIBRATING-FLY LEVEL"
 
 
-def init(display_control):   # prepare everything
-    pass   # nothing to do in the setup now
+def init(display_control, calib_url, cage):   # prepare everything
+    global calibrate_url
+    global cage_url
+
+    calibrate_url = calib_url
+    cage_url = cage
 
 
-def draw_ahrs(draw, display_control, connected, was_changed, pitch, roll, heading, slip, gps_hor_accuracy, ahrs_sensor):
+def draw_ahrs(draw, display_control, connected, was_changed, pitch, roll, heading, slip, gps_hor_accuracy,
+              ahrs_sensor, is_caging):
     global ahrs_ui_changed
 
     if was_changed or ahrs_ui_changed:
@@ -62,9 +71,27 @@ def draw_ahrs(draw, display_control, connected, was_changed, pitch, roll, headin
             error_message = MSG_PSEUDO_AHRS
         if not connected:
             error_message = MSG_NO_CONNECTION
+        if is_caging:
+            error_message = MSG_CALIBRATING
         display_control.clear(draw)
         display_control.ahrs(draw, pitch, roll, heading, slip, error_message)
         display_control.display()
+
+
+def calibrate():
+    rlog.debug("Calibration initiated by button press!")
+    try:
+        requests.post(calibrate_url)
+    except requests.exceptions.RequestException as e:
+        rlog.debug("Error posting calibration request: {0}".format(e))
+
+
+def zero_drift():
+    log.debug("Zero drift initiated by button press!")
+    try:
+        requests.post(cage_url)
+    except requests.exceptions.RequestException as e:
+        rlog.debug("Error posting zero drif request: {0}".format(e))
 
 
 def user_input():
@@ -81,4 +108,10 @@ def user_input():
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long: refresh
         return 6  # start next mode for display driver: refresh called from ahrs
+    if button == 2 and btime == 1:  # right and short, start zero drift
+        zero_drift()
+        return 5
+    if button == 0 and btime == 1:  # left and short: calibrate
+        calibrate()
+        return 5
     return 5  # no mode change

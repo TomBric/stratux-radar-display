@@ -337,7 +337,8 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
     arrow_head_size = 15
     arrow_distance = 5
     arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + arrow_head_size),
-             (0, -size / 2 + arrow_distance), (arrow_line_size / 2, -size / 2 + arrow_head_size), (arrow_line_size / 2, 0))
+             (0, -size / 2 + arrow_distance), (arrow_line_size / 2, -size / 2 + arrow_head_size),
+             (arrow_line_size / 2, 0))
     # points of arrow at angle 0 (pointing up) for line drawing
 
     deg_per_value = (to_degree - from_degree) / (end_value - start_value)
@@ -587,6 +588,11 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
         centered_text(draw, 30, error_message, smallfont, fill="red")
+    left_text = "Cali"
+    right_text = "Cage"
+    draw.text((0, sizey - SMALL - 3), left_text, font=smallfont, fill="floralwhite")
+    textsize = draw.textsize(right_text, smallfont)
+    draw.text((sizex - textsize[0], sizey - SMALL - 3), right_text, font=smallfont, fill="floralwhite", align="right")
 
 
 def text_screen(draw, headline, subline, text, left, middle, right):
@@ -963,7 +969,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
             draw.text((xpos, ypos), topic['TASK'], font=verysmallfont, fill="white")  # Topic
     if 'CHECK' in topic and topic['CHECK'] is not None:
         if toprint:
-            right_text(draw, ypos, topic['CHECK'], font=verysmallfont, fill="yellow", offset=topic_right_offset) # Check
+            right_text(draw, ypos, topic['CHECK'], font=verysmallfont, fill="yellow", offset=topic_right_offset)
     y += SMALL
     if 'REMARK' in topic and topic['REMARK'] is not None:  # remark
         y += remark_offset

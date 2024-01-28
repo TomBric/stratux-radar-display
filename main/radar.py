@@ -122,7 +122,7 @@ vertical_max = 0.0  # max value for vertical speed
 vertical_min = 0.0  # min valud for vertical spee
 
 ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0, 'gps_hor_accuracy': 20000,
-        'ahrs_sensor': False}
+        'ahrs_sensor': False, 'ahrs_caging': False}
 # ahrs information, values are all rounded to integer
 gmeter = {'was_changed': True, 'current': 0.0, 'max': 0.0, 'min': 0.0}
 # status information as received from stratux
@@ -480,6 +480,13 @@ def new_situation(json_str):
             ahrs_flag = True
         else:
             ahrs_flag = False
+        if situation['AHRSStatus'] & 0x08:
+            ahrs_caging = True
+        else:
+            ahrs_caging = False
+        if ahrs['is_caging'] != ahrs_caging:
+            ahrs['is_caging'] = ahrs_caging
+            ahrs['was_changed'] = True
         if ahrs['ahrs_sensor'] != ahrs_flag:
             ahrs['ahrs_sensor'] = ahrs_flag
             ahrs['was_changed'] = True
@@ -668,7 +675,7 @@ async def display_and_cutoff():
                 elif global_mode == 5:  # ahrs'
                     ahrsui.draw_ahrs(g_draw, display_control, situation['connected'], ui_changed or ahrs['was_changed'],
                                      ahrs['pitch'], ahrs['roll'], ahrs['heading'], ahrs['slipskid'],
-                                     ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'])
+                                     ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'], ahrs_['is_caging'])
                     ahrs['was_changed'] = False
                     ui_changed = False
                 elif global_mode == 6:  # refresh display, only relevant for epaper, mode was radar
@@ -796,10 +803,10 @@ def main():
     timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
     g_draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
-    ahrsui.init(display_control)
+    ahrsui.init(display_control, url_calibrate, url_caging)
     statusui.init(display_control, CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
-    stratuxstatus.init(display_control, url_status_ws)
+    stratuxstatus.init(display_control, url_status_ws, url_status_get, url_status_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
@@ -962,8 +969,11 @@ if __name__ == "__main__":
     url_shutdown = "http://" + url_host_base + "/shutdown"
     url_reboot = "http://" + url_host_base + "/reboot"
     url_settings_set = "http://" + url_host_base + "/setSettings"
+    url_settings_get = "http://" + url_host_base + "/getSettings"
     url_gmeter_reset = "http://" + url_host_base + "/resetGMeter"
     url_status_get = "http://" + url_host_base + "/getStatus"
+    url_caging = "http://" + url_host_base + "/cageAHRS"
+    url_calibrate = "http://" + url_host_base + "/calibrateAHRS"
 
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint

@@ -44,6 +44,8 @@ SITUATION_DEBUG = logging.DEBUG-2
 # globals
 status = {}
 status_url = ""
+status_url_get = ""
+status_url_set = ""
 rlog = None
 status_listener = None  # couroutine task for querying statux
 strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES_messages_max': 0,
@@ -58,11 +60,15 @@ middle = ""
 right = ""
 
 
-def init(display_control, url):  # prepare everything
+def init(display_control, url_ws, url_status_get, url_status_set):  # prepare everything
     global status_url
+    global status_url_set
+    global status_url_get
     global rlog
 
-    status_url = url
+    status_url = url_ws
+    status_url_get = url_status_get
+    status_url_set = url_status_set
     rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("StratuxStatus UI: Initialized with URL " + status_url)
 
@@ -99,9 +105,9 @@ hardware = [
     "USB Serial IN",  # 10
     "SoftRF Dongle",  # 11
     "Network",  # 12
-    "Not installed", # 13
-    "Not installed", # 14
-    "GxAirCom", # 15
+    "Not installed",  # 13
+    "Not installed",  # 14
+    "GxAirCom",  # 15
 ]
 
 
