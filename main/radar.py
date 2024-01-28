@@ -480,7 +480,7 @@ def new_situation(json_str):
             ahrs_flag = True
         else:
             ahrs_flag = False
-        if situation['AHRSStatus'] & 0x08:
+        if sit['AHRSStatus'] & 0x08:
             ahrs_caging = True
         else:
             ahrs_caging = False
