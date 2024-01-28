@@ -39,7 +39,7 @@ import radarmodes
 ahrs_ui_changed = True
 calibrate_url = ""   # url of stratux to initiate AHRS calibration
 cage_url = ""        # url of stratux to initation Zero Drift
-
+rlog = None
 
 MSG_GROUND_TEST = "No GPS,Ground ONLY!"
 MSG_PSEUDO_AHRS = "PSEUDO AHRS ONLY!"
@@ -51,9 +51,12 @@ MSG_CALIBRATING = "CALIBRATING-FLY LEVEL"
 def init(display_control, calib_url, cage):   # prepare everything
     global calibrate_url
     global cage_url
+    global rlog
 
     calibrate_url = calib_url
     cage_url = cage
+    rlog = logging.getLogger('stratux-radar-log')
+    rlog.debug("AHRS UI: Initialized calibrate url to {0} cage url to {1}".format(calib_url, cage))
 
 
 def draw_ahrs(draw, display_control, connected, was_changed, pitch, roll, heading, slip, gps_hor_accuracy,
@@ -87,7 +90,7 @@ def calibrate():
 
 
 def zero_drift():
-    log.debug("Zero drift initiated by button press!")
+    rlog.debug("Zero drift initiated by button press!")
     try:
         requests.post(cage_url)
     except requests.exceptions.RequestException as e:
