@@ -33,6 +33,8 @@
 
 import radarbuttons
 import radarmodes
+import logging
+import requests
 
 # constants
 # globals
