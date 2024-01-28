@@ -250,6 +250,7 @@ def draw_flighttime(draw, display_control, changed):
 def user_input():
     global flighttime_changed
     global switch_back_mode
+    global last_flights
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
@@ -262,4 +263,8 @@ def user_input():
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long, refresh
         return 18  # start next mode for display driver: refresh called
+    if button == 2 and btime == 1:  # right and short, clear flight list
+        last_flights = []
+        write_flights()  # also clear stored flights
+        return 17  # start next mode for display driver: refresh called
     return 17  # no mode change
