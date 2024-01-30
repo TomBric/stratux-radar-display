@@ -742,7 +742,7 @@ def flighttime(draw, last_flights):
     draw.text((105, starty), "Ldg", font=verysmallfont, fill="white")
     starty += VERYSMALL + 3
 
-    maxlines = 8
+    maxlines = 7
     for f in last_flights:
         draw.text((0, starty), f[0].strftime("%d.%m."), font=verysmallfont, fill="green")
         draw.text((30, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="white")

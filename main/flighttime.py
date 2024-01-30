@@ -222,7 +222,9 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
             if now - trigger_timestamp >= landing_delta:
                 landing_time = now
                 rlog.debug("Flighttime: Landing detected at " + str(now))
-                g_config['last_flights'][0][1] = now
+                if 'last_flights' in g_config and len(g_config['last_flights']) > 0:
+                    # do not do that, if list was cleared
+                    g_config['last_flights'][0][1] = now
                 write_flights()
                 flying = False
                 new_flight_info = True
