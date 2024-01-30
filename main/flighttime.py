@@ -69,7 +69,7 @@ TRIGGER_PERIOD_LANDING = 5
 # min time in seconds threshold has to be underrug before landing is triggered (to compensate gps errors)
 TRIGGER_PERIOD_STOP = 10
 # min time in seconds threshold has to be underrun before stop is triggered which will change display
-FLIGHT_LIST_LENGTH = 10
+FLIGHT_LIST_LENGTH = 20   # maximum length of flightlist which are remembered
 
 
 # global variables
@@ -250,7 +250,7 @@ def draw_flighttime(draw, display_control, changed):
 def user_input():
     global flighttime_changed
     global switch_back_mode
-    global last_flights
+    global g_config
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
@@ -264,7 +264,9 @@ def user_input():
     if button == 2 and btime == 2:  # right and long, refresh
         return 18  # start next mode for display driver: refresh called
     if button == 2 and btime == 1:  # right and short, clear flight list
-        last_flights = []
+        if 'last_flights' in g_config:
+            g_config['last_flights'].clear()
+        rlog.debug("Flight list cleared by button press")
         write_flights()  # also clear stored flights
         return 17  # start next mode for display driver: refresh called
     return 17  # no mode change
