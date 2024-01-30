@@ -78,10 +78,18 @@ systemctl --system enable pulseaudio.service
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
 
+
+
 # for groundsensor, disable ssh over serial cause it is needed for the sensor
 # disable ssh over serial otherwise
 sudo sed -i /boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
 sudo sed -i /boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 sudo sed -i /boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
+# modify /boot/config.text for groundsensor
+{
+  echo "# modification for ultrasonic ground sensor"
+  echo "enable_uart=1"
+  echo "dtoverlay=miniuart-bt"
+} | sudo tee -a /boot/config.txt
 
 echo "Radar configuration finished"

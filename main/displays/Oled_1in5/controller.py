@@ -588,8 +588,8 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
         centered_text(draw, 30, error_message, smallfont, fill="red")
-    left_text = "Cali"
-    right_text = "Cage"
+    left_text = "Level"
+    right_text = "Zero"
     draw.text((0, sizey - SMALL), left_text, font=smallfont, fill="white")
     tl = draw.textlength(right_text, smallfont)
     draw.text((sizex - tl, sizey - SMALL), right_text, font=smallfont, fill="white", align="right")

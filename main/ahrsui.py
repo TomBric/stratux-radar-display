@@ -83,20 +83,20 @@ def draw_ahrs(draw, display_control, connected, was_changed, pitch, roll, headin
         display_control.display()
 
 
-def calibrate():
-    rlog.debug("Calibration initiated by button press!")
+def zero_drift():
+    rlog.debug("Zero drift calibration initiated by button press!")
     try:
         requests.post(calibrate_url)
     except requests.exceptions.RequestException as e:
         rlog.debug("Error posting calibration request: {0}".format(e))
 
 
-def zero_drift():
-    rlog.debug("Zero drift initiated by button press!")
+def set_level():
+    rlog.debug("Levelling initiated by button press!")
     try:
         requests.post(cage_url)
     except requests.exceptions.RequestException as e:
-        rlog.debug("Error posting zero drif request: {0}".format(e))
+        rlog.debug("Error posting levelling request: {0}".format(e))
 
 
 def user_input():
@@ -113,10 +113,10 @@ def user_input():
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long: refresh
         return 6  # start next mode for display driver: refresh called from ahrs
-    if button == 2 and btime == 1:  # right and short, start zero drift
+    if button == 2 and btime == 1:  # right and short, set zero_drift
         zero_drift()
         return 5
-    if button == 0 and btime == 1:  # left and short: calibrate
-        calibrate()
+    if button == 0 and btime == 1:  # left and short: set level
+        set_level()
         return 5
     return 5  # no mode change

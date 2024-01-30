@@ -73,25 +73,24 @@ mkdir -p mnt
 mount -t ext4 "${lo}"p2 mnt/ || die "root-mount failed"
 mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 
+# enable ssh
+# chroot mnt raspi-config nonint do_ssh 0
+# create user pi and "raspberry"
+# chroot mnt useradd -m pi
+# chroot mnt chpasswd pi:raspberry
+# chroot mnt usermod -aG sudo pi
+
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$2" https://github.com/TomBric/stratux-radar-display.git
 cd ../../../
 chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$2"
+
+# set user pi and "raspberry"
 mkdir -p out
 
 # copy wpa_config and create empty ssh
 cp mnt/$DISPLAY_SRC/stratux-radar-display/image/wpa_supplicant.conf mnt/boot
 touch mnt/boot/ssh
-
-# configuration to use uart for ultrasonic ground sensor
-{
-  echo "# modification for ultrasonic ground sensor"
-  echo "enable_uart=1"
-  echo "dtoverlay=miniuart-bt"
-} >> mnt/boot/config.txt
-# disable ssh over serial otherwise UART is not working properly, change entries in cmdline if console is enabled there
-sed -i mnt/boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-sed -i mnt/boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 
 umount mnt/boot
 umount mnt
