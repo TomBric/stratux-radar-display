@@ -159,7 +159,8 @@ def write_flights():
 
 
 def current_starttime():
-    if 'last_flights' in g_config and g_config['last_flights'][0][1] == 0:    # means we are in the air
+    if 'last_flights' in g_config and len(g_config['last_flights']) > 0 and g_config['last_flights'][0][1] == 0:
+        # means we are in the air
         return g_config['last_flights'][0][0]
     return None
 
