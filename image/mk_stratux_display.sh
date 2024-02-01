@@ -79,6 +79,8 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 # chroot mnt useradd -m pi
 # chroot mnt chpasswd pi:raspberry
 # chroot mnt usermod -aG sudo pi
+# set wifi with raspi-config
+# chroot mnt raspi-config nonint do_wifi_ssid_passphrase stratux ""
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$2" https://github.com/TomBric/stratux-radar-display.git

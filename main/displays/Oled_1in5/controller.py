@@ -713,12 +713,13 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty += VERYSMALL+5
 
     fl = '{:3.0f}'.format(round(altitude) / 100)
+
     x = round_text(draw, 3, starty, "FL" + fl, "DarkBlue")
     if stat['GPS_position_accuracy'] < 19999:
         alt = '{:5.0f}'.format(gps_alt)
     else:
         alt = " --- "
-    x = round_text(draw, x, starty, "Alt"+alt+"ft", "DimGray")
+    x = round_text(draw, x, starty, "GPS"+alt+"ft", "DimGray")
     if stat['IMUConnected']:
         col = "green"
     else:
@@ -729,6 +730,25 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     else:
         col = "red"
     round_text(draw, x, starty, "BMP", col)
+    # Draw the  box and text for ythe Alt adjust
+    left = "+ 10ft"  # Note long press +100ft
+    right = "- 10ft"  # Change page
+    middle = "Mode"  # Note, long press -100ft
+
+    #    textsize = draw.textsize(t, verysmallfont)
+    #    draw.text((48-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
+    #    draw.rounded_rectangle([55, starty, 75, starty + VERYSMALL], radius=4, fill="DarkOrange", outline=None)
+    #    draw.rounded_rectangle([75, starty, 95, starty + VERYSMALL], radius=4, fill="red", outline=None)
+    fl = '{:3.0f}'.format(round(altitude))
+    x = round_text(draw, 3, (starty + 16), "Alt-Adj " + fl + " ft", "DarkBlue")
+    hps = '{:3.0f}'.format(round((1013.25 - (altitude * 0.038640888))))
+    x = round_text(draw, 75, (starty + 16), hps + " hPa", "DimGray")
+
+    bottom_line(draw, "+10ft", "", "-10ft")
+
+
+
+#    x = round_text(draw, x, starty, "Alt"+alt+"ft", "DimGray")
 
 
 def flighttime(draw, last_flights):

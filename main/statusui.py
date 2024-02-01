@@ -102,15 +102,16 @@ def read_config(config_file):
 
 def write_config(config):
     global rlog
+    global g_config_file
 
     if rlog is None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
-        with open(CONFIG_FILE, 'wt') as out:
+        with open(g_config_file, 'wt') as out:
             json.dump(config, out, sort_keys=True, indent=4, default=default)
     except (OSError, IOError, ValueError) as e:
-        rlog.debug("StatusUI: Error " + str(e) + " writing " + CONFIG_FILE)
-    rlog.debug("StatusUI: Configuration saved to " + CONFIG_FILE + ": " + json.dumps(config, sort_keys=True, indent=4,
+        rlog.debug("StatusUI: Error " + str(e) + " writing " + g_config_file)
+    rlog.debug("StatusUI: Configuration saved to " + g_config_file + ": " + json.dumps(config, sort_keys=True, indent=4,
                                                                                      default=default))
 
 

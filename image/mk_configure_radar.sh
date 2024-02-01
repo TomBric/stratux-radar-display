@@ -77,6 +77,7 @@ systemctl --system enable pulseaudio.service
 # enable spi and i2c (for cowarner)
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
+# sudo raspi-config nonint do_wifi_ssid_passphrase YOUR_SSID YOUR_PASSWORD
 
 
 
