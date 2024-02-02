@@ -37,6 +37,7 @@ import radarbuttons
 import asyncio
 import json
 import radarmodes
+import requests
 
 # constants
 SITUATION_DEBUG = logging.DEBUG-2
