@@ -55,7 +55,7 @@ strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES
         'CPUTemp': -300, 'CPUTempMax': -300,
         'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0, 'GPS_position_accuracy': 0,
         'GPS_satellites_seen': 0, 'OGN_noise_db': 0.0, 'OGN_gain_db': 0.0,
-        'IMUConnected': False, 'BMPConnected': False, 'GPS_detected_type': "Unknown", 'AlitudeOffset': 0}
+        'IMUConnected': False, 'BMPConnected': False, 'GPS_detected_type': "Unknown", 'AltitudeOffset': 0}
 left = ""
 middle = ""
 right = ""
