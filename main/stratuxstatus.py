@@ -222,10 +222,12 @@ def status_callback(json_str):
 
 
 def change_value(difference):
+    global strx
+
     alt_offset = get_current_altoffset()
     if alt_offset is not None:
         strx['AltitudeOffset'] = alt_offset + difference
-        set_altitude_offset(status['AltitudeOffset'])
+        set_altitude_offset(strx['AltitudeOffset'])
 
 
 def user_input():
