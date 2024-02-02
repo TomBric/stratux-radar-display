@@ -735,7 +735,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         alt = '{:5.0f}'.format(gps_alt)
     else:
         alt = " --- "
-    round_text(draw, x, starty, "GPS"+alt+"ft", "DimGray")
+    round_text(draw, x, starty, "GPS"+alt+"ft", "DarkBlue")
 
     bottom_line(draw, "+10ft", "Mode", "-10ft")
 
