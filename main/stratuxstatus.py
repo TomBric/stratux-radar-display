@@ -146,7 +146,7 @@ def get_current_altoffset():
         response = requests.get(settings_url_get)
         if response.status_code == 200:   # Check if the request was successful (status code 200)
             current_offset = response.json().get('AltitudeOffset', 0)
-            rlog.debug(SITUATION_DEBUG, "Received AltitudeOffset: {0} ft".format(current_offset))
+            rlog.log(SITUATION_DEBUG, "Received AltitudeOffset: {0} ft".format(current_offset))
             return current_offset
         else:
             rlog.debug("Failed to retrieve current settings. Status code: {0}".format(response.status_code))
