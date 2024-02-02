@@ -720,7 +720,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
 
     fl = '{:3.0f}'.format(round(altitude) / 100)
 
-    x = round_text(draw, 3, starty, "FL" + fl, "DarkBlue")
+    x = round_text(draw, 0, starty, "FL" + fl, "DarkBlue")
     round_text(draw, x, starty, "AltCorr {0:+}".format(stat['AltitudeOffset']), "Purple")
     starty += VERYSMALL + 3
     if stat['GPS_position_accuracy'] < 19999:
@@ -739,7 +739,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         col = "red"
     round_text(draw, x, starty, "BMP", col)
 
-    bottom_line(draw, "+10ft", "", "-10ft")
+    bottom_line(draw, "+10ft", "Mode", "-10ft")
 
 
 def flighttime(draw, last_flights):
