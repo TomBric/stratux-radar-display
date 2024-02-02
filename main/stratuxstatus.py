@@ -164,13 +164,13 @@ def set_altitude_offset(new_value):
         # Send a POST request to update the AltitudeOffset
         response = requests.post(settings_url_set, json={'AltitudeOffset': new_value})
         if response.status_code == 200:  # Check if the request was successful (status code 200)
-            rlog.debug("Set new altitude offset: {0} ft".format(current_offset))
+            rlog.debug("Set new altitude offset: {0} ft".format(new_value))
         else:
             rlog.debug("Failed to set new settings. Status code: {0}".format(response.status_code))
     except requests.exceptions.RequestException as req_exc:
-        rlog.debug("Failed to retrieve current settings. Request Exception {0}".format(req_exc))
+        rlog.debug("Failed to set current settings. Request Exception {0}".format(req_exc))
     except Exception as req_exc:
-        rlog.debug("Failed to retrieve current settings. Request Exception {0}".format(req_exc))
+        rlog.debug("Failed to set current settings. Request Exception {0}".format(req_exc))
 
 
 def status_callback(json_str):
