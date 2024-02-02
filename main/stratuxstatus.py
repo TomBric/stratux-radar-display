@@ -226,7 +226,7 @@ def change_value(difference):
     alt_offset = get_current_altoffset()
     if alt_offset is not None:
         status['AltitudeOffset'] = alt_offset + difference
-        set_altitude_offset(new_value)
+        set_altitude_offset(status['AltitudeOffset'])
 
 
 def user_input():
