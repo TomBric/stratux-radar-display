@@ -669,6 +669,14 @@ def round_text(draw, x, y, text, color):
     return x+tl+5
 
 
+def centered_round_text(draw, y, text, color):
+    tl = draw.textlength(text, verysmallfont)
+    x = sizex/2 - tl/2  # center box
+    draw.rounded_rectangle([x-2, y-1, x+tl+2, y+VERYSMALL+2], radius=4, fill=color)
+    draw.text((x, y), text, font=verysmallfont, fill="white")
+    return x+tl+5
+
+
 def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty = 0
     centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="yellow")
@@ -680,7 +688,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext=noise_text)
     if stat['UATRadio_connected']:
         starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
-    starty += 6
+    starty += 3
     if stat['CPUTemp'] > -300:    # -300 means no value available
         starty = bar(draw, starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
         starty += 3
@@ -710,7 +718,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         gps = "NoFix"
     tl = draw.textlength(gps, verysmallfont)
     draw.text((sizex - tl, starty), gps, font=verysmallfont, fill="white")
-    starty += VERYSMALL+5
+    starty += VERYSMALL+3
 
     fl = '{:3.0f}'.format(round(altitude) / 100)
 
@@ -730,25 +738,10 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     else:
         col = "red"
     round_text(draw, x, starty, "BMP", col)
-    # Draw the  box and text for ythe Alt adjust
-    left = "+ 10ft"  # Note long press +100ft
-    right = "- 10ft"  # Change page
-    middle = "Mode"  # Note, long press -100ft
 
-    #    textsize = draw.textsize(t, verysmallfont)
-    #    draw.text((48-textsize[0]/2, starty), t, font=verysmallfont, fill="white", align="middle")
-    #    draw.rounded_rectangle([55, starty, 75, starty + VERYSMALL], radius=4, fill="DarkOrange", outline=None)
-    #    draw.rounded_rectangle([75, starty, 95, starty + VERYSMALL], radius=4, fill="red", outline=None)
-    fl = '{:3.0f}'.format(round(altitude))
-    x = round_text(draw, 3, (starty + 16), "Alt-Adj " + fl + " ft", "DarkBlue")
-    hps = '{:3.0f}'.format(round((1013.25 - (altitude * 0.038640888))))
-    x = round_text(draw, 75, (starty + 16), hps + " hPa", "DimGray")
-
+    starty += VERYSMALL + 3
+    centered_round_text(draw, starty, "AltCorr {0}".format(), "DarkBlue")
     bottom_line(draw, "+10ft", "", "-10ft")
-
-
-
-#    x = round_text(draw, x, starty, "Alt"+alt+"ft", "DimGray")
 
 
 def flighttime(draw, last_flights):
@@ -780,7 +773,8 @@ def flighttime(draw, last_flights):
         maxlines -= 1
         if maxlines <= 0:
             break
-    bottom_line(draw,"", "Mode", "Clear")
+    bottom_line(draw, "", "Mode", "Clear")
+
 
 def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
     tl = draw.textlength(str(maxvalue), verysmallfont)    # for adjusting x and y

@@ -106,7 +106,9 @@ url_situation_ws = ""
 url_radar_ws = ""
 url_status_ws = ""
 url_settings_set = ""
+url_settings_get = ""
 url_status_get = ""
+url_status_set = ""
 device = ""
 sound_mixer = None
 g_draw = None
@@ -806,7 +808,7 @@ def main():
     ahrsui.init(display_control, url_calibrate, url_caging)
     statusui.init(display_control, CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
-    stratuxstatus.init(display_control, url_status_ws, url_status_get, url_status_set)
+    stratuxstatus.init(display_control, url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,

@@ -44,8 +44,8 @@ SITUATION_DEBUG = logging.DEBUG-2
 # globals
 status = {}
 status_url = ""
-status_url_get = ""
-status_url_set = ""
+settings_url_get = ""
+settings_url_set = ""
 rlog = None
 status_listener = None  # couroutine task for querying statux
 strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES_messages_max': 0,
@@ -54,21 +54,21 @@ strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES
         'CPUTemp': -300, 'CPUTempMax': -300,
         'GPS_connected': False, 'GPS_satellites_locked': 0, 'GPS_satellites_tracked': 0, 'GPS_position_accuracy': 0,
         'GPS_satellites_seen': 0, 'OGN_noise_db': 0.0, 'OGN_gain_db': 0.0,
-        'IMUConnected': False, 'BMPConnected': False, 'GPS_detected_type': "Unknown"}
+        'IMUConnected': False, 'BMPConnected': False, 'GPS_detected_type': "Unknown", 'AlitudeOffset': 0}
 left = ""
 middle = ""
 right = ""
 
 
-def init(display_control, url_ws, url_status_get, url_status_set):  # prepare everything
+def init(display_control, url_ws, url_settings_get, url_settings_set):  # prepare everything
     global status_url
-    global status_url_set
-    global status_url_get
+    global settings_url_set
+    global settings_url_get
     global rlog
 
     status_url = url_ws
-    status_url_get = url_status_get
-    status_url_set = url_status_set
+    settings_url_get = url_settings_get
+    settings_url_set = url_settings_set
     rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("StratuxStatus UI: Initialized with URL " + status_url)
 
@@ -140,6 +140,39 @@ def draw_status(draw, display_control, ui_changed, connected, altitude, gps_alt,
         strx['was_changed'] = False
 
 
+def get_current_altoffset():
+    try:
+        response = requests.get(settings_url_get)
+        if response.status_code == 200:   # Check if the request was successful (status code 200)
+            current_offset = response.json().get('AltitudeOffset', 0)
+            rlog.debug(SITUATION_DEBUG, "Received AltitudeOffset: {0} ft".format(current_offset))
+            return current_offset
+        else:
+            rlog.debug("Failed to retrieve current settings. Status code: {0}".format(response.status_code))
+            return None
+    except requests.exceptions.RequestException as req_exc:
+        rlog.debug("Failed to retrieve current settings. Request Exception {0}".format(req_exc))
+        return None
+    except Exception as req_exc:
+        rlog.debug("Failed to retrieve current settings. Request Exception {0}".format(req_exc))
+        return None
+
+
+def set_altitude_offset(new_value):
+    try:
+        # Send a POST request to update the AltitudeOffset
+        response = requests.post(api_set_url, data=json.dumps({"AltitudeOffset": new_value},
+                                                              headers={"Content-Type": "application/json"}))
+        if response.status_code == 200:  # Check if the request was successful (status code 200)
+            rlog.debug("Set new altitude offset: {0} ft".format(current_offset))
+        else:
+            rlog.debug("Failed to set new settings. Status code: {0}".format(response.status_code))
+    except requests.exceptions.RequestException as req_exc:
+        rlog.debug("Failed to retrieve current settings. Request Exception {0}".format(req_exc))
+    except Exception as req_exc:
+        rlog.debug("Failed to retrieve current settings. Request Exception {0}".format(req_exc))
+
+
 def status_callback(json_str):
     global strx
 
@@ -181,16 +214,32 @@ def status_callback(json_str):
         strx['CPUTempMax'] = stat['CPUTempMax']
     else:
         strx['CPUTemp'] = -300
+    alt_offset = get_current_altoffset()
+    if alt_offset is not None:   # None would mean failure, update only with successful get request
+        status['AltitudeOffset'] = get_current_altoffset()
+    # this is somehow dirty, but we assume that every change of altOffset via UI will also change
+    # status by changing altitude, will return 0 if request fails
+
+
+def change_value(difference):
+    alt_offset = get_current_settings()
+    if alt_offset is not None:
+        status['AltitudeOffset'] = alt_offset + difference
+        set_altitude_offset(new_value)
 
 
 def user_input():
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
         return 0  # stay in current mode
-    if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long, refresh
-        return 16  # start next mode for display driver: refresh called from gmeter
-    if button == 1 and (btime == 2 or btime == 1):  # middle
+    if button == 0 and btime == 1:  # left and short
+        change_value(10)
+    elif button == 0 and btime == 2:  # left and long
+        change_value(100)
+    elif button == 2 and btime == 1:  # right and short
+        change_value(-10)
+    elif button == 2 and btime == 2:  # right and long, refresh
+        change_value(-100)
+    elif button == 1 and (btime == 2 or btime == 1):  # middle
         return radarmodes.next_mode_sequence(15)
     return 15  # no mode change
