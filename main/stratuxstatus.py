@@ -162,7 +162,7 @@ def get_current_altoffset():
 def set_altitude_offset(new_value):
     try:
         # Send a POST request to update the AltitudeOffset
-        response = requests.post(api_set_url, data=json.dumps({"AltitudeOffset": new_value},
+        response = requests.post(settings_url_set, data=json.dumps({"AltitudeOffset": new_value},
                                                               headers={"Content-Type": "application/json"}))
         if response.status_code == 200:  # Check if the request was successful (status code 200)
             rlog.debug("Set new altitude offset: {0} ft".format(current_offset))
