@@ -738,7 +738,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     round_text(draw, x, starty, "BMP", col)
 
     starty += VERYSMALL + 3
-    centered_round_text(draw, starty, "AltCorr {0:+}".format(stat['AltitudeOffset']), "Purple")
+    round_text(draw, 3, starty, "AltCorr {0:+}".format(stat['AltitudeOffset']), "Purple")
     bottom_line(draw, "+10ft", "", "-10ft")
 
 
