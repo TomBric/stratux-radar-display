@@ -264,14 +264,14 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     tl = draw.textlength(text, smallfont)
     draw.text((sizex - tl, sizey - SMALL), text, font=smallfont, fill="floralwhite", align="right")
 
-    if extsound or bt_devices > 0:
-        if sound_active:
+    if extsound or bt_devices > 0:   # extsound means and sound devices has been found
+        if sound_active:   # means user left sound switched on
             if extsound:
                 btcolor = "orange"
                 text = "\uf028"  # volume symbol
                 if bt_devices > 0:
                     btcolor = "blue"
-            elif bt_devices > 0:
+            else:   # bt_devices is > 0 anyhow
                 btcolor = "blue"
                 text = '\uf293'  # bluetooth symbol
         else:
@@ -740,7 +740,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     round_text(draw, x, starty, "BMP", col)
 
     starty += VERYSMALL + 3
-    centered_round_text(draw, starty, "AltCorr {0}".format(), "DarkBlue")
+    centered_round_text(draw, starty, "AltCorr {0}".format(stat['AltitudeOffset']), "DarkBlue")
     bottom_line(draw, "+10ft", "", "-10ft")
 
 
