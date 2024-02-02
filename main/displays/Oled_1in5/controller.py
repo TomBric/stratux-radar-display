@@ -863,13 +863,7 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
         color = "red"
     round_text(draw, sizex/2+5, sizey - 2 * SMALL - 5, "CO max: {:3d}".format(co_max), color)
 
-    left = "Cal"
-    right = "Reset"
-    middle = "Mode"
-    draw.text((0, sizey - SMALL), left, font=smallfont, fill="green")
-    tl = draw.textlength(right, smallfont)
-    draw.text((sizex - tl, sizey - SMALL), right, font=smallfont, fill="green", align="right")
-    centered_text(draw, sizey - SMALL, middle, smallfont, fill="green")
+    bottom_line(draw, "Cal", "Mode", "Reset")
 
 
 def dashboard(draw, x, y, sizex, lines):
@@ -918,13 +912,7 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
 
     if error_message is not None:
         centered_text(draw, 80, error_message, verylargefont, fill="red")
-    left = "Stats"
-    right = "Start"
-    middle = "Mode"
-    draw.text((0, sizey - SMALL), left, font=smallfont, fill="green")
-    tl = draw.textlength(right, smallfont)
-    draw.text((sizex - tl, sizey - SMALL), right, font=smallfont, fill="green", align="right")
-    centered_text(draw, sizey - SMALL, middle, smallfont, fill="green")
+    bottom_line(draw, "Stats", "Mode", "Start")
 
 
 def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
@@ -961,8 +949,7 @@ def distance_statistics(draw, values):
     )
     dashboard(draw, 0, starty, sizex, lines)
 
-    middle = "Back"
-    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
+    bottom_line(draw, "", "Back", "")
 
 
 def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
