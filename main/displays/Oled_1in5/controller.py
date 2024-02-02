@@ -145,10 +145,11 @@ def centered_text(draw, y, text, font, fill):
 
 
 def bottom_line(draw, left, middle, right):
-    draw.text((0, sizey - SMALL), left, font=smallfont, fill="green")
+    offset = 3   # to be able to print letters like p and q
+    draw.text((0, sizey - SMALL - offset), left, font=smallfont, fill="green")
     textlength = draw.textlength(right, smallfont)
-    draw.text((sizex - textlength, sizey - SMALL), right, font=smallfont, fill="green", align="right")
-    centered_text(draw, sizey - SMALL, middle, smallfont, fill="green")
+    draw.text((sizex - textlength, sizey - SMALL -offset), right, font=smallfont, fill="green", align="right")
+    centered_text(draw, sizey - SMALL - offset, middle, smallfont, fill="green")
 
 
 def right_text(draw, y, text, font, fill, offset=0):
