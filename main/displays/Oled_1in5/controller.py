@@ -716,11 +716,12 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         gps = "NoFix"
     tl = draw.textlength(gps, verysmallfont)
     draw.text((sizex - tl, starty), gps, font=verysmallfont, fill="white")
-    starty += VERYSMALL+3
+    starty += VERYSMALL+4
 
     x = round_text(draw, 0, starty, "P-Alt {0:.0f}ft".format(altitude), "DarkBlue")
     round_text(draw, x, starty, "Corr {0:+}ft".format(stat['AltitudeOffset']), "DimGray")
-    starty += VERYSMALL + 3
+    starty += VERYSMALL + 4
+
     if stat['IMUConnected']:
         col = "green"
     else:
