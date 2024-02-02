@@ -217,7 +217,7 @@ def status_callback(json_str):
         strx['CPUTemp'] = -300
     alt_offset = get_current_altoffset()
     if alt_offset is not None:   # None would mean failure, update only with successful get request
-        status['AltitudeOffset'] = get_current_altoffset()
+        strx['AltitudeOffset'] = get_current_altoffset()
     # this is somehow dirty, but we assume that every change of altOffset via UI will also change
     # status by changing altitude, will return 0 if request fails
 
