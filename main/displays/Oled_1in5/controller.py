@@ -308,10 +308,7 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
     else:
         centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="magenta")
 
-    draw.text((0, sizey - SMALL - 3), left_text, font=smallfont, fill="green")
-    tl = draw.textlength(right_text, smallfont)
-    draw.text((sizex - tl, sizey - SMALL - 3), right_text, font=smallfont, fill="green", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="green")
+    bottom_line(draw, left_text, middle_text, right_text)
 
 
 def turn(sin_a, cos_a, p, zero):
@@ -394,11 +391,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.text((zerox+8, 65), "min", font=smallfont, fill="cyan")
     right_text(draw, 65, "{:+1.2f}".format(ming), smallfont, fill="magenta")
 
-    right = "Reset"
-    tl = draw.textlength(right, smallfont)
-    draw.text((sizex - tl, sizey - SMALL - 3), right, font=smallfont, fill="green", align="right")
-    middle = ""
-    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="green")
+    bottom_line(draw, "", "", "Reset")
 
 
 def compass(draw, heading, error_message):
@@ -515,13 +508,7 @@ def shutdown(draw, countdown, shutdownmode):
     message = "Right for reboot all ..."
     centered_text(draw, 90, message, smallfont, fill="white")
 
-    left_text = "Canc"
-    middle_text = "Displ"
-    right_text = "Rebo"
-    draw.text((0, sizey - SMALL - 3), left_text, font=smallfont, fill="green")
-    tl = draw.textlength(right_text, smallfont)
-    draw.text((sizex - tl, sizey - SMALL - 3), right_text, font=smallfont, fill="green", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle_text, smallfont, fill="green")
+    bottom_line(draw, "Canc", "Displ", "Rebo")
 
 
 def rollmarks(draw, roll):
