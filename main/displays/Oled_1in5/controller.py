@@ -144,8 +144,7 @@ def centered_text(draw, y, text, font, fill):
     draw.text((zerox - tl / 2, y), text, font=font, fill=fill)
 
 
-def bottom_line(draw, left, middle, right):
-    offset = 3   # to be able to print letters like p and q
+def bottom_line(draw, left, middle, right, offset=0):  # offset to be able to print letters like p and q
     draw.text((0, sizey - SMALL - offset), left, font=smallfont, fill="green")
     textlength = draw.textlength(right, smallfont)
     draw.text((sizex - textlength, sizey - SMALL -offset), right, font=smallfont, fill="green", align="right")
@@ -309,7 +308,7 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
     else:
         centered_text(draw, 3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="magenta")
 
-    bottom_line(draw, left_text, middle_text, right_text)
+    bottom_line(draw, left_text, middle_text, right_text, offset=3)
 
 
 def turn(sin_a, cos_a, p, zero):
@@ -509,7 +508,7 @@ def shutdown(draw, countdown, shutdownmode):
     message = "Right for reboot all ..."
     centered_text(draw, 90, message, smallfont, fill="white")
 
-    bottom_line(draw, "Canc", "Displ", "Rebo")
+    bottom_line(draw, "Canc", "Displ", "Rebo", offset=3)
 
 
 def rollmarks(draw, roll):
