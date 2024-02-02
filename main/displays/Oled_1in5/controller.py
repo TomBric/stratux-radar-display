@@ -680,7 +680,7 @@ def centered_round_text(draw, y, text, color):
 def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty = 0
     centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="yellow")
-    starty += SMALL+2
+    starty += SMALL+3
     starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
     if stat['OGN_connected']:
         starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
@@ -738,7 +738,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     round_text(draw, x, starty, "BMP", col)
 
     starty += VERYSMALL + 3
-    centered_round_text(draw, starty, "AltCorr {0:+}".format(stat['AltitudeOffset']), "DarkBlue")
+    centered_round_text(draw, starty, "AltCorr {0:+}".format(stat['AltitudeOffset']), "Purple")
     bottom_line(draw, "+10ft", "", "-10ft")
 
 
