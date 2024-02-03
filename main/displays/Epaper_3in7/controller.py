@@ -618,7 +618,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
         centered_text(draw, 80, error_message, smallfont, fill="black")
-    bottom_line(draw, "Level", "", "ZeroDr")
+    bottom_line(draw, "Levl", "", "Zero")
 
 
 def text_screen(draw, headline, subline, text, left_text, middle_text, r_text):
@@ -738,6 +738,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     draw.text((5, starty), "sensors", font=verysmallfont, fill="black")
     x = round_text(draw, 100, starty, "IMU", "white", stat['IMUConnected'], out="black")
     round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
+    bottom_line(draw, "+10ft", "Mode", "-10ft")
 
 
 def flighttime(draw, last_flights):
@@ -771,6 +772,7 @@ def flighttime(draw, last_flights):
         maxlines -= 1
         if maxlines <= 0:
             break
+        bottom_line(draw, "", "Mode", "Clear")
 
 
 def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
