@@ -772,7 +772,7 @@ def flighttime(draw, last_flights):
         maxlines -= 1
         if maxlines <= 0:
             break
-        bottom_line(draw, "", "Mode", "Clear")
+    bottom_line(draw, "", "Mode", "Clear")
 
 
 def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
