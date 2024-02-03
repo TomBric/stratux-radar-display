@@ -698,10 +698,8 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext=noise_text)
     if stat['UATRadio_connected']:
         starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
-    starty += 6
     if stat['CPUTemp'] > -300:    # -300 means no value available
         starty = bar(draw, starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
-        starty += 3
     # GPS
     draw.text((5, starty), "GPS hw", font=verysmallfont, fill="black")
     draw.text((100, starty), stat['GPS_detected_type'], font=verysmallfont, fill="black")
@@ -730,11 +728,13 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         alt = '{:5.0f}'.format(gps_alt)
     else:
         alt = " --- "
-    t = "FL" + str(round(altitude/100))
+    t = "B-Alt {0}".format(round(altitude))
     draw.text((100, starty), t, font=verysmallfont, fill="black")
-    t = "GPS-Alt " + alt + " ft"
-    draw.text((240, starty), t, font=verysmallfont, fill="black")
-    starty += VERYSMALL + 10
+    t = "Alt-Corr {0:+}ft".format(stat['AltitudeOffset'])
+    draw.text((200, starty), t, font=verysmallfont, fill="black")
+    t = "GPS-Alt " + alt + "ft"
+    draw.text((300, starty), t, font=verysmallfont, fill="black")
+    starty += VERYSMALL + 5
     draw.text((5, starty), "sensors", font=verysmallfont, fill="black")
     x = round_text(draw, 100, starty, "IMU", "white", stat['IMUConnected'], out="black")
     round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
