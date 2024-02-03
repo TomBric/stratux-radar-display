@@ -728,12 +728,12 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         alt = '{:5.0f}'.format(gps_alt)
     else:
         alt = " --- "
-    t = "B-Alt {0}".format(round(altitude))
+    t = "P-Alt {0}ft".format(round(altitude))
     draw.text((100, starty), t, font=verysmallfont, fill="black")
     t = "Alt-Corr {0:+}ft".format(stat['AltitudeOffset'])
-    draw.text((200, starty), t, font=verysmallfont, fill="black")
+    draw.text((220, starty), t, font=verysmallfont, fill="black")
     t = "GPS-Alt " + alt + "ft"
-    draw.text((300, starty), t, font=verysmallfont, fill="black")
+    draw.text((340, starty), t, font=verysmallfont, fill="black")
     starty += VERYSMALL + 5
     draw.text((5, starty), "sensors", font=verysmallfont, fill="black")
     x = round_text(draw, 100, starty, "IMU", "white", stat['IMUConnected'], out="black")
