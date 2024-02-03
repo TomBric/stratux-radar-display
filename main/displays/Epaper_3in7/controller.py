@@ -618,6 +618,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
         centered_text(draw, 80, error_message, smallfont, fill="black")
+    bottom_line(draw, "Level", "", "ZeroDr")
 
 
 def text_screen(draw, headline, subline, text, left_text, middle_text, r_text):
