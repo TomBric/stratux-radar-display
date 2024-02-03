@@ -719,7 +719,7 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
 
     t = "Sat: " + str(stat['GPS_satellites_locked']) + " sol/" + \
         str(stat['GPS_satellites_seen']) + " seen/" + str(stat['GPS_satellites_tracked']) + " track"
-    draw.text((240, starty), t, font=verysmallfont, fill="black")
+    draw.text((220, starty), t, font=verysmallfont, fill="black")
 
     starty += VERYSMALL+5
 
