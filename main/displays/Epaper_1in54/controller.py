@@ -530,7 +530,7 @@ def linepoints(pitch, roll, pitch_distance, length):
 
 def slip(draw, slipskid):
     slipsize = 8
-    slipscale = 15
+    slipscale = 10
     if slipskid < -10:
         slipskid = -10
     elif slipskid > 10:
@@ -575,7 +575,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
         centered_text(draw, 60, error_message, smallfont, fill="black")
-    bottom_line(draw, "Levl", "", "Zero")
+    bottom_line(draw, "Lev", "", "Zro")
 
 
 def text_screen(draw, headline, subline, text, left_text, middle_text, right_text):
