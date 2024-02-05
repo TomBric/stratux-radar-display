@@ -211,6 +211,13 @@ def right_text(draw, y, text, font, fill):
     draw.text((sizex - tl, y), text, font=font, fill=fill)
 
 
+def bottom_line(draw, left, middle, right, offset=0):  # offset to be able to print letters like p and q
+    draw.text((0, sizey - SMALL - offset), left, font=smallfont, fill="black")
+    textlength = draw.textlength(right, smallfont)
+    draw.text((sizex - textlength, sizey - SMALL - offset), right, font=smallfont, fill="black", align="right")
+    centered_text(draw, sizey - SMALL - offset, middle, smallfont, fill="black")
+
+
 def startup(draw, version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-150x150.bmp'))
     logo = Image.open(logopath)
@@ -334,11 +341,7 @@ def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text
         if laptime is not None:
             draw.text((5, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="black")
             centered_text(draw, 3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
-
-    draw.text((5, sizey-SMALL-3), left_text, font=smallfont, fill="black")
-    tl = draw.textlength(right_t, smallfont)
-    draw.text((sizex-tl-8, sizey-SMALL-3), right_t, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
+    bottom_line(draw, left_text, middle_text, right_t, offset=3)
 
 
 def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
@@ -406,9 +409,7 @@ def gmeter(draw, current, maxg, ming, error_message):
     draw.text((zerox + 13, 102), "min", font=verysmallfont, fill="black")
     right_text(draw, 102, "{:+1.2f}".format(ming), smallfont, fill="black")
 
-    right = "Reset"
-    tl = draw.textlength(right, verysmallfont)
-    draw.text((sizex-tl, sizey-SMALL), right, font=verysmallfont, fill="black", align="right")
+    bottom_line(draw, "", "", "Reset")
 
 
 def compass(draw, heading, error_message):
@@ -492,14 +493,7 @@ def shutdown(draw, countdown, shutdownmode):
     centered_text(draw, 100, message, smallfont, fill="black")
     message = "Right for reboot all ..."
     centered_text(draw, 120, message, smallfont, fill="black")
-
-    left_text = "Canc"
-    middle_text = "Displ"
-    right_text = "Rebo"
-    draw.text((0, sizey - SMALL), left_text, font=smallfont, fill="black")
-    tl = draw.textlength(right_text, smallfont)
-    draw.text((sizex - tl, sizey - SMALL), right_text, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL, middle_text, smallfont, fill="black")
+    bottom_line(draw, "Canc", "Displ", "Rebo")
 
 
 def rollmarks(draw, roll):
@@ -581,6 +575,7 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
         centered_text(draw, 60, error_message, smallfont, fill="black")
+    bottom_line(draw, "Levl", "", "Zero")
 
 
 def text_screen(draw, headline, subline, text, left_text, middle_text, right_text):
@@ -590,11 +585,7 @@ def text_screen(draw, headline, subline, text, left_text, middle_text, right_tex
         centered_text(draw, txt_starty, subline, largefont, fill="black")
         txt_starty += LARGE
     draw.text((0, txt_starty+4), text, font=smallfont, fill="black")
-
-    draw.text((0, sizey - SMALL), left_text, font=verysmallfont, fill="black")
-    tl = draw.textlength(right_text, verysmallfont)
-    draw.text((sizex - tl, sizey - SMALL), right_text, font=verysmallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL, middle_text, verysmallfont, fill="black")
+    bottom_line(draw, left_text, middle_text, right_text)
 
 
 def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp, suffix):
@@ -611,11 +602,7 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     draw.rectangle(bbox_rect, fill="black")
     draw.text((bbox_rect[0], bbox[3]), inp, font=smallfont, fill="white")
     draw.text((bbox_rect[2], bbox[3]), suffix, font=smallfont, fill="black")
-
-    draw.text((5, sizey - SMALL - 3), left, font=smallfont, fill="black")
-    tl = draw.textlength(right, smallfont)
-    draw.text((sizex - tl - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL - 8, middle, smallfont, fill="black")
+    bottom_line(draw, left, middle, right, offset=3)
 
 
 def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0):
@@ -712,7 +699,7 @@ def flighttime(draw, last_flights):
     draw.text((155, starty), "Ldg", font=verysmallfont, fill="black")
     starty += VERYSMALL + 5
 
-    maxlines = 8
+    maxlines = 6
     for f in last_flights:
         f[0] = f[0].replace(second=0, microsecond=0)   # round down start time to minutes
         draw.text((0, starty), f[0].strftime("%d.%m."), font=verysmallfont, fill="black")
@@ -733,6 +720,7 @@ def flighttime(draw, last_flights):
         maxlines -= 1
         if maxlines <= 0:
             break
+    bottom_line(draw, "", "Mode", "Clear")
 
 
 def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
@@ -813,14 +801,7 @@ def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmpe
     if len(co_values) > 0:
         round_text(draw, 5, sizey-2*SMALL, "act: {:3d}".format(co_values[len(co_values)-1]), "white", out="black")
     round_text(draw, sizex/2+5, sizey-2*SMALL, "max: {:3d}".format(co_max), "white", out="black")
-
-    left = "Cal"
-    right = "Reset"
-    middle = "Mode"
-    draw.text((0, sizey - SMALL), left, font=smallfont, fill="black")
-    tl = draw.textlength(right, smallfont)
-    draw.text((sizex - tl, sizey - SMALL), right, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
+    bottom_line(draw, "Cal", "Mode", "Reset")
 
 
 def dashboard(draw, x, y, sizex, lines):
@@ -868,13 +849,7 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
         dashboard(draw, 0, starty, sizex, lines)
     if error_message is not None:
         centered_text(draw, 80, error_message, verylargefont, fill="black")
-    left = "Stats"
-    right = "Start"
-    middle = "Mode"
-    draw.text((0, sizey - SMALL), left, font=smallfont, fill="black")
-    tl = draw.textlength(right, smallfont)
-    draw.text((sizex - tl, sizey - SMALL), right, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL, middle, smallfont, fill="black")
+    bottom_line(draw, "Stats", "Mode", "Start")
 
 
 def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
@@ -911,5 +886,4 @@ def distance_statistics(draw, values):
     )
     dashboard(draw, 0, starty, sizex, lines)
 
-    middle = "Back"
-    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
+    bottom_line(draw, "", "Back", "")
