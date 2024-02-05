@@ -58,7 +58,7 @@ def init(checklist_xml):
         with open(checklist_xml, "r") as f:
             xml_string = f.read()
     except FileNotFoundError:
-        rlog.debug("Checklist - Excel file '{0}' not found.".format(checklist_xml))
+        rlog.debug("Checklist - XML file '{0}' not found.".format(checklist_xml))
         return
     except Exception as e:
         rlog.debug("Checklist - Error '{0}' reading '{1}.".format(e, checklist_xml))
