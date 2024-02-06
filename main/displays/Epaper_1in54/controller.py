@@ -676,16 +676,15 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
 
     draw.text((0, starty), "P-Alt {0:.0f}ft".format(altitude), font=verysmallfont, fill="black")
     right_text(draw, starty, "Corr {0:+}ft".format(stat['AltitudeOffset']), verysmallfont, "black")
-    starty += VERYSMALL + 2
+    starty += VERYSMALL + 4
     x = round_text(draw, 0, starty, "IMU", "white", stat['IMUConnected'], out="black")
     round_text(draw, x+10, starty, "BMP", "white", stat['BMPConnected'], out="black")
     if stat['GPS_position_accuracy'] < 19999:
         alt = '{:5.0f}'.format(gps_alt)
     else:
-        alt = " --- "
-    right_text(draw, starty, "GPS-Alt" + alt + " ft", verysmallfont, "black")
+        alt = " ---"
+    right_text(draw, starty, "GAlt" + alt + "ft", verysmallfont, "black")
 
-    bottom_line(draw, "+10ft", "Mode", "-10ft")
 
 
 def flighttime(draw, last_flights):
