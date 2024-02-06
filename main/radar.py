@@ -918,7 +918,11 @@ if __name__ == "__main__":
         rlog.setLevel(SITUATION_DEBUG)  # log including situation messages
 
     url_host_base = args['connect']
-    display_control = importlib.import_module('displays.' + args['device'] + '.controller')
+    try:
+        display_control = importlib.import_module('displays.' + args['device'] + '.controller')
+    except ModuleNotFoundError as e:
+        print("Error: Controller for device {0} not found. Aborting. ".format(args['device']))
+        sys.exit(1)
     bluetooth = args['bluetooth']
     basemode = args['north']
     fullcircle = args['fullcircle']
