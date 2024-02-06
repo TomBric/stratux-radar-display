@@ -157,9 +157,6 @@ def draw_status(display_control, bluetooth_active, extsound_active):
     global middle
     global right
     global scan_end
-    global new_wifi
-    global new_pass
-    global stratux_ip
 
     display_control.clear()
     now = time.time()
@@ -283,8 +280,6 @@ def remove_device(bt_addr):
 
 
 def scan_result(output):
-    global new_devices
-
     lines = output.splitlines()
     for line in lines:
         split = line.split(maxsplit=3)

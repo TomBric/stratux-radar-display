@@ -94,13 +94,10 @@ def make_font(name, size):
 
 
 def display():
-    global device
-    global epaper_image
     device.async_displayPart(device.getbuffer_optimized(epaper_image))
 
 
 def is_busy():
-    global device
     return device.async_is_busy()
 
 
@@ -183,16 +180,12 @@ def init(fullcircle=False):
 
 
 def cleanup():
-    global device
-
     device.init(0)
     device.Clear(0xFF)
     device.sleep_nowait()
 
 
 def refresh():
-    global device
-
     device.Clear(0xFF)  # necessary to overwrite everything
     device.init(1)
 
@@ -413,10 +406,6 @@ def gmeter(current, maxg, ming, error_message):
 
 
 def compass(heading, error_message):
-    global epaper_image
-    global mask
-    global cdraw
-
     czerox = sizex / 2
     czeroy = sizey / 2
     csize = sizey / 2  # radius of compass rose

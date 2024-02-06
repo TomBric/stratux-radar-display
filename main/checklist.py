@@ -152,7 +152,6 @@ def draw_checklist(display_control, ui_changed):
 def user_input():
     global g_iterator
     global g_checklist_changed
-    global g_checklist
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:

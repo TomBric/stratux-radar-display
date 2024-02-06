@@ -127,7 +127,6 @@ def decode_gps_hardware(detected_type):
 
 
 def draw_status(display_control, ui_changed, connected, altitude, gps_alt, gps_quality):
-    global strx
     if strx['was_changed'] or ui_changed or not connected:
         display_control.clear()
         if connected:
@@ -174,8 +173,6 @@ def set_altitude_offset(new_value):
 
 
 def status_callback(json_str):
-    global strx
-
     rlog.log(SITUATION_DEBUG, "New status" + json_str)
     stat = json.loads(json_str)
 
@@ -222,8 +219,6 @@ def status_callback(json_str):
 
 
 def change_value(difference):
-    global strx
-
     alt_offset = get_current_altoffset()
     if alt_offset is not None:
         strx['AltitudeOffset'] = alt_offset + difference

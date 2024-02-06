@@ -70,7 +70,6 @@ def parse_modes(modes):
 
 
 def next_mode_sequence(current_mode):
-    global mode_sequence
     iterator = iter(mode_sequence)
     next_mode = mode_sequence[0]   # return to first mode, if old mode not found, error proof
     for value in iterator:
@@ -80,10 +79,8 @@ def next_mode_sequence(current_mode):
 
 
 def first_mode_sequence():
-    global mode_sequence
     return mode_sequence[0]  # return to first mode
 
 
 def is_mode_contained(mode):
-    global mode_sequence
     return mode in mode_sequence  # return true is mode is in mode sequence, false otherwise

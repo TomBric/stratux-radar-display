@@ -187,7 +187,6 @@ def reset_values():
     global stop_situation
     global zero_distance
     global fly_status
-    global ground_distance_active
 
     runup_situation = None
     start_situation = None
@@ -249,7 +248,6 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
 
 def write_stats():
     global rlog
-    global saved_statistics
 
     if rlog is None:  # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
@@ -430,7 +428,6 @@ def evaluate_statistics(latest_stat):
 
 def store_statistics(sit):
     global stats_next_store
-    global statistics
 
     if simulation_mode:
         sim_data = simulation.read_simulation_data()
@@ -461,8 +458,6 @@ def store_statistics(sit):
 
 
 async def read_ground_sensor():
-    global distance_sensor
-    global global_situation
     global zero_distance
 
     if ground_distance_active:

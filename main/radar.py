@@ -188,12 +188,9 @@ def draw_all_ac(allac):
 
 
 def draw_display():
-    global all_ac
-    global situation
     global aircraft_changed
     global ui_changed
     global optical_alive
-    global extsound_active
 
     rlog.log(AIRCRAFT_DEBUG, "List of all aircraft > " + json.dumps(all_ac))
     new_alive = int((int(time.time()) % (OPTICAL_ALIVE_BARS * OPTICAL_ALIVE_TIME)) / OPTICAL_ALIVE_TIME)
@@ -388,8 +385,6 @@ def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
 
 
 def new_situation(json_str):
-    global situation
-    global ahrs
     global vertical_max
     global vertical_min
     global global_mode

@@ -114,8 +114,6 @@ def init(activated, saved_flights):
 
 
 def new_flight(flight):
-    global g_config
-
     if 'last_flights' not in g_config:
         g_config['last_flights'] = []
     g_config['last_flights'].insert(0, flight)
