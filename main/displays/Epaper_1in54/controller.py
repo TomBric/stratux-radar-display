@@ -334,14 +334,14 @@ def situation(connected, gpsconnected, ownalt, course, range, altdifference, bt_
 
 def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
     draw.text((5, 0), "UTC", font=smallfont, fill="black")
-    centered_text(draw, SMALL, utctime, verylargefont, fill="black")
+    centered_text(SMALL, utctime, verylargefont, fill="black")
     if stoptime is not None:
         draw.text((5, SMALL+VERYLARGE), "Timer", font=smallfont, fill="black")
-        centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill="black")
+        centered_text(2*SMALL+VERYLARGE, stoptime, verylargefont, fill="black")
         if laptime is not None:
             draw.text((5, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="black")
-            centered_text(draw, 3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
-    bottom_line(draw, left_text, middle_text, right_t, offset=3)
+            centered_text(3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
+    bottom_line(left_text, middle_text, right_t, offset=3)
 
 
 def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
@@ -484,16 +484,16 @@ def shutdown(draw, countdown, shutdownmode):
         message = "Shtdwn displ"
     elif shutdownmode == 2:
         message = "Reboot"
-    centered_text(draw, 0, message, largefont, fill="black")
+    centered_text(0, message, largefont, fill="black")
     message = "in " + str(countdown) + " seconds!"
-    centered_text(draw, 30, message, largefont, fill="black")
+    centered_text(30, message, largefont, fill="black")
     message = "Left to cancel ..."
-    centered_text(draw, 80, message, smallfont, fill="black")
+    centered_text(80, message, smallfont, fill="black")
     message = "Middle display only ..."
-    centered_text(draw, 100, message, smallfont, fill="black")
+    centered_text(100, message, smallfont, fill="black")
     message = "Right for reboot all ..."
-    centered_text(draw, 120, message, smallfont, fill="black")
-    bottom_line(draw, "Canc", "Displ", "Rebo")
+    centered_text(120, message, smallfont, fill="black")
+    bottom_line("Canc", "Displ", "Rebo")
 
 
 def rollmarks(draw, roll):
