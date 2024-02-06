@@ -851,6 +851,8 @@ def logging_init():
 
 
 if __name__ == "__main__":
+    # set uncaught exception logging to /var/log/messages/user
+    sys.excepthook = radar_excepthook
     # parse arguments for different configurations
     ap = argparse.ArgumentParser(description='Stratux radar display')
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
@@ -990,8 +992,7 @@ if __name__ == "__main__":
     url_caging = "http://" + url_host_base + "/cageAHRS"
     url_calibrate = "http://" + url_host_base + "/calibrateAHRS"
 
-    # set uncaught exception logging to /var/log/messages/user
-    sys.excepthook = radar_excepthook
+    unsinn['raise'] = "RAISE EX"
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
         signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown
