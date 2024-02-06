@@ -779,17 +779,16 @@ async def display_and_cutoff():
 
 
 async def coroutines():
-    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
-    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
-    dis_cutoff = asyncio.create_task(display_and_cutoff())
-    sensor_reader = asyncio.create_task(cowarner.read_sensors())
-    ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
-    u_interface = asyncio.create_task(user_interface())
     try:
+        tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
+        sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+        dis_cutoff = asyncio.create_task(display_and_cutoff())
+        sensor_reader = asyncio.create_task(cowarner.read_sensors())
+        ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
+        u_interface = asyncio.create_task(user_interface()
         await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader])
     except Exception as e:
-        print("Await Exception: {0}".format(e))
-
+        print("Exception: {0}".format(e))
 
 def main():
     global max_pixel
@@ -820,8 +819,6 @@ def main():
         asyncio.run(coroutines())
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
-    except Exception as e:
-        print("Exception: {0}".format(e))
 
 
 
