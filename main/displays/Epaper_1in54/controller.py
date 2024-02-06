@@ -215,7 +215,7 @@ def bottom_line(left, middle, right, offset=0):  # offset to be able to print le
     draw.text((0, sizey - SMALL - offset), left, font=smallfont, fill="black")
     textlength = draw.textlength(right, smallfont)
     draw.text((sizex - textlength, sizey - SMALL - offset), right, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL - offset, middle, smallfont, fill="black")
+    centered_text(sizey - SMALL - offset, middle, smallfont, fill="black")
 
 
 def startup(version, target_ip, seconds):
@@ -309,12 +309,12 @@ def situation(connected, gpsconnected, ownalt, course, range, altdifference, bt_
     draw.text((sizex - tl, sizey - SMALL), text, font=smallfont, fill="black", align="right")
 
     if not gpsconnected:
-        centered_text(draw, 15, "No GPS", smallfont, fill="black")
+        centered_text(15, "No GPS", smallfont, fill="black")
     if not connected:
-        centered_text(draw, 75, "No connection!", smallfont, fill="black")
+        centered_text(75, "No connection!", smallfont, fill="black")
     if co_alarmlevel > 0:
-        centered_text(draw, sizey - 3 * SMALL, "CO Alarm!", smallfont, fill="black")
-        centered_text(draw, sizey - 2 * SMALL, co_alarmstring, smallfont, fill="black")
+        centered_text(sizey - 3 * SMALL, "CO Alarm!", smallfont, fill="black")
+        centered_text(sizey - 2 * SMALL, co_alarmstring, smallfont, fill="black")
 
     if extsound or bt_devices > 0:
         if sound_active:
