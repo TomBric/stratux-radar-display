@@ -789,6 +789,7 @@ async def coroutines():
 
 
 def async_exception_handler(loop, context):
+    print("UNCAUGHT EXCEPTION")
     exception = context.get('exception')
     if exception:
         print(f"Uncaught Exception: {exception}")
