@@ -645,7 +645,7 @@ def round_text(draw, x, y, text, color, yesno=True, out=None):
 def stratux(draw, stat, altitude, gps_alt, gps_quality):
     starty = 0
     centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="black")
-    starty += SMALL+8
+    starty += SMALL + 4
     starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
     if stat['OGN_connected']:
         starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
@@ -653,10 +653,8 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
         starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext=noise_text)
     if stat['UATRadio_connected']:
         starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
-    starty += 2
     if stat['CPUTemp'] > -300:    # -300 means no value available
         starty = bar(draw, starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
-        starty += 2
     # GPS
     if gps_quality == 1:
         t = "3D GPS "
@@ -674,18 +672,20 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     else:
         gps = "NoFix"
     right_text(draw, starty, gps, verysmallfont, "black")
+    starty += VERYSMALL+2
 
-    starty += VERYSMALL+4
-    fl = '{:3.0f}'.format(round(altitude) / 100)
-    draw.text((0, starty), "FL" + fl, font=verysmallfont, fill="black")
+    draw.text(0, starty, "P-Alt {0:.0f}ft".format(altitude), fill="black")
+    round_text(draw, x, starty, "Corr {0:+}ft".format(stat['AltitudeOffset']), fill="black")
+    starty += VERYSMALL + 2
+    x = round_text(draw, 0, starty, "IMU", "white", stat['IMUConnected'], out="black")
+    round_text(draw, x+10, starty, "BMP", "white", stat['BMPConnected'], out="black")
     if stat['GPS_position_accuracy'] < 19999:
         alt = '{:5.0f}'.format(gps_alt)
     else:
         alt = " --- "
-    right_text(draw, starty, "Alt" + alt + " ft", verysmallfont, "black")
-    starty += VERYSMALL + 6
-    x = round_text(draw, 0, starty, "IMU", "white", stat['IMUConnected'], out="black")
-    round_text(draw, x+10, starty, "BMP", "white", stat['BMPConnected'], out="black")
+    right_text(draw, starty, "GPS-Alt" + alt + " ft", verysmallfont, "black")
+
+    bottom_line(draw, "+10ft", "Mode", "-10ft")
 
 
 def flighttime(draw, last_flights):
