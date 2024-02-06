@@ -187,7 +187,7 @@ def draw_all_ac(draw, allac):
                                          line_length, tail)
 
 
-def draw_display(draw):
+def draw_display():
     global all_ac
     global situation
     global aircraft_changed
@@ -200,12 +200,12 @@ def draw_display(draw):
     if situation['was_changed'] or aircraft_changed or ui_changed or new_alive != optical_alive:
         # display is only triggered if there was a change
         optical_alive = new_alive
-        display_control.clear(draw)
-        display_control.situation(draw, situation['connected'], situation['gps_active'], situation['own_altitude'],
+        display_control.clear()
+        display_control.situation(situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
                                   sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
                                   basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1])
-        draw_all_ac(draw, all_ac)
+        draw_all_ac(all_ac)
         display_control.display()
         situation['was_changed'] = False
         aircraft_changed = False
