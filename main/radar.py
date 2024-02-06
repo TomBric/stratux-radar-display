@@ -786,6 +786,8 @@ async def coroutines():
     ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
     u_interface = asyncio.create_task(user_interface())
     await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader])
+    except Exception as e:
+        quit_gracefully()
 
 
 def async_exception_handler(loop, context):
@@ -828,8 +830,8 @@ def main():
         asyncio.run(coroutines())
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
-    except Future.exception():
-        raise RuntimeError
+    except Exception as e:
+        print("Exception: {0}".format(e))
 
 
 
