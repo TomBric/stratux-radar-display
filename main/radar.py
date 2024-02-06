@@ -803,7 +803,7 @@ def main():
     timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
     max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
-    ahrsui.init(display_control, url_calibrate, url_caging)
+    ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
