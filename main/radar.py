@@ -828,6 +828,9 @@ def main():
         asyncio.run(coroutines())
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
+    except Future.exception():
+        raise RuntimeError
+
 
 
 def quit_gracefully(*arguments):
