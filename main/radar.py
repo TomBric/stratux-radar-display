@@ -62,6 +62,9 @@ import simulation
 import checklist
 from datetime import datetime, timezone
 from pathlib import Path
+import sys
+import traceback
+import syslog
 
 # logging
 SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
@@ -825,6 +828,16 @@ def quit_gracefully(*arguments):
     return 0
 
 
+def radar_excepthook(exc_type, exc_value, exc_traceback):
+    syslog.openlog("stratux-radar-display", syslog.LOG_PID, syslog.LOG_USER)
+    # log file will be stored under /var/log/user.log
+    syslog.syslog(syslog.LOG_ERR, f"Uncaught exception: {exc_type.__name__}: {exc_value}")
+    stack_trace = traceback.format_exception(exc_type, exc_value, exc_traceback)
+    for line in stack_trace:
+        syslog.syslog(syslog.LOG_ERR, line.strip())
+    syslog.closelog()
+
+
 def logging_init():
     # Add file rotatin handler, with level DEBUG
     # rotatingHandler = logging.handlers.RotatingFileHandler(filename='rotating.log', maxBytes=1000, backupCount=5)
@@ -887,9 +900,10 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
                     default=DEFAULT_MIXER)
-    ap.add_argument("-modes", "--displaymodes", required=False, help="Select display modes that you want to see "
-        "R=radar T=timer A=ahrs D=display-status G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "    
-        "M=distance measurement L=checklist  Example: -modes RADCM", default="RTAGKVICMDS")
+    ap.add_argument("-modes", "--displaymodes", required=False,
+                    help="Select display modes that you want to see ""R=radar T=timer A=ahrs D=display-status "
+                         "G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "
+                         "M=distance measurement L=checklist  Example: -modes RADCM", default="RTAGKVICMDS")
 
     args = vars(ap.parse_args())
     # set up logging
@@ -971,6 +985,8 @@ if __name__ == "__main__":
     url_caging = "http://" + url_host_base + "/cageAHRS"
     url_calibrate = "http://" + url_host_base + "/calibrateAHRS"
 
+    # set uncaught exception logging to /var/log/messages/user
+    sys.excepthook = radar_excepthook
     try:
         signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
         signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown
