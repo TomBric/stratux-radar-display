@@ -97,7 +97,7 @@ def reset_timer():
     left_text = ""
 
 
-def draw_timer(draw, display_control, refresh_time):
+def draw_timer(display_control, refresh_time):
     global was_in_secs
     global timer_ui_changed
     global cdown_spoken
@@ -108,7 +108,7 @@ def draw_timer(draw, display_control, refresh_time):
         return    # nothing to display if time has not changed or change would be quicker than display
     was_in_secs = now_in_secs
     timer_ui_changed = False
-    display_control.clear(draw)
+    display_control.clear()
     utctimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs))
     if timer_running:
         stoptimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs-stoptime))
@@ -148,7 +148,7 @@ def draw_timer(draw, display_control, refresh_time):
         else:
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time))
 
-    display_control.timer(draw, utctimestr, stoptimestr, laptimestr, lap_head, left_text, middle_text, right_text,
+    display_control.timer(utctimestr, stoptimestr, laptimestr, lap_head, left_text, middle_text, right_text,
                           timer_running)
     display_control.display()
 
