@@ -77,6 +77,7 @@ msize = 15  # size of markings
 compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
+draw = None
 cmsize = 20        # length of compass marks
 # co warner
 space = 3  # space between scale figures and zero line
@@ -98,13 +99,10 @@ def make_font(name, size):
 
 
 def display():
-    global device
-    global epaper_image
     device.async_display_1Gray(device.getbuffer_optimized(epaper_image))
 
 
 def is_busy():
-    global device
     return device.async_is_busy()
 
 
@@ -151,6 +149,7 @@ def init(fullcircle=False):
     global mask
     global cdraw
     global rlog
+    global draw
 
     rlog = logging.getLogger('stratux-radar-log')
     device = epd3in7.EPD()
@@ -188,12 +187,10 @@ def init(fullcircle=False):
     compass_aircraft = Image.open(pic_path)
     mask = Image.new('1', (LARGE * 2, LARGE * 2))
     cdraw = ImageDraw.Draw(mask)
-    return draw, max_pixel, zerox, zeroy, display_refresh
+    return max_pixel, zerox, zeroy, display_refresh
 
 
 def cleanup():
-    global device
-
     device.init(0)
     device.Clear(0xFF, 0)
     device.sleep()
@@ -201,8 +198,6 @@ def cleanup():
 
 
 def refresh():
-    global device
-
     device.Clear(0xFF, 0)  # necessary to overwrite everything
     device.init(1)
 
@@ -439,10 +434,6 @@ def gmeter(current, maxg, ming, error_message):
 
 
 def compass(heading, error_message):
-    global epaper_image
-    global mask
-    global cdraw
-
     czerox = sizex / 2
     czeroy = sizey / 2
     csize = sizey / 2  # radius of compass rose

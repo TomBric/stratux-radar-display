@@ -70,6 +70,7 @@ pitch_posmarks = (-30, -20, -10, 10, 20, 30)
 compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
+draw = None
 cmsize = 10        # length of compass marks
 # gmeter
 m_marks = ((120, ""), (157.5, "-2"), (195, "-1"), (232.5, "0"), (270, "+1"), (307.5, "+2"), (345, "+3"),
@@ -106,6 +107,7 @@ def init(fullcircle=False):
     global compass_aircraft
     global mask
     global cdraw
+    global draw
 
     config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
     device = radar_opts.get_device(['-f', config_path])
@@ -147,7 +149,7 @@ def centered_text(y, text, font, fill):
 def bottom_line(left, middle, right, offset=0):  # offset to be able to print letters like p and q
     draw.text((0, sizey - SMALL - offset), left, font=smallfont, fill="green")
     textlength = draw.textlength(right, smallfont)
-    draw.text((sizex - textlength, sizey - SMALL -offset), right, font=smallfont, fill="green", align="right")
+    draw.text((sizex - textlength, sizey - SMALL - offset), right, font=smallfont, fill="green", align="right")
     centered_text(sizey - SMALL - offset, middle, smallfont, fill="green")
 
 
@@ -395,10 +397,6 @@ def gmeter(current, maxg, ming, error_message):
 
 
 def compass(heading, error_message):
-    global image
-    global mask
-    global cdraw
-
     csize = sizex/2   # radius of compass rose
 
     draw.ellipse((0, 0, sizex-1, sizey-1), outline="white", fill="black", width=2)
