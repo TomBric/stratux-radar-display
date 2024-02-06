@@ -787,6 +787,13 @@ async def coroutines():
     await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader])
 
 
+def global_exception_handler(loop, context):
+    exception = context.get('exception')
+    if exception:
+        print(f"Uncaught Exception: {exception}")
+        loop.default_exception_handler(context)
+
+
 def main():
     global max_pixel
     global zerox
@@ -812,6 +819,9 @@ def main():
     simulation.init(simulation_mode)
     checklist.init(excel_checklist)
     display_control.startup(RADAR_VERSION, url_host_base, 4)
+    # set async exception handler
+    loop = asyncio.get_event_loop()
+    loop.set_exception_handler(async_exception_handler)
     try:
         asyncio.run(coroutines())
     except asyncio.CancelledError:
@@ -838,7 +848,9 @@ def radar_excepthook(exc_type, exc_value, exc_traceback):
     syslog.closelog()
     # for interactive mode give some output
     print(f"Uncaught exception: {exc_type.__name__}: {exc_value}")
-    print(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    for line in stack_trace:
+        print(line.strip())
+
 
 def logging_init():
     # Add file rotatin handler, with level DEBUG
