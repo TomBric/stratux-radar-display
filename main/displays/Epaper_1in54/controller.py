@@ -476,7 +476,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
         centered_text(draw, 40, error_message, verylargefont, fill="black")
 
 
-def shutdown(draw, countdown, shutdownmode):
+def shutdown(countdown, shutdownmode):
     message = ""
     if shutdownmode == 0:   # shutdown stratux + display
         message = "Shutdown all"
