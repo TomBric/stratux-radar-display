@@ -836,7 +836,9 @@ def radar_excepthook(exc_type, exc_value, exc_traceback):
     for line in stack_trace:
         syslog.syslog(syslog.LOG_ERR, line.strip())
     syslog.closelog()
-
+    # for interactive mode give some output
+    print(f"Uncaught exception: {exc_type.__name__}: {exc_value}")
+    print(traceback.format_exception(exc_type, exc_value, exc_traceback))
 
 def logging_init():
     # Add file rotatin handler, with level DEBUG
