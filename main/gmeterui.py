@@ -61,7 +61,7 @@ def reset_gmeter():
         rlog.debug("Posting gmeter-reset exception: ", e)
 
 
-def draw_gmeter(draw, display_control, ui_changed, connected, gmeter):
+def draw_gmeter(display_control, ui_changed, connected, gmeter):
     global gmeterui_changed
 
     if ui_changed or gmeter['was_changed'] or gmeterui_changed:
@@ -69,8 +69,8 @@ def draw_gmeter(draw, display_control, ui_changed, connected, gmeter):
         error_message = None
         if not connected:
             error_message = MSG_NO_CONNECTION
-        display_control.clear(draw)
-        display_control.gmeter(draw, gmeter['current'], gmeter['max'], gmeter['min'], error_message)
+        display_control.clear()
+        display_control.gmeter(gmeter['current'], gmeter['max'], gmeter['min'], error_message)
         display_control.display()
 
 

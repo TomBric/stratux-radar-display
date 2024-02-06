@@ -207,39 +207,39 @@ def refresh():
     device.init(1)
 
 
-def clear(draw):
+def clear():
     draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
 
 
-def centered_text(draw, y, text, font, fill):
+def centered_text(y, text, font, fill):
     tl = draw.textlength(text, font)
     draw.text((zerox - tl / 2, y), text, font=font, fill=fill)
 
 
-def right_text(draw, y, text, font, fill, offset=0):
+def right_text(y, text, font, fill, offset=0):
     tl = draw.textlength(text, font)
     draw.text((sizex-5-tl-offset, y), text, font=font, fill=fill)
 
 
-def bottom_line(draw, left, middle, right):
+def bottom_line(left, middle, right):
     draw.text((5, sizey - SMALL - 3), left, font=smallfont, fill="black")
     textlength = draw.textlength(right, smallfont)
     draw.text((sizex - textlength - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey - SMALL - 3, middle, smallfont, fill="black")
+    centered_text(sizey - SMALL - 3, middle, smallfont, fill="black")
 
 
-def startup(draw, version, target_ip, seconds):
+def startup(version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
     logo = Image.open(logopath)
     draw.bitmap((zerox-192/2, 0), logo, fill="black")
     versionstr = "Radar " + version
-    centered_text(draw, 188, versionstr, largefont, fill="black")
-    centered_text(draw, sizey - 2 * VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
+    centered_text(188, versionstr, largefont, fill="black")
+    centered_text(sizey - 2 * VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
     display()
     time.sleep(seconds)
 
 
-def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
+def aircraft(x, y, direction, height, vspeed, nspeed_length, tail):
     p1 = posn(direction, 2 * AIRCRAFT_SIZE)
     p2 = posn(direction + 150, 4 * AIRCRAFT_SIZE)
     p3 = posn(direction + 180, 2 * AIRCRAFT_SIZE)
@@ -268,7 +268,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
-def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
+def modesaircraft(radius, height, arcposition, vspeed, tail):
     if radius < MINIMAL_CIRCLE:
         radius = MINIMAL_CIRCLE
     draw.ellipse((zerox-radius, zeroy-radius, zerox+radius, zeroy+radius), width=3, outline="black")
@@ -293,7 +293,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
         draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
 
 
-def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
+def situation(connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
               gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
@@ -322,14 +322,14 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     draw.text((sizex - textlength - 5, 1), t, font=smallfont, fill="black", align="right")
 
     text = str(course) + '°'
-    centered_text(draw, 1, text, smallfont, fill="black")
+    centered_text(1, text, smallfont, fill="black")
 
     if not gpsconnected:
-        centered_text(draw, 70, "No GPS", smallfont, fill="black")
+        centered_text(70, "No GPS", smallfont, fill="black")
     if not connected:
-        centered_text(draw, 30, "No Connection!", smallfont, fill="black")
+        centered_text(30, "No Connection!", smallfont, fill="black")
     if co_alarmlevel > 0:
-        centered_text(draw, 250, "CO Alarm: " + co_alarmstring, smallfont, fill="black")
+        centered_text(250, "CO Alarm: " + co_alarmstring, smallfont, fill="black")
 
     if extsound or bt_devices > 0:
         if sound_active:
@@ -347,23 +347,23 @@ def situation(draw, connected, gpsconnected, ownalt, course, range, altdifferenc
     draw.line((sizex-8, 80+optical_bar*10, sizex-8, 80+optical_bar*10+8), fill="black", width=5)
 
 
-def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
+def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
     draw.text((5, 0), "UTC", font=smallfont, fill="black")
-    centered_text(draw, SMALL, utctime, verylargefont, fill="black")
+    centered_text(SMALL, utctime, verylargefont, fill="black")
     if stoptime is not None:
         draw.text((5, SMALL+VERYLARGE), "Timer", font=smallfont, fill="black")
-        centered_text(draw, 2*SMALL+VERYLARGE, stoptime, verylargefont, fill="black")
+        centered_text(2*SMALL+VERYLARGE, stoptime, verylargefont, fill="black")
         if laptime is not None:
             draw.text((5, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="black")
-            centered_text(draw, 3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
+            centered_text(3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
 
     draw.text((5, sizey-SMALL-3), left_text, font=smallfont, fill="black")
     textlength = draw.textlength(right_t, smallfont)
     draw.text((sizex-textlength-8, sizey-SMALL-3), right_t, font=smallfont, fill="black", align="right")
-    centered_text(draw, sizey-SMALL-3, middle_text, smallfont, fill="black")
+    centered_text(sizey-SMALL-3, middle_text, smallfont, fill="black")
 
 
-def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
+def meter(current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
           marks_distance, small_marks_distance, middle_text1, middle_text2):
     big_mark_length = 20
     small_mark_length = 10
@@ -417,28 +417,28 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         draw.text((center_x-tl/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
 
 
-def gmeter(draw, current, maxg, ming, error_message):
+def gmeter(current, maxg, ming, error_message):
     gm_size = 280
-    meter(draw, current, -3, 5, 110, 430, gm_size, 140, 140, 1, 0.25, "G-Force", None)
+    meter(current, -3, 5, 110, 430, gm_size, 140, 140, 1, 0.25, "G-Force", None)
 
     right_center_x = (sizex-gm_size)/2+gm_size    # center of remaining part
     t = "G-Meter"
     tl = draw.textlength(t, largefont)
     draw.text((right_center_x - tl / 2, 30), t, font=largefont, fill="black", align="left")
     draw.text((gm_size+30, 98), "max", font=smallfont, fill="black")
-    right_text(draw, 95, "{:+1.2f}".format(maxg), largefont, fill="black")
+    right_text(95, "{:+1.2f}".format(maxg), largefont, fill="black")
     if error_message is None:
         draw.text((gm_size+30, 138), "act", font=smallfont, fill="black")
-        right_text(draw, 135, "{:+1.2f}".format(current), largefont, fill="black")
+        right_text(135, "{:+1.2f}".format(current), largefont, fill="black")
     else:
         draw.text((gm_size+30, 138), error_message, font=largefont, fill="black")
     draw.text((gm_size+30, 178), "min", font=smallfont, fill="black")
-    right_text(draw, 175, "{:+1.2f}".format(ming), largefont, fill="black")
+    right_text(175, "{:+1.2f}".format(ming), largefont, fill="black")
 
-    bottom_line(draw, "", "    Mode", "Reset")
+    bottom_line("", "    Mode", "Reset")
 
 
-def compass(draw, heading, error_message):
+def compass(heading, error_message):
     global epaper_image
     global mask
     global cdraw
@@ -483,12 +483,12 @@ def compass(draw, heading, error_message):
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
             epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
     if error_message is not None:
-        centered_text(draw, 120, error_message, largefont, fill="black")
+        centered_text(120, error_message, largefont, fill="black")
 
 
-def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
+def vsi(vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
         error_message):
-    meter(draw, vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
+    meter(vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
     draw.text((35, sizey/2 - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
     draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill="black", align="left")
     middle_text = "Vertical Speed"
@@ -503,43 +503,43 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((330, 31), "act", font=verysmallfont, fill="black", align="left")
     draw.text((330, 55), "max", font=verysmallfont, fill="black", align="left")
     draw.text((330, 79), "min", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 28, "{:+1.0f}".format(vertical_speed), smallfont, fill="black")
-    right_text(draw, 52, "{:+1.0f}".format(vertical_max), smallfont, fill="black")
-    right_text(draw, 76, "{:+1.0f}".format(vertical_min), smallfont, fill="black")
+    right_text(28, "{:+1.0f}".format(vertical_speed), smallfont, fill="black")
+    right_text(52, "{:+1.0f}".format(vertical_max), smallfont, fill="black")
+    right_text(76, "{:+1.0f}".format(vertical_min), smallfont, fill="black")
     draw.text((300, 163), "Flight-Level", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 160, "{:1.0f}".format(round(flight_level/100)), smallfont, fill="black")
+    right_text(160, "{:1.0f}".format(round(flight_level/100)), smallfont, fill="black")
     draw.text((300, 187), "GPS-Alt [ft]", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 184, "{:1.0f}".format(gps_altitude), smallfont, fill="black")
+    right_text(184, "{:1.0f}".format(gps_altitude), smallfont, fill="black")
     draw.text((300, 211), "GpsSpd [kts]", font=verysmallfont, fill="black", align="left")
-    right_text(draw, 208, "{:1.1f}".format(gps_speed), smallfont, fill="black")
+    right_text(208, "{:1.1f}".format(gps_speed), smallfont, fill="black")
 
     if error_message is not None:
-        centered_text(draw, 60, error_message, verylargefont, fill="black")
+        centered_text(60, error_message, verylargefont, fill="black")
 
-    bottom_line(draw, "", "    Mode", "Reset")
+    bottom_line("", "    Mode", "Reset")
 
 
-def shutdown(draw, countdown, shutdownmode):
+def shutdown(countdown, shutdownmode):
     if shutdownmode == 0:   # shutdown stratux + display
         message = "Shutdown stratux & display"
     elif shutdownmode == 1:
         message = "Shutdown display"
     else:
         message = "Reboot"
-    centered_text(draw, 10, message, largefont, fill="black")
+    centered_text(10, message, largefont, fill="black")
     message = "in " + str(countdown) + " seconds!"
-    centered_text(draw, 40, message, largefont, fill="black")
+    centered_text(40, message, largefont, fill="black")
     message = "Press left button to cancel ..."
-    centered_text(draw, 110, message, smallfont, fill="black")
+    centered_text(110, message, smallfont, fill="black")
     message = "Press middle for display only ..."
-    centered_text(draw, 140, message, smallfont, fill="black")
+    centered_text(140, message, smallfont, fill="black")
     message = "Press right for reboot all ..."
-    centered_text(draw, 170, message, smallfont, fill="black")
+    centered_text(170, message, smallfont, fill="black")
 
-    bottom_line(draw, "Cancel", "Display only", "Reboot")
+    bottom_line("Cancel", "Display only", "Reboot")
 
 
-def rollmarks(draw, roll):
+def rollmarks(roll):
     if ah_zerox > ah_zeroy:
         di = ah_zeroy
     else:
@@ -571,7 +571,7 @@ def linepoints(pitch, roll, pitch_distance, length):
     return ps, pe
 
 
-def slip(draw, slipskid):
+def slip(slipskid):
     slipsize = 12
     slipscale = 15
     if slipskid < -10:
@@ -587,7 +587,7 @@ def slip(draw, slipskid):
     draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey - 1), fill="white", width=2)
 
 
-def ahrs(draw, pitch, roll, heading, slipskid, error_message):
+def ahrs(pitch, roll, heading, slipskid, error_message):
     # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     h1, h2 = linepoints(pitch, roll, 0, 600)  # horizon points
     h3, h4 = linepoints(pitch, roll, -180, 600)
@@ -611,31 +611,31 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
                  fill="black")
 
     # roll indicator
-    rollmarks(draw, roll)
+    rollmarks(roll)
     # slip indicator
-    slip(draw, slipskid)
+    slip(slipskid)
 
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
-        centered_text(draw, 80, error_message, smallfont, fill="black")
-    bottom_line(draw, "Levl", "", "Zero")
+        centered_text(80, error_message, smallfont, fill="black")
+    bottom_line("Levl", "", "Zero")
 
 
-def text_screen(draw, headline, subline, text, left_text, middle_text, r_text):
-    centered_text(draw, 0, headline, verylargefont, fill="black")
+def text_screen(headline, subline, text, left_text, middle_text, r_text):
+    centered_text(0, headline, verylargefont, fill="black")
     txt_starty = VERYLARGE
     if subline is not None:
-        centered_text(draw, txt_starty, subline, largefont, fill="black")
+        centered_text(txt_starty, subline, largefont, fill="black")
         txt_starty += LARGE
     draw.text((5, txt_starty), text, font=smallfont, fill="black")
-    bottom_line(draw, left_text, middle_text, r_text)
+    bottom_line(left_text, middle_text, r_text)
 
 
-def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp, suffix):
-    centered_text(draw, 0, headline, largefont, fill="black")
+def screen_input(headline, subline, text, left, middle, right, prefix, inp, suffix):
+    centered_text(0, headline, largefont, fill="black")
     txt_starty = LARGE
     if subline is not None:
-        centered_text(draw, LARGE, subline, smallfont, fill="black")
+        centered_text(LARGE, subline, smallfont, fill="black")
         txt_starty += LARGE
     bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
     draw.text((0, txt_starty), text, font=smallfont, fill="black")
@@ -646,10 +646,10 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     draw.text((bbox_rect[0], bbox[3]), inp, font=smallfont, fill="white")
     draw.text((bbox_rect[2], bbox[3]), suffix, font=smallfont, fill="black")
 
-    bottom_line(draw, left, middle, right)
+    bottom_line(left, middle, right)
 
 
-def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0):
+def bar(y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0):
     bar_start = 100
     bar_end = 420
 
@@ -678,7 +678,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
     return y+VERYSMALL+12
 
 
-def round_text(draw, x, y, text, color, yesno=True, out=None):
+def round_text(x, y, text, color, yesno=True, out=None):
     tl = draw.textlength(text, verysmallfont)
     draw.rounded_rectangle([x, y, x+tl+10, y+VERYSMALL+2], radius=4, fill=color, outline=out)
     draw.text((x+5, y), text, font=verysmallfont, fill="black")
@@ -687,19 +687,19 @@ def round_text(draw, x, y, text, color, yesno=True, out=None):
     return x+tl+20
 
 
-def stratux(draw, stat, altitude, gps_alt, gps_quality):
+def stratux(stat, altitude, gps_alt, gps_quality):
     starty = 0
-    centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="black")
+    centered_text(0, "Stratux " + stat['version'], smallfont, fill="black")
     starty += SMALL+8
-    starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
+    starty = bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
     if stat['OGN_connected']:
-        starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
+        starty = bar(starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
         noise_text = str(round(stat['OGN_noise_db'], 1)) + "@" + str(round(stat['OGN_gain_db'], 1)) + "dB"
-        starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext=noise_text)
+        starty = bar(starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext=noise_text)
     if stat['UATRadio_connected']:
-        starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
+        starty = bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
     if stat['CPUTemp'] > -300:    # -300 means no value available
-        starty = bar(draw, starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
+        starty = bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
     # GPS
     draw.text((5, starty), "GPS hw", font=verysmallfont, fill="black")
     draw.text((100, starty), stat['GPS_detected_type'], font=verysmallfont, fill="black")
@@ -736,14 +736,14 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     draw.text((340, starty), t, font=verysmallfont, fill="black")
     starty += VERYSMALL + 5
     draw.text((5, starty), "sensors", font=verysmallfont, fill="black")
-    x = round_text(draw, 100, starty, "IMU", "white", stat['IMUConnected'], out="black")
-    round_text(draw, x, starty, "BMP", "white", stat['BMPConnected'], out="black")
-    bottom_line(draw, "+10 ft", "Mode", "-10 ft")
+    x = round_text(100, starty, "IMU", "white", stat['IMUConnected'], out="black")
+    round_text(x, starty, "BMP", "white", stat['BMPConnected'], out="black")
+    bottom_line("+10 ft", "Mode", "-10 ft")
 
 
-def flighttime(draw, last_flights):
+def flighttime(last_flights):
     starty = 0
-    centered_text(draw, 0, "Flight Logs ", smallfont, fill="black")
+    centered_text(0, "Flight Logs ", smallfont, fill="black")
     starty += SMALL + 10
     draw.text((20, starty), "Date", font=verysmallfont, fill="black")
     draw.text((120, starty), "Start", font=verysmallfont, fill="black")
@@ -767,15 +767,15 @@ def flighttime(draw, last_flights):
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)
         out = '  {:02}:{:02}  '.format(int(hours), int(minutes))
-        round_text(draw, 220, starty, out, "white", out="black")
+        round_text(220, starty, out, "white", out="black")
         starty += VERYSMALL + 5
         maxlines -= 1
         if maxlines <= 0:
             break
-    bottom_line(draw, "", "Mode", "Clear")
+    bottom_line("", "Mode", "Clear")
 
 
-def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
+def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
     tl = math.floor(draw.textlength(str(maxvalue), verysmallfont))    # for adjusting x and y
     # adjust zero lines to have room for text
     xpos = xpos + tl + space
@@ -838,37 +838,37 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
         draw.line([(x, y), (x + 3, y)], fill="black", width=1)
 
 
-def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
+def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
     if alarmlevel == 0:
-        centered_text(draw, 0, "CO Warner: No CO alarm", largefont, fill="black")
+        centered_text(0, "CO Warner: No CO alarm", largefont, fill="black")
     else:
         if alarmperiod > 60:
             alarmstr = "CO: {:d} ppm longer {:d} min".format(alarmppm, math.floor(alarmperiod/60))
         else:
             alarmstr = "CO: {:d} ppm longer {:d} sec".format(alarmppm, math.floor(alarmperiod))
-        centered_text(draw, 0, alarmstr, largefont, fill="black")
-    graph(draw, 0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout)
+        centered_text(0, alarmstr, largefont, fill="black")
+    graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout)
     draw.text((320, 50 + SMALL - VERYSMALL), "Warnlevel:", font=verysmallfont, fill="black")
-    right_text(draw, 50, "{:3d}".format(alarmlevel), smallfont, fill="black")
+    right_text(50, "{:3d}".format(alarmlevel), smallfont, fill="black")
 
     if len(co_values) > 0:
         draw.text((320, 120+SMALL-VERYSMALL), "CO act:", font=verysmallfont, fill="black")
-        right_text(draw, 120, "{:3d}".format(co_values[len(co_values) - 1]), smallfont, fill="black")
+        right_text(120, "{:3d}".format(co_values[len(co_values) - 1]), smallfont, fill="black")
     draw.text((320, 140+SMALL-VERYSMALL), "CO max:", font=verysmallfont, fill="black")
-    right_text(draw, 140, "{:3d}".format(co_max), smallfont, fill="black")
+    right_text(140, "{:3d}".format(co_max), smallfont, fill="black")
     draw.text((320, 196), "R0:", font=verysmallfont, fill="black")
-    right_text(draw, 196, "{:.1f}k".format(r0/1000), verysmallfont, fill="black")
+    right_text(196, "{:.1f}k".format(r0/1000), verysmallfont, fill="black")
 
-    bottom_line(draw, "Calibrate", "Mode", "Reset")
+    bottom_line("Calibrate", "Mode", "Reset")
 
 
-def data_item(draw, leftx, y, rightx, text, value):
+def data_item(leftx, y, rightx, text, value):
     draw.text((leftx, y + (SMALL-VERYSMALL) / 2), text, font=verysmallfont, fill="black", align="left")
     tl = draw.textlength(value, smallfont)
     draw.text((rightx - tl, y), value, font=smallfont, fill="black")
 
 
-def dashboard(draw, x, y, dsizex, rounding, headline, lines):
+def dashboard(x, y, dsizex, rounding, headline, lines):
     # dashboard, arguments are lines = ("text", "value"), ....
     starty = y + VERYSMALL/2
     for line in lines:
@@ -885,18 +885,18 @@ def dashboard(draw, x, y, dsizex, rounding, headline, lines):
     return starty
 
 
-def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
+def distance(now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
              own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
              ground_distance_valid, grounddistance, error_message):
 
-    centered_text(draw, 0, "GPS Distance", smallfont, fill="black")
+    centered_text(0, "GPS Distance", smallfont, fill="black")
 
     lines = (
         ("Date", "{:0>2d}.{:0>2d}.{:0>4d}".format(now.day, now.month, now.year)),
         ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
                                                        math.floor(now.microsecond/100000)))
     )
-    starty = dashboard(draw, 5, 35, 225, True, "Date/Time", lines)
+    starty = dashboard(5, 35, 225, True, "Date/Time", lines)
 
     t = "GPS-NoFix"
     accuracy = ""
@@ -917,19 +917,19 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
         ("GPS-Speed [kts]", gps_speed_str),
         (t, accuracy)
     )
-    starty = dashboard(draw, 5, starty, 225, True, "GPS", lines)
+    starty = dashboard(5, starty, 225, True, "GPS", lines)
     if ground_distance_valid:
         lines = (
             ("Grd Dist [cm]", "{:+3.1f}".format(grounddistance/10)),
         )
-        dashboard(draw, 5, starty, 225, True, "Ground Sensor", lines)
+        dashboard(5, starty, 225, True, "Ground Sensor", lines)
 
     if ahrs_valid:
         lines = (
             ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
             ("Roll [deg]", "{:+2d}".format(ahrs_roll)),
         )
-        starty = dashboard(draw, 250, 35, 225, True, "AHRS", lines)
+        starty = dashboard(250, 35, 225, True, "AHRS", lines)
     else:
         starty = 20
 
@@ -948,11 +948,11 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
             ("Ba-Diff r-up [ft]", alt_diff_str),
             ("Ba-Diff tof [ft]", takeoff_str),
         )
-        dashboard(draw, 250, starty, 225, True, "Baro", lines)
+        dashboard(250, starty, 225, True, "Baro", lines)
 
     if error_message is not None:
-        centered_text(draw, 60, error_message, verylargefont, fill="black")
-    bottom_line(draw, "Stats", "Mode", "Start")
+        centered_text(60, error_message, verylargefont, fill="black")
+    bottom_line("Stats", "Mode", "Start")
 
 
 def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
@@ -962,8 +962,8 @@ def form_line(values, key, format_str):    # generates line if key exists with f
         return '---'
 
 
-def distance_statistics(draw, values):
-    centered_text(draw, 0, "Start-/Landing Statistics", smallfont, fill="black")
+def distance_statistics(values):
+    centered_text(0, "Start-/Landing Statistics", smallfont, fill="black")
 
     st = '---'
     if 'start_time' in values:
@@ -976,7 +976,7 @@ def distance_statistics(draw, values):
         ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
         ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
     )
-    starty = dashboard(draw, 5, 35, 225, True, "Takeoff", lines)
+    starty = dashboard(5, 35, 225, True, "Takeoff", lines)
 
     lt = '---'
     if 'landing_time' in values:
@@ -989,12 +989,12 @@ def distance_statistics(draw, values):
         ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
         ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
     )
-    starty = dashboard(draw, 250, 35, 225, True, "Landing", lines)
+    starty = dashboard(250, 35, 225, True, "Landing", lines)
 
-    bottom_line(draw, "", "Back", "")
+    bottom_line("", "Back", "")
 
 
-def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
+def checklist_topic(ypos, topic, highlighted=False, toprint=True):
     xpos = 10
     xpos_remark = 50
     xpos_sub = 50
@@ -1009,7 +1009,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
             draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill="black")    # Topic
     if 'CHECK' in topic and topic['CHECK'] is not None:
         if toprint:
-            right_text(draw, ypos, topic['CHECK'], font=smallfont, fill="black", offset=topic_right_offset)     # Check
+            right_text(ypos, topic['CHECK'], font=smallfont, fill="black", offset=topic_right_offset)     # Check
     y += SMALL
     if 'REMARK' in topic and topic['REMARK'] is not None:   # remark
         y += remark_offset
@@ -1022,7 +1022,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
             draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill="black")  # subtopic
         if 'CHECK1' in topic and topic['CHECK1'] is not None:
             if toprint:
-                right_text(draw, y, topic['CHECK1'], font=smallfont, fill="black", offset=topic_right_offset)
+                right_text(y, topic['CHECK1'], font=smallfont, fill="black", offset=topic_right_offset)
         y += SMALL
     if 'TASK2' in topic and topic['TASK2'] is not None:   # subtopic2
         y += subtopic_offset
@@ -1030,7 +1030,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
             draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill="black")  # subtopic
         if 'CHECK2' in topic and topic['CHECK2'] is not None:
             if toprint:
-                right_text(draw, y, topic['CHECK2'], font=smallfont, fill="black", offset=topic_right_offset)
+                right_text(y, topic['CHECK2'], font=smallfont, fill="black", offset=topic_right_offset)
         y += SMALL
     if 'TASK3' in topic and topic['TASK3'] is not None:   # subtopic3
         y += subtopic_offset
@@ -1038,7 +1038,7 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
             draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="black")  # subtopic
         if 'CHECK3' in topic and topic['CHECK3'] is not None:
             if toprint:
-                right_text(draw, y, topic['CHECK3'], font=smallfont, fill="black", offset=topic_right_offset)
+                right_text(y, topic['CHECK3'], font=smallfont, fill="black", offset=topic_right_offset)
         y += SMALL
     if highlighted:   # draw frame around whole topic
         if toprint:
@@ -1046,24 +1046,24 @@ def checklist_topic(draw, ypos, topic, highlighted=False, toprint=True):
     return y + topic_offset
 
 
-def checklist(draw, checklist_name, checklist_items, current_index, last_list):
+def checklist(checklist_name, checklist_items, current_index, last_list):
     checklist_y = {'from': LARGE + 8, 'to': sizey - SMALL - 6}
     global top_index
 
-    centered_text(draw, 0, checklist_name, largefont, fill="black")
+    centered_text(0, checklist_name, largefont, fill="black")
     if current_index == 0:
         top_index = 0     # new list, reset top index
     if current_index < top_index:
         top_index = current_index    # scroll up
     while True:  # check what would fit on the screen
         last_item = top_index
-        size = checklist_topic(draw, checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
+        size = checklist_topic(checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
         while True:
             if last_item + 1 < len(checklist_items):
                 last_item += 1
             else:
                 break    # everything fits to the end of the list
-            size = checklist_topic(draw, size, checklist_items[last_item], highlighted=False, toprint=False)
+            size = checklist_topic(size, checklist_items[last_item], highlighted=False, toprint=False)
             if size > checklist_y['to']:   # last item did not fit
                 last_item -= 1
                 break
@@ -1079,14 +1079,14 @@ def checklist(draw, checklist_name, checklist_items, current_index, last_list):
     y = checklist_y['from']
     for item in range(top_index, last_item + 1):
         if item < len(checklist_items):
-            y = checklist_topic(draw, y, checklist_items[item], highlighted=(item == current_index), toprint=True)
+            y = checklist_topic(y, checklist_items[item], highlighted=(item == current_index), toprint=True)
     if current_index == 0:  # first item
         left = "PrevList"
     else:
         left = "Prev"
     if last_list and current_index == len(checklist_items) - 1:  # last_item
-        bottom_line(draw, "Prev", "Mode", "")
+        bottom_line("Prev", "Mode", "")
     elif last_list:
-        bottom_line(draw, left, "Mode", "Checked")
+        bottom_line(left, "Mode", "Checked")
     else:
-        bottom_line(draw, left, "NextList/Mode", "Checked")
+        bottom_line(left, "NextList/Mode", "Checked")

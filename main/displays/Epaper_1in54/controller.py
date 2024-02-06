@@ -344,7 +344,7 @@ def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, righ
     bottom_line(left_text, middle_text, right_t, offset=3)
 
 
-def meter(draw, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
+def meter(current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
           marks_distance, small_marks_distance, middle_text1, middle_text2):
     big_mark_length = 15
     small_mark_length = 8
@@ -398,21 +398,21 @@ def meter(draw, current, start_value, end_value, from_degree, to_degree, size, c
         draw.text((center_x-tl/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
 
 
-def gmeter(draw, current, maxg, ming, error_message):
+def gmeter(current, maxg, ming, error_message):
     gm_size = sizex
-    meter(draw, current, -3, 5, 120, 420, gm_size, zerox, zeroy, 1, 0.25, "G-Force", None)
+    meter(current, -3, 5, 120, 420, gm_size, zerox, zeroy, 1, 0.25, "G-Force", None)
 
     draw.text((zerox + 13, 80), "max", font=verysmallfont, fill="black")
-    right_text(draw, 80, "{:+1.2f}".format(maxg), smallfont, fill="black")
+    right_text(80, "{:+1.2f}".format(maxg), smallfont, fill="black")
     if error_message:
-        centered_text(draw, 57, error_message, largefont, fill="black")
+        centered_text(57, error_message, largefont, fill="black")
     draw.text((zerox + 13, 102), "min", font=verysmallfont, fill="black")
-    right_text(draw, 102, "{:+1.2f}".format(ming), smallfont, fill="black")
+    right_text(102, "{:+1.2f}".format(ming), smallfont, fill="black")
 
-    bottom_line(draw, "", "", "Reset")
+    bottom_line("", "", "Reset")
 
 
-def compass(draw, heading, error_message):
+def compass(heading, error_message):
     global epaper_image
     global mask
     global cdraw
@@ -457,12 +457,12 @@ def compass(draw, heading, error_message):
             center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
             epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
     if error_message is not None:
-        centered_text(draw, 80, error_message, largefont, fill="black")
+        centered_text(80, error_message, largefont, fill="black")
 
 
-def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
+def vsi(vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
         error_message):
-    meter(draw, vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
+    meter(vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
     draw.text((15, sizey/2 - VERYSMALL - 10), "up", font=verysmallfont, fill="black", align="left")
     draw.text((15, sizey/2 + 10), "dn", font=verysmallfont, fill="black", align="left")
     middle_text = "Vert Spd"
@@ -473,7 +473,7 @@ def vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
     draw.text((sizey/2 - tl / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
 
     if error_message is not None:
-        centered_text(draw, 40, error_message, verylargefont, fill="black")
+        centered_text(40, error_message, verylargefont, fill="black")
 
 
 def shutdown(countdown, shutdownmode):
@@ -496,7 +496,7 @@ def shutdown(countdown, shutdownmode):
     bottom_line("Canc", "Displ", "Rebo")
 
 
-def rollmarks(draw, roll):
+def rollmarks(roll):
     if ah_zerox > ah_zeroy:
         di = ah_zeroy
     else:
@@ -528,7 +528,7 @@ def linepoints(pitch, roll, pitch_distance, length):
     return ps, pe
 
 
-def slip(draw, slipskid):
+def slip(slipskid):
     slipsize = 8
     slipscale = 5
     if slipskid < -10:
@@ -544,7 +544,7 @@ def slip(draw, slipskid):
     draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey - 1), fill="white", width=2)
 
 
-def ahrs(draw, pitch, roll, heading, slipskid, error_message):
+def ahrs(pitch, roll, heading, slipskid, error_message):
     # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
     h1, h2 = linepoints(pitch, roll, 0, 300)  # horizon points
     h3, h4 = linepoints(pitch, roll, -180, 300)
@@ -568,31 +568,31 @@ def ahrs(draw, pitch, roll, heading, slipskid, error_message):
                  fill="black")
 
     # roll indicator
-    rollmarks(draw, roll)
+    rollmarks(roll)
     # slip indicator
-    slip(draw, slipskid)
+    slip(slipskid)
 
     # infotext = "P:" + str(pitch) + " R:" + str(roll)
     if error_message:
-        centered_text(draw, 60, error_message, smallfont, fill="black")
-    bottom_line(draw, "Lev", "", "Zro")
+        centered_text(60, error_message, smallfont, fill="black")
+    bottom_line("Lev", "", "Zro")
 
 
-def text_screen(draw, headline, subline, text, left_text, middle_text, right_text):
-    centered_text(draw, 0, headline, morelargefont, fill="black")
+def text_screen(headline, subline, text, left_text, middle_text, right_text):
+    centered_text(0, headline, morelargefont, fill="black")
     txt_starty = MORELARGE
     if subline is not None:
-        centered_text(draw, txt_starty, subline, largefont, fill="black")
+        centered_text(txt_starty, subline, largefont, fill="black")
         txt_starty += LARGE
     draw.text((0, txt_starty+4), text, font=smallfont, fill="black")
-    bottom_line(draw, left_text, middle_text, right_text)
+    bottom_line(left_text, middle_text, right_text)
 
 
-def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp, suffix):
-    centered_text(draw, 0, headline, largefont, fill="black")
+def screen_input(headline, subline, text, left, middle, right, prefix, inp, suffix):
+    centered_text(0, headline, largefont, fill="black")
     txt_starty = LARGE
     if subline is not None:
-        centered_text(draw, LARGE, subline, smallfont, fill="black")
+        centered_text(LARGE, subline, smallfont, fill="black")
         txt_starty += LARGE
     bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
     draw.text((0, txt_starty), text, font=smallfont, fill="black")
@@ -602,10 +602,10 @@ def screen_input(draw, headline, subline, text, left, middle, right, prefix, inp
     draw.rectangle(bbox_rect, fill="black")
     draw.text((bbox_rect[0], bbox[3]), inp, font=smallfont, fill="white")
     draw.text((bbox_rect[2], bbox[3]), suffix, font=smallfont, fill="black")
-    bottom_line(draw, left, middle, right, offset=3)
+    bottom_line(left, middle, right, offset=3)
 
 
-def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0):
+def bar(y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0):
     bar_start = 50
     bar_end = 150
 
@@ -633,7 +633,7 @@ def bar(draw, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=
     return y+VERYSMALL+6
 
 
-def round_text(draw, x, y, text, color, yesno=True, out=None):
+def round_text(x, y, text, color, yesno=True, out=None):
     tl = draw.textlength(text, verysmallfont)
     draw.rounded_rectangle([x, y-2, x+tl+10, y+VERYSMALL+3], radius=4, fill=color, outline=out)
     draw.text((x+5, y), text, font=verysmallfont, fill="black")
@@ -642,19 +642,19 @@ def round_text(draw, x, y, text, color, yesno=True, out=None):
     return x+tl+12
 
 
-def stratux(draw, stat, altitude, gps_alt, gps_quality):
+def stratux(stat, altitude, gps_alt, gps_quality):
     starty = 0
-    centered_text(draw, 0, "Stratux " + stat['version'], smallfont, fill="black")
+    centered_text(0, "Stratux " + stat['version'], smallfont, fill="black")
     starty += SMALL + 4
-    starty = bar(draw, starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
+    starty = bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
     if stat['OGN_connected']:
-        starty = bar(draw, starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
+        starty = bar(starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
         noise_text = str(round(stat['OGN_noise_db'], 1)) + " dB"
-        starty = bar(draw, starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext=noise_text)
+        starty = bar(starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext=noise_text)
     if stat['UATRadio_connected']:
-        starty = bar(draw, starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
+        starty = bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
     if stat['CPUTemp'] > -300:    # -300 means no value available
-        starty = bar(draw, starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
+        starty = bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
     # GPS
     if gps_quality == 1:
         t = "3D GPS "
@@ -686,10 +686,9 @@ def stratux(draw, stat, altitude, gps_alt, gps_quality):
     right_text(starty, "GAlt" + alt + "ft", verysmallfont, "black")
 
 
-
-def flighttime(draw, last_flights):
+def flighttime(last_flights):
     starty = 0
-    centered_text(draw, 0, "Flight Logs", smallfont, fill="black")
+    centered_text(0, "Flight Logs", smallfont, fill="black")
     starty += SMALL + 5
 
     draw.text((0, starty), "Date", font=verysmallfont, fill="black")
@@ -714,15 +713,15 @@ def flighttime(draw, last_flights):
         hours, remainder = divmod(delta, 3600)
         minutes, seconds = divmod(remainder, 60)
         out = '{:02}:{:02}'.format(int(hours), int(minutes))
-        round_text(draw, 95, starty, out, "white", out="black")
+        round_text(95, starty, out, "white", out="black")
         starty += VERYSMALL + 2
         maxlines -= 1
         if maxlines <= 0:
             break
-    bottom_line(draw, "", "Mode", "Clear")
+    bottom_line("", "Mode", "Clear")
 
 
-def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
+def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
     tl = draw.textlength(str(maxvalue), verysmallfont)    # for adjusting x and y
     # adjust zero lines to have room for text
     xpos = xpos + tl + space
@@ -786,24 +785,24 @@ def graph(draw, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1,
         draw.line([(x, y), (x + 3, y)], fill="black", width=1)
 
 
-def cowarner(draw, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
+def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
     if alarmlevel == 0:
-        centered_text(draw, 0, "CO: No CO alarm", smallfont, fill="black")
+        centered_text(0, "CO: No CO alarm", smallfont, fill="black")
     else:
         if alarmperiod > 60:
             alarmstr = "CO: {:d}ppm>{:d}min".format(alarmppm, math.floor(alarmperiod/60))
         else:
             alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
-        centered_text(draw, 0, alarmstr, smallfont, fill="black")
-    graph(draw, 0, SMALL+5, sizex-19, sizey-80, co_values, 0, 120, 50, 100, timeout)
+        centered_text(0, alarmstr, smallfont, fill="black")
+    graph(0, SMALL+5, sizex-19, sizey-80, co_values, 0, 120, 50, 100, timeout)
 
     if len(co_values) > 0:
-        round_text(draw, 5, sizey-2*SMALL, "act: {:3d}".format(co_values[len(co_values)-1]), "white", out="black")
-    round_text(draw, sizex/2+5, sizey-2*SMALL, "max: {:3d}".format(co_max), "white", out="black")
-    bottom_line(draw, "Cal", "Mode", "Reset")
+        round_text(5, sizey-2*SMALL, "act: {:3d}".format(co_values[len(co_values)-1]), "white", out="black")
+    round_text(sizex/2+5, sizey-2*SMALL, "max: {:3d}".format(co_max), "white", out="black")
+    bottom_line("Cal", "Mode", "Reset")
 
 
-def dashboard(draw, x, y, sizex, lines):
+def dashboard(x, y, sizex, lines):
     # dashboard, arguments are lines = ("text", "value"), ....
     starty = y
     for line in lines:
@@ -814,10 +813,10 @@ def dashboard(draw, x, y, sizex, lines):
     return starty
 
 
-def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
+def distance(now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
              own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
              ground_distance_valid, grounddistance, error_message):
-    centered_text(draw, 0, "GPS-Distance", smallfont, fill="black")
+    centered_text(0, "GPS-Distance", smallfont, fill="black")
     gps_dist_str = "---"
     gps_speed_str = "---"
     if distance_valid:
@@ -830,7 +829,7 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
         ("GPS-Dist [m]", gps_dist_str),
         ("GPS-Spd [kts]", gps_speed_str),
     )
-    starty = dashboard(draw, 0, SMALL+2, sizex, lines)
+    starty = dashboard(0, SMALL+2, sizex, lines)
     if baro_valid:
         if alt_diff_takeoff is not None:
             takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
@@ -840,15 +839,15 @@ def distance(draw, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, 
             ("VSpeed [ft]", "{:+4.0f}".format(vert_speed)),
             ("BaDif tof [ft]", takeoff_str),
         )
-        starty = dashboard(draw, 0, starty, sizex, lines)
+        starty = dashboard(0, starty, sizex, lines)
     if ground_distance_valid:
         lines = (
             ("GrdDist [cm]", "{:+3.1f}".format(grounddistance/10)),
         )
-        dashboard(draw, 0, starty, sizex, lines)
+        dashboard(0, starty, sizex, lines)
     if error_message is not None:
-        centered_text(draw, 80, error_message, verylargefont, fill="black")
-    bottom_line(draw, "Stats", "Mode", "Start")
+        centered_text(80, error_message, verylargefont, fill="black")
+    bottom_line("Stats", "Mode", "Start")
 
 
 def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
@@ -858,8 +857,8 @@ def form_line(values, key, format_str):    # generates line if key exists with f
         return '---'
 
 
-def distance_statistics(draw, values):
-    centered_text(draw, 0, "Start-/Landing", smallfont, fill="black")
+def distance_statistics(values):
+    centered_text(0, "Start-/Landing", smallfont, fill="black")
 
     st = '---'
     if 'start_time' in values:
@@ -871,7 +870,7 @@ def distance_statistics(draw, values):
         ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
         ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
     )
-    starty = dashboard(draw, 0, SMALL + 2, sizex, lines)
+    starty = dashboard(0, SMALL + 2, sizex, lines)
 
     lt = '---'
     if 'landing_time' in values:
@@ -883,6 +882,6 @@ def distance_statistics(draw, values):
         ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
         ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
     )
-    dashboard(draw, 0, starty, sizex, lines)
+    dashboard(0, starty, sizex, lines)
 
-    bottom_line(draw, "", "Back", "")
+    bottom_line("", "Back", "")

@@ -236,17 +236,17 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
     return 0
 
 
-def draw_flighttime(draw, display_control, changed):
+def draw_flighttime(display_control, changed):
     global flighttime_changed
 
     if changed or flighttime_changed:
         flighttime_changed = False
-        display_control.clear(draw)
+        display_control.clear()
         if 'last_flights' in g_config:
             last_flights = g_config['last_flights']
         else:
             last_flights = []
-        display_control.flighttime(draw, last_flights)
+        display_control.flighttime(last_flights)
         display_control.display()
 
 

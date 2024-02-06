@@ -61,7 +61,7 @@ middle = ""
 right = ""
 
 
-def init(display_control, url_ws, url_settings_get, url_settings_set):  # prepare everything
+def init(url_ws, url_settings_get, url_settings_set):  # prepare everything
     global status_url
     global settings_url_set
     global settings_url_get
@@ -126,17 +126,17 @@ def decode_gps_hardware(detected_type):
     return s
 
 
-def draw_status(draw, display_control, ui_changed, connected, altitude, gps_alt, gps_quality):
+def draw_status(display_control, ui_changed, connected, altitude, gps_alt, gps_quality):
     global strx
     if strx['was_changed'] or ui_changed or not connected:
-        display_control.clear(draw)
+        display_control.clear()
         if connected:
-            display_control.stratux(draw, strx, altitude, gps_alt, gps_quality)
+            display_control.stratux(strx, altitude, gps_alt, gps_quality)
         else:
             headline = "Stratux"
             subline = "not connected"
             text = ""
-            display_control.text_screen(draw, headline, subline, text, "", "Mode", "")
+            display_control.text_screen(headline, subline, text, "", "Mode", "")
         display_control.display()
         strx['was_changed'] = False
 

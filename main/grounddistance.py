@@ -51,7 +51,7 @@
 #    "landing_time": "2023-01-15 12:57:28.444494+00:00",
 #    "landing_altitude": 880.77216,
 #    "landing_distance": 0.0
-#}
+# }
 
 import logging
 import radarmodes

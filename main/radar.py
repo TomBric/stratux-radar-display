@@ -169,7 +169,7 @@ def draw_all_ac(allac):
             else:
                 tail = None
             if ac['circradius'] <= max_pixel / 2:
-                display_control.modesaircraft(draw, ac['circradius'], ac['height'], ac['arcposition'], ac['vspeed'],
+                display_control.modesaircraft(ac['circradius'], ac['height'], ac['arcposition'], ac['vspeed'],
                                               tail)
     for icao, ac in dist_sorted:
         # then draw adsb
@@ -750,7 +750,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 21
                 elif global_mode == 23:  # checklist
-                    checklist.draw_checklist(g_draw, display_control, ui_changed)
+                    checklist.draw_checklist(display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 24:  # refresh display, only relevant for epaper, mode was situation
                     rlog.debug("Checklist: Display driver - Refreshing")
@@ -804,9 +804,9 @@ def main():
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
     max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
     ahrsui.init(display_control, url_calibrate, url_caging)
-    statusui.init(display_control, CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
+    statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
-    stratuxstatus.init(display_control, url_status_ws, url_settings_get, url_settings_set)
+    stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
@@ -820,7 +820,7 @@ def main():
         rlog.debug("Main cancelled")
 
 
-def quit_gracefully(*args):
+def quit_gracefully(*arguments):
     print("Keyboard interrupt or shutdown. Quitting ...")
     tasks = asyncio.all_tasks()
     for ta in tasks:
@@ -868,7 +868,7 @@ if __name__ == "__main__":
     ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use", action='store_true',
                     default=DEFAULT_CHECKLIST)
     ap.add_argument("-stc", "--startchecklist", required=False, help="Start mode is checklist", action='store_true',
-                   default=False)
+                    default=False)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
                     default=0)

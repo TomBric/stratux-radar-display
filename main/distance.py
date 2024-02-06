@@ -87,7 +87,7 @@ def reset_values(situation):
     grounddistance.reset_values()
 
 
-def draw_distance(draw, display_control, was_changed, connected, situation, ahrs):
+def draw_distance(display_control, was_changed, connected, situation, ahrs):
     global start_distance
 
     # display in any case, even if there is no change, since time is running anyhow
@@ -113,8 +113,8 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
                 gps_distance = calc_gps_distance_meters(gps_distance_zero['latitude'], gps_distance_zero['longitude'],
                                                         situation['latitude'], situation['longitude'])
         now = datetime.datetime.now(datetime.timezone.utc)
-        display_control.clear(draw)
-        display_control.distance(draw, now, situation['gps_active'], situation['gps_quality'],
+        display_control.clear()
+        display_control.distance(now, situation['gps_active'], situation['gps_quality'],
                                  situation['gps_h_accuracy'],
                                  gps_distance_zero['gps_active'], gps_distance, situation['gps_speed'],
                                  situation['baro_valid'], situation['own_altitude'], alt_diff, alt_diff_takeoff,
@@ -123,8 +123,8 @@ def draw_distance(draw, display_control, was_changed, connected, situation, ahrs
                                  error_message)
         display_control.display()
     elif dist_user_mode == 1:   # show statistics
-        display_control.clear(draw)
-        display_control.distance_statistics(draw, grounddistance.calculate_output_values())
+        display_control.clear()
+        display_control.distance_statistics(grounddistance.calculate_output_values())
         display_control.display()
 
 

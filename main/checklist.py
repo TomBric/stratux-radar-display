@@ -131,21 +131,21 @@ def next_list(iterator):
     return iterator
 
 
-def draw_checklist(draw, display_control, ui_changed):
+def draw_checklist(display_control, ui_changed):
     global g_iterator
     global g_checklist
     global g_checklist_changed
 
     if ui_changed or g_checklist_changed:
         g_checklist_changed = False
-        display_control.clear(draw)
+        display_control.clear()
         if g_checklist is not None:
             checklist_name = g_checklist[g_iterator[0]]['TITLE']
             checklist_items = g_checklist[g_iterator[0]]['ITEM']
             last_list = (g_iterator[0] == len(g_checklist) - 1)
-            display_control.checklist(draw, checklist_name, checklist_items, g_iterator[1], last_list)
+            display_control.checklist(checklist_name, checklist_items, g_iterator[1], last_list)
         else:
-            display_control.text_screen(draw, "", "Error reading checklist", "", "", "Next Mode", "")
+            display_control.text_screen("", "Error reading checklist", "", "", "Next Mode", "")
         display_control.display()
 
 

@@ -44,7 +44,7 @@ def init(url):
     pass   # nothing to do right now
 
 
-def draw_compass(draw, display_control, changed, connected, heading):
+def draw_compass(display_control, changed, connected, heading):
     global compassui_changed
 
     if changed or compassui_changed:
@@ -52,8 +52,8 @@ def draw_compass(draw, display_control, changed, connected, heading):
         compassui_changed = False
         if not connected:
             error_message = MSG_NO_CONNECTION
-        display_control.clear(draw)
-        display_control.compass(draw, heading, error_message)
+        display_control.clear()
+        display_control.compass(heading, error_message)
         display_control.display()
 
 

@@ -50,7 +50,7 @@ MSG_NO_CONNECTION = "NO CONNECTION!"
 MSG_CALIBRATING = "CALIBRATE - FLY LEVEL"
 
 
-def init(display_control, calib_url, cage):   # prepare everything
+def init(calib_url, cage):   # prepare everything
     global calibrate_url
     global cage_url
     global rlog
@@ -78,8 +78,8 @@ def draw_ahrs(display_control, connected, was_changed, pitch, roll, heading, sli
             error_message = MSG_NO_CONNECTION
         if is_caging:
             error_message = MSG_CALIBRATING
-        display_control.clear(draw)
-        display_control.ahrs(draw, pitch, roll, heading, slip, error_message)
+        display_control.clear()
+        display_control.ahrs(pitch, roll, heading, slip, error_message)
         display_control.display()
 
 

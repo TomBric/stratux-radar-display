@@ -212,22 +212,22 @@ def read_co_value():     # called by sensor_read thread
     return check_alarm_level()
 
 
-def draw_cowarner(draw, display_control, changed):
+def draw_cowarner(display_control, changed):
     global cowarner_changed
     global co_warner_status
 
     if cowarner_active and (changed or cowarner_changed):
         cowarner_changed = False
-        display_control.clear(draw)
+        display_control.clear()
         if co_warner_status == 0:   # normal mode, display status line
-            display_control.cowarner(draw, co_values, co_max, r0, co_timeout, alarmlevel, WARNLEVEL[alarmlevel][0],
+            display_control.cowarner(co_values, co_max, r0, co_timeout, alarmlevel, WARNLEVEL[alarmlevel][0],
                                      WARNLEVEL[alarmlevel][1])
         elif co_warner_status == 1:   # calibration mode
             countdown = calibration_end - math.floor(time.time())
             if countdown < 0:
                 countdown = 0   # sometimes draw thread was quicker, thus to avoid -1
             timeleft = str(countdown) + " secs"
-            display_control.text_screen(draw, "Calibrate sensor", timeleft,
+            display_control.text_screen("Calibrate sensor", timeleft,
                                         "\n\nKeep sensor in fresh air.\n", "", "", "")
         display_control.display()
 

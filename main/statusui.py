@@ -58,7 +58,7 @@ MAX_WIFI_LENGTH = 16
 
 # globals
 rlog = None
-g_config_file = None   #  filename of config file, set in init
+g_config_file = None   # filename of config file, set in init
 global_config = {}
 status_url = ""
 stratux_ip = "0.0.0.0"
@@ -112,10 +112,10 @@ def write_config(config):
     except (OSError, IOError, ValueError) as e:
         rlog.debug("StatusUI: Error " + str(e) + " writing " + g_config_file)
     rlog.debug("StatusUI: Configuration saved to " + g_config_file + ": " + json.dumps(config, sort_keys=True, indent=4,
-                                                                                     default=default))
+                                                                                       default=default))
 
 
-def init(display_control, config_file, url, target_ip, refresh, config):   # prepare everything
+def init(config_file, url, target_ip, refresh, config):   # prepare everything
     global status_url
     global stratux_ip
     global refresh_time
@@ -150,7 +150,7 @@ def get_status():
     return status_answer
 
 
-def draw_status(draw, display_control, bluetooth_active, extsound_active):
+def draw_status(display_control, bluetooth_active, extsound_active):
     global status_mode
     global last_status_get
     global left
@@ -161,7 +161,7 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
     global new_pass
     global stratux_ip
 
-    display_control.clear(draw)
+    display_control.clear()
     now = time.time()
     if status_mode == 0:
         # if now >= last_status_get + STATUS_TIMEOUT:
@@ -179,12 +179,12 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
             right = "Scan"
         else:
             right = ""
-        display_control.text_screen(draw, "Display Status", None, status_text, "Net/Opt", "Mode", right)
+        display_control.text_screen("Display Status", None, status_text, "Net/Opt", "Mode", right)
     elif status_mode == 1:   # scan running
         countdown = math.floor(scan_end - now)
         if countdown > 0:
             subline = str(countdown) + " secs"
-            display_control.text_screen(draw, "BT-Scan", subline, "", "", "", "")
+            display_control.text_screen("BT-Scan", subline, "", "", "", "")
         else:
             status_mode = 2
     elif status_mode == 2:   # scan evaluation
@@ -202,9 +202,9 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
             middle = "Cont"
             right = "Scan"
             text += "No detections."
-        display_control.text_screen(draw, headline, subline, text, left, middle, right)
+        display_control.text_screen(headline, subline, text, left, middle, right)
     elif status_mode == 3:  # display network information
-        display_control.text_screen(draw, "WIFI Info", "", "WIFI SSID:\n" + wifi_ssid + "\nStratux-IP:\n" + stratux_ip
+        display_control.text_screen("WIFI Info", "", "WIFI SSID:\n" + wifi_ssid + "\nStratux-IP:\n" + stratux_ip
                                     + "\nMyIP:" + wifi_ip, "Opt", "Cont", "Chg")
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
@@ -213,7 +213,7 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
         prefix = new_wifi[0:charpos]
         char = new_wifi[charpos]
         suffix = new_wifi[charpos+1:len(new_wifi)]
-        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
+        display_control.screen_input(headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 5:   # change password
         headline = "Change WIFI"
         subline = "Password"
@@ -221,13 +221,13 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
         prefix = new_pass[0:charpos]
         char = new_pass[charpos]
         suffix = new_pass[charpos + 1:len(new_pass)]
-        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
+        display_control.screen_input(headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
         subline = "Confirm & reboot"
         text = "SSID: " + new_wifi + "\nPass: " + new_pass \
                + "\nStrx: " + new_stratux_ip
-        display_control.text_screen(draw, headline, subline, text, "YES", "", "NO")
+        display_control.text_screen(headline, subline, text, "YES", "", "NO")
     elif status_mode == 7:   # input of stratux-ip
         headline = "Change WIFI"
         subline = "Stratux IP Addr"
@@ -235,7 +235,7 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
         prefix = new_stratux_ip[0:charpos]
         char = new_stratux_ip[charpos]
         suffix = new_stratux_ip[charpos + 1:len(new_stratux_ip)]
-        display_control.screen_input(draw, headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
+        display_control.screen_input(headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 10:   # Error dispay
         headline = "Change WIFI"
         subline = "Input Error!"
@@ -252,27 +252,27 @@ def draw_status(draw, display_control, bluetooth_active, extsound_active):
             text = "Stratux IP invalid"
         else:
             text = "unspecified error"
-        display_control.text_screen(draw, headline, subline, text, "Canc", "", "Redo")
+        display_control.text_screen(headline, subline, text, "Canc", "", "Redo")
     elif status_mode == 11:   # REBOOT DISPLAY
         headline = "Rebooting"
         subline = "Please wait ..."
         text = "New network\nconfig applied."
-        display_control.text_screen(draw, headline, subline, text, "", "", "")
+        display_control.text_screen(headline, subline, text, "", "", "")
     elif status_mode == 12:   # Options Registration
         headline = "Options"
         subline = "Please select ..."
         text = "\nShow registration?"
-        display_control.text_screen(draw, headline, subline, text, "Yes", "Canc", "No")
+        display_control.text_screen(headline, subline, text, "Yes", "Canc", "No")
     elif status_mode == 13:   # Options speak distance warning
         headline = "Options"
         subline = "Please select ..."
         text = "\nSpeak distance?"
-        display_control.text_screen(draw, headline, subline, text, "Yes", "Canc", "No")
+        display_control.text_screen(headline, subline, text, "Yes", "Canc", "No")
     elif status_mode == 14:   # set sound warnings
         headline = "Options"
         subline = "Please select ..."
         text = "\nExternal volume?   " + str(global_config['sound_volume'])
-        display_control.text_screen(draw, headline, subline, text, "-5", "Set", "+5")
+        display_control.text_screen(headline, subline, text, "-5", "Set", "+5")
     display_control.display()
 
 
