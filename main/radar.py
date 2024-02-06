@@ -788,7 +788,7 @@ async def coroutines():
     await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader])
 
 
-def global_exception_handler(loop, context):
+def async_exception_handler(loop, context):
     exception = context.get('exception')
     if exception:
         print(f"Uncaught Exception: {exception}")
