@@ -67,7 +67,6 @@ verysmallfont = ""
 awesomefont = ""
 device = None
 epaper_image = None
-draw = None
 roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
 pitch_posmarks = (-30, -20, -10, 10, 20, 30)
 PITCH_SCALE = 4.0
@@ -143,7 +142,6 @@ def init(fullcircle=False):
     global awesomefont
     global device
     global epaper_image
-    global draw
     global compass_aircraft
     global mask
     global cdraw
