@@ -921,8 +921,8 @@ if __name__ == "__main__":
     try:
         display_control = importlib.import_module('displays.' + args['device'] + '.controller')
     except ModuleNotFoundError as e:
-        print("Error: Controller for device {0} not found. Aborting. ".format(args['device']))
-        sys.exit(1)
+        print("Error: Controller for device '{0}' not found. Aborting. ".format(args['device']))
+        raise ModuleNotFoundError("Display controller for device '{0}' not found".format(args['device']))
     bluetooth = args['bluetooth']
     basemode = args['north']
     fullcircle = args['fullcircle']
