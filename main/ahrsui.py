@@ -61,7 +61,7 @@ def init(display_control, calib_url, cage):   # prepare everything
     rlog.debug("AHRS UI: Initialized calibrate url to {0} cage url to {1}".format(calib_url, cage))
 
 
-def draw_ahrs(draw, display_control, connected, was_changed, pitch, roll, heading, slip, gps_hor_accuracy,
+def draw_ahrs(display_control, connected, was_changed, pitch, roll, heading, slip, gps_hor_accuracy,
               ahrs_sensor, is_caging):
     global ahrs_ui_changed
 
