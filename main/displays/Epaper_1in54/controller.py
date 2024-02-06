@@ -223,7 +223,7 @@ def startup(version, target_ip, seconds):
     logo = Image.open(logopath)
     draw.bitmap((zerox-150/2, 0), logo, fill="black")
     versionstr = "Radar " + version
-    centered_text(draw, 150, versionstr, verylargefont, fill="black")
+    centered_text(150, versionstr, verylargefont, fill="black")
     display()
     time.sleep(seconds)
 
@@ -332,7 +332,7 @@ def situation(connected, gpsconnected, ownalt, course, range, altdifference, bt_
     draw.line((2, 150+(optical_bar % 5)*5, 2, 150+(optical_bar % 5)*5+6), fill="black", width=4)
 
 
-def timer(draw, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
+def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
     draw.text((5, 0), "UTC", font=smallfont, fill="black")
     centered_text(draw, SMALL, utctime, verylargefont, fill="black")
     if stoptime is not None:
