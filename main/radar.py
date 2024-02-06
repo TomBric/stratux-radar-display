@@ -183,7 +183,7 @@ def draw_all_ac(allac):
                     tail = ac['tail']
                 else:
                     tail = None
-                display_control.aircraft(draw, ac['x'], ac['y'], ac['direction'], ac['height'], ac['vspeed'],
+                display_control.aircraft(ac['x'], ac['y'], ac['direction'], ac['height'], ac['vspeed'],
                                          line_length, tail)
 
 
@@ -698,7 +698,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 9
                 elif global_mode == 11:  # compass display
-                    compassui.draw_compass(g_draw, display_control, situation['was_changed'], situation['connected'],
+                    compassui.draw_compass(display_control, situation['was_changed'], situation['connected'],
                                            situation['course'])
                     situation['was_changed'] = False
                 elif global_mode == 12:  # refresh display, only relevant for epaper, mode was gmeter
@@ -706,7 +706,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 11
                 elif global_mode == 13:  # vsi display
-                    verticalspeed.draw_vsi(g_draw, display_control, situation['was_changed'] or ui_changed,
+                    verticalspeed.draw_vsi(display_control, situation['was_changed'] or ui_changed,
                                            situation['connected'], situation['vertical_speed'],
                                            situation['own_altitude'], situation['gps_speed'],
                                            situation['course'], situation['gps_altitude'], vertical_max, vertical_min,
@@ -719,7 +719,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 13
                 elif global_mode == 15:  # stratux_statux display
-                    stratuxstatus.draw_status(g_draw, display_control, ui_changed, situation['connected'],
+                    stratuxstatus.draw_status(display_control, ui_changed, situation['connected'],
                                               situation['own_altitude'], situation['gps_altitude'],
                                               situation['gps_quality'])
                     ui_changed = False
@@ -728,21 +728,21 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 15
                 elif global_mode == 17:  # display flight time
-                    flighttime.draw_flighttime(g_draw, display_control, ui_changed)
+                    flighttime.draw_flighttime(display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 18:  # refresh display, only relevant for epaper, mode was flighttime
                     rlog.debug("StratusStatus: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 17
                 elif global_mode == 19:  # co-warner
-                    cowarner.draw_cowarner(g_draw, display_control, ui_changed)
+                    cowarner.draw_cowarner(display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 20:  # refresh display, only relevant for epaper, mode was co-warner
                     rlog.debug("CO-Warner: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 19
                 elif global_mode == 21:  # situation
-                    distance.draw_distance(g_draw, display_control, situation['was_changed'] or ui_changed,
+                    distance.draw_distance(display_control, situation['was_changed'] or ui_changed,
                                            situation['connected'], situation, ahrs)
                     ui_changed = False
                 elif global_mode == 22:  # refresh display, only relevant for epaper, mode was situation
