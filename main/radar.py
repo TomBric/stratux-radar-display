@@ -111,7 +111,6 @@ url_status_get = ""
 url_status_set = ""
 device = ""
 sound_mixer = None
-g_draw = None
 all_ac = {}
 aircraft_changed = True
 ui_changed = True
@@ -662,11 +661,11 @@ async def display_and_cutoff():
                 # try it several times to be as fast as possible
             else:
                 if global_mode == 1:  # Radar
-                    draw_display(g_draw)
+                    draw_display()
                 elif global_mode == 2:  # Timer'
-                    timerui.draw_timer(g_draw, display_control, display_refresh_time)
+                    timerui.draw_timer(display_control, display_refresh_time)
                 elif global_mode == 3:  # shutdown
-                    final_shutdown = shutdownui.draw_shutdown(g_draw, display_control)
+                    final_shutdown = shutdownui.draw_shutdown(display_control)
                     if final_shutdown:
                         rlog.debug("Shutdown triggered: Display task terminating ...")
                         return
@@ -675,7 +674,7 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 1
                 elif global_mode == 5:  # ahrs'
-                    ahrsui.draw_ahrs(g_draw, display_control, situation['connected'], ui_changed or ahrs['was_changed'],
+                    ahrsui.draw_ahrs(display_control, situation['connected'], ui_changed or ahrs['was_changed'],
                                      ahrs['pitch'], ahrs['roll'], ahrs['heading'], ahrs['slipskid'],
                                      ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'], ahrs['is_caging'])
                     ahrs['was_changed'] = False
@@ -685,13 +684,13 @@ async def display_and_cutoff():
                     display_control.refresh()
                     global_mode = 5
                 elif global_mode == 7:  # status display
-                    statusui.draw_status(g_draw, display_control, bluetooth_active, extsound_active)
+                    statusui.draw_status(display_control, bluetooth_active, extsound_active)
                 elif global_mode == 8:  # refresh display, only relevant for epaper, mode was status
                     rlog.debug("Status: Display driver - Refreshing")
                     display_control.refresh()
                     global_mode = 7
                 elif global_mode == 9:  # gmeter display
-                    gmeterui.draw_gmeter(g_draw, display_control, ui_changed, situation['connected'], gmeter)
+                    gmeterui.draw_gmeter(display_control, ui_changed, situation['connected'], gmeter)
                     gmeter['was_changed'] = False
                     ui_changed = False
                 elif global_mode == 10:  # refresh display, only relevant for epaper, mode was gmeter
@@ -794,7 +793,6 @@ def main():
     global max_pixel
     global zerox
     global zeroy
-    global g_draw
     global display_refresh_time
     global extsound_active
     global bluetooth_active
@@ -804,7 +802,7 @@ def main():
     shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
-    g_draw, max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
+    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
     ahrsui.init(display_control, url_calibrate, url_caging)
     statusui.init(display_control, CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
@@ -815,7 +813,7 @@ def main():
                         groundbeep, situation, simulation_mode)
     simulation.init(simulation_mode)
     checklist.init(excel_checklist)
-    display_control.startup(g_draw, RADAR_VERSION, url_host_base, 4)
+    display_control.startup(RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
     except asyncio.CancelledError:

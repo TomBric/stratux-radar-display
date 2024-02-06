@@ -76,6 +76,7 @@ msize = 15  # size of markings
 compass_aircraft = None   # image of aircraft for compass-display
 mask = None
 cdraw = None
+draw = None
 cmsize = 14        # length of compass marks
 space = 2
 # end device globals
@@ -145,6 +146,7 @@ def init(fullcircle=False):
     global compass_aircraft
     global mask
     global cdraw
+    global draw
 
     device = epd1in54_V2.EPD()
     device.init(0)
@@ -195,28 +197,28 @@ def refresh():
     device.init(1)
 
 
-def clear(draw):
+def clear():
     draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
 
 
-def centered_text(draw, y, text, font, fill):
+def centered_text(y, text, font, fill):
     tl = draw.textlength(text, font)
     draw.text((zerox - tl / 2, y), text, font=font, fill=fill)
 
 
-def right_text(draw, y, text, font, fill):
+def right_text(y, text, font, fill):
     tl = draw.textlength(text, font)
     draw.text((sizex - tl, y), text, font=font, fill=fill)
 
 
-def bottom_line(draw, left, middle, right, offset=0):  # offset to be able to print letters like p and q
+def bottom_line(left, middle, right, offset=0):  # offset to be able to print letters like p and q
     draw.text((0, sizey - SMALL - offset), left, font=smallfont, fill="black")
     textlength = draw.textlength(right, smallfont)
     draw.text((sizex - textlength, sizey - SMALL - offset), right, font=smallfont, fill="black", align="right")
     centered_text(draw, sizey - SMALL - offset, middle, smallfont, fill="black")
 
 
-def startup(draw, version, target_ip, seconds):
+def startup(version, target_ip, seconds):
     logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-150x150.bmp'))
     logo = Image.open(logopath)
     draw.bitmap((zerox-150/2, 0), logo, fill="black")
@@ -226,7 +228,7 @@ def startup(draw, version, target_ip, seconds):
     time.sleep(seconds)
 
 
-def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
+def aircraft(x, y, direction, height, vspeed, nspeed_length, tail):
     p1 = posn(direction, 2 * AIRCRAFT_SIZE)
     p2 = posn(direction + 150, 4 * AIRCRAFT_SIZE)
     p3 = posn(direction + 180, 2 * AIRCRAFT_SIZE)
@@ -256,7 +258,7 @@ def aircraft(draw, x, y, direction, height, vspeed, nspeed_length, tail):
         draw.text((tposition[0], tposition[1] + VERYLARGE), tail, font=verysmallfont, fill="black")
 
 
-def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
+def modesaircraft(radius, height, arcposition, vspeed, tail):
     if radius < MINIMAL_CIRCLE:
         radius = MINIMAL_CIRCLE
     draw.ellipse((zerox-radius, zeroy-radius, zerox+radius, zeroy+radius), width=3, outline="black")
@@ -281,7 +283,7 @@ def modesaircraft(draw, radius, height, arcposition, vspeed, tail):
         draw.text((tposition[0], tposition[1] + VERYLARGE), tail, font=verysmallfont, fill="black")
 
 
-def situation(draw, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
+def situation(connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
               gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
     draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2-2, zeroy+max_pixel/2-2), outline="black")
     draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4-1, zeroy+max_pixel/4-1), outline="black")
