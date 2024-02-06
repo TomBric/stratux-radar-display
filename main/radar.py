@@ -159,7 +159,7 @@ groundbeep = False  # True if indication of ground distance via audio
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
 
 
-def draw_all_ac(draw, allac):
+def draw_all_ac(allac):
     dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
     for icao, ac in dist_sorted:
         # first draw mode-s
