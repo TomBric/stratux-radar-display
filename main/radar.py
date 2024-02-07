@@ -778,15 +778,14 @@ async def display_and_cutoff():
 
 
 async def coroutines():
-    async with asyncio.TaskGroup() as tg:
-        tr_handler = tg.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
-        sit_handler = tg.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
-        dis_cutoff = tg.create_task(display_and_cutoff())
-        sensor_reader = tg.create_task(cowarner.read_sensors())
-        ground_sensor_reader = tg.create_task(grounddistance.read_ground_sensor())
-        u_interface = tg.create_task(user_interface())
-    # await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
-    # TaskGroup is used to ensure theat coroutine exceptions are propagated to main task
+    tr_handler = tg.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
+    sit_handler = tg.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+    dis_cutoff = tg.create_task(display_and_cutoff())
+    sensor_reader = tg.create_task(cowarner.read_sensors())
+    ground_sensor_reader = tg.create_task(grounddistance.read_ground_sensor())
+    u_interface = tg.create_task(user_interface())
+    await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
+    # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
 
 
 def main():
