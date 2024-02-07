@@ -786,9 +786,10 @@ async def coroutines():
         sensor_reader = asyncio.create_task(cowarner.read_sensors())
         ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
         u_interface = asyncio.create_task(user_interface())
-        await asyncio.wait([tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader])
+        await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
     except Exception as e:
         print("Exception: {0}".format(e))
+
 
 def main():
     global max_pixel
