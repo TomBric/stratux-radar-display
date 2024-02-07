@@ -145,7 +145,7 @@ def draw_checklist(display_control, ui_changed):
             last_list = (g_iterator[0] == len(g_checklist) - 1)
             display_control.checklist(checklist_name, checklist_items, g_iterator[1], last_list)
         else:
-            display_control.text_screen("", "Error reading checklist", "", "", "Next Mode", "")
+            display_control.text_screen("Error", "reading checklist", "", "", "Next Mode", "")
         display_control.display()
 
 
