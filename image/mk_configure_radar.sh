@@ -21,8 +21,8 @@ apt-get remove realvnc-vnc-server -y
 apt-get autoremove -y
 
 # luma files and more
-apt-get update -y
-apt-get upgrade -y
+# apt-get update -y
+# apt-get upgrade -y
 apt-get install git python3-pip python3-pil -y libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
 pip3 install luma.oled
 
