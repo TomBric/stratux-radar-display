@@ -651,7 +651,6 @@ async def display_and_cutoff():
     global ui_changed
     global situation
 
-    unsinn['raise'] = "RAISE EX"
     try:
         while True:
             await asyncio.sleep(MIN_DISPLAY_REFRESH_TIME)
