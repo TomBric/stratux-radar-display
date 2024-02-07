@@ -821,9 +821,9 @@ def main():
 
 def quit_gracefully(*arguments):
     print("Keyboard interrupt or shutdown. Quitting ...")
-    # tasks = asyncio.all_tasks()
-    # for ta in tasks:
-    #    ta.cancel()
+    tasks = asyncio.all_tasks()
+    for ta in tasks:
+        ta.cancel()
     rlog.debug("CleanUp Display ...")
     display_control.cleanup()
     return 0
