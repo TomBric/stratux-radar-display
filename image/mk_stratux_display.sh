@@ -26,15 +26,11 @@ if [ "$#" -lt 2 ]; then
     echo "Usage: " "$0" "  <fail output> dev|main [v64]"
     exit 1
 fi
-IMAGE_VERSION="armhf"
+IMAGE_VERSION="lite_arm64"
 outprefix="stratux-display"
-if [ "$#" -gt 2 ] &&  [ "$3" == "v64" ]; then
-    IMAGE_VERSION="arm64"
-    outprefix="stratux-display64"
-fi
 
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2023-12-06/2023-12-05-raspios-bookworm-$IMAGE_VERSION.img.xz"
-ZIPNAME="2023-12-05-raspios-bookworm-$IMAGE_VERSION.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2023-12-11/2023-12-11-raspios-bookworm-arm64-lite.img.xz"
+ZIPNAME="2023-12-11-raspios-bookworm-$IMAGE_VERSION.img.xz"
 IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
