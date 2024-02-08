@@ -23,9 +23,9 @@ apt clean
 # enable ssh
 raspi-config nonint do_ssh 0
 # create user pi and "raspberry"
-useradd -m pi
-chpasswd pi:raspberry
-usermod -aG sudo pi
+# useradd -m pi
+# chpasswd pi:raspberry
+# usermod -aG sudo pi
 # set wifi with raspi-config
 raspi-config nonint do_wifi_ssid_passphrase stratux
 
