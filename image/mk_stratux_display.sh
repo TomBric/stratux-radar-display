@@ -73,14 +73,9 @@ mkdir -p mnt
 mount -t ext4 "${lo}"p2 mnt/ || die "root-mount failed"
 mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 
-# enable ssh
-# chroot mnt raspi-config nonint do_ssh 0
-# create user pi and "raspberry"
-# chroot mnt useradd -m pi
-# chroot mnt chpasswd pi:raspberry
-# chroot mnt usermod -aG sudo pi
-# set wifi with raspi-config
-# chroot mnt raspi-config nonint do_wifi_ssid_passphrase stratux ""
+
+# install git for cloning repo (if not already installed) and pip
+chroot mnt apt install git -y
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$2" https://github.com/TomBric/stratux-radar-display.git

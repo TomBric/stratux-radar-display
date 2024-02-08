@@ -12,40 +12,54 @@ else
     branch=$1
 fi
 
-# remove desktop packages
-apt purge xserver* lightdm* vlc* lxde* chromium* desktop* gnome* gstreamer* gtk* hicolor-icon-theme* lx* mesa* \
-python3-pygame pocketsphinx-en-us libllvm11 libgtk-3-common libflite1 libgtk2.0-common poppler-data \
-libqt5gui5 qttranslations5-l10n libc6-dbg geany-common gdb libqt5core5a libstdc++-10-dev python3-jedi \
-libpython3.9-dev -y
-apt-get remove realvnc-vnc-server -y
-apt-get autoremove -y
 
-# luma files and more
-# apt-get update -y
-# apt-get upgrade -y
-apt-get install git python3-pip python3-pil -y libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
-pip3 install luma.oled
+# try to reduce writing to SD card as much as possible, so they don't get bricked when yanking the power cable
+# Disable swap...
+systemctl disable dphys-swapfile
+apt purge -y dphys-swapfile
+apt autoremove -y
+apt clean
+
+# enable ssh
+raspi-config nonint do_ssh 0
+# create user pi and "raspberry"
+useradd -m pi
+chpasswd pi:raspberry
+usermod -aG sudo pi
+# set wifi with raspi-config
+raspi-config nonint do_wifi_ssid_passphrase stratux
+
+# enable spi and i2c (for cowarner)
+raspi-config nonint do_spi 0
+raspi-config nonint do_i2c 0
+
+# for groundsensor, disable ssh over serial cause it is needed for the sensor
+# disable ssh over serial otherwise
+sed -i /boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
+sed -i /boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
+sed -i /boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
+# modify /boot/config.text for groundsensor
+{
+  echo "# modification for ultrasonic ground sensor"
+  echo "enable_uart=1"
+  echo "dtoverlay=miniuart-bt"
+} | tee -a /boot/config.txt
 
 
-#websockets for radar and ADS1115 analog reader for co warner
-pip3 install websockets ADS1x15-ADC
+# software installation which is needed for radar, git if not already installed
+apt install git pip -y
+apt install python3-websockets python3-xmltodict python3-luma.oled python3-numpy -y
 
-# for checklist display and xml parsing
-pip3 install xmltodict
+# bluetooth
+apt install bluetooth pi-bluetooth bluez python3-pydbus
+apt install pulseaudio-module-bluetooth --no-install-recommends
 
-# espeak-ng for sound output and alsoaudio for external sound
-apt-get install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data libespeak-ng-dev -y
-pip3 install py-espeak-ng pyalsaaudio
+# sound and espeak
+apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
 
-# bluetooth configs
-apt-get install pi-bluetooth bluetooth libbluetooth-dev libbluetooth3 python3-dev -y
-pip3 install pybluez pydbus
-pip3 install pillow
-apt purge piwiz -y
-# necessary to disable bluetoothmessage "To turn on ..."
+# break system packages is needed here to install without a virtual environment
+pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 
-# get files from repo
-cd /home/pi && sudo -u pi git clone -b "$branch" https://github.com/TomBric/stratux-radar-display.git
 
 # include autostart into crontab of pi, so that radar starts on every boot
 echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
@@ -53,44 +67,4 @@ echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" |
 # crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
 
 
-# bluetooth configuration
-# Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
-#
-# configs in /etc/pulse/system.pa
-sed -i '$ a load-module module-bluetooth-discover' /etc/pulse/system.pa
-sed -i '$ a load-module module-bluetooth-policy' /etc/pulse/system.pa
-sed -i '$ a load-module module-switch-on-connect' /etc/pulse/system.pa
-
-# configs in /etc/pulse/client.conf to disable client spawns
-sed -i '$ a default-server = /var/run/pulse/native' /etc/pulse/client.conf
-sed -i '$ a autospawn = no' /etc/pulse/client.conf
-
-# allow user pulse bluetooth access
-addgroup pulse bluetooth
-addgroup pi pulse-access
-
-# start pulseaudio system wide
-cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
-systemctl --system enable pulseaudio.service
-# systemctl --system start pulseaudio.service
-
-# enable spi and i2c (for cowarner)
-raspi-config nonint do_spi 0
-raspi-config nonint do_i2c 0
-# sudo raspi-config nonint do_wifi_ssid_passphrase YOUR_SSID YOUR_PASSWORD
-
-
-
-# for groundsensor, disable ssh over serial cause it is needed for the sensor
-# disable ssh over serial otherwise
-sudo sed -i /boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-sudo sed -i /boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
-sudo sed -i /boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
-# modify /boot/config.text for groundsensor
-{
-  echo "# modification for ultrasonic ground sensor"
-  echo "enable_uart=1"
-  echo "dtoverlay=miniuart-bt"
-} | sudo tee -a /boot/config.txt
-
-echo "Radar configuration finished"
+echo "Radar configuration finished. Reboot to start"
