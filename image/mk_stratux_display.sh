@@ -29,8 +29,8 @@ fi
 IMAGE_VERSION="lite_arm64"
 outprefix="stratux-display"
 
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2023-12-11/2023-12-11-raspios-bookworm-arm64-lite.img.xz"
-ZIPNAME="2023-12-11-raspios-bookworm-$IMAGE_VERSION.img.xz"
+ZIPNAME="2023-12-11-raspios-bookworm-arm64-lite.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2023-12-11/$ZIPNAME"
 IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
