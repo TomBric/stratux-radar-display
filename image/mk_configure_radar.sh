@@ -15,10 +15,10 @@ fi
 
 # try to reduce writing to SD card as much as possible, so they don't get bricked when yanking the power cable
 # Disable swap...
-systemctl disable dphys-swapfile
-apt purge -y dphys-swapfile
-apt autoremove -y
-apt clean
+# systemctl disable dphys-swapfile
+# apt purge -y dphys-swapfile
+# apt autoremove -y
+# apt clean
 
 # enable ssh
 raspi-config nonint do_ssh 0
