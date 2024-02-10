@@ -46,19 +46,48 @@ sed -i /boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
 } | tee -a /boot/config.txt
 
 
-# software installation which is needed for radar, git if not already installed
-apt install git pip -y
-apt install python3-websockets python3-xmltodict python3-luma.oled python3-numpy -y
+# bluetooth configuration
+# Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
+# configs in /etc/pulse/system.pa
+sed -i '$ a load-module module-bluetooth-discover' /etc/pulse/system.pa
+sed -i '$ a load-module module-bluetooth-policy' /etc/pulse/system.pa
+sed -i '$ a load-module module-switch-on-connect' /etc/pulse/system.pa
 
-# bluetooth
-apt install bluetooth pi-bluetooth bluez python3-pydbus
-apt install pulseaudio-module-bluetooth --no-install-recommends
+# configs in /etc/pulse/client.conf to disable client spawns
+sed -i '$ a default-server = /var/run/pulse/native' /etc/pulse/client.conf
+sed -i '$ a autospawn = no' /etc/pulse/client.conf
 
 # sound and espeak
 apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
 
 # break system packages is needed here to install without a virtual environment
-pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
+pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages -y
+
+
+# bluetooth configuration
+# Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
+# configs in /etc/pulse/system.pa
+sed -i '$ a load-module module-bluetooth-discover' /etc/pulse/system.pa
+sed -i '$ a load-module module-bluetooth-policy' /etc/pulse/system.pa
+sed -i '$ a load-module module-switch-on-connect' /etc/pulse/system.pa
+
+# configs in /etc/pulse/client.conf to disable client spawns
+sed -i '$ a default-server = /var/run/pulse/native' /etc/pulse/client.conf
+sed -i '$ a autospawn = no' /etc/pulse/client.conf
+
+# allow user pulse bluetooth access
+addgroup pulse bluetooth
+addgroup pi pulse-access
+
+# start pulseaudio system wide
+cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
+systemctl --system enable pulseaudio.service
+# systemctl --system start pulseaudio.service
+
+# allow user pulse bluetooth access
+addgroup pulse bluetooth
+addgroup pi pulse-access
+
 
 
 # include autostart into crontab of pi, so that radar starts on every boot
