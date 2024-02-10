@@ -134,7 +134,7 @@ def init(fullcircle=False):
     compass_aircraft = Image.open(pic_path).convert("RGBA")
     mask = Image.new('1', (LARGE * 2, LARGE * 2))
     cdraw = ImageDraw.Draw(mask)
-    return draw, sizex, zerox, zeroy, display_refresh
+    return sizex, zerox, zeroy, display_refresh
 
 
 def cleanup():

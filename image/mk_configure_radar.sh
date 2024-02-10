@@ -52,7 +52,8 @@ apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-
 
 # break system packages is needed here to install without a virtual environment
 pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
-
+# bluetooth
+apt install bluetooth pi-bluetooth
 
 # bluetooth configuration
 # Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
