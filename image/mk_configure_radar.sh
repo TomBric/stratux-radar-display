@@ -6,11 +6,11 @@
 # usage /bin/bash mk_configure_radar.sh <branch>
 # <branch> is the github branch to clone, this is optional and set to "main" if not provided
 
-if [ "$#" -lt 1 ]; then
-    branch="main"
-else
-    branch=$1
-fi
+# remove unnecessary software from the recommended version, unfortunately the lite version does not handel uart correctly
+# remove all x11 stuff
+apt remove libice6 x11-common firefox "gir*" "cpp*" gdb busybox "gstreamer*" "gnupg*" "gnome*" "gpg*" "lx*" piwiz \
+  groff-base "gtk*" "samba*" "xdg*" galculator geany xcompmgr gcr --purge -y
+apt autoremove --purge -y
 
 apt update
 apt upgrade -y
@@ -48,7 +48,7 @@ apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-
 # break system packages is needed here to install without a virtual environment
 pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 # bluetooth
-apt install bluetooth pi-bluetooth
+apt install bluetooth pi-bluetooth -y
 
 # bluetooth configuration
 # Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
