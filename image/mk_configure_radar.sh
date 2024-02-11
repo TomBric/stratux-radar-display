@@ -8,12 +8,12 @@
 
 # remove unnecessary software from the recommended version, unfortunately the lite version does not handel uart correctly
 # remove all x11 stuff
-apt remove libice6 x11-common firefox "gir*" "cpp*" gdb busybox "gstreamer*" "gnupg*" "gnome*" "gpg*" "lx*" piwiz \
-  groff-base "gtk*" "samba*" "xdg*" galculator geany xcompmgr gcr --purge -y
-apt autoremove --purge -y
+# apt remove libice6 x11-common firefox "gir*" "cpp*" gdb busybox "gstreamer*" "gnupg*" "gnome*" "gpg*" "lx*" piwiz \
+#  groff-base "gtk*" "samba*" "xdg*" galculator geany xcompmgr gcr --purge -y
+# apt autoremove --purge -y
 
-apt update
-apt upgrade -y
+# apt update
+# apt upgrade -y
 
 # enable ssh
 raspi-config nonint do_ssh 0
