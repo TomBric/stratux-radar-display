@@ -8,12 +8,12 @@
 
 # remove unnecessary software from the recommended version, unfortunately the lite version does not handel uart correctly
 # remove all x11 stuff
-# apt remove libice6 x11-common firefox "gir*" "cpp*" gdb busybox "gstreamer*" "gnupg*" "gnome*" "gpg*" "lx*" piwiz \
-#  groff-base "gtk*" "samba*" "xdg*" galculator geany xcompmgr gcr --purge -y
-# apt autoremove --purge -y
+apt remove libice6 x11-common firefox "gir*" "cpp*" gdb busybox "gstreamer*" "gnupg*" "gnome*" "gpg*" "lx*" piwiz \
+   groff-base "gtk*" "samba*" "xdg*" galculator geany xcompmgr gcr --purge -y
+apt autoremove --purge -y
 
-# apt update
-# apt upgrade -y
+apt update
+apt upgrade -y
 
 # enable ssh
 raspi-config nonint do_ssh 0
@@ -41,7 +41,7 @@ sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
 } | tee -a /boot/firmware/config.txt
 
 
-apt install python3-pip python3-numpy python3-websockets python3-serial python3-luma.oled python3-xmltodict python3-pydbus -y
+apt install python3-websockets python3-luma.oled python3-xmltodict python3-pydbus -y
 # sound and espeak
 apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
 
