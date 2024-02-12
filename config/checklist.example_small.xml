@@ -17,7 +17,7 @@
                 <ITEM> <TASK> 12. Transponder           </TASK><CHECK> On/Alt           </CHECK> </ITEM>
                 <ITEM> <TASK> 13. Wing Flaps            </TASK><CHECK> Up               </CHECK> </ITEM>
                 <ITEM> <TASK> 14. Lights                </TASK><CHECK> On (as req.)     </CHECK> </ITEM>
-                <ITEM> <TASK> 15. ENG START COMPLETED   </TASK><CHECK>                  </CHECK> </ITEM>
+                <ITEM> <TASK> ENG START COMPLETED       </TASK><CHECK>                  </CHECK> </ITEM>
         </CHECKLIST>
         <CHECKLIST>
                 <TITLE> Taxi </TITLE>
