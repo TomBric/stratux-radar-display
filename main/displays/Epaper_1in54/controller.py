@@ -874,3 +874,101 @@ def distance_statistics(values):
     dashboard(0, starty, sizex, lines)
 
     bottom_line("", "Back", "")
+
+
+def checklist_topic(ypos, topic, highlighted=False, toprint=True):
+    xpos = 2
+    xpos_remark = 20
+    xpos_sub = 20
+    topic_offset = 2
+    subtopic_offset = 3
+    remark_offset = 2
+    topic_right_offset = 3
+
+    y = ypos
+    if 'TASK' in topic and topic['TASK'] is not None:
+        if toprint:
+            draw.text((xpos, ypos), topic['TASK'], font=verysmallfont, fill="black")  # Topic
+    if 'CHECK' in topic and topic['CHECK'] is not None:
+        if toprint:
+            right_text(ypos, topic['CHECK'], font=verysmallfont, fill="black", offset=topic_right_offset)
+    y += SMALL
+    if 'REMARK' in topic and topic['REMARK'] is not None:  # remark
+        y += remark_offset
+        if toprint:
+            draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill="black")  # remark
+        y += VERYSMALL
+    if 'TASK1' in topic and topic['TASK1'] is not None:  # subtopic
+        y += subtopic_offset
+        if toprint:
+            draw.text((xpos_sub, y), topic['TASK1'], font=verysmallfont, fill="black")  # subtopic
+        if 'CHECK1' in topic and topic['CHECK1'] is not None:
+            if toprint:
+                right_text(y, topic['CHECK1'], font=smallfont, fill="black", offset=topic_right_offset)
+        y += VERYSMALL
+    if 'TASK2' in topic and topic['TASK2'] is not None:  # subtopic2
+        y += subtopic_offset
+        if toprint:
+            draw.text((xpos_sub, y), topic['TASK2'], font=verysmallfont, fill="black")  # subtopic
+        if 'CHECK2' in topic and topic['CHECK2'] is not None:
+            if toprint:
+                right_text(y, topic['CHECK2'], font=verysmallfont, fill="black", offset=topic_right_offset)
+        y += VERYSMALL
+    if 'TASK3' in topic and topic['TASK3'] is not None:  # subtopic3
+        y += subtopic_offset
+        if toprint:
+            draw.text((xpos_sub, y), topic['TASK3'], font=verysmallfont, fill="black")  # subtopic
+        if 'CHECK3' in topic and topic['CHECK3'] is not None:
+            if toprint:
+                right_text(y, topic['CHECK3'], font=verysmallfont, fill="black", offset=topic_right_offset)
+        y += VERYSMALL
+    if highlighted:  # draw frame around whole topic
+        if toprint:
+            draw.rounded_rectangle([0, ypos - 1, sizex-1, y + 1], width=1, radius=3, outline="black")
+    return y + topic_offset
+
+
+def checklist(checklist_name, checklist_items, current_index, last_list):
+    checklist_y = {'from': SMALL + 8, 'to': sizey - VERYSMALL - 6}
+    global top_index
+
+    centered_text(0, checklist_name, smallfont, fill="black")
+    if current_index == 0:
+        top_index = 0     # new list, reset top index
+    if current_index < top_index:
+        top_index = current_index    # scroll up
+    while True:  # check what would fit on the screen
+        last_item = top_index
+        size = checklist_topic(checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
+        while True:
+            if last_item + 1 < len(checklist_items):
+                last_item += 1
+            else:
+                break    # everything fits to the end of the list
+            size = checklist_topic(size, checklist_items[last_item], highlighted=False, toprint=False)
+            if size > checklist_y['to']:   # last item did not fit
+                last_item -= 1
+                break
+        # last item now shows the last one that fits
+        if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
+            # next item would also fit on screen or list is fully displayed
+            break
+        else:      # next item would not fit
+            top_index += 1  # need to scroll, but now test again what would fit
+            if current_index == len(checklist_items) - 1:  # list is finished
+                break
+    # now display everything
+    y = checklist_y['from']
+    for item in range(top_index, last_item + 1):
+        if item < len(checklist_items):
+            y = checklist_topic(y, checklist_items[item], highlighted=(item == current_index), toprint=True)
+    if current_index == 0:  # first item
+        left = "PrevL"
+    else:
+        left = "Prev"
+    if last_list and current_index == len(checklist_items) - 1:  # last_item
+        bottom_line("Prev", "Mode", "")
+    elif last_list:
+        bottom_line(left, "Mode", "Checked")
+    else:
+        bottom_line(left, "NxtList", "Check")
