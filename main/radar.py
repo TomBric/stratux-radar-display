@@ -811,7 +811,7 @@ def main():
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
                         groundbeep, situation, simulation_mode)
     simulation.init(simulation_mode)
-    checklist.init(excel_checklist)
+    checklist.init(xml_checklist)
     display_control.startup(RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -880,7 +880,7 @@ if __name__ == "__main__":
                     default=False)
     ap.add_argument("-sit", "--situation", required=False, help="Start mode situation display", action='store_true',
                     default=False)
-    ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use", action='store_true',
+    ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use",
                     default=DEFAULT_CHECKLIST)
     ap.add_argument("-stc", "--startchecklist", required=False, help="Start mode is checklist", action='store_true',
                     default=False)
@@ -940,7 +940,7 @@ if __name__ == "__main__":
     grounddistance_activated = args['grounddistance']
     groundbeep = args['groundbeep']
     simulation_mode = args['simulation']
-    excel_checklist = args['checklist']
+    xml_checklist = args['checklist']
     if args['timer']:
         global_mode = 2  # start_in_timer_mode
     if args['ahrs']:
