@@ -21,8 +21,8 @@
         </CHECKLIST>
         <CHECKLIST>
                 <TITLE> Taxi </TITLE>
-                <ITEM> <TASK> 1. Check obstacles        </TASK><CHECK>                  </CHECK> </ITEM>
-                <ITEM> <TASK> 2. Attitude Ind      <error></error>      </TASK><CHECK> Stable        </CHECK> </ITEM>
+                <ITEM> <TASK> 1. Check obstacles           </TASK><CHECK>                  </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Attitude Ind              </TASK><CHECK> Stable        </CHECK> </ITEM>
                 <ITEM> <TASK> 3. Turn Coordinator          </TASK><CHECK> Ok       </CHECK> </ITEM>
                 <ITEM> <TASK> 4. Directional Gyro          </TASK><CHECK> Ok       </CHECK> </ITEM>
                 <ITEM> <TASK> 5. Suction/Vacuum            </TASK><CHECK> Ok       </CHECK> </ITEM>
