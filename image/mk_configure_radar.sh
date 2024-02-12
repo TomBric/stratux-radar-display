@@ -9,7 +9,7 @@
 # remove unnecessary software from the recommended version, unfortunately the lite version does not handel uart correctly
 # remove all x11 stuff
 apt remove libice6 x11-common firefox "gir*" "cpp*" gdb busybox "gstreamer*" "gnupg*" "gnome*" "gpg*" "lx*" piwiz \
-   groff-base "gtk*" "samba*" "xdg*" galculator geany xcompmgr gcr --purge -y
+   groff-base "gtk*" "samba*" "xdg*" galculator geany xcompmgr gcr "chromium-browser*" --purge -y
 apt autoremove --purge -y
 
 apt update
@@ -41,12 +41,11 @@ sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
 } | tee -a /boot/firmware/config.txt
 
 
-apt install python3-websockets python3-luma.oled python3-xmltodict python3-pydbus -y
 # sound and espeak
 apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
 
 # break system packages is needed here to install without a virtual environment
-pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
+pip3 install websockets xmltodict pydbus py-espeak-ng ADS1x15-ADC luma.oled
 # bluetooth
 apt install bluetooth pi-bluetooth -y
 
