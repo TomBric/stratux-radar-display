@@ -48,7 +48,7 @@
                 <ITEM> <TASK> 8. Throttle               </TASK><CHECK> Idle,800 Rpm</CHECK> </ITEM>
                 <ITEM> <TASK> 9. Throttle Frict.        </TASK><CHECK> Adj           </CHECK> </ITEM>
                 <ITEM> <TASK> 10. Park Brake            </TASK><CHECK> Release          </CHECK> </ITEM>
-                <ITEM> <TASK> TAKEOFF CHECK COMPLETED   </TASK><CHECK> ok              </CHECK> </ITEM>
+                <ITEM> <TASK> TOF CHECK COMPLETED       </TASK><CHECK> ok              </CHECK> </ITEM>
         </CHECKLIST>
         <CHECKLIST>
                 <TITLE> Normal Takeoff </TITLE>
@@ -56,7 +56,7 @@
                 <ITEM> <TASK> 2. Carburator heat        </TASK><CHECK> Cold             </CHECK> </ITEM>
                 <ITEM> <TASK> 3. Throttle               </TASK><CHECK> Full Open        </CHECK> </ITEM>
                 <ITEM> <TASK> 4. Elevator               </TASK><CHECK> Rotate 60        </CHECK> </ITEM>
-                <ITEM> <TASK> 5. Climb Speed            </TASK><CHECK> 80-90 KIAS        </CHECK> </ITEM>
+                <ITEM> <TASK> 5. Climb Spd              </TASK><CHECK> 80-90            </CHECK> </ITEM>
                 <ITEM> <TASK> READY FOR TAKEOFF         </TASK><CHECK>                   </CHECK> </ITEM>
         </CHECKLIST>
 </ALL_CHECKLISTS>
