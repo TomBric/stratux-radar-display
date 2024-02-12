@@ -38,7 +38,7 @@
                 <ITEM> <TASK> 5. Flight Instr           </TASK><CHECK> Set              </CHECK> </ITEM>
                 <ITEM> <TASK> 6. Fuel Selector          </TASK><CHECK> Both             </CHECK> </ITEM>
                 <ITEM> <TASK> 7. Throttle               </TASK><CHECK> 1700 RPM         </CHECK> </ITEM>
-                <ITEM> <TASK>    a. Mixture                </TASK><CHECK> <Lean>        </Lean></CHECK>
+                <ITEM> <TASK>    a. Mixture                </TASK><CHECK> Lean          </CHECK>
                     <REMARK> Rich below 3000 ft      </REMARK>                                   </ITEM>
                 <ITEM> <TASK>    b. Magnets             </TASK><CHECK> 100/50 Diff      </CHECK> </ITEM>
                 <ITEM> <TASK>    c. Carb heat           </TASK><CHECK> drop             </CHECK> </ITEM>
