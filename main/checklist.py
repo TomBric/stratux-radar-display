@@ -146,6 +146,7 @@ def draw_checklist(display_control, ui_changed):
             try:
                 display_control.checklist(checklist_name, checklist_items, g_iterator[1], last_list)
             except TypeError:
+                display_control.clear()
                 s = f"{checklist_name}\nItem #{g_iterator[1]+1}"
                 display_control.text_screen("Error", "in checklist", s, "", "Mode", "")
         else:
