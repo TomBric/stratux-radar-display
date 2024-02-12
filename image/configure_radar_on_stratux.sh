@@ -24,12 +24,12 @@ sudo pip3 install pyalsaaudio
 sudo apt-get install espeak-ng espeak-ng-data libespeak-ng-dev -y
 sudo pip3 install py-espeak-ng
 
-# bluetooth configs
+# bluetooth libraries, although later not used on stratux
 sudo apt-get install libbluetooth-dev -y
 sudo pip3 install pybluez
 sudo pip3 install pydbus
-mkdir -p /home/pi/tmp
-sudo TMPDIR=/home/pi/tmp pip3 install PILLOW==9.5
+# mkdir -p /home/pi/tmp
+# sudo TMPDIR=/home/pi/tmp pip3 install PILLOW==9.5
 sudo apt install python3-numpy -y
 
 # get files from repo
