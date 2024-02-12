@@ -199,9 +199,9 @@ def centered_text(y, text, font, fill):
     draw.text((zerox - tl / 2, y), text, font=font, fill=fill)
 
 
-def right_text(y, text, font, fill):
+def right_text(y, text, font, fill, offset=0):
     tl = draw.textlength(text, font)
-    draw.text((sizex - tl, y), text, font=font, fill=fill)
+    draw.text((sizex - tl - offset, y), text, font=font, fill=fill)
 
 
 def bottom_line(left, middle, right, offset=0):  # offset to be able to print letters like p and q
