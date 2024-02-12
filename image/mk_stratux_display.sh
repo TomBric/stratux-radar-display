@@ -26,12 +26,11 @@ if [ "$#" -lt 2 ]; then
     echo "Usage: " "$0" "  <fail output> dev|main [v64]"
     exit 1
 fi
-IMAGE_VERSION="lite_arm64"
-outprefix="stratux-display"
-
-ZIPNAME="2023-12-05-raspios-bullseye-armhf.img.xz"
-BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_armhf/images/raspios_oldstable_armhf-2023-12-06/${ZIPNAME}"
+IMAGE_VERSION="arm64"
+ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_arm64/images/raspios_oldstable_armhf-2023-12-06/${ZIPNAME}"
 IMGNAME="${ZIPNAME%.*}"
+outprefix="stratux-display"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
