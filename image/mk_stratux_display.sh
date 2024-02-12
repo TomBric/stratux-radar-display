@@ -26,9 +26,10 @@ if [ "$#" -lt 2 ]; then
     echo "Usage: " "$0" "  <fail output> dev|main [v64]"
     exit 1
 fi
+
 IMAGE_VERSION="arm64"
 ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
-BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_arm64/images/raspios_oldstable_armhf-2023-12-06/${ZIPNAME}"
+BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_arm64/images/raspios_oldstable_arm64-2023-12-06/${ZIPNAME}"
 IMGNAME="${ZIPNAME%.*}"
 outprefix="stratux-display"
 
