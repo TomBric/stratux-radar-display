@@ -8,12 +8,13 @@
 
 # remove unnecessary software from the recommended version, unfortunately the lite version does not handel uart correctly
 # remove all x11 stuff
-apt remove libice6 x11-common firefox "gir*" "cpp*" gdb busybox "gstreamer*" "gnupg*" "gnome*" "gpg*" "lx*" piwiz \
-   groff-base "gtk*" "samba*" "xdg*" galculator geany xcompmgr gcr "chromium-browser*" --purge -y
+apt remove libice6 x11-common firefox "cpp*" gdb busybox "gstreamer*" "gnupg*" "gnome*" "lx*" piwiz \
+   groff-base "samba*" "xdg*" galculator geany xcompmgr gcr "chromium-browser*" "liblouis*" "desktop-*" \
+   adwaita-icon-theme --purge -y
 apt autoremove --purge -y
 
-apt update
-apt upgrade -y
+# apt update
+# apt upgrade -y
 
 # enable ssh
 raspi-config nonint do_ssh 0
@@ -30,24 +31,22 @@ raspi-config nonint do_i2c 0
 
 # for groundsensor, disable ssh over serial cause it is needed for the sensor
 # disable ssh over serial otherwise
-sed -i /boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
-sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
+sed -i /boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
+sed -i /boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
+sed -i /boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
 # modify /boot/config.text for groundsensor
 {
   echo "# modification for ultrasonic ground sensor"
   echo "enable_uart=1"
   echo "dtoverlay=miniuart-bt"
-} | tee -a /boot/firmware/config.txt
+} | tee -a /boot/config.txt
 
 
 # sound and espeak
 apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
-
-# break system packages is needed here to install without a virtual environment
 pip3 install websockets xmltodict pydbus py-espeak-ng ADS1x15-ADC luma.oled
 # bluetooth
-apt install bluetooth pi-bluetooth -y
+# apt install bluetooth pi-bluetooth -y
 
 # bluetooth configuration
 # Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
