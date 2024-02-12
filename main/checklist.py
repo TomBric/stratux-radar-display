@@ -150,7 +150,7 @@ def draw_checklist(display_control, ui_changed):
                 s = f'Checklist:"{checklist_name}"\n   Item #{g_iterator[1]+1}\n\nCorrect XML!'
                 display_control.text_screen("Error", "in checklist", s, "", "Mode", "")
         else:
-            display_control.text_screen("Error", "reading checklist", "-check file \n-check XML-format",
+            display_control.text_screen("Error", "reading checklist", "\n - check file \n - check XML-format",
                                         "", "Next Mode", "")
         display_control.display()
 
