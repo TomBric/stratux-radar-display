@@ -18,13 +18,6 @@ apt autoremove --purge -y
 
 # enable ssh
 raspi-config nonint do_ssh 0
-# create user pi and "raspberry"
-# useradd -m pi
-# chpasswd pi:raspberry
-# usermod -aG sudo pi
-# set wifi with raspi-config
-# raspi-config nonint do_wifi_ssid_passphrase stratux
-
 # enable spi and i2c (for cowarner)
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
@@ -46,27 +39,27 @@ sed -i /boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
 apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
 pip3 install websockets xmltodict pydbus py-espeak-ng ADS1x15-ADC luma.oled
 # bluetooth
-# apt install bluetooth pi-bluetooth -y
+apt install bluetooth pulsaudio pulseaudio-module-bluetooth -y
 
 # bluetooth configuration
 # Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
 # configs in /etc/pulse/system.pa
-# sed -i '$ a load-module module-bluetooth-discover' /etc/pulse/system.pa
-# sed -i '$ a load-module module-bluetooth-policy' /etc/pulse/system.pa
-# sed -i '$ a load-module module-switch-on-connect' /etc/pulse/system.pa
+sed -i '$ a load-module module-bluetooth-discover' /etc/pulse/system.pa
+sed -i '$ a load-module module-bluetooth-policy' /etc/pulse/system.pa
+sed -i '$ a load-module module-switch-on-connect' /etc/pulse/system.pa
 
 # configs in /etc/pulse/client.conf to disable client spawns
-# sed -i '$ a default-server = /var/run/pulse/native' /etc/pulse/client.conf
-# sed -i '$ a autospawn = no' /etc/pulse/client.conf
+sed -i '$ a default-server = /var/run/pulse/native' /etc/pulse/client.conf
+sed -i '$ a autospawn = no' /etc/pulse/client.conf
 
 # allow user pulse bluetooth access
 addgroup pulse bluetooth
 addgroup pi pulse-access
 
 # start pulseaudio system wide
-# cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
-# systemctl --system enable pulseaudio.service
-# systemctl --system start pulseaudio.service
+cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
+systemctl --system enable pulseaudio.service
+systemctl --system start pulseaudio.service
 
 
 # include autostart into crontab of pi, so that radar starts on every boot

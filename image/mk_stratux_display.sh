@@ -81,10 +81,6 @@ chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar
 # set user pi and "raspberry"
 mkdir -p out
 
-# copy wpa_config and create empty ssh
-# cp mnt/$DISPLAY_SRC/stratux-radar-display/image/wpa_supplicant.conf mnt/boot
-# touch mnt/boot/ssh
-
 umount mnt/boot
 umount mnt
 
