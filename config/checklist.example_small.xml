@@ -32,11 +32,11 @@
         <CHECKLIST>
                 <TITLE> Before Takeoff </TITLE>
                 <ITEM> <TASK> 1. Parking Brake          </TASK><CHECK> Set              </CHECK> </ITEM>
-                <ITEM> <TASK> 2. Doors/Seatbelts        </TASK><CHECK> Closed           </CHECK> </ITEM>
-                <ITEM> <TASK> 3. Flaps+Trim             </TASK><CHECK>Take-off set.  </CHECK> </ITEM>
-                <ITEM> <TASK> 4. Controls               </TASK><CHECK> Free+Correct   </CHECK> </ITEM>
-                <ITEM> <TASK> 5. Flight Instruments     </TASK><CHECK> Set              </CHECK> </ITEM>
-                <ITEM> <TASK> 6. Fuel Selector Valve    </TASK><CHECK> Both             </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Doors/Belts            </TASK><CHECK> Closed           </CHECK> </ITEM>
+                <ITEM> <TASK> 3. Flaps+Trim             </TASK><CHECK>Take-off          </CHECK> </ITEM>
+                <ITEM> <TASK> 4. Controls               </TASK><CHECK> Free+Corr        </CHECK> </ITEM>
+                <ITEM> <TASK> 5. Flight Instr           </TASK><CHECK> Set              </CHECK> </ITEM>
+                <ITEM> <TASK> 6. Fuel Selector          </TASK><CHECK> Both             </CHECK> </ITEM>
                 <ITEM> <TASK> 7. Throttle               </TASK><CHECK> 1700 RPM         </CHECK> </ITEM>
                 <ITEM> <TASK>    a. Mixture                </TASK><CHECK> <Lean>        </Lean></CHECK>
                     <REMARK> Rich below 3000 ft      </REMARK>                                   </ITEM>
@@ -46,8 +46,8 @@
                 <ITEM> <TASK>    e. Ammeter             </TASK><CHECK> Check            </CHECK> </ITEM>
                 <ITEM> <TASK>    f. Suction Gauge       </TASK><CHECK> Check            </CHECK> </ITEM>
                 <ITEM> <TASK> 8. Throttle               </TASK><CHECK> Idle,800 Rpm</CHECK> </ITEM>
-                <ITEM> <TASK> 9. Throttle Frict.  </TASK><CHECK> Adjust           </CHECK> </ITEM>
-                <ITEM> <TASK> 10. Parking Brake         </TASK><CHECK> Release          </CHECK> </ITEM>
+                <ITEM> <TASK> 9. Throttle Frict.        </TASK><CHECK> Adj           </CHECK> </ITEM>
+                <ITEM> <TASK> 10. Park Brake            </TASK><CHECK> Release          </CHECK> </ITEM>
                 <ITEM> <TASK> READY TAKEOFF CHECK       </TASK><CHECK> ok              </CHECK> </ITEM>
         </CHECKLIST>
         <CHECKLIST>
