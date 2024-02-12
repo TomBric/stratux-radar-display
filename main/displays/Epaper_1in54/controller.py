@@ -969,6 +969,6 @@ def checklist(checklist_name, checklist_items, current_index, last_list):
     if last_list and current_index == len(checklist_items) - 1:  # last_item
         bottom_line("Prev", "Mode", "")
     elif last_list:
-        bottom_line(left, "Mode", "Checked")
+        bottom_line(left, "Mode", "Check")
     else:
         bottom_line(left, "NxtList", "Check")
