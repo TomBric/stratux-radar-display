@@ -33,7 +33,7 @@ sudo pip3 install pydbus
 sudo apt install python3-numpy -y
 
 # copy simple checklist once, can be changed later
-cp /home/pi/stratux-radar-display/config/checklist.small_example.xml /home/pi/stratux-radar-display/config/checklist.xml
+cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
 
 
 # disable bluetooth in any case, it is not working directly on Stratux
