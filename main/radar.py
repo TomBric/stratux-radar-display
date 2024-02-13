@@ -910,7 +910,7 @@ if __name__ == "__main__":
     ap.add_argument("-modes", "--displaymodes", required=False,
                     help="Select display modes that you want to see ""R=radar T=timer A=ahrs D=display-status "
                          "G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "
-                         "M=distance measurement L=checklist  Example: -modes RADCM", default="RTAGKVICMDS")
+                         "M=distance measurement L=checklist  Example: -modes RADCM", default="RTAGKVICMDSL")
 
     args = vars(ap.parse_args())
     # set up logging
