@@ -32,10 +32,11 @@ sudo pip3 install pydbus
 # sudo TMPDIR=/home/pi/tmp pip3 install PILLOW==9.5
 sudo apt install python3-numpy -y
 
-# get files from repo
-# cd /home/pi && git clone https://github.com/TomBric/stratux-radar-display.git
+# copy simple checklist once, can be changed later
+cp /home/pi/stratux-radar-display/config/checklist.small_example.xml /home/pi/stratux-radar-display/config/checklist.xml
 
-# disable bluetooth in any case, is not working directly on Stratux
+
+# disable bluetooth in any case, it is not working directly on Stratux
 sed -i 's/-b/ /g' /home/pi/stratux-radar-display/image/stratux_radar.sh
 # include autostart into crontab, so that radar starts on every boot
 echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -
