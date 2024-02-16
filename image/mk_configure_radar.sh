@@ -40,7 +40,7 @@ apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-
 pip3 install websockets xmltodict pydbus py-espeak-ng ADS1x15-ADC luma.oled
 
 # bluetooth
-apt install bluetooth pulsaudio pulseaudio-module-bluetooth -y
+apt install bluetooth pulseaudio pulseaudio-module-bluetooth -y
 
 # bluetooth configuration
 # Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
