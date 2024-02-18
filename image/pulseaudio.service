@@ -5,8 +5,8 @@
 Description=PulseAudio system server
 
 [Service]
-Type=notify
-ExecStart=/usr/bin/pulseaudio --daemonize=no --system --realtime --log-target=syslog --disallow-exit --exit-idle-time=-1
+ExecStart=/usr/bin/pulseaudio --system --disallow-exit --disable-shm --exit-idle-time=-1
+Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

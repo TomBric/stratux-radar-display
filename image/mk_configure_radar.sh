@@ -45,16 +45,16 @@ apt install bluetooth pulseaudio pulseaudio-module-bluetooth -y
 # bluetooth configuration
 # Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
 # configs in /etc/pulse/system.pa
-# {
-#  echo "# modification for radar bluetooth interface"
-#  echo ".ifexists module-bluetooth-discover.so"
-#  echo "load-module module-bluetooth-discover"
-#  echo ".endif"
-#  echo ".ifexists module-bluetooth-policy.so"
-#  echo "load-module module-bluetooth-policy"
-#  echo ".endif"
-#  echo "load-module module-switch-on-connect"
-#} | tee -a /etc/pulse/system.pa
+{
+  echo "### modification for radar bluetooth interface"
+  echo ".ifexists module-bluetooth-discover.so"
+  echo "load-module module-bluetooth-discover"
+  echo ".endif"
+  echo ".ifexists module-bluetooth-policy.so"
+  echo "load-module module-bluetooth-policy"
+  echo ".endif"
+  echo "load-module module-switch-on-connect"
+} | tee -a /etc/pulse/system.pa
 
 # configs in /etc/pulse/client.conf to disable client spawns
 # sed -i '$ a default-server = /var/run/pulse/native' /etc/pulse/client.conf
@@ -65,9 +65,9 @@ apt install bluetooth pulseaudio pulseaudio-module-bluetooth -y
 # systemctl --user mask pulseaudio.socket
 
 # allow user pulse bluetooth access
-# addgroup pulse bluetooth
+addgroup pulse bluetooth
 # addgroup pulse lp
-# addgroup pi pulse-access
+addgroup pi pulse-access
 
 # start pulseaudio system wide
 # cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
