@@ -158,6 +158,7 @@ Version EU28 there is a setting availabe to resolve the conflict: Go to Stratux 
    **Option 2: via ssh and bluetoothctl**
    
    * Logon on your radar as user pi:  ssh pi@192.168.x.x
+   * change to user root:   sudo -s     (bluetooth is running in system mode!)
    * Start bluetoothctl:   
    ```
       -> bluetoothctl
