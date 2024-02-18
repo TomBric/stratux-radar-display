@@ -7,6 +7,7 @@ Implementation of a standalone Radar display for Stratux Europe Edition. Can run
 - update in version 1.7: optional CO sensor is supported (see wiki)
 - update in version 1.8: integration of distance sensor and calculation of start/landing distances
 - update in version 1.9: adding mode selection parameter and start/landing distance calculation with ultrasonic sensor
+- update in version 2.0: checklist feature added
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
@@ -92,9 +93,16 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
 ## Software Installation Instructions
 ### Standard setup
    1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Image with "epaper_3in7" is the version for the waveshare 3.7 inch epaper display, "epaper_1in54" for the smaller epaper. Both versions will support Bluetooth
-   2. Flash the image using Raspberry Pi Imager (select "OwnImage") or Win32DiskImager to your SD card (32 GB cards recommended)
-   3. Insert the SD into you raspberry and let it boot. It should automatically startup and connect to the Stratux-Europe edition. 
-   Remark: Current configuration is for Stratux-Europe on IP address 192.168.10.1. using wifi SSID "stratux". If you have a different configuration please update the stratux IP in /home/pi/stratux-radar-display/image/stratux_radar.sh accordingly. To change the wifi network use a modified wpa_supplicant.conf or use the "Display status" mode with the pushbuttons (expert only).
+   2. Flash the image using Raspberry Pi Imager (select "OwnImage") to your SD card (32 GB cards recommended). Use Pi imager with the following settings:
+         - Operating system to select: "Use Custom"
+         - Settings:     
+           - set a hostname (e.g. radar.local)
+           - set a username and password (e.g. "pi" and "raspberry" or whatever you can remember)
+           - set Wifi: "stratux" and leave the password empty
+           - set language options to your preferences
+           - optional: activate ssh, if you want to login later
+   3. Insert the SD into your raspberry and let it boot. It should automatically startup and connect to the Stratux-Europe edition. 
+   Remark: Current configuration is for Stratux-Europe on IP address 192.168.10.1. using wifi SSID "stratux". If you have a different configuration please update the stratux IP in /home/pi/stratux-radar-display/image/stratux_radar.sh accordingly. To change the wifi network modify the Pi Imager Wifi Settings accordingly or use the "Display status" mode with the pushbuttons (expert only).
    
 ### Expert setup 
    1. Configure a clean Raspbian installation on your SD card. E.g. using Raspberry Pi Imager. Image to flash is the standard image "Raspbian Pi OS (recommended)". Using the Pi Imager use "settings" to set the network to "stratux" and no password. Also enable ssh in settings with the user pi and set a password ("raspberry" if you like).
@@ -231,9 +239,8 @@ Recommended setting for normal piston aircraft is 5 nm and 2000 ft.
     
 # Shell command parameters
 ```
-usage: radar.py [-h] -d DEVICE [-b] [-sd] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z] [-w] [-sit] [-c CONNECT]
-                [-v VERBOSE] [-r] [-e] [-y EXTSOUND] [-nf] [-nc] [-ci] [-gd] [-gb] [-sim] [-mx MIXER]
-                [-modes DISPLAYMODES]
+usage: radar.py [-h] -d DEVICE [-b] [-sd] [-n] [-t] [-a] [-x] [-g] [-o] [-i] [-z] [-w] [-sit] [-chl CHECKLIST] [-stc] [-c CONNECT] [-v VERBOSE] [-r] [-e] [-y EXTSOUND] [-nf] [-nc] [-ci] [-gd] [-gb] [-sim]
+                [-mx MIXER] [-modes DISPLAYMODES]
 
 Stratux radar display
 
@@ -253,6 +260,10 @@ optional arguments:
   -z, --strx            Start mode is stratux-status
   -w, --cowarner        Start mode is CO warner
   -sit, --situation     Start mode situation display
+  -chl CHECKLIST, --checklist CHECKLIST
+                        Checklist file name to use
+  -stc, --startchecklist
+                        Start mode is checklist
   -c CONNECT, --connect CONNECT
                         Connect to Stratux-IP
   -v VERBOSE, --verbose VERBOSE
@@ -271,9 +282,8 @@ optional arguments:
   -mx MIXER, --mixer MIXER
                         Mixer name to be used for sound output
   -modes DISPLAYMODES, --displaymodes DISPLAYMODES
-                        Select display modes that you want to see R=radar T=timer A=ahrs D=display-status G=g-meter
-                        K=compass V=vsi I=flighttime S=stratux-status C=co-sensor M=distance measurement Example:
-                        -modes RADCM
+                        Select display modes that you want to see R=radar T=timer A=ahrs D=display-status G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor M=distance measurement L=checklist
+                        Example: -modes RADCM
 ```
 
 
