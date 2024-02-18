@@ -70,9 +70,10 @@ addgroup pulse bluetooth
 addgroup pi pulse-access
 
 # start pulseaudio system wide
-# cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
-# systemctl --system enable pulseaudio.service
-# systemctl --system start pulseaudio.service
+cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
+systemctl daemon-reload
+systemctl --system enable pulseaudio.service
+systemctl --system start pulseaudio.service
 
 
 # include autostart into crontab of pi, so that radar starts on every boot
