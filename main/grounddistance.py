@@ -35,6 +35,24 @@
 # enable_uart=1
 # dtoverlay=miniuart-bt
 
+# start and landing statistics are stored in stratux-radar.stat
+# This file has json coded statistics for every flight, see this example
+# {
+#    "start_time": "2023-01-15 12:57:21.873912+00:00",
+#    "start_altitude": 879.8726,
+#    "takeoff_distance": 0.0,
+#    "landing_time": "2023-01-15 12:57:22.106499+00:00",
+#    "landing_altitude": 879.8606,
+#    "landing_distance": 0.0
+# }{
+#    "start_time": "2023-01-15 12:57:28.223856+00:00",
+#    "start_altitude": 880.92865,
+#    "takeoff_distance": 0.0,
+#    "landing_time": "2023-01-15 12:57:28.444494+00:00",
+#    "landing_altitude": 880.77216,
+#    "landing_distance": 0.0
+# }
+
 import logging
 import radarmodes
 import time
@@ -53,8 +71,7 @@ MEASUREMENTS_PER_SECOND = 5    # number of distance ranging meaurements per seco
 
 UART_WAIT_TIME = 0.01  # time in seconds to wait for enough uart characters
 UART_BREAK_TIME = 1.00  # time in seconds when waiting is stopped
-# statistic file
-SAVED_STATISTICS = "stratux-radar.stat"
+
 # BEEP VALUES
 DISTANCE_BEEP_MAX = 60  # in cm, where beeper starts with a low tone
 DISTANCE_BEEP_MIN = 10  # in cm, where beeper stops with a high tone
@@ -96,6 +113,7 @@ stats_before_airborne = 0
 stats_before_landing = 0
 stats_before_stop = 0
 stats_before_obstacle_clear = 0
+saved_statistics = None    # filename for statistics, set in init
 
 
 class UsonicSensor:   # definition adapted from DFRobot code
@@ -169,7 +187,6 @@ def reset_values():
     global stop_situation
     global zero_distance
     global fly_status
-    global ground_distance_active
 
     runup_situation = None
     start_situation = None
@@ -188,7 +205,7 @@ def reset_values():
             rlog.debug('Error resetting gound zero distance')
 
 
-def init(activate, debug_level, distance_indication, situation, sim_mode):
+def init(activate, stat_file, debug_level, distance_indication, situation, sim_mode):
     global rlog
     global ground_distance_active
     global indicate_distance
@@ -197,6 +214,7 @@ def init(activate, debug_level, distance_indication, situation, sim_mode):
     global global_situation
     global zero_distance
     global simulation_mode
+    global saved_statistics
 
     simulation_mode = sim_mode
     rlog = logging.getLogger('stratux-radar-log')
@@ -218,6 +236,7 @@ def init(activate, debug_level, distance_indication, situation, sim_mode):
 
     ground_distance_active = True
     value_debug_level = debug_level
+    saved_statistics = stat_file
     global_situation = situation  # to be able to read and store situation info
     rlog.debug("Ground Distance Measurement - Ultrasonic sensor active.")
 
@@ -233,11 +252,11 @@ def write_stats():
     if rlog is None:  # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
-        with open(SAVED_STATISTICS, 'at') as out:
+        with open(saved_statistics, 'at') as out:
             json.dump(calculate_output_values(), out, indent=4, default=str)
     except (OSError, IOError, ValueError) as e:
-        rlog.debug("Grounddistance: Error " + str(e) + " writing " + SAVED_STATISTICS)
-    rlog.debug("Grounddistance: Statistics saved to " + SAVED_STATISTICS)
+        rlog.debug("Grounddistance: Error " + str(e) + " writing " + saved_statistics)
+    rlog.debug("Grounddistance: Statistics saved to " + saved_statistics)
 
 
 def distance_beeper(distance):
@@ -409,7 +428,6 @@ def evaluate_statistics(latest_stat):
 
 def store_statistics(sit):
     global stats_next_store
-    global statistics
 
     if simulation_mode:
         sim_data = simulation.read_simulation_data()
@@ -440,8 +458,6 @@ def store_statistics(sit):
 
 
 async def read_ground_sensor():
-    global distance_sensor
-    global global_situation
     global zero_distance
 
     if ground_distance_active:

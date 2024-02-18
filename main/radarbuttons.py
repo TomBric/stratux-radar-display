@@ -56,7 +56,6 @@ io_status = {LEFT: {'virtualno': 0, 'status': False, 'starttime': 0.0, 'already_
 
 
 def init():
-    global io_status
     global rlog
 
     GPIO.setmode(GPIO.BCM)
@@ -71,15 +70,11 @@ def init():
 
 
 def reset_buttons():   # called if timer was modified. Reset of all timestamps necessary
-    global io_status
-
     for button in io_status:
         io_status[button]['starttime'] = 0.0
 
 
 def check_one_button(button):
-    global io_status
-
     if GPIO.event_detected(button):   # triggers on pull down
         if GPIO.input(button) != GPIO.LOW:  # not pressed anymore
             io_status[button]['status'] = False
@@ -112,8 +107,6 @@ def check_one_button(button):
 
 
 def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
-    global io_status
-
     for button in io_status:
         stat = check_one_button(button)
         if stat > 0:

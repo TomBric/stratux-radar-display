@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--Example checklist for Cessna 172, simplified, input from freechecklists.net-->
+<ALL_CHECKLISTS>
+        <CHECKLIST>
+                <TITLE> Starting Engine </TITLE>
+                <ITEM> <TASK> 1. Mixture                </TASK><CHECK> Rich             </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Carburator heat        </TASK><CHECK> Cold             </CHECK> </ITEM>
+                <ITEM> <TASK> 3. Prime                  </TASK><CHECK> As Req., Locked  </CHECK> </ITEM>
+                <ITEM> <TASK> 4. Throttle               </TASK><CHECK> Pump, 1/2"       </CHECK> </ITEM>
+                <ITEM> <TASK> 5. Master Switch          </TASK><CHECK>On                </CHECK> </ITEM>
+                <ITEM> <TASK> 6. Rotating Beacon        </TASK><CHECK> On               </CHECK> </ITEM>
+                <ITEM> <TASK> 7. Prop Area              </TASK><CHECK> Clear            </CHECK> </ITEM>
+                <ITEM> <TASK> 8. Ignition Switch        </TASK><CHECK> Start            </CHECK> </ITEM>
+                <ITEM> <TASK> 9. Throttle               </TASK><CHECK> 1000 RPM         </CHECK> </ITEM>
+                <ITEM> <TASK> 10. Oil Pressure          </TASK><CHECK> Check            </CHECK> </ITEM>
+                <ITEM> <TASK> 11. Radio,Avionics        </TASK><CHECK> On            </CHECK> </ITEM>
+                <ITEM> <TASK> 12. Transponder           </TASK><CHECK> On/Alt           </CHECK> </ITEM>
+                <ITEM> <TASK> 13. Wing Flaps            </TASK><CHECK> Up               </CHECK> </ITEM>
+                <ITEM> <TASK> 14. Lights                </TASK><CHECK> On (as req.)     </CHECK> </ITEM>
+                <ITEM> <TASK> ENG START COMPLETED       </TASK><CHECK>                  </CHECK> </ITEM>
+        </CHECKLIST>
+        <CHECKLIST>
+                <TITLE> Taxi </TITLE>
+                <ITEM> <TASK> 1. Check obstacles           </TASK><CHECK>                  </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Attitude Ind              </TASK><CHECK> Stable        </CHECK> </ITEM>
+                <ITEM> <TASK> 3. Turn Coordinator          </TASK><CHECK> Ok       </CHECK> </ITEM>
+                <ITEM> <TASK> 4. Directional Gyro          </TASK><CHECK> Ok       </CHECK> </ITEM>
+                <ITEM> <TASK> 5. Suction/Vacuum            </TASK><CHECK> Ok       </CHECK> </ITEM>
+                <ITEM> <TASK> 6. Electrical                </TASK><CHECK> Check         </CHECK> </ITEM>
+                <ITEM> <TASK> TAXI CHECK COMPLETED         </TASK><CHECK>               </CHECK></ITEM>
+        </CHECKLIST>
+        <CHECKLIST>
+                <TITLE> Before Takeoff </TITLE>
+                <ITEM> <TASK> 1. Parking Brake          </TASK><CHECK> Set              </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Doors/Belts            </TASK><CHECK> Closed           </CHECK> </ITEM>
+                <ITEM> <TASK> 3. Flaps+Trim             </TASK><CHECK>Take-off          </CHECK> </ITEM>
+                <ITEM> <TASK> 4. Controls               </TASK><CHECK> Free+Corr        </CHECK> </ITEM>
+                <ITEM> <TASK> 5. Flight Instr           </TASK><CHECK> Set              </CHECK> </ITEM>
+                <ITEM> <TASK> 6. Fuel Selector          </TASK><CHECK> Both             </CHECK> </ITEM>
+                <ITEM> <TASK> 7. Throttle               </TASK><CHECK> 1700 RPM         </CHECK> </ITEM>
+                <ITEM> <TASK>    a. Mixture                </TASK><CHECK> Lean          </CHECK>
+                    <REMARK> Rich below 3000 ft      </REMARK>                                   </ITEM>
+                <ITEM> <TASK>    b. Magnets             </TASK><CHECK> 100/50 Diff      </CHECK> </ITEM>
+                <ITEM> <TASK>    c. Carb heat           </TASK><CHECK> drop             </CHECK> </ITEM>
+                <ITEM> <TASK>    d. Engine instr.       </TASK><CHECK> Check            </CHECK> </ITEM>
+                <ITEM> <TASK>    e. Ammeter             </TASK><CHECK> Check            </CHECK> </ITEM>
+                <ITEM> <TASK>    f. Suction Gauge       </TASK><CHECK> Check            </CHECK> </ITEM>
+                <ITEM> <TASK> 8. Throttle               </TASK><CHECK> Idle,800 Rpm</CHECK> </ITEM>
+                <ITEM> <TASK> 9. Throttle Frict.        </TASK><CHECK> Adj           </CHECK> </ITEM>
+                <ITEM> <TASK> 10. Park Brake            </TASK><CHECK> Release          </CHECK> </ITEM>
+                <ITEM> <TASK> TOF CHECK COMPLETED       </TASK><CHECK> ok              </CHECK> </ITEM>
+        </CHECKLIST>
+        <CHECKLIST>
+                <TITLE> Normal Takeoff </TITLE>
+                <ITEM> <TASK> 1. Wing flaps             </TASK><CHECK> Up               </CHECK> </ITEM>
+                <ITEM> <TASK> 2. Carburator heat        </TASK><CHECK> Cold             </CHECK> </ITEM>
+                <ITEM> <TASK> 3. Throttle               </TASK><CHECK> Full Open        </CHECK> </ITEM>
+                <ITEM> <TASK> 4. Elevator               </TASK><CHECK> Rotate 60        </CHECK> </ITEM>
+                <ITEM> <TASK> 5. Climb Spd              </TASK><CHECK> 80-90            </CHECK> </ITEM>
+                <ITEM> <TASK> READY FOR TAKEOFF         </TASK><CHECK>                   </CHECK> </ITEM>
+        </CHECKLIST>
+</ALL_CHECKLISTS>

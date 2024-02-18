@@ -26,16 +26,12 @@ if [ "$#" -lt 2 ]; then
     echo "Usage: " "$0" "  <fail output> dev|main [v64]"
     exit 1
 fi
-IMAGE_VERSION="armhf"
-outprefix="stratux-display"
-if [ "$#" -gt 2 ] &&  [ "$3" == "v64" ]; then
-    IMAGE_VERSION="arm64"
-    outprefix="stratux-display64"
-fi
 
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_$IMAGE_VERSION/images/raspios_$IMAGE_VERSION-2023-05-03/2023-05-03-raspios-bullseye-$IMAGE_VERSION.img.xz"
-ZIPNAME="2023-05-03-raspios-bullseye-$IMAGE_VERSION.img.xz"
+IMAGE_VERSION="arm64"
+ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_arm64/images/raspios_oldstable_arm64-2023-12-06/${ZIPNAME}"
 IMGNAME="${ZIPNAME%.*}"
+outprefix="stratux-display"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
@@ -73,25 +69,17 @@ mkdir -p mnt
 mount -t ext4 "${lo}"p2 mnt/ || die "root-mount failed"
 mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 
+
+# install git for cloning repo (if not already installed) and pip
+chroot mnt apt install git -y
+
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$2" https://github.com/TomBric/stratux-radar-display.git
 cd ../../../
 chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$2"
+
+# set user pi and "raspberry"
 mkdir -p out
-
-# copy wpa_config and create empty ssh
-cp mnt/$DISPLAY_SRC/stratux-radar-display/image/wpa_supplicant.conf mnt/boot
-touch mnt/boot/ssh
-
-# configuration to use uart for ultrasonic ground sensor
-{
-  echo "# modification for ultrasonic ground sensor"
-  echo "enable_uart=1"
-  echo "dtoverlay=miniuart-bt"
-} >> mnt/boot/config.txt
-# disable ssh over serial otherwise UART is not working properly, change entries in cmdline if console is enabled there
-sed -i mnt/boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-sed -i mnt/boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 
 umount mnt/boot
 umount mnt

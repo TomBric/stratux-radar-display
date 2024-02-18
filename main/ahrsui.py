@@ -33,22 +33,36 @@
 
 import radarbuttons
 import radarmodes
+import logging
+import requests
 
 # constants
 # globals
 ahrs_ui_changed = True
+calibrate_url = ""   # url of stratux to initiate AHRS calibration
+cage_url = ""        # url of stratux to initation Zero Drift
+rlog = None
 
 MSG_GROUND_TEST = "No GPS,Ground ONLY!"
 MSG_PSEUDO_AHRS = "PSEUDO AHRS ONLY!"
 MSG_NO_AHRS = "NO IMU OR GPS!"
 MSG_NO_CONNECTION = "NO CONNECTION!"
+MSG_CALIBRATING = "CALIBRATE - FLY LEVEL"
 
 
-def init(display_control):   # prepare everything
-    pass   # nothing to do in the setup now
+def init(calib_url, cage):   # prepare everything
+    global calibrate_url
+    global cage_url
+    global rlog
+
+    calibrate_url = calib_url
+    cage_url = cage
+    rlog = logging.getLogger('stratux-radar-log')
+    rlog.debug("AHRS UI: Initialized calibrate url to {0} cage url to {1}".format(calib_url, cage))
 
 
-def draw_ahrs(draw, display_control, connected, was_changed, pitch, roll, heading, slip, gps_hor_accuracy, ahrs_sensor):
+def draw_ahrs(display_control, connected, was_changed, pitch, roll, heading, slip, gps_hor_accuracy,
+              ahrs_sensor, is_caging):
     global ahrs_ui_changed
 
     if was_changed or ahrs_ui_changed:
@@ -62,9 +76,27 @@ def draw_ahrs(draw, display_control, connected, was_changed, pitch, roll, headin
             error_message = MSG_PSEUDO_AHRS
         if not connected:
             error_message = MSG_NO_CONNECTION
-        display_control.clear(draw)
-        display_control.ahrs(draw, pitch, roll, heading, slip, error_message)
+        if is_caging:
+            error_message = MSG_CALIBRATING
+        display_control.clear()
+        display_control.ahrs(pitch, roll, heading, slip, error_message)
         display_control.display()
+
+
+def zero_drift():
+    rlog.debug("Zero drift calibration initiated by button press!")
+    try:
+        requests.post(calibrate_url)
+    except requests.exceptions.RequestException as e:
+        rlog.debug("Error posting calibration request: {0}".format(e))
+
+
+def set_level():
+    rlog.debug("Levelling initiated by button press!")
+    try:
+        requests.post(cage_url)
+    except requests.exceptions.RequestException as e:
+        rlog.debug("Error posting levelling request: {0}".format(e))
 
 
 def user_input():
@@ -81,4 +113,10 @@ def user_input():
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long: refresh
         return 6  # start next mode for display driver: refresh called from ahrs
+    if button == 2 and btime == 1:  # right and short, set zero_drift
+        zero_drift()
+        return 5
+    if button == 0 and btime == 1:  # left and short: set level
+        set_level()
+        return 5
     return 5  # no mode change

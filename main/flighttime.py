@@ -31,6 +31,27 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+# flight times are store in stratux-radar.flights
+# This file contains json formatted start and landing times. Here is an example:
+# {
+#    "last_flights": [
+#        [
+#            "2023-12-11T14:19:57.296707+00:00",
+#            "2023-12-11T14:50:10.197035+00:00"
+#       ],
+#        [
+#            "2023-12-10T16:47:00+00:00",
+#            "2023-12-10T17:57:00+00:00"
+#        ],
+#        [
+#            "2023-12-10T13:08:00+00:00",
+#            "2023-12-10T15:21:00+00:00"
+#        ]
+#    ]
+# }
+
+
 import datetime
 import logging
 import json
@@ -39,7 +60,6 @@ import radarmodes
 
 
 # constants
-SAVED_FLIGHTS = "stratux-radar.flights"
 SPEED_THRESHOLD_TAKEOFF = 30    # threshold in kts, when flying is detected or stopped
 SPEED_THRESHOLD_LANDING = 15    # threshold in kts, when landing is detected or stopped
 SPEED_THRESHOLD_STOPPED = 5     # threshold in kts, when stopping is detected. Triggers display of flighttime
@@ -49,10 +69,11 @@ TRIGGER_PERIOD_LANDING = 5
 # min time in seconds threshold has to be underrug before landing is triggered (to compensate gps errors)
 TRIGGER_PERIOD_STOP = 10
 # min time in seconds threshold has to be underrun before stop is triggered which will change display
-FLIGHT_LIST_LENGTH = 10
+FLIGHT_LIST_LENGTH = 20   # maximum length of flightlist which are remembered
 
 
 # global variables
+g_saved_flights = None   # filename of saved flights, set in init
 measurement_enabled = False
 takeoff_time = None
 landing_time = None
@@ -74,14 +95,16 @@ def default(obj):
         return obj.isoformat()
 
 
-def init(activated):
+def init(activated, saved_flights):
     global rlog
     global measurement_enabled
     global g_config
+    global g_saved_flights
 
     rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Flighttime: time-measurement initialized")
     measurement_enabled = activated
+    g_saved_flights = saved_flights
     fl = read_flights()
     if fl is not None:
         g_config = fl
@@ -91,8 +114,6 @@ def init(activated):
 
 
 def new_flight(flight):
-    global g_config
-
     if 'last_flights' not in g_config:
         g_config['last_flights'] = []
     g_config['last_flights'].insert(0, flight)
@@ -106,10 +127,10 @@ def read_flights():
     if rlog is None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
-        with open(SAVED_FLIGHTS) as f:
+        with open(g_saved_flights) as f:
             config = json.load(f)
     except (OSError, IOError, ValueError) as e:
-        rlog.debug("FlighttimeUI: Error " + str(e) + " reading " + SAVED_FLIGHTS)
+        rlog.debug("FlighttimeUI: Error " + str(e) + " reading " + g_saved_flights)
         return None
 
     # read back last_flights to datetime
@@ -127,16 +148,17 @@ def write_flights():
     if rlog is None:   # may be called before init
         rlog = logging.getLogger('stratux-radar-log')
     try:
-        with open(SAVED_FLIGHTS, 'wt') as out:
+        with open(g_saved_flights, 'wt') as out:
             json.dump(g_config, out, sort_keys=True, indent=4, default=default)
     except (OSError, IOError, ValueError) as e:
-        rlog.debug("FlighttimeUI: Error " + str(e) + " writing " + SAVED_FLIGHTS)
-    rlog.debug("FlighttimeUI: Configuration saved to " + SAVED_FLIGHTS + ": " +
+        rlog.debug("FlighttimeUI: Error " + str(e) + " writing " + g_saved_flights)
+    rlog.debug("FlighttimeUI: Configuration saved to " + g_saved_flights + ": " +
                json.dumps(g_config, sort_keys=True, indent=4, default=default))
 
 
 def current_starttime():
-    if 'last_flights' in g_config and g_config['last_flights'][0][1] == 0:    # means we are in the air
+    if 'last_flights' in g_config and len(g_config['last_flights']) > 0 and g_config['last_flights'][0][1] == 0:
+        # means we are in the air
         return g_config['last_flights'][0][0]
     return None
 
@@ -198,7 +220,9 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
             if now - trigger_timestamp >= landing_delta:
                 landing_time = now
                 rlog.debug("Flighttime: Landing detected at " + str(now))
-                g_config['last_flights'][0][1] = now
+                if 'last_flights' in g_config and len(g_config['last_flights']) > 0:
+                    # do not do that, if list was cleared
+                    g_config['last_flights'][0][1] = now
                 write_flights()
                 flying = False
                 new_flight_info = True
@@ -210,23 +234,24 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
     return 0
 
 
-def draw_flighttime(draw, display_control, changed):
+def draw_flighttime(display_control, changed):
     global flighttime_changed
 
     if changed or flighttime_changed:
         flighttime_changed = False
-        display_control.clear(draw)
+        display_control.clear()
         if 'last_flights' in g_config:
             last_flights = g_config['last_flights']
         else:
             last_flights = []
-        display_control.flighttime(draw, last_flights)
+        display_control.flighttime(last_flights)
         display_control.display()
 
 
 def user_input():
     global flighttime_changed
     global switch_back_mode
+    global g_config
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
@@ -239,4 +264,10 @@ def user_input():
         return 3  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long, refresh
         return 18  # start next mode for display driver: refresh called
+    if button == 2 and btime == 1:  # right and short, clear flight list
+        if 'last_flights' in g_config:
+            g_config['last_flights'].clear()
+        rlog.debug("Flight list cleared by button press")
+        write_flights()  # also clear stored flights
+        return 17  # start next mode for display driver: refresh called
     return 17  # no mode change

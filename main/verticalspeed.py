@@ -44,7 +44,7 @@ def init():
     pass
 
 
-def draw_vsi(draw, display_control, was_changed, connected, vertical_speed, flight_level, gps_speed, gps_course,
+def draw_vsi(display_control, was_changed, connected, vertical_speed, flight_level, gps_speed, gps_course,
              gps_altitude, vert_max, vert_min, gps_fixed, baro_valid):
     if was_changed:
         error_message = None
@@ -57,8 +57,8 @@ def draw_vsi(draw, display_control, was_changed, connected, vertical_speed, flig
             gps_altitude = 0.0
             gps_speed = 0.0
 
-        display_control.clear(draw)
-        display_control.vsi(draw, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
+        display_control.clear()
+        display_control.vsi(vertical_speed, flight_level, gps_speed, gps_course, gps_altitude,
                             vert_max, vert_min, error_message)
         display_control.display()
 

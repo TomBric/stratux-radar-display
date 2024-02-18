@@ -70,6 +70,8 @@ def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whet
                 rlog.debug("Audio: Selected Mixer:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
                 found = True
                 break
+        if found:   # stop outer loop as well, if first suitable mixer is found
+            break
     if not found:
         return -1, None
 

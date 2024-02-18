@@ -59,16 +59,16 @@ def init(shutdown, reboot):
     rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
 
 
-def draw_shutdown(draw, display_control):
+def draw_shutdown(display_control):
     global clear_before_shutoff
     global shutdown_mode
 
     if shutdown_time > 0:
-        display_control.clear(draw)
+        display_control.clear()
         rest_time = int(shutdown_time - time.time())
         if rest_time < 0:
             rest_time = 0   # if clear is too slow, so that not a minus is displayed
-        display_control.shutdown(draw, rest_time, shutdown_mode)
+        display_control.shutdown(rest_time, shutdown_mode)
         display_control.display()
     if clear_before_shutoff:   # this is signal for display driver to initiate shutdown/reboot
         display_control.cleanup()
