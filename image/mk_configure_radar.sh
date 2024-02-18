@@ -34,7 +34,6 @@ sed -i /boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
   echo "dtoverlay=miniuart-bt"
 } | tee -a /boot/config.txt
 
-
 # sound and espeak
 apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
 pip3 install websockets xmltodict pydbus py-espeak-ng ADS1x15-ADC luma.oled

@@ -97,17 +97,18 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    Remark: Current configuration is for Stratux-Europe on IP address 192.168.10.1. using wifi SSID "stratux". If you have a different configuration please update the stratux IP in /home/pi/stratux-radar-display/image/stratux_radar.sh accordingly. To change the wifi network use a modified wpa_supplicant.conf or use the "Display status" mode with the pushbuttons (expert only).
    
 ### Expert setup 
-   1. Configure a clean Raspbian installation on your SD card. E.g. using Raspberry Pi Imager. Image to flash is the standard image "Raspbian Pi OS (recommended)". 
+   1. Configure a clean Raspbian installation on your SD card. E.g. using Raspberry Pi Imager. Image to flash is the standard image "Raspbian Pi OS (recommended)". Using the Pi Imager use "settings" to set the network to "stratux" and no password. Also enable ssh in settings with the user pi and set a password ("raspberry" if you like).
    2. Setup your main stratux in the following way:  Install version eu-027 on ther stratux or newer. Go to "Settings" and set Wifi-Mode: AP+Client. Enable "Internet-Passthrough" as well. Then "Add wifi client network" and add the data of your local home network. This all enables your stratux to have Internet connection and gives the display the possibility to access internet as well. 
    3. Startup your Stratux and boot your new raspberry. Connect your PC/workstation to the standard "stratux" wifi network and figure out the IP-adress of your display-raspberry, e.g. by using "arp -a".
-   4. From your workstation open a remote shell on the display-raspberry:  ssh pi@192.168.x.x. Password is standard for the pi.
+   4. From your workstation open a remote shell on the display-raspberry:  ssh pi@192.168.x.x. Password is the same that you set in step 1.
    5. Clone the stratux-radar-display repository by the command: "git clone https://github.com/TomBric/stratux-radar-display.git"
    6. Execute the configuration script as user pi. "/bin/bash /home/pi/stratux-radar-display/image/configure_radar.sh".  This will take some time since it does an update on the pi. 
    7. Depending on your display modify /home/pi/stratux-radar-display/image/stratux_radar.sh. In paramater "-c" enter the IP address of your stratux and in parameter "-d" the device. E.g.
          - cd /home/pi/stratux-radar-display/main && python3 radar.py -b -d Oled_1in5 -c 192.168.10.1 &            
          - cd /home/pi/stratux-radar-display/main && python3 radar.py -b -r -d Epaper_3in7 -c 192.168.10.1 & 
-         - cd /home/pi/stratux-radar-display/main && python3 radar.py -b -r -d Epaper_1in54 -c 192.168.10.1 & 
-   8. The configuration skript will make an entry in crontab of user pi, so that radar will start automatically after reboot. 
+         - cd /home/pi/stratux-radar-display/main && python3 radar.py -b -r -d Epaper_1in54 -c 192.168.10.1 &
+           
+      The configuration script made an entry in the crontab of user pi, so that radar will start automatically after reboot. 
 
    
 ### Installation on a standard stratux device (for stratux versions eu027 or newer!)
