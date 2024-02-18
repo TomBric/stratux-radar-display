@@ -93,7 +93,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
 ## Software Installation Instructions
 ### Standard setup
    1. Download the image under Releases/Assets to your local computer. Image with "oled" is preconfigured for the Oled 1.5 inch display. Image with "epaper_3in7" is the version for the waveshare 3.7 inch epaper display, "epaper_1in54" for the smaller epaper. Both versions will support Bluetooth
-   2. Flash the image using Raspberry Pi Imager (select "OwnImage") to your SD card (32 GB cards recommended). Use Pi imager with the following settings:
+   2. Flash the image using Raspberry Pi Imager to your SD card (32 GB cards recommended). Use Pi imager with the following settings:
          - Operating system to select: "Use Custom"
          - Settings:     
            - set a hostname (e.g. radar.local)
