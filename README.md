@@ -7,7 +7,7 @@ Implementation of a standalone Radar display for Stratux Europe Edition. Can run
 - update in version 1.7: optional CO sensor is supported (see wiki)
 - update in version 1.8: integration of distance sensor and calculation of start/landing distances
 - update in version 1.9: adding mode selection parameter and start/landing distance calculation with ultrasonic sensor
-- update in version 2.0: checklist feature added
+- update in version 2.0: checklist feature added, code rework
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
