@@ -52,7 +52,7 @@ done
 if [ "$v32" = true ]; then
   IMAGE_VERSION="armhf"
   ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
-  BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_${IMAGE_VERSION}/images/raspios_oldstable_arm${IMAGE_VERSION}-2023-12-06/${ZIPNAME}"
+  BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_${IMAGE_VERSION}/images/raspios_oldstable_${IMAGE_VERSION}-2023-12-06/${ZIPNAME}"
   IMGNAME="${ZIPNAME%.*}"
   outprefix="v32-stratux-display"
 else
