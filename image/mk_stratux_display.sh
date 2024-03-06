@@ -5,33 +5,63 @@
 # sudo apt install --yes parted zip unzip zerofree
 # If you want to build on x86 with aarch64 emulation, additionally install qemu-user-static qemu-system-arm
 # Run this script as root.
-# Run with argument "dev" to get the dev branch from github, otherwise with main
-# Run with optional argument "v64" to create 64 bit based images for zero2
+#  sudo /bin/bash mk_stratux_display.sh [-b <branch>] [-k v32]
+# Run with argument "-b dev" to get the dev branch from github, otherwise with main
+# Run with optional argument "-k v32" to create 32 bit based images for zero 1
 # call examples:
-#   sudo /bin/bash mk_stratux_display.sh "Create failed" dev
-#   sudo /bin/bash mk_stratux_display.sh "Create failed" main
-# sudo /bin/bash mk_stratux_display.sh "Create failed" main v64
+#   sudo /bin/bash mk_stratux_display.sh
+#   sudo /bin/bash mk_stratux_display.sh -b dev
+#   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
 
 set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
-
 
 die() {
     echo "$1"
     exit 1
 }
 
-if [ "$#" -lt 2 ]; then
-    echo "Usage: " "$0" "  <fail output> dev|main [v64]"
-    exit 1
-fi
+# set defaults
+branch=main
+v32=false
 
-IMAGE_VERSION="arm64"
-ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
-BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_arm64/images/raspios_oldstable_arm64-2023-12-06/${ZIPNAME}"
-IMGNAME="${ZIPNAME%.*}"
-outprefix="stratux-display"
+# check parameters
+while getopts ":b:k:" opt; do
+  case $opt in
+    b)
+      branch="$OPTARG"
+      ;;
+    k)
+      if [ "$OPTARG" = "v32" ]; then
+        v32=true
+      fi
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG"
+      exit 1
+      ;;
+    :)
+      echo "option -$OPTARG requires a value."
+      exit 1
+      ;;
+  esac
+done
+
+
+if [ "$v32" = true ]; then
+  IMAGE_VERSION="armhf"
+  ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
+  BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_${IMAGE_VERSION}/images/raspios_oldstable_arm${IMAGE_VERSION}-2023-12-06/${ZIPNAME}"
+  IMGNAME="${ZIPNAME%.*}"
+  outprefix="v32-stratux-display"
+else
+  IMAGE_VERSION="arm64"
+  ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
+  BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_${IMAGE_VERSION}/images/raspios_oldstable_${IMAGE_VERSION}-2023-12-06/${ZIPNAME}"
+  IMGNAME="${ZIPNAME%.*}"
+  outprefix="stratux-display"
+fi
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
@@ -74,9 +104,9 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 chroot mnt apt install git -y
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
-sudo -u pi git clone --recursive -b "$2" https://github.com/TomBric/stratux-radar-display.git
+sudo -u pi git clone --recursive -b "$branch" https://github.com/TomBric/stratux-radar-display.git
 cd ../../../
-chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$2"
+chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$branch"
 
 # set user pi and "raspberry"
 mkdir -p out
