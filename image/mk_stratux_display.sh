@@ -5,15 +5,16 @@
 # sudo apt install --yes parted zip unzip zerofree
 # If you want to build on x86 with aarch64 emulation, additionally install qemu-user-static qemu-system-arm
 # Run this script as root.
-#  sudo /bin/bash mk_stratux_display.sh [-b <branch>] [-k v32]
+#  sudo /bin/bash mk_stratux_display.sh [-b <branch>] [-k v32] [-u <USB-stick-name>]
 # Run with argument "-b dev" to get the dev branch from github, otherwise with main
 # Run with optional argument "-k v32" to create 32 bit based images for zero 1
+# Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
 # call examples:
 #   sudo /bin/bash mk_stratux_display.sh
 #   sudo /bin/bash mk_stratux_display.sh -b dev
 #   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
 
-set -x
+# set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 
@@ -23,19 +24,23 @@ die() {
 }
 
 # set defaults
-branch=main
-v32=false
+BRANCH=main
+V32=false
+USB_NAME=""
 
 # check parameters
-while getopts ":b:k:" opt; do
+while getopts ":b:k:u:" opt; do
   case $opt in
     b)
-      branch="$OPTARG"
+      BRANCH="$OPTARG"
       ;;
     k)
       if [ "$OPTARG" = "v32" ]; then
-        v32=true
+        V32=true
       fi
+      ;;
+    u)
+      USB_NAME=$OPTARG
       ;;
     \?)
       echo "Invalid option: -$OPTARG"
@@ -49,7 +54,7 @@ while getopts ":b:k:" opt; do
 done
 
 
-if [ "$v32" = true ]; then
+if [ "$V32" = true ]; then
   IMAGE_VERSION="armhf"
   ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
   BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_${IMAGE_VERSION}/images/raspios_oldstable_${IMAGE_VERSION}-2023-12-06/${ZIPNAME}"
@@ -104,9 +109,9 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 chroot mnt apt install git -y
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
-sudo -u pi git clone --recursive -b "$branch" https://github.com/TomBric/stratux-radar-display.git
+sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
 cd ../../../
-chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$branch"
+chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
 
 # set user pi and "raspberry"
 mkdir -p out
@@ -161,5 +166,9 @@ umount mnt
 mv ${outprefix}-epaper_3in7"${outname}" ${outprefix}-epaper_1in54"${outname}"
 zip out/${outprefix}-epaper_1in54"${outname}".zip ${outprefix}-epaper_1in54"${outname}"
 
-echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
-echo "For mounting USB stick: sudo mount -t exfat /dev/sda1 /media/usb"
+if [ "${#USB_NAME}" -eq 0 ]; then
+  mv $TMPDIR/out/${outprefix}* /media/pi/"$USB_NAME"; umount /media/pi/"$USB_NAME"
+  echo "Final images have been moved to usb stick $USB_NAME and umounted. Please install and test the images."
+else
+  echo "Final images have been placed into $TMPDIR/out. Please install and test the images."echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
+fi
