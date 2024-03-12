@@ -41,6 +41,7 @@ class RaspberryPi:
     CS_PIN          = 8
     BUSY_PIN        = 24
 
+
     def __init__(self):
         import spidev
         import RPi.GPIO
