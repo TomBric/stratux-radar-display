@@ -46,10 +46,7 @@ while getopts ":b:k:u:w" opt; do
       USB_NAME=$OPTARG
       ;;
     w)
-      if [ "$OPTARG" = "bookworm" ]; then
-        BOOKWORM=true
-        echo "BOOKWORM" selected
-      fi
+      BOOKWORM=true
       ;;
     \?)
       echo "Invalid option: -$OPTARG"
