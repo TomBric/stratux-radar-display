@@ -62,6 +62,7 @@ while getopts ":b:k:u:w" opt; do
   esac
 done
 
+echo "Building images for branch '$BRANCH' V32=$V32 BOOKWORM=$BOOKWORM"
 
 if [ "$V32" = true ]; then
   IMAGE_VERSION="armhf"
