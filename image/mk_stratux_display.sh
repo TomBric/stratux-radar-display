@@ -9,6 +9,7 @@
 # Run with argument "-b dev" to get the dev branch from github, otherwise with main
 # Run with optional argument "-k v32" to create 32 bit based images for zero 1
 # Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
+# Run with optional argument "-b bookworm" to use bookworm images (either 32 bit or 64 bis)
 # call examples:
 #   sudo /bin/bash mk_stratux_display.sh
 #   sudo /bin/bash mk_stratux_display.sh -b dev
@@ -26,10 +27,11 @@ die() {
 # set defaults
 BRANCH=main
 V32=false
+BOOKWORM=false
 USB_NAME=""
 
 # check parameters
-while getopts ":b:k:u:" opt; do
+while getopts ":b:k:u:w" opt; do
   case $opt in
     b)
       BRANCH="$OPTARG"
@@ -41,6 +43,11 @@ while getopts ":b:k:u:" opt; do
       ;;
     u)
       USB_NAME=$OPTARG
+      ;;
+    w)
+      if [ "$OPTARG" = "bookworm" ]; then
+        BOOKWORM=true
+      fi
       ;;
     \?)
       echo "Invalid option: -$OPTARG"
@@ -56,17 +63,21 @@ done
 
 if [ "$V32" = true ]; then
   IMAGE_VERSION="armhf"
-  ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
-  BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_${IMAGE_VERSION}/images/raspios_oldstable_${IMAGE_VERSION}-2023-12-06/${ZIPNAME}"
-  IMGNAME="${ZIPNAME%.*}"
   outprefix="v32-stratux-display"
 else
   IMAGE_VERSION="arm64"
-  ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
-  BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_${IMAGE_VERSION}/images/raspios_oldstable_${IMAGE_VERSION}-2023-12-06/${ZIPNAME}"
-  IMGNAME="${ZIPNAME%.*}"
   outprefix="stratux-display"
 fi
+if [ "$BOOKWORM" = true ]; then
+  ZIPNAME="2024-03-15-raspios-bookworm-${IMAGE_VERSION}.img.xz"
+  BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_${IMAGE_VERSION}/images/raspios_${IMAGE_VERSION}-2024-03-15/${ZIPNAME}"
+else
+  ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
+  BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_${IMAGE_VERSION}/images/raspios_oldstable_${IMAGE_VERSION}-2023-12-06/${ZIPNAME}"
+fi
+
+
+IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
