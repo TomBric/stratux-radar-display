@@ -92,21 +92,20 @@ chroot mnt apt install git -y
 
 # configurations of stratux
 # persistend logging on
-sed -i 's/"PersistentLogging": *$/"PersistentLogging": true,/' mnt/boot/stratux.conf
+chroot mnt sed -i 's/"PersistentLogging": *$/"PersistentLogging": true,/' boot/stratux.conf
 # OGN transmission I2C off
-sed -i 's/"OGNI2CTXEnabled": *$/"OGNI2CTXEnabled": false,/' mnt/boot/stratux.conf
+chroot mnt sed -i 's/"OGNI2CTXEnabled": *$/"OGNI2CTXEnabled": false,/' boot/stratux.conf
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
 # set display to Epaer_3in7 only, at the moment just create this image
-sed -i 's/Oled_1in5/Epaper_3in7 -r/g' mnt/$DISPLAY_SRC/image/stratux_radar.sh
+chroot mnt sed -i 's/Oled_1in5/Epaper_3in7 -r/g' $DISPLAY_SRC/image/stratux_radar.sh
 cd ../../../
-chroot mnt sudo -u /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
+chroot mnt sudo -u pi /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
 
 
 # set user pi and "raspberry"
 mkdir -p out
-
 umount mnt/boot
 umount mnt
 
