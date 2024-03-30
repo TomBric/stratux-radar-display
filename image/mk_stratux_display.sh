@@ -180,7 +180,7 @@ zip out/${outprefix}-epaper_1in54"${outname}".zip ${outprefix}-epaper_1in54"${ou
 rm ${outprefix}-epaper_1in54"${outname}"
 
 if [ "${#USB_NAME}" -eq 0 ]; then
-  echo "Final images have been placed into $TMPDIR/out. Please install and test the images."echo "Final images have been placed into $TMPDIR/out."
+  echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
 else
   mv $TMPDIR/out/${outprefix}* /media/pi/"$USB_NAME"; umount /media/pi/"$USB_NAME"
   echo "Final images have been moved to usb stick $USB_NAME and umounted. Please install and test the images."
