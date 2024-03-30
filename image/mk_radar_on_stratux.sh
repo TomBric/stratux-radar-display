@@ -73,7 +73,7 @@ bootoffset=$(( 512*bootoffset ))
 
 # Original image partition is too small to hold our stuff.. resize it to 5120 Mb
 # Append one GB and truncate to size
-truncate -s 6144M "$IMGNAME" || die "Image resize failed"
+truncate -s 3000M "$IMGNAME" || die "Image resize failed"
 lo=$(losetup -f)
 losetup "$lo" "$IMGNAME"
 partprobe "$lo"
@@ -97,9 +97,6 @@ chroot mnt sed -i 's/Oled_1in5/Epaper_3in7 -r/g' $DISPLAY_SRC/image/stratux_rada
 cd ../../../
 chroot mnt sudo -u pi /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
 
-
-# set user pi and "raspberry"
-mkdir -p out
 umount mnt/boot
 umount mnt
 
