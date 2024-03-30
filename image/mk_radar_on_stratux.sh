@@ -93,7 +93,7 @@ chroot mnt apt install git -y
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
 # set display to Epaer_3in7 only, at the moment just create this image
-sudo -u pi sed -i 's/Oled_1in5/Epaper_3in7 -r/g' $DISPLAY_SRC/image/stratux_radar.sh
+sudo -u pi sed -i 's/Oled_1in5/Epaper_3in7 -r/g' image/stratux_radar.sh
 cd ../../../
 chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
 
