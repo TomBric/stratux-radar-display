@@ -95,7 +95,7 @@ sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux
 # set display to Epaer_3in7 only, at the moment just create this image
 sudo -u pi sed -i 's/Oled_1in5/Epaper_3in7 -r/g' $DISPLAY_SRC/image/stratux_radar.sh
 cd ../../../
-sudo -u pi /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
+chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
 
 umount mnt/boot
 umount mnt
