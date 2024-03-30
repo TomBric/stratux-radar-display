@@ -90,12 +90,6 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt install git -y
 
-# configurations of stratux
-# persistend logging on
-chroot mnt sed -i 's/"PersistentLogging": *$/"PersistentLogging": true,/' boot/stratux.conf
-# OGN transmission I2C off
-chroot mnt sed -i 's/"OGNI2CTXEnabled": *$/"OGNI2CTXEnabled": false,/' boot/stratux.conf
-
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
 # set display to Epaer_3in7 only, at the moment just create this image
@@ -132,6 +126,15 @@ outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 
 cd $TMPDIR || die "cd failed"
 
 # Rename and zip oled version
+mount -t ext4 -o offset=$partoffset "$IMGNAME" mnt/ || die "root-mount failed"
+
+# configurations of stratux
+# persistend logging on
+sed -i 's/"PersistentLogging": *$/"PersistentLogging": true,/' mnt/boot/stratux.conf
+# OGN transmission I2C off
+sed -i 's/"OGNI2CTXEnabled": *$/"OGNI2CTXEnabled": false,/' mnt/boot/stratux.conf
+
+
 mv "$IMGNAME" ${outprefix}"${outname}"
 zip out/${outprefix}"${outname}".zip ${outprefix}"${outname}"
 
