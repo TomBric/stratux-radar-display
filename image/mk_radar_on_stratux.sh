@@ -139,6 +139,8 @@ zip out/${outprefix}"${outname}".zip ${outprefix}"${outname}"
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final image has been placed into $TMPDIR/out. Please install and test the images."
 else
-  mv $TMPDIR/out/${outprefix}* /media/pi/"$USB_NAME"; umount /media/pi/"$USB_NAME"
+  cp $TMPDIR/out/${outprefix}* /media/pi/"$USB_NAME"
+  umount /media/pi/"$USB_NAME"
+  rm $TMPDIR/out/${outprefix}*
   echo "Final image has been moved to usb stick $USB_NAME and umounted. Please install and test the image."
 fi
