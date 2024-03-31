@@ -97,6 +97,7 @@ chroot mnt apt install git pip -y
 # enable persistent logging
 chroot mnt overlayctl disable
 
+die "STOP"
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
 # set display to Epaper_3in7 only, at the moment just create this image
