@@ -90,6 +90,7 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt install git -y
 
+die "STOP"
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
 # set display to Epaer_3in7 only, at the moment just create this image
