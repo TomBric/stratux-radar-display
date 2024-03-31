@@ -15,6 +15,7 @@
 set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
+LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 die() {
     echo "$1"
@@ -89,7 +90,7 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 
 # copy configurations of stratux
 # persistend logging on and OGN transmission I2C off
-cp stratux.conf.radar mnt/boot/stratux.conf
+cp "$LOCAL_DIR"/stratux.conf.radar mnt/boot/stratux.conf
 
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt install git -y
