@@ -87,23 +87,20 @@ mkdir -p mnt
 mount -t ext4 "${lo}"p2 mnt/ || die "root-mount failed"
 mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 
+# copy configurations of stratux
+# persistend logging on and OGN transmission I2C off
+cp stratux.conf.radar mnt/boot/stratux.conf
+
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt install git -y
 
-die "STOP"
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
-# set display to Epaer_3in7 only, at the moment just create this image
-sudo -u pi sed -i 's/Oled_1in5/Epaper_3in7 -r/g' stratux-radar-display/image/stratux_radar.sh
-# back to root directory
+# back to root directory of stratux image
 cd ../../../
 chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
-
-# configurations of stratux
-# persistend logging on
-sed -i 's/"PersistentLogging": *$/"PersistentLogging": true,/' mnt/boot/stratux.conf
-# OGN transmission I2C off
-sed -i 's/"OGNI2CTXEnabled": *$/"OGNI2CTXEnabled": false,/' mnt/boot/stratux.conf
+# set display to Epaer_3in7 only, at the moment just create this image
+sudo -u pi sed -i 's/Oled_1in5/Epaper_3in7 -r/g' $DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
 
 umount mnt/boot
 umount mnt
