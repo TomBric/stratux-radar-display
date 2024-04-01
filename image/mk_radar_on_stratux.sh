@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Thomas Breitbach 2024 configures on stratux image with radar-display-software installed
+# Thomas Breitbach 2024 configures an stratux image with radar-display-software installed
 # modified, but mainly based on work for stratux europe by b3nn0
 # To run this, make sure that this is installed:
 # sudo apt install --yes parted zip unzip zerofree
@@ -9,10 +9,10 @@
 # Run with argument "-b dev" to get the dev branch from github, otherwise with main
 # Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
 # call examples:
-#   sudo /bin/bash mk_stratux_display.sh
-#   sudo /bin/bash mk_stratux_display.sh -b dev
+#   sudo /bin/bash mk_radar_on_stratux.sh
+#   sudo /bin/bash mk_radar_on_stratux.sh -b dev
 
-set -x
+# set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -46,7 +46,7 @@ while getopts ":b:u" opt; do
   esac
 done
 
-echo "Building stratux images for branch '$BRANCH' "
+echo "Building stratux image for branch '$BRANCH' "
 
 ZIPNAME="stratux-v1.6r1-eu029-94438ef6.img.zip"
 BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu029/${ZIPNAME}"
