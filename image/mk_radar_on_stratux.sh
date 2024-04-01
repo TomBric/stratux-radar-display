@@ -94,15 +94,17 @@ cp "$LOCAL_DIR"/stratux.conf.radar mnt/boot/stratux.conf
 
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt install git -y
+# enable persistent logging
+chroot mnt overlayctl disable
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
-sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
+chroot mnt sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
 # set display to Epaper_3in7 only, at the moment just create this image
-sudo -u pi sed -i 's/Oled_1in5/Epaper_3in7 -r/g' stratux-radar-display/image/stratux_radar.sh
+chroot mnt sudo -u pi sed -i 's/Oled_1in5/Epaper_3in7 -r/g' stratux-radar-display/image/stratux_radar.sh
 # back to root directory of stratux image
 cd ../../../
 # run stratux configuration skript
-chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
+chroot mnt sudo -u pi /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
 
 
 umount mnt/boot
