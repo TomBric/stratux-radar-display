@@ -1,0 +1,101 @@
+{
+  "DarkMode": false,
+  "UAT_Enabled": false,
+  "ES_Enabled": true,
+  "OGN_Enabled": true,
+  "APRS_Enabled": true,
+  "AIS_Enabled": false,
+  "Ping_Enabled": false,
+  "GPS_Enabled": true,
+  "BMP_Sensor_Enabled": true,
+  "IMU_Sensor_Enabled": true,
+  "NetworkOutputs": [
+    {
+      "Conn": null,
+      "Ip": "",
+      "Port": 4000,
+      "Capability": 5,
+      "LastPingResponse": "0001-01-01T00:00:00Z",
+      "LastUnreachable": "0001-01-01T00:00:00Z",
+      "SleepFlag": false
+    },
+    {
+      "Conn": null,
+      "Ip": "",
+      "Port": 2000,
+      "Capability": 8,
+      "LastPingResponse": "0001-01-01T00:00:00Z",
+      "LastUnreachable": "0001-01-01T00:00:00Z",
+      "SleepFlag": false
+    },
+    {
+      "Conn": null,
+      "Ip": "",
+      "Port": 49002,
+      "Capability": 18,
+      "LastPingResponse": "0001-01-01T00:00:00Z",
+      "LastUnreachable": "0001-01-01T00:00:00Z",
+      "SleepFlag": false
+    }
+  ],
+  "SerialOutputs": null,
+  "DisplayTrafficSource": false,
+  "DEBUG": false,
+  "ReplayLog": false,
+  "TraceLog": false,
+  "AHRSLog": false,
+  "PersistentLogging": true,
+  "IMUMapping": [
+    -1,
+    0
+  ],
+  "SensorQuaternion": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "C": [
+    0,
+    0,
+    0
+  ],
+  "D": [
+    0,
+    0,
+    0
+  ],
+  "PPM": 0,
+  "AltitudeOffset": 0,
+  "OwnshipModeS": "F00000",
+  "WatchList": "",
+  "DeveloperMode": true,
+  "GLimits": "",
+  "StaticIps": [],
+  "WiFiCountry": "",
+  "WiFiSSID": "stratux",
+  "WiFiChannel": 1,
+  "WiFiSecurityEnabled": false,
+  "WiFiPassphrase": "",
+  "NoSleep": false,
+  "WiFiMode": 0,
+  "WiFiDirectPin": "",
+  "WiFiIPAddress": "192.168.10.1",
+  "WiFiClientNetworks": [],
+  "WiFiInternetPassThroughEnabled": false,
+  "EstimateBearinglessDist": false,
+  "RadarLimits": 2000,
+  "RadarRange": 10,
+  "OGNI2CTXEnabled": false,
+  "OGNAddr": "",
+  "OGNAddrType": 0,
+  "OGNAcftType": 0,
+  "OGNPilot": "",
+  "OGNReg": "",
+  "OGNTxPower": 0,
+  "GXAddr": 0,
+  "GXAddrType": 0,
+  "GXAcftType": 0,
+  "GXPilot": "",
+  "PWMDutyMin": 0
+}
