@@ -36,7 +36,7 @@ sed -i /boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
 
 # sound and espeak
 apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled -y
 pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 
 # bluetooth
@@ -65,9 +65,9 @@ apt install bluetooth pulseaudio pulseaudio-module-bluetooth -y
 # systemctl --user mask pulseaudio.socket
 
 # allow user pulse bluetooth access
-addgroup pulse bluetooth
+adduser pulse bluetooth
 # addgroup pulse lp
-addgroup pi pulse-access
+adduser pi pulse-access
 
 # start pulseaudio system wide
 cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
