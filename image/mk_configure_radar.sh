@@ -24,15 +24,15 @@ raspi-config nonint do_i2c 0
 
 # for groundsensor, disable ssh over serial cause it is needed for the sensor
 # disable ssh over serial otherwise
-sed -i /boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-sed -i /boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
-sed -i /boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
-# modify /boot/config.text for groundsensor
+sed -i /boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
+sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
+sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
+# modify /boot/firmware/config.text for groundsensor
 {
   echo "# modification for ultrasonic ground sensor"
   echo "enable_uart=1"
   echo "dtoverlay=miniuart-bt"
-} | tee -a /boot/config.txt
+} | tee -a /boot/firmware/config.txt
 
 # sound and espeak
 apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
