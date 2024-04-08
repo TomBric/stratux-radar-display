@@ -29,7 +29,7 @@ Find below a photo of the current supported displays
 
 ## Hardware-List
 - Raspberry Hardware: Since the code is pure python, no special hardware is required. I recommend a current "raspbian standard desktop os" as operating system. Performance requirements are not so high, so I recommend a "Rasperry Zero or Zero 2 W 512MByte RAM". Normal Raspberry 3B or 4 are also possible. The Raspi Zero has the smallest form factor and best battery consumption. 
-- Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Paper Raw Panel Driver HAT 13512. Please make sure to switch the "Display Config" switch to A.
+- Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Paper Raw Panel Driver HAT 13512. Please make sure to switch the "Display Config" switch to A. "Interface Config" is to be switched to  0 (4-line SPI).
 (Alternatively Waveshare 18057 3.7inch e-Paper HAT: Directly mountable on the Raspi as a HAT, if you buy an Raspi Zero WH, but then you can't connect the buttons).
 
 ![Epaper photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_3in7.jpg)
@@ -60,8 +60,8 @@ Find below a photo of the current supported displays
 
 # Hardware connection of the Epaper 3.7 inch or 1.54 inch display 
  
-| Connection  | PIN# on Raspberry  |
-|:-----------:|:------------------:|
+| Connection  | PIN# on Raspberry  | Remark | 
+|:-----------:|:------------------:|:-----:|
 | VCC | 17 |
 | GND | 20 | 
 | DIN/MOSI | 19 |
@@ -70,6 +70,10 @@ Find below a photo of the current supported displays
 | DC | 22 | 
 | RST | 11 |
 | BUSY | 18 |
+| PWR | 1 |   * e-Driver-Hat Rev. 2.3 only !!! * |
+
+Important remark for e-Paper Driver Hat Waveshare 13512 Rev. 2.3:  Waveshare introduced a 9-cable connection since Rev. 2.3. The additional cable PWR (red) needs to be connected to 3.3 V. 
+So connect it to PIN#1 on the Raspberry GPIO.
 
 Remark: If you have a barometric sensor or ahrs connected you may have conflict with GPIO Pin 11. 
 You can also use PIN 16 (GPIO 23) for the RST line.
