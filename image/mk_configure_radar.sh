@@ -36,7 +36,7 @@ sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
 
 # sound and espeak
 apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled -y
 pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 
 # bluetooth
