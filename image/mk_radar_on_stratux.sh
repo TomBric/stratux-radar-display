@@ -48,9 +48,9 @@ done
 
 echo "Building stratux image for branch '$BRANCH' "
 
-ZIPNAME="stratux-v1.6r1-eu029-94438ef6.img.zip"
-BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu029/${ZIPNAME}"
-outprefix="stratux-eu29-with-display_3in7"
+ZIPNAME="stratux-v1.6r1-eu030-150f2828.img.zip"
+BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu030/${ZIPNAME}"
+outprefix="stratux-eu30-with-display_3in7"
 IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory

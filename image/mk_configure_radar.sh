@@ -65,9 +65,9 @@ apt install bluetooth pulseaudio pulseaudio-module-bluetooth -y
 # systemctl --user mask pulseaudio.socket
 
 # allow user pulse bluetooth access
-addgroup pulse bluetooth
+usermod -a -G bluetooth pulse
 # addgroup pulse lp
-addgroup pi pulse-access
+usermod -a -G pulse-access pi
 
 # start pulseaudio system wide
 cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
