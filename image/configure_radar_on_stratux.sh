@@ -6,9 +6,9 @@
 set -x
 # luma files, pip3 and more
 sudo apt-get update -y
-apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-numpy -y
-pip3 install pybluez py-espeak-ng ADS1x15-ADC --break-system-packages
+sudo apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
+sudo apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-numpy -y
+sudo pip3 install pybluez py-espeak-ng ADS1x15-ADC --break-system-packages
 
 # copy simple checklist once, can be changed later
 cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
