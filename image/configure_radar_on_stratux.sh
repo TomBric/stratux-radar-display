@@ -3,11 +3,12 @@
 # script configures basic libraries necessary for stratux-radar
 # script to be run as pi on stratux (without a zero pi)
 
+set -x
 # luma files, pip3 and more
 sudo apt-get update -y
-sudo apt install python3-pip python3-pil python3-gi -y
 sudo apt-get install libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
-sudo pip3 install luma.oled
+sudo apt install python3-luma.oled -y
+
 
 #websockets for radar
 sudo pip3 install websockets ADS1x15-ADC
