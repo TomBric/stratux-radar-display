@@ -2,7 +2,7 @@
 
 # script configures basic libraries and settings necessary for stratux-radar
 # script to be run as root
-# called via configure_radar as sudo via qemu
+# called via configure_radar as sudo
 # usage /bin/bash mk_configure_radar.sh <branch>
 # <branch> is the github branch to clone, this is optional and set to "main" if not provided
 

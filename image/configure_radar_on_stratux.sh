@@ -11,10 +11,10 @@ apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.ole
 pip3 install pybluez py-espeak-ng ADS1x15-ADC --break-system-packages
 
 # copy simple checklist once, can be changed later
-sudo -u pi cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
+cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
 
 # disable bluetooth in any case, it is not working directly on Stratux
-sudo -u pi sed -i 's/-b/ /g' /home/pi/stratux-radar-display/image/stratux_radar.sh
+sed -i 's/-b/ /g' /home/pi/stratux-radar-display/image/stratux_radar.sh
 # include autostart into crontab, so that radar starts on every boot
 echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
 # only works if crontab is empty, otherwise use
