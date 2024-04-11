@@ -6,32 +6,9 @@
 set -x
 # luma files, pip3 and more
 sudo apt-get update -y
-sudo apt-get install libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
-sudo apt install python3-luma.oled -y
-
-
-#websockets for radar
-sudo pip3 install websockets ADS1x15-ADC
-
-# for checklist display xml parsing
-sudo pip3 install xmltodict
-
-# sound configuration for external output
-sudo apt-get install libasound2-dev -y
-sudo pip3 install pyalsaaudio
-
-# espeak-ng for sound output
-# sudo apt-get update
-sudo apt-get install espeak-ng espeak-ng-data libespeak-ng-dev -y
-sudo pip3 install py-espeak-ng
-
-# bluetooth libraries, although later not used on stratux
-sudo apt-get install libbluetooth-dev -y
-sudo pip3 install pybluez
-sudo pip3 install pydbus
-# mkdir -p /home/pi/tmp
-# sudo TMPDIR=/home/pi/tmp pip3 install PILLOW==9.5
-sudo apt install python3-numpy -y
+apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-numpy python3-pybluez -y
+pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 
 # copy simple checklist once, can be changed later
 cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
