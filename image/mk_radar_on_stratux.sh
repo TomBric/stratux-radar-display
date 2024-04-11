@@ -104,7 +104,7 @@ sudo -u pi sed -i 's/Oled_1in5/Epaper_3in7 -r/g' stratux-radar-display/image/str
 # back to root directory of stratux image
 cd ../../../
 # run stratux configuration skript
-chroot mnt /bin/bash /$DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
+chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
 
 
 umount mnt/boot
