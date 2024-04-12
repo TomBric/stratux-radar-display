@@ -16,7 +16,7 @@
 #   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
 #   sudo /bin/bash mk_stratux_display.sh -b dev -w
 
-set -x
+# set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 
