@@ -3,7 +3,7 @@
 # script configures basic libraries necessary for stratux-radar
 # script to be run as root on stratux (without a zero pi)
 
-set -x
+# set -x
 # luma files, pip3 and more
 apt-get update -y
 apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
