@@ -48,9 +48,9 @@ done
 
 echo "Building stratux image for branch '$BRANCH' "
 
-ZIPNAME="stratux-v1.6r1-eu029-94438ef6.img.zip"
-BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu029/${ZIPNAME}"
-outprefix="stratux-eu29-with-display_3in7"
+ZIPNAME="stratux-v1.6r1-eu030-150f2828.img.zip"
+BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu030/${ZIPNAME}"
+outprefix="stratux-eu30-with-display_3in7"
 IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
@@ -74,7 +74,7 @@ bootoffset=$(( 512*bootoffset ))
 
 # Original image partition is too small to hold our stuff.. resize it to 5120 Mb
 # Append one GB and truncate to size
-truncate -s 3000M "$IMGNAME" || die "Image resize failed"
+truncate -s 6144M "$IMGNAME" || die "Image resize failed"
 lo=$(losetup -f)
 losetup "$lo" "$IMGNAME"
 partprobe "$lo"
@@ -93,7 +93,7 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 cp "$LOCAL_DIR"/stratux.conf.radar mnt/boot/stratux.conf
 
 # install git for cloning repo (if not already installed) and pip
-chroot mnt apt install git -y
+chroot mnt apt install git pip -y
 # enable persistent logging
 chroot mnt overlayctl disable
 
@@ -104,7 +104,7 @@ sudo -u pi sed -i 's/Oled_1in5/Epaper_3in7 -r/g' stratux-radar-display/image/str
 # back to root directory of stratux image
 cd ../../../
 # run stratux configuration skript
-chroot mnt sudo -u pi /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
+chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
 
 
 umount mnt/boot

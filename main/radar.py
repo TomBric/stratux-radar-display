@@ -73,7 +73,7 @@ rlog = None  # radar specific logger
 #
 
 # constant definitions
-RADAR_VERSION = "2.0"
+RADAR_VERSION = "2.01"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -383,7 +383,6 @@ def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
             rlog.debug("Radar: Error setting system time")
         else:
             timerui.reset_timer()  # all timers are reset to be on the safe side!
-            radarbuttons.reset_buttons()  # reset button-timers (start-time)
             last_bt_checktime = 0.0  # reset timer
 
 
@@ -641,7 +640,6 @@ async def user_interface():
                     ui_changed = True
     except asyncio.CancelledError:
         rlog.debug("UI task terminating ...")
-        radarbuttons.cleanup()
 
 
 async def display_and_cutoff():

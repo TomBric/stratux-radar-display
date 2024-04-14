@@ -16,7 +16,7 @@
 #   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
 #   sudo /bin/bash mk_stratux_display.sh -b dev -w
 
-set -x
+# set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 
@@ -124,8 +124,20 @@ sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux
 cd ../../../
 chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
 
-# set user pi and "raspberry"
-mkdir -p out
+# for groundsensor, disable ssh over serial cause it is needed for the sensor
+# disable ssh over serial otherwise
+# does not work in mk_configure_radar, since it is not mounted there when called via chroot mnt
+sed -i mnt/boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
+sed -i mnt/boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
+sed -i mnt/boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
+# modify /boot/firmware/config.text for groundsensor
+{
+  echo "# modification for ultrasonic ground sensor"
+  echo "enable_uart=1"
+  echo "dtoverlay=miniuart-bt"
+} | tee -a mnt/boot/firmware/config.txt
+
+# mkdir -p out
 
 umount mnt/boot
 umount mnt
