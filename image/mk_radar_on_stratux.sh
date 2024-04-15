@@ -30,7 +30,7 @@ USB_NAME=""
 DISPLAY_NAME="Epaper_3in7"
 
 # check parameters
-while getopts ":b:d:u" opt; do
+while getopts ":b:d:u:" opt; do
   case $opt in
     b)
       BRANCH="$OPTARG"
