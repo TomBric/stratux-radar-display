@@ -52,7 +52,7 @@ while getopts ":b:u:d" opt; do
   esac
 done
 
-echo "Building stratux image for branch '${BRANCH}' and display '${DISPLAY_NAME}'"
+echo "Building stratux image for branch '$BRANCH' and display '$DISPLAY_NAME'"
 
 ZIPNAME="stratux-v1.6r1-eu030-150f2828.img.zip"
 BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu030/${ZIPNAME}"
