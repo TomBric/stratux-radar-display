@@ -52,11 +52,11 @@ while getopts ":b:u:d" opt; do
   esac
 done
 
-echo "Building stratux image for branch '$BRANCH' and display '$DISPLAY_NAME'"
+echo "Building stratux image for branch '${BRANCH}' and display ${DISPLAY_NAME}"
 
 ZIPNAME="stratux-v1.6r1-eu030-150f2828.img.zip"
 BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu030/${ZIPNAME}"
-outprefix="stratux-eu30-with-display_3in7"
+outprefix="stratux-eu30-with-${DISPLAY_NAME}"
 IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
@@ -106,7 +106,7 @@ chroot mnt overlayctl disable
 die "STOP"
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
-# set display to Epaper_3in7 only, at the moment just create this image
+# set display
 sudo -u pi sed -i 's/Oled_1in5/"$DISPLAY_NAME"/g' stratux-radar-display/image/stratux_radar.sh
 # back to root directory of stratux image
 cd ../../../
@@ -142,15 +142,15 @@ cd $TMPDIR || die "cd failed"
 mount -t ext4 -o offset=$partoffset "$IMGNAME" mnt/ || die "root-mount failed"
 
 
-mv "$IMGNAME" ${outprefix}"${outname}"
-zip out/${outprefix}"${outname}".zip ${outprefix}"${outname}"
+mv "$IMGNAME" "${outprefix}""${outname}"
+zip out/"${outprefix}""${outname}".zip "${outprefix}""${outname}"
 
 
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final image has been placed into $TMPDIR/out. Please install and test the images."
 else
-  cp $TMPDIR/out/${outprefix}* /media/pi/"$USB_NAME"
+  cp $TMPDIR/out/"${outprefix}"* /media/pi/"$USB_NAME"
   umount /media/pi/"$USB_NAME"
-  rm $TMPDIR/out/${outprefix}*
+  rm $TMPDIR/out/"${outprefix}"*
   echo "Final image has been moved to usb stick $USB_NAME and umounted. Please install and test the image."
 fi
