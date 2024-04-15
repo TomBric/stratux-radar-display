@@ -7,10 +7,12 @@
 # Run this script as root.
 #  sudo /bin/bash mk_radar_on_stratux.sh [-b <branch>][-u <USB-stick-name>]
 # Run with argument "-b dev" to get the dev branch from github, otherwise with main
+# Run with argument "-d <display>" to create an image for <display>, otherwise default is 'Epaper_3in7'
 # Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
 # call examples:
 #   sudo /bin/bash mk_radar_on_stratux.sh
 #   sudo /bin/bash mk_radar_on_stratux.sh -b dev
+#   sudo /bin/bash mk_radar_on_stratux.sh -d Epaper_1in54
 
 # set -x
 TMPDIR="/home/pi/image-tmp"
@@ -25,15 +27,19 @@ die() {
 # set defaults
 BRANCH=main
 USB_NAME=""
+DISPLAY_NAME="Epaper_3in7"
 
 # check parameters
-while getopts ":b:u" opt; do
+while getopts ":b:u:d" opt; do
   case $opt in
     b)
       BRANCH="$OPTARG"
       ;;
     u)
       USB_NAME=$OPTARG
+      ;;
+    d)
+      DISPLAY_NAME=$OPTARG
       ;;
     \?)
       echo "Invalid option: -$OPTARG"
@@ -46,7 +52,7 @@ while getopts ":b:u" opt; do
   esac
 done
 
-echo "Building stratux image for branch '$BRANCH' "
+echo "Building stratux image for branch '$BRANCH' and display '$DISPLAY_NAME'"
 
 ZIPNAME="stratux-v1.6r1-eu030-150f2828.img.zip"
 BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu030/${ZIPNAME}"
@@ -101,12 +107,11 @@ die "STOP"
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
 # set display to Epaper_3in7 only, at the moment just create this image
-sudo -u pi sed -i 's/Oled_1in5/Epaper_3in7 -r/g' stratux-radar-display/image/stratux_radar.sh
+sudo -u pi sed -i 's/Oled_1in5/"$DISPLAY_NAME"/g' stratux-radar-display/image/stratux_radar.sh
 # back to root directory of stratux image
 cd ../../../
 # run stratux configuration skript
 chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
-
 
 umount mnt/boot
 umount mnt
