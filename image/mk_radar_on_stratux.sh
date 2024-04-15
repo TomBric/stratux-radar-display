@@ -103,7 +103,6 @@ chroot mnt apt install git python3-pip -y
 # enable persistent logging
 chroot mnt overlayctl disable
 
-die "STOP"
 cd mnt/$DISPLAY_SRC || die "cd failed"
 sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
 # set display
