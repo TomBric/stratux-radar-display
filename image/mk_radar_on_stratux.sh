@@ -27,10 +27,10 @@ die() {
 # set defaults
 BRANCH=main
 USB_NAME=""
-DISPLAY_NAME=Epaper_3in7
+DISPLAY_NAME="Epaper_3in7"
 
 # check parameters
-while getopts ":b:u:d" opt; do
+while getopts ":b:d:u" opt; do
   case $opt in
     b)
       BRANCH="$OPTARG"
