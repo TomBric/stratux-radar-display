@@ -27,7 +27,7 @@ die() {
 # set defaults
 BRANCH=main
 USB_NAME=""
-DISPLAY_NAME="Epaper_3in7"
+DISPLAY_NAME=Epaper_3in7
 
 # check parameters
 while getopts ":b:u:d" opt; do
