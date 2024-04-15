@@ -27,6 +27,9 @@ raspi-config nonint do_i2c 0
 sed -i /boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
 sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
+# for bookworm disable serial-getty, it is whatsoever started by bookworm even if cmdline is changed
+sudo systemctl mask serial-getty@ttyAMA0.service
+
 # modify /boot/firmware/config.text for groundsensor
 {
   echo "# modification for ultrasonic ground sensor"
