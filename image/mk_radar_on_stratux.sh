@@ -111,6 +111,11 @@ sudo -u pi sed -i 's/Oled_1in5/"$DISPLAY_NAME"/g' stratux-radar-display/image/st
 cd ../../../
 # run stratux configuration skript
 chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
+# modify /boot/firmware/config.text for serial interface
+{
+  echo "# modification for serial interface"
+  echo "init_uart_baud=115200"
+} | tee -a mnt/boot/firmware/config.txt
 
 umount mnt/boot
 umount mnt
