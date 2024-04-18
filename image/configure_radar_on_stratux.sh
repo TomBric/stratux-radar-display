@@ -15,6 +15,8 @@ cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/st
 
 # disable bluetooth in any case, it is not working directly on Stratux
 sed -i 's/-b/ /g' /home/pi/stratux-radar-display/image/stratux_radar.sh
+# set IP to localhost in any case, if someone changes stratux ip
+sed -i 's/192.168.10.1/127.0.0.1/g' /home/pi/stratux-radar-display/image/stratux_radar.sh
 # include autostart into crontab, so that radar starts on every boot
 echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
 # only works if crontab is empty, otherwise use
