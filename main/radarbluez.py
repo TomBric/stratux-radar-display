@@ -38,6 +38,9 @@ import logging
 from espeakng import ESpeakNG
 import subprocess
 import alsaaudio
+from queue import Queue
+import threading    # for espeak-ng, so that there is no blocking of other sensor functions during that time
+
 
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
@@ -55,6 +58,11 @@ extsound_active = False
 bt_devices = 0          # no of active bluetooth devices last time checked via connected devices
 mixer = None
 global_config = None
+e_queue = None    # external sound queue
+sound_thread = None
+b_queue = None    # bluetooth sound queue
+bluetooth_thread = None
+
 
 
 def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whether it was selected
@@ -91,6 +99,10 @@ def sound_init(config, bluetooth, mixer_name):
     global mixer
     global rlog
     global global_config
+    global e_queue
+    global b_queue
+    global sound_thread
+    global bluetooth_thread
 
     extsound_active = False
     bluetooth_active = False
@@ -114,6 +126,9 @@ def sound_init(config, bluetooth, mixer_name):
             bluetooth_active = True
             rlog.debug("Radarbluez: Bluetooth espeak-ng successfully initialized.")
             b_esng.say("Stratux Radar connected")
+            b_queue = Queue()  # queue for bluetooth sound output
+            bluetooth_thread = threading.Thread(target=b_speaker, args=(b_queue,))  # external thread that speaks
+            bluetooth_thread.start()
 
     if mixer is not None and e_esng is None:
         audio = "plughw:" + str(card)
@@ -124,9 +139,23 @@ def sound_init(config, bluetooth, mixer_name):
         else:
             rlog.debug("Radarbluez: ExtSound espeak-ng successfully initialized.")
             e_esng.say("Stratux Radar connected")
+            e_queue = Queue()  # queue for external sound output
+            sound_thread = threading.Thread(target=e_speaker, args=(e_queue,))  # external thread
+            sound_thread.start()
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
                " ExtSound volume: " + str(global_config['sound_volume']) + ".")
     return extsound_active, bluetooth_active
+
+
+def sound_terminate():
+    if e_queue:
+        e_queue.put('STOP')
+    if b_queue:
+        b_queue.put('STOP')
+    if sound_thread:
+        sound_thread.join()    # wait for termination
+    if bluetooth_thread:
+        bluetooth_thread.join()   # wait for termination
 
 
 def bluez_init():
@@ -165,9 +194,12 @@ def setvolume(new_volume):
 def speak(text):
     global b_esng
     global e_esng
+    global e_queue
+    global b_queue
+    global bluetooth_thread
 
     if extsound_active and global_config['sound_volume'] > 0:
-        e_esng.say(text)
+        e_queue.put(text)
     if bluetooth_active and bt_devices > 0:
         if b_esng is None:   # first initialization failed, may happen with bluetooth, try again
             b_esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
@@ -175,9 +207,33 @@ def speak(text):
                 rlog.debug("Radarbluez: Bluetooth espeak-ng not initialized")
                 return
             rlog.debug("Radarbluez: Bluetooth speak-ng successfully initialized.")
-        b_esng.say(text)
+            b_queue = Queue()  # queue for bluetooth sound output
+            bluetooth_thread = threading.Thread(target=b_speaker, args=(b_queue,))  # external thread that speaks
+            bluetooth_thread.start()
+        b_queue.put(text)
     rlog.debug("Speak: "+text)
 
+
+def e_speaker(queue):
+    rlog.debug("Radarbluez: Sound-Speaker thread active.")
+    while True:
+        msg = queue.get()
+        if msg == 'STOP':
+            break
+        else:
+            e_esng.say(msg)
+    rlog.debug("Radarbluez: Sound-Speaker thread terminated.")
+
+
+def b_speaker(queue):
+    rlog.debug("Radarbluez: Bluetooth-Speaker thread active.")
+    while True:
+        msg = queue.get()
+        if msg == 'STOP':
+            break
+        else:
+            b_esng.say(msg)
+    rlog.debug("Radarbluez: Bluetooth-Speaker thread terminated.")
 
 def connected_devices():
     global manager

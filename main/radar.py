@@ -822,6 +822,7 @@ def quit_gracefully(*arguments):
     tasks = asyncio.all_tasks()
     for ta in tasks:
         ta.cancel()
+    radarbluez.sound_terminate()
     rlog.debug("CleanUp Display ...")
     display_control.cleanup()
     return 0

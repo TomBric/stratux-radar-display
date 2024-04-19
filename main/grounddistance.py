@@ -105,7 +105,7 @@ fly_status = 0  # status for evaluating statistics 0 = run up  1 = start_detecte
 runup_situation = None  # situation values, for accelleration on runway started
 start_situation = None  # situation values when wheels leave the ground
 obstacle_up_clear = None  # situation values when obstacle clearance was reached when taking off
-obstacle_down_clear = None  # situation values when obstacle clearance was last reached when landing
+obstacle_down_clear = None  # situation values when obstacle clearance was last reacheds when landing
 landing_situation = None  # situation when wheels touch the ground
 stop_situation = None  # siuation values when the aircraft is stopped on the runway
 
@@ -114,6 +114,22 @@ stats_before_landing = 0
 stats_before_stop = 0
 stats_before_obstacle_clear = 0
 saved_statistics = None    # filename for statistics, set in init
+
+gps_warnings = [
+    {'height': 500, 'upper': False},
+    {'height': 1000, 'upper': False}
+]
+# speech warnings in feet, when calculated with gps, upper is true, if height + hysteresis was met
+sensor_warnings = [
+    {'height': 1, 'upper': False},
+    {'height': 2, 'upper': False},
+    {'height': 3, 'upper': False},
+    {'height': 5, 'upper': False},
+    {'height': 10, 'upper': False}
+]
+
+hysteresis = 0.1    # hysterisis 10% for speech warnings,
+# this means a ground warning is only repeated if more then 10% more of height was reached in between
 
 
 class UsonicSensor:   # definition adapted from DFRobot code
@@ -258,13 +274,20 @@ def write_stats():
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + saved_statistics)
     rlog.debug("Grounddistance: Statistics saved to " + saved_statistics)
 
+to_speak = None  # this is the height that should be spoken. Done by a different coroutine
+def calc_distance_speaker(gps_distance, ground_distance):
+    global to_speak
 
-def distance_beeper(distance):
-    if indicate_distance:
-        if DISTANCE_BEEP_MIN <= distance <= DISTANCE_BEEP_MAX:
-            # to do tone_pitch = radarbluez.beep()
-            # generate tone on raspberry
-            pass
+    if indicate_distance and fly_status == 1:
+        for i in gps_warnings:
+            if gps_distance < i['height'] and i['upper']:
+                # distance is reached and was higher than hysterisis befor
+                to_speak = i['height']
+            if gps_distance >= i['height'] * hysteresis:
+                i['upper'] = True
+
+
+
 
 
 def is_airborne():
@@ -491,3 +514,4 @@ async def read_ground_sensor():
             rlog.debug("Ground distance reader terminating ...")
     else:
         rlog.debug("No ground distance sensor active.")
+
