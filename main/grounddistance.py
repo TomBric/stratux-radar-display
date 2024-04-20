@@ -122,8 +122,23 @@ sensor_upper = [False] * len(sensor_warnings) # is true, if height + hysteresis 
 hysteresis = 1.1    # hysteresis 10% for speech warnings,
 # this means a ground warning is only repeated if more than 10% more of height was reached in between
 
-# dest_elevation = 99999   # elevation for destination airport for height warnings, set to maximum if not set
-dest_elevation = 500
+INVALID_DEST_ELEVATION = 99999.0
+dest_elevation = INVALID_DEST_ELEVATION
+# elevation for destination airport for height warnings, set to maximum if not set
+
+def set_dest_elevation(dest_increment):
+    global dest_elevation
+    if dest_elevation == INVALID_DEST_ELEVATION:
+        if global_situation['gps_valid']:
+            dest_elevation = global_situation['gps_altitude']
+        else:
+            dest_elevation = dest_increment   # start with the first values, 100 or 10
+    else:
+        dest_elevation = dest_elevation + dest_increment
+        if dest_elevation >= INVALID_DEST_ELEVATION:    # set to invalid if to high
+            dest_elevation = INVALID_DEST_ELEVATION
+    rlog.debug('Grounddistance: Destination Altitude set to {0:5.0f}'.format(dest_elevation))
+
 
 class UsonicSensor:   # definition adapted from DFRobot code
     distance_max = 3000

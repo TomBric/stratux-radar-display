@@ -124,7 +124,10 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
         display_control.display()
     elif dist_user_mode == 1:   # show statistics
         display_control.clear()
-        display_control.distance_statistics(grounddistance.calculate_output_values())
+        display_control.distance_statistics(grounddistance.calculate_output_values(), situation['gps_active'],
+                                            situation['gps_altitude'], grounddistance.dest_elevation,
+                                            grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
+                                            grounddistance.indicate_distance)
         display_control.display()
 
 
@@ -147,8 +150,20 @@ def user_input():
         if button == 2 and btime == 2:  # right and long - refresh
             return 22, False  # start next mode for display driver: refresh called from vsi
         return 21, False  # no mode change for any other interaction
-    elif dist_user_mode == 1:
+    elif dist_user_mode == 1:  # statistics/set mode
         if button == 1 and btime == 1:  # middle and short - return to display mode
             dist_user_mode = 0
+            return 21, False
+        if button == 0 and btime == 1:  # left and short - +100 ft
+            grounddistance.set_dest_elevation(+100)
+            return 21, False
+        if button == 0 and btime == 2:  # left and long - -100 ft
+            grounddistance.set_dest_elevation(-100)
+            return 21, False
+        if button == 2 and btime == 1:  # right and short - -100 ft
+            grounddistance.set_dest_elevation(+10)
+            return 21, False
+        if button == 2 and btime == 2:  # right and long - -100 ft
+            grounddistance.set_dest_elevation(-10)
             return 21, False
         return 21, False  # no mode change for any other interaction
