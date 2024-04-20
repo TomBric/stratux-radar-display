@@ -88,6 +88,8 @@ STATS_FOR_SITUATION_CHANGE = 3  # no of values in a row before a situation is ch
 STATS_TOTAL_TIME = 120  # time in seconds how long statistic window is
 INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
 
+MIN_GPS_H_ACCURACY = 150   # minimum horizontal accuracy of gps, if not met, no speech warnings are spoken
+
 # globals
 ground_distance_active = False  # True if sensor is found and activated
 indicate_distance = False  # True if audio indication for ground distance is active
@@ -115,22 +117,16 @@ stats_before_stop = 0
 stats_before_obstacle_clear = 0
 saved_statistics = None    # filename for statistics, set in init
 
-gps_warnings = [
-    {'height': 500, 'upper': False},
-    {'height': 1000, 'upper': False}
-]
-# speech warnings in feet, when calculated with gps, upper is true, if height + hysteresis was met
-sensor_warnings = [
-    {'height': 1, 'upper': False},
-    {'height': 2, 'upper': False},
-    {'height': 3, 'upper': False},
-    {'height': 5, 'upper': False},
-    {'height': 10, 'upper': False}
-]
+gps_warnings = (500, 1000)    # speech warnings in feet, when calculated with gps
+gps_upper = [False] * len(gps_warnings)  # is true, if height + hysteresis was met
+sensor_warnings = (1, 2, 3, 5, 10)   # speech warnings in feet, when calculated with groundsensor
+sensor_upper = [False] * len(sensor_warnings) # is true, if height + hysteresis was met
 
-hysteresis = 0.1    # hysterisis 10% for speech warnings,
-# this means a ground warning is only repeated if more then 10% more of height was reached in between
+hysteresis = 0.1    # hysteresis 10% for speech warnings,
+# this means a ground warning is only repeated if more than 10% more of height was reached in between
 
+# dest_elevation = 99999   # elevation for destination airport for height warnings, set to maximum if not set
+dest_elevation = 500
 
 class UsonicSensor:   # definition adapted from DFRobot code
     distance_max = 3000
@@ -274,20 +270,31 @@ def write_stats():
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + saved_statistics)
     rlog.debug("Grounddistance: Statistics saved to " + saved_statistics)
 
-to_speak = None  # this is the height that should be spoken. Done by a different coroutine
-def calc_distance_speaker(gps_distance, ground_distance):
-    global to_speak
 
+def calc_distance_speaker(stat):
+    if stat['gps_active'] and stat['gps_h_accuracy'] < MIN_GPS_H_ACCURACY:
+        gps_distance = stat['gps_altitude'] - dest_elevation
+    else:
+        gps_distance = 0.0
+    if stat['g_distance_valid']:
+        ground_distance = stat['g_distance']
+    else:
+        ground_distance = 0.0
     if indicate_distance and fly_status == 1:
-        for i in gps_warnings:
-            if gps_distance < i['height'] and i['upper']:
-                # distance is reached and was higher than hysterisis befor
-                to_speak = i['height']
-            if gps_distance >= i['height'] * hysteresis:
-                i['upper'] = True
-
-
-
+        for (i, height) in enumerate(gps_warnings):
+            if gps_distance < height and gps_upper[i]:
+                # distance is reached and was before higher than hysteresis
+                radarbluez.speak(height)
+                gps_upper[i] = False
+            if gps_distance >= height * hysteresis:
+                gps_upper[i] = True
+        for (i, height) in enumerate(sensor_warnings):
+            if ground_distance < height and sensor_upper[i]:
+                # distance is reached and was before higher than hysteresis
+                radarbluez.speak(height)
+                sensor_upper[i] = False
+            if ground_distance >= height * hysteresis:
+                sensor_upper[i] = True
 
 
 def is_airborne():
@@ -447,7 +454,7 @@ def evaluate_statistics(latest_stat):
             obstacle_down_clear = None  # clear obstacle down, only last landing is recorded
             rlog.debug("Grounddistance: Re-Start detected without stop, keeping first start " +
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
-
+    calc_distance_speaker(latest_stat)
 
 def store_statistics(sit):
     global stats_next_store
@@ -464,6 +471,10 @@ def store_statistics(sit):
             if 'gps_speed' in sim_data:
                 sit['gps_speed'] = sim_data['gps_speed']
                 sit['gps_active'] = True
+            if 'gps_altitude' in sim_data:
+                sit['gps_altitude'] = sim_data['gps_altitude']
+                sit['gps_active'] = True
+                sit['gps_hor_accuracy'] = 50  # just any nice valud
             if 'own_altitude' in sim_data:
                 sit['own_altitude'] = sim_data['own_altitude']
                 sit['baro_valid'] = True
@@ -472,8 +483,9 @@ def store_statistics(sit):
         now = datetime.datetime.now(datetime.timezone.utc)
         stat_value = {'Time': now, 'baro_valid': sit['baro_valid'], 'own_altitude': sit['own_altitude'],
                       'gps_active': sit['gps_active'], 'longitude': sit['longitude'], 'latitude': sit['latitude'],
-                      'gps_speed': sit['gps_speed'], 'g_distance_valid': sit['g_distance_valid'],
-                      'g_distance': sit['g_distance']}
+                      'gps_speed': sit['gps_speed'], 'gps_altitude': sit['gps_altitude'],
+                      'gps_h_accuracy': sit['gps_h_accuracy'],
+                      'g_distance_valid': sit['g_distance_valid'], 'g_distance': sit['g_distance']}
         statistics.append(stat_value)
         if len(statistics) > stats_max_values:     # sliding window, remove old values
             statistics.pop(0)

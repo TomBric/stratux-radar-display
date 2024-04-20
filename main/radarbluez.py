@@ -64,7 +64,6 @@ b_queue = None    # bluetooth sound queue
 bluetooth_thread = None
 
 
-
 def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whether it was selected
     found = False
     mix = None
