@@ -120,7 +120,7 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
                                  situation['baro_valid'], situation['own_altitude'], alt_diff, alt_diff_takeoff,
                                  situation['vertical_speed'], ahrs['ahrs_sensor'],
                                  ahrs['pitch'], ahrs['roll'], situation['g_distance_valid'], situation['g_distance'],
-                                 error_message)
+                                 situation['gps_altitude'], grounddistance.dest_elevation, error_message)
         display_control.display()
     elif dist_user_mode == 1:   # show statistics
         display_control.clear()
