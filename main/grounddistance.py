@@ -62,6 +62,7 @@ import json
 import math
 import serial
 import simulation
+import radarbluez
 
 rlog = None  # radar specific logger
 
