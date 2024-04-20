@@ -280,6 +280,7 @@ def calc_distance_speaker(stat):
         ground_distance = stat['g_distance']
     else:
         ground_distance = 0.0
+    print("Calc-distance-speaker: indicate {0} fly-status {1]".format(indicate_distance, fly_status))
     if indicate_distance and fly_status == 1:
         print("gps-levels reached :{0}".format(gps_upper))
         print("ground-levels reached :{0}".format(sensor_upper))
