@@ -114,9 +114,9 @@ stats_before_stop = 0
 stats_before_obstacle_clear = 0
 saved_statistics = None    # filename for statistics, set in init
 
-gps_warnings = (500, 1000)    # speech warnings in feet, when calculated with gps
+gps_warnings = (1000, 500)    # speech warnings in feet, when calculated with gps
 gps_upper = [False] * len(gps_warnings)  # is true, if height + hysteresis was met
-sensor_warnings = (1, 2, 3, 5, 10)   # speech warnings in feet, when calculated with groundsensor
+sensor_warnings = (10, 5, 3, 2, 1)   # speech warnings in feet, when calculated with groundsensor
 sensor_upper = [False] * len(sensor_warnings) # is true, if height + hysteresis was met
 
 hysteresis = 1.1    # hysteresis 10% for speech warnings,
