@@ -122,7 +122,7 @@ sensor_upper = [False] * len(sensor_warnings) # is true, if height + hysteresis 
 hysteresis = 1.1    # hysteresis 10% for speech warnings,
 # this means a ground warning is only repeated if more than 10% more of height was reached in between
 
-INVALID_DEST_ELEVATION = 99999.0
+INVALID_DEST_ELEVATION = 9999.0
 dest_elevation = INVALID_DEST_ELEVATION
 # elevation for destination airport for height warnings, set to maximum if not set
 
@@ -130,7 +130,7 @@ def set_dest_elevation(dest_increment):
     global dest_elevation
     if dest_elevation == INVALID_DEST_ELEVATION:
         if global_situation['gps_active']:
-            dest_elevation = global_situation['gps_altitude']
+            dest_elevation = math.ceil (global_situation['gps_altitude'] / 10) * 10   # round up to 10
         else:
             dest_elevation = dest_increment   # start with the first values, 100 or 10
     else:
