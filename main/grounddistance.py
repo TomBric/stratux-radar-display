@@ -119,7 +119,7 @@ gps_upper = [False] * len(gps_warnings)  # is true, if height + hysteresis was m
 sensor_warnings = (1, 2, 3, 5, 10)   # speech warnings in feet, when calculated with groundsensor
 sensor_upper = [False] * len(sensor_warnings) # is true, if height + hysteresis was met
 
-hysteresis = 0.1    # hysteresis 10% for speech warnings,
+hysteresis = 1.1    # hysteresis 10% for speech warnings,
 # this means a ground warning is only repeated if more than 10% more of height was reached in between
 
 # dest_elevation = 99999   # elevation for destination airport for height warnings, set to maximum if not set
