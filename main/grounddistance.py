@@ -123,6 +123,7 @@ hysteresis = 1.1    # hysteresis 10% for speech warnings,
 # this means a ground warning is only repeated if more than 10% more of height was reached in between
 
 INVALID_DEST_ELEVATION = 9999.0
+MIN_ELEVATION = -999.0
 dest_elevation = INVALID_DEST_ELEVATION
 # elevation for destination airport for height warnings, set to maximum if not set
 
@@ -135,7 +136,8 @@ def set_dest_elevation(dest_increment):
             dest_elevation = dest_increment   # start with the first values, 100 or 10
     else:
         dest_elevation = dest_elevation + dest_increment
-        if dest_elevation >= INVALID_DEST_ELEVATION:    # set to invalid if to high
+        if dest_elevation >= INVALID_DEST_ELEVATION or dest_elevation <= MIN_ELEVATION:
+            # set to invalid if too high or too low
             dest_elevation = INVALID_DEST_ELEVATION
     rlog.debug('Grounddistance: Destination Altitude set to {0:5.0f}'.format(dest_elevation))
 
