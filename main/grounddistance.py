@@ -129,7 +129,7 @@ dest_elevation = INVALID_DEST_ELEVATION
 def set_dest_elevation(dest_increment):
     global dest_elevation
     if dest_elevation == INVALID_DEST_ELEVATION:
-        if global_situation['gps_valid']:
+        if global_situation['gps_active']:
             dest_elevation = global_situation['gps_altitude']
         else:
             dest_elevation = dest_increment   # start with the first values, 100 or 10
