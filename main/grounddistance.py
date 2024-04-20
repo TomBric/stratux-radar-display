@@ -279,14 +279,14 @@ def calc_distance_speaker(stat):
         ground_distance = 0.0
     if indicate_distance and fly_status == 1:
         for (i, height) in enumerate(gps_warnings):
-            if gps_distance < height and gps_upper[i]:
+            if gps_distance <= height and gps_upper[i]:
                 # distance is reached and was before higher than hysteresis
                 radarbluez.speak(str(height))
                 gps_upper[i] = False
             if gps_distance >= height * hysteresis:
                 gps_upper[i] = True
         for (i, height) in enumerate(sensor_warnings):
-            if ground_distance < height and sensor_upper[i]:
+            if ground_distance <= height and sensor_upper[i]:
                 # distance is reached and was before higher than hysteresis
                 radarbluez.speak(str(height))
                 sensor_upper[i] = False
