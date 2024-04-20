@@ -119,7 +119,7 @@ aircraft_changed = True
 ui_changed = True
 situation = {'was_changed': True, 'last_update': 0.0, 'connected': False, 'gps_active': False, 'course': 0,
              'own_altitude': -99.0, 'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000,
-             'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
+             'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_v_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
              'vertical_speed': 0.0, 'baro_valid': False, 'g_distance_valid': False,
              'g_distance': grounddistance.INVALID_GDISTANCE}
 vertical_max = 0.0  # max value for vertical speed
@@ -422,6 +422,9 @@ def new_situation(json_str):
             situation['was_changed'] = True
         if situation['gps_h_accuracy'] != sit['GPSHorizontalAccuracy']:
             situation['gps_h_accuracy'] = sit['GPSHorizontalAccuracy']
+            situation['was_changed'] = True
+        if situation['gps_v_accuracy'] != sit['GPSVerticalAccuracy']:
+            situation['gps_v_accuracy'] = sit['GPSVerticalAccuracy']
             situation['was_changed'] = True
         if situation['gps_speed'] != sit['GPSGroundSpeed']:
             situation['gps_speed'] = sit['GPSGroundSpeed']

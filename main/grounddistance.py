@@ -85,7 +85,7 @@ STATS_FOR_SITUATION_CHANGE = 3  # no of values in a row before a situation is ch
 STATS_TOTAL_TIME = 120  # time in seconds how long statistic window is
 INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
 
-MIN_GPS_H_ACCURACY = 150   # minimum horizontal accuracy of gps, if not met, no speech warnings are spoken
+MIN_GPS_V_ACCURACY = 150   # minimum horizontal accuracy of gps, if not met, no speech warnings are spoken
 
 # globals
 ground_distance_active = False  # True if sensor is found and activated
@@ -269,7 +269,7 @@ def write_stats():
 
 
 def calc_distance_speaker(stat):
-    if stat['gps_active'] and stat['gps_h_accuracy'] < MIN_GPS_H_ACCURACY:
+    if stat['gps_active'] and stat['gps_v_accuracy'] < MIN_GPS_V_ACCURACY:
         gps_distance = stat['gps_altitude'] - dest_elevation   # both are in ft
     else:
         gps_distance = 0.0
@@ -481,7 +481,7 @@ def store_statistics(sit):
         stat_value = {'Time': now, 'baro_valid': sit['baro_valid'], 'own_altitude': sit['own_altitude'],
                       'gps_active': sit['gps_active'], 'longitude': sit['longitude'], 'latitude': sit['latitude'],
                       'gps_speed': sit['gps_speed'], 'gps_altitude': sit['gps_altitude'],
-                      'gps_h_accuracy': sit['gps_h_accuracy'],
+                      'gps_h_accuracy': sit['gps_h_accuracy'], 'gps_v_accuracy': sit['gps_v_accuracy'],
                       'g_distance_valid': sit['g_distance_valid'], 'g_distance': sit['g_distance']}
         statistics.append(stat_value)
         if len(statistics) > stats_max_values:     # sliding window, remove old values
