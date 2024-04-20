@@ -72,10 +72,6 @@ MEASUREMENTS_PER_SECOND = 5    # number of distance ranging meaurements per seco
 UART_WAIT_TIME = 0.01  # time in seconds to wait for enough uart characters
 UART_BREAK_TIME = 1.00  # time in seconds when waiting is stopped
 
-# BEEP VALUES
-DISTANCE_BEEP_MAX = 60  # in cm, where beeper starts with a low tone
-DISTANCE_BEEP_MIN = 10  # in cm, where beeper stops with a high tone
-
 # GPS-Measurement of start-distance
 DISTANCE_START_DETECTED = 30 * 10  # in mm where measurement assumes that plane is in the air
 DISTANCE_LANDING_DETECTED = 15 * 10  # in mm where measurement assumes to be landed
@@ -273,14 +269,13 @@ def write_stats():
 
 def calc_distance_speaker(stat):
     if stat['gps_active'] and stat['gps_h_accuracy'] < MIN_GPS_H_ACCURACY:
-        gps_distance = stat['gps_altitude'] - dest_elevation
+        gps_distance = stat['gps_altitude'] - dest_elevation   # both are in ft
     else:
         gps_distance = 0.0
     if stat['g_distance_valid']:
-        ground_distance = stat['g_distance']
+        ground_distance = stat['g_distance'] / 304.8    # g_distance is in mm, here we need ft
     else:
         ground_distance = 0.0
-    print("Calc-distance-speaker: indicate {0} fly-status {1}".format(indicate_distance, fly_status))
     if indicate_distance and fly_status == 1:
         print("gps-levels reached :{0}".format(gps_upper))
         print("ground-levels reached :{0}".format(sensor_upper))
