@@ -39,11 +39,11 @@ apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.ole
 pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 
 #  enable headless connect:
-#    sudo vi /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
-#        ["with-logind"] = false,    auf false setzen
+#  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
-#        ["with-logind"] = false,    auf false setzen
-#cp systemctl-autostart-radar.service /home/pi/
+mkdir -p /home/pi/.config/systemd/user/
+cp systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
+sudo -l -u pi systemctl --user enable autostart-radar.service
 loginctl enable-linger pi
 
 # include autostart into crontab of pi, so that radar starts on every boot
