@@ -45,6 +45,14 @@ pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 # bluetooth
 apt install bluetooth pulseaudio pulseaudio-module-bluetooth -y
 
+# bookworm lite:
+# apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth espeak-ng espeak-ng-data python3-alsaaudio
+# apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy -y
+# pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
+#  enable headless connect:
+#    sudo vi /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
+#        ["with-logind"] = false,    auf false setzen
+
 # bluetooth configuration
 # Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
 # configs in /etc/pulse/system.pa
