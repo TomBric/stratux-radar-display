@@ -43,7 +43,14 @@ pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 #        ["with-logind"] = false,    auf false setzen
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 #        ["with-logind"] = false,    auf false setzen
+#cp systemctl-autostart-radar.service /home/pi/
 loginctl enable-linger pi
+
+# include autostart into crontab of pi, so that radar starts on every boot
+echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
+# only works if crontab is empty, otherwise use
+# crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
+
 
 
 # copy simple checklist once, can be changed later

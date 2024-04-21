@@ -1,0 +1,8 @@
+[Unit]
+Description=Autostart Stratux-Radar
+
+[Service]
+ExecStart=/bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh
+
+[Install]
+WantedBy=default.target
