@@ -41,11 +41,10 @@ pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 #  enable headless connect:
 #    sudo vi /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 #        ["with-logind"] = false,    auf false setzen
+sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
+#        ["with-logind"] = false,    auf false setzen
+loginctl enable-linger pi
 
-# allow user pulse bluetooth access
-usermod -a -G bluetooth pulse
-# addgroup pulse lp
-usermod -a -G pulse-access pi
 
 # copy simple checklist once, can be changed later
 cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
