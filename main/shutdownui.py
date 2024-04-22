@@ -33,6 +33,7 @@
 
 import os
 import psutil
+import subprocess
 import radarbuttons
 import time
 import requests
