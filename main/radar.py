@@ -798,7 +798,9 @@ def main():
     global bluetooth_active
 
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
-    radarui.init(url_settings_set)
+    if not radarui.init(url_settings_set):
+        print("GPIO Error, is  another radar process running?). Terminating.")
+        quit_gracefully()
     shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)

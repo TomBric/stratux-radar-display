@@ -82,8 +82,9 @@ def init():
         btn = [RadarButton(LEFT), RadarButton(MIDDLE), RadarButton(RIGHT)]
     except:
         rlog.debug("ERROR: GPIO-Pins busy! No input possible. Please clarify!")
+        return False  # indicate errors
     rlog.debug("Radarbuttons: Initialized.")
-
+    return True    # indicate everything is fine
 
 def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
     for index, but in enumerate(btn):
