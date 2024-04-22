@@ -32,6 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import psutil
 import radarbuttons
 import time
 import requests
@@ -60,8 +61,20 @@ def init(shutdown, reboot):
 
 
 def clear_lingering_radar():     # remove other radar.py processes, necessary sind lingering is enabled for bluetooth
-    if os.popen('kill $(pgrep -f radar.py)').read() == 0:
-        rlog.debug("Lingering radar.py process terminated.")
+    current_pid = os.getpid()   # my processid
+    process_name = os.path.basename(__file__)    # my name
+    pids_to_kill = []
+    for proc in psutil.process_iter(['pid', 'name']):
+        if proc.info['name'] == process_name and proc.pid != current_pid:
+            pids_to_kill.append(proc.pid)
+    if pids_to_kill:
+        rlog.debug("Terminating all {0} processes: {1}".format(process_name, pid_to_kill))
+        for pid in pids_to_kill:
+            try:
+                process = psutil.Process(pid)
+                process.terminate()
+            except psutil.NoSuchProcess:
+                pass
 
 
 def draw_shutdown(display_control):
