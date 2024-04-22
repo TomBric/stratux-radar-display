@@ -73,7 +73,7 @@ def clear_lingering_radar():     # remove other radar.py processes, necessary si
     for proc in pid_list:
         if int(proc) != current_pid:
             try:
-                rlog.debug("Terminating other process {0}".format(int(proc)))
+                print("Terminating other process {0}".format(int(proc)))
                 os.kill(int(proc), 15)   # Terminate signal
             except OSError :
                 pass
