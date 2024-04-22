@@ -67,13 +67,13 @@ def clear_lingering_radar():     # remove other radar.py processes, necessary si
     pname = "radar.py"
     try:
         output = subprocess.check_output(['pgrep', '-f', pname]).decode('utf-8').strip()
-        pid_list = output.split('\n')   # generate a list
+        pid_list = output.split('\n')   # generate a list of strings
     except subprocess.CalledProcessError:
         pass
     for proc in pid_list:
         if proc != current_pid:
             try:
-                os.kill(proc, 15)   # Terminate signal
+                os.kill(int(proc), 15)   # Terminate signal
             except OSError :
                 pass
 
