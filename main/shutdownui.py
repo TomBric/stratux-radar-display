@@ -32,7 +32,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import psutil
 import subprocess
 import radarbuttons
 import time
@@ -74,10 +73,8 @@ def clear_lingering_radar():     # remove other radar.py processes, necessary si
     for proc in pid_list:
         if proc != current_pid:
             try:
-                process = psutil.Process(proc)
-                rlog.debug("Terminating other radar.py process with processid {0}".format(pid))
-                process.terminate()
-            except psutil.NoSuchProcess:
+                os.kill(proc)
+            except OSError :
                 pass
 
 
