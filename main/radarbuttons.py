@@ -80,7 +80,7 @@ def init():
     rlog = logging.getLogger('stratux-radar-log')
     try:
         btn = [RadarButton(LEFT), RadarButton(MIDDLE), RadarButton(RIGHT)]
-    except (GPIOZeroError, GPIODeviceError):
+    except:
         rlog.debug("ERROR: GPIO-Pins busy! No input possible. Please clarify!")
     rlog.debug("Radarbuttons: Initialized.")
 
