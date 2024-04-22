@@ -46,6 +46,7 @@ RIGHT = 21
 
 class RadarButton:
     def __init__(self,gpio_number):
+        print("RadadrButton.init")
         self.btn = Button(gpio_number, bounce_time=BOUNCE_TIME, hold_time=HOLD_TIME)
         self.short = False
         self.long = False
