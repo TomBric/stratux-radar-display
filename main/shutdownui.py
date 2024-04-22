@@ -74,7 +74,7 @@ def clear_lingering_radar():     # remove other radar.py processes, necessary si
     for proc in pid_list:
         if proc != current_pid:
             try:
-                process = psutil.Process(pid)
+                process = psutil.Process(proc)
                 rlog.debug("Terminating other radar.py process with processid {0}".format(pid))
                 process.terminate()
             except psutil.NoSuchProcess:
