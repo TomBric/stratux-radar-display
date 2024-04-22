@@ -33,7 +33,7 @@
 
 import logging
 from gpiozero import Button
-from gpiozero.exc import GPIOZeroError
+from gpiozero.exc import GPIOZeroError, GPIODeviceError
 
 btn = None   # will be set in init
 
@@ -46,7 +46,6 @@ RIGHT = 21
 
 class RadarButton:
     def __init__(self,gpio_number):
-        print("RadadrButton.init")
         self.btn = Button(gpio_number, bounce_time=BOUNCE_TIME, hold_time=HOLD_TIME)
         self.short = False
         self.long = False
@@ -81,7 +80,7 @@ def init():
     rlog = logging.getLogger('stratux-radar-log')
     try:
         btn = [RadarButton(LEFT), RadarButton(MIDDLE), RadarButton(RIGHT)]
-    except GPIOZeroError:
+    except (GPIOZeroError, GPIODeviceError):
         rlog.debug("ERROR: GPIO-Pins busy! No input possible. Please clarify!")
     rlog.debug("Radarbuttons: Initialized.")
 
