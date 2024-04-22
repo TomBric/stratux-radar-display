@@ -60,18 +60,22 @@ def init(shutdown, reboot):
     rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
 
 
+
 def clear_lingering_radar():     # remove other radar.py processes, necessary sind lingering is enabled for bluetooth
     current_pid = os.getpid()   # my processid
-    process_name = os.path.basename(__file__)    # my name
-    pids_to_kill = []
-    for proc in psutil.process_iter(['pid', 'name']):
-        if proc.info['name'] == process_name and proc.pid != current_pid:
-            pids_to_kill.append(proc.pid)
-    if pids_to_kill:
-        rlog.debug("Terminating all {0} processes: {1}".format(process_name, pid_to_kill))
-        for pid in pids_to_kill:
+    pid_list = []
+    pname = "radar.py"
+    try:
+        output = subprocess.check_output(['pgrep', '-f', pname]).decode('utf-8').strip()
+        pid_list = output.split('\n')   # generate a list
+        return pid_list
+    except subprocess.CalledProcessError:
+        pass
+    for proc in pid_list:
+        if proc != current_pid:
             try:
                 process = psutil.Process(pid)
+                rlog.debug("Terminating other radar.py process with processid {0}".format(pid))
                 process.terminate()
             except psutil.NoSuchProcess:
                 pass
