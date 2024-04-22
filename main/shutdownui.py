@@ -69,7 +69,6 @@ def clear_lingering_radar():     # remove other radar.py processes, necessary si
     try:
         output = subprocess.check_output(['pgrep', '-f', pname]).decode('utf-8').strip()
         pid_list = output.split('\n')   # generate a list
-        return pid_list
     except subprocess.CalledProcessError:
         pass
     for proc in pid_list:
