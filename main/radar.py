@@ -860,6 +860,10 @@ def logging_init():
 if __name__ == "__main__":
     # set uncaught exception logging to /var/log/messages/user
     sys.excepthook = radar_excepthook
+    # set up radar-specific logging
+    logging_init()
+    # set up logging
+    shutdownui.clear_lingering_radar()
     # parse arguments for different configurations
     ap = argparse.ArgumentParser(description='Stratux radar display')
     ap.add_argument("-d", "--device", required=True, help="Display device to use")

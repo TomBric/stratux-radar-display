@@ -59,6 +59,11 @@ def init(shutdown, reboot):
     rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
 
 
+def clear_lingering_radar():     # remove other radar.py processes, necessary sind lingering is enabled for bluetooth
+    if os.popen('kill $(pgrep -f radar.py)').read() == 0:
+        rlog.debug("Lingering radar.py process terminated.")
+
+
 def draw_shutdown(display_control):
     global clear_before_shutoff
     global shutdown_mode
