@@ -75,6 +75,7 @@ def clear_lingering_radar():     # remove other radar.py processes, necessary si
             try:
                 print("Terminating other process {0}".format(int(proc)))
                 os.kill(int(proc), 15)   # Terminate signal
+                time.sleep(3)   # give him some time to terminate
             except OSError :
                 pass
 
