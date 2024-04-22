@@ -33,6 +33,9 @@
 
 import logging
 from gpiozero import Button
+from gpiozero.exc import GPIOZeroError
+
+btn = None   # will be set in init
 
 # global constants
 HOLD_TIME = 0.8 # time to trigger the hold activity if one button is pressed longer
@@ -69,12 +72,16 @@ class RadarButton:
             return 1
         return 0
 
-btn = [RadarButton(LEFT), RadarButton(MIDDLE), RadarButton(RIGHT)]
 
 def init():
     global rlog
+    global btn
 
     rlog = logging.getLogger('stratux-radar-log')
+    try:
+        btn = [RadarButton(LEFT), RadarButton(MIDDLE), RadarButton(RIGHT)]
+    except GPIOZeroError:
+        rlog.debug("ERROR: GPIO-Pins busy! No input possible. Please clarify!")
     rlog.debug("Radarbuttons: Initialized.")
 
 

@@ -35,7 +35,7 @@ sudo systemctl mask serial-getty@ttyAMA0.service
 # bookworm lite:
 apt install git python3-pip -y
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth espeak-ng espeak-ng-data python3-alsaaudio -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy -y
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy python3-psutil -y
 pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 
 #  enable headless connect:
