@@ -71,7 +71,7 @@ def clear_lingering_radar():     # remove other radar.py processes, necessary si
     except subprocess.CalledProcessError:
         pass
     for proc in pid_list:
-        if proc != current_pid:
+        if int(proc) != current_pid:
             try:
                 os.kill(int(proc), 15)   # Terminate signal
             except OSError :
