@@ -122,7 +122,7 @@ def sound_init(config, bluetooth, mixer_name):
 
 def sound_terminate():
     if sound_queue:
-        e_queue.put('STOP')
+        sound_queue.put('STOP')
     if sound_thread:
         sound_thread.join()    # wait for termination
 
@@ -178,7 +178,7 @@ def audio_speaker(queue):
                 res = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg, "|",  "aplay"])
             elif extsound_active:
                 res = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg, "|",
-                                      "aplay", "--device", "plughw:", sound_card])
+                                      "aplay", "--device", "plughw:", str(sound_card)])
             if res != 0:
                 rlog.debug("Radarbluez: Error running pico2wave subprocess.")
     rlog.debug("Radarbluez: Sound-Speaker thread terminated.")

@@ -37,7 +37,6 @@ apt install git python3-pip -y
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy -y
 # create symbolic link to /dev/stdout for pico2wave and stdout
-sudo apt-get install libttspico-utils
 pip3 install  ADS1x15-ADC --break-system-packages
 
 #  enable headless connect:
