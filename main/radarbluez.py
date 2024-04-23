@@ -168,24 +168,19 @@ def audio_speaker(queue):
         if msg == 'STOP':
             break
         else:
-            # ln -s /dev/stdout /var/local/pico2wave.wav      in install: make symbolic link to /dev/stdout first
-            # pico2wave - w /var/loca/pico2wave.wav <speech> | aplay     use this for pipe to stdout
-            # <speed level='120'>
-            # aplay - -device "plughw:<cardno>" xxxx   for external sound
-            # aplay default for bluetooth
-            res = 1
-            if bluetooth_active:
-                pico_output = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg],
-                                             stdout=subprocess.PIPE)
-                if pico_output is not None:
-                    res = subprocess.run(["aplay"], stdin=pico_output.stdout)
-            elif extsound_active:
-                pico_output = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg],
-                                             stdout=subprocess.PIPE)
-                if pico_output is not None:
-                    res = subprocess.run(["aplay", "--device", "plughw:", str(sound_card)], stdin=pico_output.stdout)
-            if res != 0:
-                rlog.debug("Radarbluez: Error running pico2wave subprocess.")
+            pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", msg])  # generate wave
+            if pico_result.returncode == 0:
+                if bluetooth_active and bt_devices > 0:
+                    aplay_result = subprocess.Popen(["aplay", "/tmp/radar.wav"])
+                    if aplay_result.resultcode != 0:
+                        rlog.debug("Radarbluez: Error running aplay for bluetooth")
+                if extsound_active and global_config['sound_volume'] > 0:
+                    deviceopt = "--device=plughw:" + str(sound_card)
+                    aplay_result = subprocess.Popen(["aplay", deviceopt, "/tmp/radar.wav"])
+                    if aplay_result.resultcode != 0:
+                        rlog.debug("Radarbluez: Error running aplay {0}.".format(deviceopt))
+            else:
+                rlog.debug("Radarbluez: Error using pico2wave TTS")
     rlog.debug("Radarbluez: Sound-Speaker thread terminated.")
 
 
