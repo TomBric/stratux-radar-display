@@ -171,12 +171,12 @@ def audio_speaker(queue):
             pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", msg])  # generate wave
             if pico_result.returncode == 0:
                 if bluetooth_active and bt_devices > 0:
-                    aplay_result = subprocess.run(["aplay", "/tmp/radar.wav"])
+                    aplay_result = subprocess.run(["aplay", "-q", "/tmp/radar.wav"])
                     if aplay_result.returncode != 0:
                         rlog.debug("Radarbluez: Error running aplay for bluetooth")
                 if extsound_active and global_config['sound_volume'] > 0:
                     deviceopt = "--device=plughw:" + str(sound_card)
-                    aplay_result = subprocess.run(["aplay", deviceopt, "/tmp/radar.wav"])
+                    aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
                     if aplay_result.returncode != 0:
                         rlog.debug("Radarbluez: Error running aplay {0}".format(deviceopt))
             else:
