@@ -156,7 +156,7 @@ def setvolume(new_volume):
 
 def speak(text):
     if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
-        sound_queue.put("<speed level=120>" + text + "</speed>")
+        sound_queue.put("<speed level='120'>" + text + "</speed>")
     rlog.debug("Speak: "+text)
 
 
