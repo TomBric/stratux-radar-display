@@ -175,10 +175,12 @@ def audio_speaker(queue):
             # aplay default for bluetooth
             res = 1
             if bluetooth_active:
-                res = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg, "|",  "aplay"])
+                pico_output = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg],
+                                             stdout=subprocess.PIPE)
+                res = subprocess.run(["aplay"], input=pico_output.stdout)
             elif extsound_active:
-                res = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg, "|",
-                                      "aplay", "--device", "plughw:", str(sound_card)])
+                pico_output = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg], stdout=subprocess.PIPE)
+                res = subprocess.run(["aplay", "--device", "plughw:", str(sound_card)], input=pico_output.stdout)
             if res != 0:
                 rlog.debug("Radarbluez: Error running pico2wave subprocess.")
     rlog.debug("Radarbluez: Sound-Speaker thread terminated.")
