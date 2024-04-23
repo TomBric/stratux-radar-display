@@ -31,7 +31,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 import re
 import pydbus
 import logging
@@ -39,7 +38,6 @@ import subprocess
 import alsaaudio
 from queue import Queue
 import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
-
 
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
