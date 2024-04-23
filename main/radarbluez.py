@@ -35,7 +35,7 @@
 import re
 import pydbus
 import logging
-from espeakng import ESpeakNG
+# from espeakng import ESpeakNG
 import subprocess
 import alsaaudio
 from queue import Queue
@@ -51,18 +51,14 @@ rlog = None
 bus = None
 manager = None
 adapter = None
-b_esng = None
-e_esng = None
 bluetooth_active = False
 extsound_active = False
 bt_devices = 0          # no of active bluetooth devices last time checked via connected devices
 mixer = None
 global_config = None
-e_queue = None    # external sound queue
+sound_queue = None    # external sound queue
 sound_thread = None
-b_queue = None    # bluetooth sound queue
-bluetooth_thread = None
-
+soundcard = None     # number of sound card, is initialized if external_sound_output is True
 
 def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whether it was selected
     found = False
@@ -93,21 +89,18 @@ def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whet
 def sound_init(config, bluetooth, mixer_name):
     global bluetooth_active
     global extsound_active
-    global b_esng
-    global e_esng
     global mixer
+    global sound_queue
+    global sound_thread
+    global sound_card
     global rlog
     global global_config
-    global e_queue
-    global b_queue
-    global sound_thread
-    global bluetooth_thread
 
     extsound_active = False
     bluetooth_active = False
     global_config = config
     rlog = logging.getLogger('stratux-radar-log')
-    card, mixer = find_mixer(mixer_name)   # search for mixer in any case
+    sound_card, mixer = find_mixer(mixer_name)   # search for mixer in any case
     if not mixer:
         rlog.debug("Radarbluez: Mixer not found!")
     else:
@@ -117,44 +110,21 @@ def sound_init(config, bluetooth, mixer_name):
     if bluetooth:
         bluetooth_active = bluez_init()
 
-    if bluetooth_active and b_esng is None:
-        b_esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-        if b_esng is None:
-            rlog.debug("Radarbluez: Bluetooth espeak-ng not initialized")
-        else:
-            bluetooth_active = True
-            rlog.debug("Radarbluez: Bluetooth espeak-ng successfully initialized.")
-            b_esng.say("Stratux Radar connected")
-            b_queue = Queue()  # queue for bluetooth sound output
-            bluetooth_thread = threading.Thread(target=b_speaker, args=(b_queue,))  # external thread that speaks
-            bluetooth_thread.start()
-
-    if mixer is not None and e_esng is None:
-        audio = "plughw:" + str(card)
-        e_esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev=audio)
-        if e_esng is None:  # could not initialize esng
-            extsound_active = False
-            rlog.debug("Radarbluez: ExtSound espeak-ng not initialized")
-        else:
-            rlog.debug("Radarbluez: ExtSound espeak-ng successfully initialized.")
-            e_esng.say("Stratux Radar connected")
-            e_queue = Queue()  # queue for external sound output
-            sound_thread = threading.Thread(target=e_speaker, args=(e_queue,))  # external thread
-            sound_thread.start()
+    if bluetooth_active or extsound_active:
+        sound_queue = Queue()
+        sound_thread = threading.Thread(target=sound_speaker, args=(sound_queue,))  # external thread that speaks
+        sound_thread.start()
+        speak("Stratux Radar connected")
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
                " ExtSound volume: " + str(global_config['sound_volume']) + ".")
     return extsound_active, bluetooth_active
 
 
 def sound_terminate():
-    if e_queue:
+    if sound_queue:
         e_queue.put('STOP')
-    if b_queue:
-        b_queue.put('STOP')
     if sound_thread:
         sound_thread.join()    # wait for termination
-    if bluetooth_thread:
-        bluetooth_thread.join()   # wait for termination
 
 
 def bluez_init():
@@ -162,8 +132,6 @@ def bluez_init():
     global manager
     global adapter
     global bluetooth_active
-    global bt_devices
-    global rlog
 
     bus = pydbus.SystemBus()
 
@@ -183,59 +151,40 @@ def bluez_init():
 
 
 def setvolume(new_volume):
-    global mixer
-    global extsound_active
-
     if mixer is not None:
         mixer.setvolume(new_volume)
 
 
 def speak(text):
-    global b_esng
-    global e_esng
-    global e_queue
-    global b_queue
-    global bluetooth_thread
-
-    if extsound_active and global_config['sound_volume'] > 0:
-        e_queue.put(text)
-    if bluetooth_active and bt_devices > 0:
-        if b_esng is None:   # first initialization failed, may happen with bluetooth, try again
-            b_esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-            if b_esng is None:
-                rlog.debug("Radarbluez: Bluetooth espeak-ng not initialized")
-                return
-            rlog.debug("Radarbluez: Bluetooth speak-ng successfully initialized.")
-            b_queue = Queue()  # queue for bluetooth sound output
-            bluetooth_thread = threading.Thread(target=b_speaker, args=(b_queue,))  # external thread that speaks
-            bluetooth_thread.start()
-        b_queue.put(text)
+    if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
+        sound_queue.put(text)
     rlog.debug("Speak: "+text)
 
 
-def e_speaker(queue):
-    rlog.debug("Radarbluez: Sound-Speaker thread active.")
+def audio_speaker(queue):
+    rlog.debug("Radarbluez: Audio-Speaker thread active.")
     while True:
         msg = queue.get()
         if msg == 'STOP':
             break
         else:
-            e_esng.say(msg)
+            # ln -s /dev/stdout /var/local/pico2wave.wav      in install: make symbolic link to /dev/stdout first
+            # pico2wave - w /var/loca/pico2wave.wav <speech> | aplay     use this for pipe to stdout
+            # <speed level='120'>
+            # aplay - -device "plughw:<cardno>" xxxx   for external sound
+            # aplay default for bluetooth
+            res = 1
+            if bluetooth_active:
+                res = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg, "|",  "aplay"])
+            elif extsound_active:
+                res = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg, "|",
+                                      "aplay", "--device", "plughw:", card_no])
+            if res != 0:
+                rlog.debug("Radarbluez: Error running pico2wave subprocess.")
     rlog.debug("Radarbluez: Sound-Speaker thread terminated.")
 
 
-def b_speaker(queue):
-    rlog.debug("Radarbluez: Bluetooth-Speaker thread active.")
-    while True:
-        msg = queue.get()
-        if msg == 'STOP':
-            break
-        else:
-            b_esng.say(msg)
-    rlog.debug("Radarbluez: Bluetooth-Speaker thread terminated.")
-
 def connected_devices():
-    global manager
     global bt_devices
 
     if not bluetooth_active:
