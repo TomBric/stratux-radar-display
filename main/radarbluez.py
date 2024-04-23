@@ -58,7 +58,7 @@ mixer = None
 global_config = None
 sound_queue = None    # external sound queue
 sound_thread = None
-soundcard = None     # number of sound card, is initialized if external_sound_output is True
+sound_card = None     # number of sound card, is initialized if external_sound_output is True
 
 def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whether it was selected
     found = False
@@ -178,7 +178,7 @@ def audio_speaker(queue):
                 res = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg, "|",  "aplay"])
             elif extsound_active:
                 res = subprocess.run(["pico2wave", "-w", "/var/local/pico2wave.wav", msg, "|",
-                                      "aplay", "--device", "plughw:", card_no])
+                                      "aplay", "--device", "plughw:", sound_card])
             if res != 0:
                 rlog.debug("Radarbluez: Error running pico2wave subprocess.")
     rlog.debug("Radarbluez: Sound-Speaker thread terminated.")
