@@ -35,11 +35,10 @@
 import re
 import pydbus
 import logging
-# from espeakng import ESpeakNG
 import subprocess
 import alsaaudio
 from queue import Queue
-import threading    # for espeak-ng, so that there is no blocking of other sensor functions during that time
+import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
 
 
 # DBus object paths
@@ -157,7 +156,7 @@ def setvolume(new_volume):
 
 def speak(text):
     if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
-        sound_queue.put(text)
+        sound_queue.put("<speed level=120>" + text + "</speed>")
     rlog.debug("Speak: "+text)
 
 
