@@ -6,7 +6,6 @@
 # usage /bin/bash mk_configure_radar.sh <branch>
 # <branch> is the github branch to clone, this is optional and set to "main" if not provided
 
-
 apt update
 apt upgrade -y
 
@@ -52,10 +51,7 @@ echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" |
 # only works if crontab is empty, otherwise use
 # crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
 
-
-
 # copy simple checklist once, can be changed later
 cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
-
 
 echo "Radar configuration finished. Reboot to start"
