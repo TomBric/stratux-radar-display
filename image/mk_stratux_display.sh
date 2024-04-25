@@ -96,7 +96,7 @@ truncate -s 4000M $IMGNAME || die "Image resize failed"
 lo=$(losetup -f)
 losetup "$lo" $IMGNAME
 partprobe "$lo"
-e2fsck -f "${lo}"p2
+e2fsck -y -f "${lo}"p2
 parted "${lo}" resizepart 2 100%
 partprobe "$lo" || die "Partprobe failed failed"
 resize2fs -p "${lo}"p2 || die "FS resize failed"
