@@ -34,25 +34,21 @@ sudo systemctl mask serial-getty@ttyAMA0.service
 apt install git python3-pip -y
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy -y
-# create symbolic link to /dev/stdout for pico2wave and stdout
 pip3 install  ADS1x15-ADC --break-system-packages
 
 #  enable headless connect:
 #  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
-mkdir -p /home/pi/.config/systemd/user/
-cp systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
-sudo -l -u pi systemctl --user enable autostart-radar.service
-loginctl enable-linger pi
-# In /usr/lib/systemd/system/rtkit-daemon.service
-# Einfügen hinter [Service] LogLevelMax=notice
 
+# install and start service to start radar
+sudo -u pi mkdir -p /home/pi/.config/systemd/user/
+sudo -u pi cp systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
+sudo -l -u pi systemctl --user enable autostart-radar
+# enable linger so that services will stay alive
+sudo -u pi loginctl enable-linger pi
 
-
-# include autostart into crontab of pi, so that radar starts on every boot
-# echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
-# only works if crontab is empty, otherwise use
-# crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
+# change log level of rtkit, otherwise this fills journal with tons of useless info
+sudo sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
 
 # copy simple checklist once, can be changed later
 cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
