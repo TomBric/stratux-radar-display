@@ -5,8 +5,8 @@
 # called via configure_radar as sudo
 # usage /bin/bash mk_configure_radar.sh
 
-apt update
-apt upgrade -y
+# apt update
+# apt upgrade -y
 
 # enable ssh
 raspi-config nonint do_ssh 0
@@ -44,9 +44,13 @@ mkdir -p /home/pi/.config/systemd/user/
 cp systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
 sudo -l -u pi systemctl --user enable autostart-radar.service
 loginctl enable-linger pi
+# In /usr/lib/systemd/system/rtkit-daemon.service
+# Einfügen hinter [Service] LogLevelMax=notice
+
+
 
 # include autostart into crontab of pi, so that radar starts on every boot
-echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
+# echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
 # only works if crontab is empty, otherwise use
 # crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
 
