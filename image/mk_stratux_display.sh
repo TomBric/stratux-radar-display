@@ -64,8 +64,8 @@ else
   outprefix="stratux-display"
 fi
 
-ZIPNAME="2024-03-15-raspios-bookworm-lite-${IMAGE_VERSION}.img.xz"
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_${IMAGE_VERSION}-2024-03-15/${ZIPNAME}"
+ZIPNAME="2024-03-15-raspios-bookworm-${IMAGE_VERSION}-lite.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_${IMAGE_VERSION}-lite-2024-03-15/${ZIPNAME}"
 
 
 IMGNAME="${ZIPNAME%.*}"
