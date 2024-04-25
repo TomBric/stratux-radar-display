@@ -43,7 +43,7 @@ sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wirepl
 # install and start service to start radar
 sudo -u pi mkdir -p /home/pi/.config/systemd/user/
 sudo -u pi cp systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
-sudo -l -u pi systemctl --user enable autostart-radar
+sudo systemctl --user -M pi@ enable autostart-radar
 # enable linger so that services will stay alive
 sudo -u pi loginctl enable-linger pi
 
