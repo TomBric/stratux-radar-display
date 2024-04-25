@@ -28,11 +28,10 @@ die() {
 # set defaults
 BRANCH=main
 V32=false
-BOOKWORM=false
 USB_NAME=""
 
 # check parameters
-while getopts ":b:k:u:w" opt; do
+while getopts ":b:k:u" opt; do
   case $opt in
     b)
       BRANCH="$OPTARG"
@@ -45,9 +44,6 @@ while getopts ":b:k:u:w" opt; do
     u)
       USB_NAME=$OPTARG
       ;;
-    w)
-      BOOKWORM=true
-      ;;
     \?)
       echo "Invalid option: -$OPTARG"
       exit 1
@@ -59,7 +55,7 @@ while getopts ":b:k:u:w" opt; do
   esac
 done
 
-echo "Building images for branch '$BRANCH' V32=$V32 BOOKWORM=$BOOKWORM"
+echo "Building images for branch '$BRANCH' V32=$V32 based on Bookworm"
 
 if [ "$V32" = true ]; then
   IMAGE_VERSION="armhf"
@@ -68,13 +64,9 @@ else
   IMAGE_VERSION="arm64"
   outprefix="stratux-display"
 fi
-if [ "$BOOKWORM" = true ]; then
-  ZIPNAME="2024-03-15-raspios-bookworm-${IMAGE_VERSION}.img.xz"
-  BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_${IMAGE_VERSION}/images/raspios_${IMAGE_VERSION}-2024-03-15/${ZIPNAME}"
-else
-  ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
-  BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_${IMAGE_VERSION}/images/raspios_oldstable_${IMAGE_VERSION}-2023-12-06/${ZIPNAME}"
-fi
+
+ZIPNAME="2024-03-15-raspios-bookworm-lite${IMAGE_VERSION}.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_${IMAGE_VERSION}-2024-03-15/${ZIPNAME}"
 
 
 IMGNAME="${ZIPNAME%.*}"

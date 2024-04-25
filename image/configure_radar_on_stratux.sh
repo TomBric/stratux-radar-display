@@ -5,10 +5,9 @@
 
 # set -x
 # luma files, pip3 and more
-apt-get update -y
-apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-numpy python3-pip -y
-pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
+apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils python3-alsaaudio -y
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy -y
+pip3 install  ADS1x15-ADC --break-system-packages
 
 # copy simple checklist once, can be changed later
 cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
