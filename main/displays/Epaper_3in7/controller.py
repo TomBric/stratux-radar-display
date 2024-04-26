@@ -915,15 +915,13 @@ def distance(now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_di
         )
         dashboard(5, starty, 225, True, "Ground Sensor", lines)
 
+    starty = 35   # right column
     if ahrs_valid:
         lines = (
             ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
             ("Roll [deg]", "{:+2d}".format(ahrs_roll)),
         )
         starty = dashboard(250, 35, 225, True, "AHRS", lines)
-    else:
-        starty = 20
-
     if baro_valid:
         if alt_diff_takeoff is not None:
             takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
