@@ -44,6 +44,10 @@ def is_busy():
     pass
 
 
+def clear():
+    pass
+
+
 def init(fullcircle=False):
     rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Running Radar with NoDisplay! ")
