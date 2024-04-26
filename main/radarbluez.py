@@ -152,9 +152,10 @@ def setvolume(new_volume):
         mixer.setvolume(new_volume)
 
 
-def speak(text):
+def speak(text, speed_percent = 100):
     if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
-        sound_queue.put("<speed level='120'>" + text + "</speed>")   # speek a little bit quicker
+        output_text = f"<speed level='{speed_percent}'> {text} </speed>"    # include string for setting speed
+        sound_queue.put(output_text)
     rlog.debug("Speak: "+text)
 
 
