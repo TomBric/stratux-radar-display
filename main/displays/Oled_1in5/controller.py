@@ -907,7 +907,7 @@ def form_line(values, key, format_str):    # generates line if key exists with f
         return '---'
 
 
-def distance_statistics(values):
+def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
     centered_text(0, "Start-/Landing", smallfont, fill="yellow")
 
     st = '---'
