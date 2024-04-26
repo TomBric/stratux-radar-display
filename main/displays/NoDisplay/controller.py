@@ -44,6 +44,10 @@ def is_busy():
     pass
 
 
+def next_arcposition(old_arcposition):
+    pass
+
+
 def clear():
     pass
 
