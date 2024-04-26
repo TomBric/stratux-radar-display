@@ -32,6 +32,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 
+import logging
+
+
 # just the skeleton of all functions to be able to start without display
 def display():
     pass
