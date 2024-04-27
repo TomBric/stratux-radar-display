@@ -106,6 +106,9 @@ mkdir -p mnt
 mount -t ext4 "${lo}"p2 mnt/ || die "root-mount failed"
 mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 
+
+die "manually STOPPED for debugging"
+
 # for groundsensor, disable ssh over serial cause it is needed for the sensor
 # disable ssh over serial otherwise
 # does not work in mk_configure_radar, since it is not mounted there when called via chroot mnt
