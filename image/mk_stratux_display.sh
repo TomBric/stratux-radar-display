@@ -106,15 +106,6 @@ mkdir -p mnt
 mount -t ext4 "${lo}"p2 mnt/ || die "root-mount failed"
 mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 
-
-# install git for cloning repo (if not already installed) and pip
-chroot mnt apt install git -y
-
-cd mnt/$DISPLAY_SRC || die "cd failed"
-sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
-cd ../../../
-chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
-
 # for groundsensor, disable ssh over serial cause it is needed for the sensor
 # disable ssh over serial otherwise
 # does not work in mk_configure_radar, since it is not mounted there when called via chroot mnt
@@ -128,8 +119,16 @@ sed -i mnt/boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
   echo "dtoverlay=miniuart-bt"
 } | tee -a mnt/boot/firmware/config.txt
 
-# mkdir -p out
 
+# install git for cloning repo (if not already installed) and pip
+chroot mnt apt install git -y
+
+cd mnt/$DISPLAY_SRC || die "cd failed"
+sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
+cd ../../../
+chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
+
+# mkdir -p out
 umount mnt/boot
 umount mnt
 
