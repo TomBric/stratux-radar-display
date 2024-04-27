@@ -108,20 +108,19 @@ mount -t ext4 "${lo}"p2 mnt/ || die "root-mount failed"
 mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 
 
-die "manually STOPPED for debugging"
-
 # for groundsensor, disable ssh over serial cause it is needed for the sensor
 # disable ssh over serial otherwise
 # does not work in mk_configure_radar, since it is not mounted there when called via chroot mnt
-sed -i mnt/boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-sed -i mnt/boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
-sed -i mnt/boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
-# modify /boot/firmware/config.text for groundsensor
+# before first boot cmdline and config are still in /boot not /boot/firmware
+sed -i mnt/boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
+sed -i mnt/boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
+sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
+# modify /boot/config.text for groundsensor
 {
   echo "# modification for ultrasonic ground sensor"
   echo "enable_uart=1"
   echo "dtoverlay=miniuart-bt"
-} | tee -a mnt/boot/firmware/config.txt
+} | tee -a mnt/boot/config.txt
 
 
 # install git for cloning repo (if not already installed) and pip
