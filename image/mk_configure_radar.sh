@@ -5,8 +5,11 @@
 # called via configure_radar as sudo
 # usage /bin/bash mk_configure_radar.sh
 
+set -x
+
 # apt update
 # apt upgrade -y
+
 
 # enable ssh
 raspi-config nonint do_ssh 0
@@ -42,7 +45,7 @@ sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wirepl
 
 # install and start service to start radar
 sudo -u pi mkdir -p /home/pi/.config/systemd/user/
-sudo -u pi cp systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
+sudo -u pi cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
 sudo systemctl --user -M pi@ enable autostart-radar
 # enable linger so that services will stay alive
 sudo -u pi loginctl enable-linger pi
