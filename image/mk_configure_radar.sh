@@ -44,14 +44,14 @@ pip3 install  ADS1x15-ADC --break-system-packages
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 
 # install and start service to start radar
-sudo -u pi mkdir -p /home/pi/.config/systemd/user/
-sudo -u pi cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
-sudo systemctl --user -M pi@ enable autostart-radar
+su pi -c mkdir -p /home/pi/.config/systemd/user/
+su pi -c cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
+systemctl --user -M pi@ enable autostart-radar
 # enable linger so that services will stay alive
-sudo -u pi loginctl enable-linger pi
+su pi -c loginctl enable-linger pi
 
 # change log level of rtkit, otherwise this fills journal with tons of useless info
-sudo sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
+sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
 
 # copy simple checklist once, can be changed later
 cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
