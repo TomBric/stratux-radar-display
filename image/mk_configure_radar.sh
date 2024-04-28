@@ -23,7 +23,7 @@ sed -i /boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
 sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
 # for bookworm disable serial-getty, it is whatsoever started by bookworm even if cmdline is changed
-sudo systemctl mask serial-getty@ttyAMA0.service
+systemctl mask serial-getty@ttyAMA0.service
 
 # modify /boot/firmware/config.text for groundsensor
 {
@@ -37,7 +37,7 @@ sudo systemctl mask serial-getty@ttyAMA0.service
 apt install git python3-pip -y
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy -y
-pip3 install  ADS1x15-ADC --break-system-packages
+su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 
 #  enable headless connect:
 #  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
@@ -52,6 +52,8 @@ loginctl enable-linger pi
 
 # change log level of rtkit, otherwise this fills journal with tons of useless info
 sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
+# set audio level to 50% as default
+wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.5
 
 # copy simple checklist once, can be changed later
 cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
