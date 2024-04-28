@@ -127,7 +127,7 @@ sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
 chroot mnt apt install git -y
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
-sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
+su pi -c "git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git"
 cd ../../../
 chroot mnt sudo /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
 
