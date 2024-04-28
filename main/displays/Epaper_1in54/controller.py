@@ -880,7 +880,7 @@ def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt
             dest_alt_str = "---"
 
         lines = (
-            ("Destination Alt [ft]", dest_alt_str),
+            ("Dest. Alt [ft]", dest_alt_str),
         )
         dashboard(0, starty, sizex, lines)
     if not ground_warnings:
