@@ -129,7 +129,7 @@ chroot mnt apt install git -y
 cd mnt/$DISPLAY_SRC || die "cd failed"
 su pi -c "git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git"
 cd ../../../
-unshare -mpfu chroot mnt /bin/bash -c $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
+unshare -mpfu chroot mnt /bin/bash -c "$DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
 
 # mkdir -p out
 umount mnt/boot
