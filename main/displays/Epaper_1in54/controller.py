@@ -836,7 +836,7 @@ def distance(now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_di
         dashboard(0, starty, sizex, lines)
     if error_message is not None:
         centered_text(80, error_message, verylargefont, fill="black")
-    bottom_line("Stats", "Mode", "Start")
+    bottom_line("Stats/Set", "  Mode", "Start")
 
 
 def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
