@@ -886,10 +886,7 @@ def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt
     if not ground_warnings:
         bottom_line("", "Back", "")
     else:
-        bottom_line("+/-100ft", "Back", "+/-10ft")
-
-
-    bottom_line("", "Back", "")
+        bottom_line("+/-100ft", "  Back", "+/-10ft")
 
 
 def checklist_topic(ypos, topic, highlighted=False, toprint=True):

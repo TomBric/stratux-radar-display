@@ -932,9 +932,21 @@ def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt
         ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
         ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
     )
-    dashboard(0, starty, sizex, lines)
+    starty = dashboard(0, starty, sizex, lines)
+    if ground_warnings:
+        if dest_alt_valid:
+            dest_alt_str = "{:+5.0f}".format(dest_altitude)
+        else:
+            dest_alt_str = "---"
 
-    bottom_line("", "Back", "")
+        lines = (
+            ("Dest. Alt [ft]", dest_alt_str),
+        )
+        dashboard(0, starty, sizex, lines)
+    if not ground_warnings:
+        bottom_line("", "Back", "")
+    else:
+        bottom_line("+/-100ft", "  Back", "+/-10ft")
 
 
 def checklist_topic(ypos, topic, highlighted=False, toprint=True):
