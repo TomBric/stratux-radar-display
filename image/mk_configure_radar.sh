@@ -52,8 +52,6 @@ loginctl enable-linger pi
 
 # change log level of rtkit, otherwise this fills journal with tons of useless info
 sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
-# set audio level to 50% as default
-wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.5
 
 # copy simple checklist once, can be changed later
 cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
