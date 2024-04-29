@@ -129,7 +129,11 @@ chroot mnt apt install git -y
 cd mnt/$DISPLAY_SRC || die "cd failed"
 su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git"
 cd ../../../
+# run the configuration skript, that is also executed when setting up on target device
 unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
+
+# run additional device setup topics, which are not working when executing the normal config skript from above
+unshare -mpfu chroot mnt /bin/bash -c /home/pi/stratux_radar_display/image/mk_statux_display_device_setup.sh
 
 # mkdir -p out
 umount mnt/boot
