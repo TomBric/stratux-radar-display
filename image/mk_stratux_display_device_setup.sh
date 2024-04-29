@@ -7,6 +7,11 @@
 
 set -x
 mount -t proc proc /proc
+# enable ssh
+raspi-config nonint do_ssh 0
+# enable spi and i2c (for cowarner)
+raspi-config nonint do_spi 0
+raspi-config nonint do_i2c 0
 systemctl --user -M pi@ enable autostart-radar
 # enable linger so that services will stay alive
 loginctl enable-linger pi
