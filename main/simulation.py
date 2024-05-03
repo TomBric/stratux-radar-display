@@ -48,6 +48,7 @@ SIM_DATA_FILE = "simulation_data.json"
 #    "g_distance": 10,
 #    "gps_speed": 0,
 #    "own_altitude": 10,
+#    "gps_altitude": 1000,
 #    "gear_down": false
 # }
 #
