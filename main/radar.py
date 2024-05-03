@@ -813,7 +813,7 @@ def main():
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
-                        groundbeep, situation, simulation_mode)
+                        groundbeep, situation, simulation_mode, global_config)
     simulation.init(simulation_mode)
     checklist.init(xml_checklist)
     radarbuttons.init_gear_indicator(global_config, gear_indication)
