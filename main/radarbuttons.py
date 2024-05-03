@@ -101,7 +101,7 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
 
 
 def gear_is_down():
-    return gear_down_btn.is_held()
+    return gear_down_btn.is_held
 
 def init_gear_indicator(global_config, gear_down_indication):
     global gear_down_btn
