@@ -329,7 +329,7 @@ def calc_distance_speaker(stat):
                     radarbluez.speak(GEAR_DOWN_WARNING, 120)
                 gear_gps_upper[i] = False
                 if gps_distance >= height * hysteresis:
-                    gps_gear_upper[i] = True
+                    gear_gps_upper[i] = True
         for (i, height) in enumerate(gear_sensor_warnings):
             if ground_distance <= height and gear_sensor_upper[i]:
                 # distance is reached and was before higher than hysteresis
