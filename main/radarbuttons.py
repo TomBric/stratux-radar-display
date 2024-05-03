@@ -107,6 +107,7 @@ def init_gear_indicator(global_config, gear_down_indication):
     global gear_down_btn
 
     global_config['gear_indication_active'] = False
+    print("Gear down indicator init {0} ".form(gear_down_indication))
     if gear_down_indication:
         try:
             gear_down_btn = Button(GEAR_DOWN, bounce_time=BOUNCE_TIME, hold_time=GEAR_HOLD_TIME)
