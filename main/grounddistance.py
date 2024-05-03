@@ -63,6 +63,7 @@ import math
 import serial
 import simulation
 import radarbluez
+import radarbuttons
 
 rlog = None  # radar specific logger
 
