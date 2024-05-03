@@ -325,7 +325,7 @@ def calc_distance_speaker(stat):
     if global_config['gear_indication_active'] and fly_status == 1:
         for (i, height) in enumerate(gear_gps_warnings):
             if gps_distance <= height and gear_gps_upper[i]:
-                if stat['gear_is_down'] is False:
+                if stat['gear_down'] is False:
                     radarbluez.speak(GEAR_DOWN_WARNING, 120)
                 gear_gps_upper[i] = False
             if gps_distance >= height * hysteresis:
@@ -333,7 +333,7 @@ def calc_distance_speaker(stat):
         for (i, height) in enumerate(gear_sensor_warnings):
             if ground_distance <= height and gear_sensor_upper[i]:
                 # distance is reached and was before higher than hysteresis
-                if stat['gear_is_down'] is False:
+                if stat['gear_down'] is False:
                     radarbluez.speak(GEAR_NOT_DOWN_GO_AROUND, 120)
                 gear_sensor_upper[i] = False
             if ground_distance >= height * hysteresis:
@@ -572,6 +572,8 @@ async def read_ground_sensor():
                 if global_config['gear_indication_active']:
                     global_situation['gear_down'] = radarbuttons.gear_is_down()
                     rlog.log(value_debug_level, 'Ground Distance: gear-down: {0}'.format(global_situation['gear_down']))
+                else:
+                    global_situation['gear_down'] = False   # default value if not to be indicated
                 store_statistics(global_situation)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
