@@ -318,7 +318,7 @@ def calc_distance_speaker(stat):
                 sensor_upper[i] = False
             if ground_distance >= height * hysteresis:
                 sensor_upper[i] = True
-    if global_config['gear_indication_active'] and fly_status == 1:
+    if global_situation['gear_indication_active'] and fly_status == 1:
         for (i, height) in enumerate(gps_gear_warnings):
             if gps_distance <= height and gear_gps_upper[i]:
                 if stat['gear_down'] is False:
