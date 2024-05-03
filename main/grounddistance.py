@@ -94,7 +94,6 @@ GEAR_NOT_DOWN_GO_AROUND = "Go around! Gear not down!"
 # globals
 ground_distance_active = False  # True if sensor is found and activated
 indicate_distance = False  # True if audio indication for ground distance is active
-indicate_gear = Fals  # True if audio indication for gear warnings is active
 distance_sensor = None
 zero_distance = 0.0  # distance of sensor when aircraft is on ground
 value_debug_level = 0  # set during init
@@ -246,7 +245,6 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
     global rlog
     global ground_distance_active
     global indicate_distance
-    global indicate_gear
     global distance_sensor
     global value_debug_level
     global global_situation
