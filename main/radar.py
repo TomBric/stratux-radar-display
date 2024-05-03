@@ -157,6 +157,7 @@ optical_alive = -1
 measure_flighttime = False  # True if automatic measurement of flighttime is enabled
 co_warner_activated = False  # True if co-warner is activated
 co_indication = False  # True if indication via GPIO Pin 16 is on for co
+gear_indication = False # True if indication vio GPIO Pin 19 is on for reading gear statux (pull down if gear is down)
 grounddistance_activated = False  # True if measurement of grounddistance via VL53L1x is activated
 groundbeep = False  # True if indication of ground distance via audio
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
@@ -815,6 +816,7 @@ def main():
                         groundbeep, situation, simulation_mode)
     simulation.init(simulation_mode)
     checklist.init(xml_checklist)
+    radarbuttons.init_gear_indicator(global_config, gear_indication)
     display_control.startup(RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -914,6 +916,8 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
                     action="store_true", default=False)
+    ap.add_argument("-gi", "--gearindicate", required=False, help="Indicate gear warning",
+                    action="store_true", default=False)
     ap.add_argument("-sim", "--simulation", required=False, help="Simulation mode for testing",
                     action="store_true", default=False)
     ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
@@ -950,6 +954,7 @@ if __name__ == "__main__":
     co_indication = args['coindicate']
     grounddistance_activated = args['grounddistance']
     groundbeep = args['groundbeep']
+    gear_indication = args ['gearindicate']
     simulation_mode = args['simulation']
     xml_checklist = args['checklist']
     if args['timer']:

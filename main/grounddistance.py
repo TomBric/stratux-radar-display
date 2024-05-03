@@ -87,6 +87,10 @@ INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
 
 MIN_GPS_V_ACCURACY = 150   # minimum horizontal accuracy of gps, if not met, no speech warnings are spoken
 
+GEAR_DOWN_WARNING = "Gear down!"    # warning to be spoken, when gear_
+GEAR_NOT_DOWN_GO_AROUND = "Go around! Gear not down!"
+
+
 # globals
 ground_distance_active = False  # True if sensor is found and activated
 indicate_distance = False  # True if audio indication for ground distance is active
@@ -118,6 +122,11 @@ gps_warnings = (1000, 500)    # speech warnings in feet, when calculated with gp
 gps_upper = [False] * len(gps_warnings)  # is true, if height + hysteresis was met
 sensor_warnings = (10, 5, 3, 2, 1)   # speech warnings in feet, when calculated with groundsensor
 sensor_upper = [False] * len(sensor_warnings) # is true, if height + hysteresis was met
+
+gear_gps_warnings = (1000, 500, 400, 300, 200, 100)  # speech warnings if gear is not down, calculated with gps
+gear_gps_upper = [False] * len(gear_gps_warnings)  # is true, if height + hysteresis was met
+gear_sensor_warnings= (10, 5)   # speech warnings if gear is not down based on sensor
+gear_sensor_upper = [False] * len(gear_sensor_warnings)  # is true, if height + hysteresis was met
 
 hysteresis = 1.1    # hysteresis 10% for speech warnings,
 # this means a ground warning is only repeated if more than 10% more of height was reached in between
@@ -291,7 +300,7 @@ def calc_distance_speaker(stat):
     else:
         gps_distance = 0.0
     if stat['g_distance_valid']:
-        ground_distance = stat['g_distance'] / 304.8    # g_distance is in mm, here we need ft
+        ground_distance = stat['g_distance'] / 328.1    # g_distance is in mm, here we need ft
     else:
         ground_distance = 0.0
     if indicate_distance and fly_status == 1:
@@ -309,6 +318,20 @@ def calc_distance_speaker(stat):
                 sensor_upper[i] = False
             if ground_distance >= height * hysteresis:
                 sensor_upper[i] = True
+        if global_config['gear_indication_active']:
+            for (i, height) in enumerate(gps_gear_warnings):
+                if gps_distance <= height and gear_gps_upper[i]:
+                    radarbluez.speak(GEAR_DOWN_WARNING, 120)
+                    gear_gps_upper[i] = False
+                    if gps_distance >= height * hysteresis:
+                        gps_gear_upper[i] = True
+            for (i, height) in enumerate(gear_sensor_warnings):
+                if ground_distance <= height and gear_sensor_upper[i]:
+                    # distance is reached and was before higher than hysteresis
+                    radarbluez.speak(GEAR_NOT_DOWN_GO_AROUND, 120)
+                    gear_sensor_upper[i] = False
+                if ground_distance >= height * hysteresis:
+                    gear_sensor_upper[i] = True
 
 
 def is_airborne():
