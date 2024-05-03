@@ -565,7 +565,7 @@ async def read_ground_sensor():
                     global_situation['g_distance_valid'] = False
                     global_situation['g_distance'] = INVALID_GDISTANCE   # just to be safe
                     rlog.log(value_debug_level, 'Ground Distance: Sensor value invalid, maybe out of range')
-                if global_config['gear_indication_active']:
+                if global_situation['gear_indication_active']:
                     global_situation['gear_down'] = radarbuttons.gear_is_down()
                     rlog.log(value_debug_level, 'Ground Distance: gear-down: {0}'.format(global_situation['gear_down']))
                 store_statistics(global_situation)
