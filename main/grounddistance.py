@@ -321,14 +321,16 @@ def calc_distance_speaker(stat):
     if global_config['gear_indication_active'] and fly_status == 1:
         for (i, height) in enumerate(gps_gear_warnings):
             if gps_distance <= height and gear_gps_upper[i]:
-                radarbluez.speak(GEAR_DOWN_WARNING, 120)
+                if stat['gear_down'] is False:
+                    radarbluez.speak(GEAR_DOWN_WARNING, 120)
                 gear_gps_upper[i] = False
                 if gps_distance >= height * hysteresis:
                     gps_gear_upper[i] = True
         for (i, height) in enumerate(gear_sensor_warnings):
             if ground_distance <= height and gear_sensor_upper[i]:
                 # distance is reached and was before higher than hysteresis
-                radarbluez.speak(GEAR_NOT_DOWN_GO_AROUND, 120)
+                if stat['gear_down'] is False:
+                    radarbluez.speak(GEAR_NOT_DOWN_GO_AROUND, 120)
                 gear_sensor_upper[i] = False
             if ground_distance >= height * hysteresis:
                 gear_sensor_upper[i] = True
@@ -515,6 +517,10 @@ def store_statistics(sit):
             if 'own_altitude' in sim_data:
                 sit['own_altitude'] = sim_data['own_altitude']
                 sit['baro_valid'] = True
+            if 'gear_down' in sim_data:
+                sit['gear_down'] = sim_data['gear_down']
+            else:
+                sit['gear_down'] = False
     if time.perf_counter() > stats_next_store:
         stats_next_store = time.perf_counter() + (1 / STATS_PER_SECOND)
         now = datetime.datetime.now(datetime.timezone.utc)
@@ -522,7 +528,8 @@ def store_statistics(sit):
                       'gps_active': sit['gps_active'], 'longitude': sit['longitude'], 'latitude': sit['latitude'],
                       'gps_speed': sit['gps_speed'], 'gps_altitude': sit['gps_altitude'],
                       'gps_h_accuracy': sit['gps_h_accuracy'], 'gps_v_accuracy': sit['gps_v_accuracy'],
-                      'g_distance_valid': sit['g_distance_valid'], 'g_distance': sit['g_distance']}
+                      'g_distance_valid': sit['g_distance_valid'], 'g_distance': sit['g_distance'],
+                      'gear_down': sit['gear_down']}
         statistics.append(stat_value)
         if len(statistics) > stats_max_values:     # sliding window, remove old values
             statistics.pop(0)
@@ -558,6 +565,9 @@ async def read_ground_sensor():
                     global_situation['g_distance_valid'] = False
                     global_situation['g_distance'] = INVALID_GDISTANCE   # just to be safe
                     rlog.log(value_debug_level, 'Ground Distance: Sensor value invalid, maybe out of range')
+                if global_config['gear_indication_active']:
+                    global_situation['gear_down'] = radarbuttons.gear_is_down()
+                    rlog.log(value_debug_level, 'Ground Distance: gear-down: {0}'.format(global_situation['gear_down']))
                 store_statistics(global_situation)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
