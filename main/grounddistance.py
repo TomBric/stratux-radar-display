@@ -88,8 +88,8 @@ INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
 
 MIN_GPS_V_ACCURACY = 150   # minimum horizontal accuracy of gps, if not met, no speech warnings are spoken
 
-GEAR_DOWN_WARNING = "<pitch level="110"> Gear down! </pitch>"    # warning to be spoken, when gear_
-GEAR_NOT_DOWN_GO_AROUND = "<pitch level="130"> Go around! Gear not down! </pitch>"
+GEAR_DOWN_WARNING = '<pitch level="110"> Gear down! </pitch>'    # warning to be spoken, when gear_
+GEAR_NOT_DOWN_GO_AROUND = '<pitch level="130"> Go around! Gear not down! </pitch>'
 
 
 # globals
