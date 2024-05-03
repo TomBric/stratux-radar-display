@@ -114,4 +114,4 @@ def init_gear_indicator(global_config, gear_down_indication):
             rlog.debug("Radarbuttons ERROR: GPIO-Pin {0} for gear down indication busy! Please clarify!".format(GEAR_DOWN))
         else:
             global_config['gear_indication_active'] = True
-            rlog.debug("Radarbuttons: Gear down indicator on GPIO-Pin {0} initialized.".format(GEAR_DOWN))
+            rlog.debug("Radarbuttons: Gear down indicator on GPIO{0} initialized.".format(GEAR_DOWN))
