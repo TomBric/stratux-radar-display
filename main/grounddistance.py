@@ -318,20 +318,20 @@ def calc_distance_speaker(stat):
                 sensor_upper[i] = False
             if ground_distance >= height * hysteresis:
                 sensor_upper[i] = True
-        if global_config['gear_indication_active']:
-            for (i, height) in enumerate(gps_gear_warnings):
-                if gps_distance <= height and gear_gps_upper[i]:
-                    radarbluez.speak(GEAR_DOWN_WARNING, 120)
-                    gear_gps_upper[i] = False
-                    if gps_distance >= height * hysteresis:
-                        gps_gear_upper[i] = True
-            for (i, height) in enumerate(gear_sensor_warnings):
-                if ground_distance <= height and gear_sensor_upper[i]:
-                    # distance is reached and was before higher than hysteresis
-                    radarbluez.speak(GEAR_NOT_DOWN_GO_AROUND, 120)
-                    gear_sensor_upper[i] = False
-                if ground_distance >= height * hysteresis:
-                    gear_sensor_upper[i] = True
+    if global_config['gear_indication_active'] and fly_status == 1:
+        for (i, height) in enumerate(gps_gear_warnings):
+            if gps_distance <= height and gear_gps_upper[i]:
+                radarbluez.speak(GEAR_DOWN_WARNING, 120)
+                gear_gps_upper[i] = False
+                if gps_distance >= height * hysteresis:
+                    gps_gear_upper[i] = True
+        for (i, height) in enumerate(gear_sensor_warnings):
+            if ground_distance <= height and gear_sensor_upper[i]:
+                # distance is reached and was before higher than hysteresis
+                radarbluez.speak(GEAR_NOT_DOWN_GO_AROUND, 120)
+                gear_sensor_upper[i] = False
+            if ground_distance >= height * hysteresis:
+                gear_sensor_upper[i] = True
 
 
 def is_airborne():
