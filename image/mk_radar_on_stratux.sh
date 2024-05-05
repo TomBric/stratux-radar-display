@@ -104,9 +104,9 @@ chroot mnt apt install git python3-pip -y
 chroot mnt overlayctl disable
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
-su pi -c "git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git"
+su pi -c "git clone --recursive -b ${BRANCH} https://github.com/TomBric/stratux-radar-display.git"
 # set display
-sed -i 's/Oled_1in5/${DISPLAY_NAME}/g' stratux-radar-display/image/stratux_radar.sh
+sed -i "s/Oled_1in5/${DISPLAY_NAME}/g" stratux-radar-display/image/stratux_radar.sh
 # back to root directory of stratux image
 cd ../../../
 # run stratux configuration skript
