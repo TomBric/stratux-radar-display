@@ -47,6 +47,7 @@ sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wirepl
 su pi -c "mkdir -p /home/pi/.config/systemd/user/"
 su pi -c "cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service"
 # create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
+su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
 su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
 # enable linger for bluetooth
 loginctl enable-linger pi
