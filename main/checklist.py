@@ -72,6 +72,7 @@ def init(checklist_xml):
         g_checklist = xml_dict['ALL_CHECKLISTS']['CHECKLIST']
     except KeyError:
         rlog.debug("Checklist - KeyError understanding dict from xml")
+    rlog.debug("Checklist - XML file '{0}' successfully read.".format(checklist_xml))
     # rlog.debug("Checklist read: {0}".format(g_checklist))
     # g_checklist is now a list of checklists
     # [{'ITEM': [{'CHECK': 'Done',
