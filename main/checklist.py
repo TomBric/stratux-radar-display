@@ -65,6 +65,7 @@ def init(checklist_xml):
         return
     try:
         xml_dict = xmltodict.parse(xml_string, force_list=('CHECKLIST', 'ITEM'))
+        # force_list ensures that there is a list generated, even if there is only one CHECKLIST or ITEM
     except Exception as e:
         rlog.debug("Checklist - Parsing of xml-checklist failed with error <{0}>".format(e))
         return
