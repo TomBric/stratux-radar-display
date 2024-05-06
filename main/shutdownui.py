@@ -32,6 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import subprocess
 import radarbuttons
 import time
 import requests
@@ -57,6 +58,26 @@ def init(shutdown, reboot):
     url_shutdown = shutdown
     rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
+
+
+
+def clear_lingering_radar():     # remove other radar.py processes, necessary sind lingering is enabled for bluetooth
+    current_pid = os.getpid()   # my processid
+    pid_list = []
+    pname = "radar.py"
+    try:
+        output = subprocess.check_output(['pgrep', '-f', pname]).decode('utf-8').strip()
+        pid_list = output.split('\n')   # generate a list of strings
+    except subprocess.CalledProcessError:
+        pass
+    for proc in pid_list:
+        if int(proc) != current_pid:
+            try:
+                print("Terminating other process {0}".format(int(proc)))
+                os.kill(int(proc), 9)   # Kill signal
+                time.sleep(2)   # give him some time to terminate
+            except OSError :
+                pass
 
 
 def draw_shutdown(display_control):

@@ -3,18 +3,13 @@
 # script configures basic libraries and settings necessary for stratux-radar
 # script to be run as root
 # called via configure_radar as sudo
-# usage /bin/bash mk_configure_radar.sh <branch>
-# <branch> is the github branch to clone, this is optional and set to "main" if not provided
+# usage /bin/bash mk_configure_radar.sh
 
-# remove unnecessary software from the recommended version, unfortunately the lite version does not handel uart correctly
-# remove all x11 stuff
-apt remove libice6 x11-common firefox "cpp*" gdb busybox "gstreamer*" "gnupg*" "gnome*" "lx*" piwiz \
-   groff-base "samba*" "xdg*" galculator geany xcompmgr gcr "chromium-browser*" "liblouis*" "desktop-*" \
-   adwaita-icon-theme --purge -y
-apt autoremove --purge -y
+set -x
 
 # apt update
 # apt upgrade -y
+
 
 # enable ssh
 raspi-config nonint do_ssh 0
@@ -27,6 +22,9 @@ raspi-config nonint do_i2c 0
 sed -i /boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
 sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
+# for bookworm disable serial-getty, it is whatsoever started by bookworm even if cmdline is changed
+systemctl mask serial-getty@ttyAMA0.service
+
 # modify /boot/firmware/config.text for groundsensor
 {
   echo "# modification for ultrasonic ground sensor"
@@ -34,55 +32,30 @@ sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
   echo "dtoverlay=miniuart-bt"
 } | tee -a /boot/firmware/config.txt
 
-# sound and espeak
-apt install libasound2-dev libasound2-doc python3-alsaaudio espeak-ng espeak-ng-data -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled -y
-pip3 install py-espeak-ng ADS1x15-ADC --break-system-packages
 
-# bluetooth
-apt install bluetooth pulseaudio pulseaudio-module-bluetooth -y
+# bookworm lite:
+apt install git python3-pip -y
+apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils python3-alsaaudio -y
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy -y
+su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 
-# bluetooth configuration
-# Enable a system wide pulseaudio server, otherwise audio in non-login sessions is not working
-# configs in /etc/pulse/system.pa
-{
-  echo "### modification for radar bluetooth interface"
-  echo ".ifexists module-bluetooth-discover.so"
-  echo "load-module module-bluetooth-discover"
-  echo ".endif"
-  echo ".ifexists module-bluetooth-policy.so"
-  echo "load-module module-bluetooth-policy"
-  echo ".endif"
-  echo "load-module module-switch-on-connect"
-} | tee -a /etc/pulse/system.pa
+#  enable headless connect:
+#  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
+sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 
-# configs in /etc/pulse/client.conf to disable client spawns
-# sed -i '$ a default-server = /var/run/pulse/native' /etc/pulse/client.conf
-# sed -i '$ a autospawn = no' /etc/pulse/client.conf
-# disable user oriented pulseaudio completely, is started as system daemon later to
-# enable bluetooth without interactive session
-# systemctl --user mask pulseaudio.service
-# systemctl --user mask pulseaudio.socket
+# install and start service to start radar
+su pi -c "mkdir -p /home/pi/.config/systemd/user/"
+su pi -c "cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service"
+# create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
+su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
+su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
+# enable linger for bluetooth
+loginctl enable-linger pi
 
-# allow user pulse bluetooth access
-usermod -a -G bluetooth pulse
-# addgroup pulse lp
-usermod -a -G pulse-access pi
-
-# start pulseaudio system wide
-cp /home/pi/stratux-radar-display/image/pulseaudio.service /etc/systemd/system/
-systemctl daemon-reload
-systemctl --system enable pulseaudio.service
-systemctl --system start pulseaudio.service
-
-
-# include autostart into crontab of pi, so that radar starts on every boot
-echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
-# only works if crontab is empty, otherwise use
-# crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
+# change log level of rtkit, otherwise this fills journal with tons of useless info
+sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
 
 # copy simple checklist once, can be changed later
-cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml
-
+su pi -c "cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml"
 
 echo "Radar configuration finished. Reboot to start"

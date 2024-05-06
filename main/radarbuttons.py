@@ -33,13 +33,19 @@
 
 import logging
 from gpiozero import Button
+from gpiozero.exc import GPIOZeroError, GPIODeviceError
+
+btn = None   # will be set in init
+gear_down_btn = None   # will be set ini int
 
 # global constants
 HOLD_TIME = 0.8 # time to trigger the hold activity if one button is pressed longer
+GEAR_HOLD_TIME = 0.3   # time until gear is indicated to be down
 BOUNCE_TIME = 0.05
 LEFT = 26
 MIDDLE = 20
 RIGHT = 21
+GEAR_DOWN = 19
 
 class RadarButton:
     def __init__(self,gpio_number):
@@ -69,13 +75,20 @@ class RadarButton:
             return 1
         return 0
 
-btn = [RadarButton(LEFT), RadarButton(MIDDLE), RadarButton(RIGHT)]
 
 def init():
     global rlog
+    global btn
 
     rlog = logging.getLogger('stratux-radar-log')
+    try:
+        btn = [RadarButton(LEFT), RadarButton(MIDDLE), RadarButton(RIGHT)]
+    except:
+        rlog.debug("ERROR: GPIO-Pins busy! No input possible. Please clarify!")
+        return False  # indicate errors
     rlog.debug("Radarbuttons: Initialized.")
+    return True    # indicate everything is fine
+
 
 
 def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
@@ -86,3 +99,19 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
             return stat, index
     return 0, 0
 
+
+def gear_is_down():
+    return gear_down_btn.is_held
+
+def init_gear_indicator(global_config, gear_down_indication):
+    global gear_down_btn
+
+    global_config['gear_indication_active'] = False
+    if gear_down_indication:
+        try:
+            gear_down_btn = Button(GEAR_DOWN, bounce_time=BOUNCE_TIME, hold_time=GEAR_HOLD_TIME)
+        except:
+            rlog.debug("Radarbuttons ERROR: GPIO-Pin {0} for gear down indication busy! Please clarify!".format(GEAR_DOWN))
+        else:
+            global_config['gear_indication_active'] = True
+            rlog.debug("Radarbuttons: Gear down indicator on GPIO{0} initialized.".format(GEAR_DOWN))

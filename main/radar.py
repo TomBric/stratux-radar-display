@@ -73,7 +73,7 @@ rlog = None  # radar specific logger
 #
 
 # constant definitions
-RADAR_VERSION = "2.01"
+RADAR_VERSION = "2.03"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -119,7 +119,7 @@ aircraft_changed = True
 ui_changed = True
 situation = {'was_changed': True, 'last_update': 0.0, 'connected': False, 'gps_active': False, 'course': 0,
              'own_altitude': -99.0, 'latitude': 0.0, 'longitude': 0.0, 'RadarRange': 5, 'RadarLimits': 10000,
-             'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
+             'gps_quality': 0, 'gps_h_accuracy': 20000, 'gps_v_accuracy': 20000, 'gps_speed': -100.0, 'gps_altitude': -99.0,
              'vertical_speed': 0.0, 'baro_valid': False, 'g_distance_valid': False,
              'g_distance': grounddistance.INVALID_GDISTANCE}
 vertical_max = 0.0  # max value for vertical speed
@@ -157,6 +157,7 @@ optical_alive = -1
 measure_flighttime = False  # True if automatic measurement of flighttime is enabled
 co_warner_activated = False  # True if co-warner is activated
 co_indication = False  # True if indication via GPIO Pin 16 is on for co
+gear_indication = False # True if indication vio GPIO Pin 19 is on for reading gear statux (pull down if gear is down)
 grounddistance_activated = False  # True if measurement of grounddistance via VL53L1x is activated
 groundbeep = False  # True if indication of ground distance via audio
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
@@ -422,6 +423,9 @@ def new_situation(json_str):
             situation['was_changed'] = True
         if situation['gps_h_accuracy'] != sit['GPSHorizontalAccuracy']:
             situation['gps_h_accuracy'] = sit['GPSHorizontalAccuracy']
+            situation['was_changed'] = True
+        if situation['gps_v_accuracy'] != sit['GPSVerticalAccuracy']:
+            situation['gps_v_accuracy'] = sit['GPSVerticalAccuracy']
             situation['was_changed'] = True
         if situation['gps_speed'] != sit['GPSGroundSpeed']:
             situation['gps_speed'] = sit['GPSGroundSpeed']
@@ -795,7 +799,9 @@ def main():
     global bluetooth_active
 
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
-    radarui.init(url_settings_set)
+    if not radarui.init(url_settings_set):
+        print("GPIO Error, is  another radar process running? Terminating.")
+        return 1
     shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
@@ -807,9 +813,10 @@ def main():
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
-                        groundbeep, situation, simulation_mode)
+                        groundbeep, situation, simulation_mode, global_config)
     simulation.init(simulation_mode)
     checklist.init(xml_checklist)
+    radarbuttons.init_gear_indicator(global_config, gear_indication)
     display_control.startup(RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -819,9 +826,13 @@ def main():
 
 def quit_gracefully(*arguments):
     print("Keyboard interrupt or shutdown. Quitting ...")
-    tasks = asyncio.all_tasks()
-    for ta in tasks:
-        ta.cancel()
+    try:
+        tasks = asyncio.all_tasks()
+        for ta in tasks:
+            ta.cancel()
+    except RuntimeError:
+        pass
+    radarbluez.sound_terminate()
     rlog.debug("CleanUp Display ...")
     display_control.cleanup()
     return 0
@@ -856,6 +867,10 @@ def logging_init():
 if __name__ == "__main__":
     # set uncaught exception logging to /var/log/messages/user
     sys.excepthook = radar_excepthook
+    # set up radar-specific logging
+    logging_init()
+    # set up logging
+    shutdownui.clear_lingering_radar()
     # parse arguments for different configurations
     ap = argparse.ArgumentParser(description='Stratux radar display')
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
@@ -901,6 +916,8 @@ if __name__ == "__main__":
                     action="store_true", default=False)
     ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
                     action="store_true", default=False)
+    ap.add_argument("-gi", "--gearindicate", required=False, help="Indicate gear warning",
+                    action="store_true", default=False)
     ap.add_argument("-sim", "--simulation", required=False, help="Simulation mode for testing",
                     action="store_true", default=False)
     ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
@@ -937,6 +954,7 @@ if __name__ == "__main__":
     co_indication = args['coindicate']
     grounddistance_activated = args['grounddistance']
     groundbeep = args['groundbeep']
+    gear_indication = args ['gearindicate']
     simulation_mode = args['simulation']
     xml_checklist = args['checklist']
     if args['timer']:

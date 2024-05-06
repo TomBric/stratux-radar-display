@@ -31,13 +31,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 import re
 import pydbus
 import logging
-from espeakng import ESpeakNG
 import subprocess
 import alsaaudio
+from queue import Queue
+import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
 
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
@@ -48,14 +48,14 @@ rlog = None
 bus = None
 manager = None
 adapter = None
-b_esng = None
-e_esng = None
 bluetooth_active = False
 extsound_active = False
 bt_devices = 0          # no of active bluetooth devices last time checked via connected devices
 mixer = None
 global_config = None
-
+sound_queue = None    # external sound queue
+sound_thread = None
+sound_card = None     # number of sound card, is initialized if external_sound_output is True
 
 def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whether it was selected
     found = False
@@ -86,9 +86,10 @@ def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whet
 def sound_init(config, bluetooth, mixer_name):
     global bluetooth_active
     global extsound_active
-    global b_esng
-    global e_esng
     global mixer
+    global sound_queue
+    global sound_thread
+    global sound_card
     global rlog
     global global_config
 
@@ -96,7 +97,7 @@ def sound_init(config, bluetooth, mixer_name):
     bluetooth_active = False
     global_config = config
     rlog = logging.getLogger('stratux-radar-log')
-    card, mixer = find_mixer(mixer_name)   # search for mixer in any case
+    sound_card, mixer = find_mixer(mixer_name)   # search for mixer in any case
     if not mixer:
         rlog.debug("Radarbluez: Mixer not found!")
     else:
@@ -106,27 +107,21 @@ def sound_init(config, bluetooth, mixer_name):
     if bluetooth:
         bluetooth_active = bluez_init()
 
-    if bluetooth_active and b_esng is None:
-        b_esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-        if b_esng is None:
-            rlog.debug("Radarbluez: Bluetooth espeak-ng not initialized")
-        else:
-            bluetooth_active = True
-            rlog.debug("Radarbluez: Bluetooth espeak-ng successfully initialized.")
-            b_esng.say("Stratux Radar connected")
-
-    if mixer is not None and e_esng is None:
-        audio = "plughw:" + str(card)
-        e_esng = ESpeakNG(voice='en-us', pitch=30, speed=175, audio_dev=audio)
-        if e_esng is None:  # could not initialize esng
-            extsound_active = False
-            rlog.debug("Radarbluez: ExtSound espeak-ng not initialized")
-        else:
-            rlog.debug("Radarbluez: ExtSound espeak-ng successfully initialized.")
-            e_esng.say("Stratux Radar connected")
+    if bluetooth_active or extsound_active:
+        sound_queue = Queue()
+        sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
+        sound_thread.start()
+        speak("Stratux Radar connected")
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
                " ExtSound volume: " + str(global_config['sound_volume']) + ".")
     return extsound_active, bluetooth_active
+
+
+def sound_terminate():
+    if sound_queue:
+        sound_queue.put('STOP')
+    if sound_thread:
+        sound_thread.join()    # wait for termination
 
 
 def bluez_init():
@@ -134,8 +129,6 @@ def bluez_init():
     global manager
     global adapter
     global bluetooth_active
-    global bt_devices
-    global rlog
 
     bus = pydbus.SystemBus()
 
@@ -155,32 +148,42 @@ def bluez_init():
 
 
 def setvolume(new_volume):
-    global mixer
-    global extsound_active
-
     if mixer is not None:
         mixer.setvolume(new_volume)
 
 
-def speak(text):
-    global b_esng
-    global e_esng
-
-    if extsound_active and global_config['sound_volume'] > 0:
-        e_esng.say(text)
-    if bluetooth_active and bt_devices > 0:
-        if b_esng is None:   # first initialization failed, may happen with bluetooth, try again
-            b_esng = ESpeakNG(voice='en-us', pitch=30, speed=175)
-            if b_esng is None:
-                rlog.debug("Radarbluez: Bluetooth espeak-ng not initialized")
-                return
-            rlog.debug("Radarbluez: Bluetooth speak-ng successfully initialized.")
-        b_esng.say(text)
+def speak(text, speed_percent = 100):
+    if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
+        output_text = f"<speed level='{speed_percent}'> {text} </speed>"    # include string for setting speed
+        sound_queue.put(output_text)
     rlog.debug("Speak: "+text)
 
 
+def audio_speaker(queue):
+    rlog.debug("Radarbluez: Audio-Speaker thread active.")
+    while True:
+        msg = queue.get()
+        if msg == 'STOP':
+            break
+        else:
+            pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", msg])  # generate wave
+            if pico_result.returncode == 0:
+                if bluetooth_active and bt_devices > 0:
+                    deviceopt = "--device=pipewire"
+                    aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
+                    if aplay_result.returncode != 0:
+                        rlog.debug("Radarbluez: Error running aplay for bluetooth")
+                if extsound_active and global_config['sound_volume'] > 0:
+                    deviceopt = "--device=plughw:" + str(sound_card)
+                    aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
+                    if aplay_result.returncode != 0:
+                        rlog.debug("Radarbluez: Error running aplay {0}".format(deviceopt))
+            else:
+                rlog.debug("Radarbluez: Error using pico2wave TTS")
+    rlog.debug("Radarbluez: Sound-Speaker thread terminated.")
+
+
 def connected_devices():
-    global manager
     global bt_devices
 
     if not bluetooth_active:

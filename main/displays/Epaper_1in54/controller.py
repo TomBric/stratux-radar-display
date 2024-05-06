@@ -836,7 +836,7 @@ def distance(now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_di
         dashboard(0, starty, sizex, lines)
     if error_message is not None:
         centered_text(80, error_message, verylargefont, fill="black")
-    bottom_line("Stats", "Mode", "Start")
+    bottom_line("Stats/Set", "  Mode", "Start")
 
 
 def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
@@ -846,7 +846,7 @@ def form_line(values, key, format_str):    # generates line if key exists with f
         return '---'
 
 
-def distance_statistics(values):
+def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
     centered_text(0, "Start-/Landing", smallfont, fill="black")
 
     st = '---'
@@ -871,9 +871,22 @@ def distance_statistics(values):
         ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
         ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
     )
-    dashboard(0, starty, sizex, lines)
+    starty = dashboard(0, starty, sizex, lines)
 
-    bottom_line("", "Back", "")
+    if ground_warnings:
+        if dest_alt_valid:
+            dest_alt_str = "{:+5.0f}".format(dest_altitude)
+        else:
+            dest_alt_str = "---"
+
+        lines = (
+            ("Dest. Alt [ft]", dest_alt_str),
+        )
+        dashboard(0, starty, sizex, lines)
+    if not ground_warnings:
+        bottom_line("", "Back", "")
+    else:
+        bottom_line("+/-100ft", "  Back", "+/-10ft")
 
 
 def checklist_topic(ypos, topic, highlighted=False, toprint=True):

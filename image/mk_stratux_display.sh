@@ -14,9 +14,9 @@
 #   sudo /bin/bash mk_stratux_display.sh
 #   sudo /bin/bash mk_stratux_display.sh -b dev
 #   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
-#   sudo /bin/bash mk_stratux_display.sh -b dev -w
 
-# set -x
+set -x
+
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 
@@ -28,11 +28,10 @@ die() {
 # set defaults
 BRANCH=main
 V32=false
-BOOKWORM=false
 USB_NAME=""
 
 # check parameters
-while getopts ":b:k:u:w" opt; do
+while getopts ":b:k:u" opt; do
   case $opt in
     b)
       BRANCH="$OPTARG"
@@ -45,9 +44,6 @@ while getopts ":b:k:u:w" opt; do
     u)
       USB_NAME=$OPTARG
       ;;
-    w)
-      BOOKWORM=true
-      ;;
     \?)
       echo "Invalid option: -$OPTARG"
       exit 1
@@ -59,7 +55,7 @@ while getopts ":b:k:u:w" opt; do
   esac
 done
 
-echo "Building images for branch '$BRANCH' V32=$V32 BOOKWORM=$BOOKWORM"
+echo "Building images for branch '$BRANCH' V32=$V32 based on Bookworm"
 
 if [ "$V32" = true ]; then
   IMAGE_VERSION="armhf"
@@ -68,13 +64,9 @@ else
   IMAGE_VERSION="arm64"
   outprefix="stratux-display"
 fi
-if [ "$BOOKWORM" = true ]; then
-  ZIPNAME="2024-03-15-raspios-bookworm-${IMAGE_VERSION}.img.xz"
-  BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_${IMAGE_VERSION}/images/raspios_${IMAGE_VERSION}-2024-03-15/${ZIPNAME}"
-else
-  ZIPNAME="2023-12-05-raspios-bullseye-${IMAGE_VERSION}.img.xz"
-  BASE_IMAGE_URL="https://downloads.raspberrypi.com/raspios_oldstable_${IMAGE_VERSION}/images/raspios_oldstable_${IMAGE_VERSION}-2023-12-06/${ZIPNAME}"
-fi
+
+ZIPNAME="2024-03-15-raspios-bookworm-${IMAGE_VERSION}-lite.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2024-03-15/${ZIPNAME}"
 
 
 IMGNAME="${ZIPNAME%.*}"
@@ -101,11 +93,11 @@ bootoffset=$(( 512*bootoffset ))
 
 # Original image partition is too small to hold our stuff.. resize it to 5120 Mb
 # Append one GB and truncate to size
-truncate -s 6144M $IMGNAME || die "Image resize failed"
+truncate -s 4000M $IMGNAME || die "Image resize failed"
 lo=$(losetup -f)
 losetup "$lo" $IMGNAME
 partprobe "$lo"
-e2fsck -f "${lo}"p2
+e2fsck -y -f "${lo}"p2
 parted "${lo}" resizepart 2 100%
 partprobe "$lo" || die "Partprobe failed failed"
 resize2fs -p "${lo}"p2 || die "FS resize failed"
@@ -116,29 +108,37 @@ mount -t ext4 "${lo}"p2 mnt/ || die "root-mount failed"
 mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 
 
-# install git for cloning repo (if not already installed) and pip
-chroot mnt apt install git -y
-
-cd mnt/$DISPLAY_SRC || die "cd failed"
-sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
-cd ../../../
-chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
-
 # for groundsensor, disable ssh over serial cause it is needed for the sensor
 # disable ssh over serial otherwise
 # does not work in mk_configure_radar, since it is not mounted there when called via chroot mnt
-sed -i mnt/boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-sed -i mnt/boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
-sed -i mnt/boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
-# modify /boot/firmware/config.text for groundsensor
+# before first boot cmdline and config are still in /boot not /boot/firmware
+sed -i mnt/boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
+sed -i mnt/boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
+sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
+# modify /boot/config.text for groundsensor
 {
   echo "# modification for ultrasonic ground sensor"
   echo "enable_uart=1"
   echo "dtoverlay=miniuart-bt"
-} | tee -a mnt/boot/firmware/config.txt
+} | tee -a mnt/boot/config.txt
+
+
+# install git for cloning repo (if not already installed) and pip
+chroot mnt apt install git -y
+
+cd mnt/$DISPLAY_SRC || die "cd failed"
+su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git"
+# modify stratux_radar.sh to put enable-linger there (can't be done via chroot)
+sed -i stratux-radar-display/image/stratux_radar.sh -e "2i\\
+loginctl enable-linger"
+cd ../../../
+# run the configuration skript, that is also executed when setting up on target device
+unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
+
+# run additional device setup topics, which are not working when executing the normal config skript from above
+unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_stratux_display_device_setup.sh
 
 # mkdir -p out
-
 umount mnt/boot
 umount mnt
 

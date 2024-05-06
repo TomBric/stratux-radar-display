@@ -915,15 +915,13 @@ def distance(now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_di
         )
         dashboard(5, starty, 225, True, "Ground Sensor", lines)
 
+    starty = 35   # right column
     if ahrs_valid:
         lines = (
             ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
             ("Roll [deg]", "{:+2d}".format(ahrs_roll)),
         )
         starty = dashboard(250, 35, 225, True, "AHRS", lines)
-    else:
-        starty = 20
-
     if baro_valid:
         if alt_diff_takeoff is not None:
             takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
@@ -943,7 +941,7 @@ def distance(now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_di
 
     if error_message is not None:
         centered_text(60, error_message, verylargefont, fill="black")
-    bottom_line("Stats", "Mode", "Start")
+    bottom_line("Stats/Set", "Mode", "Start")
 
 
 def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
@@ -953,7 +951,7 @@ def form_line(values, key, format_str):    # generates line if key exists with f
         return '---'
 
 
-def distance_statistics(values):
+def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
     centered_text(0, "Start-/Landing Statistics", smallfont, fill="black")
 
     st = '---'
@@ -981,8 +979,25 @@ def distance_statistics(values):
         ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
     )
     starty = dashboard(250, 35, 225, True, "Landing", lines)
+    if ground_warnings:
+        if dest_alt_valid:
+            dest_alt_str = "{:+5.0f}".format(dest_altitude)
+        else:
+            dest_alt_str = "---"
+        if gps_valid:
+            gps_alt_str = "{:+5.0f}".format(gps_altitude)
+        else:
+            gps_alt_str = "---"
 
-    bottom_line("", "Back", "")
+        lines = (
+            ("Act GPS-Alt [ft]", gps_alt_str),
+            ("Destination Alt [ft]", dest_alt_str),
+        )
+        dashboard(5, starty + 10, 475, True, "Destination Elevation", lines)
+    if not ground_warnings:
+        bottom_line("", "Back", "")
+    else:
+        bottom_line("+100/-100ft", "Back", "+10/-10ft")
 
 
 def checklist_topic(ypos, topic, highlighted=False, toprint=True):
