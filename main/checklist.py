@@ -64,7 +64,7 @@ def init(checklist_xml):
         rlog.debug("Checklist - Error '{0}' reading '{1}.".format(e, checklist_xml))
         return
     try:
-        xml_dict = xmltodict.parse(xml_string)
+        xml_dict = xmltodict.parse(xml_string, force_list=('CHECKLIST', 'ITEM'))
     except Exception as e:
         rlog.debug("Checklist - Parsing of xml-checklist failed with error <{0}>".format(e))
         return
