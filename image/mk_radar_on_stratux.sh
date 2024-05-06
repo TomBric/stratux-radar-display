@@ -14,7 +14,7 @@
 #   sudo /bin/bash mk_radar_on_stratux.sh -b dev
 #   sudo /bin/bash mk_radar_on_stratux.sh -d Epaper_1in54
 
-# set -x
+set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -104,9 +104,9 @@ chroot mnt apt install git python3-pip -y
 chroot mnt overlayctl disable
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
-sudo -u pi git clone --recursive -b "$BRANCH" https://github.com/TomBric/stratux-radar-display.git
+su pi -c "git clone --recursive -b ${BRANCH} https://github.com/TomBric/stratux-radar-display.git"
 # set display
-sudo -u pi sed -i 's/Oled_1in5/"$DISPLAY_NAME"/g' stratux-radar-display/image/stratux_radar.sh
+sed -i "s/Oled_1in5/${DISPLAY_NAME}/g" stratux-radar-display/image/stratux_radar.sh
 # back to root directory of stratux image
 cd ../../../
 # run stratux configuration skript

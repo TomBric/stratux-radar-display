@@ -63,6 +63,7 @@ import math
 import serial
 import simulation
 import radarbluez
+import radarbuttons
 
 rlog = None  # radar specific logger
 
@@ -87,6 +88,10 @@ INVALID_GDISTANCE = -9999   # indicates no valid grounddistance
 
 MIN_GPS_V_ACCURACY = 150   # minimum horizontal accuracy of gps, if not met, no speech warnings are spoken
 
+GEAR_DOWN_WARNING = '<pitch level="110"> Gear down! </pitch>'    # warning to be spoken, when gear_
+GEAR_NOT_DOWN_GO_AROUND = '<pitch level="130"> Go around! Gear not down! </pitch>'
+
+
 # globals
 ground_distance_active = False  # True if sensor is found and activated
 indicate_distance = False  # True if audio indication for ground distance is active
@@ -99,6 +104,7 @@ statistics = []  # values for calculating everything
 stats_max_values = STATS_PER_SECOND * STATS_TOTAL_TIME
 stats_next_store = 0
 global_situation = None
+global_config = None
 fly_status = 0  # status for evaluating statistics 0 = run up  1 = start_detected 2 = 15 m detected
 # 3 = landing detected  4 = stop detected
 runup_situation = None  # situation values, for accelleration on runway started
@@ -118,6 +124,11 @@ gps_warnings = (1000, 500)    # speech warnings in feet, when calculated with gp
 gps_upper = [False] * len(gps_warnings)  # is true, if height + hysteresis was met
 sensor_warnings = (10, 5, 3, 2, 1)   # speech warnings in feet, when calculated with groundsensor
 sensor_upper = [False] * len(sensor_warnings) # is true, if height + hysteresis was met
+
+gear_gps_warnings = (1000, 500, 400, 300, 200, 100)  # speech warnings if gear is not down, calculated with gps
+gear_gps_upper = [False] * len(gear_gps_warnings)  # is true, if height + hysteresis was met
+gear_sensor_warnings= (10, 5)   # speech warnings if gear is not down based on sensor
+gear_sensor_upper = [False] * len(gear_sensor_warnings)  # is true, if height + hysteresis was met
 
 hysteresis = 1.1    # hysteresis 10% for speech warnings,
 # this means a ground warning is only repeated if more than 10% more of height was reached in between
@@ -231,7 +242,7 @@ def reset_values():
             rlog.debug('Error resetting gound zero distance')
 
 
-def init(activate, stat_file, debug_level, distance_indication, situation, sim_mode):
+def init(activate, stat_file, debug_level, distance_indication, situation, sim_mode, g_config):
     global rlog
     global ground_distance_active
     global indicate_distance
@@ -241,8 +252,10 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
     global zero_distance
     global simulation_mode
     global saved_statistics
+    global global_config
 
     simulation_mode = sim_mode
+    global_config = g_config
     rlog = logging.getLogger('stratux-radar-log')
     if not activate:
         rlog.debug("Ground Distance Measurement - not activated.")
@@ -291,7 +304,7 @@ def calc_distance_speaker(stat):
     else:
         gps_distance = 0.0
     if stat['g_distance_valid']:
-        ground_distance = stat['g_distance'] / 304.8    # g_distance is in mm, here we need ft
+        ground_distance = stat['g_distance'] / 328.1    # g_distance is in mm, here we need ft
     else:
         ground_distance = 0.0
     if indicate_distance and fly_status == 1:
@@ -309,6 +322,22 @@ def calc_distance_speaker(stat):
                 sensor_upper[i] = False
             if ground_distance >= height * hysteresis:
                 sensor_upper[i] = True
+    if global_config['gear_indication_active'] and fly_status == 1:
+        for (i, height) in enumerate(gear_gps_warnings):
+            if gps_distance <= height and gear_gps_upper[i]:
+                if stat['gear_down'] is False:
+                    radarbluez.speak(GEAR_DOWN_WARNING, 120)
+                gear_gps_upper[i] = False
+            if gps_distance >= height * hysteresis:
+                gear_gps_upper[i] = True
+        for (i, height) in enumerate(gear_sensor_warnings):
+            if ground_distance <= height and gear_sensor_upper[i]:
+                # distance is reached and was before higher than hysteresis
+                if stat['gear_down'] is False:
+                    radarbluez.speak(GEAR_NOT_DOWN_GO_AROUND, 120)
+                gear_sensor_upper[i] = False
+            if ground_distance >= height * hysteresis:
+                gear_sensor_upper[i] = True
 
 
 def is_airborne():
@@ -492,6 +521,10 @@ def store_statistics(sit):
             if 'own_altitude' in sim_data:
                 sit['own_altitude'] = sim_data['own_altitude']
                 sit['baro_valid'] = True
+            if 'gear_down' in sim_data:
+                sit['gear_down'] = sim_data['gear_down']
+            else:
+                sit['gear_down'] = False
     if time.perf_counter() > stats_next_store:
         stats_next_store = time.perf_counter() + (1 / STATS_PER_SECOND)
         now = datetime.datetime.now(datetime.timezone.utc)
@@ -499,7 +532,8 @@ def store_statistics(sit):
                       'gps_active': sit['gps_active'], 'longitude': sit['longitude'], 'latitude': sit['latitude'],
                       'gps_speed': sit['gps_speed'], 'gps_altitude': sit['gps_altitude'],
                       'gps_h_accuracy': sit['gps_h_accuracy'], 'gps_v_accuracy': sit['gps_v_accuracy'],
-                      'g_distance_valid': sit['g_distance_valid'], 'g_distance': sit['g_distance']}
+                      'g_distance_valid': sit['g_distance_valid'], 'g_distance': sit['g_distance'],
+                      'gear_down': sit['gear_down']}
         statistics.append(stat_value)
         if len(statistics) > stats_max_values:     # sliding window, remove old values
             statistics.pop(0)
@@ -535,6 +569,11 @@ async def read_ground_sensor():
                     global_situation['g_distance_valid'] = False
                     global_situation['g_distance'] = INVALID_GDISTANCE   # just to be safe
                     rlog.log(value_debug_level, 'Ground Distance: Sensor value invalid, maybe out of range')
+                if global_config['gear_indication_active']:
+                    global_situation['gear_down'] = radarbuttons.gear_is_down()
+                    rlog.log(value_debug_level, 'Ground Distance: gear-down: {0}'.format(global_situation['gear_down']))
+                else:
+                    global_situation['gear_down'] = False   # default value if not to be indicated
                 store_statistics(global_situation)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")

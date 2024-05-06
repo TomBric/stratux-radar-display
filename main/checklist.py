@@ -64,7 +64,8 @@ def init(checklist_xml):
         rlog.debug("Checklist - Error '{0}' reading '{1}.".format(e, checklist_xml))
         return
     try:
-        xml_dict = xmltodict.parse(xml_string)
+        xml_dict = xmltodict.parse(xml_string, force_list=('CHECKLIST', 'ITEM'))
+        # force_list ensures that there is a list generated, even if there is only one CHECKLIST or ITEM
     except Exception as e:
         rlog.debug("Checklist - Parsing of xml-checklist failed with error <{0}>".format(e))
         return
@@ -72,6 +73,7 @@ def init(checklist_xml):
         g_checklist = xml_dict['ALL_CHECKLISTS']['CHECKLIST']
     except KeyError:
         rlog.debug("Checklist - KeyError understanding dict from xml")
+    rlog.debug("Checklist - XML file '{0}' successfully read.".format(checklist_xml))
     # rlog.debug("Checklist read: {0}".format(g_checklist))
     # g_checklist is now a list of checklists
     # [{'ITEM': [{'CHECK': 'Done',
