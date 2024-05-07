@@ -3,7 +3,7 @@
 # script configures basic libraries necessary for stratux-radar
 # script to be run as root on stratux (without a zero pi)
 
-set -x
+# set -x
 apt install git python3-pip -y
 # no sound or bluetooth on stratux
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils

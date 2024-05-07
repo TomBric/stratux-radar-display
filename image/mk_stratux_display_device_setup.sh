@@ -5,7 +5,7 @@
 # Do NOT run directly. This is called from mk_stratux_display.sh via chroot
 # This is used to trigger systemctl commands inside a chrooted environmen
 
-set -x
+# set -x
 mount -t proc proc /proc
 # enable ssh
 raspi-config nonint do_ssh 0
