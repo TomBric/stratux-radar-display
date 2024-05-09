@@ -12,4 +12,5 @@ raspi-config nonint do_ssh 0
 # enable spi and i2c (for cowarner)
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
-# enable linger so that services will stay alive
+raspi-config nonint do_boot_behaviour B2
+# enable autologin
