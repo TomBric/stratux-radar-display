@@ -36,7 +36,7 @@ import pydbus
 import logging
 import subprocess
 import alsaaudio
-from pygame import Mixer
+import pygame
 from queue import Queue
 import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
 from os import environ
@@ -116,7 +116,7 @@ def sound_init(config, bluetooth, mixer_name):
         sound_queue = Queue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
-        Mixer.init(devicename=mixer_name)    # initialize pygame mixer
+        pygame.mixer.init(devicename=mixer_name)    # initialize pygame mixer
         speak("Stratux Radar connected")
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
                " ExtSound volume: " + str(global_config['sound_volume']) + ".")
@@ -170,7 +170,7 @@ def prepare_sounds_tuple(int_tuple):
     for i in enumerate(int_tuple):
         pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", str(int_tuple[i])])  # generate wave
         if pico_result.returncode == 0:
-            out.append(Mixer.Sound("/tmp/radar.wav"))
+            out.append(pygame.mixer.Sound("/tmp/radar.wav"))
         else:
             rlog.debug("Radarbluez: Error creating sound for tuple.")
     return out
@@ -178,15 +178,15 @@ def prepare_sounds_tuple(int_tuple):
 def prepare_sounds_string(tospeak):
     pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", tospeak])  # generate wave
     if pico_result.returncode == 0:
-        return Mixer.Sound("/tmp/radar.wav")
+        return pygame.mixer.Sound("/tmp/radar.wav")
     else:
         rlog.debug("Radarbluez: Error creating sound string.")
 
 
 def speak_sound(sound, text=""):    # used to instantly speak sounds which are already prepared (warnings, heights)
     if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
-        pygame_mixer.stop()    # stop conflicting sounds
-        pygame_mixer.play(sound)
+        pygame.mixer.stop()    # stop conflicting sounds
+        pygame.mixer.play(sound)
     rlog.debug("SpeakSound: " + text)
 
 
