@@ -204,7 +204,7 @@ def audio_speaker(queue):
                 if (bluetooth_active and bt_devices > 0) or (extsound_active and global_config['sound_volume'] > 0):
                     # deviceopt = "--device=pipewire"
                     # aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
-                    pygame.mixer.Sound.play("/tmp/radar.wav")   # serialized via this thread
+                    pygame.mixer.Sound("/tmp/radar.wav").play()   # serialized via this thread
                     # if aplay_result.returncode != 0:
                     #   rlog.debug("Radarbluez: Error running aplay for bluetooth")
                 # if extsound_active and global_config['sound_volume'] > 0:
