@@ -41,7 +41,7 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'  # disable pygame hello message
 import pygame
 from queue import Queue
 import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
-
+import time
 
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
