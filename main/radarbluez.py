@@ -116,7 +116,7 @@ def sound_init(config, bluetooth, mixer_name):
         sound_queue = Queue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
-        pygame.mixer.init(devicename=mixer_name)    # initialize pygame mixer
+        pygame.mixer.init()    # initialize pygame mixer
         speak("Stratux Radar connected")
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
                " ExtSound volume: " + str(global_config['sound_volume']) + ".")

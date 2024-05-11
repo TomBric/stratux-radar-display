@@ -338,7 +338,7 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
     value_debug_level = debug_level
     saved_statistics = stat_file
     global_situation = situation  # to be able to read and store situation info
-    rlog.debug("Ground Distance Measurement - Ultrasonic sensor active.")
+    rlog.debug("Ground Distance Measurement - Ground sensor active.")
 
     if distance_indication:
         indicate_distance = True
