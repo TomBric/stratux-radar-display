@@ -217,7 +217,7 @@ class UsonicSensor:   # definition adapted from DFRobot code
 class LidarSensor:   # Implemention for TFMini-Plus Lidar Sensor
     lidar_bytes = 9
     distance_max = 4000    # sensor is able to detect till 12 meters but reliable only to 4 m in bad conditions
-    distance_min = 5
+    distance_min = 100     # 10 cm min
     ser = None
     distance = 0
     strength = 0
@@ -255,7 +255,7 @@ class LidarSensor:   # Implemention for TFMini-Plus Lidar Sensor
                 checksum += result[index + i]
             if (checksum & 0xFF) == result[index + 8]:  # checksum check
                 # now calculate distance and strength
-                self.distance = result[index + 2] + result[index + 3] * 256
+                self.distance = 10 * (result[index + 2] + result[index + 3] * 256)
                 if self.distance > self.distance_max or self.distance < self.distance_min:
                     self.distance = 0
                 self.strength = result[index + 4] + result[index + 3] * 256
@@ -614,6 +614,7 @@ async def read_ground_sensor():
                 next_read = now + (1 / MEASUREMENTS_PER_SECOND)
                 distance_sensor.calc_distance()
                 distance = distance_sensor.last_distance()  # distance in mm
+                print(f"Distance {distance}")
                 if distance > 0:
                     global_situation['g_distance_valid'] = True
                     global_situation['g_distance'] = distance - zero_distance
