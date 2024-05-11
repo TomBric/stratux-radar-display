@@ -164,9 +164,10 @@ def speak(text, speed_percent = 100):
     rlog.debug("Speak: "+text)
 
 
-def prepare_sounds_tuple(int_tuple):
-    out = []
+def prepare_sounds_tuple(int_tuple):  # done during init without parallel coroutines
+    out = None
     if bluetooth_active or extsound_active:
+        out = []
         for i in int_tuple:
             pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", str(i)])  # generate wave
             if pico_result.returncode == 0:
@@ -175,14 +176,14 @@ def prepare_sounds_tuple(int_tuple):
                 rlog.debug("Radarbluez: Error creating sound for tuple.")
     return out
 
-def prepare_sounds_string(tospeak):
+def prepare_sounds_string(tospeak):   # done during init without parallel coroutines
     if bluetooth_active or extsound_active:
         pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", tospeak])  # generate wave
         if pico_result.returncode == 0:
             return pygame.mixer.Sound("/tmp/radar.wav")
         else:
             rlog.debug("Radarbluez: Error creating sound string.")
-
+    return None
 
 def speak_sound(sound, text=""):    # used to instantly speak sounds which are already prepared (warnings, heights)
     if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
