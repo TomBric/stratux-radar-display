@@ -64,6 +64,7 @@ import serial
 import simulation
 import radarbluez
 import radarbuttons
+import binascii
 
 rlog = None  # radar specific logger
 
