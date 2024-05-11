@@ -366,10 +366,10 @@ def prepare_sounds():
     global gear_not_down_warning_sound
     global go_around_warning_sound
 
-    gps_warnings_sounds = prepare_sounds_tuple(gps_warnings)
-    sensor_warnings_sounds = prepare_sounds_tuple(sensor_warnings)
-    gear_not_down_warning_sound = prepare_sounds_string(GEAR_DOWN_WARNING)
-    go_around_warning_sound = prepare_sounds_string(GEAR_NOT_DOWN_GO_AROUND)
+    gps_warnings_sounds = radarbluez.prepare_sounds_tuple(gps_warnings)
+    sensor_warnings_sounds = radarbluez.prepare_sounds_tuple(sensor_warnings)
+    gear_not_down_warning_sound = radarbluez.prepare_sounds_string(GEAR_DOWN_WARNING)
+    go_around_warning_sound = radarbluez.prepare_sounds_string(GEAR_NOT_DOWN_GO_AROUND)
 
 
 def calc_distance_speaker(stat):
