@@ -68,11 +68,9 @@ import radarbuttons
 rlog = None  # radar specific logger
 
 # constants
-MEASUREMENTS_PER_SECOND = 5    # number of distance ranging meaurements per second
+MEASUREMENTS_PER_SECOND = 10     # number of distance ranging meaurements per second
 # A22 usonic sensor allows approx. 10 per second
-
-UART_WAIT_TIME = 0.01  # time in seconds to wait for enough uart characters
-UART_BREAK_TIME = 1.00  # time in seconds when waiting is stopped
+# TFMini-Plus sensor allows 100 per second
 
 # GPS-Measurement of start-distance
 DISTANCE_START_DETECTED = 30 * 10  # in mm where measurement assumes that plane is in the air
@@ -215,6 +213,62 @@ class UsonicSensor:   # definition adapted from DFRobot code
                         self.distance = 0
 
 
+class LidarSensor:   # Implemention for TFMini-Plus Lidar Sensor
+    lidar_bytes = 9
+    distance_max = 4000    # sensor is able to detect till 12 meters but reliable only to 4 m in bad conditions
+    distance_min = 5
+    ser = None
+    distance = 0
+    strength = 0
+    celsius = 0
+
+    def init(self):
+        self.ser = serial.Serial("/dev/ttyAMA0", 115200)     # Lidar module has 115200 baud
+        self.ser.flushInput()
+        if not self.ser.isOpen():
+            return False
+        return True
+
+    def last_distance(self):
+        return self.distance
+    def calc_distance(self):
+        if  self.ser.inWaiting() < self.lidar_bytes:
+            rlog.debug("Error, no data received from Lidar sensor")
+            return
+        result = self.ser.read(self.ser.inWaiting())
+        rlog.log(value_debug_level, f"Lidar sensor - Bytes received: {len(result)} : {binascii.hexlify(result)} ")
+        if len(result) >= self.lidar_bytes:
+            index = len(result) - self.lidar_bytes
+            while True:   # find last 0x59 0x59
+                 if result[index] == 0x59 and result[index + 1] == 0x59:
+                     break
+                 else:
+                     if index > 0:
+                         index = index - 1
+                     else:
+                         rlog.debug("Lidar-Sensor: Frame Header not found")
+                         return
+            # here we found two 0x59, now check checksum
+            checksum = 0x00
+            for i in range(self.lidar_bytes - 1):
+                checksum += result[index + i]
+            if (checksum & 0xFF) == result[index + 8]:  # checksum check
+                # now calculate distance and strength
+                self.distance = result[index + 2] + result[index + 3] * 256
+                if self.distance > self.distance_max or self.distance < self.distance_min:
+                    self.distance = 0
+                self.strength = result[index + 4] + result[index + 3] * 256
+                self.celsius = result[index + 6] + result[index + 7] * 256
+                #  Convert temp code to degrees Celsius.
+                self.celsius =  self.celsius / 8 - 256
+                rlog.log(value_debug_level, "Lidar-Sensor: Distance {self.distance} Strength {self.strength} Celsius {self.celsius}")
+            else:
+                 rlog.debug(f"Lidar-Sensor: Invalid checksum")
+        else:
+              rlog.debug(f"Lidar-Sensor: Error less bytes read than expected")
+
+
+
 def reset_values():
     global runup_situation
     global start_situation
@@ -262,12 +316,11 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
         ground_distance_active = False
         return False
     try:
-        distance_sensor = UsonicSensor()
+        distance_sensor = LidarSensor()
         if not distance_sensor.init():
             rlog.debug("Ground Distance Measurement - Error init ultrasonic sensor, serial not found")
             ground_distance_active = False
             return False
-        distance_sensor.set_dis_range(35, 2000)  # range between 35 mm and 2 meter
     except Exception as e:
         ground_distance_active = False
         rlog.debug("Ground Distance Measurement - Ultrasonic sensor not found: " + str(e))
@@ -558,7 +611,7 @@ async def read_ground_sensor():
                 now = time.perf_counter()
                 await asyncio.sleep(next_read - now)  # wait for next time of measurement
                 next_read = now + (1 / MEASUREMENTS_PER_SECOND)
-                await distance_sensor.calc_distance()   # asynchronous, may wait
+                distance_sensor.calc_distance()
                 distance = distance_sensor.last_distance()  # distance in mm
                 if distance > 0:
                     global_situation['g_distance_valid'] = True
