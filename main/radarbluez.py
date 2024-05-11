@@ -168,7 +168,7 @@ def speak(text, speed_percent = 100):
 def prepare_sounds_tuple(int_tuple):
     out = []
     for i in int_tuple:
-        pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", str(i))  # generate wave
+        pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", str(i)])  # generate wave
         if pico_result.returncode == 0:
             out.append(pygame.mixer.Sound("/tmp/radar.wav"))
         else:
