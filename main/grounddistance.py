@@ -599,7 +599,7 @@ async def read_ground_sensor():
 
     if ground_distance_active:
         rlog.debug("Ground distance reader active ...")
-        await distance_sensor.calc_distance()
+        distance_sensor.calc_distance()
         new_zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
         if new_zero_distance > 0:
             zero_distance = new_zero_distance  # distance in mm this is zero
