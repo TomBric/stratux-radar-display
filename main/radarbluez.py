@@ -188,7 +188,7 @@ def prepare_sounds_string(tospeak):
 def speak_sound(sound, text=""):    # used to instantly speak sounds which are already prepared (warnings, heights)
     if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
         pygame.mixer.stop()    # stop conflicting sounds
-        pygame.mixer.play(sound)
+        sound.play()
     rlog.debug("SpeakSound: " + text)
 
 
