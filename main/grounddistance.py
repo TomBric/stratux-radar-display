@@ -121,7 +121,7 @@ saved_statistics = None    # filename for statistics, set in init
 
 gps_warnings = (1000, 500)    # speech warnings in feet, when calculated with gps
 gps_upper = [False] * len(gps_warnings)  # is true, if height + hysteresis was met
-sensor_warnings = (10, 5, 3, 2, 1)   # speech warnings in feet, when calculated with groundsensor
+sensor_warnings = (10, 5, 4, 3, 2, 1)   # speech warnings in feet, when calculated with groundsensor
 sensor_upper = [False] * len(sensor_warnings) # is true, if height + hysteresis was met
 
 gear_gps_warnings = (1000, 500, 400, 300, 200, 100)  # speech warnings if gear is not down, calculated with gps
@@ -162,7 +162,6 @@ def set_dest_elevation(dest_increment):
 class UsonicSensor:   # definition adapted from DFRobot code
     distance_max = 3000
     distance_min = 5
-    range_max = 3000
     ser = None
     distance = 0
 
