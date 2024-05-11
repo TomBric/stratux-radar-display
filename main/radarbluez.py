@@ -36,8 +36,13 @@ import pydbus
 import logging
 import subprocess
 import alsaaudio
+from pygame import Mixer
 from queue import Queue
 import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'      # disable pygame hello message
+
+
 
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
@@ -111,6 +116,7 @@ def sound_init(config, bluetooth, mixer_name):
         sound_queue = Queue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
+        Mixer.init(devicename=mixer_name)    # initialize pygame mixer
         speak("Stratux Radar connected")
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
                " ExtSound volume: " + str(global_config['sound_volume']) + ".")
@@ -157,6 +163,31 @@ def speak(text, speed_percent = 100):
         output_text = f"<speed level='{speed_percent}'> {text} </speed>"    # include string for setting speed
         sound_queue.put(output_text)
     rlog.debug("Speak: "+text)
+
+
+def prepare_sounds_tuple(int_tuple):
+    out = []
+    for i in enumerate(int_tuple):
+        pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", str(int_tuple[i])])  # generate wave
+        if pico_result.returncode == 0:
+            out.append(Mixer.Sound("/tmp/radar.wav"))
+        else:
+            rlog.debug("Radarbluez: Error creating sound for tuple.")
+    return out
+
+def prepare_sounds_string(tospeak):
+    pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", tospeak])  # generate wave
+    if pico_result.returncode == 0:
+        return Mixer.Sound("/tmp/radar.wav")
+    else:
+        rlog.debug("Radarbluez: Error creating sound string.")
+
+
+def speak_sound(sound, text=""):    # used to instantly speak sounds which are already prepared (warnings, heights)
+    if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
+        pygame_mixer.stop()    # stop conflicting sounds
+        pygame_mixer.play(sound)
+    rlog.debug("SpeakSound: " + text)
 
 
 def audio_speaker(queue):
