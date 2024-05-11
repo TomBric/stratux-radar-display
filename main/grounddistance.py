@@ -610,13 +610,10 @@ async def read_ground_sensor():
             next_read = time.perf_counter() + (1 / MEASUREMENTS_PER_SECOND)
             while True:
                 now = time.perf_counter()
-                print(f"Now: {now:5.2f} Sleeping {next_read-now:5.2f} seconds")
                 await asyncio.sleep(next_read - now)  # wait for next time of measurement
                 next_read = next_read + (1 / MEASUREMENTS_PER_SECOND)
-                print(f"Next_Read: {next_read:5.2f}")
                 distance_sensor.calc_distance()
                 distance = distance_sensor.last_distance()  # distance in mm
-                print(f"Distance {distance}")
                 if distance > 0:
                     global_situation['g_distance_valid'] = True
                     global_situation['g_distance'] = distance - zero_distance
