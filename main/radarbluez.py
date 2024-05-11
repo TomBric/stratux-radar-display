@@ -36,10 +36,11 @@ import pydbus
 import logging
 import subprocess
 import alsaaudio
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'  # disable pygame hello message
 import pygame
 from queue import Queue
 import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
-from os import environ
 
 
 # DBus object paths
@@ -114,7 +115,6 @@ def sound_init(config, bluetooth, mixer_name):
         sound_queue = Queue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
-        environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'  # disable pygame hello message
         pygame.mixer.init()    # initialize pygame mixer
         speak("Stratux Radar connected")
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
