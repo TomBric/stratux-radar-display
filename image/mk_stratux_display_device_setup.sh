@@ -6,6 +6,9 @@
 # This is used to trigger systemctl commands inside a chrooted environmen
 
 set -x
+mount -t proc proc /proc
+mount -t sys sys /sys
+mount --bind dev /dev
 # enable ssh
 raspi-config nonint do_ssh 0
 # enable spi and i2c (for cowarner)

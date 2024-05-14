@@ -136,9 +136,6 @@ cd ../../../
 unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
 
 # run additional device setup topics, which are not working when executing the normal config skript from above
-mount -t proc proc /proc
-mount -t sys sys /sys
-mount --bind dev /dev
 unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_stratux_display_device_setup.sh
 
 # mkdir -p out
