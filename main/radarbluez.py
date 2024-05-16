@@ -112,10 +112,10 @@ def sound_init(config, bluetooth, mixer_name):
         bluetooth_active = bluez_init()
 
     if bluetooth_active or extsound_active:
+        pygame.mixer.init()  # initialize pygame mixer
         sound_queue = Queue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
-        pygame.mixer.init()    # initialize pygame mixer
         speak("Stratux Radar connected")
     rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
                " ExtSound volume: " + str(global_config['sound_volume']) + ".")
@@ -216,7 +216,7 @@ def audio_speaker(queue):
                 #        rlog.debug("Radarbluez: Error running aplay {0}".format(deviceopt))
             else:
                 rlog.debug("Radarbluez: Error using pico2wave TTS")
-    rlog.debug("Radarbluez: Sound-Speaker thread terminated.")
+    rlog.debug("Radarbluez: Audio-Speaker thread terminated.")
 
 
 def connected_devices():
