@@ -112,6 +112,7 @@ def sound_init(config, bluetooth, mixer_name):
         bluetooth_active = bluez_init()
 
     if bluetooth_active or extsound_active:
+        print(f"Just before pygame.init()")
         pygame.mixer.init()  # initialize pygame mixer
         sound_queue = Queue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
