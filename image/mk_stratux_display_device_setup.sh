@@ -7,7 +7,7 @@
 
 set -x
 mount -t proc proc /proc
-mount -t sys sys /sys
+mount -t sysfs sys /sys
 mount --bind dev /dev
 # enable ssh
 raspi-config nonint do_ssh 0
