@@ -115,8 +115,10 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 sed -i mnt/boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
 sed -i mnt/boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
-# add enable-linger for pi during first boot, insert this command in firstrun.sh
+
+# add enable-linger for pi during first boot, insert this command into firstrun.sh
 sed -i mnt/boot/firstrun.sh -e "/rm -f \/boot\/firstrun.sh/i loginctl enable-linger pi"
+
 # modify /boot/config.text for groundsensor
 {
   echo "# modification for ultrasonic ground sensor"
