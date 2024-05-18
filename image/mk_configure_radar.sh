@@ -44,11 +44,11 @@ su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 
 # install and start service to start radar
-# su pi -c "mkdir -p /home/pi/.config/systemd/user/"
-# su pi -c "cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service"
+su pi -c "mkdir -p /home/pi/.config/systemd/user/"
+su pi -c "cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service"
 # create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
-# su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
-# su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
+su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
+su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
 # enable linger for bluetooth
 loginctl enable-linger pi
 
@@ -58,6 +58,4 @@ sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.
 # copy simple checklist once, can be changed later
 su pi -c "cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /home/pi/stratux-radar-display/config/checklist.xml"
 
-# include autostart into crontab, so that radar starts on every boot
-echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
 echo "Radar configuration finished. Reboot to start"
