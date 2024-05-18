@@ -121,7 +121,7 @@ sed -i mnt/boot/firstrun.sh -e "/rm -f \/boot\/firstrun.sh/i loginctl enable-lin
 
 # modify /boot/config.text for groundsensor
 {
-  echo "# modification for ultrasonic ground sensor"
+  echo "# modification for UART ground sensor"
   echo "enable_uart=1"
   echo "dtoverlay=miniuart-bt"
 } | tee -a mnt/boot/config.txt
@@ -140,7 +140,7 @@ cd ../../../
 unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
 
 # run additional device setup topics, which are not working when executing the normal config skript from above
-unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_stratux_display_device_setup.sh
+# unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_stratux_display_device_setup.sh
 
 # mkdir -p out
 umount mnt/boot

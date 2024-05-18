@@ -43,6 +43,11 @@ su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 #  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 
+
+# install service to enable-linger of user pi
+cp /home/pi/stratux-radar-display/image/systemctl-enable-linger.service /etc/systemd/system
+chmod 644 /etc/systemd/system/systemctl-enable-linger.service
+
 # install and start service to start radar
 su pi -c "mkdir -p /home/pi/.config/systemd/user/"
 su pi -c "cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service"

@@ -1,0 +1,8 @@
+[Unit]
+Description=Enable Linger for Stratux-Radar
+
+[Service]
+ExecStart=loginctl enable-linger pi
+
+[Install]
+WantedBy=default.target
