@@ -45,8 +45,9 @@ sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wirepl
 
 
 # install service to enable-linger of user pi
-cp /home/pi/stratux-radar-display/image/systemctl-enable-linger.service /etc/systemd/system
-chmod 644 /etc/systemd/system/systemctl-enable-linger.service
+cp /home/pi/stratux-radar-display/image/systemctl-enable-linger.service /etc/systemd/system/enable-linger.service
+chmod 644 /etc/systemd/system/enable-linger.service
+systemctl enable enable-linger.service
 
 # install and start service to start radar
 su pi -c "mkdir -p /home/pi/.config/systemd/user/"
@@ -54,8 +55,6 @@ su pi -c "cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.serv
 # create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
 su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
 su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
-# enable linger for bluetooth
-loginctl enable-linger pi
 
 # change log level of rtkit, otherwise this fills journal with tons of useless info
 sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
