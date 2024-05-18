@@ -112,7 +112,6 @@ def sound_init(config, bluetooth, mixer_name):
         bluetooth_active = bluez_init()
 
     if bluetooth_active or extsound_active:
-        print(f"Just before pygame.init()")
         pygame.mixer.init()  # initialize pygame mixer
         sound_queue = Queue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
@@ -200,16 +199,13 @@ def audio_speaker(queue):
         if msg == 'STOP':
             break
         else:
-            print(f"Speaking: {msg}")
             pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", msg])  # generate wave
             if pico_result.returncode == 0:
                 if (bluetooth_active and bt_devices > 0) or (extsound_active and global_config['sound_volume'] > 0):
                     # deviceopt = "--device=pipewire"
                     # aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
                     while pygame.mixer.get_busy():
-                        print(f"pygame.mixer is busy")
                         time.sleep(0.05)    # is a different thread, other threads continue, just audio speaker waits
-                    print(f"pygame.mixer start playing")
                     pygame.mixer.Sound("/tmp/radar.wav").play()   # serialized via this thread
                     # if aplay_result.returncode != 0:
                     #   rlog.debug("Radarbluez: Error running aplay for bluetooth")
