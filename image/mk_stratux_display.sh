@@ -115,6 +115,8 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 sed -i mnt/boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
 sed -i mnt/boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
+# add enable-linger for pi during first boot, insert this command in firstrun.sh
+sed -i mnt/boot/firstrun.sh -e "/rm -f \/boot\/firstrun.sh/i loginctl enable-linger pi"
 # modify /boot/config.text for groundsensor
 {
   echo "# modification for ultrasonic ground sensor"
@@ -129,8 +131,8 @@ chroot mnt apt install git -y
 cd mnt/$DISPLAY_SRC || die "cd failed"
 su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git"
 # modify stratux_radar.sh to put enable-linger there (can't be done via chroot)
-sed -i stratux-radar-display/image/stratux_radar.sh -e "2i\\
-loginctl enable-linger"
+# sed -i stratux-radar-display/image/stratux_radar.sh -e "2i\\
+# loginctl enable-linger"
 cd ../../../
 # run the configuration skript, that is also executed when setting up on target device
 unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
