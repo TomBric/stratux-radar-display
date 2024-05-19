@@ -45,9 +45,11 @@ sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wirepl
 
 
 # install service to enable-linger of user pi
-cp /home/pi/stratux-radar-display/image/systemctl-enable-linger.service /etc/systemd/system/enable-linger.service
-chmod 644 /etc/systemd/system/enable-linger.service
-systemctl enable enable-linger.service
+# cp /home/pi/stratux-radar-display/image/systemctl-enable-linger.service /etc/systemd/system/enable-linger.service
+# chmod 644 /etc/systemd/system/enable-linger.service
+# systemctl enable enable-linger.service
+# this is the same effect as loginctl enable-linger pi
+touch /var/lib/systemd/linger/pi
 
 # install and start service to start radar
 su pi -c "mkdir -p /home/pi/.config/systemd/user/"
