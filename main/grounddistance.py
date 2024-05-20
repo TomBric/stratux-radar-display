@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 #
 # BSD 3-Clause License
-# Copyright (c) 2022, Thomas Breitbach
+# Copyright (c) 2022-2024, Thomas Breitbach
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -220,7 +220,7 @@ class UsonicSensor:   # definition adapted from DFRobot code
                         self.distance = 0
 
 
-class LidarSensor:   # Implemention for TFMini-Plus Lidar Sensor
+class LidarSensor:   # Implementation for TFMini-Plus Lidar Sensor
     lidar_bytes = 9
     distance_max = 4000    # sensor is able to detect till 12 meters but reliable only to 4 m in bad conditions
     distance_min = 100     # 10 cm min
