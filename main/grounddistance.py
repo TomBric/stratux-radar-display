@@ -384,7 +384,7 @@ def calc_distance_speaker(stat):
         for (i, height) in enumerate(gps_warnings):
             if gps_distance <= height and gps_upper[i]:
                 # distance is reached and was before higher than hysteresis
-                if gps_warnings_sound != None:
+                if gps_warnings_sound is not None:
                     radarbluez.speak_sounds(gps_warnings_sounds[i])
                 gps_upper[i] = False
             if gps_distance >= height * hysteresis:
@@ -392,7 +392,7 @@ def calc_distance_speaker(stat):
         for (i, height) in enumerate(sensor_warnings):
             if ground_distance <= height and sensor_upper[i]:
                 # distance is reached and was before higher than hysteresis
-                if sensor_warnings_sounds != None:
+                if sensor_warnings_sounds is not None:
                     radarbluez.speak_sound(sensor_warnings_sounds[i])
                 sensor_upper[i] = False
             if ground_distance >= height * hysteresis:
@@ -400,7 +400,7 @@ def calc_distance_speaker(stat):
     if global_config['gear_indication_active'] and fly_status == 1:
         for (i, height) in enumerate(gear_gps_warnings):
             if gps_distance <= height and gear_gps_upper[i]:
-                if stat['gear_down'] is False and gear_not_down_warning_sound != None:
+                if stat['gear_down'] is False and gear_not_down_warning_sound is not None:
                     radarbluez.speak_sound(gear_not_down_warning_sound, GEAR_DOWN_WARNING)
                 gear_gps_upper[i] = False
             if gps_distance >= height * hysteresis:
@@ -408,7 +408,7 @@ def calc_distance_speaker(stat):
         for (i, height) in enumerate(gear_sensor_warnings):
             if ground_distance <= height and gear_sensor_upper[i]:
                 # distance is reached and was before higher than hysteresis
-                if stat['gear_down'] is False and go_around_warning_sound != None:
+                if stat['gear_down'] is False and go_around_warning_sound is not None:
                     radarbluez.speak_sound(go_around_warning_sound, GEAR_NOT_DOWN_GO_AROUND)
                 gear_sensor_upper[i] = False
             if ground_distance >= height * hysteresis:

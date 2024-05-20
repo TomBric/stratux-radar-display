@@ -5,11 +5,10 @@
 # called via configure_radar as sudo
 # usage /bin/bash mk_configure_radar.sh
 
-set -x
+# set -x
 
 # apt update
 # apt upgrade -y
-
 
 # enable ssh
 raspi-config nonint do_ssh 0
@@ -43,11 +42,6 @@ su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 #  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 
-
-# install service to enable-linger of user pi
-# cp /home/pi/stratux-radar-display/image/systemctl-enable-linger.service /etc/systemd/system/enable-linger.service
-# chmod 644 /etc/systemd/system/enable-linger.service
-# systemctl enable enable-linger.service
 # this is the same effect as loginctl enable-linger piA
 mkdir -p /var/lib/systemd/linger
 touch /var/lib/systemd/linger/pi
