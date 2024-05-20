@@ -36,8 +36,12 @@ import pydbus
 import logging
 import subprocess
 import alsaaudio
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'  # disable pygame hello message
+import pygame
 from queue import Queue
 import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
+import time
 
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
@@ -108,6 +112,7 @@ def sound_init(config, bluetooth, mixer_name):
         bluetooth_active = bluez_init()
 
     if bluetooth_active or extsound_active:
+        pygame.mixer.init()  # initialize pygame mixer
         sound_queue = Queue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
@@ -159,6 +164,34 @@ def speak(text, speed_percent = 100):
     rlog.debug("Speak: "+text)
 
 
+def prepare_sounds_tuple(int_tuple):  # done during init without parallel coroutines
+    out = None
+    if bluetooth_active or extsound_active:
+        out = []
+        for i in int_tuple:
+            pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", str(i)])  # generate wave
+            if pico_result.returncode == 0:
+                out.append(pygame.mixer.Sound("/tmp/radar.wav"))
+            else:
+                rlog.debug("Radarbluez: Error creating sound for tuple.")
+    return out
+
+def prepare_sounds_string(tospeak):   # done during init without parallel coroutines
+    if bluetooth_active or extsound_active:
+        pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", tospeak])  # generate wave
+        if pico_result.returncode == 0:
+            return pygame.mixer.Sound("/tmp/radar.wav")
+        else:
+            rlog.debug("Radarbluez: Error creating sound string.")
+    return None
+
+def speak_sound(sound, text=""):    # used to instantly speak sounds which are already prepared (warnings, heights)
+    if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
+        pygame.mixer.stop()    # stop conflicting sounds
+        sound.play()
+    rlog.debug("SpeakSound: " + text)
+
+
 def audio_speaker(queue):
     rlog.debug("Radarbluez: Audio-Speaker thread active.")
     while True:
@@ -168,19 +201,22 @@ def audio_speaker(queue):
         else:
             pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", msg])  # generate wave
             if pico_result.returncode == 0:
-                if bluetooth_active and bt_devices > 0:
-                    deviceopt = "--device=pipewire"
-                    aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
-                    if aplay_result.returncode != 0:
-                        rlog.debug("Radarbluez: Error running aplay for bluetooth")
-                if extsound_active and global_config['sound_volume'] > 0:
-                    deviceopt = "--device=plughw:" + str(sound_card)
-                    aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
-                    if aplay_result.returncode != 0:
-                        rlog.debug("Radarbluez: Error running aplay {0}".format(deviceopt))
+                if (bluetooth_active and bt_devices > 0) or (extsound_active and global_config['sound_volume'] > 0):
+                    # deviceopt = "--device=pipewire"
+                    # aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
+                    while pygame.mixer.get_busy():
+                        time.sleep(0.05)    # is a different thread, other threads continue, just audio speaker waits
+                    pygame.mixer.Sound("/tmp/radar.wav").play()   # serialized via this thread
+                    # if aplay_result.returncode != 0:
+                    #   rlog.debug("Radarbluez: Error running aplay for bluetooth")
+                # if extsound_active and global_config['sound_volume'] > 0:
+                #    deviceopt = "--device=plughw:" + str(sound_card)
+                #    aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
+                #    if aplay_result.returncode != 0:
+                #        rlog.debug("Radarbluez: Error running aplay {0}".format(deviceopt))
             else:
                 rlog.debug("Radarbluez: Error using pico2wave TTS")
-    rlog.debug("Radarbluez: Sound-Speaker thread terminated.")
+    rlog.debug("Radarbluez: Audio-Speaker thread terminated.")
 
 
 def connected_devices():

@@ -5,11 +5,10 @@
 # called via configure_radar as sudo
 # usage /bin/bash mk_configure_radar.sh
 
-set -x
+# set -x
 
 # apt update
 # apt upgrade -y
-
 
 # enable ssh
 raspi-config nonint do_ssh 0
@@ -36,12 +35,16 @@ systemctl mask serial-getty@ttyAMA0.service
 # bookworm lite:
 apt install git python3-pip -y
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils python3-alsaaudio -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy -y
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy python3-pygame -y
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 
 #  enable headless connect:
 #  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
+
+# this is the same effect as loginctl enable-linger piA
+mkdir -p /var/lib/systemd/linger
+touch /var/lib/systemd/linger/pi
 
 # install and start service to start radar
 su pi -c "mkdir -p /home/pi/.config/systemd/user/"
@@ -49,8 +52,6 @@ su pi -c "cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.serv
 # create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
 su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
 su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
-# enable linger for bluetooth
-loginctl enable-linger pi
 
 # change log level of rtkit, otherwise this fills journal with tons of useless info
 sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service

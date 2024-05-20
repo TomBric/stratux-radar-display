@@ -15,7 +15,7 @@
 #   sudo /bin/bash mk_stratux_display.sh -b dev
 #   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
 
-set -x
+# set -x
 
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
@@ -115,9 +115,10 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 sed -i mnt/boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
 sed -i mnt/boot/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
+
 # modify /boot/config.text for groundsensor
 {
-  echo "# modification for ultrasonic ground sensor"
+  echo "# modification for UART ground sensor"
   echo "enable_uart=1"
   echo "dtoverlay=miniuart-bt"
 } | tee -a mnt/boot/config.txt
@@ -128,15 +129,10 @@ chroot mnt apt install git -y
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
 su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git"
-# modify stratux_radar.sh to put enable-linger there (can't be done via chroot)
-sed -i stratux-radar-display/image/stratux_radar.sh -e "2i\\
-loginctl enable-linger"
+
 cd ../../../
 # run the configuration skript, that is also executed when setting up on target device
 unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
-
-# run additional device setup topics, which are not working when executing the normal config skript from above
-unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_stratux_display_device_setup.sh
 
 # mkdir -p out
 umount mnt/boot
