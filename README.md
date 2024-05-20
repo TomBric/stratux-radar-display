@@ -8,6 +8,7 @@ Implementation of a standalone Radar display for Stratux Europe Edition. Can run
 - update in version 1.8: integration of distance sensor and calculation of start/landing distances
 - update in version 1.9: adding mode selection parameter and start/landing distance calculation with ultrasonic sensor
 - update in version 2.0: checklist feature added, code rework
+- update in version 2.03: changed base to new operating system bookworm, spoken groundwarnings implemented, changed to Lidar ground sensor
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
@@ -143,8 +144,10 @@ Version EU28 there is a setting availabe to resolve the conflict: Go to Stratux 
    
 ### External Sound output
    
-   You can connect your stratux device with your intercom if it has an input for external audio (e.g. TQ KRT2 has one). This is possible on the Pi Zero or the PI3B with an external USB sound card (using the builtin headphone output does not work on the Pi3B). I used a simple "3D USB 5.1 Sound card" available for 4 Euro. The sound volume can be controlled via the option "-y 50" or can be modified with the pushbuttons under ->Status-> Net/Opt -> External Volume.
-   The following link gives some good hints, which USB sound card can be used and it also shows how to solder it to the Pi Zero, if you do not want an adapter or space is an issue (https://www.raspberrypi-spy.co.uk/2019/06/using-a-usb-audio-device-with-the-raspberry-pi/)
+   You can connect your radar device with your intercom if it has an input for external audio (e.g. TQ KRT2 has one). This is possible on the Pi Zero with an external USB sound card. I used a simple "3D USB 5.1 Sound card" available for 4 Euro. The sound volume can be controlled via the option "-y 50" or can be modified with the pushbuttons under ->Status-> Net/Opt -> External Volume.
+   The following link gives some good hints, which USB sound card can be used and it also shows how to solder it to the Pi Zero, if you do not want an adapter or space is an issue (https://www.raspberrypi-spy.co.uk/2019/06/using-a-usb-audio-device-with-the-raspberry-pi/).
+   
+   If you are using a Pi3B or Pi4 for the radar-display you can use the builtin audio jack. To enable this, you have to specify "-mx PCM" (select mixer PCM) in stratux_radar.sh along with the option "-y 100" (for sound volume). If you are running the radar-display on the same Pi together with stratux this is currently not supported, since there are software conflicts.
    
 ### Bluetooth devices
    
