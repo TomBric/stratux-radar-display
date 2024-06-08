@@ -8,7 +8,7 @@
 # set -x
 
 apt update
-apt upgrade -y
+# apt upgrade -y
 
 # enable ssh
 raspi-config nonint do_ssh 0
