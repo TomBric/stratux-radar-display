@@ -31,6 +31,12 @@ systemctl mask serial-getty@ttyAMA0.service
   echo "dtoverlay=miniuart-bt"
 } | tee -a /boot/firmware/config.txt
 
+# pico2wave is not installable in bookworm armhf (why so ever), so include debian source to install
+{
+  echo "# modification radar-display to install pico2wave"
+  echo "deb [arch=armhf, trusted=yes] http://deb.debian.org/debian bookworm main contrib non-free"
+} | tee -a /etc/apt/sources.list
+apt update
 
 # bookworm lite:
 apt install git python3-pip -y
