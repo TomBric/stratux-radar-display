@@ -5,7 +5,7 @@
 # called via configure_radar as sudo
 # usage /bin/bash mk_configure_radar.sh
 
-# set -x
+set -x
 
 # apt update
 # apt upgrade -y
@@ -37,13 +37,12 @@ systemctl mask serial-getty@ttyAMA0.service
 } | tee -a /etc/apt/sources.list
 apt update
 apt install libttspico-utils -y
-# remove the last line in sources.list no again
-sed '$d' /etc/apt/sources.list
-
+# remove the last line in sources.list now again
+sudo sed -i /etc/apt/sources.list -e '$d'
 
 # bookworm lite:
 apt install git python3-pip -y
-apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils python3-alsaaudio -y
+apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy python3-pygame -y
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 
