@@ -7,7 +7,7 @@
 
 # set -x
 
-apt update
+# apt update
 # apt upgrade -y
 
 # enable ssh
@@ -36,7 +36,7 @@ systemctl mask serial-getty@ttyAMA0.service
   echo "deb [arch=armhf, trusted=yes] http://deb.debian.org/debian bookworm main contrib non-free"
 } | tee -a /etc/apt/sources.list
 apt update
-apt install libttspico-utils
+apt install libttspico-utils -y
 # remove the last line in sources.list no again
 sed '$d' /etc/apt/sources.list
 
