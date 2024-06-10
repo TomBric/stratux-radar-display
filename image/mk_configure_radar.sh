@@ -5,7 +5,7 @@
 # called via configure_radar as sudo
 # usage /bin/bash mk_configure_radar.sh
 
-set -x
+# set -x
 
 # apt update
 # apt upgrade -y
