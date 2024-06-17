@@ -77,7 +77,7 @@ MEASUREMENTS_PER_SECOND = 10     # number of distance ranging meaurements per se
 DISTANCE_START_DETECTED = 30 * 10  # in mm where measurement assumes that plane is in the air
 DISTANCE_LANDING_DETECTED = 15 * 10  # in mm where measurement assumes to be landed
 OBSTACLE_HEIGHT = 50  # in feet, height value to calculate as obstacle clearance, 15 meters
-STOP_SPEED = 3  # in kts, speed when before runup or after landing a stop is assumed
+STOP_SPEED = 5  # in kts, speed when before runup or after landing a stop is assumed
 
 # start distance with groundsensor
 STATS_PER_SECOND = 5  # how many statistics are written per second
