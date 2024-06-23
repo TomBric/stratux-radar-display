@@ -4,6 +4,29 @@
 # script to be run as root
 # called via configure_radar as sudo
 # usage /bin/bash mk_configure_radar.sh
+# use option -i pico2tts to install pico2tts from debian source (necessary for armhf 32 bit version)
+# exmple: /bin/bash mk_configure_radar.sh -i pico2tts
+
+DEBIAN=false
+
+while getopts ":i" opt; do
+  case $opt in
+    i)
+      if [ "$OPTARG" = "pico2tts" ]; then
+        DEBIAN=true
+      fi
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG"
+      exit 1
+      ;;
+    :)
+      echo "option -$OPTARG requires a value."
+      exit 1
+      ;;
+  esac
+done
+
 
 # set -x
 
@@ -32,9 +55,22 @@ systemctl mask serial-getty@ttyAMA0.service
 } | tee -a /boot/firmware/config.txt
 
 
+if [ "$DEBIAN" = false ]; then
+  apt install libttspico-utils -y
+else
+  # pico2wave is not installable in bookworm armhf (why so ever), so include debian source to install
+  {
+    echo "deb [arch=armhf, trusted=yes] http://deb.debian.org/debian bookworm main contrib non-free"
+  } | tee -a /etc/apt/sources.list
+  apt update
+  apt install libttspico-utils -y
+  # remove the last line in sources.list now again
+  sudo sed -i /etc/apt/sources.list -e '$d'
+fi
+
 # bookworm lite:
 apt install git python3-pip -y
-apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils python3-alsaaudio -y
+apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy python3-pygame -y
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 
