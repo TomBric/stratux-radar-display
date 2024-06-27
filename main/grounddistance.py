@@ -222,7 +222,7 @@ class UsonicSensor:   # definition adapted from DFRobot code
 
 class LidarSensor:   # Implementation for TFMini-Plus Lidar Sensor
     lidar_bytes = 9
-    distance_max = 4000    # sensor is able to detect till 12 meters but reliable only to 4 m in bad conditions
+    distance_max = 5000    # sensor is able to detect till 12 meters but reliable only to 4 m in bad conditions
     distance_min = 100     # 10 cm min
     ser = None
     distance = 0
