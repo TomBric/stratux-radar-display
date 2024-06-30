@@ -35,7 +35,7 @@ sed -i 's/-b/ /g' /home/pi/stratux-radar-display/image/stratux_radar.sh
 # set IP to localhost in any case, if someone changes stratux ip
 sed -i 's/192.168.10.1/127.0.0.1/g' /home/pi/stratux-radar-display/image/stratux_radar.sh
 # include autostart into crontab, so that radar starts on every boot
-echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
+# echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
 # only works if crontab is empty, otherwise use
 # crontab -l | sed "\$a@reboot /bin/bash /home/pi/stratux-radar-display/image/start_radar" | crontab -
 
