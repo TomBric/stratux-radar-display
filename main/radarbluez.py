@@ -119,7 +119,7 @@ def sound_init(config, bluetooth, mixer_name):
         try:
             pygame.mixer.init()  # for what reason soever, init with a devicename only works after a sucessful init
             pygame.mixer.init(devicename=audio_device)  # initialize pygame mixer with devicename
-        except pygame.err as error:
+        except pygame.error as error:
             rlog.debug(f"SoundInit: Error pygame.init - {error} ")
         rlog.debug(f"SoundInit: Mixer initialized with device '{audio_device}'")
         sound_queue = Queue()
