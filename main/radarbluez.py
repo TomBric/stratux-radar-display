@@ -65,7 +65,7 @@ audio_device = None   # name of audio device selected by mixer name
 def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whether it was selected
     found = False
     mix = None
-    devicename = None
+    devicename = ""
     cardno = 0
     kwargs = {}
     for cardno in alsaaudio.card_indexes():
