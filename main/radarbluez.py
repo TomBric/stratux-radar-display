@@ -118,10 +118,10 @@ def sound_init(config, bluetooth, mixer_name):
     if bluetooth_active or extsound_active:
         try:
             pygame.mixer.init()  # for what reason soever, init with a devicename only works after a sucessful init
-            pygame.mixer.init(devicename=audio_device)  # initialize pygame mixer with devicename
+            #  pygame.mixer.init(devicename=audio_device)  # initialize pygame mixer with devicename
         except pygame.error as error:
             rlog.debug(f"SoundInit: Error pygame.init - {error} ")
-        rlog.debug(f"SoundInit: Mixer initialized with device '{audio_device}'")
+        # rlog.debug(f"SoundInit: Mixer initialized with device '{audio_device}'")
         sound_queue = Queue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
