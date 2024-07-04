@@ -83,6 +83,13 @@ def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whet
         return -1, None, None
 
     try:
+        master = alsaudio.Mixer()    # retrieve "Master" mixer, which means pipewire connection itself
+    except alsaaudio.ALSAAudioError:
+        rlog.debug("Radarbluez: Error setting Master volume to 100%")
+    else:
+        master.setvolume(100)       # set Master volume for pipewire to 100%
+
+    try:
         mix = alsaaudio.Mixer(mixer_name, **kwargs)
     except alsaaudio.ALSAAudioError:
         rlog.debug("Radarbluez: Could not get mixer '" + mixer_name + "'")
