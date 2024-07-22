@@ -30,7 +30,7 @@ done
 
 # set -x
 
-# apt update
+apt update
 # apt upgrade -y
 
 # enable ssh
@@ -78,7 +78,7 @@ su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 #  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 
-# this is the same effect as loginctl enable-linger piA
+# this is the same effect as loginctl enable-linger pi
 mkdir -p /var/lib/systemd/linger
 touch /var/lib/systemd/linger/pi
 

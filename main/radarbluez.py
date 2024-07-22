@@ -60,10 +60,12 @@ global_config = None
 sound_queue = None    # external sound queue
 sound_thread = None
 sound_card = None     # number of sound card, is initialized if external_sound_output is True
+audio_device = None   # name of audio device selected by mixer name
 
 def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whether it was selected
     found = False
     mix = None
+    devicename = None
     cardno = 0
     kwargs = {}
     for cardno in alsaaudio.card_indexes():
@@ -72,19 +74,27 @@ def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whet
             rlog.debug("Audio: Available Card:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
             if m == mixer_name:
                 rlog.debug("Audio: Selected Mixer:" + alsaaudio.card_name(cardno)[0] + " Mixer: " + m)
+                devicename = alsaaudio.card_name(cardno)[0]
                 found = True
                 break
         if found:   # stop outer loop as well, if first suitable mixer is found
             break
     if not found:
-        return -1, None
+        return -1, None, None
+
+    try:
+        master = alsaaudio.Mixer()    # retrieve "Master" mixer, which means pipewire connection itself
+    except alsaaudio.ALSAAudioError:
+        rlog.debug("Radarbluez: Error setting Master volume to 100%")
+    else:
+        master.setvolume(100)       # set Master volume for pipewire to 100%
 
     try:
         mix = alsaaudio.Mixer(mixer_name, **kwargs)
     except alsaaudio.ALSAAudioError:
         rlog.debug("Radarbluez: Could not get mixer '" + mixer_name + "'")
     rlog.debug("Radarbluez: Mixer '" + mixer_name + "' selected")
-    return cardno, mix
+    return cardno, mix, devicename
 
 
 def sound_init(config, bluetooth, mixer_name):
@@ -94,6 +104,7 @@ def sound_init(config, bluetooth, mixer_name):
     global sound_queue
     global sound_thread
     global sound_card
+    global audio_device
     global rlog
     global global_config
 
@@ -101,7 +112,7 @@ def sound_init(config, bluetooth, mixer_name):
     bluetooth_active = False
     global_config = config
     rlog = logging.getLogger('stratux-radar-log')
-    sound_card, mixer = find_mixer(mixer_name)   # search for mixer in any case
+    sound_card, mixer, audio_device = find_mixer(mixer_name)   # search for mixer in any case
     if not mixer:
         rlog.debug("Radarbluez: Mixer not found!")
     else:
@@ -112,7 +123,12 @@ def sound_init(config, bluetooth, mixer_name):
         bluetooth_active = bluez_init()
 
     if bluetooth_active or extsound_active:
-        pygame.mixer.init()  # initialize pygame mixer
+        try:
+            pygame.mixer.init()  # for what reason soever, init with a devicename only works after a sucessful init
+            #  pygame.mixer.init(devicename=audio_device)  # initialize pygame mixer with devicename
+        except pygame.error as error:
+            rlog.debug(f"SoundInit: Error pygame.init - {error} ")
+        # rlog.debug(f"SoundInit: Mixer initialized with device '{audio_device}'")
         sound_queue = Queue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
@@ -202,18 +218,9 @@ def audio_speaker(queue):
             pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", msg])  # generate wave
             if pico_result.returncode == 0:
                 if (bluetooth_active and bt_devices > 0) or (extsound_active and global_config['sound_volume'] > 0):
-                    # deviceopt = "--device=pipewire"
-                    # aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
                     while pygame.mixer.get_busy():
                         time.sleep(0.05)    # is a different thread, other threads continue, just audio speaker waits
                     pygame.mixer.Sound("/tmp/radar.wav").play()   # serialized via this thread
-                    # if aplay_result.returncode != 0:
-                    #   rlog.debug("Radarbluez: Error running aplay for bluetooth")
-                # if extsound_active and global_config['sound_volume'] > 0:
-                #    deviceopt = "--device=plughw:" + str(sound_card)
-                #    aplay_result = subprocess.run(["aplay", "-q", deviceopt, "/tmp/radar.wav"])
-                #    if aplay_result.returncode != 0:
-                #        rlog.debug("Radarbluez: Error running aplay {0}".format(deviceopt))
             else:
                 rlog.debug("Radarbluez: Error using pico2wave TTS")
     rlog.debug("Radarbluez: Audio-Speaker thread terminated.")
