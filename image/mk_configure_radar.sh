@@ -30,7 +30,7 @@ done
 
 # set -x
 
-# apt update
+apt update
 # apt upgrade -y
 
 # enable ssh
