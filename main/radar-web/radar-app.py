@@ -50,6 +50,8 @@ app = Flask(__name__)
 app.secret_key = 'radar-web-51Hgfw'
 
 # set default button sytle and size, will be overwritten by macro parameters
+app.config['BOOTSTRAP_SERVE_LOCAL'] = True      # use local instances of css etc.
+app.config['BOOTSTRAP_USE_MINIFIED'] = True
 app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 app.config['BOOTSTRAP_BTN_SIZE'] = 'md'
 
