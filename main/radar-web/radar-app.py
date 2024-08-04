@@ -102,7 +102,7 @@ def logging_init():
 VALID_IP_REGEX = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 
 class RadarForm(FlaskForm):
-    stratux_ip = StringField('IP address of Stratux',validator=Regexp(VALID_IP_REGEX))
+    stratux_ip = StringField('IP address of Stratux',validators=[Regexp(VALID_IP_REGEX)])
     display = RadioField(' ',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
