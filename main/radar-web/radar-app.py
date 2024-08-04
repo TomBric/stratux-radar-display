@@ -125,7 +125,7 @@ class RadarForm(FlaskForm):
     stratux_seq = IntegerField('', default=11)
     checklist = SwitchField('Checklists', default=False)
     checklist_seq = IntegerField('', default=12)
-    checklist_filename = FileField('Checklist filename', default='checklist.xml')
+    checklist_filename = StringField('Checklist filename', default='checklist.xml')
 
     #traffic options
     registration = SwitchField('Display call sign (epaper only)', default=True)
