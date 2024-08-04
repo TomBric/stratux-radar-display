@@ -142,19 +142,10 @@ def index():
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
+    print("result called.")
     watchdog.refresh()
     flash(Markup('A simple success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.'), 'success')
     return render_template('result.html')
-
-
-@app.route('/icon')
-def test_icon():
-    return render_template('icon.html')
-
-
-@app.route('/icons')
-def test_icons():
-    return render_template('icons.html')
 
 
 if __name__ == '__main__':
