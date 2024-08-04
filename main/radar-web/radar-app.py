@@ -161,7 +161,7 @@ if __name__ == '__main__':
     print("Stratux Radar Web Configuration Server " + RADAR_WEB_VERSION + " running ...")
     logging_init()
     ap = argparse.ArgumentParser(description='Stratux radar web configuration')
-    ap.add_argument("-t", "--timer", required=False, help="Inactivity timer after which server will shut down", default=3)
+    ap.add_argument("-t", "--timer", type=int, required=False, help="Inactivity timer after which server will shut down", default=3)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug level [0-1]", default=0)
     args = vars(ap.parse_args())
     flask_debug = False
