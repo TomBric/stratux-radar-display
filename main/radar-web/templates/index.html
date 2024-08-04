@@ -20,25 +20,32 @@
 {{ render_form_row([radar_form.gps_dist, radar_form.gps_dist_seq], col_map={'gps_dist': 'col-md-3', 'gps_dist_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.status, radar_form.status_seq], col_map={'status': 'col-md-3', 'status_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.stratux, radar_form.stratux_seq], col_map={'stratux': 'col-md-3', 'stratux_seq': 'no-label col-md-1'}) }}
-{{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist], col_map={'checklist': 'col-md-3', 'checklist_seq': 'no-label col-md-1', 'checklist': 'col-md-1'}) }}
+{{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist_filename],
+    col_map={'checklist': 'col-md-3', 'checklist_seq': 'no-label col-md-1', 'checklist_filename': 'col-md-3'}) }}
 
 <h5>Radar traffic display options</h5>
-{{ render_form_row([radar_form.registration, radar_form.ground_mode, radar_form.full_circle], col_map={'registration': 'col-md-3', 'ground_mode': 'col-md-3', 'full_circle': 'no-label col-md-3'}) }}
+{{ render_form_row([radar_form.registration, radar_form.ground_mode, radar_form.full_circle],
+    col_map={'registration': 'col-md-3', 'ground_mode': 'col-md-3', 'full_circle': 'no-label col-md-3'}) }}
 
 
 <h5>Sound options</h5>
-{{ render_form_row([radar_form.bluetooth, radar_form.speakdistance], col_map={'bluetooth': 'col-md-3', 'speakdistance': 'col-md-3'}) }}
-{{ render_form_row([radar_form.external_sound, radar_form.sound_volume, radar_form.mixer], col_map={'external_sound': 'col-md-3', 'sound_volume': 'col-md-3', 'mixer': 'col-md-3'}) }}
+{{ render_form_row([radar_form.bluetooth, radar_form.speakdistance],
+    col_map={'bluetooth': 'col-md-3', 'speakdistance': 'col-md-3'}) }}
+{{ render_form_row([radar_form.external_sound, radar_form.sound_volume, radar_form.mixer],
+    col_map={'external_sound': 'col-md-3', 'sound_volume': 'col-md-3', 'mixer': 'col-md-3'}) }}
 
 <h5>CO warner options</h5>
-{{ render_form_row([radar_form.coindicate, radar_form.no_cowarner], col_map={'coindicate': 'col-md-3', 'no_cowarner': 'col-md-3'}) }}
+{{ render_form_row([radar_form.coindicate, radar_form.no_cowarner],
+    col_map={'coindicate': 'col-md-3', 'no_cowarner': 'col-md-3'}) }}
 
 <h5>Ground sensor (LIDAR) options</h5>
-{{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.gearindicate], col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-3', 'gearindicate': 'col-md-3'}) }}
+{{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.gearindicate],
+    col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-3', 'gearindicate': 'col-md-3'}) }}
 
 <form method="post">
 {{ radar_form.csrf_token }}
-{{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart, radar_form.cancel], button_map={'save_restart': 'success', 'save': 'primary', 'restart': 'secondary', 'cancel':'danger'}) }}
+{{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart, radar_form.cancel],
+    button_map={'save_restart': 'success', 'save': 'primary', 'restart': 'secondary', 'cancel':'danger'}) }}
 </form>
 
 {% endblock %}
