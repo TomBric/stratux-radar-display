@@ -165,6 +165,7 @@ class RadarForm(FlaskForm):
 
 def build_option_string(radar_form):
     out = f'-d {radar_form.display.data} {radar_form.stratux_ip.data}'
+    print(f'option string: {out}')
     rlog.debug(f'option string: {out}')
     return out
 
