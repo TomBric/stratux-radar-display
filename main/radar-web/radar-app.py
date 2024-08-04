@@ -165,7 +165,7 @@ class RadarForm(FlaskForm):
 
 def build_option_string(radar_form):
     out = f'-d {radar_form.display.data} {radar_form.stratux_ip.data}'
-    rlog.debuig(f'option string: {out}')
+    rlog.debug(f'option string: {out}')
     return out
 
 @app.route('/')
@@ -174,7 +174,7 @@ def index():
     watchdog.refresh()
     radar_form = RadarForm()
     if radar_form.validate_on_submit():
-        print(radar_form.display.data)
+        build_option_string(radar_form)
         return redirect(url_for('result'))
     return render_template(
         'index.html',
