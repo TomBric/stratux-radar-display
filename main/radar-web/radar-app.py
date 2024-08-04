@@ -133,7 +133,7 @@ def index():
     watchdog.refresh()
     radar_form = RadarForm()
     if radar_form.validate_on_submit():
-        print(radar_form.display)
+        print(radar_form.display.data)
         return redirect(url_for('result'))
     return render_template(
         'index.html',
@@ -145,6 +145,7 @@ def index():
 def result():
     print("result called.")
     watchdog.refresh()
+    flash('Test')
     flash(Markup('A simple success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.'), 'success')
     return render_template('result.html')
 
