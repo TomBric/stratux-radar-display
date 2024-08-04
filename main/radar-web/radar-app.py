@@ -159,11 +159,12 @@ if __name__ == '__main__':
     logging_init()
     ap = argparse.ArgumentParser(description='Stratux radar web configuration')
     ap.add_argument("-t", "--timer", required=False, help="Inactivity timer after which server will shut down", default=3)
+    ap.add_argument("-v", "--verbose", required=False, help="Debug level [0-1]", default=0)
     args = vars(ap.parse_args())
     logging_init()
     flask_debug = False
     if args['verbose'] == 0:
-        flask_debug = True
+        flask_debug = False
         rlog.setLevel(logging.INFO)
     elif args['verbose'] == 1:
         flask_debug = True
