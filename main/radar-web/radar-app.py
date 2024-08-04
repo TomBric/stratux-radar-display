@@ -174,5 +174,6 @@ if __name__ == '__main__':
     shutdown_timer = 60 * args['timer']
     rlog.debug(f"radar-web: setting watchdog timer to {shutdown_timer} seconds")
     watchdog = Watchdog(shutdown_timer)
+    watchdog.start()
 
     app.run(debug=flask_debug)
