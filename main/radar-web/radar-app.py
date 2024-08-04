@@ -44,6 +44,8 @@ from wtforms.validators import DataRequired, Length, Regexp
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
+RADAR_WEB_VERSION = "0.5"
+
 app = Flask(__name__)
 app.secret_key = 'radar-web-51Hgfw'
 
@@ -156,12 +158,12 @@ def test_icons():
 
 
 if __name__ == '__main__':
+    print("Stratux Radar Web Configuration Server " + RADAR_WEB_VERSION + " running ...")
     logging_init()
     ap = argparse.ArgumentParser(description='Stratux radar web configuration')
     ap.add_argument("-t", "--timer", required=False, help="Inactivity timer after which server will shut down", default=3)
     ap.add_argument("-v", "--verbose", required=False, help="Debug level [0-1]", default=0)
     args = vars(ap.parse_args())
-    logging_init()
     flask_debug = False
     if args['verbose'] == 0:
         flask_debug = False
