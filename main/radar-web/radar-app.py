@@ -113,49 +113,51 @@ class RadarForm(FlaskForm):
     compass_seq = IntegerField('', default=5)
     vspeed = SwitchField('Vertical speed', default=True)
     vspeed_seq = IntegerField('', default=6)
+    cowarner = SwitchField('CO warner', default=False)
+    cowarner_seq = IntegerField('', default=7)
     flogs = SwitchField('Flight logs', default=True)
-    flogs_seq = IntegerField('', default=7)
+    flogs_seq = IntegerField('', default=8)
     gps_dist = SwitchField('GPS distance measuring', default=False)
-    gps_dist_seq = IntegerField('', default=8)
+    gps_dist_seq = IntegerField('', default=9)
     status = SwitchField('Display status', default=True)
-    status_seq = IntegerField('', default=9)
+    status_seq = IntegerField('', default=10)
     stratux = SwitchField('Stratux status', default=True)
-    stratux_seq = IntegerField('', default=10)
-    checklist = SwitchField('Checklists status', default=False)
-    checklist_seq = IntegerField('', default=11)
+    stratux_seq = IntegerField('', default=11)
+    checklist = SwitchField('Checklists', default=False)
+    checklist_seq = IntegerField('', default=12)
+    checklist_filename = FileField('Checklist filename', default='checklist.xml')
+
+    #traffic options
+    registration = SwitchField('Display call sign (epaper only)', default=True)
+    ground_mode = SwitchField('Ground mode, north always up', default=False)
+    full_circle = SwitchField('Full circle display on epaper 3.7', default=False)
+
+    # sound options
+    bluetooth = SwitchField('Bluetooth sound', default=False)
+    external_sound = SwitchField('External sound output', default=False)
+    sound_volume = IntegerRangeField(render_kw={'min': '0', 'max': '100'})
+    mixer = StringField('Sound mixer name', default = 'Speaker', validators=[Length(1, 40)])
+    speakdistance = SwitchField('Speak distance to target', default=False)
+
 
     save_restart = SubmitField('Save and restart radar')
     save = SubmitField('Save configuration only')
     restart = SubmitField('Restart radar only')
     cancel = SubmitField('Exit without saving')
 
-""""
-Sound options:
-- bluetooth
-- external sound on/off, volume,   Mixer name
-- speakdistance with traffic warnings
+    #co-warner options
+    no_cowarner = SwitchField('Suppress activation of co sensor', default=False)
+    coindicate = SwitchField('Indicate CO warning on GPIO16', default = False)
 
-Traffic options:
-- display registration no (epaper only)
+    #ground-distance options
+    groundsensor = SwitchField('Activate ground sensor via UART', default=False)
+    groundbeep = SwitchField('Indicate ground distance via sound', default=False)
+    gearindicate = SwitchField('Speak gear up warning depending on GPIO xxx', default=False)
 
-Radar display options:
-- Ground mode, always display north  up
-- display full circle radar (3.7 epaper only)
+    # special options
+    no_flighttime = SwitchField('Suppress detection and display of flighttime', default=False)
+    simulation_mode = SwitchField('Start in simulation mode (expert only)', default=False)
 
-Checklist name oben
-Special options
-- Suppress detection and display of flighttime
--simulation", required=False, help="Simulation mode for testing
-
-CO-Warner options
-- suppress activation of co-warner
-- co indicate, Indicate co warning via GPIO16
-
-Grounddistance options
--activate grounddistance sensor via UART
-- groundbeep, indicate ground distance via sound
-- gearinidicate
-"""
 
 @app.route('/')
 @app.route('/', methods=['GET', 'POST'])

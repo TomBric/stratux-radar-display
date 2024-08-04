@@ -4,14 +4,11 @@
 
 <style> .no-label { label{ display: None; } } </style>
 <h4>Stratux Radar-Display Configuration</h4>
-<br>
 
-<h6>Select, which display to use</h6>
+
+<h5>Select, which display to use</h5>
 {{ render_field(radar_form.display, class='no-label') }}
-
-<br>
-<h6>Select screens and their sequence</h6>
-<br>
+<h5>Select screens and their sequence</h5>
 {{ render_form_row([radar_form.radar, radar_form.radar_seq], col_map={'radar': 'col-md-3', 'radar_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.timer, radar_form.timer_seq], col_map={'timer': 'col-md-3', 'timer_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.ahrs, radar_form.ahrs_seq], col_map={'ahrs': 'col-md-3', 'ahrs_seq': 'no-label col-md-1'}) }}
@@ -19,10 +16,30 @@
 {{ render_form_row([radar_form.compass, radar_form.compass_seq], col_map={'compass': 'col-md-3', 'compass_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.vspeed, radar_form.vspeed_seq], col_map={'vspeed': 'col-md-3', 'vspeed_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.flogs, radar_form.flogs_seq], col_map={'flogs': 'col-md-3', 'flogs_seq': 'no-label col-md-1'}) }}
+{{ render_form_row([radar_form.cowarner, radar_form.flogs_seq], col_map={'flogs': 'col-md-3', 'flogs_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.gps_dist, radar_form.gps_dist_seq], col_map={'gps_dist': 'col-md-3', 'gps_dist_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.status, radar_form.status_seq], col_map={'status': 'col-md-3', 'status_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.stratux, radar_form.stratux_seq], col_map={'stratux': 'col-md-3', 'stratux_seq': 'no-label col-md-1'}) }}
-{{ render_form_row([radar_form.checklist, radar_form.checklist_seq], col_map={'checklist': 'col-md-3', 'checklist_seq': 'no-label col-md-1'}) }}
+{{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist],
+    col_map={'checklist': 'col-md-3', 'checklist_seq': 'no-label col-md-1', 'checklist': 'no-label col-md-1'}) }}
+
+<h5>Radar traffic display options</h5>
+{{ render_form_row([radar_form.registration, radar_form.ground_mode, radar_form.full_circle],
+    col_map={'checklist': 'col-md-1', 'checklist_seq': 'col-md-1', 'checklist': 'no-label col-md-1'}) }}
+
+<h5>Sound options</h5>
+{{ render_form_row([radar_form.bluetooth, radar_form.speakdistance],
+    col_map={'bluetooth': 'col-md-1', 'speakdistance': 'col-md-1'}) }}
+{{ render_form_row([radar_form.external_sound, radar_form.sound_volume, radar_form.mixer],
+    col_map={'checklist': 'col-md-1', 'checklist_seq': 'col-md-2', 'checklist': 'no-label col-md-2'}) }}
+
+<h5>CO warner options</h5>
+{{ render_form_row([radar_form.co_indicate, radar_form.no_cowarner],
+    col_map={'co_indicate': 'col-md-1', 'no_cowarner': 'col-md-1'}) }}
+
+<h5>Ground sensor (LIDAR) options</h5>
+{{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.gearindicate],
+    col_map={'groundsensor': 'col-md-1', 'groundbeep': 'col-md-1', 'gearindicate': 'col-md-1'}) }}
 
 <form method="post">
 {{ radar_form.csrf_token }}
