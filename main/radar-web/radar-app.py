@@ -60,12 +60,13 @@ rlog = None  # radar specific logger
 watchdog = None  # watchdog to shut down
 
 
-class Watchdog():
+class Watchdog:
     def __init__(self, timeout=180):
         self.timeout = timeout
         self._t = None
 
-    def do_expire(self):
+    @staticmethod
+    def do_expire():
         rlog.debug(f'radar-web: watchdog timeout expired! Stopping flask-app. ')
         os.kill(os.getpid(),signal.SIGINT)
 
@@ -126,6 +127,33 @@ class RadarForm(FlaskForm):
     restart = SubmitField('Restart radar only')
     cancel = SubmitField('Exit without saving')
 
+""""
+Sound options:
+- bluetooth
+- external sound on/off, volume,   Mixer name
+- speakdistance with traffic warnings
+
+Traffic options:
+- display registration no (epaper only)
+
+Radar display options:
+- Ground mode, always display north  up
+- display full circle radar (3.7 epaper only)
+
+Checklist name oben
+Special options
+- Suppress detection and display of flighttime
+-simulation", required=False, help="Simulation mode for testing
+
+CO-Warner options
+- suppress activation of co-warner
+- co indicate, Indicate co warning via GPIO16
+
+Grounddistance options
+-activate grounddistance sensor via UART
+- groundbeep, indicate ground distance via sound
+- gearinidicate
+"""
 
 @app.route('/')
 @app.route('/', methods=['GET', 'POST'])
@@ -146,21 +174,6 @@ def result():
     print("result called.")
     watchdog.refresh()
     flash('Test')
-    flash(Markup('A simple success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.'), 'success')
-    return render_template('result.html')
-
-
-@app.route('/flash', methods=['GET', 'POST'])
-def test_flash():
-    flash('A simple default alert—check it out!')
-    flash('A simple primary alert—check it out!', 'primary')
-    flash('A simple secondary alert—check it out!', 'secondary')
-    flash('A simple success alert—check it out!', 'success')
-    flash('A simple danger alert—check it out!', 'danger')
-    flash('A simple warning alert—check it out!', 'warning')
-    flash('A simple info alert—check it out!', 'info')
-    flash('A simple light alert—check it out!', 'light')
-    flash('A simple dark alert—check it out!', 'dark')
     flash(Markup('A simple success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.'), 'success')
     return render_template('result.html')
 
