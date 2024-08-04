@@ -133,6 +133,7 @@ def index():
     watchdog.refresh()
     radar_form = RadarForm()
     if radar_form.validate_on_submit():
+        print(radar_from)
         return redirect(url_for('result'))
     return render_template(
         'index.html',
