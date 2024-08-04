@@ -152,7 +152,7 @@ class RadarForm(FlaskForm):
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
-    gearindicate = SwitchField('Speak gear up warning depending on GPIO xxx', default=False)
+    gearindicate = SwitchField('Speak gear up warning', default=False)
 
     # special options
     no_flighttime = SwitchField('Suppress detection and display of flighttime', default=False)
