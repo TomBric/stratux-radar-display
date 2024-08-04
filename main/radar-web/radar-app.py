@@ -69,7 +69,9 @@ class Watchdog:
 
     @staticmethod
     def do_expire():
-        rlog.debug(f'radar-web: watchdog timeout expired! Stopping flask-app. ')
+        rlog.debug(f'radar-web: watchdog timeout expired! Stopping nginx proxy. ')
+        os.system('sudo systemctl stop nginx')
+        rlog.debug('radar-web: watchdog timeout expired! Stopping flask-app. ')
         os.kill(os.getpid(),signal.SIGINT)
 
     def _expire(self):
@@ -97,8 +99,10 @@ def logging_init():
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     rlog = logging.getLogger('stratux-radar-web-log')
 
+VALID_IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
 
 class RadarForm(FlaskForm):
+    stratux_ip = StringField('IP address of Stratux',validators=[Length(1, 18), Regexp(VALID_IP_REGEX)])
     display = RadioField(' ',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
@@ -159,6 +163,11 @@ class RadarForm(FlaskForm):
     simulation_mode = SwitchField('Start in simulation mode (expert only)', default=False)
 
 
+def build_option_string(radar_form):
+    out = f'-d {radar_form.display.data} {radar_form.stratux_ip.data}'
+    rlog.debuig(f'option string: {out}')
+    return out
+
 @app.route('/')
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -201,4 +210,7 @@ if __name__ == '__main__':
     watchdog = Watchdog(shutdown_timer)
     watchdog.start()
 
+    rlog.debug(f"radar-web: sudo systemctl start nginx")
+    os.system('sudo systemctl start nginx')  # just in case it has been stopped before
+    rlog.debug(f"radar-web: starting flask app")
     app.run(debug=flask_debug)
