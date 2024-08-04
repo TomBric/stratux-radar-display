@@ -150,6 +150,21 @@ def result():
     return render_template('result.html')
 
 
+@app.route('/flash', methods=['GET', 'POST'])
+def test_flash():
+    flash('A simple default alert—check it out!')
+    flash('A simple primary alert—check it out!', 'primary')
+    flash('A simple secondary alert—check it out!', 'secondary')
+    flash('A simple success alert—check it out!', 'success')
+    flash('A simple danger alert—check it out!', 'danger')
+    flash('A simple warning alert—check it out!', 'warning')
+    flash('A simple info alert—check it out!', 'info')
+    flash('A simple light alert—check it out!', 'light')
+    flash('A simple dark alert—check it out!', 'dark')
+    flash(Markup('A simple success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.'), 'success')
+    return render_template('result.html')
+
+
 if __name__ == '__main__':
     print("Stratux Radar Web Configuration Server " + RADAR_WEB_VERSION + " running ...")
     logging_init()

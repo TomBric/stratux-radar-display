@@ -34,7 +34,7 @@
     </nav>
     
     <main class="container">
-        {{ render_messages(container=True, dismissible=True, dismiss_animate=True) }}
+        {{ render_messages(container=False, dismissible=True, dismiss_animate=True) }}
         {% block content %}{% endblock %}
     </main>
 
