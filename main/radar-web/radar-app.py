@@ -103,7 +103,7 @@ VALID_IP_REGEX = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4]
 
 class RadarForm(FlaskForm):
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1',
-                             validators=[Length(1, 40, message='Invalid Length'), Regexp(VALID_IP_REGEX, message='Enter a valid IP of form xxx.xxx.xxx.xxx')])
+                             validators=[Length(1, 16), Regexp(VALID_IP_REGEX)])
     display = RadioField(' ',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
