@@ -102,7 +102,8 @@ def logging_init():
 VALID_IP_REGEX = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 
 class RadarForm(FlaskForm):
-    stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[Regexp(VALID_IP_REGEX, message='Enter a valid IP of form xxx.xxx.xxx.xxx')])
+    stratux_ip = StringField('IP address of Stratux', default='192.168.10.1',
+                             validators=[Length(1, 40, message='Invalid Length'), Regexp(VALID_IP_REGEX, message='Enter a valid IP of form xxx.xxx.xxx.xxx')])
     display = RadioField(' ',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
@@ -164,8 +165,7 @@ class RadarForm(FlaskForm):
 
 
 def build_option_string(radar_form):
-    out = f'-d {radar_form.display.data} {radar_form.stratux_ip.data}'
-    print(f'option string: {out}')
+    out = f'-d {radar_form.display.data} -c {radar_form.stratux_ip.data}'
     rlog.debug(f'option string: {out}')
     return out
 
@@ -175,7 +175,7 @@ def index():
     watchdog.refresh()
     radar_form = RadarForm()
     if radar_form.validate_on_submit():
-        build_option_string(radar_form)
+        outstring = build_option_string(radar_form)
         return redirect(url_for('result'))
     return render_template(
         'index.html',
@@ -185,7 +185,6 @@ def index():
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
-    print("result called.")
     watchdog.refresh()
     flash('Test')
     flash(Markup('A simple success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.'), 'success')
