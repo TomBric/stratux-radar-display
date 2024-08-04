@@ -25,21 +25,21 @@
 
 <h5>Radar traffic display options</h5>
 {{ render_form_row([radar_form.registration, radar_form.ground_mode, radar_form.full_circle],
-    col_map={'checklist': 'col-md-1', 'checklist_seq': 'col-md-1', 'checklist': 'no-label col-md-1'}) }}
+    col_map={'checklist': 'col-md-3', 'checklist_seq': 'col-md-3', 'checklist': 'no-label col-md-3'}) }}
 
 <h5>Sound options</h5>
 {{ render_form_row([radar_form.bluetooth, radar_form.speakdistance],
-    col_map={'bluetooth': 'col-md-1', 'speakdistance': 'col-md-1'}) }}
+    col_map={'bluetooth': 'col-md-3', 'speakdistance': 'col-md-3'}) }}
 {{ render_form_row([radar_form.external_sound, radar_form.sound_volume, radar_form.mixer],
-    col_map={'checklist': 'col-md-1', 'checklist_seq': 'col-md-2', 'checklist': 'no-label col-md-2'}) }}
+    col_map={'checklist': 'col-md-3', 'checklist_seq': 'col-md-3', 'checklist': 'no-label col-md-3'}) }}
 
 <h5>CO warner options</h5>
 {{ render_form_row([radar_form.coindicate, radar_form.no_cowarner],
-    col_map={'co_indicate': 'col-md-1', 'no_cowarner': 'col-md-1'}) }}
+    col_map={'co_indicate': 'col-md-3', 'no_cowarner': 'col-md-3'}) }}
 
 <h5>Ground sensor (LIDAR) options</h5>
 {{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.gearindicate],
-    col_map={'groundsensor': 'col-md-1', 'groundbeep': 'col-md-1', 'gearindicate': 'col-md-1'}) }}
+    col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-3', 'gearindicate': 'col-md-3'}) }}
 
 <form method="post">
 {{ radar_form.csrf_token }}

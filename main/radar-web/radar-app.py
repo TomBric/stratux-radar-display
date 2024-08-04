@@ -135,7 +135,7 @@ class RadarForm(FlaskForm):
     # sound options
     bluetooth = SwitchField('Bluetooth sound', default=False)
     external_sound = SwitchField('External sound output', default=False)
-    sound_volume = IntegerRangeField(render_kw={'min': '0', 'max': '100'})
+    sound_volume = IntegerRangeField(render_kw={'min': '0', 'max': '100'}, default=100)
     mixer = StringField('Sound mixer name', default = 'Speaker', validators=[Length(1, 40)])
     speakdistance = SwitchField('Speak distance to target', default=False)
 
