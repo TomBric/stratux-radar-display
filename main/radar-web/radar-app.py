@@ -99,7 +99,7 @@ def logging_init():
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     rlog = logging.getLogger('stratux-radar-web-log')
 
-VALID_IP_REGEX = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+VALID_IP_REGEX = f'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 
 class RadarForm(FlaskForm):
     stratux_ip = StringField('IP address of Stratux', validators=[Regexp(VALID_IP_REGEX)])
