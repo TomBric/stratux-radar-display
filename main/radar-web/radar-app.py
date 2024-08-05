@@ -102,7 +102,7 @@ def logging_init():
 VALID_IP_REGEX = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 
 class RadarForm(FlaskForm):
-    stratux_ip = IntegerField('IP address of Stratux')
+    stratux_ip = StringField('IP address of Stratux')
     display = RadioField(' ',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
@@ -176,6 +176,7 @@ def index():
     rlog.debug(f'Statux-IP: {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit():
         rlog.debug(f'Statux-IP after validation: {radar_form.stratux_ip.data}')
+        rlog.debug(f'Mixer: {radar_form.mixer.data}')
         outstring = build_option_string(radar_form)
         return redirect(url_for('result'))
     return render_template(
