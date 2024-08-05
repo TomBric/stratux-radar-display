@@ -2,6 +2,8 @@
 {% from 'bootstrap5/form.html' import render_form, render_field, render_form_row %}
 {% block content %}
 
+<form method="post">
+{{ radar_form.csrf_token }}
 <style> .no-label { label{ display: None; } } </style>
 <h4>Stratux Radar-Display Configuration</h4>
 <br>
@@ -45,8 +47,7 @@
 {{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.gearindicate],
     col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-3', 'gearindicate': 'col-md-3'}) }}
 
-<form method="post">
-{{ radar_form.csrf_token }}
+
 {{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart, radar_form.cancel],
     button_map={'save_restart': 'success', 'save': 'primary', 'restart': 'secondary', 'cancel':'danger'}) }}
 </form>
