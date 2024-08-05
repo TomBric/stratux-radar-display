@@ -175,6 +175,7 @@ def index():
     radar_form = RadarForm()
     rlog.debug(f'Statux-IP: {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit():
+        rlog.debug(f'Statux-IP after validation: {radar_form.stratux_ip.data}')
         outstring = build_option_string(radar_form)
         return redirect(url_for('result'))
     return render_template(
