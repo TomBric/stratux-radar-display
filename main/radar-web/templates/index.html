@@ -8,7 +8,7 @@
 <h4>Stratux Radar-Display Configuration</h4>
 <br>
 <h5>IP Address of Stratux</h5>
-{{ render_field(radar_form.stratux_ip) }}
+{{ render_form_row([radar_form.stratux_ip], col_map={'stratux-ip': 'no-label col-md-3'}) }}
 
 <h5>Select, which display to use</h5>
 {{ render_field(radar_form.display, class='no-label') }}
