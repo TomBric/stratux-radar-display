@@ -173,7 +173,6 @@ def build_option_string(radar_form):
 def index():
     watchdog.refresh()
     radar_form = RadarForm()
-    radar_form.stratux_ip.data='192.168.10.1'
     if radar_form.validate_on_submit():
         outstring = build_option_string(radar_form)
         return redirect(url_for('result'))
