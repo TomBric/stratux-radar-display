@@ -13,14 +13,14 @@
 
 <br>
 <h5>Select screens and their sequence</h5>
-{{ render_form_row([radar_form.radar, radar_form.radar_seq], col_map={'radar': 'col-sm-3', 'radar_seq': 'no-label col-sm-1'}) }}
-{{ render_form_row([radar_form.timer, radar_form.timer_seq], col_map={'timer': 'col-sm-3', 'timer_seq': 'no-label col-sm-1'}) }}
+{{ render_form_row([radar_form.radar, radar_form.radar_seq], col_class_default='no-label col-md-3')
+{{ render_form_row([radar_form.timer, radar_form.timer_seq], col_map={'timer': 'col-md-3', 'timer_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.ahrs, radar_form.ahrs_seq], col_map={'ahrs': 'col-md-3', 'ahrs_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.gmeter, radar_form.gmeter_seq], col_map={'gmeter': 'col-md-3', 'gmeter_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.compass, radar_form.compass_seq], col_map={'compass': 'col-md-3', 'compass_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.vspeed, radar_form.vspeed_seq], col_map={'vspeed': 'col-md-3', 'vspeed_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.flogs, radar_form.flogs_seq], col_map={'flogs': 'col-md-3', 'flogs_seq': 'no-label col-md-1'}) }}
-{{ render_form_row([radar_form.cowarner, radar_form.flogs_seq], col_map={'flogs': 'col-md-3', 'flogs_seq': 'no-label col-md-1'}) }}
+{{ render_form_row([radar_form.cowarner, radar_form.cowarner_seq], col_map={'flogs': 'col-md-3', 'flogs_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.gps_dist, radar_form.gps_dist_seq], col_map={'gps_dist': 'col-md-3', 'gps_dist_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.status, radar_form.status_seq], col_map={'status': 'col-md-3', 'status_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.stratux, radar_form.stratux_seq], col_map={'stratux': 'col-md-3', 'stratux_seq': 'no-label col-md-1'}) }}
