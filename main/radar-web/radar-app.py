@@ -54,6 +54,11 @@ from flask_bootstrap import Bootstrap5, SwitchField
 RADAR_WEB_VERSION = "0.5"
 START_RADAR_FILE = "../../image/start_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
+TIMEOUT = 0.5
+MAX_WAIT_TIME = 10
+
+wait = MAX_WAIT_TIME
+status = '.'
 
 app = Flask(__name__)
 app.secret_key = 'radar-web-51Hgfw'
@@ -258,6 +263,7 @@ def build_option_string(radar_form):
 @app.route('/')
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    global wait
     watchdog.refresh()
     radar_form = RadarForm()
     # read_arguments(radar_form)
@@ -266,7 +272,7 @@ def index():
         rlog.debug(f'Stratux-IP after validation: {radar_form.stratux_ip.data}')
         rlog.debug(f'Mixer: {radar_form.mixer.data}')
         # write_arguments(radar_form)
-
+        wait = MAX_WAIT_TIME
         return redirect(url_for('waiting'))
     return render_template(
         'index.html',
@@ -281,12 +287,6 @@ def result():
     flash(Markup('A simple success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.'), 'success')
     return render_template('result.html')
 
-
-TIMEOUT = 0.5
-MAX_WAIT_TIME = 10
-
-wait = MAX_WAIT_TIME
-status = '.'
 
 @app.route('/waiting', methods=['GET', 'POST'])
 def waiting():
