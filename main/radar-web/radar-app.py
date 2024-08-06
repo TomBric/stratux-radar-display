@@ -36,8 +36,8 @@ import logging
 import os
 import signal
 import threading
-from .. import arguments
-from .. import radarmodes
+from ... import arguments
+from ... import radarmodes
 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from markupsafe import Markup
