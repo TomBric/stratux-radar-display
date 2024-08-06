@@ -3,4 +3,5 @@
 {% block content %}
 <h2> Status Indication; {{ status_indication }} </h2>
 <a href="{{ url_for('index') }}">Back to configuration</a>
+<script>window.location.href = "{{ url_for('results') }}";</script>
 {% endblock %}
