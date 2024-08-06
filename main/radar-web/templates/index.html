@@ -13,7 +13,8 @@
 
 <br>
 <h5>Select screens and their sequence</h5>
-{{ render_form_row([radar_form.radar, radar_form.radar_seq], col_map={'timer': 'col-sm-3', 'timer_seq': 'form-control-sm no-label col-sm-1'}) }}
+<div class="form-control-sm">
+{{ render_form_row([radar_form.radar, radar_form.radar_seq], col_map={'timer': 'col-md-3', 'timer_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.timer, radar_form.timer_seq], col_map={'timer': 'col-md-3', 'timer_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.ahrs, radar_form.ahrs_seq], col_map={'ahrs': 'col-md-3', 'ahrs_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.gmeter, radar_form.gmeter_seq], col_map={'gmeter': 'col-md-3', 'gmeter_seq': 'no-label col-md-1'}) }}
@@ -26,7 +27,7 @@
 {{ render_form_row([radar_form.stratux, radar_form.stratux_seq], col_map={'stratux': 'col-md-3', 'stratux_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist_filename],
     col_map={'checklist': 'col-md-3', 'checklist_seq': 'no-label col-md-1', 'checklist_filename': 'col-md-3'}) }}
-
+</div>
 <h5>Radar traffic display options</h5>
 {{ render_form_row([radar_form.registration, radar_form.ground_mode, radar_form.full_circle],
     col_map={'registration': 'col-md-3', 'ground_mode': 'col-md-3', 'full_circle': 'no-label col-md-3'}) }}
