@@ -264,7 +264,7 @@ def index():
     if radar_form.validate_on_submit():
         rlog.debug(f'Stratux-IP after validation: {radar_form.stratux_ip.data}')
         rlog.debug(f'Mixer: {radar_form.mixer.data}')
-        write_arguments(radar_form)
+        # write_arguments(radar_form)
 
         return redirect(url_for('result'))
     return render_template(
