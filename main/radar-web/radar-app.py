@@ -266,7 +266,7 @@ def index():
         rlog.debug(f'Mixer: {radar_form.mixer.data}')
         # write_arguments(radar_form)
 
-        return redirect(url_for('result'))
+        return redirect(url_for('waiting'))
     return render_template(
         'index.html',
         radar_form=radar_form
@@ -296,7 +296,7 @@ def waiting():
     wait -= TIMEOUT
     time.sleep(TIMEOUT)
     if wait <= 0:
-        return render_template('result.html')
+        return redirect(url_for('result'))
     return render_template('waiting.html', status_indication=status)
 
 
