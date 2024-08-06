@@ -36,6 +36,8 @@ import logging
 import os
 import signal
 import threading
+from .. import arguments
+from .. import radarmodes
 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from markupsafe import Markup
@@ -45,6 +47,8 @@ from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
 RADAR_WEB_VERSION = "0.5"
+START_RADAR_FILE = "../../image/start_radar.sh"
+RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 
 app = Flask(__name__)
 app.secret_key = 'radar-web-51Hgfw'
@@ -161,6 +165,86 @@ class RadarForm(FlaskForm):
     simulation_mode = SwitchField('Start in simulation mode (expert only)', default=False)
 
 
+def read_options_in_file(file_path, word):
+    try:
+        with open(file_path, 'r') as fp:
+            for line in fp:
+                if word in line:
+                    w_index = line.find(word)
+                    radar_arguments = line[w_index + len(word):].strip()
+                    break
+    except FileNotFoundError:
+        rlog.debug(f'Radar-app: {file_path} not found!')
+        return
+    except Exception as e:
+        rlog.debug(f'Radar-app: Error {e} reading {file_path}')
+        return
+
+def modify_line_in_file(file_path, word, new_text):    # search word in file and replace after word with new_text
+    try:
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+        with open(file_path, 'w') as file:
+            for line in lines:
+                if word in line:
+                    word_index = line.find(word)
+                    new_line = line[:word_index + len(word)] + " " + new_text + "\n"
+                    file.write(new_line)
+                else:
+                    file.write(line)
+    except FileNotFoundError:
+        rlog.debug(f'Radar-app: {START_RADAR_FILE} not found!')
+        return
+    except Exception as e:
+        rlog.debug(f'Radar-app: Error {e} modifying {START_RADAR_FILE}')
+        return
+
+
+def read_arguments(rf):
+    options = read_options_in_file(START_RADAR_FILE, RADAR_COMMAND)
+    ap = argparse.ArgumentParser(description='Stratux options')
+    arguments.add(ap)
+    args = vars(ap.parse_args(options.split()))
+    rf.stratux_ip.data = args['connect']
+    rf.display.data = args['device']
+    rf.bluetooth.data = args['bluetooth']
+    rf.ground_mode.data = args['north']
+    rf.full_circle.data = args['fullcircle']
+    rf.co_indicate.data = args['coindicate']
+
+    radarmodes.parse_modes(args['displaymodes'])
+    # radarmodes.mode_sequence analysieren und umsetzen
+
+
+    measure_flighttime = not args['noflighttime']
+    co_warner_activated = not args['nocowarner']
+    co_indication = args['coindicate']
+    grounddistance_activated = args['grounddistance']
+    groundbeep = args['groundbeep']
+    gear_indication = args['gearindicate']
+    simulation_mode = args['simulation']
+    xml_checklist = args['checklist']
+    sound_mixer = args['mixer']
+    radarmodes.parse_modes(args['displaymodes'])
+    global_mode = radarmodes.first_mode_sequence()
+    global_config['display_tail'] = args['registration']  # display registration if set
+    global_config['distance_warnings'] = args['speakdistance']  # display registration if set
+    global_config['sound_volume'] = args['extsound']  # 0 if not enabled
+    if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
+        global_config['sound_volume'] = 50  # set to a medium value if strange number used
+    # check config file, if extistent use config from there
+    # parse arguments after radar.py
+    # set rf accordingly
+
+
+def write_arguments(rf):
+    new_options = build_option_string(radar_form)
+    modify_line_in_file(START_RADAR_FILE, RADAR_COMMAND, new_options)
+    # find line with command "radar.py"
+    # create arguments with content auf radar.py
+    # save new line
+
+
 def build_option_string(radar_form):
     out = f'-d {radar_form.display.data} -c {radar_form.stratux_ip.data}'
     rlog.debug(f'option string: {out}')
@@ -171,11 +255,13 @@ def build_option_string(radar_form):
 def index():
     watchdog.refresh()
     radar_form = RadarForm()
+    read_current_arguments(radar_form)
     rlog.debug(f'Stratux-IP: {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit():
         rlog.debug(f'Stratux-IP after validation: {radar_form.stratux_ip.data}')
         rlog.debug(f'Mixer: {radar_form.mixer.data}')
-        outstring = build_option_string(radar_form)
+        write_arguments(radar_form)
+
         return redirect(url_for('result'))
     return render_template(
         'index.html',
@@ -189,6 +275,25 @@ def result():
     flash('Test')
     flash(Markup('A simple success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.'), 'success')
     return render_template('result.html')
+
+
+TIMEOUT = 0.5
+MAX_WAIT_TIME = 10
+
+wait = MAX_WAIT_TIME
+status = '.'
+
+@app.route('/waiting', methods=['GET', 'POST'])
+def waiting():
+    global status
+    global wait
+    watchdog.refresh()
+    status += '.'
+    wait -= TIMEOUT
+    time.sleep(TIMEOUT)
+    if wait <= 0:
+        return render_template('result.html')
+    return render_template('waiting.html', status_indication=status)
 
 
 if __name__ == '__main__':
