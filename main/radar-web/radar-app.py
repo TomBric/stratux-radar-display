@@ -114,16 +114,10 @@ def logging_init():
     rlog = logging.getLogger('stratux-radar-web-log')
 
 
-class ScreenForm(FlaskForm):
-    on = SwitchField(default=True)
-    seq = IntegerField(label='', default=1)
-
-
 class RadarForm(FlaskForm):
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[IPAddress()])
     display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
 
-    screen = FormField(ScreenForm)
     radar = SwitchField('Radar', description=' ', default=True)
     radar_seq = IntegerField(label='', default=1)
     timer = SwitchField('Timer', default=True)
