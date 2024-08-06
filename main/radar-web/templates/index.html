@@ -25,7 +25,7 @@
 {{ render_form_row([radar_form.gps_dist, radar_form.gps_dist_seq], col_map={'gps_dist': 'col-md-3', 'gps_dist_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.status, radar_form.status_seq], col_map={'status': 'col-md-3', 'status_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.stratux, radar_form.stratux_seq], col_map={'stratux': 'col-md-3', 'stratux_seq': 'no-label col-md-1'}) }}
-{{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist_filename], form_type='inline',
+{{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist_filename], form_type='horizontal',
     col_map={'checklist': 'col-md-3', 'checklist_seq': 'no-label col-md-1', 'checklist_filename': 'col-md-3'}) }}
 </div>
 <h5>Radar traffic display options</h5>
