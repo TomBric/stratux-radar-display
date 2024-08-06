@@ -259,7 +259,7 @@ def build_option_string(radar_form):
 def index():
     watchdog.refresh()
     radar_form = RadarForm()
-    read_current_arguments(radar_form)
+    # read_arguments(radar_form)
     rlog.debug(f'Stratux-IP: {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit():
         rlog.debug(f'Stratux-IP after validation: {radar_form.stratux_ip.data}')
