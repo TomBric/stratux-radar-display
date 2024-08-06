@@ -36,8 +36,10 @@ import logging
 import os
 import signal
 import threading
-from ... import arguments
-from ... import radarmodes
+# add parent path to syspath
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import arguments
+import radarmodes
 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from markupsafe import Markup
