@@ -12,4 +12,4 @@ apt update
 # apt upgrade -y
 apt install nginx -y
 pip3 install bootstrap-flask flask-wtf --break-system-packages
-cp radar_reverse.conf /etc/nginx/sites-available/
+cp radar_reverse.conf /etc/nginx/conf.d/
