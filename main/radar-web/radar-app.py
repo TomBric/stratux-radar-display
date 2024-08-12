@@ -162,21 +162,18 @@ class RadarForm(FlaskForm):
     restart = SubmitField('Restart radar only')
     cancel = SubmitField('Exit without saving')
 
-    #co-warner options
+    # special options
     no_cowarner = SwitchField('Suppress activation of co sensor', default=False)
     coindicate = SwitchField('Indicate CO warning on GPIO16', default = False)
+    no_flighttime = SwitchField('Suppress detection and display of flighttime', default=False)
 
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
-    gearindicate = SwitchField('Speak gear up warning', default=False)
-
-    # special options
-    no_flighttime = SwitchField('Suppress detection and display of flighttime', default=False)
-    simulation_mode = SwitchField('Start in simulation mode (expert only)', default=False)
 
 
 def read_options_in_file(file_path, word):
+    radar_arguments = ''
     try:
         with open(file_path, 'r') as fp:
             for line in fp:
@@ -190,6 +187,7 @@ def read_options_in_file(file_path, word):
     except Exception as e:
         rlog.debug(f'Radar-app: Error {e} reading {file_path}')
         return
+    return radar_arguments
 
 def modify_line_in_file(file_path, word, new_text):    # search word in file and replace after word with new_text
     try:
@@ -211,41 +209,50 @@ def modify_line_in_file(file_path, word, new_text):    # search word in file and
         return
 
 
+modes = { 'R': 'radar', 'T': 'timer', 'A': 'ahrs', 'D': 'status', 'G': 'gmeter','K': 'compass','V': 'vspeed',
+        'S': 'stratux', 'I': 'flogs', 'C': 'cowarner', 'M': 'gps_dist', 'L': 'checklist'}
+
+def parsemodes(options, radarform):
+    for c in options:
+        att = modes.get(c)
+        if att is not None:
+            radarform.getattr(radarform, att).data = True
+
+
 def read_arguments(rf):
     options = read_options_in_file(START_RADAR_FILE, RADAR_COMMAND)
+    rlog.debug(f'radar_arguments read from "{START_RADAR_FILE}": {options}')
     ap = argparse.ArgumentParser(description='Stratux options')
     arguments.add(ap)
     args = vars(ap.parse_args(options.split()))
     rf.stratux_ip.data = args['connect']
     rf.display.data = args['device']
-    rf.bluetooth.data = args['bluetooth']
+
+    # radar options
     rf.ground_mode.data = args['north']
     rf.full_circle.data = args['fullcircle']
-    rf.co_indicate.data = args['coindicate']
+    rf.registration.data = args['registration']
 
-    radarmodes.parse_modes(args['displaymodes'])
-    # radarmodes.mode_sequence analysieren und umsetzen
+    # sound options
+    rf.bluetooth.data = args['bluetooth']
+    rf.sound_volume.data = args['extsound']
+    if rf.sound_volume.data < 0 or rf.sound_volume.data > 100:
+        rf.sound_volume.data = 50
+    rf.external_sound.data = args['extsound'] > 0
+    rf.mixer.data = args['mixer']
+    rf.speakdistance.data = args['speakdistance']
+    # ground-options
+    rf.groundsensor.data = args['grounddistance']
+    rf.groundbeep.data = args['groundbeep']
+    rf.gearindicate.data = args['gearindicate']
+    # special options
+    rf.no_cowarner.data = args['nocowarner']
+    rf.coindicata.data = args['coindicate']
+    rf.no_flighttime.data = args['noflighttime']
+    rf.checklist_filename.data = args['checklist']
 
+    parse_modes(args['displaymodes'])
 
-    measure_flighttime = not args['noflighttime']
-    co_warner_activated = not args['nocowarner']
-    co_indication = args['coindicate']
-    grounddistance_activated = args['grounddistance']
-    groundbeep = args['groundbeep']
-    gear_indication = args['gearindicate']
-    simulation_mode = args['simulation']
-    xml_checklist = args['checklist']
-    sound_mixer = args['mixer']
-    radarmodes.parse_modes(args['displaymodes'])
-    global_mode = radarmodes.first_mode_sequence()
-    global_config['display_tail'] = args['registration']  # display registration if set
-    global_config['distance_warnings'] = args['speakdistance']  # display registration if set
-    global_config['sound_volume'] = args['extsound']  # 0 if not enabled
-    if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
-        global_config['sound_volume'] = 50  # set to a medium value if strange number used
-    # check config file, if extistent use config from there
-    # parse arguments after radar.py
-    # set rf accordingly
 
 
 def write_arguments(rf):
@@ -267,7 +274,7 @@ def index():
     global wait
     watchdog.refresh()
     radar_form = RadarForm()
-    # read_arguments(radar_form)
+    read_arguments(radar_form)
     rlog.debug(f'Stratux-IP: {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit():
         rlog.debug(f'Stratux-IP after validation: {radar_form.stratux_ip.data}')
