@@ -52,7 +52,7 @@ from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
 RADAR_WEB_VERSION = "0.5"
-START_RADAR_FILE = "../image/start_radar.sh"
+START_RADAR_FILE = "../../image/stratux_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 TIMEOUT = 0.5
 MAX_WAIT_TIME = 10
@@ -170,6 +170,8 @@ class RadarForm(FlaskForm):
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
+    gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
+
 
 
 def read_options_in_file(file_path, word):
