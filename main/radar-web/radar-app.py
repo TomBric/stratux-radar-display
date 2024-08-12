@@ -278,7 +278,7 @@ def read_app_arguments(rf):
         rlog.debug(f'Error reading options from "{START_RADAR_FILE}"')
         return
     args = vars(ap.parse_args(options.split()))
-    rf.webtimeout.data = args['time']
+    rf.webtimeout.data = args['timer']
 
 
 def write_arguments(rf):
