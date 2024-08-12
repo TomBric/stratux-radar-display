@@ -256,7 +256,7 @@ def read_arguments(rf):
     rf.no_flighttime.data = args['noflighttime']
     rf.checklist_filename.data = args['checklist']
 
-    parse_modes(args['displaymodes'])
+    parsemodes(args['displaymodes'])
 
 
 
