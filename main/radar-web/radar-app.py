@@ -252,7 +252,7 @@ def read_arguments(rf):
     rf.gearindicate.data = args['gearindicate']
     # special options
     rf.no_cowarner.data = args['nocowarner']
-    rf.coindicata.data = args['coindicate']
+    rf.coindicate.data = args['coindicate']
     rf.no_flighttime.data = args['noflighttime']
     rf.checklist_filename.data = args['checklist']
 
