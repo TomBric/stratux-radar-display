@@ -52,7 +52,7 @@ from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
 RADAR_WEB_VERSION = "0.5"
-START_RADAR_FILE = "../../image/start_radar.sh"
+START_RADAR_FILE = "../image/start_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 TIMEOUT = 0.5
 MAX_WAIT_TIME = 10
@@ -221,6 +221,9 @@ def parsemodes(options, radarform):
 
 def read_arguments(rf):
     options = read_options_in_file(START_RADAR_FILE, RADAR_COMMAND)
+    if options is None:
+        rlog.debug(f'Error reading options from "{START_RADAR_FILE}"')
+        return
     rlog.debug(f'radar_arguments read from "{START_RADAR_FILE}": {options}')
     ap = argparse.ArgumentParser(description='Stratux options')
     arguments.add(ap)
