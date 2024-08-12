@@ -35,6 +35,8 @@
 
 import argparse
 
+DEFAULT_CHECKLIST = 'checklist.xml'
+
 def add(ap):
     ap.add_argument("-d", "--device", required=True, help="Display device to use")
     ap.add_argument("-b", "--bluetooth", required=False, help="Bluetooth speech warnings on", action='store_true',
