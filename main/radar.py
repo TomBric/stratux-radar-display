@@ -97,17 +97,12 @@ OPTICAL_ALIVE_BARS = 10
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
 
-# global variables
-DEFAULT_URL_HOST_BASE = "192.168.10.1"
-DEFAULT_MIXER = "Speaker"  # default mixer name to be used for sound output
 
-CONFIG_DIR = "config"
-CONFIG_FILE = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "stratux-radar.conf"))
-DEFAULT_CHECKLIST = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "checklist.xml"))
-SAVED_FLIGHTS = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "stratux-radar.flights"))
-SAVED_STATISTICS = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "stratux-radar.stat"))
+CONFIG_FILE = str(Path(__file__).resolve().parent.parent.joinpath(arguments.CONFIG_DIR, "stratux-radar.conf"))
+SAVED_FLIGHTS = str(Path(__file__).resolve().parent.parent.joinpath(arguments.CONFIG_DIR, "stratux-radar.flights"))
+SAVED_STATISTICS = str(Path(__file__).resolve().parent.parent.joinpath(arguments.CONFIG_DIR, "stratux-radar.stat"))
 
-url_host_base = DEFAULT_URL_HOST_BASE
+url_host_base = arguments.DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
 url_radar_ws = ""
 url_status_ws = ""
@@ -827,7 +822,7 @@ def main():
         rlog.debug("Main cancelled")
 
 
-def quit_gracefully(*arguments):
+def quit_gracefully(*argus):
     print("Keyboard interrupt or shutdown. Quitting ...")
     try:
         tasks = asyncio.all_tasks()
