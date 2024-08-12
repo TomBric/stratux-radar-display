@@ -240,7 +240,7 @@ def read_arguments(rf):
     rlog.debug(f'radar_arguments read from "{START_RADAR_FILE}": {options}')
     radar_ap = argparse.ArgumentParser(description='Stratux options')
     arguments.add(radar_ap)
-    args = vars(ap.parse_args(options.split()))
+    args = vars(radar_ap.parse_args(options.split()))
     rf.display.data = args['device']
     rf.stratux_ip.data = args['connect']
     rf.display.data = args['device']
