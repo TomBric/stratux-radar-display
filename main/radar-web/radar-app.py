@@ -215,9 +215,11 @@ modes = { 'R': 'radar', 'T': 'timer', 'A': 'ahrs', 'D': 'status', 'G': 'gmeter',
         'S': 'stratux', 'I': 'flogs', 'C': 'cowarner', 'M': 'gps_dist', 'L': 'checklist'}
 
 def parsemodes(options, radarform):
+    rlog.debug(f'parsing options: {options}')
     for c in options:
         att = modes.get(c)
         if att is not None:
+            rlog.debug(f'Setting option: {c}')
             getattr(radarform, att).data = True
 
 
