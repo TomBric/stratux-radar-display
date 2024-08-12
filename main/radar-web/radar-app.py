@@ -218,7 +218,7 @@ def parsemodes(options, radarform):
     for c in options:
         att = modes.get(c)
         if att is not None:
-            radarform.getattr(radarform, att).data = True
+            getattr(radarform, att).data = True
 
 
 def read_arguments(rf):
