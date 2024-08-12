@@ -158,7 +158,7 @@ class RadarForm(FlaskForm):
     speakdistance = SwitchField('Speak distance to target', default=False)
 
     # web options
-    webtimeout = RadioField('Shutdown',
+    webtimeout = RadioField('Configuration shutdown',
                              choices=[ (10, 'after 10 mins inactivity'),(3, 'after 3 mins inactivity'),
                                       (1, 'after 1 min inactivity'),
                                       (0, 'Disable web server configuration'),], default=3)
@@ -278,8 +278,9 @@ def read_app_arguments(rf):
         rlog.debug(f'Error reading options from "{START_RADAR_FILE}"')
         return
     rlog.debug(f'radarapp_arguments read from "{START_RADAR_FILE}": {options}')
-    args = vars(ap.parse_args(options.split()))
-    rf.webtimeout.data = args['timer']
+    app_args = vars(ap.parse_args(options.split()))
+    rf.webtimeout.data = app_args['timer']
+    rlog.debug(f'Read web timeout of {rf.webtimeout.data} mins')
 
 
 def write_arguments(rf):
