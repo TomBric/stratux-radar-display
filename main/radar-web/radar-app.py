@@ -230,6 +230,7 @@ def read_arguments(rf):
     ap = argparse.ArgumentParser(description='Stratux options')
     arguments.add(ap)
     args = vars(ap.parse_args(options.split()))
+    rf.device.data = args['device']
     rf.stratux_ip.data = args['connect']
     rf.display.data = args['device']
 
