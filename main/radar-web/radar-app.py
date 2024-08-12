@@ -54,6 +54,7 @@ from flask_bootstrap import Bootstrap5, SwitchField
 RADAR_WEB_VERSION = "0.5"
 START_RADAR_FILE = "../../image/stratux_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
+RADARAPP_COMMAND = "radar-app.py"  # command line to search in start_radar.sh
 TIMEOUT = 0.5
 MAX_WAIT_TIME = 10
 
@@ -269,6 +270,16 @@ def read_arguments(rf):
 
     parsemodes(args['displaymodes'], rf)
 
+def read_app_arguments(rf):
+    options = read_options_in_file(START_RADAR_FILE, RADARAPP_COMMAND)
+    if options is None:
+        rlog.debug(f'Error reading options from "{START_RADAR_FILE}"')
+        return
+    webap = argparse.ArgumentParser(description='Radar app options')
+    webap.add_argument("-t", "--time", type=int, required=False, help="Shutdown inactivity time in mins",
+                    default=3)
+    args = vars(webap.parse_args(oimeptions.split()))
+    rf.webtimeout.data = args['time']
 
 
 def write_arguments(rf):
@@ -291,6 +302,7 @@ def index():
     watchdog.refresh()
     radar_form = RadarForm()
     read_arguments(radar_form)
+    read_app_arguments(radar_form)
     rlog.debug(f'Stratux-IP: {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit():
         rlog.debug(f'Stratux-IP after validation: {radar_form.stratux_ip.data}')
