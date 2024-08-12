@@ -216,6 +216,8 @@ modes = { 'R': 'radar', 'T': 'timer', 'A': 'ahrs', 'D': 'status', 'G': 'gmeter',
 
 def parsemodes(options, radarform):
     rlog.debug(f'parsing options: {options}')
+    for att in modes.values():     # set default to false
+        getattr(radarform, att).data = False
     for c in options:
         att = modes.get(c)
         if att is not None:
