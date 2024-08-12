@@ -189,6 +189,8 @@ def read_options_in_file(file_path, word):
                 if word in line:
                     w_index = line.find(word)
                     radar_arguments = line[w_index + len(word):].strip()
+                    if '&' in radar_arguments:
+                        radar_arguments = radar_arguments.split('&')[0].strip()  # ignore & at the end
                     break
     except FileNotFoundError:
         rlog.debug(f'Radar-app: {file_path} not found!')
