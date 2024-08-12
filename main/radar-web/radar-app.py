@@ -238,8 +238,8 @@ def read_arguments(rf):
         rlog.debug(f'Error reading options from "{START_RADAR_FILE}"')
         return
     rlog.debug(f'radar_arguments read from "{START_RADAR_FILE}": {options}')
-    ap = argparse.ArgumentParser(description='Stratux options')
-    arguments.add(ap)
+    radar_ap = argparse.ArgumentParser(description='Stratux options')
+    arguments.add(radar_ap)
     args = vars(ap.parse_args(options.split()))
     rf.display.data = args['device']
     rf.stratux_ip.data = args['connect']
@@ -275,10 +275,7 @@ def read_app_arguments(rf):
     if options is None:
         rlog.debug(f'Error reading options from "{START_RADAR_FILE}"')
         return
-    webap = argparse.ArgumentParser(description='Radar app options')
-    webap.add_argument("-t", "--time", type=int, required=False, help="Shutdown inactivity time in mins",
-                    default=3)
-    args = vars(webap.parse_args(oimeptions.split()))
+    args = vars(ap.parse_args(options.split()))
     rf.webtimeout.data = args['time']
 
 
@@ -341,7 +338,8 @@ if __name__ == '__main__':
     print("Stratux Radar Web Configuration Server " + RADAR_WEB_VERSION + " running ...")
     logging_init()
     ap = argparse.ArgumentParser(description='Stratux radar web configuration')
-    ap.add_argument("-t", "--timer", type=int, required=False, help="Inactivity timer after which server will shut down", default=3)
+    ap.add_argument("-t", "--timer", type=int, required=False,
+                    help="Inactivity timer after which server will shut down", default=3)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug level [0-1]", default=0)
     args = vars(ap.parse_args())
     flask_debug = False
