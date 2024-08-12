@@ -158,7 +158,7 @@ class RadarForm(FlaskForm):
     speakdistance = SwitchField('Speak distance to target', default=False)
 
     # web options
-    web_timeout = RadioField('Shutdown',
+    webtimeout = RadioField('Shutdown',
                              choices=[ ('10', 'after 10 mins inactivity'),('3', 'after 3 mins inactivity'),
                                       ('1', 'after 1 min inactivity'),
                                       ('Disable', 'Disable web server configuration'),], default='3')

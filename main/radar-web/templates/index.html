@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 {% from 'bootstrap5/form.html' import render_form, render_field, render_form_row %}
 {% block content %}
-
+<style> .no-label { label{ display: None; } } </style>
 <form method="post">
 {{ radar_form.csrf_token }}
-<style> .no-label { label{ display: None; } } </style>
 
 <h4>Stratux Radar-Display Configuration</h4>
 <br>
@@ -48,7 +47,7 @@
     col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-3', 'gearindicate': 'col-md-3'}) }}
 
 <h5>Web server shutdown time</h5>
-{{ render_field(radar_form.web_timeout, form_type='horizontal') }}
+{{ render_field(radar_form.webtimeout, form_type='horizontal') }}
 
 {{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart, radar_form.cancel],
     button_map={'save_restart': 'success', 'save': 'primary', 'restart': 'secondary', 'cancel':'danger'}) }}
