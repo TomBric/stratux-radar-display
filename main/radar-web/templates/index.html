@@ -47,7 +47,7 @@
 {{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.gearindicate],
     col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-3', 'gearindicate': 'col-md-3'}) }}
 
-<h5>Web Server Settings</h5>
+<h5>Web server shutdown time</h5>
 {{ render_field(radar_form.web_timeout, form_type='horizontal') }}
 
 {{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart, radar_form.cancel],
