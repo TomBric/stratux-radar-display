@@ -43,6 +43,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import arguments
 import radarmodes
+import shutdownui
+import psutil
 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from markupsafe import Markup
@@ -57,6 +59,7 @@ RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 RADARAPP_COMMAND = "radar-app.py"  # command line to search in start_radar.sh
 TIMEOUT = 0.5
 MAX_WAIT_TIME = 10
+RADAR_PROCESS_NAME = "radar.py"   # process name to search for and restart/terminate
 
 wait = MAX_WAIT_TIME
 status = '.'
@@ -208,17 +211,17 @@ def modify_line_in_file(file_path, word, new_text):    # search word in file and
             for line in lines:
                 if word in line:
                     word_index = line.find(word)
-                    new_line = line[:word_index + len(word)] + " " + new_text + "\n"
+                    new_line = line[:word_index + len(word)] + " " + new_text + "&\n"
                     file.write(new_line)
                 else:
                     file.write(line)
     except FileNotFoundError:
         rlog.debug(f'Radar-app: {START_RADAR_FILE} not found!')
-        return
+        return False
     except Exception as e:
         rlog.debug(f'Radar-app: Error {e} modifying {START_RADAR_FILE}')
-        return
-
+        return False
+    return True
 
 modes = { 'R': 'radar', 'T': 'timer', 'A': 'ahrs', 'D': 'status', 'G': 'gmeter','K': 'compass','V': 'vspeed',
         'S': 'stratux', 'I': 'flogs', 'C': 'cowarner', 'M': 'gps_dist', 'L': 'checklist'}
@@ -227,12 +230,15 @@ def parsemodes(options, radarform):
     rlog.debug(f'parsing options: {options}')
     for att in modes.values():     # set default to false
         getattr(radarform, att).data = False
+        getattr(radarform, att + '_seq').data = 0
+    sequence = 1
     for c in options:
         att = modes.get(c)
         if att is not None:
             rlog.debug(f'Setting option: {c}')
             getattr(radarform, att).data = True
-
+            getattr(radarform, att + '_seq').data = sequence
+            sequence += 1
 
 def read_arguments(rf):
     options = read_options_in_file(START_RADAR_FILE, RADAR_COMMAND)
@@ -282,39 +288,108 @@ def read_app_arguments(rf):
     rf.webtimeout.data = str(app_args['timer'])
     rlog.debug(f'Read web timeout of {rf.webtimeout.data} mins')
 
+def app_option_string(radarform):
+    res = f'-t {radarform.webtimeout.data}'
+    return res
+
+
+def build_mode_string(radarform):
+    res = ''
+    modestring = ''
+    for (key, value) in enumerate(modes.items()):
+        if getattr(radarform, value).data is True:
+            modestring += key
+    if length(modestring) > 0:
+        res = f'-modes {modestring}'
+    return res
 
 def write_arguments(rf):
-    new_options = build_option_string(radar_form)
-    modify_line_in_file(START_RADAR_FILE, RADAR_COMMAND, new_options)
-    # find line with command "radar.py"
-    # create arguments with content auf radar.py
-    # save new line
+    new_options_app = app_option_string(rf)
+    rlog.debug(f'New option string for radar web: "{new_options_app}"')
+    if modify_line_in_file(START_RADAR_FILE, RADARAPP_COMMAND, new_options_app) is False:
+        return False
+    new_options = build_option_string(rf)
+    rlog.debug(f'New option string for radar: "{new_options}"')
+    if modify_line_in_file(START_RADAR_FILE, RADAR_COMMAND, new_options) is False:
+        return False
+    return True
 
-
-def build_option_string(radar_form):
-    out = f'-d {radar_form.display.data} -c {radar_form.stratux_ip.data}'
-    rlog.debug(f'option string: {out}')
+def build_option_string(rf):
+    out = f'-d {rf.display.data} -c {rf.stratux_ip.data}'
+    out += build_mode_string(rf)
+    if rf.ground_mode.data is True:
+        out += '-n'
+    if rf.full_circle.data is True:
+        out += '-e'
+    if rf.registration.data is True:
+        out += '-r'
+    if rf.bluetooth.data is True:
+        out += 'b'
+    if rf.sound_volume.data is True:
+        if rf.sound_volume.data < 0 or rf.sound_volume.data > 100:
+            rf.sound_volume.data = 50
+        out += '-y rf.sound_volume.data'
+    if len(rf.mixer.data) > 0:
+        out += f'-mx {rf.mixer.data}'
+    if rf.speakdistance.data is True:
+        out += '-sd'
+    if rf.groundsensor.data is True:
+        out += '-gd'
+    if rf.groundbeep.data is True:
+        out += '-gb'
+    if rf.gearindicate.data is True:
+        out += '-gi'
+    if rf.no_cowarner.data is True:
+        out += '-nc'
+    if rf.coindicate.data is True:
+        out += '-ci'
+    if rf.no_flighttime.data is True:
+        out += '-nf'
+    if len(rf.checklist_filename.data) > 0:
+        out += f'-chl {rf.checklist_filename.data}'
     return out
+
+
+def restart_radar():    # shutdown and restart radar-app
+    global wait
+    wait = MAX_WAIT_TIME
+    radar_name = RADAR_PROCESS_NAME
+    for proc in psutil.process_iter(['pid', 'name']):
+        if proc.info['name'] == radar_name:
+            rlog.debug(f"Terminating process {proc.info['name']} with pid {proc.info['pid']}.")
+            proc.terminate()  # Prozess beenden
+
+def is_radar_running():
+    radar_name = RADAR_PROCESS_NAME
+    for proc in psutil.process_iter(['pid', 'name']):
+        if proc.info['name'] == radar_name:
+            return True
+    return False
+
 
 @app.route('/')
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    global wait
     watchdog.refresh()
     radar_form = RadarForm()
     read_arguments(radar_form)
     read_app_arguments(radar_form)
     rlog.debug(f'Stratux-IP: {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit():
-        rlog.debug(f'Stratux-IP after validation: {radar_form.stratux_ip.data}')
-        rlog.debug(f'Mixer: {radar_form.mixer.data}')
-        # write_arguments(radar_form)
-        wait = MAX_WAIT_TIME
-        return redirect(url_for('waiting'))
-    return render_template(
-        'index.html',
-        radar_form=radar_form
-    )
+        if radar_form.save_restart.data is True:
+            if write_arguments(radar_form) is False:
+                redirect(url_for('negative_result', reason='File error writing configuration.'))
+            return redirect(url_for('waiting'))
+        elif radar_form.save.data is True:
+            if write_arguments(radar_form) is False:
+                redirect(url_for('negative_result', reason='File error saving configuration'))
+            return render_template('index.html', radar_form=radar_form)
+        elif radar_form.restart.data is True:
+            restart_radar()
+            return redirect(url_for('waiting'))
+        elif radar_from.cancel.data is True:
+            return render_template('index.html', radar_form=radar_form)
+    return render_template('index.html',radar_form=radar_form)
 
 
 @app.route('/result', methods=['GET', 'POST'])
@@ -330,12 +405,20 @@ def waiting():
     global status
     global wait
     watchdog.refresh()
+    if is_radar_running() is False:
+        return redirect(url_for('result'))
     status += '.'
     wait -= TIMEOUT
     time.sleep(TIMEOUT)
     if wait <= 0:
-        return redirect(url_for('result'))
+        return redirect(url_for('negative_result'), reason='Could not terminate running radar-process.')
     return render_template('waiting.html', status_indication=status)
+
+
+@app.route('/negative_result', methods=['GET', 'POST'])
+def negative_result():
+    watchdog.refresh()
+    return render_template('negative_result.html', status_indication=status)
 
 
 if __name__ == '__main__':

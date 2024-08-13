@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2> Error: {{ status_indication }} </h2>
+<a href="{{ url_for('index') }}">Back to configuration</a>
+{% endblock %}

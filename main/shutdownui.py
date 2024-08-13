@@ -61,7 +61,7 @@ def init(shutdown, reboot):
 
 
 
-def clear_lingering_radar():     # remove other radar.py processes, necessary sind lingering is enabled for bluetooth
+def clear_lingering_radar():     # remove other radar.py processes, necessary since lingering is enabled for bluetooth
     current_pid = os.getpid()   # my processid
     pid_list = []
     pname = "radar.py"
