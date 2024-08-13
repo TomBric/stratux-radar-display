@@ -385,7 +385,7 @@ def calc_distance_speaker(stat):
             if gps_distance <= height and gps_upper[i]:
                 # distance is reached and was before higher than hysteresis
                 if gps_warnings_sound is not None:
-                    radarbluez.speak_sounds(gps_warnings_sounds[i])
+                    radarbluez.speak_sound(gps_warnings_sounds[i])
                 gps_upper[i] = False
             if gps_distance >= height * hysteresis:
                 gps_upper[i] = True
