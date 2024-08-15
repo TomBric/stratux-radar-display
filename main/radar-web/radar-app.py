@@ -167,8 +167,8 @@ class RadarForm(FlaskForm):
 
     # web options
     webtimeout = RadioField('Configuration shutdown',
-                             choices=[ ('-1', 'never shutdown'), ('10', 'after 10 mins inactivity'),('3', 'after 3 mins inactivity'),
-                                      ('1', 'after 1 min inactivity'), ('0', 'Disable web server configuration'),], default=3)
+                             choices=[ ('0', 'never shutdown'), ('10', 'after 10 mins inactivity'),('3', 'after 3 mins inactivity'),
+                                      ('1', 'after 1 min inactivity'), ('-1', 'disable web server configuration'),], default=3)
 
 
     save_restart = SubmitField('Save and restart radar')
