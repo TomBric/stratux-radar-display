@@ -300,7 +300,7 @@ def build_mode_string(radarform):
         if getattr(radarform, value).data is True:
             modestring += key
     if len(modestring) > 0:
-        res = f'-modes {modestring}'
+        res = f' -modes {modestring}'
     return res
 
 def write_arguments(rf):
@@ -378,12 +378,15 @@ def index():
     if radar_form.validate_on_submit():
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
-                redirect(url_for('negative_result', reason='File error writing configuration.'))
+                flash(Markup('File error saving configuration'), 'fail')
+                redirect(url_for('negative_result'))
             return redirect(url_for('waiting'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
-                redirect(url_for('negative_result', reason='File error saving configuration'))
-            return redirect(url_for('result', reason='New configuration saved!', radar_form=radar_form))
+                flash(Markup('File error saving configuration'), 'fail')
+                redirect(url_for('negative_result'))
+            flash(Markup(reason), 'success')
+            return redirect(url_for('result'))
         elif radar_form.restart.data is True:
             restart_radar()
             return redirect(url_for('waiting'))
