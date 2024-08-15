@@ -263,7 +263,8 @@ def read_arguments(rf):
     if rf.sound_volume.data < 0 or rf.sound_volume.data > 100:
         rf.sound_volume.data = 50
     rf.external_sound.data = args['extsound'] > 0
-    rf.mixer.data = args['mixer']
+    if rf.external_sound.data is True:
+        rf.mixer.data = args['mixer']
     rf.speakdistance.data = args['speakdistance']
     # ground-options
     rf.groundsensor.data = args['grounddistance']
@@ -273,7 +274,8 @@ def read_arguments(rf):
     rf.no_cowarner.data = args['nocowarner']
     rf.coindicate.data = args['coindicate']
     rf.no_flighttime.data = args['noflighttime']
-    rf.checklist_filename.data = args['checklist']
+    if rf.checklist.data is True:
+        rf.checklist_filename.data = args['checklist']
 
     parsemodes(args['displaymodes'], rf)
 
@@ -374,9 +376,7 @@ def index():
     if radar_form.validate_on_submit() is not True:   # no POST
         read_arguments(radar_form)
         read_app_arguments(radar_form)
-        rlog.debug(f'Index(): Stratux-IP: {radar_form.stratux_ip.data}')
     else:     # validated POST request
-        rlog.debug(f'Index(): validate_on_submit is True')
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
