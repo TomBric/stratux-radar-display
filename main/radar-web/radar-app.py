@@ -235,7 +235,6 @@ def parsemodes(options, radarform):
     for c in options:
         att = modes.get(c)
         if att is not None:
-            rlog.debug(f'Setting option: {c}')
             getattr(radarform, att).data = True
             getattr(radarform, att + '_seq').data = sequence
             sequence += 1
@@ -374,8 +373,9 @@ def index():
     radar_form = RadarForm()
     read_arguments(radar_form)
     read_app_arguments(radar_form)
-    rlog.debug(f'Stratux-IP: {radar_form.stratux_ip.data}')
+    rlog.debug(f'Index(): Stratux-IP: {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit():
+        rlog.debug(f'Index(): validate_on_submit is True')
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
