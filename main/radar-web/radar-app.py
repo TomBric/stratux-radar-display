@@ -383,7 +383,7 @@ def index():
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
                 redirect(url_for('negative_result', reason='File error saving configuration'))
-            return render_template('result.html', result_message='New configuration saved!', radar_form=radar_form)
+            return redirect(url_for('result', reason='New configuration saved!', radar_form=radar_form))
         elif radar_form.restart.data is True:
             restart_radar()
             return redirect(url_for('waiting'))
@@ -395,7 +395,7 @@ def index():
 @app.route('/result', methods=['GET', 'POST'])
 def result():
     watchdog.refresh()
-    flash(Markup(result_message), 'success')
+    flash(Markup(reason), 'success')
     return render_template('index.html', radar_form=radar_form)
 
 
