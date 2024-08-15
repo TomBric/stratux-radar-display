@@ -299,7 +299,7 @@ def build_mode_string(radarform):
     for (key, value) in modes.items():
         if getattr(radarform, value).data is True:
             modestring += key
-    if length(modestring) > 0:
+    if len(modestring) > 0:
         res = f'-modes {modestring}'
     return res
 
@@ -383,7 +383,7 @@ def index():
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
                 redirect(url_for('negative_result', reason='File error saving configuration'))
-            return render_template('index.html', radar_form=radar_form)
+            return render_template('result.html', result_message='New configuration saved!', radar_form=radar_form)
         elif radar_form.restart.data is True:
             restart_radar()
             return redirect(url_for('waiting'))
@@ -395,9 +395,8 @@ def index():
 @app.route('/result', methods=['GET', 'POST'])
 def result():
     watchdog.refresh()
-    flash('Test')
-    flash(Markup('A simple success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.'), 'success')
-    return render_template('result.html')
+    flash(Markup(result_message), 'success')
+    return render_template('index.html', radar_form=radar_form)
 
 
 @app.route('/waiting', methods=['GET', 'POST'])
