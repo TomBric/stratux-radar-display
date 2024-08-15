@@ -167,9 +167,8 @@ class RadarForm(FlaskForm):
 
     # web options
     webtimeout = RadioField('Configuration shutdown',
-                             choices=[ ('10', 'after 10 mins inactivity'),('3', 'after 3 mins inactivity'),
-                                      ('1', 'after 1 min inactivity'),
-                                      ('0', 'Disable web server configuration'),], default=3)
+                             choices=[ ('-1', 'never shutdown'), ('10', 'after 10 mins inactivity'),('3', 'after 3 mins inactivity'),
+                                      ('1', 'after 1 min inactivity'), ('0', 'Disable web server configuration'),], default=3)
 
 
     save_restart = SubmitField('Save and restart radar')
@@ -448,7 +447,11 @@ if __name__ == '__main__':
     shutdown_timer = 60 * args['timer']
     rlog.debug(f"radar-web: setting watchdog timer to {shutdown_timer} seconds")
     watchdog = Watchdog(shutdown_timer)
-    watchdog.start()
+    if shutdown_timer > 0:  # if zero: set no timeout
+        watchdog.start()
+    if shutdown_timer < 0:
+        rlog.debug(f"radar-web: not starting")
+        watchdog.do_expire()   # do not start at all, terminate nginx and this process
 
     rlog.debug(f"radar-web: sudo systemctl start nginx")
     os.system('sudo systemctl start nginx')  # just in case it has been stopped before
