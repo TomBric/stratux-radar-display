@@ -366,9 +366,12 @@ def is_radar_running():
     return False
 
 
+waiting_message = 'Waiting'
+
 @app.route('/')
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    global waiting_message
     watchdog.refresh()
     radar_form = RadarForm()
     if radar_form.validate_on_submit() is not True:   # no POST
@@ -378,7 +381,9 @@ def index():
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
-                redirect(url_for('negative_result'))
+                return redirect(url_for('negative_result'))
+            waiting_message = 'Configuration saved. Restarting radar .."'
+            restart_radar()
             return redirect(url_for('waiting'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
@@ -387,6 +392,7 @@ def index():
             flash(Markup('Configuration successfully saved!'), 'success')
             return render_template('index.html',radar_form=radar_form)
         elif radar_form.restart.data is True:
+            waiting_message = "No configuration saved. Restarting radar .."
             restart_radar()
             return redirect(url_for('waiting'))
         elif radar_from.cancel.data is True:
@@ -406,7 +412,7 @@ def waiting():
     time.sleep(TIMEOUT)
     if wait <= 0:
         return redirect(url_for('negative_result'), reason='Could not terminate running radar-process.')
-    return render_template('waiting.html', status_indication=status)
+    return render_template('waiting.html', message=waiting_message, status_indication=status)
 
 
 @app.route('/negative_result', methods=['GET', 'POST'])
