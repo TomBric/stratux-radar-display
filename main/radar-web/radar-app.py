@@ -397,7 +397,7 @@ def index():
     global waiting_message
     watchdog.refresh()
     radar_form = RadarForm()
-    rlog.debug('index(): webtimeout is {radar_form.webtimeout.data}')
+    rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     if radar_form.validate_on_submit() is not True:   # no POST
         read_arguments(radar_form)
         read_app_arguments(radar_form)
