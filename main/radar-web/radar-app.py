@@ -231,14 +231,13 @@ def find_line_in_file(file_path, word):
     try:
         with open(file_path, 'r') as file:
             lines = file.readlines()
-        with open(file_path, 'w') as file:
-            for line in lines:
-                if word in line:
-                    return line
     except FileNotFoundError:
         rlog.debug(f'Radar-app: {START_RADAR_FILE} not found!')
     except Exception as e:
         rlog.debug(f'Radar-app: Error {e} modifying {START_RADAR_FILE}')
+    for line in lines:
+        if word in line:
+            return line
     return None
 
 modes = { 'R': 'radar', 'T': 'timer', 'A': 'ahrs', 'D': 'status', 'G': 'gmeter','K': 'compass','V': 'vspeed',
