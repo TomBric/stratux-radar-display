@@ -49,7 +49,7 @@
 <h5>Configuration web server shutdown time</h5>
 {{ render_field(radar_form.webtimeout, form_type='horizontal') }}
 
-{{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart, radar_form.cancel],
+{{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart],
     button_map={'save_restart': 'success', 'save': 'primary', 'restart': 'secondary'}) }}
 </form>
 
