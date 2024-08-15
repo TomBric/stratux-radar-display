@@ -387,12 +387,13 @@ def index():
                 return redirect(url_for('negative_result'))
             waiting_message = 'Configuration saved. Restarting radar ..'
             restart_radar()
-            if radar_form.webtimeout.data == 0:
+            new_timeout = int(radar_form.webtimeout.data)
+            if new_timeout < 0:
                 rlog.debug(f'Disabling radar config app due to new configuration!')
                 watchdog.do_expire()
             else:
-                rlog.debug(f'Setting new watchdog timeout to {radar_form.webtimeout.data} mins')
-                watchdog.new_timeout(radar_form.webtimeout.data)
+                rlog.debug(f'Setting new watchdog timeout to {new_timeout} mins')
+                watchdog.new_timeout(new_timeout)
             return redirect(url_for('waiting'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
