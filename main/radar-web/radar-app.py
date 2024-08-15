@@ -111,6 +111,11 @@ class Watchdog:
              self.stop()
              self.start()
 
+    def new_timeout(self, timeout):
+        self.stop()
+        self.timeout = timeout
+        self.start()
+
 
 def logging_init():
     global rlog
@@ -170,7 +175,6 @@ class RadarForm(FlaskForm):
     save_restart = SubmitField('Save and restart radar')
     save = SubmitField('Save configuration only')
     restart = SubmitField('Restart radar only')
-    cancel = SubmitField('Exit without saving')
 
     # special options
     no_cowarner = SwitchField('Suppress activation of co sensor', default=False)
@@ -382,8 +386,14 @@ def index():
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
                 return redirect(url_for('negative_result'))
-            waiting_message = 'Configuration saved. Restarting radar .."'
+            waiting_message = 'Configuration saved. Restarting radar ..'
             restart_radar()
+            if radar_form.webtimeout.data == 0:
+                rlog.debug(f'Disabling radar config app due to new configuration!')
+                watchdog.do_expire()
+            else:
+                rlog.debug(f'Setting new watchdog timeout to {radar_form.webtimeout.data} mins')
+                watchdog.new_timeout(radar_form.webtimeout.data)
             return redirect(url_for('waiting'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
@@ -392,11 +402,9 @@ def index():
             flash(Markup('Configuration successfully saved!'), 'success')
             return render_template('index.html',radar_form=radar_form)
         elif radar_form.restart.data is True:
-            waiting_message = "No configuration saved. Restarting radar .."
+            waiting_message = 'No configuration saved. Restarting radar ..'
             restart_radar()
             return redirect(url_for('waiting'))
-        elif radar_from.cancel.data is True:
-            return render_template('index.html', radar_form=radar_form)
     return render_template('index.html',radar_form=radar_form)
 
 
