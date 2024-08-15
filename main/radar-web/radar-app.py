@@ -386,20 +386,13 @@ def index():
                 flash(Markup('File error saving configuration'), 'fail')
                 redirect(url_for('negative_result'))
             flash(Markup('Configuration successfully saved!'), 'success')
-            return redirect(url_for('result'))
+            return render_template('index.html',radar_form=radar_form)
         elif radar_form.restart.data is True:
             restart_radar()
             return redirect(url_for('waiting'))
         elif radar_from.cancel.data is True:
             return render_template('index.html', radar_form=radar_form)
     return render_template('index.html',radar_form=radar_form)
-
-
-@app.route('/result', methods=['GET', 'POST'])
-def result():
-    watchdog.refresh()
-    flash(Markup(reason), 'success')
-    return render_template('index.html', radar_form=radar_form)
 
 
 @app.route('/waiting', methods=['GET', 'POST'])
