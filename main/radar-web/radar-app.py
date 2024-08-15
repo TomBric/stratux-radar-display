@@ -263,8 +263,7 @@ def read_arguments(rf):
     if rf.sound_volume.data < 0 or rf.sound_volume.data > 100:
         rf.sound_volume.data = 50
     rf.external_sound.data = args['extsound'] > 0
-    if rf.external_sound.data is True:
-        rf.mixer.data = args['mixer']
+    rf.mixer.data = args['mixer']
     rf.speakdistance.data = args['speakdistance']
     # ground-options
     rf.groundsensor.data = args['grounddistance']
@@ -274,8 +273,7 @@ def read_arguments(rf):
     rf.no_cowarner.data = args['nocowarner']
     rf.coindicate.data = args['coindicate']
     rf.no_flighttime.data = args['noflighttime']
-    if rf.checklist.data is True:
-        rf.checklist_filename.data = args['checklist']
+    rf.checklist_filename.data = args['checklist']
 
     parsemodes(args['displaymodes'], rf)
 
@@ -330,8 +328,8 @@ def build_option_string(rf):
         if rf.sound_volume.data < 0 or rf.sound_volume.data > 100:
             rf.sound_volume.data = 50
         out += ' -y rf.sound_volume.data'
-    if len(rf.mixer.data) > 0:
-        out += f' -mx {rf.mixer.data}'
+        if len(rf.mixer.data) > 0:
+            out += f' -mx {rf.mixer.data}'
     if rf.speakdistance.data is True:
         out += ' -sd'
     if rf.groundsensor.data is True:
@@ -346,7 +344,7 @@ def build_option_string(rf):
         out += ' -ci'
     if rf.no_flighttime.data is True:
         out += ' -nf'
-    if len(rf.checklist_filename.data) > 0:
+    if rf.checklist.data is True and len(rf.checklist_filename.data) > 0:
         out += f' -chl {rf.checklist_filename.data}'
     return out
 
