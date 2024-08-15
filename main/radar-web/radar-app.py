@@ -406,7 +406,8 @@ def waiting():
     global wait
     watchdog.refresh()
     if is_radar_running() is False:
-        return redirect(url_for('result'))
+        flash(Markup('Configuration successfully saved! Restarting radar.'), 'success')
+        return
     status += '.'
     wait -= TIMEOUT
     time.sleep(TIMEOUT)
