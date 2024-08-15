@@ -296,7 +296,7 @@ def app_option_string(radarform):
 def build_mode_string(radarform):
     res = ''
     modestring = ''
-    for (key, value) in enumerate(modes.items()):
+    for (key, value) in modes.items():
         if getattr(radarform, value).data is True:
             modestring += key
     if length(modestring) > 0:
