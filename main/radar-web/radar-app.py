@@ -226,6 +226,21 @@ def modify_line_in_file(file_path, word, new_text):    # search word in file and
         return False
     return True
 
+
+def find_line_in_file(file_path, word):
+    try:
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+        with open(file_path, 'w') as file:
+            for line in lines:
+                if word in line:
+                    return line
+    except FileNotFoundError:
+        rlog.debug(f'Radar-app: {START_RADAR_FILE} not found!')
+    except Exception as e:
+        rlog.debug(f'Radar-app: Error {e} modifying {START_RADAR_FILE}')
+    return None
+
 modes = { 'R': 'radar', 'T': 'timer', 'A': 'ahrs', 'D': 'status', 'G': 'gmeter','K': 'compass','V': 'vspeed',
         'S': 'stratux', 'I': 'flogs', 'C': 'cowarner', 'M': 'gps_dist', 'L': 'checklist'}
 
@@ -360,6 +375,11 @@ def restart_radar():    # shutdown and restart radar-app
         if proc.info['name'] == radar_name:
             rlog.debug(f"Terminating process {proc.info['name']} with pid {proc.info['pid']}.")
             proc.terminate()  # Prozess beenden
+    exec_line = find_line_in_file(START_RADAR_FILE, RADAR_COMMAND)
+    if exec_line is not None:
+        rlog.debug(f'Starting subprocess: {line}')
+        subprocess.run(line)
+
 
 def is_radar_running():
     radar_name = RADAR_PROCESS_NAME
