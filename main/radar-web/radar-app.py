@@ -211,7 +211,7 @@ def modify_line_in_file(file_path, word, new_text):    # search word in file and
             for line in lines:
                 if word in line:
                     word_index = line.find(word)
-                    new_line = line[:word_index + len(word)] + " " + new_text + "&\n"
+                    new_line = line[:word_index + len(word)] + " " + new_text + " &\n"
                     file.write(new_line)
                 else:
                     file.write(line)
@@ -289,7 +289,7 @@ def read_app_arguments(rf):
     rlog.debug(f'Read web timeout of {rf.webtimeout.data} mins')
 
 def app_option_string(radarform):
-    res = f'-t {radarform.webtimeout.data}'
+    res = f' -t {radarform.webtimeout.data}'
     return res
 
 
@@ -318,35 +318,35 @@ def build_option_string(rf):
     out = f'-d {rf.display.data} -c {rf.stratux_ip.data}'
     out += build_mode_string(rf)
     if rf.ground_mode.data is True:
-        out += '-n'
+        out += ' -n'
     if rf.full_circle.data is True:
-        out += '-e'
+        out += ' -e'
     if rf.registration.data is True:
-        out += '-r'
+        out += ' -r'
     if rf.bluetooth.data is True:
-        out += 'b'
+        out += ' -b'
     if rf.sound_volume.data is True:
         if rf.sound_volume.data < 0 or rf.sound_volume.data > 100:
             rf.sound_volume.data = 50
-        out += '-y rf.sound_volume.data'
+        out += ' -y rf.sound_volume.data'
     if len(rf.mixer.data) > 0:
-        out += f'-mx {rf.mixer.data}'
+        out += f' -mx {rf.mixer.data}'
     if rf.speakdistance.data is True:
-        out += '-sd'
+        out += ' -sd'
     if rf.groundsensor.data is True:
-        out += '-gd'
+        out += ' -gd'
     if rf.groundbeep.data is True:
-        out += '-gb'
+        out += ' -gb'
     if rf.gearindicate.data is True:
-        out += '-gi'
+        out += ' -gi'
     if rf.no_cowarner.data is True:
-        out += '-nc'
+        out += ' -nc'
     if rf.coindicate.data is True:
-        out += '-ci'
+        out += ' -ci'
     if rf.no_flighttime.data is True:
-        out += '-nf'
+        out += ' -nf'
     if len(rf.checklist_filename.data) > 0:
-        out += f'-chl {rf.checklist_filename.data}'
+        out += f' -chl {rf.checklist_filename.data}'
     return out
 
 
