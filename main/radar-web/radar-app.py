@@ -385,7 +385,7 @@ def index():
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
                 redirect(url_for('negative_result'))
-            flash(Markup(reason), 'success')
+            flash(Markup('Configuration successfully saved!'), 'success')
             return redirect(url_for('result'))
         elif radar_form.restart.data is True:
             restart_radar()
