@@ -371,10 +371,11 @@ def is_radar_running():
 def index():
     watchdog.refresh()
     radar_form = RadarForm()
-    read_arguments(radar_form)
-    read_app_arguments(radar_form)
-    rlog.debug(f'Index(): Stratux-IP: {radar_form.stratux_ip.data}')
-    if radar_form.validate_on_submit():
+    if radar_form.validate_on_submit() is not True:   # no POST
+        read_arguments(radar_form)
+        read_app_arguments(radar_form)
+        rlog.debug(f'Index(): Stratux-IP: {radar_form.stratux_ip.data}')
+    else:     # validated POST request
         rlog.debug(f'Index(): validate_on_submit is True')
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
