@@ -511,10 +511,6 @@ def waiting():
     # in waiting.html is a javascript implemented that pushed back to /waiting
 
 
-flash(Markup(waiting_message), 'success')
-        return redirect(url_for('index'))
-
-
 @app.route('/negative_result', methods=['GET', 'POST'])
 def negative_result():
     watchdog.refresh()
