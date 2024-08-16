@@ -482,6 +482,7 @@ def waiting():
     global status
     global wait
     global restart_triggered
+    global waiting_message
 
     watchdog.refresh()
     flash(Markup(waiting_message), 'success')
