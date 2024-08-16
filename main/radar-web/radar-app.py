@@ -45,6 +45,7 @@ import arguments
 import radarmodes
 import shutdownui
 import psutil
+import subprocess
 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from markupsafe import Markup
