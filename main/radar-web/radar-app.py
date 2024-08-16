@@ -413,8 +413,9 @@ def restart_radar():    # shutdown and restart radar-app
     exec_line = find_line_in_file(START_RADAR_FILE, RADAR_COMMAND)
     if exec_line is not None:
         rlog.debug(f'Starting subprocess: {exec_line}')
-        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        return start_radar_and_wait(exec_line, EXPECTED_RADAR_OUTPUT, MAX_WAIT_TIME)
+        process = subprocess.Popen(exec_line, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return True
+    return False
 
 
 def poll_radar_start_message():
@@ -470,7 +471,6 @@ def index():
             return render_template('index.html',radar_form=radar_form)
         elif radar_form.restart.data is True:
             waiting_message = 'No configuration saved. Restarting radar ..'
-            restart_radar()
             return redirect(url_for('waiting'))
     return render_template('index.html',radar_form=radar_form)
 
@@ -495,8 +495,7 @@ def waiting():
         restart_triggered = True
     poll_result = poll_radar_start_message()
     if poll_result == 1:
-        waiting_message = "Radar restarted."
-        flash(Markup(waiting_message), 'success')
+        flash(Markup("Radar restarted."), 'success')
         return redirect(url_for('index'))
     elif poll_result == 2:
         flash("Waiting for start of radar ...")
