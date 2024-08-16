@@ -61,8 +61,8 @@ RADARAPP_COMMAND = "radar-app.py"  # command line to search in start_radar.sh
 TIMEOUT = 0.5
 MAX_WAIT_TIME = 10
 RADAR_PROCESS_NAME = "radar.py"   # process name to search for and restart/terminate
+EXPECTED_RADAR_OUTPUT = "Stratux Radar Display"     # output that is expected and waited for when radar is restarted
 
-wait = MAX_WAIT_TIME
 status = '.'
 
 app = Flask(__name__)
@@ -375,19 +375,58 @@ def build_option_string(rf):
     return out
 
 
-def restart_radar():    # shutdown and restart radar-app
-    global wait
-    wait = MAX_WAIT_TIME
+def start_radar_and_wait(command, expected_output, max_wait_time):
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    while True:
+        output = process.stdout.readline()    # read output of running process
+        if expected_output in output.strip():
+            rlog.debug(f'Output "{expected_output}" detected. Radar process active')
+            return True
+        else:
+            if max_wait_time <= 0:   # output not found
+                rlog.debug('Error: Radar output not found after timeout.')
+                return False
+            if process.poll() is not None:  # process still active, wait
+                time.sleep(0.5)
+                max_wait_time -= 0.5
+            else:
+                rlog.debug('Error: Radar process is not running')
+                return False
+
+
+def terminate_radar_instances():
     radar_name = RADAR_PROCESS_NAME
     for proc in psutil.process_iter(['pid', 'name']):
         if proc.info['name'] == radar_name:
             rlog.debug(f"Terminating process {proc.info['name']} with pid {proc.info['pid']}.")
             proc.terminate()  # Prozess beenden
+
+stdout = None
+stderr = None
+process = None
+
+def restart_radar():    # shutdown and restart radar-app
+    global stdout
+    global stderr
+    global process
+
     exec_line = find_line_in_file(START_RADAR_FILE, RADAR_COMMAND)
     if exec_line is not None:
         rlog.debug(f'Starting subprocess: {exec_line}')
-        subprocess.run(exec_line, shell=True)
+        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return start_radar_and_wait(exec_line, EXPECTED_RADAR_OUTPUT, MAX_WAIT_TIME)
 
+
+def poll_radar_start_message():
+    output = process.stdout.readline()  # read output of running process
+    if EXPECTED_RADAR_OUTPUT in output.strip():
+        rlog.debug(f'Output "{expected_output}" detected. Radar process active')
+        return 1
+    if process.poll() is not None:
+        return 2   # process still active, wait
+    else:
+        rlog.debug('Error: Radar process is not running')
+        return 3
 
 def is_radar_running():
     radar_name = RADAR_PROCESS_NAME
@@ -415,7 +454,6 @@ def index():
                 flash(Markup('File error saving configuration'), 'fail')
                 return redirect(url_for('negative_result'))
             waiting_message = 'Configuration saved. Restarting radar ..'
-            restart_radar()
             new_timeout = int(radar_form.webtimeout.data)
             if new_timeout < 0:
                 rlog.debug(f'Disabling radar config app due to new configuration!')
@@ -437,20 +475,44 @@ def index():
     return render_template('index.html',radar_form=radar_form)
 
 
+restart_triggered = False
+
 @app.route('/waiting', methods=['GET', 'POST'])
 def waiting():
     global status
     global wait
+    global restart_triggered
+
     watchdog.refresh()
-    if is_radar_running() is False:
+    flash(Markup(waiting_message), 'success')
+    if is_radar_running():
+        flash("Terminating running radar instances ..")
+        terminate_radar_instances()
+    elif restart_triggered is False:
+        flash("Restarting radar ..")
+        restart_radar()
+        restart_triggered = True
+    poll_result = poll_radar_start_message()
+    if poll_result == 1:
+        waiting_message = "Radar restarted."
         flash(Markup(waiting_message), 'success')
         return redirect(url_for('index'))
+    elif poll_result == 2:
+        flash("Waiting for start of radar ...")
+    elif poll_result == 3:
+        # process no more active, terminated whysoever, do not wait longer
+        redirect(url_for('negative_result'), reason='Could not start radar process.')
     status += '.'
     wait -= TIMEOUT
     time.sleep(TIMEOUT)
     if wait <= 0:
         return redirect(url_for('negative_result'), reason='Could not terminate running radar-process.')
     return render_template('waiting.html', message=waiting_message, status_indication=status)
+    # in waiting.html is a javascript implemented that pushed back to /waiting
+
+
+flash(Markup(waiting_message), 'success')
+        return redirect(url_for('index'))
 
 
 @app.route('/negative_result', methods=['GET', 'POST'])
