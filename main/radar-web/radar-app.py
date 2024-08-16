@@ -422,7 +422,7 @@ def index():
                 watchdog.do_expire()
             else:
                 rlog.debug(f'Setting new watchdog timeout to {new_timeout} mins')
-                watchdog.new_timeout(new_timeout)
+                watchdog.new_timeout(60*new_timeout)
             return redirect(url_for('waiting'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
