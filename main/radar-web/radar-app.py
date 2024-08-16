@@ -419,6 +419,7 @@ def restart_radar():    # shutdown and restart radar-app
 
 
 def poll_radar_start_message():
+    rlog.debug(f'Waiting for "{EXPECTED_RADAR_OUTPUT}" of subprocess')
     output = process.stdout.readline()  # read output of running process
     if EXPECTED_RADAR_OUTPUT in output.strip():
         rlog.debug(f'Output "{expected_output}" detected. Radar process active')
@@ -491,8 +492,10 @@ def waiting():
         terminate_radar_instances()
     elif restart_triggered is False:
         flash("Restarting radar ..")
-        restart_radar()
-        restart_triggered = True
+        if restart_radar() is True:
+            restart_triggered = True
+        else:
+            redirect(url_for('negative_result'), reason='Could find appropriate radar command in file.')
     poll_result = poll_radar_start_message()
     if poll_result == 1:
         flash(Markup("Radar restarted."), 'success')
