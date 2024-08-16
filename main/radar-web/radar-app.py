@@ -386,7 +386,7 @@ def restart_radar():    # shutdown and restart radar-app
     exec_line = find_line_in_file(START_RADAR_FILE, RADAR_COMMAND)
     if exec_line is not None:
         rlog.debug(f'Starting subprocess: {exec_line}')
-        subprocess.run(exec_line)
+        subprocess.run(exec_line, shell=True)
 
 
 def is_radar_running():
