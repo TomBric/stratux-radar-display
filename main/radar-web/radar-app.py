@@ -401,13 +401,10 @@ def terminate_radar_instances():
             rlog.debug(f"Terminating process {proc.info['name']} with pid {proc.info['pid']}.")
             proc.terminate()  # Prozess beenden
 
-stdout = None
-stderr = None
+
 process = None
 
 def restart_radar():    # shutdown and restart radar-app
-    global stdout
-    global stderr
     global process
 
     exec_line = find_line_in_file(START_RADAR_FILE, RADAR_COMMAND)
