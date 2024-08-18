@@ -267,7 +267,7 @@ def read_arguments(rf):
     arguments.add(radar_ap)
     try:
         args = vars(radar_ap.parse_args(options.split()))
-    except (argparse.ArgumentError, argparse.ArgumentTypeError) as e:
+    except (SystemExit, argparse.ArgumentError, argparse.ArgumentTypeError) as e:
         rlog.debug(f'Error parsing radar arguments in "{START_RADAR_FILE}": {e}')
         return
     rf.display.data = args['device']
