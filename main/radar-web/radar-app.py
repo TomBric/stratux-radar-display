@@ -263,11 +263,11 @@ def read_arguments(rf):
         rlog.debug(f'Error reading options from "{START_RADAR_FILE}"')
         return
     rlog.debug(f'radar_arguments read from "{START_RADAR_FILE}": {options}')
-    radar_ap = argparse.ArgumentParser(description='Stratux options')
+    radar_ap = argparse.ArgumentParser(description='Stratux options', exit_on_error=False)
     arguments.add(radar_ap)
     try:
         args = vars(radar_ap.parse_args(options.split()))
-    except argparse.ArgumentError as e:
+    except (argparse.ArgumentError, argparse.ArgumentTypeError) as e:
         rlog.debug(f'Error parsing radar arguments in "{START_RADAR_FILE}": {e}')
         return
     rf.display.data = args['device']
