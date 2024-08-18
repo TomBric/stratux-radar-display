@@ -268,7 +268,7 @@ def read_arguments(rf):
     try:
         args = vars(radar_ap.parse_args(options.split()))
     except (SystemExit, argparse.ArgumentError, argparse.ArgumentTypeError) as e:
-        rlog.debug(f'Error parsing radar arguments in "{START_RADAR_FILE}": {e}')
+        rlog.debug(f'Error parsing radar arguments in "{START_RADAR_FILE}": {type(e)}')
         return
     rf.display.data = args['device']
     rf.stratux_ip.data = args['connect']
@@ -307,8 +307,8 @@ def read_app_arguments(rf):
     rlog.debug(f'radarapp_arguments read from "{START_RADAR_FILE}": {options}')
     try:
         app_args = vars(ap.parse_args(options.split()))
-    except argparse.ArgumentError as e:
-        rlog.debug(f'Error parsing radar-app arguments in "{START_RADAR_FILE}": {e}')
+    except (SystemExit, argparse.ArgumentError, argparse.ArgumentTypeError) as e:
+        rlog.debug(f'Error parsing radar-app arguments in "{START_RADAR_FILE}": {type(e)}')
         return
     rf.webtimeout.data = str(app_args['timer'])
     rlog.debug(f'Read web timeout of {rf.webtimeout.data} mins')
