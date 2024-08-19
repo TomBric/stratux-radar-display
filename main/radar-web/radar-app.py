@@ -56,8 +56,7 @@ RADAR_WEB_VERSION = "0.5"
 START_RADAR_FILE = "../../image/stratux_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 RADARAPP_COMMAND = "radar-app.py"  # command line to search in start_radar.sh
-TIMEOUT = 0.5
-MAX_WAIT_TIME = 10
+REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
 
 app = Flask(__name__)
 app.secret_key = 'radar-web-51Hgfw'
@@ -369,10 +368,15 @@ def build_option_string(rf):
     return out
 
 
-
-def restart_radar():    # shutdown and restart radar-app
-    rlog.debug("Triggering reboot.")
+def do_reboot():
+    rlog.dbug('Rebooting now')
     subprocess.run(["sudo", "reboot"])
+
+
+def restart_radar():    # shutdown after some seconds to give the option for a web response
+    rlog.debug(f'Starting reboot in {REBOOT_TIMEOUT} seconds')
+    reboot = threading.Timer(REBOOT_TIMEOUT, do_reboot())
+    reboot.start()
 
 
 @app.route('/')
