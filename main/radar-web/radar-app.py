@@ -378,11 +378,12 @@ def restart_radar():    # shutdown after some seconds to give the option for a w
     reboot = threading.Timer(REBOOT_TIMEOUT, do_reboot)
     reboot.start()
 
+result_message = "Wait"
 
 @app.route('/')
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    global waiting_message
+    global result_message
     watchdog.refresh()
     radar_form = RadarForm()
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
@@ -394,9 +395,9 @@ def index():
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
                 return redirect(url_for('negative_result'))
-            flash(Markup('Configuration saved. Rebooting radar. Please wait ..'), 'success')
+            flash(Markup('Configuration saved!'), 'success')
             restart_radar()
-            result_message = Rebooting Radar. Please approx. 30 seconds ...
+            result_message = "Rebooting Radar. Please wait approx. 30 seconds ..."
             return redirect(url_for('result'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
@@ -406,6 +407,7 @@ def index():
         elif radar_form.restart.data is True:
             flash(Markup('Rebooting radar ..'), 'success')
             restart_radar()
+            result_message = "Rebooting Radar. Please wait approx. 30 seconds ..."
             return redirect(url_for('result'))
     return render_template('index.html',radar_form=radar_form)
 
@@ -419,7 +421,7 @@ def negative_result():
 @app.route('/result', methods=['GET', 'POST'])
 def result():
     watchdog.refresh()
-    return render_template('result.html')
+    return render_template('result.html', result_message=result_message)
 
 
 
