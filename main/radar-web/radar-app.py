@@ -347,7 +347,7 @@ def build_option_string(rf):
     if rf.sound_volume.data is True:
         if rf.sound_volume.data < 0 or rf.sound_volume.data > 100:
             rf.sound_volume.data = 50
-        out += ' -y rf.sound_volume.data'
+        out += f' -y {rf.sound_volume.data}'
         if len(rf.mixer.data) > 0:
             out += f' -mx {rf.mixer.data}'
     if rf.speakdistance.data is True:
