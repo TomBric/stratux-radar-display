@@ -375,7 +375,7 @@ def do_reboot():
 
 def restart_radar():    # shutdown after some seconds to give the option for a web response
     rlog.debug(f'Starting reboot in {REBOOT_TIMEOUT} seconds')
-    reboot = threading.Timer(REBOOT_TIMEOUT, do_reboot())
+    reboot = threading.Timer(REBOOT_TIMEOUT, do_reboot)
     reboot.start()
 
 
