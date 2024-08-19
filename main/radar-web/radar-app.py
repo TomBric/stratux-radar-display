@@ -394,16 +394,19 @@ def index():
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
                 return redirect(url_for('negative_result'))
-            flash(Markup('Configuration saved. Rebooting radar ..'), 'success')
+            flash(Markup('Configuration saved. Rebooting radar. Please wait ..'), 'success')
             restart_radar()
+            result_message = Rebooting Radar. Please approx. 30 seconds ...
+            return redirect(url_for('result'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
-                redirect(url_for('negative_result'))
+                return redirect(url_for('negative_result'))
             flash(Markup('Configuration successfully saved!'), 'success')
         elif radar_form.restart.data is True:
             flash(Markup('Rebooting radar ..'), 'success')
             restart_radar()
+            return redirect(url_for('result'))
     return render_template('index.html',radar_form=radar_form)
 
 
@@ -411,6 +414,13 @@ def index():
 def negative_result():
     watchdog.refresh()
     return render_template('negative_result.html', status_indication=status)
+
+
+@app.route('/result', methods=['GET', 'POST'])
+def result():
+    watchdog.refresh()
+    return render_template('result.html')
+
 
 
 if __name__ == '__main__':
