@@ -369,7 +369,7 @@ def build_option_string(rf):
 
 
 def do_reboot():
-    rlog.dbug('Rebooting now')
+    rlog.debug('Rebooting now')
     subprocess.run(["sudo", "reboot"])
 
 
