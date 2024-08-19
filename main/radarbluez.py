@@ -192,7 +192,7 @@ def prepare_sounds_tuple(int_tuple):  # done during init without parallel corout
                 rlog.debug("Radarbluez: Error creating sound for tuple.")
     return out
 
-def prepare_sounds_string(tospeak):   # done during init without parallel coroutines
+def prepare_sounds_string(tospeak):   # done during init wwpcithout parallel coroutines
     if bluetooth_active or extsound_active:
         pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", tospeak])  # generate wave
         if pico_result.returncode == 0:

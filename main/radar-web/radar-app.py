@@ -414,19 +414,6 @@ def restart_radar():    # shutdown and restart radar-app
         return True
     return False
 
-try:
-    # Warten für die gegebene Zeit und prüfen, ob der Prozess beendet ist
-    stdout, stderr = process.communicate(timeout=wartezeit)
-    print("Ausgabe erhalten:")
-    print(stdout.decode())
-except subprocess.TimeoutExpired:
-    print(f"Der Prozess hat innerhalb von {wartezeit} Sekunden keine Ausgabe geliefert.")
-    process.kill()  # Den Prozess beenden, falls er noch läuft
-    stdout, stderr = process.communicate()
-    print("Ausgabe nach dem Kill:")
-    print(stdout.decode())
-
-
 
 def poll_radar_start_message():
     rlog.debug(f'Waiting for "{EXPECTED_RADAR_OUTPUT}" of subprocess')
