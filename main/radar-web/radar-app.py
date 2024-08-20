@@ -398,6 +398,8 @@ def index():
                 flash(Markup('File error saving configuration'), 'fail')
                 return redirect(url_for('negative_result'))
             flash(Markup('Configuration saved!'), 'success')
+            read_arguments(radar_form)  # reread arguments to get sequence nice
+            read_app_arguments(radar_form)
             restart_radar()
             result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
             return redirect(url_for('result'))
@@ -406,6 +408,8 @@ def index():
                 flash(Markup('File error saving configuration'), 'fail')
                 return redirect(url_for('negative_result'))
             flash(Markup('Configuration successfully saved!'), 'success')
+            read_arguments(radar_form)   # reread arguments to get sequence nice
+            read_app_arguments(radar_form)
         elif radar_form.restart.data is True:
             flash(Markup('Rebooting radar ..'), 'success')
             restart_radar()
