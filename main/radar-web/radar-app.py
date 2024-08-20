@@ -72,8 +72,7 @@ bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
 
 rlog = None  # radar specific logger
-watchdog = None  # watchdog to shut down
-radar_form = None   # general form for input
+watchdog = None  # watchdog to shut dow
 
 
 class Watchdog:
@@ -387,8 +386,8 @@ result_message = "Wait"
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global result_message
-    global radar_form
     watchdog.refresh()
+    radar_form = RadarForm()
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
