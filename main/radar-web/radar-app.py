@@ -73,6 +73,7 @@ csrf = CSRFProtect(app)
 
 rlog = None  # radar specific logger
 watchdog = None  # watchdog to shut down
+radar_form = None   # general form for input
 
 
 class Watchdog:
@@ -381,7 +382,6 @@ def restart_radar():    # shutdown after some seconds to give the option for a w
     reboot.start()
 
 result_message = "Wait"
-radar_form = RadarForm()
 
 @app.route('/')
 @app.route('/', methods=['GET', 'POST'])
@@ -460,3 +460,4 @@ if __name__ == '__main__':
     os.system('sudo systemctl start nginx')  # just in case it has been stopped before
     rlog.debug(f"radar-web: starting flask app")
     app.run(debug=flask_debug)
+    radar_form = RadarForm()
