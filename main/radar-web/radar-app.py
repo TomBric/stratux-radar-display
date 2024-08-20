@@ -388,11 +388,10 @@ def index():
     global result_message
     watchdog.refresh()
     radar_form = RadarForm()
+    read_arguments(radar_form)   # in case of errors reading arguments, default is taken
+    read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
-    if radar_form.validate_on_submit() is not True:   # no POST
-        read_arguments(radar_form)
-        read_app_arguments(radar_form)
-    else:     # validated POST request
+    if radar_form.validate_on_submit() is True:   # validated POST request
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
