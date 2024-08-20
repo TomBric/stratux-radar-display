@@ -123,11 +123,11 @@ class RadarForm(FlaskForm):
     display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
-    radar_seq = IntegerField('', default=1, validators=[NumberRange(min=1, max=MAX_SEQUENCE, message="Not Valid")])
+    radar_seq = IntegerField('', default=1, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     timer = SwitchField('Timer', default=True)
-    timer_seq = IntegerField('', default=2, validators=[NumberRange(min=1, max=MAX_SEQUENCE, message="Not Valid")])
+    timer_seq = IntegerField('', default=2, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     ahrs = SwitchField('Artificial horizon', default=True)
-    ahrs_seq = IntegerField('', default=3, validators=[NumberRange(min=1, max=MAX_SEQUENCE, message="Not Valid")])
+    ahrs_seq = IntegerField('', default=3, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     gmeter = SwitchField('G-Meter', default=True)
     gmeter_seq = IntegerField('', default=4, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     compass = SwitchField('GPS based compass', default=True)
@@ -317,7 +317,7 @@ def build_mode_string(radarform):
     modestring = ''
     for i in range(1, MAX_SEQUENCE+1):    # this is a simple enumeration, no sorting
         for (key, value) in modes.items():
-            if getattr(radarform, _seq).data == i and getattr(radarform, value).data is True:
+            if getattr(radarform, value + '_seq').data == i and getattr(radarform, value).data is True:
                 modestring += key
     if len(modestring) > 0:
         res = f' -modes {modestring}'
