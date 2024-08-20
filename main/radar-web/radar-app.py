@@ -123,7 +123,8 @@ class RadarForm(FlaskForm):
     display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
-    radar_seq = IntegerField('', default=1, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
+    radar_seq = IntegerField('', default=1, validators=[NumberRange(min=1, max=MAX_SEQUENCE,
+                                                        message=f'Enter a value between 1 and {MAX_SEQUENCE}')])
     timer = SwitchField('Timer', default=True)
     timer_seq = IntegerField('', default=2)
     ahrs = SwitchField('Artificial horizon', default=True)
