@@ -410,6 +410,7 @@ def index():
             flash(Markup('Configuration successfully saved!'), 'success')
             read_arguments(radar_form)   # reread arguments to get sequence nice
             read_app_arguments(radar_form)
+            return redirect(url_for('index'))
         elif radar_form.restart.data is True:
             flash(Markup('Rebooting radar ..'), 'success')
             restart_radar()
