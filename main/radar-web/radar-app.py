@@ -242,7 +242,7 @@ def parsemodes(options, radarform):
     rlog.debug(f'parsing options: {options}')
     for att in modes.values():     # set default to false
         getattr(radarform, att).data = False
-        getattr(radarform, att + '_seq').data = 0
+        getattr(radarform, att + '_seq').data = 1   # preset if later on this is selected
     sequence = 1
     for c in options:
         att = modes.get(c)
