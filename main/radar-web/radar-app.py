@@ -397,7 +397,7 @@ def index():
                 return redirect(url_for('negative_result'))
             flash(Markup('Configuration saved!'), 'success')
             restart_radar()
-            result_message = "Rebooting Radar. Please wait approx. 30 seconds ..."
+            result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
             return redirect(url_for('result'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
@@ -407,7 +407,7 @@ def index():
         elif radar_form.restart.data is True:
             flash(Markup('Rebooting radar ..'), 'success')
             restart_radar()
-            result_message = "Rebooting Radar. Please wait approx. 30 seconds ..."
+            result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
             return redirect(url_for('result'))
     return render_template('index.html',radar_form=radar_form)
 
