@@ -123,30 +123,29 @@ class RadarForm(FlaskForm):
     display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
-    radar_seq = IntegerField('', default=1, validators=[NumberRange(min=1, max=MAX_SEQUENCE,
-                                                        message=f'Enter a value between 1 and {MAX_SEQUENCE}')])
+    radar_seq = IntegerField('', default=1, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     timer = SwitchField('Timer', default=True)
-    timer_seq = IntegerField('', default=2)
+    timer_seq = IntegerField('', default=2, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     ahrs = SwitchField('Artificial horizon', default=True)
-    ahrs_seq = IntegerField('', default=3)
+    ahrs_seq = IntegerField('', default=3, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     gmeter = SwitchField('G-Meter', default=True)
-    gmeter_seq = IntegerField('', default=4)
+    gmeter_seq = IntegerField('', default=4, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     compass = SwitchField('GPS based compass', default=True)
-    compass_seq = IntegerField('', default=5)
+    compass_seq = IntegerField('', default=5, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     vspeed = SwitchField('Vertical speed', default=True)
-    vspeed_seq = IntegerField('', default=6)
+    vspeed_seq = IntegerField('', default=6, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     cowarner = SwitchField('CO warner', default=False)
-    cowarner_seq = IntegerField('', default=7)
+    cowarner_seq = IntegerField('', default=7, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     flogs = SwitchField('Flight logs', default=True)
-    flogs_seq = IntegerField('', default=8)
+    flogs_seq = IntegerField('', default=8, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     gps_dist = SwitchField('GPS distance measuring', default=False)
-    gps_dist_seq = IntegerField('', default=9)
+    gps_dist_seq = IntegerField('', default=9, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     status = SwitchField('Display status', default=True)
-    status_seq = IntegerField('', default=10)
+    status_seq = IntegerField('', default=10, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     stratux = SwitchField('Stratux status', default=True)
-    stratux_seq = IntegerField('', default=11)
+    stratux_seq = IntegerField('', default=11, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist = SwitchField('Checklists', default=False)
-    checklist_seq = IntegerField('', default=12)
+    checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist_filename = StringField('Checklist filename', default='checklist.xml')
 
     #traffic options
@@ -316,9 +315,10 @@ def app_option_string(radarform):
 def build_mode_string(radarform):
     res = ''
     modestring = ''
-    for (key, value) in modes.items():
-        if getattr(radarform, value).data is True:
-            modestring += key
+    for i in range(1, MAX_SEQUENCE+1):    # this is a simple enumeration, no sorting
+        for (key, value) in modes.items():
+            if getattr(radarform, _seq).data == i and getattr(radarform, value).data is True:
+                modestring += key
     if len(modestring) > 0:
         res = f' -modes {modestring}'
     return res
