@@ -381,17 +381,19 @@ def restart_radar():    # shutdown after some seconds to give the option for a w
     reboot.start()
 
 result_message = "Wait"
+radar_form = RadarForm()
 
 @app.route('/')
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global result_message
+    global radar_form
     watchdog.refresh()
-    radar_form = RadarForm()
-    read_arguments(radar_form)   # in case of errors reading arguments, default is taken
-    read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
-    if radar_form.validate_on_submit() is True:   # validated POST request
+    if radar_form.validate_on_submit() is not True:   # no POST request
+        read_arguments(radar_form)  # in case of errors reading arguments, default is taken
+        read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
+    else:
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
