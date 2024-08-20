@@ -57,6 +57,7 @@ START_RADAR_FILE = "../../image/stratux_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 RADARAPP_COMMAND = "radar-app.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
+MAX_SEQUENCE = 99   # maximum value accepted as sequence of modes
 
 app = Flask(__name__)
 app.secret_key = 'radar-web-51Hgfw'
@@ -122,7 +123,7 @@ class RadarForm(FlaskForm):
     display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
-    radar_seq = IntegerField('', default=1)
+    radar_seq = IntegerField('', default=1, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     timer = SwitchField('Timer', default=True)
     timer_seq = IntegerField('', default=2)
     ahrs = SwitchField('Artificial horizon', default=True)
