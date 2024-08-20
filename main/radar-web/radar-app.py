@@ -73,6 +73,7 @@ csrf = CSRFProtect(app)
 
 rlog = None  # radar specific logger
 watchdog = None  # watchdog to shut dow
+radar_from = None # global input fields
 
 
 class Watchdog:
@@ -386,8 +387,9 @@ result_message = "Wait"
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global result_message
+    global radar_form
     watchdog.refresh()
-    radar_form = RadarForm()
+
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
@@ -457,6 +459,8 @@ if __name__ == '__main__':
 
     rlog.debug(f"radar-web: sudo systemctl start nginx")
     os.system('sudo systemctl start nginx')  # just in case it has been stopped before
+    with app.app_context():
+        radar_form = RadarForm()
     rlog.debug(f"radar-web: starting flask app")
     app.run(debug=flask_debug)
-    radar_form = RadarForm()
+
