@@ -144,6 +144,7 @@ class RadarForm(FlaskForm):
     checklist = SwitchField('Checklists', default=False)
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist_filename = StringField('Checklist filename', default='checklist.xml')
+    edit_checklist = SubmitField('Edit checklist')
 
     #traffic options
     registration = SwitchField('Display call sign (epaper only)', default=True)
