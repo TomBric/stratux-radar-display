@@ -7,8 +7,8 @@
 
 <h4>Edit checklist</h4>
 <br>
-{% for list in checklist_form.data.lists %}
-    {% for item in list.data.items %}
+{% for list in checklist_form.lists.data %}
+    {% for item in list.items.data %}
         {{ render_form_row([item.task, item.check, item.remark],
             col_map={'task': 'col-md-3', 'check': 'col-md-3', 'remark': 'col-md-3'}) }}
         {{ render_form_row([item.task1, item.check1, item.task2, item.check2, item.task3, item.check3],
