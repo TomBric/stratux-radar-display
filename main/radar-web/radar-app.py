@@ -466,7 +466,7 @@ example_list = [{'ITEM': [{'CHECK': 'Done', 'REMARK': 'Please use preflight chec
 
 def init_item_form(item):
     new_item = ItemForm()
-    new_item.check.data = item['CHEC']
+    new_item.check.data = item['CHECK']
     new_item.task.data = item['TASK']
     new_item.remark.data = item['REMARK']
     return new_item
@@ -475,7 +475,7 @@ def init_item_form(item):
 def init_checklist_form(form, cl):     # initializes form from checklist (which is a dict)
     for one_list in cl:
         new_list = ChecklistForm()
-        new_list.name = one_list['TITLE']
+        new_list.name.data = one_list['TITLE']
         for item in one_list:
             new_item = init_item_form(item)
             new_list.items.append_entry([new_item])
