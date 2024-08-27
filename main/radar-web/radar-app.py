@@ -441,13 +441,13 @@ class ItemForm(FlaskForm):
 
 class ChecklistForm(FlaskForm):
     name = StringField('List name', default='Unnamed')
-    items = FieldList(FormField(ItemForm()))
+    items = FieldList(FormField(ItemForm))
     delete = SubmitField('Delete list!')
     add = SubmitField('Add item')
 
 
 class ListsForm(FlaskForm):
-    lists = FieldList(FormField(ChecklistForm()))
+    lists = FieldList(FormField(ChecklistForm))
     add = SubmitField('Add list')
     save_exit = SubmitField('Save list and exit')
     save = SubmitField('Save list')
