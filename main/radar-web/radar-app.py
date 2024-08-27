@@ -466,9 +466,9 @@ example_list = [{'ITEM': [{'CHECK': 'Done', 'REMARK': 'Please use preflight chec
 
 def init_item_form(item):
     new_item = ItemForm()
-    new_item.check.data = item['CHECK']
-    new_item.task.data = item['TASK']
-    new_item.remark.data = item['REMARK']
+    new_item.check.data = item.get('CHECK','')
+    new_item.task.data = item.get('TASK', '')
+    new_item.remark.data = item.get('REMARK', '')
     return new_item
 
 
