@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form, render_field, render_form_row %}
+{% block content %}
+<style> .no-label { label{ display: None; } } </style>
+<form method="post">
+{{ radar_form.csrf_token }}
+
+<h4>Edit checklist</h4>
+<br>
+{% for list in checklist_form.lists %}
+    {{% for item in list.items %}
+        {{ render_form_row([item.task, item.check, item.remark],
+            col_map={'task': 'col-md-3', 'check': 'col-md-3', 'remark': 'col-md-3'}) }}
+        {{ render_form_row([item.task1, item.check1, item.task2, item.check2, item.task3, item.check3],
+            col_map={'task1': 'col-sm-2', 'check1': 'col-sm-2', 'task2': 'col-sm-2', 'check2': 'col-sm-2',
+                     'task3': 'col-sm-2', 'check3': 'col-sm-2'}) }}
+    {% endfor %}
+{% endfor %}
+
+{{ render_form_row([checklist_form.save_exit, checklist_form.save, checklist_form.exit],
+                button_map={'save_exit': 'success', 'save': 'primary', 'exit': 'secondary'}) }}
+
+</form>
+
+{% endblock %}
