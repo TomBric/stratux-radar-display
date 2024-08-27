@@ -475,7 +475,7 @@ def init_item_form(item):
 def init_checklist_form(form, cl):     # initializes form from checklist (which is a dict)
     for one_list in cl:
         new_list = ChecklistForm()
-        new_list.name = list['TITLE']
+        new_list.name = one_list['TITLE']
         for item in one_list:
             new_item = init_item_form(item)
             new_list.items.append_entry([new_item])
