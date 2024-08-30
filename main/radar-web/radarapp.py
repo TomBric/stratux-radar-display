@@ -464,23 +464,20 @@ example_list = [{'ITEM': [{'CHECK': 'Done', 'REMARK': 'Please use preflight chec
                 'TITLE': 'Engine Start'}]
 
 
-def init_item_form(item):
-    new_item = ItemForm()
+def init_item_form(new_item, item):
     new_item.check.data = item.get('CHECK','')
     new_item.task.data = item.get('TASK', '')
     new_item.remark.data = item.get('REMARK', '')
-    rlog.debug(f'new_item.check.data: {new_item.check.data}')
-    return new_item
 
 
 def init_checklist_form(form, cl):     # initializes form from checklist (which is a dict)
     for one_list in cl:
         new_list = ChecklistForm()
         new_list.name.data = one_list['TITLE']
-        rlog.debug(f"Setting title to {one_list['TITLE']}")
         for item in one_list['ITEM']:
             rlog.debug(f"ITEM  in list {item}")
-            new_item = init_item_form(item)
+            new_item = ItemForm()
+            init_item_form(new_item, item)
             new_list.items.append_entry(new_item)
         form.lists.append_entry(new_list)
         rlog.debug(f"Form lists: {form.lists}")
