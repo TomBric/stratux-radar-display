@@ -10,6 +10,7 @@
 {% for list in checklist_form.lists.data %}
     {{ render_field(list.name) }}
     {% for item in list.items.data %}
+         Something in there ...
         {{ render_form_row([item.task, item.check, item.remark],
             col_map={'task': 'col-md-3', 'check': 'col-md-3', 'remark': 'col-md-3'}) }}
         {{ render_form_row([item.task1, item.check1, item.task2, item.check2, item.task3, item.check3],
