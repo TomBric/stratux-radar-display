@@ -467,6 +467,7 @@ example_list = [{'ITEM': [{'CHECK': 'Done', 'REMARK': 'Please use preflight chec
 def init_item_form(new_item, item):
     new_item.check.data = item.get('CHECK','')
     new_item.task.data = item.get('TASK', '')
+    rlog.debug(f'Found task {new_item.task.data}')
     new_item.remark.data = item.get('REMARK', '')
 
 
