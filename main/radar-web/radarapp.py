@@ -469,6 +469,7 @@ def init_item_form(item):
     new_item.check.data = item.get('CHECK','')
     new_item.task.data = item.get('TASK', '')
     new_item.remark.data = item.get('REMARK', '')
+    rlog.debug(f'new_item Form: {new_item}')
     return new_item
 
 
