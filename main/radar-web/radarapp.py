@@ -54,7 +54,7 @@ from flask_bootstrap import Bootstrap5, SwitchField
 RADAR_WEB_VERSION = "0.5"
 START_RADAR_FILE = "../../image/stratux_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
-RADARAPP_COMMAND = "radar-app.py"  # command line to search in start_radar.sh
+RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
 MAX_SEQUENCE = 99   # maximum value accepted as sequence of modes
 
