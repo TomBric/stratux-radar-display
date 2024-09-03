@@ -173,6 +173,28 @@ def setvolume(new_volume):
         mixer.setvolume(new_volume)
 
 
+def workaround():
+    # this is a workaround/bug fixing of the bluetooth-stack
+    # it disconnects and connects all bluetooth devices
+    # it is called, when an additional bluetooth device is found
+    # by this workaround the sound problems disappear which strangely happen after reconnect
+    res = subprocess.run(["bluetoothctl", "devices"], encoding="UTF-8", capture_output=True)
+    if res.returncode != 0:
+        return
+    lines = res.stdout.splitlines()  # stdout delivers a CR at the end
+    for line in lines:
+        split = line.split(maxsplit=3)
+        if len(split) >= 2:
+            if 'Device' in split[0]:
+                bt_addr = split[1]
+                rlog.debug("BT-Workaround: Disconnecting/Connecting Device" + bt_addr)
+                res = subprocess.run(["bluetoothctl", "disconnect", bt_addr])
+                if res == 0:
+                    res = subprocess.run(["bluetoothctl", "connect", bt_addr])
+                if res != 0:
+                    rlog.debug("BT-Workaround: Disconnecting/Connecting Device failed")
+
+
 def speak(text, speed_percent = 100):
     if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
         output_text = f"<speed level='{speed_percent}'> {text} </speed>"    # include string for setting speed

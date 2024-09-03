@@ -639,6 +639,7 @@ async def user_interface():
                     rlog.debug("User Interface: Bluetooth " + str(new_devices) + " devices connected.")
                 if new_devices != bt_devices:
                     if new_devices > bt_devices:  # new or additional device
+                        radarbluez.workaround()
                         radarbluez.speak("Radar connected")
                     bt_devices = new_devices
                     ui_changed = True
