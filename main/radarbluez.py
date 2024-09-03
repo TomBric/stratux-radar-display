@@ -187,14 +187,11 @@ def workaround():
         if len(split) >= 2:
             if 'Device' in split[0]:
                 bt_addr = split[1]
-                rlog.debug(f'BT-Workaround: Disconnecting/Connecting Device: {bt_addr}')
-                res = subprocess.run(["bluetoothctl", "disconnect", bt_addr])
+                rlog.debug(f'BT-Workaround: Connecting Device: {bt_addr}')
+                res = subprocess.run(["bluetoothctl", "connect", bt_addr])
                 if res.returncode != 0:
-                    rlog.debug(f'BT-Workaround: Disconnecting Device {bt_addr} failed with returncode: {res}')
-                else:
-                    res = subprocess.run(["bluetoothctl", "connect", bt_addr])
-                    if res.returncode != 0:
-                        rlog.debug(f'BT-Workaround: Reconnecting Device {bt_addr} failed')
+                    rlog.debug(f'BT-Workaround: Reconnecting Device {bt_addr} failed')
+
 
 
 def speak(text, speed_percent = 100):
