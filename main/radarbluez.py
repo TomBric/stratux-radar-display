@@ -190,7 +190,7 @@ def workaround():
                 rlog.debug(f'BT-Workaround: Disconnecting/Connecting Device: {bt_addr}')
                 res = subprocess.run(["bluetoothctl", "disconnect", bt_addr])
                 if res != 0:
-                    rlog.debug(f'BT-Workaround: Disconnecting Device {bt_addr} failed')
+                    rlog.debug(f'BT-Workaround: Disconnecting Device {bt_addr} failed with returncode: {res}')
                 else:
                     res = subprocess.run(["bluetoothctl", "connect", bt_addr])
                     if res != 0:
