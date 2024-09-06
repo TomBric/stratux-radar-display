@@ -31,7 +31,7 @@ done
 # set -x
 
 apt update
-apt full-upgrade -y
+apt upgrade -y
 
 # enable ssh
 raspi-config nonint do_ssh 0
