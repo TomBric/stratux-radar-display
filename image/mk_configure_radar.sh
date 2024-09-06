@@ -79,7 +79,7 @@ su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 # configuration changes for bluetooth
 # change autoconnect feature and limit headset roles
-sed -i 's/--\["bluez5.auto-connect"\] = "\[ hfp_hf hsp_hs a2dp_sink hfp_ag hsp_ag a2dp_source \]",/\["bluez5.auto-connect"\]  = "\[ hfp_hf a2dp_sink \]",/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
+sed -i 's/\["bluez5.auto-connect"\]  = "\[ hfp_hf hsp_hs a2dp_sink \]",/\["bluez5.auto-connect"\]  = "\[ hfp_hf a2dp_sink \]",/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 sed -i 's/--\["bluez5.headset-roles"\] = "\[ hsp_hs hsp_ag hfp_hf hfp_ag \]",/\["bluez5.headset-roles"\] = "\[ hfp_hf hfp_ag \]",/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 # tweaks for bluetooth on zero 2 w
 # /lib/firmware/brcm/brcmfmac43436s-sdio.raspberrypi,model-zero-2-w.txt
