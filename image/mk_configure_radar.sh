@@ -31,7 +31,8 @@ done
 # set -x
 
 apt update
-# apt upgrade -y
+# do an upgrade, otherwise bluez is not working properly in version 2024-07-04
+apt upgrade -y
 
 # enable ssh
 raspi-config nonint do_ssh 0
