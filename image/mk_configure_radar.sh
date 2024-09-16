@@ -81,6 +81,8 @@ sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wirepl
 # change autoconnect feature and limit headset roles
 sed -i 's/\["bluez5.auto-connect"\]  = "\[ hfp_hf hsp_hs a2dp_sink \]",/\["bluez5.auto-connect"\]  = "\[ hfp_hf a2dp_sink \]",/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
 sed -i 's/--\["bluez5.headset-roles"\] = "\[ hsp_hs hsp_ag hfp_hf hfp_ag \]",/\["bluez5.headset-roles"\] = "\[ hfp_hf hfp_ag \]",/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
+# changes to bluetooth since the bluetooth-driver had problems with bt-le
+sed -i 's/#ControllerMode = dual/ControllerMode = bredr/' /etc/bluetooth/main.conf
 # tweaks for bluetooth on zero 2 w
 # /lib/firmware/brcm/brcmfmac43436s-sdio.raspberrypi,model-zero-2-w.txt
 # btc_mode=1
