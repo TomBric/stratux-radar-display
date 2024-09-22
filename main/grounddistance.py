@@ -129,7 +129,7 @@ gear_gps_upper = [False] * len(gear_gps_warnings)  # is true, if height + hyster
 gear_sensor_warnings= (10, 5)   # speech warnings if gear is not down based on sensor
 gear_sensor_upper = [False] * len(gear_sensor_warnings)  # is true, if height + hysteresis was met
 
-hysteresis = 1.1    # hysteresis 10% for speech warnings,
+hysteresis = 1.3    # hysteresis 10% for speech warnings,
 # this means a ground warning is only repeated if more than 10% more of height was reached in between
 
 INVALID_DEST_ELEVATION = 9999.0
@@ -384,8 +384,8 @@ def calc_distance_speaker(stat):
         for (i, height) in enumerate(gps_warnings):
             if gps_distance <= height and gps_upper[i]:
                 # distance is reached and was before higher than hysteresis
-                if gps_warnings_sound is not None:
-                    radarbluez.speak_sounds(gps_warnings_sounds[i])
+                if gps_warnings_sounds is not None:
+                    radarbluez.speak_sound(gps_warnings_sounds[i])
                 gps_upper[i] = False
             if gps_distance >= height * hysteresis:
                 gps_upper[i] = True
