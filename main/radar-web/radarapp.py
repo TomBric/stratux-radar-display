@@ -492,7 +492,7 @@ def checklist_edit():
         # init_checklist_form(checklist_form, checklist.g_checklist)
         init_checklist_form(checklist_form, example_list)
         # rlog.debug(f'Example List {example_list}')
-        # rlog.debug(f'Checklist-Form {checklist_form}')
+        rlog.debug(f'Checklist-Form {checklist_form}')
     else:
         pass
         # parse checklist form
