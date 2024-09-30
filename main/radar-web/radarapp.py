@@ -435,8 +435,6 @@ class ItemForm(FlaskForm):
     task3 = StringField('Subtask3', default='')
     check3 = StringField('Check3', default='')
     delete = SubmitField('Delete')
-    save = SubmitField('Save configuration only')
-    restart = SubmitField('Reboot radar only')
 
 
 class ChecklistForm(FlaskForm):
