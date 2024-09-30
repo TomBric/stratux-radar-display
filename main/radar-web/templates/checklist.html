@@ -10,7 +10,7 @@
 {% for list in checklist_form.lists.data %}
     {{ render_field(list.name) }}
     {{ render_form_row([list.name, list.edit, list.delete],
-        col_map={'checklist': 'col-md-3'},
+        col_map={'name': 'col-md-3'},
         button_map={'edit': 'success', 'delete': 'danger'}) }}
 {% endfor %}
 
