@@ -5,17 +5,13 @@
 <form method="post">
 {{ checklist_form.csrf_token }}
 
-<h4>Edit checklist</h4>
+<h4>Edit all checklists</h4>
 <br>
 {% for list in checklist_form.lists.data %}
     {{ render_field(list.name) }}
-    {% for item in list.items.data %}
-        {{ render_form_row([item.task, item.check, item.remark],
-            col_map={'task': 'col-md-3', 'check': 'col-md-3', 'remark': 'col-md-3'}) }}
-        {{ render_form_row([item.task1, item.check1, item.task2, item.check2, item.task3, item.check3],
-            col_map={'task1': 'col-sm-2', 'check1': 'col-sm-2', 'task2': 'col-sm-2', 'check2': 'col-sm-2',
-                     'task3': 'col-sm-2', 'check3': 'col-sm-2'}) }}
-    {% endfor %}
+    {{ render_form_row([list.name, list.edit, list.delete],
+        col_map={'checklist': 'col-md-3'},
+        button_map={'edit': 'success', 'delete': 'danger'}) }}
 {% endfor %}
 
 {{ render_form_row([checklist_form.save_exit, checklist_form.save, checklist_form.exit],

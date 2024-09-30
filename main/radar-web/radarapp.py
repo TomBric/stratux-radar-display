@@ -146,7 +146,7 @@ class RadarForm(FlaskForm):
     checklist = SwitchField('Checklists', default=False)
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist_filename = StringField('Checklist filename', default='checklist.xml')
-    edit_checklist = SubmitField('Edit checklist')
+    edit_checklist = SubmitField('Edit checklists')
 
     #traffic options
     registration = SwitchField('Display call sign (epaper only)', default=True)
@@ -443,14 +443,14 @@ class ChecklistForm(FlaskForm):
     name = StringField('List name', default='Unnamed')
     items = FieldList(FormField(ItemForm))
     delete = SubmitField('Delete list!')
-    add = SubmitField('Add item')
+    edit = SubmitField('Edit List')
 
 
 class ListsForm(FlaskForm):
     lists = FieldList(FormField(ChecklistForm))
     add = SubmitField('Add list')
-    save_exit = SubmitField('Save list and exit')
-    save = SubmitField('Save list')
+    save_exit = SubmitField('Save lists and exit')
+    save = SubmitField('Save lists')
     exit = SubmitField('Exit only')
 
 
@@ -501,6 +501,22 @@ def checklist_edit():
         # save checklist form
     return render_template('checklist.html', checklist_form=checklist_form)
 
+
+@app.route('/onechecklist', methods=['GET', 'POST'])
+def onechecklist_edit():
+    watchdog.refresh()
+    checklist_form = ListsForm()
+    if checklist_form.validate_on_submit() is not True:   # no POST request
+        # checklist.init(checklist_xml)     # read_checklist. checklist is now in checklist.g_checklist
+        # init_checklist_form(checklist_form, checklist.g_checklist)
+        init_checklist_form(checklist_form, example_list)
+        # rlog.debug(f'Example List {example_list}')
+        # rlog.debug(f'Checklist-Form {checklist_form}')
+    else:
+        pass
+        # parse checklist form
+        # save checklist form
+    return render_template('checklist.html', checklist_form=checklist_form)
 
 
 @app.route('/negative_result', methods=['GET', 'POST'])
