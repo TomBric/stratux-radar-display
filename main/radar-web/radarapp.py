@@ -469,7 +469,8 @@ def init_item_form(new_item, item):
     new_item.remark.data = item.get('REMARK', '')
 
 
-def init_checklist_form(form, cl):     # initializes form from checklist (which is a dict)
+def init_checklist_form(cl):     # initializes form from checklist (which is a dict)
+    form = ListsForm()
     for one_list in cl:
         new_list = ChecklistForm()
         new_list.name.data = one_list['TITLE']
@@ -480,6 +481,7 @@ def init_checklist_form(form, cl):     # initializes form from checklist (which 
             new_list.items.append_entry(new_item)
         form.lists.append_entry(new_list)
         rlog.debug(f"Form lists: {form.lists}")
+    return form
 
 
 
@@ -490,7 +492,7 @@ def checklist_edit():
     if checklist_form.validate_on_submit() is not True:   # no POST request
         # checklist.init(checklist_xml)     # read_checklist. checklist is now in checklist.g_checklist
         # init_checklist_form(checklist_form, checklist.g_checklist)
-        init_checklist_form(checklist_form, example_list)
+        checklist_form = init_checklist_form(example_list)
         # rlog.debug(f'Example List {example_list}')
         rlog.debug(f'Checklist-Form {checklist_form}')
     else:
