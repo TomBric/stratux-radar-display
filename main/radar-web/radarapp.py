@@ -33,16 +33,15 @@
 
 import argparse
 import logging
-import os
 import signal
 import threading
-import time
 # add parent path to syspath
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import arguments
 import radarmodes
+import checklist
 import subprocess
 
 from flask import Flask, render_template, request, flash, redirect, url_for
@@ -55,7 +54,7 @@ from flask_bootstrap import Bootstrap5, SwitchField
 RADAR_WEB_VERSION = "0.5"
 START_RADAR_FILE = "../../image/stratux_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
-RADARAPP_COMMAND = "radar-app.py"  # command line to search in start_radar.sh
+RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
 MAX_SEQUENCE = 99   # maximum value accepted as sequence of modes
 
@@ -73,6 +72,7 @@ csrf = CSRFProtect(app)
 
 rlog = None  # radar specific logger
 watchdog = None  # watchdog to shut dow
+checklist_xml = None   # filename of checklist. Is set before editing checklist
 
 class Watchdog:
     def __init__(self, timeout=180):
@@ -146,6 +146,7 @@ class RadarForm(FlaskForm):
     checklist = SwitchField('Checklists', default=False)
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist_filename = StringField('Checklist filename', default='checklist.xml')
+    edit_checklist = SubmitField('Edit checklist')
 
     #traffic options
     registration = SwitchField('Display call sign (epaper only)', default=True)
@@ -385,6 +386,7 @@ result_message = "Wait"
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global result_message
+    global checklist_xml
 
     watchdog.refresh()
     radar_form = RadarForm()
@@ -416,7 +418,89 @@ def index():
             restart_radar()
             result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
             return redirect(url_for('result'))
+        elif radar_form.edit_checklist.data is True:    # button for checklists was pressed
+            checklist_xml = radar_form.checklist_filename.data
+            return redirect(url_for('checklist_edit'))
     return render_template('index.html',radar_form=radar_form)
+
+
+class ItemForm(FlaskForm):
+    task = StringField('Task', default='To check')
+    check = StringField('Check', default='Check')
+    remark = StringField('Remark', default='')
+    task1 = StringField('Subtask1', default='')
+    check1 = StringField('Check1', default='')
+    task2 = StringField('Subtask2', default='')
+    check2 = StringField('Check2', default='')
+    task3 = StringField('Subtask3', default='')
+    check3 = StringField('Check3', default='')
+    delete = SubmitField('Delete')
+    save = SubmitField('Save configuration only')
+    restart = SubmitField('Reboot radar only')
+
+
+class ChecklistForm(FlaskForm):
+    name = StringField('List name', default='Unnamed')
+    items = FieldList(FormField(ItemForm))
+    delete = SubmitField('Delete list!')
+    add = SubmitField('Add item')
+
+
+class ListsForm(FlaskForm):
+    lists = FieldList(FormField(ChecklistForm))
+    add = SubmitField('Add list')
+    save_exit = SubmitField('Save list and exit')
+    save = SubmitField('Save list')
+    exit = SubmitField('Exit only')
+
+
+example_list = [{'ITEM': [{'CHECK': 'Done', 'REMARK': 'Please use preflight checklist', 'TASK': 'Pre flight inspection'},
+                          {'CHECK': 'Locked', 'TASK': 'Seat Adjustment'}],
+                'TITLE': 'Before Engine Start'},
+                {'ITEM': [{'CHECK': 'ON', 'TASK': 'Strobes'},
+                          {'CHECK': 'ON (SOUND)', 'TASK': 'Electr. Fuel Pump'},
+                          {'CHECK1': 'IDLE', 'CHECK2': '1cm forward', 'TASK': 'Power Setting',
+                                   'TASK1': 'Cold Engine', 'TASK2': 'Warm Engine'}],
+                'TITLE': 'Engine Start'}]
+
+
+def init_item_form(new_item, item):
+    new_item.check.data = item.get('CHECK','')
+    new_item.task.data = item.get('TASK', '')
+    rlog.debug(f'Found task {new_item.task.data}')
+    new_item.remark.data = item.get('REMARK', '')
+
+
+def init_checklist_form(form, cl):     # initializes form from checklist (which is a dict)
+    for one_list in cl:
+        new_list = ChecklistForm()
+        new_list.name.data = one_list['TITLE']
+        for item in one_list['ITEM']:
+            new_item = ItemForm()
+            init_item_form(new_item, item)
+            rlog.debug(f"Appending: {item}")
+            new_list.items.append_entry(new_item)
+        form.lists.append_entry(new_list)
+        rlog.debug(f"Form lists: {form.lists}")
+
+
+
+@app.route('/checklist', methods=['GET', 'POST'])
+def checklist_edit():
+    watchdog.refresh()
+    checklist_form = ListsForm()
+    if checklist_form.validate_on_submit() is not True:   # no POST request
+        # checklist.init(checklist_xml)     # read_checklist. checklist is now in checklist.g_checklist
+        # init_checklist_form(checklist_form, checklist.g_checklist)
+        init_checklist_form(checklist_form, example_list)
+        # rlog.debug(f'Example List {example_list}')
+        # rlog.debug(f'Checklist-Form {checklist_form}')
+    else:
+        pass
+        # parse checklist form
+        # save checklist form
+    return render_template('checklist.html', checklist_form=checklist_form)
+
 
 
 @app.route('/negative_result', methods=['GET', 'POST'])
