@@ -441,17 +441,17 @@ class ItemForm(FlaskForm):
 
 class ChecklistForm(FlaskForm):
     name = StringField('List name', default='Unnamed')
-    items = FieldList(FormField(ItemForm))
     delete = SubmitField('Delete list!')
     edit = SubmitField('Edit List')
+    items = FieldList(FormField(ItemForm))
 
 
 class ListsForm(FlaskForm):
-    lists = FieldList(FormField(ChecklistForm))
     add = SubmitField('Add list')
     save_exit = SubmitField('Save lists and exit')
     save = SubmitField('Save lists')
     exit = SubmitField('Exit only')
+    lists = FieldList(FormField(ChecklistForm))
 
 
 example_list = [{'ITEM': [{'CHECK': 'Done', 'REMARK': 'Please use preflight checklist', 'TASK': 'Pre flight inspection'},
