@@ -9,6 +9,7 @@
 <br>
 {% for list in checklist_form.lists.data %}
     {{ render_field(list.name) }}
+    {{ render_field(list.edit) }}
 
 {% endfor %}
 
