@@ -489,18 +489,16 @@ def init_checklist_form(cl):     # initializes form from checklist (which is a d
 @app.route('/checklist', methods=['GET', 'POST'])
 def checklist_edit():
     watchdog.refresh()
-    checklist_form = ListsForm()
-    if checklist_form.validate_on_submit() is not True:   # no POST request
-        # checklist.init(checklist_xml)     # read_checklist. checklist is now in checklist.g_checklist
-        # init_checklist_form(checklist_form, checklist.g_checklist)
-        checklist_form = init_checklist_form(example_list)
+    all_lists = ListsForm()
+    if all_lists.validate_on_submit() is not True:   # no POST request
+        all_lists = init_checklist_form(example_list)
         # rlog.debug(f'Example List {example_list}')
-        rlog.debug(f'Checklist-Form {checklist_form}')
+        rlog.debug(f'all_lists-Form: {all_lists}')
     else:
         pass
         # parse checklist form
         # save checklist form
-    return render_template('checklist.html', checklist_form=checklist_form)
+    return render_template('checklist.html', checklist_form=all_lists)
 
 
 @app.route('/onechecklist', methods=['GET', 'POST'])
