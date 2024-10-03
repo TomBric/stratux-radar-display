@@ -8,8 +8,7 @@
 <h4>Edit all checklists</h4>
 <br>
 {% for list in checklist_form.lists.data %}
-    {{ render_form_row([checklist_form.lists.data[list].name, checklist_form.lists.data[list].edit,
-        checklist_form.lists.data[list].delete], button_map={'edit': 'success', 'delete': 'danger'},
+    {{ render_form_row([checklist_form.lists.data[list].name], button_map={'edit': 'success', 'delete': 'danger'},
         col_map={'name': 'col-md-3'}) }}
 {% endfor %}
 
