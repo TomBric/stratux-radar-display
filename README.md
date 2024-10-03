@@ -113,8 +113,8 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    1. Setup your main stratux in the following way:  Install version eu-027 on ther stratux or newer. Go to "Settings" and set Wifi-Mode: AP+Client. Enable "Internet-Passthrough" as well. Then "Add wifi client network" and add the data of your local home network. This all enables your stratux to have Internet connection and gives the display the possibility to access internet as well. 
    2. Configure a clean Raspbian installation on your SD card. E.g. using Raspberry Pi Imager. Image to flash is the standard image "Raspbian Pi OS Lite (64bit)". Using the Pi Imager use "settings" to set the network to "stratux" and no password. Also enable ssh in settings with the user pi and set a password ("raspberry" if you like).
    3. Startup your Stratux and boot your new raspberry. Connect your PC/workstation to the standard "stratux" wifi network and figure out the IP-adress of your display-raspberry, e.g. by using "arp -a".
-   4. From your workstation open a remote shell on the display-raspberry:  ```ssh pi@192.168.x.x```. Password is the same that you set in step 2.
-   5. Install git software by `sudo apt install python3-git```
+   4. From your workstation open a remote shell on the display-raspberry with the ip adress from step 3:  ```ssh pi@192.168.x.x```. Password is the same that you set in step 2.
+   5. Install git software by `sudo apt install python3-git`
    6. Clone the stratux-radar-display repository by the command: `git clone https://github.com/TomBric/stratux-radar-display.git`
    7. Execute the configuration script as user pi. `/bin/bash /home/pi/stratux-radar-display/image/configure_radar.sh`.  This will take some time since it does an update on the pi. 
    8. Depending on your display modify /home/pi/stratux-radar-display/image/stratux_radar.sh. In paramater "-c" enter the IP address of your stratux and in parameter "-d" the device. E.g.
@@ -133,7 +133,8 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    This will connect your stratux to your local wlan. Alternatively connect Stratux via network cable.
    2. Enable a writeable persistent filesystem in the settings tab by setting "Persistent Logging". 
    3. Reboot and log on to your Stratux as user pi, directory /home/pi
-   4. Clone the stratux repository by
+   4. Install git software on the stratux: `sudo apt install git`
+   5. Clone the stratux repository by
       `git clone https://github.com/TomBric/stratux-radar-display.git`
    6. Execute the configuration skript:
       `sudo /bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh` 
