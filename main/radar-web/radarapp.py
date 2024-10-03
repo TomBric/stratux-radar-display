@@ -484,7 +484,7 @@ def init_checklist_form(cl):     # initializes form from checklist (which is a d
         for item in one_list['ITEM']:
             new_item = ItemForm()
             init_item_form(new_item, item)
-            rlog.debug(f"Appending: {item}")
+            rlog.debug(f"Appending: {item.form}")
             new_list.items.append_entry(new_item)
         form.lists.append_entry(new_list)
         rlog.debug(f"Form lists: {form.lists}")
