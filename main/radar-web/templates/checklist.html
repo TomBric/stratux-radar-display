@@ -11,8 +11,8 @@
     {{ render_field(list.name) }}
 {% endfor %}
 
-{{ render_form_row([checklist_form.save_exit, checklist_form.save, checklist_form.exit],
-                button_map={'save_exit': 'success', 'save': 'primary', 'exit': 'secondary'}) }}
+{{ render_form_row([checklist_form.exit, checklist_form.add],
+                button_map={'exit': 'success', 'add': 'primary'}) }}
 
 </form>
 
