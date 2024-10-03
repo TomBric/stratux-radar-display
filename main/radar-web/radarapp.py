@@ -439,17 +439,13 @@ class ItemForm(FlaskForm):
 
 class ChecklistForm(FlaskForm):
     name = StringField('List name', default='Unnamed')
-    name2 = StringField('List name2', default='Unnamed')
-    delete22 = SubmitField('Delete list!')
+    delete = SubmitField('Delete list!')
     edit = SubmitField('Edit List')
-    items = FieldList(FormField(ItemForm))
 
 
 class ListsForm(FlaskForm):
     add = SubmitField('Add list')
-    save_exit = SubmitField('Save lists and exit')
-    save = SubmitField('Save lists')
-    exit = SubmitField('Exit only')
+    exit = SubmitField('Exit to configuration')
     lists = FieldList(FormField(ChecklistForm))
 
 
@@ -468,6 +464,15 @@ def init_item_form(new_item, item):
     new_item.task.data = item.get('TASK', '')
     rlog.debug(f'Found task {new_item.task.data}')
     new_item.remark.data = item.get('REMARK', '')
+
+def init_all_lists(cl):  # initializes form from all checklist (which is a dict) with an edit/delete button
+    form = ListsForm()
+    for one_list in cl:
+        new_list = ChecklistForm()
+        new_list.name.data = one_list['TITLE']
+        form.lists.append_entry(new_list)
+    rlog.debug(f"Returning all_lists: {form}")
+    return form
 
 
 def init_checklist_form(cl):     # initializes form from checklist (which is a dict)
@@ -492,7 +497,7 @@ def checklist_edit():
     watchdog.refresh()
     all_lists = ListsForm()
     if all_lists.validate_on_submit() is not True:   # no POST request
-        all_lists = init_checklist_form(example_list)
+        all_lists = init_all_lists(example_list)
         # rlog.debug(f'Example List {example_list}')
         rlog.debug(f'all_lists-Form: {all_lists}')
     else:
