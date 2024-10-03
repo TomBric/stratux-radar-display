@@ -45,7 +45,7 @@ Find below a photo of the current supported displays
 | ![1.54in1](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_radar.jpg) | ![1.54in2](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54.jpg) | ![1.54in3](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_gmeter.jpg) | ![1.54in4](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_logs.jpg) |
 
    
- - Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters LM2596. Then you can use the aircraft power supply (up to 40V). Calibrate the LM2596 at home for a power output at 5 V e.g. using an old laptop power supply. LM2596 also work well for the stratux itself. If you encounter problems with radio noise, please ensure that the power cable to the display is twisted and if necessary use a ferrit-core at the power connection.  
+ - Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters XL4015. Then you can use the aircraft power supply (up to 40V). Calibrate the XL4015 at home for a power output at 5 V e.g. using an old laptop power supply. XL4015 also work well for the stratux itself. If you encounter problems with radio noise, please ensure that the power cable to the display is twisted and if necessary use a ferrit-core at the power connection.  
    
  # Hardware connection of the OLED 1.5 inch display
  
@@ -122,7 +122,7 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
          - cd /home/pi/stratux-radar-display/main && python3 radar.py -b -r -d Epaper_3in7 -c 192.168.10.1 & 
          - cd /home/pi/stratux-radar-display/main && python3 radar.py -b -r -d Epaper_1in54 -c 192.168.10.1 &
            
-      The configuration script made an entry in the crontab of user pi, so that radar will start automatically after reboot. 
+      The configuration script will configure the pi so that the radar display will start automatically after reboot. 
 
    
 ### Installation on a standard stratux device (for stratux versions eu027 or newer!)
@@ -157,8 +157,9 @@ Version EU28 there is a setting availabe to resolve the conflict: Go to Stratux 
    
 ### Bluetooth devices
    
-   stratux-radar-display will automatically connect the your headset if their bluetooth is switched on. 
-   But once you need to do the pairing of a new bluetooth device. 
+   stratux-radar-display will automatically connect the your headset if their bluetooth is switched on. Please keep in mind that the bluetooth drivers on some pi-s have  bugs. Sometimes pairing is not performed properly.
+   
+   First, once you need to do the pairing of a new bluetooth device. 
    
    There are two options for pairing:
    
