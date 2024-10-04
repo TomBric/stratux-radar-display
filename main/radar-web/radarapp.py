@@ -472,9 +472,8 @@ def init_all_lists(cl):  # initializes form from all checklist (which is a dict)
         new_list.name.data = one_list['TITLE']
         rlog.debug(f"Appending one_list: {one_list['TITLE']}")
         form.lists.append_entry(new_list)
-        rlog.debug(f"Appending list: {new_list.data}")
     breakpoint()
-    rlog.debug(f"Returning all_lists: {form}")
+    rlog.debug(f"Returning all_lists: {form.lists}")
     return form
 
 
