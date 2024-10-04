@@ -9,6 +9,7 @@
 <br>
 {% for list in checklist_form.lists %}
     {{ list.name }}
+    {{ list.edit }}
 {% endfor %}
 
 {{ render_form_row([checklist_form.exit, checklist_form.add],
