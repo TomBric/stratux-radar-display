@@ -9,7 +9,8 @@
 <br>
 {% for list in checklist_form.lists %}
     {{ render_field(list.form.name) }}
-    {{ render_field(list.edit) }}
+    {{ render_form_row([list.edit, list.delete],
+                button_map={'edit': 'success', 'delete': 'danger'}) }}
 {% endfor %}
 
 {{ render_form_row([checklist_form.exit, checklist_form.add],
