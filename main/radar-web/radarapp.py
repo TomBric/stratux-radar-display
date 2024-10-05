@@ -446,7 +446,7 @@ class ChecklistForm(FlaskForm):
 class ListsForm(FlaskForm):
     add = SubmitField('Add list')
     exit = SubmitField('Exit to configuration')
-    lists = FieldList(FormField(ChecklistForm))
+    lists = FieldList(ChecklistForm)
 
 
 example_list = [{'ITEM': [{'CHECK': 'Done', 'REMARK': 'Please use preflight checklist', 'TASK': 'Pre flight inspection'},
