@@ -439,7 +439,7 @@ class ItemForm(FlaskForm):
 
 class ChecklistForm(FlaskForm):
     name = StringField('List name', default='Unnamed')
-    delete = SubmitField('Delete list!')
+    delete = SubmitField('Delete list')
     edit = SubmitField('Edit List')
 
 
