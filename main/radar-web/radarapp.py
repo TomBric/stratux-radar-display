@@ -179,7 +179,7 @@ class RadarForm(FlaskForm):
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
 
     def __init__(self, detected_mixers):   # detected mixers is a list of (device, mixername) tuples
-        detected_mixers.append('other', 'Other')  # to enable input of undetected devices
+        detected_mixers.append(('other', 'Other'))  # to enable input of undetected devices
         options = [(t[1],t[0]+'/'+t[1]) for t in detected_mixers]
         self.all_mixers = RadioField(choices=options)
 
