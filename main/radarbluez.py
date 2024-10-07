@@ -63,19 +63,6 @@ sound_card = None     # number of sound card, is initialized if external_sound_o
 audio_device = None   # name of audio device selected by mixer name
 
 
-def cards_and_mixers():  # returns a list of (cardname, mixer) tuples
-    retvalue = []
-    try:
-        for cardno in alsaaudio.card_indexes():
-            kwargs = {'cardindex': cardno}
-            for m in alsaaudio.mixers(**kwargs):
-                retvalue.append((alsaaudio.card_name(cardno)[0], m))
-    except alsaaudio.ALSAAudioError:
-        rlog.debug(f"ALSAAudioError retrieving cards and mixeres ")
-    rlog.debug(f"Available Mixers: {retvalue} ")
-    return retvalue
-
-
 def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whether it was selected
     found = False
     mix = None

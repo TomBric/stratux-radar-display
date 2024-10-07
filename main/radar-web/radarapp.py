@@ -41,7 +41,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import arguments
 import radarmodes
-import radarbluez
+import alsaaudio
 import subprocess
 
 from flask import Flask, render_template, request, flash, redirect, url_for
@@ -182,6 +182,19 @@ class RadarForm(FlaskForm):
         detected_mixers.append('other', 'Other')  # to enable input of undetected devices
         options = [(t[1],t[0]+'/'+t[1]) for t in detected_mixers]
         self.all_mixers = RadioField(choices=options)
+
+
+def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called from radar_app
+    retvalue = []
+    try:
+        for cardno in alsaaudio.card_indexes():
+            kwargs = {'cardindex': cardno}
+            for m in alsaaudio.mixers(**kwargs):
+                retvalue.append((alsaaudio.card_name(cardno)[0], m))
+    except alsaaudio.ALSAAudioError:
+        rlog.debug(f"ALSAAudioError retrieving cards and mixeres ")
+    rlog.debug(f"Available Mixers: {retvalue} ")
+    return retvalue
 
 
 def read_options_in_file(file_path, word):
