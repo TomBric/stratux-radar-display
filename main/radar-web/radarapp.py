@@ -41,6 +41,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import arguments
 import radarmodes
+import radarbluez
 import subprocess
 
 from flask import Flask, render_template, request, flash, redirect, url_for
@@ -154,7 +155,7 @@ class RadarForm(FlaskForm):
     bluetooth = SwitchField('Bluetooth sound', default=False)
     external_sound = SwitchField('External sound output', default=False)
     sound_volume = IntegerRangeField(render_kw={'min': '0', 'max': '100'}, default=100)
-    mixer = StringField('Sound mixer name', default = 'Speaker', validators=[Length(1, 40)])
+    mixername = StringField('Sound mixer name', default = 'Speaker', validators=[Length(1, 40)])
     speakdistance = SwitchField('Speak distance to target', default=False)
 
     # web options
@@ -177,6 +178,10 @@ class RadarForm(FlaskForm):
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
 
+    def __init__(self, detected_mixers):   # detected mixers is a list of (device, mixername) tuples
+        detected_mixers.append('other', 'Other')  # to enable input of undetected devices
+        options = [(t[1],t[0]+'/'+t[1]) for t in detected_mixers]
+        self.all_mixers = RadioField(choices=options)
 
 
 def read_options_in_file(file_path, word):
@@ -385,7 +390,7 @@ def index():
     global result_message
 
     watchdog.refresh()
-    radar_form = RadarForm()
+    radar_form = RadarForm(radarbluez.cards_and_mixers())
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
