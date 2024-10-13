@@ -183,7 +183,7 @@ class RadarForm(FlaskForm):
         FlaskForm.__init__(self)
         detected_mixers.append(('other', 'Other'))  # to enable input of undetected devices
         options = [(t[1],t[0]+'/'+t[1]) for t in detected_mixers]
-        self.all_mixers = RadioField('All Mixers', choices=options)
+        self.all_mixers.choices = options
 
 
 def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called from radar_app
