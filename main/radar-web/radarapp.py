@@ -192,7 +192,7 @@ def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called fr
             for m in alsaaudio.mixers(**kwargs):
                 retvalue.append((alsaaudio.card_name(cardno)[0], m))
     except alsaaudio.ALSAAudioError:
-        rlog.debug(f"ALSAAudioError retrieving cards and mixeres ")
+        rlog.debug(f"ALSAAudioError retrieving cards and mixers ")
     rlog.debug(f"Available Mixers: {retvalue} ")
     return retvalue
 
