@@ -296,7 +296,7 @@ def read_arguments(rf):
     if rf.sound_volume.data < 0 or rf.sound_volume.data > 100:
         rf.sound_volume.data = 50
     rf.external_sound.data = args['extsound'] > 0
-    rf.mixer.data = args['mixer']
+    rf.mixername.data = args['mixer']
     rf.speakdistance.data = args['speakdistance']
     # ground-options
     rf.groundsensor.data = args['grounddistance']
