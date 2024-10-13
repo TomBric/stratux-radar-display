@@ -58,6 +58,7 @@ RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
 MAX_SEQUENCE = 99   # maximum value accepted as sequence of modes
 
+stratux_mode = False  # if this mode is True (--stratux) start configuration for radar directly on stratux
 app = Flask(__name__)
 app.secret_key = 'radar-web-51Hgfw'
 
@@ -432,7 +433,10 @@ def index():
             restart_radar()
             result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
             return redirect(url_for('result'))
-    return render_template('index.html',radar_form=radar_form)
+    if not stratux_mode:
+        return render_template('index.html',radar_form=radar_form)
+    else:
+        return render_template('index_on_stratux.html',radar_form=radar_form)
 
 
 @app.route('/negative_result', methods=['GET', 'POST'])
@@ -454,6 +458,8 @@ if __name__ == '__main__':
     ap.add_argument("-t", "--timer", type=int, required=False,
                     help="Inactivity timer after which server will shut down", default=3)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug level [0-1]", default=0)
+    ap.add_argument("-s", "--stratux", required=False, help="Configuration for radar directly on stratux",
+                    action="store_true", default=False)
     args = vars(ap.parse_args())
     flask_debug = False
     if args['verbose'] == 0:
@@ -462,6 +468,7 @@ if __name__ == '__main__':
     elif args['verbose'] == 1:
         flask_debug = True
         rlog.setLevel(logging.DEBUG)  # log events without situation and aircraft
+    stratux_mode = args['stratux']
     shutdown_timer = 60 * args['timer']
     rlog.debug(f"radar-web: setting watchdog timer to {shutdown_timer} seconds")
     watchdog = Watchdog(shutdown_timer)
