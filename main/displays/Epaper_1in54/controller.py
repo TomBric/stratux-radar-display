@@ -37,6 +37,7 @@ import math
 import time
 import datetime
 from pathlib import Path
+import logging
 
 # global constants
 VERYLARGE = 30    # timer
@@ -51,6 +52,7 @@ ARCPOSITION_EXCLUDE_FROM = 0
 ARCPOSITION_EXCLUDE_TO = 0
 # end definitions
 
+rlog = None
 # global device properties
 sizex = 0
 sizey = 0
@@ -145,6 +147,7 @@ def init(fullcircle=False):
     global cdraw
     global draw
 
+    rlog = logging.getLogger('stratux-radar-log')
     device = epd1in54_V2.EPD()
     device.init(0)
     device.Clear(0xFF)   # necessary to overwrite everything

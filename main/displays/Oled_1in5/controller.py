@@ -37,6 +37,7 @@ import datetime
 from pathlib import Path
 from PIL import Image, ImageFont, ImageDraw
 from . import radar_opts
+import logging
 
 # global constants
 VERYLARGE = 24
@@ -49,6 +50,7 @@ MINIMAL_CIRCLE = 10  # minimal size of mode-s circle
 PITCH_SCALE = 1.5
 # end definitions
 
+rlog = None
 # device properties
 sizex = 0
 sizey = 0
@@ -109,6 +111,7 @@ def init(fullcircle=False):
     global cdraw
     global draw
 
+    rlog = logging.getLogger('stratux-radar-log')
     config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
     device = radar_opts.get_device(['-f', config_path])
     image = Image.new(device.mode, device.size)
