@@ -179,6 +179,8 @@ class RadarForm(FlaskForm):
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
     all_mixers = RadioField('All Mixers')
+
+
     def __init__(self, detected_mixers):   # detected mixers is a list of (device, mixername) tuples
         FlaskForm.__init__(self)
         detected_mixers.append(('other', 'Other'))  # to enable input of undetected devices
