@@ -117,6 +117,7 @@ def init(fullcircle=False):
     sizey = device.height
     zerox = sizex / 2
     zeroy = sizey / 2
+    rlog.debug(f'Oled_1in5 selected: sizex={sizex} sizey={sizey} zero=({zerox}, {zeroy})')
     device.contrast(255)  # set full contrast
     verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)  # font for height indications

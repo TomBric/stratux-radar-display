@@ -156,6 +156,7 @@ def init(fullcircle=False):
     sizey = device.width
     zerox = sizex / 2
     zeroy = sizey / 2
+    rlog.debug(f'Epaper_1in54 selected: sizex={sizex} sizey={sizey} zero=({zerox}, {zeroy})')
     max_pixel = sizey
     ah_zeroy = sizey / 2   # zero line for ahrs
     ah_zerox = sizex / 2
