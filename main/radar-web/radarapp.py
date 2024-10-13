@@ -178,12 +178,12 @@ class RadarForm(FlaskForm):
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
-
+    all_mixers = RadioField('All Mixers')
     def __init__(self, detected_mixers):   # detected mixers is a list of (device, mixername) tuples
         FlaskForm.__init__(self)
         detected_mixers.append(('other', 'Other'))  # to enable input of undetected devices
         options = [(t[1],t[0]+'/'+t[1]) for t in detected_mixers]
-        all_mixers = RadioField('All Mixers', choices=options)
+        self.all_mixers = RadioField('All Mixers', choices=options)
 
 
 def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called from radar_app
