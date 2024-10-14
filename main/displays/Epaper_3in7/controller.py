@@ -168,6 +168,7 @@ def init(fullcircle=False):
     else:
         zeroy = sizey / 2
         max_pixel = sizey
+    rlog.debug(f'Epaper_3in7 selected: sizex={sizex} sizey={sizey} zero=({zerox}, {zeroy})')
     ah_zeroy = sizey / 2   # zero line for ahrs
     ah_zerox = sizex / 2
     verylargefont = make_font("Font.ttc", VERYLARGE)
@@ -808,24 +809,24 @@ def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value
         x = x + offset
     lastpoint = None
     for i in range(0, len(data)):
-        y = ypos-4 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
+        y = math.floor(ypos-4 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue))
         if y < ypos:
             y = ypos   # if value is outside
         if y > ypos+ysize-1:
             x = ypos+ysize-1
         if i >= 1:  # we need at least two points before we draw
-            x = xpos + i * xsize / (len(data)-1)
+            x = math.floor(xpos + i * xsize / (len(data)-1))
             draw.line([lastpoint, (x, y)], fill="black", width=3)
         else:
             x = xpos
         lastpoint = (x, y)
     # value_line 1
-    y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
-    for x in range(xpos, xpos+xsize, 6):
+    y = math.floor(ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue))
+    for x in range(int(xpos), int(xpos+xsize), 6):
         draw.line([(x, y), (x + 3, y)], fill="black", width=1)
     # value_line 2
-    y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
-    for x in range(xpos, xpos+xsize, 6):
+    y = math.floor(ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue))
+    for x in range(int(xpos), int(xpos+xsize), 6):
         draw.line([(x, y), (x + 3, y)], fill="black", width=1)
 
 

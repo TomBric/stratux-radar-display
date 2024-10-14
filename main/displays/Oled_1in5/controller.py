@@ -37,6 +37,7 @@ import datetime
 from pathlib import Path
 from PIL import Image, ImageFont, ImageDraw
 from . import radar_opts
+import logging
 
 # global constants
 VERYLARGE = 24
@@ -49,6 +50,7 @@ MINIMAL_CIRCLE = 10  # minimal size of mode-s circle
 PITCH_SCALE = 1.5
 # end definitions
 
+rlog = None
 # device properties
 sizex = 0
 sizey = 0
@@ -109,6 +111,7 @@ def init(fullcircle=False):
     global cdraw
     global draw
 
+    rlog = logging.getLogger('stratux-radar-log')
     config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
     device = radar_opts.get_device(['-f', config_path])
     image = Image.new(device.mode, device.size)
@@ -117,6 +120,7 @@ def init(fullcircle=False):
     sizey = device.height
     zerox = sizex / 2
     zeroy = sizey / 2
+    rlog.debug(f'Oled_1in5 selected: sizex={sizex} sizey={sizey} zero=({zerox}, {zeroy})')
     device.contrast(255)  # set full contrast
     verylargefont = make_font("Font.ttc", VERYLARGE)
     largefont = make_font("Font.ttc", LARGE)  # font for height indications
@@ -801,24 +805,24 @@ def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value
         x = x + offset
     lastpoint = None
     for i in range(0, len(data)):
-        y = ypos-1 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue)
+        y = math.floor(ypos-1 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue))
         if y < ypos:
             y = ypos   # if value is outside
         if y > ypos+ysize-1:
             x = ypos+ysize-1
         if i >= 1:  # we need at least two points before we draw
-            x = xpos + i * xsize / (len(data)-1)
+            x = math.floor(xpos + i * xsize / (len(data)-1))
             draw.line([lastpoint, (x, y)], fill="cyan", width=2)
         else:
             x = xpos
         lastpoint = (x, y)
     # value_line 1
-    y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
-    for x in range(xpos, xpos+xsize, 6):
+    y = math.floor(ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue))
+    for x in range(int(xpos), int(xpos+xsize), 6):
         draw.line([(x, y), (x + 3, y)], fill="white", width=1)
     # value_line 2
-    y = ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue)
-    for x in range(xpos, xpos+xsize, 6):
+    y = math.floor(ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue))
+    for x in range(int(xpos), int(xpos+xsize), 6):
         draw.line([(x, y), (x + 3, y)], fill="white", width=1)
 
 
