@@ -9,7 +9,6 @@
 # Run with argument "-b dev" to get the dev branch from github, otherwise with main
 # Run with optional argument "-k v32" to create 32 bit based images for zero 1
 # Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
-# Run with optional argument "-w" to use bookworm images (either 32 bit or 64 bis)
 # call examples:
 #   sudo /bin/bash mk_stratux_display.sh
 #   sudo /bin/bash mk_stratux_display.sh -b dev
