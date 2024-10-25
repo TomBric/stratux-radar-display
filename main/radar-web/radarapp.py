@@ -145,7 +145,8 @@ class RadarForm(FlaskForm):
     stratux_seq = IntegerField('', default=11, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist = SwitchField('Checklists', default=False)
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
-    checklist_filename = StringField('Checklist filename', default='checklist.xml')
+    checklist_filename = StringField('Local checklist filename', default='checklist.xml')
+    upload_checklist = SubmitField('Select checklist for upload')
 
     #traffic options
     registration = SwitchField('Display call sign (epaper only)', default=True)
