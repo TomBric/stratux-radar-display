@@ -148,7 +148,8 @@ class RadarForm(FlaskForm):
     stratux_seq = IntegerField('', default=11, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist = SwitchField('Checklists', default=False)
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
-    checklist_filename = StringField('Local checklist filename', default='checklist.xml')
+    checklist_filename = StringField(f'Local checklist file (in {arguments.FULL_CONFIG_DIR})',
+                                     default=arguments.DEFAULT_CHECKLIST)
     upload_checklist = SubmitField('Upload a checklist')
 
     #traffic options
@@ -313,7 +314,7 @@ def read_arguments(rf):
     rf.coindicate.data = args['coindicate']
     rf.no_flighttime.data = args['noflighttime']
     rf.checklist_filename.data = args['checklist']
-    rlog.debug(f'checklist_filename: {rf.checklist_filename.data}"')
+    rlog.debug(f'checklist_filename: {rf.checklist_filename.data}')
 
     parsemodes(args['displaymodes'], rf)
 

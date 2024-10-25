@@ -98,9 +98,9 @@ OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
 
 
-CONFIG_FILE = str(Path(__file__).resolve().parent.parent.joinpath(arguments.CONFIG_DIR, "stratux-radar.conf"))
-SAVED_FLIGHTS = str(Path(__file__).resolve().parent.parent.joinpath(arguments.CONFIG_DIR, "stratux-radar.flights"))
-SAVED_STATISTICS = str(Path(__file__).resolve().parent.parent.joinpath(arguments.CONFIG_DIR, "stratux-radar.stat"))
+CONFIG_FILE = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.conf"))
+SAVED_FLIGHTS = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.flights"))
+SAVED_STATISTICS = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.stat"))
 
 url_host_base = arguments.DEFAULT_URL_HOST_BASE
 url_situation_ws = ""

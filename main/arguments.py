@@ -37,9 +37,10 @@ import argparse
 from pathlib import Path
 
 CONFIG_DIR = "config"
+FULL_CONFIG_DIR = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR))
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
 DEFAULT_MIXER = "Speaker"  # default mixer name to be used for sound output
-DEFAULT_CHECKLIST = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "checklist.xml"))
+DEFAULT_CHECKLIST = "checklist.xml"
 
 
 def add(ap):
