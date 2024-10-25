@@ -314,7 +314,6 @@ def read_arguments(rf):
     rf.coindicate.data = args['coindicate']
     rf.no_flighttime.data = args['noflighttime']
     rf.checklist_filename.data = args['checklist']
-    rlog.debug(f'checklist_filename: {rf.checklist_filename.data}')
 
     parsemodes(args['displaymodes'], rf)
 
@@ -391,7 +390,7 @@ def build_option_string(rf):
     if rf.no_flighttime.data is True:
         out += ' -nf'
     if rf.checklist.data is True and len(rf.checklist_filename.data) > 0:
-        out += f' -chl {rf.checklist_filename.data}'
+        out += f' -chl {secure_filename(rf.checklist_filename.data)}'
     return out
 
 
@@ -406,11 +405,13 @@ def restart_radar():    # shutdown after some seconds to give the option for a w
     reboot.start()
 
 result_message = "Wait"
+local_checklist_filename = ""
 
 @app.route('/')
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global result_message
+    global local_checklist_filename
 
     watchdog.refresh()
     radar_form = RadarForm(cards_and_mixers())
@@ -444,7 +445,7 @@ def index():
             result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
             return redirect(url_for('result'))
         elif radar_form.upload_checklist.data is True:
-            local_checklist_filename = secure_filename(file.filename)
+            local_checklist_filename = secure_filename(radar_form.checklist_filename.data)
             return redirect(url_for('checklist'))
     if not stratux_mode:
         return render_template('index.html',radar_form=radar_form)
@@ -468,9 +469,8 @@ def checklist():
             flash(Markup('No file selected'), 'fail')
             return redirect(url_for('index'))
         if file:
-            filename = secure_filename(local_checklist_file)
-            file.save(filename)
-            flash(Markup(f'Checklist successully uploaded to {local_checklist_file}', 'success'))
+            file.save(local_checklist_filename)
+            flash(Markup(f'Checklist successully uploaded to {local_checklist_filename}', 'success'))
             return redirect(url_for('index'))
     return render_template('checklist.html')
 
