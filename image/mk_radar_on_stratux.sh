@@ -143,6 +143,7 @@ mount -t ext4 -o offset=$partoffset "$IMGNAME" mnt/ || die "root-mount failed"
 
 mv "$IMGNAME" "${outprefix}""${outname}"
 zip out/"${outprefix}""${outname}".zip "${outprefix}""${outname}"
+rm "${outprefix}""${outname}"
 
 
 if [ "${#USB_NAME}" -eq 0 ]; then
