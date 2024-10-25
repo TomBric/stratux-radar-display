@@ -440,6 +440,7 @@ def index():
             result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
             return redirect(url_for('result'))
         elif radar_form.upload_checklist.data is True:
+            rlog.debug(f'Upload checklist is true')
             return redirect(url_for('checklist'), local_checklist_file=radar_form.checklist_filename.data)
     if not stratux_mode:
         return render_template('index.html',radar_form=radar_form)
