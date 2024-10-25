@@ -151,8 +151,6 @@ class RadarForm(FlaskForm):
     checklist_filename = StringField('Local checklist filename', default='checklist.xml')
     upload_checklist = SubmitField('Upload a checklist')
 
-    rlog.debug(f'Checklist-filename: {checklist_filename.data}')
-
     #traffic options
     registration = SwitchField('Display call sign (epaper only)', default=True)
     ground_mode = SwitchField('Ground mode, north always up', default=False)
@@ -414,6 +412,7 @@ def index():
 
     watchdog.refresh()
     radar_form = RadarForm(cards_and_mixers())
+    rlog.debug(f'Checklist-filename: {radar_form.checklist_filename.data}')
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
