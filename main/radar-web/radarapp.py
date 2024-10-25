@@ -148,7 +148,7 @@ class RadarForm(FlaskForm):
     stratux_seq = IntegerField('', default=11, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist = SwitchField('Checklists', default=False)
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
-    checklist_filename = StringField(f'Local checklist file (in {arguments.FULL_CONFIG_DIR})',
+    checklist_filename = StringField(f'Local checklist file (in "{arguments.FULL_CONFIG_DIR}")',
                                      default=arguments.DEFAULT_CHECKLIST)
     upload_checklist = SubmitField('Upload a checklist')
 
