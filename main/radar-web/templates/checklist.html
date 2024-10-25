@@ -5,15 +5,11 @@
 <form method="post">
 {{ checklist_form.csrf_token }}
 
-<h4>Edit all checklists</h4>
+<h4>Upload a checklists</h4>
 <br>
-{% for list in checklist_form.lists %}
-    {{ render_field(list.form.name) }}
-{% endfor %}
-
-{{ render_form_row([checklist_form.exit, checklist_form.add],
-                button_map={'exit': 'success', 'add': 'primary'}) }}
-
+Upload a file:
+    <input type="file" id="file-input" >
+    <input type=submit value=Upload>
 </form>
 
 {% endblock %}

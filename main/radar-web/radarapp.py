@@ -67,6 +67,8 @@ app.config['BOOTSTRAP_SERVE_LOCAL'] = True      # use local instances of css etc
 app.config['BOOTSTRAP_USE_MINIFIED'] = True
 app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 app.config['BOOTSTRAP_BTN_SIZE'] = 'md'
+# define max download file, is used for checklist, maximum length set to 1 MB
+app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
 
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
@@ -146,7 +148,7 @@ class RadarForm(FlaskForm):
     checklist = SwitchField('Checklists', default=False)
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist_filename = StringField('Local checklist filename', default='checklist.xml')
-    upload_checklist = SubmitField('Select checklist for upload')
+    upload_checklist = SubmitField('Upload a checklist')
 
     #traffic options
     registration = SwitchField('Display call sign (epaper only)', default=True)
@@ -437,11 +439,34 @@ def index():
             restart_radar()
             result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
             return redirect(url_for('result'))
+        elif radar_form.upload_checklist.data is True:
+            return redirect(url_for('checklist'), local_checklist_file=radar_form.checklist_filename.data)
     if not stratux_mode:
         return render_template('index.html',radar_form=radar_form)
     else:
         return render_template('index_on_stratux.html',radar_form=radar_form)
 
+
+@app.route('/checklist', methods=['GET', 'POST'])
+def checklist():
+    watchdog.refresh()
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash(Markup('No file part'), 'fail')
+            return redirect(url_for('index'))
+        file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            flash(Markup('No file selected'), 'fail')
+            return redirect(url_for('index'))
+        if file:
+            filename = secure_filename(local_checklist_file)
+            file.save(filename)
+            flash(Markup(f'Checklist successully uploaded to {local_checklist_file}', 'success'))
+            return redirect(url_for('index'))
+    return render_template('checklist.html')
 
 @app.route('/negative_result', methods=['GET', 'POST'])
 def negative_result():
