@@ -313,6 +313,7 @@ def read_arguments(rf):
     rf.coindicate.data = args['coindicate']
     rf.no_flighttime.data = args['noflighttime']
     rf.checklist_filename.data = args['checklist']
+    rlog.debug(f'checklist_filename: {rf.checklist_filename.data}"')
 
     parsemodes(args['displaymodes'], rf)
 
