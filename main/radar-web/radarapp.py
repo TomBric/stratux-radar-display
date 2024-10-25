@@ -120,6 +120,11 @@ def logging_init():
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     rlog = logging.getLogger('stratux-radar-web-log')
 
+class ChecklistForm(FlaskForm):
+    filename = StringField('Store with filename', default=arguments.DEFAULT_CHECKLIST)
+    upload = SubmitField('Upload File')
+    exit = SubmitField('Back to configuration')
+
 
 class RadarForm(FlaskForm):
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[IPAddress()])
@@ -457,8 +462,8 @@ def index():
 @app.route('/checklist', methods=['GET', 'POST'])
 def checklist():
     watchdog.refresh()
-    rlog.debug(f'Checklist called')
-    if request.method == 'POST':
+    cf = ChecklistForm()
+    if radar_form.validate_on_submit() is True:  # POST request
         # check if the post request has the file part
         if 'file' not in request.files:
             flash(Markup('No file part'), 'fail')
@@ -473,7 +478,7 @@ def checklist():
             file.save(local_checklist_filename)
             flash(Markup(f'Checklist successully uploaded to {local_checklist_filename}', 'success'))
             return redirect(url_for('index'))
-    return render_template('checklist.html')
+    return render_template('checklist.html', checklist_form = cf)
 
 @app.route('/negative_result', methods=['GET', 'POST'])
 def negative_result():

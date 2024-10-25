@@ -9,7 +9,9 @@
 <br>
 Upload a file:
     <input type="file" id="file-input" >
-    <input type=submit value=Upload>
+{{ render_field(checklist_form.filename) }}
+{{ render_form_row([checklist_form.upload, checklist_form.exit],
+    button_map={'upload': 'success', 'exit': 'primary'}) }}
 </form>
 
 {% endblock %}
