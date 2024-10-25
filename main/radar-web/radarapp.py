@@ -463,7 +463,7 @@ def index():
 def checklist():
     watchdog.refresh()
     cf = ChecklistForm()
-    if radar_form.validate_on_submit() is True:  # POST request
+    if cf.validate_on_submit() is True:  # POST request
         # check if the post request has the file part
         if 'file' not in request.files:
             flash(Markup('No file part'), 'fail')
