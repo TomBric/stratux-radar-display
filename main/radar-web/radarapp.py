@@ -450,6 +450,7 @@ def index():
 @app.route('/checklist', methods=['GET', 'POST'])
 def checklist():
     watchdog.refresh()
+    rlog.debug(f'Checklist called')
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
