@@ -69,6 +69,7 @@ app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 app.config['BOOTSTRAP_BTN_SIZE'] = 'md'
 # define max download file, is used for checklist, maximum length set to 1 MB
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
+# app.config['UPLOAD_FOLDER'] =
 
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
@@ -149,6 +150,8 @@ class RadarForm(FlaskForm):
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist_filename = StringField('Local checklist filename', default='checklist.xml')
     upload_checklist = SubmitField('Upload a checklist')
+
+    rlog.debug(f'Checklist-filename: {checklist_filename.data}')
 
     #traffic options
     registration = SwitchField('Display call sign (epaper only)', default=True)
@@ -440,8 +443,8 @@ def index():
             result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
             return redirect(url_for('result'))
         elif radar_form.upload_checklist.data is True:
-            rlog.debug(f'Upload checklist is true')
-            return redirect(url_for('checklist'), local_checklist_file=radar_form.checklist_filename.data)
+            local_checklist_filename = secure_filename(file.filename)
+            return redirect(url_for('checklist'))
     if not stratux_mode:
         return render_template('index.html',radar_form=radar_form)
     else:
