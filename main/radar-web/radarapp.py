@@ -194,7 +194,7 @@ class RadarForm(FlaskForm):
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
-    all_mixers = RadioField('All Mixers')
+    all_mixers = RadioField('All Mixers', default='other')
 
 
     def __init__(self, detected_mixers):   # detected mixers is a list of (device, mixername) tuples
