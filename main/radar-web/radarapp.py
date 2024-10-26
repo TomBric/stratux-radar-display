@@ -125,11 +125,7 @@ def logging_init():
 
 
 class ChecklistForm(FlaskForm):
-    validators = [
-        # validate_xml(message="XML file has errors!")
-    ]
-
-    upload_file = FileField('Select file', validators=validators)
+    upload_file = FileField('Select file')
     filename = StringField(f'Store as    (in "{arguments.FULL_CONFIG_DIR}")', default=arguments.DEFAULT_CHECKLIST)
     upload = SubmitField('Upload File')
     exit = SubmitField('Back to configuration')
@@ -473,7 +469,7 @@ def validate_uploaded_xml(xml_string):
         # force_list ensures that there is a list generated, even if there is only one CHECKLIST or ITEM
     except Exception as e:
         rlog.debug(f'Parsing of xml-checklist failed with error <{str(e)}>. File not uploaded!')
-        return str(e)
+        return "Parsing of uploaded file failed: " + str(e) + "/nFile not uploaded!"
     try:
         tmp = xml_dict['ALL_CHECKLISTS']['CHECKLIST']
     except KeyError:
