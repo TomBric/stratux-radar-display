@@ -121,6 +121,11 @@ def logging_init():
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     rlog = logging.getLogger('stratux-radar-web-log')
 
+
+def validate_xml(message=""):
+    pass
+
+
 class ChecklistForm(FlaskForm):
     validators = [
         FileRequired(message="Select a file!"),
