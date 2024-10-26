@@ -132,7 +132,7 @@ class ChecklistForm(FlaskForm):
     ]
 
     upload_file = FileField('Select file', validators=validators)
-    filename = StringField(f'Store as (in "{arguments.FULL_CONFIG_DIR}")', default=arguments.DEFAULT_CHECKLIST)
+    filename = StringField(f'Store as    (in "{arguments.FULL_CONFIG_DIR}")', default=arguments.DEFAULT_CHECKLIST)
     upload = SubmitField('Upload File')
     exit = SubmitField('Back to configuration')
 
@@ -432,7 +432,6 @@ def index():
 
     watchdog.refresh()
     radar_form = RadarForm(cards_and_mixers())
-    rlog.debug(f'Checklist-filename: {radar_form.checklist_filename.data}')
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
@@ -476,19 +475,20 @@ def checklist():
     cf = ChecklistForm()
     if cf.validate_on_submit() is True:  # POST request
         # check if the post request has the file part
-        if 'file' not in request.files:
-            flash(Markup('No file part'), 'fail')
+        if cf.exit.data is True:
             return redirect(url_for('index'))
-        file = request.files['file']
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
-        if file.filename == '':
-            flash(Markup('No file selected'), 'fail')
-            return redirect(url_for('index'))
-        if file:
-            file.save(local_checklist_filename)
-            flash(Markup(f'Checklist successully uploaded to {local_checklist_filename}', 'success'))
-            return redirect(url_for('index'))
+        if cf.upload_file.data is True:
+            if 'file' not in request.files:
+                flash(Markup('No file part'), 'fail')
+            else:
+                file = request.files['file']
+                # If the user does not select a file, the browser submits an
+                # empty file without a filename.
+                if file.filename == '':
+                    flash(Markup('No file selected'), 'fail')
+                elif file:
+                    file.save(local_checklist_filename)
+                    flash(Markup(f'Checklist successully uploaded to {local_checklist_filename}', 'success'))
     return render_template('checklist.html', checklist_form = cf)
 
 @app.route('/negative_result', methods=['GET', 'POST'])
