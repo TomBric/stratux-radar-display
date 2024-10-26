@@ -5,10 +5,10 @@
 <form method="post">
 {{ checklist_form.csrf_token }}
 
-<h4>Upload a checklists</h4>
+<h4>Upload a checklist</h4>
 <br>
-{{ render_field(checklist_form.upload_file) }}
-{{ render_field(checklist_form.filename) }}
+{{ render_form_row([checklist_form.upload_file, checklist_form.filename],
+    col_map={'upload_file': 'col-md-3', 'filename': 'col-md-3'}) }}
 {{ render_form_row([checklist_form.upload, checklist_form.exit],
     button_map={'upload': 'success', 'exit': 'primary'}) }}
 </form>
