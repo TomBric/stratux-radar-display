@@ -382,9 +382,11 @@ def build_option_string(rf):
     if rf.external_sound.data is True:
         if rf.sound_volume.data < 0 or rf.sound_volume.data > 100:
             rf.sound_volume.data = 50
-        out += f' -y {rf.sound_volume.data}'
-        if len(rf.mixer.data) > 0:
-            out += f' -mx {rf.mixer.data}'
+        out += f' -y {rf.sound_volume.data}'a
+        if rf.all_mixers.data != 'Other':
+            out += f' -mx {rf.all_mixers.data}'
+        elif len(rf.mixername.data) > 0:
+            out += f' -mx {rf.mixername.data}'
     if rf.speakdistance.data is True:
         out += ' -sd'
     if rf.groundsensor.data is True:
