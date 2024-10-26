@@ -121,7 +121,13 @@ def logging_init():
     rlog = logging.getLogger('stratux-radar-web-log')
 
 class ChecklistForm(FlaskForm):
-    filename = StringField('Store with filename', default=arguments.DEFAULT_CHECKLIST)
+    validators = [
+        FileRequired(message="Select a file!"),
+        validate_xml(message="XML file has errors!")
+    ]
+
+    upload_file = FileField('Select file', validators=validators)
+    StringField('Store with filename', default=arguments.DEFAULT_CHECKLIST)
     upload = SubmitField('Upload File')
     exit = SubmitField('Back to configuration')
 

@@ -7,8 +7,7 @@
 
 <h4>Upload a checklists</h4>
 <br>
-Upload a file:
-    <input type="file" id="file-input" >
+{{ render_field(checklist_form.upload_file) }}
 {{ render_field(checklist_form.filename) }}
 {{ render_form_row([checklist_form.upload, checklist_form.exit],
     button_map={'upload': 'success', 'exit': 'primary'}) }}
