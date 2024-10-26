@@ -48,7 +48,7 @@ from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, flash, redirect, url_for
 from markupsafe import Markup
 from flask_wtf import FlaskForm, CSRFProtect
-from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRange
+from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRange, FileRequired
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
