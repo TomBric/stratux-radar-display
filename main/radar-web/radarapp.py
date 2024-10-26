@@ -485,7 +485,7 @@ def checklist():
             flash(Markup(f'Checklist successully uploaded to {secure_filename(xml_file)}'), 'success')
             return redirect(url_for('checklist'))
         else:
-            flash(Markup(f'No file provided!'), 'success')
+            flash(Markup(f'No file provided!'), 'error')
             return redirect(url_for('checklist'))
     return render_template('checklist.html', checklist_form = cf)
 
