@@ -479,7 +479,7 @@ def checklist():
             return redirect(url_for('index'))
         if cf.upload_file.data:
             rlog.debug(f'file.data provided')
-            xml_file = secure_filename(cf.filename)
+            xml_file = secure_filename(cf.filename.data)
             rlog.debug(f'xml target destination is {xml_file}')
             cf.upload_file.data.save(os.path.join(arguments.FULL_CONFIG_DIR, xml_file))
             flash(Markup(f'Checklist successully uploaded to {secure_filename(xml_file)}'), 'success')
