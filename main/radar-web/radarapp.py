@@ -49,7 +49,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for
 from markupsafe import Markup
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_wtf.file import FileField, FileRequired
-from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRange, FileRequired
+from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRange
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
