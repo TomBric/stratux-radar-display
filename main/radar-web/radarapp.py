@@ -122,9 +122,6 @@ def logging_init():
     rlog = logging.getLogger('stratux-radar-web-log')
 
 
-def validate_xml(message=""):
-    pass
-
 
 class ChecklistForm(FlaskForm):
     validators = [
@@ -469,6 +466,21 @@ def index():
         return render_template('index_on_stratux.html',radar_form=radar_form)
 
 
+def validate_uploaded_xml(xml_string):
+    try:
+        xml_dict = xmltodict.parse(xml_string, force_list=('CHECKLIST', 'ITEM'))
+        # force_list ensures that there is a list generated, even if there is only one CHECKLIST or ITEM
+    except Exception as e:
+        rlog.debug(f'Parsing of xml-checklist failed with error <{str(e)}>. File not uploaded!')
+        return str(e)
+    try:
+        tmp = xml_dict['ALL_CHECKLISTS']['CHECKLIST']
+    except KeyError:
+        rlog.debug("Checklist - KeyError understanding dict from xml")
+        return("KeyError parsing XML. File not uploaded!")
+    rlog.debug(f'Checklist - XML parsed')
+    return None
+
 @app.route('/checklist', methods=['GET', 'POST'])
 def checklist():
     watchdog.refresh()
@@ -478,7 +490,12 @@ def checklist():
         if cf.exit.data is True:
             return redirect(url_for('index'))
         if cf.upload_file.data:
-            rlog.debug(f'file.data provided')
+            xml_string = cf.upload_file.data.read()
+            error = validate_uploaded_xml(xml_string)
+            if error is not None:
+                flash(Markup(error), 'error')
+                return redirect(url_for('checklist'))
+            # parsing successful, now save
             xml_file = secure_filename(cf.filename.data)
             rlog.debug(f'xml target destination is {xml_file}')
             cf.upload_file.data.save(os.path.join(arguments.FULL_CONFIG_DIR, xml_file))
