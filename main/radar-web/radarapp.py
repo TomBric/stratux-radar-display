@@ -481,7 +481,7 @@ def checklist():
             rlog.debug(f'file.data provided')
             xml_file = cf.upload_file.data.filename
             rlog.debug(f'xml file is {xml_file}')
-            cf.upload_file.data.save(open(os.path.join(arguments.FULL_CONFIG_DIR, xml_file)))
+            cf.upload_file.data.save(os.path.join(arguments.FULL_CONFIG_DIR, xml_file))
             flash(Markup(f'Checklist successully uploaded to {secure_filename(xml_file)}'), 'success')
             return redirect(url_for('checklist'))
         else:
