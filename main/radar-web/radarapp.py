@@ -479,13 +479,13 @@ def checklist():
             return redirect(url_for('index'))
         if cf.upload_file.data:
             rlog.debug(f'file.data provided')
-            xml_file = cf.upload_file.data.filename
-            rlog.debug(f'xml file is {xml_file}')
+            xml_file = secure_filename(cf.filename)
+            rlog.debug(f'xml target destination is {xml_file}')
             cf.upload_file.data.save(os.path.join(arguments.FULL_CONFIG_DIR, xml_file))
             flash(Markup(f'Checklist successully uploaded to {secure_filename(xml_file)}'), 'success')
             return redirect(url_for('checklist'))
         else:
-            flash(Markup('No file provided!'), 'fail')
+            flash(Markup(f'No file provided!'), 'success')
             return redirect(url_for('checklist'))
     return render_template('checklist.html', checklist_form = cf)
 
