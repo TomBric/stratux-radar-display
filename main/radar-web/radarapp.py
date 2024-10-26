@@ -478,17 +478,15 @@ def checklist():
         if cf.exit.data is True:
             return redirect(url_for('index'))
         if cf.upload_file.data is True:
-            if 'file' not in request.files:
-                flash(Markup('No file part'), 'fail')
-            else:
-                file = request.files['file']
-                # If the user does not select a file, the browser submits an
-                # empty file without a filename.
-                if file.filename == '':
-                    flash(Markup('No file selected'), 'fail')
-                elif file:
-                    file.save(local_checklist_filename)
-                    flash(Markup(f'Checklist successully uploaded to {local_checklist_filename}', 'success'))
+            rlog.debug(f'file.data is True')
+            xml_file = request.FILES[cf.upload_file.data].read()
+            rlog.debug(f'xml file read with length {length(xml_file)}')
+            open(os.path.join(arguments.FULL_CONFIG_DIR, secure_filename(cf.filename.data))).write(xml_file)
+            flash(Markup(f'Checklist successully uploaded to {secure_filename(local_checklist_filename)}', 'success'))
+            return redirect(url_for('checklist'))
+        else:
+            flash(Markup(f'No file provided!', 'fail'))
+            return redirect(url_for('checklist'))
     return render_template('checklist.html', checklist_form = cf)
 
 @app.route('/negative_result', methods=['GET', 'POST'])
