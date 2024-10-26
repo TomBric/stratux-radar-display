@@ -129,7 +129,7 @@ def validate_xml(message=""):
 class ChecklistForm(FlaskForm):
     validators = [
         FileRequired(message="Select a file!"),
-        validate_xml(message="XML file has errors!")
+        # validate_xml(message="XML file has errors!")
     ]
 
     upload_file = FileField('Select file', validators=validators)
