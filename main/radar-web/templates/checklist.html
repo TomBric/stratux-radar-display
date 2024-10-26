@@ -2,7 +2,7 @@
 {% from 'bootstrap5/form.html' import render_form, render_field, render_form_row %}
 {% block content %}
 <style> .no-label { label{ display: None; } } </style>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
 {{ checklist_form.csrf_token }}
 
 <h4>Upload a checklist</h4>
