@@ -172,7 +172,7 @@ class RadarForm(FlaskForm):
     bluetooth = SwitchField('Bluetooth sound', default=False)
     external_sound = SwitchField('External sound output', default=False)
     sound_volume = IntegerField('Sound volume in %', default=100, validators=[NumberRange(min=0, max=100)])
-    mixername = StringField('Sound mixer name', default = 'Speaker', validators=[Length(1, 40)])
+    mixername = StringField("Specify 'other' mixer name", default = 'Speaker', validators=[Length(1, 40)])
     speakdistance = SwitchField('Speak distance to target', default=False)
 
     # web options
@@ -194,7 +194,7 @@ class RadarForm(FlaskForm):
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
-    all_mixers = RadioField('All Mixers', choices=[('other', 'Other')], default='other')
+    all_mixers = RadioField('Detected Mixers', choices=[('other', 'Other')], default='other')
 
 
     def __init__(self, detected_mixers):   # detected mixers is a list of (device, mixername) tuples
