@@ -382,7 +382,7 @@ def build_option_string(rf):
     if rf.external_sound.data is True:
         if rf.sound_volume.data < 0 or rf.sound_volume.data > 100:
             rf.sound_volume.data = 50
-        out += f' -y {rf.sound_volume.data}'a
+        out += f' -y {rf.sound_volume.data}'
         if rf.all_mixers.data != 'Other':
             out += f' -mx {rf.all_mixers.data}'
         elif len(rf.mixername.data) > 0:
