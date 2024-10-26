@@ -44,6 +44,7 @@ import radarmodes
 import alsaaudio
 import subprocess
 from werkzeug.utils import secure_filename
+import xmltodict
 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from markupsafe import Markup

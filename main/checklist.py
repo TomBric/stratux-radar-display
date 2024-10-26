@@ -36,7 +36,6 @@ import logging
 import radarmodes
 import radarbuttons
 import xmltodict
-import json
 
 rlog = None  # radar specific logger
 # constants
