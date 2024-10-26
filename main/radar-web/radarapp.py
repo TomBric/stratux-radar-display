@@ -472,14 +472,14 @@ def index():
 @app.route('/checklist', methods=['GET', 'POST'])
 def checklist():
     watchdog.refresh()
-    cf = ChecklistForm()
+    cf = ChecklistForm(request.POST)
     if cf.validate_on_submit() is True:  # POST request
         # check if the post request has the file part
         if cf.exit.data is True:
             return redirect(url_for('index'))
         if cf.upload_file.data:
             rlog.debug(f'file.data provided')
-            xml_file = request.FILES[cf.upload_file.data].read()
+            xml_file = request.files[cf.upload_file.name].read()
             rlog.debug(f'xml file read with length {length(xml_file)}')
             open(os.path.join(arguments.FULL_CONFIG_DIR, secure_filename(cf.filename.data))).write(xml_file)
             flash(Markup(f'Checklist successully uploaded to {secure_filename(local_checklist_filename)}'), 'success')
