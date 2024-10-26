@@ -482,10 +482,10 @@ def checklist():
             xml_file = request.FILES[cf.upload_file.data].read()
             rlog.debug(f'xml file read with length {length(xml_file)}')
             open(os.path.join(arguments.FULL_CONFIG_DIR, secure_filename(cf.filename.data))).write(xml_file)
-            flash(Markup(f'Checklist successully uploaded to {secure_filename(local_checklist_filename)}', 'success'))
+            flash(Markup(f'Checklist successully uploaded to {secure_filename(local_checklist_filename)}'), 'success')
             return redirect(url_for('checklist'))
         else:
-            flash(Markup(f'No file provided!', 'fail'))
+            flash(Markup('No file provided!'), 'fail')
             return redirect(url_for('checklist'))
     return render_template('checklist.html', checklist_form = cf)
 
