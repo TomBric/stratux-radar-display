@@ -133,7 +133,7 @@ class ChecklistForm(FlaskForm):
     ]
 
     upload_file = FileField('Select file', validators=validators)
-    StringField('Store with filename', default=arguments.DEFAULT_CHECKLIST)
+    filename = StringField('Store with filename', default=arguments.DEFAULT_CHECKLIST)
     upload = SubmitField('Upload File')
     exit = SubmitField('Back to configuration')
 
