@@ -161,6 +161,7 @@ class RadarForm(FlaskForm):
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist_filename = StringField(f'Local checklist file (in "{arguments.FULL_CONFIG_DIR}")',
                                      default=arguments.DEFAULT_CHECKLIST)
+    downlist_checklist = SubmitField('Download checklist')
     upload_checklist = SubmitField('Upload a checklist')
 
     #traffic options
@@ -458,6 +459,9 @@ def index():
         elif radar_form.upload_checklist.data is True:
             local_checklist_filename = secure_filename(radar_form.checklist_filename.data)
             return redirect(url_for('checklist'))
+        elif radar_form.download_checklist.data is True:
+            return send_from_directory(arguments.FULL_CONFIG_DIR, radar_form.checklist_filename.data,
+                                       as_attachment=True)
     if not stratux_mode:
         return render_template('index.html',radar_form=radar_form)
     else:
