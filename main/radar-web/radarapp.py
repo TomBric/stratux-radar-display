@@ -460,6 +460,7 @@ def index():
             local_checklist_filename = secure_filename(radar_form.checklist_filename.data)
             return redirect(url_for('checklist'))
         elif radar_form.download_checklist.data is True:
+            rlog.debug(f'Sending file: {arguments.FULL_CONFIG_DIR}/{radar_form.checklist_filename.data}')
             return send_from_directory(arguments.FULL_CONFIG_DIR, radar_form.checklist_filename.data,
                                        as_attachment=True)
     if not stratux_mode:
