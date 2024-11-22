@@ -161,7 +161,7 @@ class RadarForm(FlaskForm):
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist_filename = StringField(f'Local checklist file (in "{arguments.FULL_CONFIG_DIR}")',
                                      default=arguments.DEFAULT_CHECKLIST)
-    downlist_checklist = SubmitField('Download checklist')
+    download_checklist = SubmitField('Download checklist')
     upload_checklist = SubmitField('Upload a checklist')
 
     #traffic options
