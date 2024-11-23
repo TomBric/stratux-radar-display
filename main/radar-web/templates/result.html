@@ -2,5 +2,21 @@
 
 {% block content %}
 <h2> {{result_message}} </h2>
-<a href="{{ url_for('index') }}">Back to configuration</a>
+    <p>Du wirst in <span id="countdown">{{ countdown }}</span> Sekunden weitergeleitet.</p>
+
+    <script>
+        let countdown = {{ 180 }};  // Countdown-Zeit vom Server
+        const countdownElement = document.getElementById('countdown');
+
+        const timer = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown; // Update Countdown-Anzeige
+
+            if (countdown <= 0) {
+                clearInterval(timer);
+                window.location.href = "{{ url_for('index') }}" ; // Weiterleitung bei 0
+            }
+        }, 1000); // Jede Sekunde aktualisieren
+    </script>
+<a href="{{ url_for('index') }}">Manually back to configuration</a>
 {% endblock %}
