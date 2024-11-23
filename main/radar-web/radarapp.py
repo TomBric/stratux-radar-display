@@ -441,7 +441,7 @@ def index():
             read_arguments(radar_form)  # reread arguments to get sequence nice
             read_app_arguments(radar_form)
             restart_radar()
-            result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
+            result_message = f'Rebooting Radar. Please wait ...'
             return redirect(url_for('result'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
@@ -518,7 +518,7 @@ def negative_result():
 @app.route('/result', methods=['GET', 'POST'])
 def result():
     watchdog.refresh()
-    return render_template('result.html', result_message=result_message)
+    return render_template('result.html', result_message=result_message, countdown=120)
 
 
 if __name__ == '__main__':
