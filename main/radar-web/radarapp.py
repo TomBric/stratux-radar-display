@@ -453,7 +453,7 @@ def index():
             return redirect(url_for('index'))
         elif radar_form.restart.data is True:
             flash(Markup('Rebooting radar ..'), 'success')
-            restart_radar()
+            # restart_radar()  for testing removed
             result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
             return redirect(url_for('result'))
         elif radar_form.upload_checklist.data is True:
