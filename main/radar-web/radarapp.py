@@ -462,7 +462,7 @@ def index():
         elif radar_form.download_checklist.data is True:
             rlog.debug(f'Sending file: {arguments.FULL_CONFIG_DIR}/{radar_form.checklist_filename.data}')
             return send_from_directory(arguments.FULL_CONFIG_DIR, radar_form.checklist_filename.data,
-                                       mimetype='application/xml', as_attachment=True, max_age=0)
+                                       mimetype='application/xml', as_attachment=False, max_age=0)
     if not stratux_mode:
         return render_template('index.html',radar_form=radar_form)
     else:
