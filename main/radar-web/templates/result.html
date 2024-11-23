@@ -2,7 +2,9 @@
 
 {% block content %}
 <h2> {{result_message}} </h2>
-    <h3>You will be redirected back to configuration page in <span id="countdown">{{ countdown }}</span> seconds.</h3>
+    <p></p>
+    <p>If you are finished with the configuration, you may close the window.</p>
+    <p>You will be redirected back to configuration page after reboot in <span id="countdown">{{ countdown }}</span> seconds.</p>
     <script>
         let countdown = {{ countdown }};
         const countdownElement = document.getElementById('countdown');

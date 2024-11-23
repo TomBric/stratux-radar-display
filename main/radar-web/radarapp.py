@@ -453,8 +453,8 @@ def index():
             return redirect(url_for('index'))
         elif radar_form.restart.data is True:
             flash(Markup('Rebooting radar ..'), 'success')
-            # restart_radar()  for testing removed
-            result_message = "Rebooting Radar. Please wait approx. 3 minutes ..."
+            restart_radar()
+            result_message = "Rebooting Radar. Please wait  ..."
             return redirect(url_for('result'))
         elif radar_form.upload_checklist.data is True:
             local_checklist_filename = secure_filename(radar_form.checklist_filename.data)
@@ -526,7 +526,7 @@ if __name__ == '__main__':
     logging_init()
     ap = argparse.ArgumentParser(description='Stratux radar web configuration')
     ap.add_argument("-t", "--timer", type=int, required=False,
-                    help="Inactivity timer after which server will shut down", default=3)
+                    help="Inactivity timer after which server will shut down", default=10)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug level [0-1]", default=0)
     ap.add_argument("-s", "--stratux", required=False, help="Configuration for radar directly on stratux",
                     action="store_true", default=False)
