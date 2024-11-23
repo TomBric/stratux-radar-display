@@ -12,7 +12,7 @@ apt update
 # apt upgrade -y
 apt install nginx -y
 apt install python3-psutil
-pip3 install bootstrap-flask flask-wtf --break-system-packages
+pip3 install bootstrap-flask flask-wtf werkzeug--break-system-packages
 # generate reverse proxy config
 unlink /etc/nginx/sites-enabled/default
 cp radar_reverse.conf /etc/nginx/sites-available/
