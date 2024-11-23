@@ -518,7 +518,7 @@ def negative_result():
 @app.route('/result', methods=['GET', 'POST'])
 def result():
     watchdog.refresh()
-    return render_template('result.html', result_message=result_message, countdown=120)
+    return render_template('result.html', result_message=result_message, countdown=150)
 
 
 if __name__ == '__main__':
