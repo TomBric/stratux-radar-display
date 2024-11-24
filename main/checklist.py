@@ -36,7 +36,7 @@ import logging
 import radarmodes
 import radarbuttons
 import xmltodict
-import pathlib
+from pathlib import Path
 
 rlog = None  # radar specific logger
 # constants
