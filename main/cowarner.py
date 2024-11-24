@@ -40,7 +40,7 @@ import time
 import asyncio
 import statusui
 import radarbluez
-import RPi.GPIO as GPIO
+from RPi import GPIO
 import numpy
 import radarmodes
 
