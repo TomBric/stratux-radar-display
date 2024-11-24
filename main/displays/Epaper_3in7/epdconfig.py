@@ -161,7 +161,7 @@ class RaspberryPi:
             self.GPIO_BUSY_PIN.close()
 
 
-    implementation = RaspberryPi()
+implementation = RaspberryPi()
 
 for func in [x for x in dir(implementation) if not x.startswith('_')]:
     setattr(sys.modules[__name__], func, getattr(implementation, func))
