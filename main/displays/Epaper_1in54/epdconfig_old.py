@@ -41,20 +41,14 @@ class RaspberryPi:
     CS_PIN          = 8
     BUSY_PIN        = 24
 
-
     def __init__(self):
         import spidev
         import RPi.GPIO
 
-        import spidev
-        import gpiozero
+        self.GPIO = RPi.GPIO
 
-        self.SPI = spidev.SpiDev()
-        self.GPIO_RST_PIN = gpiozero.LED(self.RST_PIN)
-        self.GPIO_DC_PIN = gpiozero.LED(self.DC_PIN)
-        # self.GPIO_CS_PIN     = gpiozero.LED(self.CS_PIN)
-        self.GPIO_PWR_PIN = gpiozero.LED(self.PWR_PIN)
-        self.GPIO_BUSY_PIN = gpiozero.Button(self.BUSY_PIN, pull_up=False)
+        # SPI device, bus = 0, device = 0
+        self.SPI = spidev.SpiDev(0, 0)
 
     def digital_write(self, pin, value):
         self.GPIO.output(pin, value)
@@ -88,6 +82,7 @@ class RaspberryPi:
         self.GPIO.output(self.DC_PIN, 0)
 
         self.GPIO.cleanup()
+
 
 
 implementation = RaspberryPi()
