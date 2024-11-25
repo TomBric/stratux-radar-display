@@ -244,7 +244,7 @@ def modify_line_in_file(file_path, word, new_text):    # search word in file and
             for line in lines:
                 if word in line:
                     word_index = line.find(word)
-                    new_line = line[:word_index + len(word)] + " " + new_text + " &\n"
+                    new_line = line[:word_index + len(word)] + " " + new_text + "\n"
                     file.write(new_line)
                 else:
                     file.write(line)
@@ -343,7 +343,7 @@ def read_app_arguments(rf):
     rlog.debug(f'Read web timeout of {rf.webtimeout.data} mins')
 
 def app_option_string(radarform):
-    res = f' -t {radarform.webtimeout.data}'
+    res = f' -t {radarform.webtimeout.data} &'
     return res
 
 
