@@ -133,16 +133,17 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    This will connect your stratux to your local wlan. Alternatively connect Stratux via network cable.
    2. Enable a writeable persistent filesystem in the settings tab by setting "Persistent Logging". 
    3. Reboot and log on to your Stratux as user pi, directory /home/pi
-   4. Update apt-get using `apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update`
-   5. Install git software on the stratux: `sudo apt install git`
-   6. Clone the stratux repository by
+   4. Prepare System for installation using `sudo systemctl start systemd-timesyncd; sleep 2; sudo systemctl stop systemd-timesyncd`
+   5. Update installer using `apt-get update`
+   6. Install git software on the stratux: `sudo apt install git`
+   7. Clone the stratux repository by
       `git clone https://github.com/TomBric/stratux-radar-display.git`
-   7. Execute the configuration skript:
+   8. Execute the configuration skript:
       `sudo /bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh` 
       It will take some time.
-   8. The script configures stratux to work with the Oled display and without bluetooth or external sound. So if this is your configuration, you are fine. Otherwise you can configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5",  "-d Epaper_3in7" or "-d Epaper_1in54". You can use a simple editor like nano for this:
+   9. The script configures stratux to work with the Oled display and without bluetooth or external sound. So if this is your configuration, you are fine. Otherwise you can configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5",  "-d Epaper_3in7" or "-d Epaper_1in54". You can use a simple editor like nano for this:
 `nano image/stratux_radar.sh`
-   9. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
+   10. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
 
 The Oled display uses different GPIO-Pins as the baro-sensor, so there is no conflict. Also the e-Paper display can be connected (not the HAT version) with the baro and ahrs sensors in place.
 - Remark: Bluetooth is currently not properly supported by Stratux, so if you want audio output to your headset, please use an additional Raspberry Zero 2 W or Zero W for the display.
