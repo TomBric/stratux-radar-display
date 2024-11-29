@@ -134,12 +134,14 @@ All pushbuttons are used as pull down. Connect the other side of all buttons to 
    2. Enable a writeable persistent filesystem in the settings tab by setting "Persistent Logging". 
    3. Reboot and log on to your Stratux as user pi, directory /home/pi
    4. Install git software on the stratux: `sudo apt install git`
-   5. Clone the stratux repository by
+      - _Remark: If your stratux has not yet received valid gps, your clock may be incorrect. In this case please do this to get a proper time:_
+      `sudo systemctl start systemd-timesyncd; sleep 2; sudo systemctl stop systemd-timesyncd` 
+   6. Clone the stratux repository by
       `git clone https://github.com/TomBric/stratux-radar-display.git`
-   6. Execute the configuration skript:
+   7. Execute the configuration skript:
       `sudo /bin/bash /home/pi/stratux-radar-display/image/configure_radar_on_stratux.sh` 
       It will take some time.
-   7. The script configures stratux to work with the Oled display and without bluetooth or external sound. So if this is your configuration, you are fine. Otherwise you can configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5",  "-d Epaper_3in7" or "-d Epaper_1in54". You can use a simple editor like nano for this:
+   8. The script configures stratux to work with the Oled display and without bluetooth or external sound. So if this is your configuration, you are fine. Otherwise you can configure the startup skript "image/stratux_radar.sh": Check that the bluetooth option is not specified (no "-b") and use the corresponding display option with "-d Oled_1in5",  "-d Epaper_3in7" or "-d Epaper_1in54". You can use a simple editor like nano for this:
 `nano image/stratux_radar.sh`
    9. Reboot stratux. If everything if installed correctly, the display software will automatically startup.
 
