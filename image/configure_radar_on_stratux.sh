@@ -35,6 +35,8 @@ su pi -c "cp /home/pi/stratux-radar-display/config/checklist.example_small.xml /
 sed -i 's/-b/ /g' /home/pi/stratux-radar-display/image/stratux_radar.sh
 # set IP to localhost in any case, if someone changes stratux ip
 sed -i 's/192.168.10.1/127.0.0.1/g' /home/pi/stratux-radar-display/image/stratux_radar.sh
+# set stratux flag for web app to disable several options
+sed -i 's/radarapp.py -t 10/radarapp.py -t 10 --stratux/g' /home/pi/stratux-radar-display/image/stratux_radar.sh
 # include autostart into crontab, so that radar starts on every boot
 # echo "@reboot /bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh" | crontab -u pi -
 # only works if crontab is empty, otherwise use
