@@ -5,14 +5,14 @@
 <form method="post">
 {{ radar_form.csrf_token }}
 
-{% if on_stratux == FALSE %}
+{% if on_stratux == False %}
     <h4>Stratux Radar-Display Configuration</h4>
 {% else %}
     <h4>Stratux Radar-Display Configuration On Stratux</h4>
 {% endif %}
 
 <br>
-{% if on_stratux == FALSE %}
+{% if on_stratux == False %}
     {{ render_field(radar_form.stratux_ip, form_type='horizontal') }}
     {{ render_field(radar_form.display, form_type='horizontal') }}
 {% endif %}
@@ -27,7 +27,7 @@
 {{ render_form_row([radar_form.compass, radar_form.compass_seq], col_map={'compass': 'col-md-3', 'compass_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.vspeed, radar_form.vspeed_seq], col_map={'vspeed': 'col-md-3', 'vspeed_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.flogs, radar_form.flogs_seq], col_map={'flogs': 'col-md-3', 'flogs_seq': 'no-label col-md-1'}) }}
-{% if on_stratux == FALSE %}
+{% if on_stratux == False %}
     {{ render_form_row([radar_form.cowarner, radar_form.cowarner_seq], col_map={'cowarner': 'col-md-3', 'cowarner_seq': 'no-label col-md-1'}) }}
 {% endif %}
 {{ render_form_row([radar_form.gps_dist, radar_form.gps_dist_seq], col_map={'gps_dist': 'col-md-3', 'gps_dist_seq': 'no-label col-md-1'}) }}
@@ -44,21 +44,21 @@
 
 
 <h5>Sound options</h5>
-{% if on_stratux == FALSE %}
+{% if on_stratux == False %}
     {{ render_form_row([radar_form.bluetooth, radar_form.speakdistance],
         col_map={'bluetooth': 'col-md-3', 'speakdistance': 'col-md-3'}) }}
 {% endif %}
 {{ render_form_row([radar_form.external_sound, radar_form.sound_volume, radar_form.all_mixers, radar_form.mixername],
     col_map={'external_sound': 'col-md-3', 'sound_volume': 'col-md-2', 'all_mixers': 'col-md-3', 'mixername': 'col-md-2'}) }}
 <h5>Special options</h5>
-{% if on_stratux == FALSE %}
+{% if on_stratux == False %}
     {{ render_form_row([radar_form.coindicate, radar_form.no_cowarner, radar_form.no_flighttime],
         col_map={'coindicate': 'col-md-3', 'no_cowarner': 'col-md-3', 'no_flighttime': 'col-md-3'}) }}
 {% else %}
     {{ render_form_row([radar_form.no_flighttime], col_map={ 'no_flighttime': 'col-md-3'}) }}
 {% endif %}
 
-{% if on_stratux == FALSE %}
+{% if on_stratux == False %}
     <h5>Ground sensor (LIDAR) options</h5>
     {{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.gearindicate],
         col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-3', 'gearindicate': 'col-md-3'}) }}
