@@ -132,6 +132,7 @@ su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-ra
 cd ../../../
 # run the configuration skript, that is also executed when setting up on target device
 unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
+unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_config_webapp.sh
 
 # mkdir -p out
 umount mnt/boot

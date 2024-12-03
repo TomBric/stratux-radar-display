@@ -463,10 +463,7 @@ def index():
             rlog.debug(f'Sending file: {arguments.FULL_CONFIG_DIR}/{radar_form.checklist_filename.data}')
             return send_from_directory(arguments.FULL_CONFIG_DIR, radar_form.checklist_filename.data,
                                        mimetype='application/xml', as_attachment=True)
-    if not stratux_mode:
-        return render_template('index.html',radar_form=radar_form)
-    else:
-        return render_template('index_on_stratux.html',radar_form=radar_form)
+    return render_template('index.html',radar_form=radar_form, on_stratux=stratux_mode)
 
 
 def validate_uploaded_xml(xml_string):

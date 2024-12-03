@@ -3,9 +3,7 @@
 # script configures libraries and settings necessary for stratux-radar web configuration
 # script to be run as root
 # called via configure_radar as sudo with target image mounted
-# usage /bin/bash mk_configure webapp.sh
-# exmple: /bin/bash mk_config_webapp.sh
-
+# example: /bin/bash mk_config_webapp.sh
 
 set -x
 apt update
