@@ -160,9 +160,9 @@ sudo -u pi git pull --rebase
 outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
 
-# Rename and zip oled version
-mv $IMGNAME ${outprefix}-oled"${outname}"
-zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-oled"${outname}"
+# Rename and zip webconfig version
+mv $IMGNAME ${outprefix}-webconfig"${outname}"
+zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-webconfig"${outname}"
 
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
