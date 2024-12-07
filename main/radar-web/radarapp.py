@@ -54,7 +54,7 @@ from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRa
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
-RADAR_WEB_VERSION = "0.5"
+RADAR_WEB_VERSION = "1.0"
 START_RADAR_FILE = "../../image/stratux_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
