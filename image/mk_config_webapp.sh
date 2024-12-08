@@ -8,7 +8,7 @@
 
 set -x
 
-ON_STRATUX = false
+ON_STRATUX=false
 
 while getopts ":s" opt; do
   case $opt in
