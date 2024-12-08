@@ -21,7 +21,7 @@ touch /var/lib/systemd/linger/pi
 su pi -c "mkdir -p /home/pi/.config/systemd/user/"
 su pi -c "cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service"
 # create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
-su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
+su pi -c "mkdir -p /home/pi/.config/systemd/user/default.target.wants"
 su pi -c "ln -f -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
 
 # change log level of rtkit, otherwise this fills journal with tons of useless info
