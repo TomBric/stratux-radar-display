@@ -71,7 +71,7 @@ Find below a photo of the current supported displays
 | DC | 22 | 
 | RST | 11 |
 | BUSY | 18 |
-| PWR | 1 |   * e-Driver-Hat Rev. 2.3 only !!! * |
+| PWR | 1 |   * e-Driver-Hat Rev. 2.3 only !!! optionally PIN2 * |
 
 Important remark for e-Paper Driver Hat Waveshare 13512 Rev. 2.3:  Waveshare introduced a 9-cable connection since Rev. 2.3. The additional cable PWR (red) needs to be connected to 3.3 V. 
 So connect it to PIN#1 on the Raspberry GPIO.
