@@ -5,6 +5,7 @@
 # called via configure_radar as sudo with target image mounted
 # run with option -s to configure webapp on stratux (uses port 81 instead of 80)
 # example: /bin/bash mk_config_webapp.sh
+#          /bin/bash mk_config_webapp.sh -s
 
 set -x
 

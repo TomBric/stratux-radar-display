@@ -11,7 +11,7 @@ apt install git python3-pip -y
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy python3-pygame -y
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
-su pi -c "/bin/bash "$(dirname "$0")"/mk_config_webapp.sh --stratux"
+su pi -c "/bin/bash "$(dirname "$0")"/mk_config_webapp.sh -s"
 
 # check to get sound running on stratux
 # this is the same effect as loginctl enable-linger pi
@@ -30,7 +30,7 @@ sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.
 # ---------------
 
 # copy simple checklist once, can be changed later
-su pi -c "cp "$(dirname "$0")"/config/checklist.example_small.xml "$(dirname "$0")"/config/checklist.xml"
+su pi -c "cp "$(dirname "$0")"/../config/checklist.example_small.xml "$(dirname "$0")"/../config/checklist.xml"
 
 # disable bluetooth in any case, it is not working directly on Stratux
 sed -i 's/-b/ /g' "$(dirname "$0")"/stratux_radar.sh
