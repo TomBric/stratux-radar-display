@@ -11,7 +11,7 @@ apt install git python3-pip -y
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy python3-pygame -y
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
-su pi -c "/bin/bash "$(dirname "$0")"/mk_config_webapp.sh"
+su pi -c "/bin/bash "$(dirname "$0")"/mk_config_webapp.sh --stratux"
 
 # check to get sound running on stratux
 # this is the same effect as loginctl enable-linger pi
