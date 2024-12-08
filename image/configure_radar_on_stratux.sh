@@ -30,7 +30,7 @@ sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.
 # ---------------
 
 # copy simple checklist once, can be changed later
-su pi -c "cp \"$(dirname "$0")/../config/checklist.example_small.xml\" \"$(dirname "$0")/../config/checklist.xml\""
+su pi -c 'cp "$(dirname "$0")"/../config/checklist.example_small.xml "$(dirname "$0")"/../config/checklist.xml\'
 
 # disable bluetooth in any case, it is not working directly on Stratux
 sed -i 's/-b/ /g' "$(dirname "$0")"/stratux_radar.sh
