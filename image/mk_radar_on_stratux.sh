@@ -54,9 +54,9 @@ done
 
 echo "Building stratux image for branch '$BRANCH' and display '$DISPLAY_NAME'"
 
-ZIPNAME="stratux-v1.6r1-eu031-60df05a0.img.zip"
-BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu031/${ZIPNAME}"
-outprefix="stratux-eu31-with-${DISPLAY_NAME}"
+ZIPNAME="stratux-v1.6r1-eu032-ff1f01dc.img.zip"
+BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu032/${ZIPNAME}"
+outprefix="stratux-eu32-radar-webconfig"
 IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
