@@ -7,7 +7,7 @@
 # example: /bin/bash mk_config_webapp.sh
 #          /bin/bash mk_config_webapp.sh -s
 
-set -x
+# set -x
 
 ON_STRATUX=false
 
@@ -36,11 +36,11 @@ pip3 install bootstrap-flask flask-wtf werkzeug --break-system-packages
 # generate reverse proxy config
 unlink /etc/nginx/sites-enabled/default
 cp radar_reverse.conf /etc/nginx/sites-available/
-if [ "ON_STRATUX" = true ]; then
+if [ "$ON_STRATUX" = true ]; then
   # change port 80 to 81 for nginx, since stratux already offers web on 80
-  sed -i 's/listen 80/listen 81/g' /etc/nginx/sites-available/
+  sed -i 's/listen 80/listen 81/g' /etc/nginx/sites-available/radar_reverse.conf
 fi
-ln -s /etc/nginx/sites-available/radar_reverse.conf /etc/nginx/sites-enabled/
+ln -f /etc/nginx/sites-available/radar_reverse.conf /etc/nginx/sites-enabled/
 # restart to read new configuration
 systemctl restart nginx
 
