@@ -34,7 +34,7 @@ apt install nginx -y
 apt install python3-psutil
 pip3 install bootstrap-flask flask-wtf werkzeug --break-system-packages
 # generate reverse proxy config
-unlink /etc/nginx/sites-enabled/default
+unlink /etc/nginx/sites-enabled/default || true
 cp radar_reverse.conf /etc/nginx/sites-available/
 if [ "$ON_STRATUX" = true ]; then
   # change port 80 to 81 for nginx, since stratux already offers web on 80
