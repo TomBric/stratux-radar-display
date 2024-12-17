@@ -84,7 +84,9 @@ touch /var/lib/systemd/linger/pi
 
 # install and start service to start radar
 su pi -c "mkdir -p /home/pi/.config/systemd/user/"
-su pi -c "cp \"$(dirname \"$0\")/systemctl-autostart-radar.service\" /home/pi/.config/systemd/user/autostart-radar.service"
+cp "$(dirname "$0")"/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
+chown pi /home/pi/.config/systemd/user/autostart-radar.service ; chgrp pi /home/pi/.config/systemd/user/autostart-radar.service
+
 # create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
 su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
 su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
@@ -93,6 +95,7 @@ su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.
 sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
 
 # copy simple checklist once, can be changed later
-su pi -c "cp \"$(dirname \""$0"\")/../config/checklist.example_small.xml\" \"$(dirname \""$0"\")/../config/checklist.xml\""
+cp "$(dirname "$0")"/../config/checklist.example_small.xml\" "$(dirname "$0")"/../config/checklist.xml
+chown pi "$(dirname "$0")"/../config/checklist.xml ; chgrp pi "$(dirname "$0")"/../config/checklist.xml
 
 echo "Radar configuration finished. Reboot to start"
