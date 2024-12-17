@@ -95,7 +95,7 @@ su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.
 sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
 
 # copy simple checklist once, can be changed later
-cp "$(dirname "$0")"/../config/checklist.example_small.xml\" "$(dirname "$0")"/../config/checklist.xml
-chown pi "$(dirname "$0")"/../config/checklist.xml ; chgrp pi "$(dirname "$0")"/../config/checklist.xml
+cp "$(dirname "$0")"/../config/checklist.example_small.xml "$(dirname "$0")"/../config/checklist.xml
+chown pi "$(dirname "$0")"/../config/checklist.xml; chgrp pi "$(dirname "$0")"/../config/checklist.xml
 
 echo "Radar configuration finished. Reboot to start"

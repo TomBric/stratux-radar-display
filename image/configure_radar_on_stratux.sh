@@ -31,7 +31,7 @@ sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.
 # ---------------
 
 # copy simple checklist once, can be changed later
-cp "$(dirname "$0")"/../config/checklist.example_small.xml\" "$(dirname "$0")"/../config/checklist.xml
+cp "$(dirname "$0")"/../config/checklist.example_small.xml "$(dirname "$0")"/../config/checklist.xml
 chown pi "$(dirname "$0")"/../config/checklist.xml ; chgrp pi "$(dirname "$0")"/../config/checklist.xml
 
 
