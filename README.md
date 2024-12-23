@@ -1,8 +1,8 @@
 # Software installation instructions
 
-## Installation on dedicated Rasperry Pi - recommended for all features
+### Installation on dedicated Rasperry Pi - recommended for all features
 
-## Installation on stratux
+
 ### Installation on a standard stratux device (for stratux versions eu027 or newer!)
    stratux-radar-display can run also directly on your stratux device. You can find an example of a case with everything installed in the [wiki](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display)). Connect the displays to the GPIO pins of the Stratux. 
    Installation is only for expert users! To install the software perform the following steps:
@@ -13,7 +13,6 @@
    3. Reboot and log on to your Stratux as user pi, directory /home/pi
 ```
 sudo apt update -y
-
 sudo apt install git -y
 git clone https://github.com/TomBric/stratux-radar-display.git
 sudo /bin/bash stratux-radar-display/image/configure_radar_on_stratux.sh
