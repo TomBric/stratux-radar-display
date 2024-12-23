@@ -12,12 +12,17 @@
    2. Enable a writeable persistent filesystem in the settings tab by setting "Persistent Logging". 
    3. Reboot and log on to your Stratux as user pi, directory /home/pi
 ```
+sudo systemctl start systemd-timesyncd; sleep 2; sudo systemctl stop systemd-timesyncd
 sudo apt update -y
 sudo apt install git -y
 git clone https://github.com/TomBric/stratux-radar-display.git
 sudo /bin/bash stratux-radar-display/image/configure_radar_on_stratux.sh
+sudo reboot
 ```
+This will take some time to finish.
 
+  4. After stratux has rebooted, connect your device (PC, tablet or mobile) to the stratux network.
+  5. Check that you can connect to your stratux Web-Interface by going to (http://127.0.0.1)
 
 
 
