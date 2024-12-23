@@ -21,11 +21,11 @@ sudo reboot
 ```
 This will take some time to finish.
 
-  4. After stratux has rebooted, connect your device (PC, tablet or mobile) to the stratux network.
-  5. Check that you can connect to your stratux Web-Interface by opening http://127.0.0.1 in your browser
-  6. Open the radar configuration web interface opening http://127.0.0.1:81 in your browser
-   7.   Configure stratux-radar to your needs (select display and other features)
-8.   Press "save and reboot"
+  4. After stratux has rebooted, connect your device (PC, tablet or mobile) to the "stratux" network.
+  5. Check that you can connect to your stratux web interface by opening http://192.168.10.1 in your browser
+  6. Open the radar configuration web interface opening http://192.168.10.1:81 in your browser (do not forget the ":81")
+7   Configure stratux-radar to your needs (select display and other features)
+8.   Press "save and reboot radar"
 
 
 
