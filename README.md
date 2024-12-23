@@ -23,9 +23,12 @@ This will take some time to finish.
 
   4. After stratux has rebooted, connect your device (PC, tablet or mobile) to the "stratux" network.
   5. Check that you can connect to your stratux web interface by opening http://192.168.10.1 in your browser
-  6. Open the radar configuration web interface opening http://192.168.10.1:81 in your browser (do not forget the ":81")
-7.   Configure stratux-radar to your needs (select display and other features)
-8.   Press "save and reboot radar"
+  6. Open the radar configuration web interface opening http://192.168.10.1:81 in your browser. Do not forget the ":81", the configuration server is listening on port 81. Per default the configuration web server is active for 10 minutes after reboot.
+     
+     ![Screenshot 2024-12-23 182240](https://github.com/user-attachments/assets/0810e530-ba83-4d67-8286-aff62cd88f26)
+
+8.   Configure stratux-radar to your needs (select display and other features)
+9.   Press "save and reboot radar"
 
 
 
