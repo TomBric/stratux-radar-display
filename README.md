@@ -1,3 +1,28 @@
+# Software installation instructions
+
+## Installation on dedicated Rasperry Pi - recommended for all features
+
+## Installation on stratux
+### Installation on a standard stratux device (for stratux versions eu027 or newer!)
+   stratux-radar-display can run also directly on your stratux device. You can find an example of a case with everything installed in the [wiki](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display)). Connect the displays to the GPIO pins of the Stratux. 
+   Installation is only for expert users! To install the software perform the following steps:
+   
+   1. Connect your stratux to a network, e.g. by integrating into your WLAN: go to "Settings" and add your local wifi network.
+   This will connect your stratux to your local wlan. Alternatively connect Stratux via network cable.
+   2. Enable a writeable persistent filesystem in the settings tab by setting "Persistent Logging". 
+   3. Reboot and log on to your Stratux as user pi, directory /home/pi
+```
+sudo apt update -y
+
+sudo apt install git -y
+git clone https://github.com/TomBric/stratux-radar-display.git
+sudo /bin/bash stratux-radar-display/image/configure_radar_on_stratux.sh
+```
+
+
+
+
+
 # stratux-radar-display
 Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W). Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
 
