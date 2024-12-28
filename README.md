@@ -1,57 +1,27 @@
-# Software installation instructions
-
-### Installation on dedicated Rasperry Pi - recommended for all features
-
-
-### Installation on a standard stratux device (for stratux versions eu027 or newer!)
-   stratux-radar-display can run also directly on your stratux device. You can find an example of a case with everything installed in the [wiki](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display)). Connect the displays to the GPIO pins of the Stratux. 
-   Installation is only for expert users! To install the software perform the following steps:
-   
-   1. Connect your stratux to a network, e.g. by integrating into your WLAN: go to "Settings" and add your local wifi network.
-   This will connect your stratux to your local wlan. Alternatively connect Stratux via network cable.
-   2. Enable a writeable persistent filesystem in the settings tab by setting "Persistent Logging". 
-   3. Reboot and log on to your Stratux as user pi, directory /home/pi
-```
-sudo systemctl start systemd-timesyncd; sleep 2; sudo systemctl stop systemd-timesyncd
-sudo apt update -y
-sudo apt install git -y
-git clone https://github.com/TomBric/stratux-radar-display.git
-sudo /bin/bash stratux-radar-display/image/configure_radar_on_stratux.sh
-sudo reboot
-```
-This will take some time to finish.
-
-  4. After stratux has rebooted, connect your device (PC, tablet or mobile) to the "stratux" network.
-  5. Check that you can connect to your stratux web interface by opening http://192.168.10.1 in your browser
-  6. Open the radar configuration web interface opening http://192.168.10.1:81 in your browser. Do not forget the ":81", the configuration server is listening on port 81. Per default the configuration web server is active for 10 minutes after reboot.
-     
-     ![Screenshot 2024-12-23 182240](https://github.com/user-attachments/assets/0810e530-ba83-4d67-8286-aff62cd88f26)
-
-8.   Configure stratux-radar to your needs (select display and other features)
-9.   Press "save and reboot radar"
-
-
 
 # stratux-radar-display
-Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W). Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
+Implementation of a Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W) or directly with the display attached to your stratux.
+Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, an automatic flight-time measurement, a g-meter, an artificial horizon, a compass (based on GPS), a VSI display and other features are also implemented.
 
-- update in version 1.4: external sound connection is now supported by using a USB sound card (approx. 4 Euro). With that you can connect your display to your intercom. This external sound output is also functioning on the stratux only, without an additional Zero.
-- update in version 1.5: the display now also supports an automatic logging of your flight times. Flight time is started when your GPS speed is 5 seconds more than 30 kts and stopped if you are 5 seconds below 10 kts. When you stopped the airplane (below 5 kts) the display will automatically show the 8 latest flights. This can be disabled with the option "-nf". You can also switch via pressing middle button ("Mode") several times to the flight display mode. 
-- update in version 1.6: an additional epaper display is now supported (1.54 epaper Waveshare module 12955 or 12561+hat). This is a good option for the oled display. Perfect visibility in sunlight, but slower than the oled. Can be used in 2 1/4 instrument holes.
-- update in version 1.7: optional CO sensor is supported (see wiki)
-- update in version 1.8: integration of distance sensor and calculation of start/landing distances
-- update in version 1.9: adding mode selection parameter and start/landing distance calculation with ultrasonic sensor
-- update in version 2.0: checklist feature added, code rework
-- update in version 2.03: changed base to new operating system bookworm, spoken groundwarnings implemented, changed to Lidar ground sensor
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
 - Epaper Display 3.7 inch (waveshare)
 - Epaper Display 1.54 inch (waveshare)
 
+The best user experience is with the epaper-display. They are perfectly readable even in bright cockpits in the sun
+
 | 3.7 inch Epaper for 80 mm instrument hole      |      1.54 inch Epaper for 57 mm instrument hole | Oled for 57 mm instrument hole |
 |---------------------------------|----------------------------|----------------|
 | ![](https://github.com/TomBric/stratux-radar-display/blob/main/.github/images/All-in-one%20Epaper%201.jpg) | ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/1.54-front-ahrs.jpg) |  ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/All-in-one%20OLED%205.jpg) |
+
+
+
+- [Hardware and Connections]
+- [Software Installation](https://github.com/TomBric/stratux-radar-display/wiki/Installation)
+
+
+
 
 More displays can be integrated.
 You can find instructions how to build the full instruments in the wiki. The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. Instructions e.g. how to build an [all-in one 2 1/4 Oled case](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display) "wiki 2 1/4"), or [all-in-one 3 1/8 Epaper instrument](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-for-80-mm-instrument-hole-with-Epaper-display-and-Bluetooth "wiki 3 1/8"), or [Epaper 3 1/8 display only](https://github.com/TomBric/stratux-radar-display/wiki/Epaper-Display-for-80-mm-instrument-hole) can be found in the wiki.
@@ -79,21 +49,9 @@ Find below a photo of the current supported displays
 | ![1.54in1](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_radar.jpg) | ![1.54in2](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54.jpg) | ![1.54in3](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_gmeter.jpg) | ![1.54in4](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_logs.jpg) |
 
    
- - Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters LM2596. Then you can use the aircraft power supply (up to 40V). Calibrate the LM2596 at home for a power output at 5 V e.g. using an old laptop power supply. LM2596 also work well for the stratux itself. If you encounter problems with radio noise, please ensure that the power cable to the display is twisted and if necessary use a ferrit-core at the power connection.  
+ - Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters XL4015. Then you can use the aircraft power supply (up to 40V). Calibrate the XL4015 at home for a power output at 5 V e.g. using an old laptop power supply. XL4015 also work well for the stratux itself. If you encounter problems with radio noise, please ensure that the power cable to the display is twisted and if necessary use a ferrit-core at the power connection.  
    
- # Hardware connection of the OLED 1.5 inch display
  
-| Connection  | PIN# on Raspberry  | Cable color |
-|:-----------:|:------------------:|:-----------:|
-| VCC | 17 | red |
-| GND | 20 | black |
-| DIN/MOSI | 19 | blue |
-| CLK/SCK | 23| yellow  |
-| CS/CE0 | 24 | orange |
-| DC | 18 | green |
-| RST | 22 | white |
-
-# Hardware connection of the Epaper 3.7 inch or 1.54 inch display 
  
 | Connection  | PIN# on Raspberry  | Remark | 
 |:-----------:|:------------------:|:-----:|
@@ -113,7 +71,7 @@ So connect it to PIN#1 on the Raspberry GPIO.
 Remark: If you have a barometric sensor or ahrs connected you may have conflict with GPIO Pin 11. 
 You can also use PIN 16 (GPIO 23) for the RST line.
 
-To do that please modify in /home/pi/stratux-radar-display/main/displays/Epaper_3in7/epdconfig.py line 38/39:
+To do that please modify in /home/pi/stratux-radar-display/main/displays/Epaper_3in7/epdconfig.py line 43/44:
 ```
    # RST_PIN         = 17    # if directly as hat
    RST_PIN = 23  # for cable mounted in stratux on different GPIO 23, which is PIN 16
