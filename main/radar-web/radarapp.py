@@ -495,7 +495,7 @@ def checklist():
             rlog.debug(f'xml temp target destination saved to {xml_file_tmp}')
             cf.upload_file.data.save(os.path.join(arguments.FULL_CONFIG_DIR, xml_file_tmp))
             # FileField is somehow buggy, so no read before the save, thus we save to .tmp
-            xml_string = cf.upload_file.data.read()
+            xml_string = os.read(xml_file_tmp)
             error = validate_uploaded_xml(xml_string)
             if error is not None:
                 rlog.debug(f'Error in xml, removing temp file {xml_file_tmp}')
