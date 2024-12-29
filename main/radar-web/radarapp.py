@@ -60,6 +60,7 @@ RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
 MAX_SEQUENCE = 99   # maximum value accepted as sequence of modes
+MAX_CHECKLIST_SIZE = 256 * 1024  # max size of checklist, set to 256K
 
 stratux_mode = False  # if this mode is True (--stratux) start configuration for radar directly on stratux
 app = Flask(__name__)
@@ -70,8 +71,9 @@ app.config['BOOTSTRAP_SERVE_LOCAL'] = True      # use local instances of css etc
 app.config['BOOTSTRAP_USE_MINIFIED'] = True
 app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 app.config['BOOTSTRAP_BTN_SIZE'] = 'md'
-# define max download file, is used for checklist, maximum length set to 1 MB
-app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
+# define max download file, is used for checklist, maximum length set to 256 K
+MAX_CHECKLIST_SIZE = 128 * 1024
+app.config['MAX_CONTENT_LENGTH'] = MAX_CHECKLIST_SIZE
 # app.config['UPLOAD_FOLDER'] =
 
 bootstrap = Bootstrap5(app)
@@ -495,7 +497,7 @@ def checklist():
             rlog.debug(f'xml temp target destination saved to {xml_file_tmp}')
             cf.upload_file.data.save(os.path.join(arguments.FULL_CONFIG_DIR, xml_file_tmp))
             # FileField is somehow buggy, so no read before the save, thus we save to .tmp
-            xml_string = os.read(xml_file_tmp)
+            xml_string = os.read(xml_file_tmp, MAX_CHECKLIST_SIZE)
             error = validate_uploaded_xml(xml_string)
             if error is not None:
                 rlog.debug(f'Error in xml, removing temp file {xml_file_tmp}')
