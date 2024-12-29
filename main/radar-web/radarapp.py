@@ -498,7 +498,7 @@ def checklist():
                 cf.upload_file.data.save(xml_file_tmp)
                 # FileField is somehow buggy, so no read before the save, thus we save to .tmp
                 with open(xml_file_tmp, 'r') as cl_file:
-                    xml_string = cl_file.read(xml_file_tmp)
+                    xml_string = cl_file.read()
                 error = validate_uploaded_xml(xml_string)
                 if error is not None:
                     rlog.debug(f'Error {error} in xml, removing temp file {xml_file_tmp}')
