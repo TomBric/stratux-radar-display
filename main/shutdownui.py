@@ -93,7 +93,6 @@ def draw_shutdown(display_control):
         display_control.display()
     if clear_before_shutoff:   # this is signal for display driver to initiate shutdown/reboot
         display_control.cleanup()
-
         if shutdown_mode == 0:   # shutdown display and stratux
             rlog.debug("Posting shutdown.")
             try:
@@ -110,7 +109,6 @@ def draw_shutdown(display_control):
             except requests.exceptions.RequestException as e:
                 rlog.debug("Posting shutdown exception: ", e)
             os.popen("sudo shutdown --reboot now").read()
-
         clear_before_shutoff = False
         return True
     else:
