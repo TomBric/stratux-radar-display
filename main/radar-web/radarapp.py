@@ -493,7 +493,6 @@ def checklist():
         if cf.upload_file.data:
             xml_file = os.path.join(arguments.FULL_CONFIG_DIR, secure_filename(cf.filename.data))
             xml_file_tmp = xml_file + ".tmp"
-            rlog.debug(f'xml temp target destination saved to {xml_file_tmp}')
             try:
                 cf.upload_file.data.save(xml_file_tmp)
                 # FileField is somehow buggy, so no read before the save, thus we save to .tmp
@@ -506,7 +505,7 @@ def checklist():
                     flash(Markup(error), 'error')
                     return redirect(url_for('checklist'))
                 # parsing successful, now save
-                rlog.debug(f'xml target destination is {xml_file}')
+                rlog.debug(f'Checklist - storing checklist on target destination {xml_file}')
                 os.rename(xml_file_tmp, xml_file)
                 flash(Markup(f'Checklist successully uploaded to {secure_filename(cf.filename.data)}'), 'success')
                 return redirect(url_for('checklist'))
