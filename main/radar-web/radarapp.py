@@ -72,7 +72,6 @@ app.config['BOOTSTRAP_USE_MINIFIED'] = True
 app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 app.config['BOOTSTRAP_BTN_SIZE'] = 'md'
 # define max download file, is used for checklist, maximum length set to 256 K
-MAX_CHECKLIST_SIZE = 128 * 1024
 app.config['MAX_CONTENT_LENGTH'] = MAX_CHECKLIST_SIZE
 # app.config['UPLOAD_FOLDER'] =
 
@@ -495,20 +494,32 @@ def checklist():
             xml_file = os.path.join(arguments.FULL_CONFIG_DIR, secure_filename(cf.filename.data))
             xml_file_tmp = xml_file + ".tmp"
             rlog.debug(f'xml temp target destination saved to {xml_file_tmp}')
-            cf.upload_file.data.save(os.path.join(arguments.FULL_CONFIG_DIR, xml_file_tmp))
-            # FileField is somehow buggy, so no read before the save, thus we save to .tmp
-            xml_string = os.read(xml_file_tmp, MAX_CHECKLIST_SIZE)
-            error = validate_uploaded_xml(xml_string)
-            if error is not None:
-                rlog.debug(f'Error in xml, removing temp file {xml_file_tmp}')
-                os.remove(xml_file_tmp)
-                flash(Markup(error), 'error')
+            try:
+                cf.upload_file.data.save(xml_file_tmp)
+                # FileField is somehow buggy, so no read before the save, thus we save to .tmp
+                with open(xml_file_tmp, 'r') as cl_file:
+                    xml_string = cl_file.read(xml_file_tmp)
+                error = validate_uploaded_xml(xml_string)
+                if error is not None:
+                    rlog.debug(f'Error {error} in xml, removing temp file {xml_file_tmp}')
+                    os.remove(xml_file_tmp)
+                    flash(Markup(error), 'error')
+                    return redirect(url_for('checklist'))
+                # parsing successful, now save
+                rlog.debug(f'xml target destination is {xml_file}')
+                os.rename(xml_file_tmp, xml_file)
+                flash(Markup(f'Checklist successully uploaded to {secure_filename(cf.filename.data)}'), 'success')
                 return redirect(url_for('checklist'))
-            # parsing successful, now save
-            rlog.debug(f'xml target destination is {xml_file}')
-            os.rename(xml_file_tmp, xml_file)
-            flash(Markup(f'Checklist successully uploaded to {secure_filename(xml_file)}'), 'success')
-            return redirect(url_for('checklist'))
+            except FileNotFoundError:
+                flash(Markup(f'File not found!'), 'error')
+                return redirect(url_for('checklist'))
+            except PermissionError:
+                flash(Markup(f'Permission Error!'), 'error')
+                return redirect(url_for('checklist'))
+            except Exception as e:
+                # Allgemeine Ausnahmebehandlung
+                flash(Markup(f'File Error: {e} '), 'error')
+                return redirect(url_for('checklist'))
         else:
             flash(Markup(f'No file provided!'), 'error')
             return redirect(url_for('checklist'))
