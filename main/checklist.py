@@ -55,7 +55,7 @@ def init(checklist_name):
 
     rlog = logging.getLogger('stratux-radar-log')
     checklist_xml = str(Path(arguments.FULL_CONFIG_DIR).resolve().joinpath(checklist_name))
-    rlog.debug("Checklist - Trying to open checklist '$0'".format(checklist_xml))
+    rlog.debug(f"Checklist - Trying to open checklist '{checklist_xml}'")
     g_iterator = [0, 0]  # start in checklist 0 at item 0
     try:
         with open(checklist_xml, "r") as f:

@@ -490,15 +490,21 @@ def checklist():
         if cf.exit.data is True:
             return redirect(url_for('index'))
         if cf.upload_file.data:
+            xml_file = os.path.join(arguments.FULL_CONFIG_DIR, secure_filename(cf.filename.data))
+            xml_file_tmp = xml_file + ".tmp"
+            rlog.debug(f'xml temp target destination saved to {xml_file_tmp}')
+            cf.upload_file.data.save(os.path.join(arguments.FULL_CONFIG_DIR, xml_file_tmp))
+            # FileField is somehow buggy, so no read before the save, thus we save to .tmp
             xml_string = cf.upload_file.data.read()
             error = validate_uploaded_xml(xml_string)
             if error is not None:
+                rlog.debug(f'Error in xml, removing temp file {xml_file_tmp}')
+                os.remove(xml_file_tmp)
                 flash(Markup(error), 'error')
                 return redirect(url_for('checklist'))
             # parsing successful, now save
-            xml_file = secure_filename(cf.filename.data)
             rlog.debug(f'xml target destination is {xml_file}')
-            cf.upload_file.data.save(os.path.join(arguments.FULL_CONFIG_DIR, xml_file))
+            os.rename(xml_file_tmp, xml_file)
             flash(Markup(f'Checklist successully uploaded to {secure_filename(xml_file)}'), 'success')
             return redirect(url_for('checklist'))
         else:
