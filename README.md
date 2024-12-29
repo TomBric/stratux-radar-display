@@ -1,89 +1,33 @@
-# stratux-radar-display
-Implementation of a standalone Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W). Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, a g-meter, an artificial horizon, a compass (based on GPS) and a VSI display are also implemented.
 
-- update in version 1.4: external sound connection is now supported by using a USB sound card (approx. 4 Euro). With that you can connect your display to your intercom. This external sound output is also functioning on the stratux only, without an additional Zero.
-- update in version 1.5: the display now also supports an automatic logging of your flight times. Flight time is started when your GPS speed is 5 seconds more than 30 kts and stopped if you are 5 seconds below 10 kts. When you stopped the airplane (below 5 kts) the display will automatically show the 8 latest flights. This can be disabled with the option "-nf". You can also switch via pressing middle button ("Mode") several times to the flight display mode. 
-- update in version 1.6: an additional epaper display is now supported (1.54 epaper Waveshare module 12955 or 12561+hat). This is a good option for the oled display. Perfect visibility in sunlight, but slower than the oled. Can be used in 2 1/4 instrument holes.
-- update in version 1.7: optional CO sensor is supported (see wiki)
-- update in version 1.8: integration of distance sensor and calculation of start/landing distances
-- update in version 1.9: adding mode selection parameter and start/landing distance calculation with ultrasonic sensor
-- update in version 2.0: checklist feature added, code rework
-- update in version 2.03: changed base to new operating system bookworm, spoken groundwarnings implemented, changed to Lidar ground sensor
+# stratux-radar-display
+Implementation of a Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W) or directly with the display attached to your stratux.
+Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, an automatic flight-time measurement, a g-meter, an artificial horizon, a compass (based on GPS), a VSI display and other features are also implemented.
+
 
 Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
 - Epaper Display 3.7 inch (waveshare)
 - Epaper Display 1.54 inch (waveshare)
 
+The best user experience is with the epaper-display. They are perfectly readable even in bright cockpits in the sun
+
 | 3.7 inch Epaper for 80 mm instrument hole      |      1.54 inch Epaper for 57 mm instrument hole | Oled for 57 mm instrument hole |
 |---------------------------------|----------------------------|----------------|
 | ![](https://github.com/TomBric/stratux-radar-display/blob/main/.github/images/All-in-one%20Epaper%201.jpg) | ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/1.54-front-ahrs.jpg) |  ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/All-in-one%20OLED%205.jpg) |
 
-More displays can be integrated.
-You can find instructions how to build the full instruments in the wiki. The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. Instructions e.g. how to build an [all-in one 2 1/4 Oled case](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display) "wiki 2 1/4"), or [all-in-one 3 1/8 Epaper instrument](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-for-80-mm-instrument-hole-with-Epaper-display-and-Bluetooth "wiki 3 1/8"), or [Epaper 3 1/8 display only](https://github.com/TomBric/stratux-radar-display/wiki/Epaper-Display-for-80-mm-instrument-hole) can be found in the wiki.
 
-Find below a photo of the current supported displays
-- the oled display is relatively small, but can be build into a 2 1/4" or larger instrument mounting hole
-- the epaper display is larger and has optimal readability in sunlight. As e-paper it has a slower update of approx. twice per second. For the radar display this update rate is appropriate
 
-![Display photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/StratuxRadar.jpg)
+- [Hardware and Wiring the displays](https://github.com/TomBric/stratux-radar-display/wiki/Hardware-and-wiring)
+- [Connecting pushbuttons for a user interface]
+- [Software Installation](https://github.com/TomBric/stratux-radar-display/wiki/Installation)
 
-## Hardware-List
-- Raspberry Hardware: Since the code is pure python, no special hardware is required. I recommend a current "raspbian standard desktop os" as operating system. Performance requirements are not so high, so I recommend a "Rasperry Zero or Zero 2 W 512MByte RAM". Normal Raspberry 3B or 4 are also possible. The Raspi Zero has the smallest form factor and best battery consumption. 
-- Waveshare 18381 3.7inch e-Paper Display + Waveshare Universal e-Paper Raw Panel Driver HAT 13512. Please make sure to switch the "Display Config" switch to A. "Interface Config" is to be switched to  0 (4-line SPI).
-(Alternatively Waveshare 18057 3.7inch e-Paper HAT: Directly mountable on the Raspi as a HAT, if you buy an Raspi Zero WH, but then you can't connect the buttons).
 
-![Epaper photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_3in7.jpg)
+You can find instructions how to build the full instruments in the wiki. 
+The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. Instructions e.g. how to build an [all-in one 2 1/4 Oled case](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display) "wiki 2 1/4"), or [all-in-one 3 1/8 Epaper instrument](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-for-80-mm-instrument-hole-with-Epaper-display-and-Bluetooth "wiki 3 1/8"), or [Epaper 3 1/8 display only](https://github.com/TomBric/stratux-radar-display/wiki/Epaper-Display-for-80-mm-instrument-hole) can be found in the wiki.
 
-- Oled-Display: Waveshare 14747, 128x128, General 1.5inch RGB OLED display Module
-   ![Oled photo](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Oled_1in5.jpg)
- 
- - Waveshare 12955 1.54inch epaper Display (hat is included) or waveshare 12561+hat 13512. 
- 
-| Radar | Stratux-Status | G-Meter | Flightlogs |  
-| :----:|:--------------:|:-------:|:----------:|
-| ![1.54in1](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_radar.jpg) | ![1.54in2](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54.jpg) | ![1.54in3](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_gmeter.jpg) | ![1.54in4](https://github.com/TomBric/stratux-radar-display/blob/main/no-code/images/Epaper_1in54_logs.jpg) |
-
+Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters XL4015. Then you can use the aircraft power supply (up to 40V). Calibrate the XL4015 at home for a power output at 5 V e.g. using an old laptop power supply. XL4015 also work well for the stratux itself. If you encounter problems with radio noise, please ensure that the power cable to the display is twisted and if necessary use a ferrit-core at the power connection.  
    
- - Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters LM2596. Then you can use the aircraft power supply (up to 40V). Calibrate the LM2596 at home for a power output at 5 V e.g. using an old laptop power supply. LM2596 also work well for the stratux itself. If you encounter problems with radio noise, please ensure that the power cable to the display is twisted and if necessary use a ferrit-core at the power connection.  
-   
- # Hardware connection of the OLED 1.5 inch display
- 
-| Connection  | PIN# on Raspberry  | Cable color |
-|:-----------:|:------------------:|:-----------:|
-| VCC | 17 | red |
-| GND | 20 | black |
-| DIN/MOSI | 19 | blue |
-| CLK/SCK | 23| yellow  |
-| CS/CE0 | 24 | orange |
-| DC | 18 | green |
-| RST | 22 | white |
 
-# Hardware connection of the Epaper 3.7 inch or 1.54 inch display 
- 
-| Connection  | PIN# on Raspberry  | Remark | 
-|:-----------:|:------------------:|:-----:|
-| VCC | 17 |
-| GND | 20 | 
-| DIN/MOSI | 19 |
-| CLK/SCK | 23|
-| CS/CE0 | 24 |
-| DC | 22 | 
-| RST | 11 |
-| BUSY | 18 |
-| PWR | 1 |   * e-Driver-Hat Rev. 2.3 only !!! * |
-
-Important remark for e-Paper Driver Hat Waveshare 13512 Rev. 2.3:  Waveshare introduced a 9-cable connection since Rev. 2.3. The additional cable PWR (red) needs to be connected to 3.3 V. 
-So connect it to PIN#1 on the Raspberry GPIO.
-
-Remark: If you have a barometric sensor or ahrs connected you may have conflict with GPIO Pin 11. 
-You can also use PIN 16 (GPIO 23) for the RST line.
-
-To do that please modify in /home/pi/stratux-radar-display/main/displays/Epaper_3in7/epdconfig.py line 38/39:
-```
-   # RST_PIN         = 17    # if directly as hat
-   RST_PIN = 23  # for cable mounted in stratux on different GPIO 23, which is PIN 16
-```
 
 # Hardware connection of the pushbuttons for the user interface
  
