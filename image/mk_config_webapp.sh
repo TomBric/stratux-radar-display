@@ -34,7 +34,7 @@ apt install nginx -y
 apt install python3-psutil
 pip cache purge
 # necessary to match new hashes
-pip3 install bootstrap-flask flask-wtf werkzeug --break-system-packages
+pip3 install bootstrap-flask flask-wtf werkzeug --break-system-packages --no-cache-dir
 # generate reverse proxy config
 rm -f /etc/nginx/sites-enabled/default || true
 cp "$(dirname "$0")"/radar_reverse.conf /etc/nginx/sites-available/
