@@ -818,6 +818,7 @@ def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value
         lastpoint = (x, y)
     # value_line 1
     y = math.floor(ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue))
+
     for x in range(int(xpos), int(xpos+xsize), 6):
         draw.line([(x, y), (x + 3, y)], fill="white", width=1)
     # value_line 2

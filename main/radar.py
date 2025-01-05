@@ -40,6 +40,8 @@ import websockets
 import logging
 import math
 import time
+
+import arguments
 import radarbluez
 import radarui
 import timerui
@@ -60,6 +62,7 @@ import grounddistance
 import radarmodes
 import simulation
 import checklist
+
 from datetime import datetime, timezone
 from pathlib import Path
 import sys
@@ -73,7 +76,7 @@ rlog = None  # radar specific logger
 #
 
 # constant definitions
-RADAR_VERSION = "2.05"
+RADAR_VERSION = "2.06"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -94,17 +97,12 @@ OPTICAL_ALIVE_BARS = 10
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
 
-# global variables
-DEFAULT_URL_HOST_BASE = "192.168.10.1"
-DEFAULT_MIXER = "Speaker"  # default mixer name to be used for sound output
 
-CONFIG_DIR = "config"
-CONFIG_FILE = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "stratux-radar.conf"))
-DEFAULT_CHECKLIST = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "checklist.xml"))
-SAVED_FLIGHTS = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "stratux-radar.flights"))
-SAVED_STATISTICS = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR, "stratux-radar.stat"))
+CONFIG_FILE = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.conf"))
+SAVED_FLIGHTS = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.flights"))
+SAVED_STATISTICS = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.stat"))
 
-url_host_base = DEFAULT_URL_HOST_BASE
+url_host_base = arguments.DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
 url_radar_ws = ""
 url_status_ws = ""
@@ -824,7 +822,7 @@ def main():
         rlog.debug("Main cancelled")
 
 
-def quit_gracefully(*arguments):
+def quit_gracefully(*argus):
     print("Keyboard interrupt or shutdown. Quitting ...")
     try:
         tasks = asyncio.all_tasks()
@@ -873,60 +871,7 @@ if __name__ == "__main__":
     shutdownui.clear_lingering_radar()
     # parse arguments for different configurations
     ap = argparse.ArgumentParser(description='Stratux radar display')
-    ap.add_argument("-d", "--device", required=True, help="Display device to use")
-    ap.add_argument("-b", "--bluetooth", required=False, help="Bluetooth speech warnings on", action='store_true',
-                    default=False)
-    ap.add_argument("-sd", "--speakdistance", required=False, help="Speech with distance", action='store_true',
-                    default=False)
-    ap.add_argument("-n", "--north", required=False, help="Ground mode: always display north up", action='store_true',
-                    default=False)
-    ap.add_argument("-t", "--timer", required=False, help="Start mode is timer", action='store_true', default=False)
-    ap.add_argument("-a", "--ahrs", required=False, help="Start mode is ahrs", action='store_true', default=False)
-    ap.add_argument("-x", "--status", required=False, help="Start mode is status", action='store_true', default=False)
-    ap.add_argument("-g", "--gmeter", required=False, help="Start mode is g-meter", action='store_true', default=False)
-    ap.add_argument("-o", "--compass", required=False, help="Start mode is compass", action='store_true', default=False)
-    ap.add_argument("-i", "--vsi", required=False, help="Start mode is vertical speed indicator", action='store_true',
-                    default=False)
-    ap.add_argument("-z", "--strx", required=False, help="Start mode is stratux-status", action='store_true',
-                    default=False)
-    ap.add_argument("-w", "--cowarner", required=False, help="Start mode is CO warner", action='store_true',
-                    default=False)
-    ap.add_argument("-sit", "--situation", required=False, help="Start mode situation display", action='store_true',
-                    default=False)
-    ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use",
-                    default=DEFAULT_CHECKLIST)
-    ap.add_argument("-stc", "--startchecklist", required=False, help="Start mode is checklist", action='store_true',
-                    default=False)
-    ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
-    ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
-                    default=0)
-    ap.add_argument("-r", "--registration", required=False, help="Display registration no (epaper only)",
-                    action="store_true", default=False)
-    ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (3.7 epaper only)",
-                    action="store_true", default=False)
-    ap.add_argument("-y", "--extsound", type=int, required=False, help="Ext sound on with volume [0-100]",
-                    default=0)
-    ap.add_argument("-nf", "--noflighttime", required=False, help="Suppress detection and display of flighttime",
-                    action="store_true", default=False)
-    ap.add_argument("-nc", "--nocowarner", required=False, help="Suppress activation of co-warner",
-                    action="store_true", default=False)
-    ap.add_argument("-ci", "--coindicate", required=False, help="Indicate co warning via GPIO16",
-                    action="store_true", default=False)
-    ap.add_argument("-gd", "--grounddistance", required=False, help="Activate ground distance sensor",
-                    action="store_true", default=False)
-    ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
-                    action="store_true", default=False)
-    ap.add_argument("-gi", "--gearindicate", required=False, help="Indicate gear warning",
-                    action="store_true", default=False)
-    ap.add_argument("-sim", "--simulation", required=False, help="Simulation mode for testing",
-                    action="store_true", default=False)
-    ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
-                    default=DEFAULT_MIXER)
-    ap.add_argument("-modes", "--displaymodes", required=False,
-                    help="Select display modes that you want to see ""R=radar T=timer A=ahrs D=display-status "
-                         "G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "
-                         "M=distance measurement L=checklist  Example: -modes RADCM", default="RTAGKVICMDSL")
-
+    arguments.add(ap)
     args = vars(ap.parse_args())
     # set up logging
     logging_init()
@@ -957,37 +902,16 @@ if __name__ == "__main__":
     gear_indication = args ['gearindicate']
     simulation_mode = args['simulation']
     xml_checklist = args['checklist']
-    if args['timer']:
-        global_mode = 2  # start_in_timer_mode
-    if args['ahrs']:
-        global_mode = 5  # start_in_ahrs mode
-    if args['status']:
-        global_mode = 7  # start in status mode
-    if args['gmeter']:
-        global_mode = 9  # start in g-meter mode
-    if args['compass']:
-        global_mode = 11  # start in compass mode
-    if args['vsi']:
-        global_mode = 13  # start in vsi mode
-    if args['strx']:
-        global_mode = 15  # start in stratux-status
-    if args['cowarner']:
-        global_mode = 19  # start in co-warner mode
-    if args['situation']:
-        global_mode = 21  # start in situation
-    if args['startchecklist']:
-        global_mode = 23  # start in checklist
     sound_mixer = args['mixer']
     radarmodes.parse_modes(args['displaymodes'])
-    if global_mode == 1:  # no mode override set, take first mode in mode_sequence
-        global_mode = radarmodes.first_mode_sequence()
+    global_mode = radarmodes.first_mode_sequence()
     global_config['display_tail'] = args['registration']  # display registration if set
     global_config['distance_warnings'] = args['speakdistance']  # display registration if set
     global_config['sound_volume'] = args['extsound']  # 0 if not enabled
     if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
         global_config['sound_volume'] = 50  # set to a medium value if strange number used
     # check config file, if extistent use config from there
-    url_host_base = args['connect']
+
     saved_config = statusui.read_config(CONFIG_FILE)
     if saved_config is not None:
         if 'stratux_ip' in saved_config:

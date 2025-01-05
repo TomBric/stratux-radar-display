@@ -9,7 +9,6 @@
 # Run with argument "-b dev" to get the dev branch from github, otherwise with main
 # Run with optional argument "-k v32" to create 32 bit based images for zero 1
 # Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
-# Run with optional argument "-w" to use bookworm images (either 32 bit or 64 bis)
 # call examples:
 #   sudo /bin/bash mk_stratux_display.sh
 #   sudo /bin/bash mk_stratux_display.sh -b dev
@@ -65,9 +64,8 @@ else
   outprefix="stratux-display"
 fi
 
-ZIPNAME="2024-07-04-raspios-bookworm-${IMAGE_VERSION}-lite.img.xz"
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2024-07-04/${ZIPNAME}"
-
+ZIPNAME="2024-11-19-raspios-bookworm-${IMAGE_VERSION}-lite.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2024-11-19/${ZIPNAME}"
 
 IMGNAME="${ZIPNAME%.*}"
 
@@ -132,7 +130,12 @@ su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-ra
 
 cd ../../../
 # run the configuration skript, that is also executed when setting up on target device
-unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
+if [ "$V32" = true ]; then
+  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH" -i pico2tts
+else
+  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
+fi
+unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_config_webapp.sh
 
 # mkdir -p out
 umount mnt/boot
@@ -160,32 +163,9 @@ sudo -u pi git pull --rebase
 outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
 
-# Rename and zip oled version
-mv $IMGNAME ${outprefix}-oled"${outname}"
-zip out/${outprefix}-oled"${outname}".zip ${outprefix}-oled"${outname}"
-
-
-# Now create epaper 3.7 version.
-mount -t ext4 -o offset=$partoffset ${outprefix}-oled"${outname}" mnt/ || die "root-mount failed"
-# save old command line to put it back to oled later
-sed -i 's/Epaper_3in7/TEMP_EP/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
-sed -i 's/Oled_1in5/Epaper_3in7 -r/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
-sed -i 's/TEMP_EP/Oled_1in5/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
-umount mnt
-mv ${outprefix}-oled"${outname}" ${outprefix}-epaper_3in7"${outname}"
-zip out/${outprefix}-epaper_3in7"${outname}".zip ${outprefix}-epaper_3in7"${outname}"
-
-# Now create epaper 1.54 version.
-mount -t ext4 -o offset=$partoffset ${outprefix}-epaper_3in7"${outname}" mnt/ || die "root-mount failed"
-# save old command line to put it back to oled later
-sed -i 's/Epaper_1in54/TEMP_EP/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
-sed -i 's/Epaper_3in7 -r/Epaper_1in54/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
-sed -i 's/TEMP_EP/Epaper_1in54/g' mnt/$DISPLAY_SRC/stratux-radar-display/image/stratux_radar.sh
-umount mnt
-mv ${outprefix}-epaper_3in7"${outname}" ${outprefix}-epaper_1in54"${outname}"
-zip out/${outprefix}-epaper_1in54"${outname}".zip ${outprefix}-epaper_1in54"${outname}"
-# remove last unzipped image
-rm ${outprefix}-epaper_1in54"${outname}"
+# Rename and zip webconfig version
+mv $IMGNAME ${outprefix}-webconfig"${outname}"
+zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-webconfig"${outname}"
 
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final images have been placed into $TMPDIR/out. Please install and test the images."

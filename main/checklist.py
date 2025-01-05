@@ -36,7 +36,8 @@ import logging
 import radarmodes
 import radarbuttons
 import xmltodict
-import json
+from pathlib import Path
+import arguments
 
 rlog = None  # radar specific logger
 # constants
@@ -47,12 +48,14 @@ g_iterator = [0, 0]   # current position of checklist [checklist number, item no
 g_checklist_changed = True
 
 
-def init(checklist_xml):
+def init(checklist_name):
     global rlog
     global g_iterator
     global g_checklist
 
     rlog = logging.getLogger('stratux-radar-log')
+    checklist_xml = str(Path(arguments.FULL_CONFIG_DIR).resolve().joinpath(checklist_name))
+    rlog.debug(f"Checklist - Trying to open checklist '{checklist_xml}'")
     g_iterator = [0, 0]  # start in checklist 0 at item 0
     try:
         with open(checklist_xml, "r") as f:
