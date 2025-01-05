@@ -99,6 +99,7 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 cp "$LOCAL_DIR"/stratux.conf.radar mnt/boot/stratux.conf
 
 # install git for cloning repo (if not already installed) and pip
+chroot mnt apt update
 chroot mnt apt install git python3-pip -y
 # enable persistent logging
 chroot mnt overlayctl disable
