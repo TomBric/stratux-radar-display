@@ -566,5 +566,5 @@ if __name__ == '__main__':
     rlog.debug(f"radar-web: sudo systemctl start nginx")
     os.system('sudo systemctl start nginx')  # just in case it has been stopped before
     rlog.debug(f"radar-web: starting flask app")
-    app.run(debug=flask_debug)
+    app.run(debug=False)
 
