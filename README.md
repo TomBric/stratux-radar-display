@@ -20,7 +20,6 @@ The best user experience is with the epaper-display. They are perfectly readable
 | ![](https://github.com/TomBric/stratux-radar-display/blob/main/.github/images/All-in-one%20Epaper%201.jpg) | ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/1.54-front-ahrs.jpg) |  ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/All-in-one%20OLED%205.jpg) |
 
 
-
 - [Hardware and Wiring the displays](https://github.com/TomBric/stratux-radar-display/wiki/Hardware-and-wiring)
 - [Connecting pushbuttons for a user interface](https://github.com/TomBric/stratux-radar-display/wiki/Connecting-pushbuttons-for-a-user-interface)
 - [Software Installation](https://github.com/TomBric/stratux-radar-display/wiki/Installation)

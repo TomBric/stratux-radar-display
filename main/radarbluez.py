@@ -62,7 +62,6 @@ sound_thread = None
 sound_card = None     # number of sound card, is initialized if external_sound_output is True
 audio_device = None   # name of audio device selected by mixer name
 
-
 def find_mixer(mixer_name):    # searches for an "Audio" mixer, independent whether it was selected
     found = False
     mix = None

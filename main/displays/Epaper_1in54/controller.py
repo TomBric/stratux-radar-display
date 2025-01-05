@@ -37,6 +37,7 @@ import math
 import time
 import datetime
 from pathlib import Path
+import logging
 
 # global constants
 VERYLARGE = 30    # timer
@@ -51,6 +52,7 @@ ARCPOSITION_EXCLUDE_FROM = 0
 ARCPOSITION_EXCLUDE_TO = 0
 # end definitions
 
+rlog = None
 # global device properties
 sizex = 0
 sizey = 0
@@ -145,6 +147,7 @@ def init(fullcircle=False):
     global cdraw
     global draw
 
+    rlog = logging.getLogger('stratux-radar-log')
     device = epd1in54_V2.EPD()
     device.init(0)
     device.Clear(0xFF)   # necessary to overwrite everything
@@ -156,6 +159,7 @@ def init(fullcircle=False):
     sizey = device.width
     zerox = sizex / 2
     zeroy = sizey / 2
+    rlog.debug(f'Epaper_1in54 selected: sizex={sizex} sizey={sizey} zero=({zerox}, {zeroy})')
     max_pixel = sizey
     ah_zeroy = sizey / 2   # zero line for ahrs
     ah_zerox = sizex / 2
@@ -766,11 +770,12 @@ def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value
         lastpoint = (x, y)
     # value_line 1
     y = math.floor(ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue))
-    for x in range(xpos, xpos+xsize, 6):
+
+    for x in range(int(xpos), int(xpos+xsize), 6):
         draw.line([(x, y), (x + 3, y)], fill="black", width=1)
     # value_line 2
     y = math.floor(ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue))
-    for x in range(xpos, xpos+xsize, 6):
+    for x in range(int(xpos), int(xpos+xsize), 6):
         draw.line([(x, y), (x + 3, y)], fill="black", width=1)
 
 

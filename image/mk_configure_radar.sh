@@ -31,7 +31,9 @@ done
 # set -x
 
 apt update
-# apt upgrade -y
+
+# do an upgrade, otherwise bluez is not working properly in version 2024-07-04
+apt upgrade -y
 
 # enable ssh
 raspi-config nonint do_ssh 0
@@ -77,6 +79,18 @@ su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 #  enable headless connect:
 #  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
+
+# configuration changes for bluetooth
+# change autoconnect feature and limit headset roles
+sed -i 's/\["bluez5.auto-connect"\]  = "\[ hfp_hf hsp_hs a2dp_sink \]",/\["bluez5.auto-connect"\]  = "\[ hfp_hf a2dp_sink \]",/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
+sed -i 's/--\["bluez5.headset-roles"\] = "\[ hsp_hs hsp_ag hfp_hf hfp_ag \]",/\["bluez5.headset-roles"\] = "\[ hfp_hf hfp_ag \]",/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
+# changes to bluetooth since the bluetooth-driver had problems with bt-le
+sed -i 's/#ControllerMode = dual/ControllerMode = bredr/' /etc/bluetooth/main.conf
+# tweaks for bluetooth on zero 2 w
+# /lib/firmware/brcm/brcmfmac43436s-sdio.raspberrypi,model-zero-2-w.txt
+# btc_mode=1
+# btc_params8=0x4e20
+# btc_params1=0x7530
 
 # this is the same effect as loginctl enable-linger pi
 mkdir -p /var/lib/systemd/linger

@@ -320,8 +320,10 @@ def read_network():
     lines = res.stdout.splitlines()   # stdout delivers a CR at the end
     if len(lines) >= 1:
         ssid = lines[0]
+        rlog.debug(f'Network ssid read via iwgetid: {ssid}')
         return ssid
     else:
+        rlog.debug(f'No Network ssid read via iwgetid')
         return ""
 
 
@@ -332,8 +334,10 @@ def read_wlanip():
     lines = res.stdout.splitlines()  # stdout delivers a CR at the end
     if len(lines) >= 1 and len(lines[0]) >= 1:
         wlanip = lines[0].split()[0]     # if ip4 and ip6 present just take ipv4 adress
+        rlog.debug(f'WLAN-IP read via hostname: {wlanip}')
         return wlanip
     else:
+        rlog.debug(f'No WLAN-IP received via hostname.')
         return ""
 
 
