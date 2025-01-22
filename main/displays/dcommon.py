@@ -95,11 +95,11 @@ class GenericDisplay:
         self.rlog.debug("Running Radar with NoDisplay! ")
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
-    def modesaircraft(self, radius, height, arcposition, vspeed, tail, width=3, color=AIRCRAFT_COLOR, bgcolor=BG_COLOR):
+    def modesaircraft(self, radius, height, arcposition, vspeed, tail, width=3):
         if radius < self.MINIMAL_CIRCLE:
             radius = self.MINIMAL_CIRCLE
         self.draw.ellipse((self.zerox-radius, self.zeroy-radius, self.zerox+radius, self.zeroy+radius),
-                          width=width, outline=color)
+                          width=width, outline=self.AIRCRAFT_COLOR)
         arctext = posn(arcposition, radius, angle_offset=self.ANGLE_OFFSET)
         if height > 0:
             signchar = "+"
@@ -112,16 +112,16 @@ class GenericDisplay:
             t = t + self.DOWN_CHARACTER
         w = self.draw.textlength(t, largefont)
         tposition = (int(self.zerox+arctext[0]-w/2), int(self.zeroy+arctext[1]-self.LARGE/2))
-        self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.LARGE+2)), fill=bgcolor)
-        self.draw.text(tposition, t, font=self.largefont, fill=color)
+        self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.LARGE+2)), fill=self.BG_COLOR)
+        self.draw.text(tposition, t, font=self.largefont, fill=self.AIRCRAFT_COLOR)
         if tail is not None:
             tl = self.draw.textlength(tail, self.verysmallfont)
             self.draw.rectangle((tposition[0], tposition[1] + self.LARGE, tposition[0] + tl,
-                            tposition[1] + self.LARGE + self.VERYSMALL), fill=bgcolor)
-            self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.verysmallfont, fill=color)
+                            tposition[1] + self.LARGE + self.VERYSMALL), fill=self.BG_COLOR)
+            self.draw.text((tposition[0], tposition[1] + self.LARGE), tail,
+                           font=self.verysmallfont, fill=self.AIRCRAFT_COLOR)
 
-    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, angle_offset=0,
-                 color=self.AIRCRAFT_COLOR, velocity_width=self.VELOCITY_WIDTH):
+    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, angle_offset=0):
         p1 = posn(direction, 2 * AIRCRAFT_SIZE, angle_offset)
         p2 = posn(direction + 150, 4 * AIRCRAFT_SIZE, angle_offset)
         p3 = posn(direction + 180, 2 * AIRCRAFT_SIZE, angle_offset)
@@ -130,8 +130,8 @@ class GenericDisplay:
 
         self.draw.polygon(
             ((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
-            fill=color, outline=color)
-        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=color, width=velocity_width)
+            fill=self.AIRCRAFT_COLOR, outline=self.AIRCRAFT_COLOR)
+        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=self.AIRCRAFT_COLOR, width=self.VELOCITY_WIDTH)
         if height >= 0:
             t = "+" + str(abs(height))
         else:
@@ -146,9 +146,9 @@ class GenericDisplay:
             tposition = (x - 4 * AIRCRAFT_SIZE - w, int(y - LARGE / 2))
         else:
             tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - LARGE / 2))
-        self.draw.text(tposition, t, font=largefont, fill=color)
+        self.draw.text(tposition, t, font=largefont, fill=self.AIRCRAFT_COLOR)
         if tail is not None:
-            self.draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill=color)
+            self.draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill=self.AIRCRAFT_COLOR)
 
 
     def display(self):
