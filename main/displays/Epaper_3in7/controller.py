@@ -62,6 +62,7 @@ class Epaper3in7(GenericDisplay):
     CO_SPACE = 3
     ANGLE_OFFSET=270 # offset for calculating angles in displays
 
+
     def init(self, fullcircle=False):
         self.device = epd3in7.EPD()
         self.device.init(0)
