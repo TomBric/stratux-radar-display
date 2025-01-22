@@ -67,6 +67,7 @@ class GenericDisplay:
     GRAPH_X_AXIS_LINE_LENGTH = 5  # line length for values in graph
     # end constant definitions
 
+
     def __init__(self):
         sflf.rlog = logging.getLogger('stratux-radar-log')
         # these variables below need to be set for every display!
