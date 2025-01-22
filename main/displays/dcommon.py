@@ -348,7 +348,7 @@ class GenericDisplay:
         for x in range(int(xpos), int(xpos + xsize), 6):
             self.draw.line([(x, y), (x + 3, y)], fill=linecolor, width=linewidth)
 
-    def dashboard(self, x, y, dsizex, lines, color, bgcolor, rounding=false, headline=None):
+    def dashboard(self, x, y, dsizex, lines, color, bgcolor, rounding=False, headline=None):
         # dashboard, arguments are lines = ("text", "value"), ....
         starty = y + VERYSMALL / 2
         for line in lines:
