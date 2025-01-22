@@ -89,7 +89,7 @@ class Epaper3in7(GenericDisplay):
         self.device.display_1Gray(device.getbuffer_optimized(self.epaper_image))
         end = time.time()
         self.display_refresh = end - start
-        # compass
+        # compass preparation
         pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
         self.compass_aircraft = Image.open(pic_path)
         self.mask = Image.new('1', (LARGE * 2, LARGE * 2))
