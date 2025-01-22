@@ -47,7 +47,7 @@ SMALL = 12  # size of information indications on top and bottom
 VERYSMALL = 10  # used for "nm" and "ft"
 AIRCRAFT_SIZE = 3  # size of aircraft arrow
 MINIMAL_CIRCLE = 10  # minimal size of mode-s circle
-PITCH_SCALE = 1.5
+PITCH_SCALE = 1.5   # scaling factor for ahrs pitch
 # end definitions
 
 rlog = None
@@ -198,6 +198,7 @@ def startup(version, target_ip, seconds):
 
 
 def aircraft(x, y, direction, height, vspeed, nspeed_length, tail):
+    GenericDisplay().aircraft(x, y, direction, height, vspeed, nspeed_length, tail, angle_offset=270)
     p1 = posn(270 + direction, 2 * AIRCRAFT_SIZE)
     p2 = posn(270 + direction + 150, 4 * AIRCRAFT_SIZE)
     p3 = posn(270 + direction + 180, 2 * AIRCRAFT_SIZE)

@@ -32,6 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 from . import epd3in7
+from .. import dcommon
 from PIL import Image, ImageDraw, ImageFont
 import math
 import time
@@ -39,308 +40,149 @@ import datetime
 from pathlib import Path
 import logging
 
-# global constants
-VERYLARGE = 48    # timer
-MORELARGE = 36
-LARGE = 30           # size of height indications of aircraft
-SMALL = 24      # size of information indications on top and bottom
-VERYSMALL = 18
-AWESOME_FONTSIZE = 18   # bluetooth indicator
-AIRCRAFT_SIZE = 6        # size of aircraft arrow
-MINIMAL_CIRCLE = 20     # minimal size of mode-s circle
-ARCPOSITION_EXCLUDE_FROM = 110
-ARCPOSITION_EXCLUDE_TO = 250
-# end definitions
-
-# global device properties
-sizex = 0
-sizey = 0
-zerox = 0
-zeroy = 0
-ah_zerox = 0  # zero point for ahrs
-ah_zeroy = 0
-max_pixel = 0
-verylargefont = ""
-morelargefont = ""
-largefont = ""
-smallfont = ""
-verysmallfont = ""
-awesomefont = ""
-device = None
-epaper_image = None
-roll_posmarks = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
-pitch_posmarks = (-30, -20, -10, 10, 20, 30)
-PITCH_SCALE = 4.0
-msize = 15  # size of markings
-
-# compass
-compass_aircraft = None   # image of aircraft for compass-display
-mask = None
-cdraw = None
-draw = None
-cmsize = 20        # length of compass marks
-# co warner
-space = 3  # space between scale figures and zero line
-# end device globals
 
 top_index = 0    # top index being displayed in checklist
-rlog = None
 
-
-def posn(angle, arm_length):
-    dx = round(math.cos(math.radians(270+angle)) * arm_length)
-    dy = round(math.sin(math.radians(270+angle)) * arm_length)
-    return dx, dy
-
-
-def make_font(name, size):
-    font_path = str(Path(__file__).resolve().parent.joinpath('fonts', name))
-    return ImageFont.truetype(font_path, size)
-
-
-def display():
-    device.async_display_1Gray(device.getbuffer_optimized(epaper_image))
-
-
-def is_busy():
-    return device.async_is_busy()
-
-
-def next_arcposition(old_arcposition):
-    # defines next position of height indicator on circle. Can be used to exclude several ranges or
-    # be used to define the next angle on the circle
-    new_arcposition = (old_arcposition + 210) % 360
-    if ARCPOSITION_EXCLUDE_TO >= new_arcposition >= ARCPOSITION_EXCLUDE_FROM:
-        new_arcposition = (new_arcposition + 210) % 360
-    return new_arcposition
-
-
-def turn(sin_a, cos_a, p, zero):
-    # help function which turns a point around zero with degree a, cos_a and sin_a in radians
-    return round(zero[0] + p[0] * cos_a - p[1] * sin_a), round(zero[1] + p[0] * sin_a + p[1] * cos_a)
-
-
-def translate(angle, points, zero):
-    s = math.sin(math.radians(angle))
-    c = math.cos(math.radians(angle))
-    result = ()
-    for p in points:
-        result += (turn(s, c, p, zero),)
-    return result
-
-
-def init(fullcircle=False):
-    global sizex
-    global sizey
-    global zerox
-    global zeroy
-    global ah_zerox
-    global ah_zeroy
-    global max_pixel
-    global verylargefont
-    global morelargefont
-    global largefont
-    global smallfont
-    global verysmallfont
-    global awesomefont
-    global device
-    global epaper_image
-    global compass_aircraft
-    global mask
-    global cdraw
-    global rlog
-    global draw
-
-    rlog = logging.getLogger('stratux-radar-log')
-    device = epd3in7.EPD()
-    device.init(0)
-    device.Clear(0xFF, 0)   # necessary to overwrite everything
-    epaper_image = Image.new('1', (device.height, device.width), 0xFF)
-    draw = ImageDraw.Draw(epaper_image)
-    device.init(1)
-    device.Clear(0xFF, 1)
-    sizex = device.height
-    sizey = device.width
-    zerox = sizex / 2
-    if not fullcircle:
-        zeroy = 200    # not centered
-        max_pixel = 400
-    else:
-        zeroy = sizey / 2
-        max_pixel = sizey
-    rlog.debug(f'Epaper_3in7 selected: sizex={sizex} sizey={sizey} zero=({zerox}, {zeroy})')
-    ah_zeroy = sizey / 2   # zero line for ahrs
-    ah_zerox = sizex / 2
-    verylargefont = make_font("Font.ttc", VERYLARGE)
-    morelargefont = make_font("Font.ttc", MORELARGE)
-    largefont = make_font("Font.ttc", LARGE)               # font for height indications
-    smallfont = make_font("Font.ttc", SMALL)            # font for information indications
-    verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
-    awesomefont = make_font("fontawesome-webfont.ttf", AWESOME_FONTSIZE)  # for bluetooth indicator
-    # measure time for refresh
-    start = time.time()
-    # do sync version of display to measure time
-    device.display_1Gray(device.getbuffer_optimized(epaper_image))
-    end = time.time()
-    display_refresh = end-start
-    # compass
-    pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
-    compass_aircraft = Image.open(pic_path)
-    mask = Image.new('1', (LARGE * 2, LARGE * 2))
-    cdraw = ImageDraw.Draw(mask)
-    return max_pixel, zerox, zeroy, display_refresh
-
-
-def cleanup():
-    device.init(0)
-    device.Clear(0xFF, 0)
-    device.sleep()
-    device.Dev_exit()
-
-
-def refresh():
-    device.Clear(0xFF, 0)  # necessary to overwrite everything
-    device.init(1)
-
-
-def clear():
-    draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
-
-
-def centered_text(y, text, font, fill):
-    tl = draw.textlength(text, font)
-    draw.text((zerox - tl / 2, y), text, font=font, fill=fill)
-
-
-def right_text(y, text, font, fill, offset=0):
-    tl = draw.textlength(text, font)
-    draw.text((sizex-5-tl-offset, y), text, font=font, fill=fill)
-
-
-def bottom_line(left, middle, right):
-    draw.text((5, sizey - SMALL - 3), left, font=smallfont, fill="black")
-    textlength = draw.textlength(right, smallfont)
-    draw.text((sizex - textlength - 8, sizey - SMALL - 3), right, font=smallfont, fill="black", align="right")
-    centered_text(sizey - SMALL - 3, middle, smallfont, fill="black")
-
-
-def startup(version, target_ip, seconds):
-    logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
-    logo = Image.open(logopath)
-    draw.bitmap((zerox-192/2, 0), logo, fill="black")
-    versionstr = "Radar " + version
-    centered_text(188, versionstr, largefont, fill="black")
-    centered_text(sizey - 2 * VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
-    display()
-    time.sleep(seconds)
-
-
-def aircraft(x, y, direction, height, vspeed, nspeed_length, tail):
-    p1 = posn(direction, 2 * AIRCRAFT_SIZE)
-    p2 = posn(direction + 150, 4 * AIRCRAFT_SIZE)
-    p3 = posn(direction + 180, 2 * AIRCRAFT_SIZE)
-    p4 = posn(direction + 210, 4 * AIRCRAFT_SIZE)
-    p5 = posn(direction, nspeed_length)  # line for speed
-
-    draw.polygon(((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
-                 fill="black", outline="black")
-    draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill="black", width=3)
-    if height >= 0:
-        t = "+" + str(abs(height))
-    else:
-        t = "-" + str(abs(height))
-    if vspeed > 0:
-        t = t + '\u2197'
-    if vspeed < 0:
-        t = t + '\u2198'
-    w = draw.textlength(t, largefont)
-    if w + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
-        # would draw text outside, move to the left
-        tposition = (x - 4 * AIRCRAFT_SIZE - w, int(y - LARGE/2))
-    else:
-        tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - LARGE/2))
-    draw.text(tposition, t, font=largefont, fill="black")
-    if tail is not None:
-        draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
-
-
-def modesaircraft(radius, height, arcposition, vspeed, tail):
-    if radius < MINIMAL_CIRCLE:
-        radius = MINIMAL_CIRCLE
-    draw.ellipse((zerox-radius, zeroy-radius, zerox+radius, zeroy+radius), width=3, outline="black")
-    arctext = posn(arcposition, radius)
-    if height > 0:
-        signchar = "+"
-    else:
-        signchar = "-"
-    t = signchar+str(abs(height))
-    if vspeed > 0:
-        t = t + '\u2197'
-    if vspeed < 0:
-        t = t + '\u2198'
-    w = draw.textlength(t, largefont)
-    tposition = (zerox+arctext[0]-w/2, zeroy+arctext[1]-LARGE/2)
-    draw.rectangle((tposition, (tposition[0]+w, tposition[1]+LARGE+2)), fill="white")
-    draw.text(tposition, t, font=largefont, fill="black")
-    if tail is not None:
-        tl = draw.textlength(tail, verysmallfont)
-        draw.rectangle((tposition[0], tposition[1] + LARGE, tposition[0] + tl,
-                        tposition[1] + LARGE + VERYSMALL), fill="white")
-        draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill="black")
-
-
-def situation(connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
-    draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2, zeroy+max_pixel/2), outline="black")
-    draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4, zeroy+max_pixel/4), outline="black")
-    draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
-
-    draw.text((5, 1), str(range)+" nm", font=smallfont, fill="black")
-
-    if gps_quality == 0:
-        t = "GPS-NoFix"
-    elif gps_quality == 1:
-        t = "3D GPS\n" + str(round(gps_h_accuracy, 1)) + "m"
-    elif gps_quality == 2:
-        t = "DGNSS\n" + str(round(gps_h_accuracy, 1)) + "m"
-    else:
-        t = ""
-    if basemode:
-        t += "\nGround\nmode"
-    draw.text((5, SMALL+10), t, font=verysmallfont, fill="black")
-
-    t = "FL"+str(round(ownalt / 100))
-    textlength = draw.textlength(t, verysmallfont)
-    draw.text((sizex - textlength - 5, SMALL+10), t, font=verysmallfont, fill="black")
-
-    t = str(altdifference) + " ft"
-    textlength = draw.textlength(t, smallfont)
-    draw.text((sizex - textlength - 5, 1), t, font=smallfont, fill="black", align="right")
-
-    text = str(course) + '°'
-    centered_text(1, text, smallfont, fill="black")
-
-    if not gpsconnected:
-        centered_text(70, "No GPS", smallfont, fill="black")
-    if not connected:
-        centered_text(30, "No Connection!", smallfont, fill="black")
-    if co_alarmlevel > 0:
-        centered_text(250, "CO Alarm: " + co_alarmstring, smallfont, fill="black")
-
-    if extsound or bt_devices > 0:
-        if sound_active:
-            t = ""
-            if extsound:
-                t += "\uf028"  # volume symbol
-            if bt_devices > 0:
-                t += "\uf293"  # bluetooth symbol
+class Epaper3in7(GenericDisplay):
+    # display constants
+    VERYLARGE = 48  # timer
+    MORELARGE = 36
+    LARGE = 30  # size of height indications of aircraft
+    SMALL = 24  # size of information indications on top and bottom
+    VERYSMALL = 18
+    AWESOME_FONTSIZE = 18  # bluetooth indicator
+    AIRCRAFT_SIZE = 6  # size of aircraft arrow
+    BG_COLOR = "white"
+    AIRCRAFT_COLOR = "black"
+    MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
+    ARCPOSITION_EXCLUDE_FROM = 110
+    ARCPOSITION_EXCLUDE_TO = 250
+    PITCH_SCALE = 4.0
+    CM_SIZE = 15  # size of markings in ahrs
+    CO_SPACE = 3
+    ANGLE_OFFSET=270 # offset for calculating angles in displays
+    
+    def init(self, fullcircle=False):
+        self.device = epd3in7.EPD()
+        self.device.init(0)
+        self.device.Clear(0xFF, 0)  # necessary to overwrite everything
+        self.epaper_image = Image.new('1', (device.height, device.width), 0xFF)
+        self.draw = ImageDraw.Draw(self.epaper_image)
+        self.device.init(1)
+        self.device.Clear(0xFF, 1)
+        self.sizex = device.height
+        self.sizey = device.width
+        self.zerox = sizex / 2
+        if not fullcircle:
+            self.zeroy = 200  # not centered
+            self.max_pixel = 400
         else:
-            t = "\uf1f6"  # bell off symbol
-        textlength = draw.textlength(t, awesomefont)
-        draw.text((sizex - textlength - 5, sizey - SMALL), t, font=awesomefont, fill="black")
+            self.zeroy = self.sizey / 2
+            self.max_pixel = self.sizey
+        rlog.debug(f'Epaper_3in7 selected: sizex={sizex} sizey={sizey} zero=({zerox}, {zeroy})')
+        self.ah_zeroy = self.sizey / 2  # zero line for ahrs
+        self.ah_zerox = self.sizex / 2
+        # measure time for refresh
+        start = time.time()
+        # do sync version of display to measure time
+        self.device.display_1Gray(device.getbuffer_optimized(self.epaper_image))
+        end = time.time()
+        self.display_refresh = end - start
+        # compass
+        pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
+        self.compass_aircraft = Image.open(pic_path)
+        self.mask = Image.new('1', (LARGE * 2, LARGE * 2))
+        self.cdraw = ImageDraw.Draw(mask)
+        self.rlog.debug(f'Epaper_3in7 selected: sizex={sizex} sizey={sizey} zero=({zerox}, {zeroy}) refresh-time: {str(round(self.display_refresh_time, 2))} secs')
+        return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
-    # optical keep alive bar at right side
-    draw.line((sizex-8, 80+optical_bar*10, sizex-8, 80+optical_bar*10+8), fill="black", width=5)
+    def display(self):
+        self.device.async_display_1Gray(device.getbuffer_optimized(epaper_image))
+
+    def is_busy(self):
+        return self.device.async_is_busy()
+
+    def next_arcposition(old_arcposition):
+        return GenericDisplay().next_arcposition(old_arcposition,
+            exclude_from = ARCPOSITION_EXCLUDE_FROM, exclude_to= ARCPOSITION_EXCLUDE_TO)
+
+    def cleanup(self):
+        self.device.init(0)
+        self.device.Clear(0xFF, 0)
+        self.device.sleep()
+        self.device.Dev_exit()
+
+    def refresh(self):
+        self.device.Clear(0xFF, 0)  # necessary to overwrite everything
+        self.device.init(1)
+
+    def clear(self):
+        self.draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
+
+    def startup(self, version, target_ip, seconds):
+        logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
+        logo = Image.open(logopath)
+        self.draw.bitmap((zerox-192/2, 0), logo, fill="black")
+        versionstr = "Radar " + version
+        self.centered_text(188, versionstr, largefont, fill="black")
+        self.centered_text(sizey - 2 * VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
+        self.display()
+        time.sleep(seconds)
+
+
+    def situation(self, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
+                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
+        self.draw.ellipse((self.zerox-self.max_pixel/2, self.zeroy-self.max_pixel/2,
+                           self.zerox+self.max_pixel/2, self.zeroy+self.max_pixel/2), outline="black")
+        self.draw.ellipse((self.zerox-self.max_pixel/4, self.zeroy-self.max_pixel/4,
+                           self.zerox+max_pixel/4, self.zeroy+max_pixel/4), outline="black")
+        self.draw.ellipse((self.zerox-2, self.zeroy-2, self.zerox+2, self.zeroy+2), outline="black")
+        self.draw.text((5, 1), str(range)+" nm", font=smallfont, fill="black")
+        if gps_quality == 0:
+            t = "GPS-NoFix"
+        elif gps_quality == 1:
+            t = "3D GPS\n" + str(round(gps_h_accuracy, 1)) + "m"
+        elif gps_quality == 2:
+            t = "DGNSS\n" + str(round(gps_h_accuracy, 1)) + "m"
+        else:
+            t = ""
+        if basemode:
+            t += "\nGround\nmode"
+        self.draw.text((5, self.SMALL+10), t, font=self.verysmallfont, fill="black")
+
+        t = "FL"+str(round(ownalt / 100))
+        textlength = self.draw.textlength(t, verysmallfont)
+        self.draw.text((self.sizex - textlength - 5, self.SMALL+10), t, font=self.verysmallfont, fill="black")
+
+        t = str(altdifference) + " ft"
+        textlength = self.draw.textlength(t, self.smallfont)
+        self.draw.text((self.sizex - textlength - 5, 1), t, font=self.smallfont, fill="black", align="right")
+
+        text = str(course) + '°'
+        self.centered_text(1, text, self.smallfont, fill="black")
+
+        if not gpsconnected:
+            self.centered_text(70, "No GPS", self.smallfont, fill="black")
+        if not connected:
+            self.centered_text(30, "No Connection!", self.smallfont, fill="black")
+        if co_alarmlevel > 0:
+            self.tered_text(250, "CO Alarm: " + co_alarmstring, self.smallfont, fill="black")
+
+        if extsound or bt_devices > 0:
+            if sound_active:
+                t = ""
+                if extsound:
+                    t += "\uf028"  # volume symbol
+                if bt_devices > 0:
+                    t += "\uf293"  # bluetooth symbol
+            else:
+                t = "\uf1f6"  # bell off symbol
+            textlength = self.draw.textlength(t, awesomefont)
+            self.draw.text((self.sizex - textlength - 5, self.sizey - self.SMALL), t,
+                           font=self.awesomefont, fill="black")
+
+        # optical keep alive bar at right side
+        self.draw.line((self.sizex-8, 80+optical_bar*10, self.sizex-8, 80+optical_bar*10+8), fill="black", width=5)
 
 
 def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
@@ -449,11 +291,11 @@ def compass(heading, error_message):
         s = math.sin(math.radians(m - heading + 90))
         c = math.cos(math.radians(m - heading + 90))
         if m % 30 != 0:
-            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
-                       czeroy - (csize - cmsize) * s), fill="black", width=2)
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - CM_SIZE) * c,
+                       czeroy - (csize - CM_SIZE) * s), fill="black", width=2)
         else:
-            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - cmsize) * c,
-                       czeroy - (csize - cmsize) * s), fill="black", width=4)
+            draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - CM_SIZE) * c,
+                       czeroy - (csize - CM_SIZE) * s), fill="black", width=4)
             cdraw.rectangle((0, 0, LARGE * 2, LARGE * 2), fill="black")
             if m == 0:
                 mark = "N"
@@ -472,7 +314,7 @@ def compass(heading, error_message):
                 tl = draw.textlength(mark, morelargefont)
                 cdraw.text(((LARGE * 2 - tl) / 2, (LARGE * 2 - MORELARGE) / 2), mark, 1, font=morelargefont)
             rotmask = mask.rotate(-m + heading, expand=False)
-            center = (czerox - (csize - cmsize - LARGE / 2) * c, czeroy - (csize - cmsize - LARGE / 2) * s)
+            center = (czerox - (csize - CM_SIZE - LARGE / 2) * c, czeroy - (csize - CM_SIZE - LARGE / 2) * s)
             epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
     if error_message is not None:
         centered_text(120, error_message, largefont, fill="black")
@@ -537,7 +379,7 @@ def rollmarks(roll):
     else:
         di = ah_zerox
 
-    for rm in roll_posmarks:
+    for rm in ROLL_POSMARKS:
         s = math.sin(math.radians(rm - roll + 90))
         c = math.cos(math.radians(rm - roll + 90))
         if rm % 30 == 0:
@@ -593,7 +435,7 @@ def ahrs(pitch, roll, heading, slipskid, error_message):
         earthfill -= 3
         draw.line((linepoints(pitch, roll, earthfill, 600)), fill="black", width=1)
 
-    for pm in pitch_posmarks:  # pitchmarks
+    for pm in PITCH_POSMARKS:  # pitchmarks
         draw.line((linepoints(pitch, roll, pm, 30)), fill="black", width=4)
 
     # pointer in the middle
@@ -767,70 +609,6 @@ def flighttime(last_flights):
     bottom_line("", "Mode", "Clear")
 
 
-def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
-    tl = math.floor(draw.textlength(str(maxvalue), verysmallfont))    # for adjusting x and y
-    # adjust zero lines to have room for text
-    xpos = xpos + tl + space
-    xsize = xsize - tl - space
-    ypos = ypos + VERYSMALL/2
-    ysize = ysize - VERYSMALL
-
-    vlmin_y = ypos + ysize - 1
-    tl = draw.textlength(str(minvalue), verysmallfont)
-    draw.text((xpos - tl - space, vlmin_y - VERYSMALL), str(minvalue), font=verysmallfont, fill="black")
-
-    vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue)
-    tl = draw.textlength(str(value_line1), verysmallfont)
-    draw.text((xpos - tl - space, vl1_y - VERYSMALL/2), str(value_line1), font=verysmallfont, fill="black")
-    vl2_y = math.floor(ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue))
-    tl = draw.textlength(str(value_line2), verysmallfont)
-    draw.text((xpos - tl - space, vl2_y - VERYSMALL/2), str(value_line2), font=verysmallfont, fill="black")
-
-    vlmax_y = ypos
-    tl = draw.textlength(str(maxvalue), verysmallfont)
-    draw.text((xpos - tl - space, vlmax_y - VERYSMALL/2), str(maxvalue), font=verysmallfont, fill="black")
-
-    draw.rectangle((xpos, ypos, xpos+xsize, ypos+ysize), outline="black", width=3, fill="white")
-
-    # values below x-axis
-    no_of_values = len(data)
-    full_time = timeout * no_of_values   # time for full display in secs
-    timestr = time.strftime("%H:%M", time.gmtime())
-    tl = draw.textlength(timestr, verysmallfont)
-    no_of_time = math.floor(xsize / tl / 2) + 1  # calculate maximum number of time indications
-    time_offset = full_time / no_of_time
-    offset = math.floor((xsize-1) / no_of_time)
-    x = xpos
-    acttime = math.floor(time.time())
-    for i in range(0, no_of_time+1):
-        draw.line((x, ypos+ysize-1-5, x, ypos+ysize-1+3), width=2, fill="black")
-        timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time-i) * time_offset)))
-        draw.text((x - tl/2, ypos+ysize-1 + 1), timestr, font=verysmallfont, fill="black")
-        x = x + offset
-    lastpoint = None
-    for i in range(0, len(data)):
-        y = math.floor(ypos-4 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue))
-        if y < ypos:
-            y = ypos   # if value is outside
-        if y > ypos+ysize-1:
-            x = ypos+ysize-1
-        if i >= 1:  # we need at least two points before we draw
-            x = math.floor(xpos + i * xsize / (len(data)-1))
-            draw.line([lastpoint, (x, y)], fill="black", width=3)
-        else:
-            x = xpos
-        lastpoint = (x, y)
-    # value_line 1
-    y = math.floor(ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue))
-
-    for x in range(int(xpos), int(xpos+xsize), 6):
-        draw.line([(x, y), (x + 3, y)], fill="black", width=1)
-    # value_line 2
-    y = math.floor(ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue))
-    for x in range(int(xpos), int(xpos+xsize), 6):
-        draw.line([(x, y), (x + 3, y)], fill="black", width=1)
-
-
 def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
     if alarmlevel == 0:
         centered_text(0, "CO Warner: No CO alarm", largefont, fill="black")
@@ -840,7 +618,7 @@ def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):
         else:
             alarmstr = "CO: {:d} ppm longer {:d} sec".format(alarmppm, math.floor(alarmperiod))
         centered_text(0, alarmstr, largefont, fill="black")
-    graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout)
+    self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, "black", "black", "black", "white", 3, 3, 5, 3)
     draw.text((320, 50 + SMALL - VERYSMALL), "Warnlevel:", font=verysmallfont, fill="black")
     right_text(50, "{:3d}".format(alarmlevel), smallfont, fill="black")
 
@@ -853,12 +631,6 @@ def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):
     right_text(196, "{:.1f}k".format(r0/1000), verysmallfont, fill="black")
 
     bottom_line("Calibrate", "Mode", "Reset")
-
-
-def data_item(leftx, y, rightx, text, value):
-    draw.text((leftx, y + (SMALL-VERYSMALL) / 2), text, font=verysmallfont, fill="black", align="left")
-    tl = draw.textlength(value, smallfont)
-    draw.text((rightx - tl, y), value, font=smallfont, fill="black")
 
 
 def dashboard(x, y, dsizex, rounding, headline, lines):
@@ -944,13 +716,6 @@ def distance(now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_di
     if error_message is not None:
         centered_text(60, error_message, verylargefont, fill="black")
     bottom_line("Stats/Set", "Mode", "Start")
-
-
-def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
-    if key in values:
-        return format_str.format(values[key])
-    else:
-        return '---'
 
 
 def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):

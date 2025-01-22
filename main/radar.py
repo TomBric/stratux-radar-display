@@ -886,7 +886,8 @@ if __name__ == "__main__":
 
     url_host_base = args['connect']
     try:
-        display_control = importlib.import_module('displays.' + args['device'] + '.controller')
+        display_control_module = importlib.import_module('displays.' + args['device'] + '.controller')
+        display_control = display_control_module.radar_display  # inherited instance of GenericDisplay in imported module
     except ModuleNotFoundError as e:
         print("Error: Controller for device '{0}' not found. Aborting. ".format(args['device']))
         syslog.syslog(syslog.LOG_ERR, "Error: Controller for device '{0}' not found. Aborting. ".format(args['device']))
