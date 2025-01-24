@@ -91,7 +91,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         # compass preparation
         pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
         self.compass_aircraft = Image.open(pic_path)
-        self.mask = Image.new('1', (LARGE * 2, self.LARG * 2))
+        self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
         self.cdraw = ImageDraw.Draw(mask)
         self.rlog.debug(f'Epaper_3in7 selected: sizex={self.sizex} sizey={self.sizey} zero=({self.zerox}, {self.zeroy}) '
                         f'refresh-time: {str(round(self.display_refresh_time, 2))} secs')
