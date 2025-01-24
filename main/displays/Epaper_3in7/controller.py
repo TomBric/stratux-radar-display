@@ -139,7 +139,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.ellipse((self.zerox-self.max_pixel/4, self.zeroy-self.max_pixel/4,
                            self.zerox+self.max_pixel/4, self.zeroy+self.max_pixel/4), outline= self.TEXT_COLOR)
         self.draw.ellipse((self.zerox-2, self.zeroy-2, self.zerox+2, self.zeroy+2), outline= self.TEXT_COLOR)
-        self.draw.text((5, 1), str(range)+" nm", font=smallfont, fill= self.TEXT_COLOR)
+        self.draw.text((5, 1), str(range)+" nm", font=self.smallfont, fill= self.TEXT_COLOR)
         if gps_quality == 0:
             t = "GPS-NoFix"
         elif gps_quality == 1:
@@ -188,16 +188,16 @@ class Epaper3in7(dcommon.GenericDisplay):
 
 
     def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
-        draw.text((5, 0), "UTC", font=smallfont, fill= self.TEXT_COLOR)
+        draw.text((5, 0), "UTC", font=self.smallfont, fill= self.TEXT_COLOR)
         centered_text(SMALL, utctime, self.verylargefont, fill= self.TEXT_COLOR)
         if stoptime is not None:
-            draw.text((5,  self.SMALL+VERYLARGE), "Timer", font=smallfont, fill= self.TEXT_COLOR)
+            draw.text((5,  self.SMALL+VERYLARGE), "Timer", font=self.smallfont, fill= self.TEXT_COLOR)
             centered_text(2*SMALL+VERYLARGE, stoptime, self.verylargefont)
             if laptime is not None:
                 draw.text((5, 2*self.SMALL + 2*self.VERYLARGE), laptime_head, font=self.smallfont, fill=self.TEXT_COLOR)
                 centered_text(3*self.SMALL+2*self.VERYLARGE, laptime, self.verylargefont, fill=self.TEXT_COLOR)
 
-        draw.text((5, self.sizey-self.SMALL-3), left_text, font=smallfont, fill=self.TEXT_COLOR)
+        draw.text((5, self.sizey-self.SMALL-3), left_text, font=self.smallfont, fill=self.TEXT_COLOR)
         textlength = draw.textlength(right_t, self.smallfont)
         draw.text((self.sizex-textlength-8, self.sizey-self.SMALL-3), right_t,
                   font=self.smallfont, fill=self.TEXT_COLOR, align="right")
