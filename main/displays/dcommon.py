@@ -48,7 +48,9 @@ class GenericDisplay:
     BG_COLOR = "white"  # background color
     # radar-mode
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
-    AIRCRAFT_COLOR = "black"
+    AIRCRAFT_COLOR = "red"
+    BG_COLOR = "black"
+    TEXT_COLOR = "white"   # default color for text
     VELOCITY_WIDTH = 3  # width of indicator for velocity of aircraft
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 0
@@ -261,16 +263,16 @@ class GenericDisplay:
         else:
             return '---'
 
-    def centered_text(self, y, text, font, color):
+    def centered_text(self, y, text, font, color=self.TEXT_COLOR):
         tl = self.draw.textlength(text, font)
         self.draw.text((math.floor(self.zerox - tl / 2), y), text, font=font, fill=color)
 
-    def right_text(self, y, text, font, color, offset=0):
+    def right_text(self, y, text, font, color=self.TEXT_COLOR, offset=0):
         tl = self.draw.textlength(text, font)
         self.draw.text((self.sizex - 5 - tl - offset, y), text, font=font, fill=color)
 
 
-    def bottom_line(self, left, middle, right, color, offset_bottom=0, offset_left=0, offset_right=0):
+    def bottom_line(self, left, middle, right, color=self.TEXT_COLOR, offset_bottom=0, offset_left=0, offset_right=0):
         self.draw.text((offset_left, self.sizey - smallfont.size - offset_bottom), left, font=smallfont, fill=color)
         textlength = self.draw.textlength(right, smallfont)
         self.draw.text((self.sizex - textlength - offset_right, self.sizey - smallfont.size - offset_bottom), right,
