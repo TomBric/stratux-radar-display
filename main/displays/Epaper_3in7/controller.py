@@ -137,7 +137,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.ellipse((self.zerox-self.max_pixel/2, self.zeroy-self.max_pixel/2,
                            self.zerox+self.max_pixel/2, self.zeroy+self.max_pixel/2), outline= self.TEXT_COLOR)
         self.draw.ellipse((self.zerox-self.max_pixel/4, self.zeroy-self.max_pixel/4,
-                           self.zerox+max_pixel/4, self.zeroy+max_pixel/4), outline= self.TEXT_COLOR)
+                           self.zerox+self.max_pixel/4, self.zeroy+self.max_pixel/4), outline= self.TEXT_COLOR)
         self.draw.ellipse((self.zerox-2, self.zeroy-2, self.zerox+2, self.zeroy+2), outline= self.TEXT_COLOR)
         self.draw.text((5, 1), str(range)+" nm", font=smallfont, fill= self.TEXT_COLOR)
         if gps_quality == 0:
