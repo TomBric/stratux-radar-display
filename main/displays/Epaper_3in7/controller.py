@@ -67,12 +67,12 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.device = epd3in7.EPD()
         self.device.init(0)
         self.device.Clear(0xFF, 0)  # necessary to overwrite everything
-        self.epaper_image = Image.new('1', (device.height, device.width), 0xFF)
+        self.epaper_image = Image.new('1', (self.device.height, self.device.width), 0xFF)
         self.draw = ImageDraw.Draw(self.epaper_image)
         self.device.init(1)
         self.device.Clear(0xFF, 1)
-        self.sizex = device.height
-        self.sizey = device.width
+        self.sizex = self.device.height
+        self.sizey = self.device.width
         self.zerox = sizex / 2
         if not fullcircle:
             self.zeroy = 200  # not centered
@@ -86,7 +86,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         # measure time for refresh
         start = time.time()
         # do sync version of display to measure time
-        self.device.display_1Gray(device.getbuffer_optimized(self.epaper_image))
+        self.device.display_1Gray(self.device.getbuffer_optimized(self.epaper_image))
         end = time.time()
         self.display_refresh = end - start
         # compass preparation
@@ -98,7 +98,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
     def display(self):
-        self.device.async_display_1Gray(device.getbuffer_optimized(epaper_image))
+        self.device.async_display_1Gray(self.device.getbuffer_optimized(epaper_image))
 
     def is_busy(self):
         return self.device.async_is_busy()
