@@ -43,7 +43,7 @@ import logging
 
 top_index = 0    # top index being displayed in checklist
 
-class Epaper3in7(GenericDisplay):
+class Epaper3in7(dcommon.GenericDisplay):
     # display constants
     VERYLARGE = 48  # timer
     MORELARGE = 36
