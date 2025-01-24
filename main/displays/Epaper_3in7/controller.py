@@ -107,7 +107,7 @@ class Epaper3in7(dcommon.GenericDisplay):
     @staticmethod
     def next_arcposition(old_arcposition):
         return dcommon.GenericDisplay().next_arcposition(old_arcposition,
-            exclude_from=self.ARCPOSITION_EXCLUDE_FROM, exclude_to=selfARCPOSITION_EXCLUDE_TO)
+            exclude_from=Epaper3in7().ARCPOSITION_EXCLUDE_FROM, exclude_to=Epaper3in7().ARCPOSITION_EXCLUDE_TO)
 
     def cleanup(self):
         self.device.init(0)
