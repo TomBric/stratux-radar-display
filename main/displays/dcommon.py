@@ -264,20 +264,20 @@ class GenericDisplay:
             return '---'
 
     def centered_text(self, y, text, font, color=None):
-        if color == NONE:
+        if color == None:
             color = self.TEXT_COLOR
         tl = self.draw.textlength(text, font)
         self.draw.text((math.floor(self.zerox - tl / 2), y), text, font=font, fill=color)
 
     def right_text(self, y, text, font, color=None, offset=0):
-        if color == NONE:
+        if color == None:
             color = self.TEXT_COLOR
         tl = self.draw.textlength(text, font)
         self.draw.text((self.sizex - 5 - tl - offset, y), text, font=font, fill=color)
 
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=0, offset_left=0, offset_right=0):
-        if color == NONE:
+        if color == None:
             color = self.TEXT_COLOR
         self.draw.text((offset_left, self.sizey - smallfont.size - offset_bottom), left, font=smallfont, fill=color)
         textlength = self.draw.textlength(right, smallfont)
