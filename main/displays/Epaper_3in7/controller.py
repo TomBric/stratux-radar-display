@@ -91,7 +91,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         # compass preparation
         pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
         self.compass_aircraft = Image.open(pic_path)
-        self.mask = Image.new('1', (LARGE * 2, LARGE * 2))
+        self.mask = Image.new('1', (LARGE * 2, self.LARG * 2))
         self.cdraw = ImageDraw.Draw(mask)
         self.rlog.debug(f'Epaper_3in7 selected: sizex={self.sizex} sizey={self.sizey} zero=({self.zerox}, {self.zeroy}) '
                         f'refresh-time: {str(round(self.display_refresh_time, 2))} secs')
@@ -152,7 +152,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.text((5, self.SMALL+10), t, font=self.verysmallfont, fill="black")
 
         t = "FL"+str(round(ownalt / 100))
-        textlength = self.draw.textlength(t, verysmallfont)
+        textlength = self.draw.textlength(t, self.smallfont)
         self.draw.text((self.sizex - textlength - 5, self.SMALL+10), t, font=self.verysmallfont, fill="black")
 
         t = str(altdifference) + " ft"
@@ -188,18 +188,18 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
         draw.text((5, 0), "UTC", font=smallfont, fill="black")
-        centered_text(SMALL, utctime, verylargefont, fill="black")
+        centered_text(SMALL, utctime, self.verylargefont, fill="black")
         if stoptime is not None:
             draw.text((5, SMALL+VERYLARGE), "Timer", font=smallfont, fill="black")
-            centered_text(2*SMALL+VERYLARGE, stoptime, verylargefont, fill="black")
+            centered_text(2*SMALL+VERYLARGE, stoptime, self.verylargefont, fill="black")
             if laptime is not None:
                 draw.text((5, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="black")
-                centered_text(3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
+                centered_text(3*SMALL+2*VERYLARGE, laptime, self.verylargefont, fill="black")
 
         draw.text((5, sizey-SMALL-3), left_text, font=smallfont, fill="black")
-        textlength = draw.textlength(right_t, smallfont)
+        textlength = draw.textlength(right_t, self.smallfont)
         draw.text((sizex-textlength-8, sizey-SMALL-3), right_t, font=smallfont, fill="black", align="right")
-        centered_text(sizey-SMALL-3, middle_text, smallfont, fill="black")
+        centered_text(sizey-SMALL-3, middle_text, self.smallfont, fill="black")
 
 
     def meter(current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
@@ -224,7 +224,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             mark = translate(angle, line, (center_x, center_y))
             draw.line(mark, fill="black", width=2)
             m += small_marks_distance
-        # large marks
+        # self.LARG marks
         line = ((0, -size/2+1), (0, -size/2+big_mark_length))
         m = start_value
         while m <= end_value:
@@ -233,8 +233,8 @@ class Epaper3in7(dcommon.GenericDisplay):
             draw.line(mark, fill="black", width=4)
             # text
             marktext = str(m)
-            tl = draw.textlength(marktext, largefont)
-            t_center = translate(angle, ((0, -size/2 + big_mark_length + LARGE/2 + text_distance), ), (center_x, center_y))
+            tl = draw.textlength(marktext, self.largefont)
+            t_center = translate(angle, ((0, -size/2 + big_mark_length + self.LARG/2 + text_distance), ), (center_x, center_y))
             draw.text((t_center[0][0]-tl/2, t_center[0][1]-LARGE/2), marktext, fill="black", font=largefont)
             m += marks_distance
         # arrow
@@ -249,10 +249,10 @@ class Epaper3in7(dcommon.GenericDisplay):
         draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill="black")
 
         if middle_text1 is not None:
-            tl = draw.textlength(middle_text1, smallfont)
+            tl = draw.textlength(middle_text1, self.smallfont)
             draw.text((center_x - tl/2, center_y - SMALL - 20), middle_text1, font=smallfont, fill="black", align="left")
         if middle_text2 is not None:
-            tl = draw.textlength(middle_text2, smallfont)
+            tl = draw.textlength(middle_text2, self.smallfont)
             draw.text((center_x-tl/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
 
 
@@ -262,17 +262,17 @@ class Epaper3in7(dcommon.GenericDisplay):
 
         right_center_x = (sizex-gm_size)/2+gm_size    # center of remaining part
         t = "G-Meter"
-        tl = draw.textlength(t, largefont)
+        tl = draw.textlength(t, self.largefont)
         draw.text((right_center_x - tl / 2, 30), t, font=largefont, fill="black", align="left")
         draw.text((gm_size+30, 98), "max", font=smallfont, fill="black")
-        right_text(95, "{:+1.2f}".format(maxg), largefont, fill="black")
+        right_text(95, "{:+1.2f}".format(maxg), self.largefont, fill="black")
         if error_message is None:
             draw.text((gm_size+30, 138), "act", font=smallfont, fill="black")
-            right_text(135, "{:+1.2f}".format(current), largefont, fill="black")
+            right_text(135, "{:+1.2f}".format(current), self.largefont, fill="black")
         else:
             draw.text((gm_size+30, 138), error_message, font=largefont, fill="black")
         draw.text((gm_size+30, 178), "min", font=smallfont, fill="black")
-        right_text(175, "{:+1.2f}".format(ming), largefont, fill="black")
+        right_text(175, "{:+1.2f}".format(ming), self.largefont, fill="black")
 
         bottom_line("", "    Mode", "Reset")
 
@@ -286,7 +286,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         draw.bitmap((zerox - 60, 70), compass_aircraft, fill="black")
         draw.line((czerox, 20, czerox, 70), fill="black", width=4)
         text = str(heading) + '°'
-        tl = draw.textlength(text, smallfont)
+        tl = draw.textlength(text, self.smallfont)
         draw.text((self.sizex - tl - 100, self.sizey - SMALL - 10), text, font=smallfont, fill="black", align="right")
         for m in range(0, 360, 10):
             s = math.sin(math.radians(m - heading + 90))
@@ -297,7 +297,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             else:
                 draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - CM_SIZE) * c,
                            czeroy - (csize - CM_SIZE) * s), fill="black", width=4)
-                cdraw.rectangle((0, 0, LARGE * 2, LARGE * 2), fill="black")
+                cdraw.rectangle((0, 0, self.LARG * 2, self.LARGE * 2), fill="black")
                 if m == 0:
                     mark = "N"
                 elif m == 90:
@@ -309,8 +309,8 @@ class Epaper3in7(dcommon.GenericDisplay):
                 else:
                     mark = str(int(m / 10))
                 if m % 90 != 0:
-                    tl = draw.textlength(mark, largefont)
-                    cdraw.text(((LARGE * 2 - tl) / 2, LARGE / 2), mark, 1, font=largefont)
+                    tl = draw.textlength(mark, self.largefont)
+                    cdraw.text(((self.LARGE * 2 - tl) / 2, self.LARGE / 2), mark, 1, font=largefont)
                 else:
                     tl = draw.textlength(mark, self.morelargefont)
                     cdraw.text(((self.LARGE * 2 - tl) / 2, (self.LARGE * 2 - self.MORELARGE) / 2), mark, 1, font=morelargefont)
@@ -327,10 +327,10 @@ class Epaper3in7(dcommon.GenericDisplay):
         draw.text((35, sizey/2 - VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
         draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill="black", align="left")
         middle_text = "Vertical Speed"
-        tl = draw.textlength(middle_text, verysmallfont)
+        tl = draw.textlength(middle_text, self.smallfont)
         draw.text((sizey/2 - tl / 2, sizey/2 - VERYSMALL - 10), middle_text, font=verysmallfont, fill="black", align="left")
         middle_text = "100 feet per min"
-        tl = draw.textlength(middle_text, verysmallfont)
+        tl = draw.textlength(middle_text, self.smallfont)
         draw.text((sizey/2 - tl / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
 
         # right data display
@@ -338,18 +338,18 @@ class Epaper3in7(dcommon.GenericDisplay):
         draw.text((330, 31), "act", font=verysmallfont, fill="black", align="left")
         draw.text((330, 55), "max", font=verysmallfont, fill="black", align="left")
         draw.text((330, 79), "min", font=verysmallfont, fill="black", align="left")
-        right_text(28, "{:+1.0f}".format(vertical_speed), smallfont, fill="black")
-        right_text(52, "{:+1.0f}".format(vertical_max), smallfont, fill="black")
-        right_text(76, "{:+1.0f}".format(vertical_min), smallfont, fill="black")
+        right_text(28, "{:+1.0f}".format(vertical_speed), self.smallfont, fill="black")
+        right_text(52, "{:+1.0f}".format(vertical_max), self.smallfont, fill="black")
+        right_text(76, "{:+1.0f}".format(vertical_min), self.smallfont, fill="black")
         draw.text((300, 163), "Flight-Level", font=verysmallfont, fill="black", align="left")
-        right_text(160, "{:1.0f}".format(round(flight_level/100)), smallfont, fill="black")
+        right_text(160, "{:1.0f}".format(round(flight_level/100)), self.smallfont, fill="black")
         draw.text((300, 187), "GPS-Alt [ft]", font=verysmallfont, fill="black", align="left")
-        right_text(184, "{:1.0f}".format(gps_altitude), smallfont, fill="black")
+        right_text(184, "{:1.0f}".format(gps_altitude), self.smallfont, fill="black")
         draw.text((300, 211), "GpsSpd [kts]", font=verysmallfont, fill="black", align="left")
-        right_text(208, "{:1.1f}".format(gps_speed), smallfont, fill="black")
+        right_text(208, "{:1.1f}".format(gps_speed), self.smallfont, fill="black")
 
         if error_message is not None:
-            centered_text(60, error_message, verylargefont, fill="black")
+            centered_text(60, error_message, self.verylargefont, fill="black")
 
         bottom_line("", "    Mode", "Reset")
 
@@ -361,15 +361,15 @@ class Epaper3in7(dcommon.GenericDisplay):
             message = "Shutdown display"
         else:
             message = "Reboot"
-        centered_text(10, message, largefont, fill="black")
+        centered_text(10, message, self.largefont, fill="black")
         message = "in " + str(countdown) + " seconds!"
-        centered_text(40, message, largefont, fill="black")
+        centered_text(40, message, self.largefont, fill="black")
         message = "Press left button to cancel ..."
-        centered_text(110, message, smallfont, fill="black")
+        centered_text(110, message, self.smallfont, fill="black")
         message = "Press middle for display only ..."
-        centered_text(140, message, smallfont, fill="black")
+        centered_text(140, message, self.smallfont, fill="black")
         message = "Press right for reboot all ..."
-        centered_text(170, message, smallfont, fill="black")
+        centered_text(170, message, self.smallfont, fill="black")
 
         bottom_line("Cancel", "Display only", "Reboot")
 
@@ -452,26 +452,26 @@ class Epaper3in7(dcommon.GenericDisplay):
 
         # infotext = "P:" + str(pitch) + " R:" + str(roll)
         if error_message:
-            centered_text(80, error_message, smallfont, fill="black")
+            centered_text(80, error_message, self.smallfont, fill="black")
         bottom_line("Levl", "", "Zero")
 
 
     def text_screen(headline, subline, text, left_text, middle_text, r_text):
-        centered_text(0, headline, verylargefont, fill="black")
+        centered_text(0, headline, self.verylargefont, fill="black")
         txt_starty = VERYLARGE
         if subline is not None:
-            centered_text(txt_starty, subline, largefont, fill="black")
-            txt_starty += LARGE
+            centered_text(txt_starty, subline, self.largefont, fill="black")
+            txt_starty += self.LARGE
         draw.text((5, txt_starty), text, font=smallfont, fill="black")
         bottom_line(left_text, middle_text, r_text)
 
 
     def screen_input(headline, subline, text, left, middle, right, prefix, inp, suffix):
-        centered_text(0, headline, largefont, fill="black")
-        txt_starty = LARGE
+        centered_text(0, headline, self.largefont, fill="black")
+        txt_starty = self.LARGE
         if subline is not None:
-            centered_text(LARGE, subline, smallfont, fill="black")
-            txt_starty += LARGE
+            centered_text(LARGE, subline, self.smallfont, fill="black")
+            txt_starty += self.LARGE
         bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
         draw.text((0, txt_starty), text, font=smallfont, fill="black")
         bbox_p = draw.textbbox((bbox[0], bbox[3]), prefix, font=smallfont)
@@ -490,7 +490,7 @@ class Epaper3in7(dcommon.GenericDisplay):
 
         draw.text((5, y), text, font=verysmallfont, fill="black", align="left")
         right_val = str(int(max_val)) + unit
-        textlength = draw.textlength(right_val, verysmallfont)
+        textlength = draw.textlength(right_val, self.smallfont)
         draw.text((sizex - textlength - 5, y), right_val, font=verysmallfont, fill="black", align="right")
         draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline="black", width=1)
         color = "black"
@@ -507,14 +507,14 @@ class Epaper3in7(dcommon.GenericDisplay):
             t = valtext
         else:
             t = str(val)
-        tl = draw.textlength(t, verysmallfont)
+        tl = draw.textlength(t, self.smallfont)
         draw.text(((bar_end-bar_start)/2+bar_start-tl/2, y), t, font=verysmallfont, fill="black",
                   stroke_width=1, stroke_fill="white")
         return y+VERYSMALL+12
 
 
     def round_text(x, y, text, color, yesno=True, out=None):
-        tl = draw.textlength(text, verysmallfont)
+        tl = draw.textlength(text, self.smallfont)
         draw.rounded_rectangle([x, y, x+tl+10, y+VERYSMALL+2], radius=4, fill=color, outline=out)
         draw.text((x+5, y), text, font=verysmallfont, fill="black")
         if not yesno:
@@ -524,7 +524,7 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def stratux(stat, altitude, gps_alt, gps_quality):
         starty = 0
-        centered_text(0, "Stratux " + stat['version'], smallfont, fill="black")
+        centered_text(0, "Stratux " + stat['version'], self.smallfont, fill="black")
         starty += SMALL+8
         starty = bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
         if stat['OGN_connected']:
@@ -578,7 +578,7 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def flighttime(last_flights):
         starty = 0
-        centered_text(0, "Flight Logs ", smallfont, fill="black")
+        centered_text(0, "Flight Logs ", self.smallfont, fill="black")
         starty += SMALL + 10
         draw.text((20, starty), "Date", font=verysmallfont, fill="black")
         draw.text((120, starty), "Start", font=verysmallfont, fill="black")
@@ -612,24 +612,24 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
         if alarmlevel == 0:
-            centered_text(0, "CO Warner: No CO alarm", largefont, fill="black")
+            centered_text(0, "CO Warner: No CO alarm", self.largefont, fill="black")
         else:
             if alarmperiod > 60:
                 alarmstr = "CO: {:d} ppm longer {:d} min".format(alarmppm, math.floor(alarmperiod/60))
             else:
                 alarmstr = "CO: {:d} ppm longer {:d} sec".format(alarmppm, math.floor(alarmperiod))
-            centered_text(0, alarmstr, largefont, fill="black")
+            centered_text(0, alarmstr, self.largefont, fill="black")
         self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, "black", "black", "black", "white", 3, 3, 5, 3)
         draw.text((320, 50 + SMALL - VERYSMALL), "Warnlevel:", font=verysmallfont, fill="black")
-        right_text(50, "{:3d}".format(alarmlevel), smallfont, fill="black")
+        right_text(50, "{:3d}".format(alarmlevel), self.smallfont, fill="black")
 
         if len(co_values) > 0:
             draw.text((320, 120+SMALL-VERYSMALL), "CO act:", font=verysmallfont, fill="black")
-            right_text(120, "{:3d}".format(co_values[len(co_values) - 1]), smallfont, fill="black")
+            right_text(120, "{:3d}".format(co_values[len(co_values) - 1]), self.smallfont, fill="black")
         draw.text((320, 140+SMALL-VERYSMALL), "CO max:", font=verysmallfont, fill="black")
-        right_text(140, "{:3d}".format(co_max), smallfont, fill="black")
+        right_text(140, "{:3d}".format(co_max), self.smallfont, fill="black")
         draw.text((320, 196), "R0:", font=verysmallfont, fill="black")
-        right_text(196, "{:.1f}k".format(r0/1000), verysmallfont, fill="black")
+        right_text(196, "{:.1f}k".format(r0/1000), self.smallfont, fill="black")
 
         bottom_line("Calibrate", "Mode", "Reset")
 
@@ -639,13 +639,13 @@ class Epaper3in7(dcommon.GenericDisplay):
         starty = y + VERYSMALL/2
         for line in lines:
             draw.text((x + 7, starty + (SMALL - VERYSMALL) / 2), line[0], font=verysmallfont, fill="black", align="left")
-            tl = draw.textlength(line[1], smallfont)
+            tl = draw.textlength(line[1], self.smallfont)
             draw.text((x + dsizex - 7 - tl, starty), line[1], font=smallfont, fill="black")
             starty += SMALL + 3
         if rounding:
             starty += VERYSMALL/2
             draw.rounded_rectangle([x, y, x + dsizex, starty], radius=6, fill=None, outline="black", width=2)
-            tl = draw.textlength(headline, verysmallfont)
+            tl = draw.textlength(headline, self.smallfont)
             draw.rectangle([x + 20, y - SMALL/2, x + 20 + tl + 8, y + SMALL/2], fill="white", outline=None)
         draw.text((x+20+4, y - VERYSMALL/2), headline, font=verysmallfont, fill="black")
         return starty
@@ -655,7 +655,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                  own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                  ground_distance_valid, grounddistance, error_message):
 
-        centered_text(0, "GPS Distance", smallfont, fill="black")
+        centered_text(0, "GPS Distance", self.smallfont, fill="black")
 
         lines = (
             ("Date", "{:0>2d}.{:0>2d}.{:0>4d}".format(now.day, now.month, now.year)),
@@ -715,12 +715,12 @@ class Epaper3in7(dcommon.GenericDisplay):
             dashboard(250, starty, 225, True, "Baro", lines)
 
         if error_message is not None:
-            centered_text(60, error_message, verylargefont, fill="black")
+            centered_text(60, error_message, self.verylargefont, fill="black")
         bottom_line("Stats/Set", "Mode", "Start")
 
 
     def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        centered_text(0, "Start-/Landing Statistics", smallfont, fill="black")
+        centered_text(0, "Start-/Landing Statistics", self.smallfont, fill="black")
 
         st = '---'
         if 'start_time' in values:
@@ -821,10 +821,10 @@ class Epaper3in7(dcommon.GenericDisplay):
 
 
     def checklist(checklist_name, checklist_items, current_index, last_list):
-        checklist_y = {'from': LARGE + 8, 'to': sizey - SMALL - 6}
+        checklist_y = {'from': self.LARGE + 8, 'to': sizey - SMALL - 6}
         global top_index
 
-        centered_text(0, checklist_name, largefont, fill="black")
+        centered_text(0, checklist_name, self.largefont, fill="black")
         if current_index == 0:
             top_index = 0     # new list, reset top index
         if current_index < top_index:
