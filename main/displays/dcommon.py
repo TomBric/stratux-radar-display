@@ -69,7 +69,7 @@ class GenericDisplay:
 
 
     def __init__(self):
-        sflf.rlog = logging.getLogger('stratux-radar-log')
+        self.rlog = logging.getLogger('stratux-radar-log')
         # these variables below need to be set for every display!
         self.sizex = 0  # display size x axis in pixel
         self.sizey = 0  # display size y axis in pixel
