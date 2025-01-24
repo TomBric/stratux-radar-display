@@ -104,7 +104,8 @@ class Epaper3in7(dcommon.GenericDisplay):
     def is_busy(self):
         return self.device.async_is_busy()
 
-    def next_arcposition(self, old_arcposition):
+    @staticmethod
+    def next_arcposition(old_arcposition):
         return GenericDisplay().next_arcposition(old_arcposition,
             exclude_from = ARCPOSITION_EXCLUDE_FROM, exclude_to= ARCPOSITION_EXCLUDE_TO)
 

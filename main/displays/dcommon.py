@@ -160,7 +160,8 @@ class GenericDisplay:
         pass
 
 
-    def next_arcposition(self, old_arcposition, exclude_from=0, exclude_to=0):
+    @staticmethod
+    def next_arcposition(old_arcposition, exclude_from=0, exclude_to=0):
         # defines next position of height indicator on circle. Can be used to exclude several ranges or
         # be used to define the next angle on the circle
         new_arcposition = (old_arcposition + 210) % 360
