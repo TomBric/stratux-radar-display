@@ -84,7 +84,7 @@ class GenericDisplay:
         self.cdraw = None  # pixel array to be used in compass to delete text
         self.compass_aircraft = None    # image of the compass aircraft
         # fonts
-        self.VERYLARGEfont = GenericDisplay.make_font("Font.ttc", self.VERYLARGE)
+        self.verylargefont = GenericDisplay.make_font("Font.ttc", self.VERYLARGE)
         self.morelargefont = GenericDisplay.make_font("Font.ttc", self.MORELARGE)
         self.largefont = GenericDisplay.make_font("Font.ttc", self.LARGE)  # font for height indications
         self.smallfont = GenericDisplay.make_font("Font.ttc", self.SMALL)  # font for information indications
