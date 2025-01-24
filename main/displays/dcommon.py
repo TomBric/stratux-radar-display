@@ -263,13 +263,13 @@ class GenericDisplay:
         else:
             return '---'
 
-    def centered_text(self, y, text, font, color=textcolor):
+    def centered_text(self, y, text, font, color=TEXT_COLOR):
         tl = self.draw.textlength(text, font)
-        self.draw.text((math.floor(self.zerox - tl / 2), y), text, font=font, fill=textcolor)
+        self.draw.text((math.floor(self.zerox - tl / 2), y), text, font=font, fill=color)
 
-    def right_text(self, y, text, font, color=textcolor, offset=0):
+    def right_text(self, y, text, font, color=TEXT_COLOR, offset=0):
         tl = self.draw.textlength(text, font)
-        self.draw.text((self.sizex - 5 - tl - offset, y), text, font=font, fill=textcolor)
+        self.draw.text((self.sizex - 5 - tl - offset, y), text, font=font, fill=color)
 
 
     def bottom_line(self, left, middle, right, color=textcolor, offset_bottom=0, offset_left=0, offset_right=0):
