@@ -45,7 +45,6 @@ class GenericDisplay:
     SMALL = 24  # size of information indications on top and bottom
     VERYSMALL = 18
     AWESOME_FONTSIZE = 18  # bluetooth indicator
-    BG_COLOR = "white"  # background color
     # radar-mode
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
     AIRCRAFT_COLOR = "red"
@@ -160,8 +159,8 @@ class GenericDisplay:
     def is_busy(self):
         pass
 
-    @staticmethod
-    def next_arcposition(old_arcposition, exclude_from=0, exclude_to=0):
+
+    def next_arcposition(self, old_arcposition, exclude_from=0, exclude_to=0):
         # defines next position of height indicator on circle. Can be used to exclude several ranges or
         # be used to define the next angle on the circle
         new_arcposition = (old_arcposition + 210) % 360
@@ -264,20 +263,20 @@ class GenericDisplay:
             return '---'
 
     def centered_text(self, y, text, font, color=None):
-        if color == None:
+        if color is None:
             color = self.TEXT_COLOR
         tl = self.draw.textlength(text, font)
         self.draw.text((math.floor(self.zerox - tl / 2), y), text, font=font, fill=color)
 
     def right_text(self, y, text, font, color=None, offset=0):
-        if color == None:
+        if color is None:
             color = self.TEXT_COLOR
         tl = self.draw.textlength(text, font)
         self.draw.text((self.sizex - 5 - tl - offset, y), text, font=font, fill=color)
 
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=0, offset_left=0, offset_right=0):
-        if color == None:
+        if color is None:
             color = self.TEXT_COLOR
         self.draw.text((offset_left, self.sizey - smallfont.size - offset_bottom), left, font=smallfont, fill=color)
         textlength = self.draw.textlength(right, smallfont)
