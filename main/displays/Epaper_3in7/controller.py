@@ -92,7 +92,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
         self.compass_aircraft = Image.open(pic_path)
         self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
-        self.cdraw = ImageDraw.Draw(mask)
+        self.cdraw = ImageDraw.Draw(self.mask)
         self.rlog.debug(f'Epaper_3in7 selected: sizex={self.sizex} sizey={self.sizey} zero=({self.zerox}, {self.zeroy}) '
                         f'refresh-time: {str(round(self.display_refresh_time, 2))} secs')
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
@@ -314,7 +314,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                 else:
                     tl = draw.textlength(mark, self.morelargefont)
                     cdraw.text(((self.LARGE * 2 - tl) / 2, (self.LARGE * 2 - self.MORELARGE) / 2), mark, 1, font=morelargefont)
-                rotmask = mask.rotate(-m + heading, expand=False)
+                rotmask = self.mask.rotate(-m + heading, expand=False)
                 center = (czerox - (csize - CM_SIZE - self.LARGE / 2) * c, czeroy - (csize - CM_SIZE - self.LARGE / 2) * s)
                 epaper_image.paste("black", (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
         if error_message is not None:
