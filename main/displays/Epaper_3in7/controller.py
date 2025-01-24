@@ -124,10 +124,10 @@ class Epaper3in7(dcommon.GenericDisplay):
     def startup(self, version, target_ip, seconds):
         logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
         logo = Image.open(logopath)
-        self.draw.bitmap((self.zerox-192/2, 0), logo, fill="black")
+        self.draw.bitmap((self.zerox-192/2, 0), logo, fill= self.TEXT_COLOR)
         versionstr = "Radar " + version
-        self.centered_text(188, versionstr, self.largefont, fill="black")
-        self.centered_text(sizey - 2 *  self.VERYSMALL - 2, "Connecting to " + target_ip, self.verysmallfont, fill="black")
+        self.centered_text(188, versionstr, self.largefont)
+        self.centered_text(sizey - 2 *  self.VERYSMALL - 2, "Connecting to " + target_ip, self.verysmallfont)
         self.display()
         time.sleep(seconds)
 
@@ -135,11 +135,11 @@ class Epaper3in7(dcommon.GenericDisplay):
     def situation(self, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
                   gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
         self.draw.ellipse((self.zerox-self.max_pixel/2, self.zeroy-self.max_pixel/2,
-                           self.zerox+self.max_pixel/2, self.zeroy+self.max_pixel/2), outline="black")
+                           self.zerox+self.max_pixel/2, self.zeroy+self.max_pixel/2), outline= self.TEXT_COLOR)
         self.draw.ellipse((self.zerox-self.max_pixel/4, self.zeroy-self.max_pixel/4,
-                           self.zerox+max_pixel/4, self.zeroy+max_pixel/4), outline="black")
-        self.draw.ellipse((self.zerox-2, self.zeroy-2, self.zerox+2, self.zeroy+2), outline="black")
-        self.draw.text((5, 1), str(range)+" nm", font=smallfont, fill="black")
+                           self.zerox+max_pixel/4, self.zeroy+max_pixel/4), outline= self.TEXT_COLOR)
+        self.draw.ellipse((self.zerox-2, self.zeroy-2, self.zerox+2, self.zeroy+2), outline= self.TEXT_COLOR)
+        self.draw.text((5, 1), str(range)+" nm", font=smallfont, fill= self.TEXT_COLOR)
         if gps_quality == 0:
             t = "GPS-NoFix"
         elif gps_quality == 1:
@@ -150,25 +150,25 @@ class Epaper3in7(dcommon.GenericDisplay):
             t = ""
         if basemode:
             t += "\nGround\nmode"
-        self.draw.text((5, self.SMALL+10), t, font=self.verysmallfont, fill="black")
+        self.draw.text((5, self.SMALL+10), t, font=self.verysmallfont, fill= self.TEXT_COLOR)
 
         t = "FL"+str(round(ownalt / 100))
         textlength = self.draw.textlength(t, self.smallfont)
-        self.draw.text((self.sizex - textlength - 5, self.SMALL+10), t, font=self.verysmallfont, fill="black")
+        self.draw.text((self.sizex - textlength - 5, self.SMALL+10), t, font=self.verysmallfont, fill= self.TEXT_COLOR)
 
         t = str(altdifference) + " ft"
         textlength = self.draw.textlength(t, self.smallfont)
-        self.draw.text((self.sizex - textlength - 5, 1), t, font=self.smallfont, fill="black", align="right")
+        self.draw.text((self.sizex - textlength - 5, 1), t, font=self.smallfont, fill= self.TEXT_COLOR, align="right")
 
         text = str(course) + '°'
-        self.centered_text(1, text, self.smallfont, fill="black")
+        self.centered_text(1, text, self.smallfont)
 
         if not gpsconnected:
-            self.centered_text(70, "No GPS", self.smallfont, fill="black")
+            self.centered_text(70, "No GPS", self.smallfont)
         if not connected:
-            self.centered_text(30, "No Connection!", self.smallfont, fill="black")
+            self.centered_text(30, "No Connection!", self.smallfont)
         if co_alarmlevel > 0:
-            self.tered_text(250, "CO Alarm: " + co_alarmstring, self.smallfont, fill="black")
+            self.centered_text(250, "CO Alarm: " + co_alarmstring, self.smallfont)
 
         if extsound or bt_devices > 0:
             if sound_active:
@@ -181,18 +181,18 @@ class Epaper3in7(dcommon.GenericDisplay):
                 t = "\uf1f6"  # bell off symbol
             textlength = self.draw.textlength(t, awesomefont)
             self.draw.text((self.sizex - textlength - 5, self.sizey - self.SMALL), t,
-                           font=self.awesomefont, fill="black")
+                           font=self.awesomefont, fill= self.TEXT_COLOR)
 
         # optical keep alive bar at right side
-        self.draw.line((self.sizex-8, 80+optical_bar*10, self.sizex-8, 80+optical_bar*10+8), fill="black", width=5)
+        self.draw.line((self.sizex-8, 80+optical_bar*10, self.sizex-8, 80+optical_bar*10+8), fill= self.TEXT_COLOR, width=5)
 
 
     def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
-        draw.text((5, 0), "UTC", font=smallfont, fill="black")
-        centered_text(SMALL, utctime, self.verylargefont, fill="black")
+        draw.text((5, 0), "UTC", font=smallfont, fill= self.TEXT_COLOR)
+        centered_text(SMALL, utctime, self.verylargefont, fill= self.TEXT_COLOR)
         if stoptime is not None:
-            draw.text((5,  self.SMALL+VERYLARGE), "Timer", font=smallfont, fill="black")
-            centered_text(2*SMALL+VERYLARGE, stoptime, self.verylargefont, fill="black")
+            draw.text((5,  self.SMALL+VERYLARGE), "Timer", font=smallfont, fill= self.TEXT_COLOR)
+            centered_text(2*SMALL+VERYLARGE, stoptime, self.verylargefont)
             if laptime is not None:
                 draw.text((5, 2*self.SMALL + 2*self.VERYLARGE), laptime_head, font=self.smallfont, fill=self.TEXT_COLOR)
                 centered_text(3*self.SMALL+2*self.VERYLARGE, laptime, self.verylargefont, fill=self.TEXT_COLOR)
@@ -217,14 +217,14 @@ class Epaper3in7(dcommon.GenericDisplay):
         deg_per_value = (to_degree - from_degree) / (end_value - start_value)
 
         draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
-                 from_degree-90, to_degree-90, width=6, fill="black")
+                 from_degree-90, to_degree-90, width=6, fill= self.TEXT_COLOR)
         # small marks first
         line = ((0, -size/2+1), (0, -size/2+small_mark_length))
         m = start_value
         while m <= end_value:
             angle = deg_per_value * (m-start_value) + from_degree
             mark = translate(angle, line, (center_x, center_y))
-            draw.line(mark, fill="black", width=2)
+            draw.line(mark, fill= self.TEXT_COLOR, width=2)
             m += small_marks_distance
         # self.LARG marks
         line = ((0, -size/2+1), (0, -size/2+big_mark_length))
@@ -232,12 +232,12 @@ class Epaper3in7(dcommon.GenericDisplay):
         while m <= end_value:
             angle = deg_per_value*(m-start_value) + from_degree
             mark = translate(angle, line, (center_x, center_y))
-            draw.line(mark, fill="black", width=4)
+            draw.line(mark, fill= self.TEXT_COLOR, width=4)
             # text
             marktext = str(m)
             tl = draw.textlength(marktext, self.largefont)
             t_center = translate(angle, ((0, -size/2 + big_mark_length + self.LARG/2 + text_distance), ), (center_x, center_y))
-            draw.text((t_center[0][0]-tl/2, t_center[0][1]-LARGE/2), marktext, fill="black", font=largefont)
+            draw.text((t_center[0][0]-tl/2, t_center[0][1]-LARGE/2), marktext, fill= self.TEXT_COLOR, font=largefont)
             m += marks_distance
         # arrow
         if current > end_value:   # normalize values in allowed ranges
@@ -246,16 +246,16 @@ class Epaper3in7(dcommon.GenericDisplay):
             current = start_value
         angle = deg_per_value * (current - start_value) + from_degree
         ar = translate(angle, arrow, (center_x, center_y))
-        draw.line(ar, fill="black", width=4)
+        draw.line(ar, fill= self.TEXT_COLOR, width=4)
         # centerpoint
-        draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill="black")
+        draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill= self.TEXT_COLOR)
 
         if middle_text1 is not None:
             tl = draw.textlength(middle_text1, self.smallfont)
-            draw.text((center_x - tl/2, center_y -  self.SMALL - 20), middle_text1, font=smallfont, fill="black", align="left")
+            draw.text((center_x - tl/2, center_y -  self.SMALL - 20), middle_text1, font=smallfont, fill= self.TEXT_COLOR, align="left")
         if middle_text2 is not None:
             tl = draw.textlength(middle_text2, self.smallfont)
-            draw.text((center_x-tl/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
+            draw.text((center_x-tl/2, center_y+20), middle_text2, font=smallfont, fill= self.TEXT_COLOR, align="left")
 
 
     def gmeter(current, maxg, ming, error_message):
@@ -265,16 +265,16 @@ class Epaper3in7(dcommon.GenericDisplay):
         right_center_x = (sizex-gm_size)/2+gm_size    # center of remaining part
         t = "G-Meter"
         tl = draw.textlength(t, self.largefont)
-        draw.text((right_center_x - tl / 2, 30), t, font=largefont, fill="black", align="left")
-        draw.text((gm_size+30, 98), "max", font=smallfont, fill="black")
-        right_text(95, "{:+1.2f}".format(maxg), self.largefont, fill="black")
+        draw.text((right_center_x - tl / 2, 30), t, font=largefont, fill= self.TEXT_COLOR, align="left")
+        draw.text((gm_size+30, 98), "max", font=smallfont, fill= self.TEXT_COLOR)
+        right_text(95, "{:+1.2f}".format(maxg), self.largefont, fill= self.TEXT_COLOR)
         if error_message is None:
-            draw.text((gm_size+30, 138), "act", font=smallfont, fill="black")
-            right_text(135, "{:+1.2f}".format(current), self.largefont, fill="black")
+            draw.text((gm_size+30, 138), "act", font=smallfont, fill= self.TEXT_COLOR)
+            right_text(135, "{:+1.2f}".format(current), self.largefont, fill= self.TEXT_COLOR)
         else:
-            draw.text((gm_size+30, 138), error_message, font=largefont, fill="black")
-        draw.text((gm_size+30, 178), "min", font=smallfont, fill="black")
-        right_text(175, "{:+1.2f}".format(ming), self.largefont, fill="black")
+            draw.text((gm_size+30, 138), error_message, font=largefont, fill= self.TEXT_COLOR)
+        draw.text((gm_size+30, 178), "min", font=smallfont, fill= self.TEXT_COLOR)
+        right_text(175, "{:+1.2f}".format(ming), self.largefont)
 
         bottom_line("", "    Mode", "Reset")
 
@@ -284,22 +284,22 @@ class Epaper3in7(dcommon.GenericDisplay):
         czeroy = self.sizey / 2
         csize = int(self.sizey / 2) # radius of compass rose
 
-        draw.ellipse((self.sizex/2-csize, 0, self.sizex/2+csize-1, self.sizey - 1), outline="black", fill="white", width=4)
-        draw.bitmap((self.zerox - 60, 70), compass_aircraft, fill="black")
-        draw.line((czerox, 20, czerox, 70), fill="black", width=4)
+        draw.ellipse((self.sizex/2-csize, 0, self.sizex/2+csize-1, self.sizey - 1), outline= self.TEXT_COLOR, fill="white", width=4)
+        draw.bitmap((self.zerox - 60, 70), compass_aircraft, fill= self.TEXT_COLOR)
+        draw.line((czerox, 20, czerox, 70), fill= self.TEXT_COLOR, width=4)
         text = str(heading) + '°'
         tl = draw.textlength(text, self.smallfont)
-        draw.text((self.sizex - tl - 100, self.sizey -  self.SMALL - 10), text, font=smallfont, fill="black", align="right")
+        draw.text((self.sizex - tl - 100, self.sizey -  self.SMALL - 10), text, font=smallfont, fill= self.TEXT_COLOR, align="right")
         for m in range(0, 360, 10):
             s = math.sin(math.radians(m - heading + 90))
             c = math.cos(math.radians(m - heading + 90))
             if m % 30 != 0:
                 draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - CM_SIZE) * c,
-                           czeroy - (csize - CM_SIZE) * s), fill="black", width=2)
+                           czeroy - (csize - CM_SIZE) * s), fill= self.TEXT_COLOR, width=2)
             else:
                 draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - CM_SIZE) * c,
-                           czeroy - (csize - CM_SIZE) * s), fill="black", width=4)
-                cdraw.rectangle((0, 0, self.LARG * 2, self.LARGE * 2), fill="black")
+                           czeroy - (csize - CM_SIZE) * s), fill= self.TEXT_COLOR, width=4)
+                cdraw.rectangle((0, 0, self.LARG * 2, self.LARGE * 2), fill= self.TEXT_COLOR)
                 if m == 0:
                     mark = "N"
                 elif m == 90:
@@ -318,40 +318,40 @@ class Epaper3in7(dcommon.GenericDisplay):
                     cdraw.text(((self.LARGE * 2 - tl) / 2, (self.LARGE * 2 - self.MORELARGE) / 2), mark, 1, font=morelargefont)
                 rotmask = self.mask.rotate(-m + heading, expand=False)
                 center = (czerox - (csize - CM_SIZE - self.LARGE / 2) * c, czeroy - (csize - CM_SIZE - self.LARGE / 2) * s)
-                epaper_image.paste("black", (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
+                epaper_image.paste( self.TEXT_COLOR, (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
         if error_message is not None:
-            self.centered_text(120, error_message, self.largefont, fill="black")
+            self.centered_text(120, error_message, self.largefont)
 
 
     def vsi(vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
         meter(vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
-        draw.text((35, sizey/2 -  self.VERYSMALL - 25), "up", font=verysmallfont, fill="black", align="left")
-        draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill="black", align="left")
+        draw.text((35, sizey/2 -  self.VERYSMALL - 25), "up", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+        draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
         middle_text = "Vertical Speed"
         tl = draw.textlength(middle_text, self.smallfont)
-        draw.text((sizey/2 - tl / 2, sizey/2 -  self.VERYSMALL - 10), middle_text, font=verysmallfont, fill="black", align="left")
+        draw.text((sizey/2 - tl / 2, sizey/2 -  self.VERYSMALL - 10), middle_text, font=verysmallfont, fill= self.TEXT_COLOR, align="left")
         middle_text = "100 feet per min"
         tl = draw.textlength(middle_text, self.smallfont)
-        draw.text((sizey/2 - tl / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
+        draw.text((sizey/2 - tl / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill= self.TEXT_COLOR, align="left")
 
         # right data display
-        draw.text((300, 10), "Vert Speed [ft/min]", font=verysmallfont, fill="black", align="left")
-        draw.text((330, 31), "act", font=verysmallfont, fill="black", align="left")
-        draw.text((330, 55), "max", font=verysmallfont, fill="black", align="left")
-        draw.text((330, 79), "min", font=verysmallfont, fill="black", align="left")
-        right_text(28, "{:+1.0f}".format(vertical_speed), self.smallfont, fill="black")
-        right_text(52, "{:+1.0f}".format(vertical_max), self.smallfont, fill="black")
-        right_text(76, "{:+1.0f}".format(vertical_min), self.smallfont, fill="black")
-        draw.text((300, 163), "Flight-Level", font=verysmallfont, fill="black", align="left")
-        right_text(160, "{:1.0f}".format(round(flight_level/100)), self.smallfont, fill="black")
-        draw.text((300, 187), "GPS-Alt [ft]", font=verysmallfont, fill="black", align="left")
-        right_text(184, "{:1.0f}".format(gps_altitude), self.smallfont, fill="black")
-        draw.text((300, 211), "GpsSpd [kts]", font=verysmallfont, fill="black", align="left")
-        right_text(208, "{:1.1f}".format(gps_speed), self.smallfont, fill="black")
+        draw.text((300, 10), "Vert Speed [ft/min]", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+        draw.text((330, 31), "act", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+        draw.text((330, 55), "max", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+        draw.text((330, 79), "min", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+        right_text(28, "{:+1.0f}".format(vertical_speed), self.smallfont, fill= self.TEXT_COLOR)
+        right_text(52, "{:+1.0f}".format(vertical_max), self.smallfont, fill= self.TEXT_COLOR)
+        right_text(76, "{:+1.0f}".format(vertical_min), self.smallfont, fill= self.TEXT_COLOR)
+        draw.text((300, 163), "Flight-Level", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+        right_text(160, "{:1.0f}".format(round(flight_level/100)), self.smallfont, fill= self.TEXT_COLOR)
+        draw.text((300, 187), "GPS-Alt [ft]", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+        right_text(184, "{:1.0f}".format(gps_altitude), self.smallfont, fill= self.TEXT_COLOR)
+        draw.text((300, 211), "GpsSpd [kts]", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+        right_text(208, "{:1.1f}".format(gps_speed), self.smallfont, fill= self.TEXT_COLOR)
 
         if error_message is not None:
-            centered_text(60, error_message, self.verylargefont, "black")
+            centered_text(60, error_message, self.verylargefont)
 
         bottom_line("", "    Mode", "Reset")
 
@@ -490,12 +490,12 @@ class Epaper3in7(dcommon.GenericDisplay):
         bar_start = 100
         bar_end = 420
 
-        draw.text((5, y), text, font=verysmallfont, fill="black", align="left")
+        draw.text((5, y), text, font=verysmallfont, fill= self.TEXT_COLOR, align="left")
         right_val = str(int(max_val)) + unit
         textlength = draw.textlength(right_val, self.smallfont)
-        draw.text((sizex - textlength - 5, y), right_val, font=verysmallfont, fill="black", align="right")
-        draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline="black", width=1)
-        color = "black"
+        draw.text((sizex - textlength - 5, y), right_val, font=verysmallfont, fill= self.TEXT_COLOR, align="right")
+        draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline= self.TEXT_COLOR, width=1)
+        color =  self.TEXT_COLOR
         if val < minval:
             val = minval   # to display a minimum bar, valtext should be provided in this case
         if max_val != 0:
@@ -503,24 +503,24 @@ class Epaper3in7(dcommon.GenericDisplay):
         else:
             xval = bar_start
         for b in range(int(bar_start), int(xval), 5):
-            draw.line([(b, y), (b, y+VERYSMALL)], fill="black", width=1)
+            draw.line([(b, y), (b, y+VERYSMALL)], fill= self.TEXT_COLOR, width=1)
         # draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
         if valtext is not None:
             t = valtext
         else:
             t = str(val)
         tl = draw.textlength(t, self.smallfont)
-        draw.text(((bar_end-bar_start)/2+bar_start-tl/2, y), t, font=verysmallfont, fill="black",
+        draw.text(((bar_end-bar_start)/2+bar_start-tl/2, y), t, font=verysmallfont, fill= self.TEXT_COLOR,
                   stroke_width=1, stroke_fill="white")
-        return y+VERYSMALL+12
+        return y+self.VERYSMALL+12
 
 
     def round_text(x, y, text, color, yesno=True, out=None):
         tl = draw.textlength(text, self.smallfont)
         draw.rounded_rectangle([x, y, x+tl+10, y+VERYSMALL+2], radius=4, fill=color, outline=out)
-        draw.text((x+5, y), text, font=verysmallfont, fill="black")
+        draw.text((x+5, y), text, font=verysmallfont, fill= self.TEXT_COLOR)
         if not yesno:
-            draw.line([x, y+VERYSMALL+2, x+tl+10, y], fill="black", width=2)
+            draw.line([x, y+VERYSMALL+2, x+tl+10, y], fill= self.TEXT_COLOR, width=2)
         return x+tl+20
 
 
@@ -538,10 +538,10 @@ class Epaper3in7(dcommon.GenericDisplay):
         if stat['CPUTemp'] > -300:    # -300 means no value available
             starty = bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
         # GPS
-        draw.text((5, starty), "GPS hw", font=verysmallfont, fill="black")
-        draw.text((100, starty), stat['GPS_detected_type'], font=verysmallfont, fill="black")
+        draw.text((5, starty), "GPS hw", font=verysmallfont, fill= self.TEXT_COLOR)
+        draw.text((100, starty), stat['GPS_detected_type'], font=verysmallfont, fill= self.TEXT_COLOR)
         starty +=  self.VERYSMALL + 5
-        draw.text((5, starty), "GPS sol", font=verysmallfont, fill="black")
+        draw.text((5, starty), "GPS sol", font=verysmallfont, fill= self.TEXT_COLOR)
         if gps_quality == 1:
             t = "3D GPS "
         elif gps_quality == 2:
@@ -552,29 +552,29 @@ class Epaper3in7(dcommon.GenericDisplay):
             gps = str(round(stat['GPS_position_accuracy'], 1)) + "m"
         else:
             gps = "NoFix"
-        draw.text((100, starty), t + gps, font=verysmallfont, fill="black")
+        draw.text((100, starty), t + gps, font=verysmallfont, fill= self.TEXT_COLOR)
 
         t = "Sat: " + str(stat['GPS_satellites_locked']) + " sol/" + \
             str(stat['GPS_satellites_seen']) + " seen/" + str(stat['GPS_satellites_tracked']) + " track"
-        draw.text((220, starty), t, font=verysmallfont, fill="black")
+        draw.text((220, starty), t, font=verysmallfont, fill= self.TEXT_COLOR)
 
         starty +=  self.VERYSMALL+5
 
-        draw.text((5, starty), "altitudes", font=verysmallfont, fill="black")
+        draw.text((5, starty), "altitudes", font=verysmallfont, fill= self.TEXT_COLOR)
         if stat['GPS_position_accuracy'] < 19999:
             alt = '{:5.0f}'.format(gps_alt)
         else:
             alt = " ---"
         t = "P-Alt {0} ft".format(round(altitude))
-        draw.text((100, starty), t, font=verysmallfont, fill="black")
+        draw.text((100, starty), t, font=verysmallfont, fill= self.TEXT_COLOR)
         t = "Corr {0:+} ft".format(stat['AltitudeOffset'])
-        draw.text((220, starty), t, font=verysmallfont, fill="black")
+        draw.text((220, starty), t, font=verysmallfont, fill= self.TEXT_COLOR)
         t = "GPS-Alt " + alt + " ft"
-        draw.text((340, starty), t, font=verysmallfont, fill="black")
+        draw.text((340, starty), t, font=verysmallfont, fill= self.TEXT_COLOR)
         starty +=  self.VERYSMALL + 5
-        draw.text((5, starty), "sensors", font=verysmallfont, fill="black")
-        x = round_text(100, starty, "IMU", "white", stat['IMUConnected'], out="black")
-        round_text(x, starty, "BMP", "white", stat['BMPConnected'], out="black")
+        draw.text((5, starty), "sensors", font=verysmallfont, fill= self.TEXT_COLOR)
+        x = round_text(100, starty, "IMU", "white", stat['IMUConnected'], out= self.TEXT_COLOR)
+        round_text(x, starty, "BMP", "white", stat['BMPConnected'], out= self.TEXT_COLOR)
         bottom_line("+10 ft", "Mode", "-10 ft")
 
 
@@ -614,24 +614,25 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
         if alarmlevel == 0:
-            centered_text(0, "CO Warner: No CO alarm", self.largefont, fill="black")
+            centered_text(0, "CO Warner: No CO alarm", self.largefont)
         else:
             if alarmperiod > 60:
                 alarmstr = "CO: {:d} ppm longer {:d} min".format(alarmppm, math.floor(alarmperiod/60))
             else:
                 alarmstr = "CO: {:d} ppm longer {:d} sec".format(alarmppm, math.floor(alarmperiod))
-            centered_text(0, alarmstr, self.largefont, fill="black")
-        self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, "black", "black", "black", "white", 3, 3, 5, 3)
-        draw.text((320, 50 +  self.SMALL -  self.VERYSMALL), "Warnlevel:", font=verysmallfont, fill="black")
-        right_text(50, "{:3d}".format(alarmlevel), self.smallfont, fill="black")
+            centered_text(0, alarmstr, self.largefont)
+        self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, self.TEXT_COLOR, self.TEXT_COLOR,
+                   self.TEXT_COLOR, self.BG_COLOR, 3, 3, 5, 3)
+        draw.text((320, 50 +  self.SMALL -  self.VERYSMALL), "Warnlevel:", font=verysmallfont, fill=self.TEXT_COLOR)
+        right_text(50, "{:3d}".format(alarmlevel), self.smallfont)
 
         if len(co_values) > 0:
-            draw.text((320, 120+SMALL-VERYSMALL), "CO act:", font=verysmallfont, fill="black")
-            right_text(120, "{:3d}".format(co_values[len(co_values) - 1]), self.smallfont, fill="black")
-        draw.text((320, 140+SMALL-VERYSMALL), "CO max:", font=verysmallfont, fill="black")
-        right_text(140, "{:3d}".format(co_max), self.smallfont, fill="black")
-        draw.text((320, 196), "R0:", font=verysmallfont, fill="black")
-        right_text(196, "{:.1f}k".format(r0/1000), self.smallfont, fill="black")
+            draw.text((320, 120+SMALL-VERYSMALL), "CO act:", font=verysmallfont, fill=self.TEXT_COLOR)
+            right_text(120, "{:3d}".format(co_values[len(co_values) - 1]), self.smallfont)
+        draw.text((320, 140+SMALL-VERYSMALL), "CO max:", font=verysmallfont, fill=self.TEXT_COLOR)
+        right_text(140, "{:3d}".format(co_max), self.smallfont)
+        draw.text((320, 196), "R0:", font=verysmallfont, fill=self.TEXT_COLOR)
+        right_text(196, "{:.1f}k".format(r0/1000), self.smallfont)
 
         bottom_line("Calibrate", "Mode", "Reset")
 
@@ -640,16 +641,18 @@ class Epaper3in7(dcommon.GenericDisplay):
         # dashboard, arguments are lines = ("text", "value"), ....
         starty = y +  self.VERYSMALL/2
         for line in lines:
-            draw.text((x + 7, starty + (SMALL -  self.VERYSMALL) / 2), line[0], font=verysmallfont, fill="black", align="left")
+            draw.text((x + 7, starty + (SMALL -  self.VERYSMALL) / 2), line[0], font=verysmallfont,
+                      fill=self.TEXT_COLOR, align="left")
             tl = draw.textlength(line[1], self.smallfont)
-            draw.text((x + dsizex - 7 - tl, starty), line[1], font=smallfont, fill="black")
+            draw.text((x + dsizex - 7 - tl, starty), line[1], font=smallfont, fill=self.TEXT_COLOR)
             starty +=  self.SMALL + 3
         if rounding:
             starty +=  self.VERYSMALL/2
-            draw.rounded_rectangle([x, y, x + dsizex, starty], radius=6, fill=None, outline="black", width=2)
+            draw.rounded_rectangle([x, y, x + dsizex, starty], radius=6, fill=None, outline=self.TEXT_COLOR, width=2)
             tl = draw.textlength(headline, self.smallfont)
-            draw.rectangle([x + 20, y -  self.SMALL/2, x + 20 + tl + 8, y +  self.SMALL/2], fill="white", outline=None)
-        draw.text((x+20+4, y -  self.VERYSMALL/2), headline, font=verysmallfont, fill="black")
+            draw.rectangle([x + 20, y -  self.SMALL/2, x + 20 + tl + 8, y +  self.SMALL/2],
+                           fill=self.BG_COLOR, outline=None)
+        draw.text((x+20+4, y -  self.VERYSMALL/2), headline, font=verysmallfont, fill=self.TEXT_COLOR)
         return starty
 
 
@@ -657,7 +660,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                  own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                  ground_distance_valid, grounddistance, error_message):
 
-        centered_text(0, "GPS Distance", self.smallfont, fill="black")
+        centered_text(0, "GPS Distance", self.smallfont)
 
         lines = (
             ("Date", "{:0>2d}.{:0>2d}.{:0>4d}".format(now.day, now.month, now.year)),
@@ -717,12 +720,12 @@ class Epaper3in7(dcommon.GenericDisplay):
             dashboard(250, starty, 225, True, "Baro", lines)
 
         if error_message is not None:
-            centered_text(60, error_message, self.verylargefont, fill="black")
+            centered_text(60, error_message, self.verylargefont)
         bottom_line("Stats/Set", "Mode", "Start")
 
 
     def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        centered_text(0, "Start-/Landing Statistics", self.smallfont, fill="black")
+        centered_text(0, "Start-/Landing Statistics", self.smallfont)
 
         st = '---'
         if 'start_time' in values:
@@ -782,31 +785,31 @@ class Epaper3in7(dcommon.GenericDisplay):
         y = ypos
         if 'TASK' in topic and topic['TASK'] is not None:
             if toprint:
-                draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill="black")    # Topic
+                draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill=self.TEXT_COLOR)    # Topic
         if 'CHECK' in topic and topic['CHECK'] is not None:
             if toprint:
-                right_text(ypos, topic['CHECK'], font=smallfont, fill="black", offset=topic_right_offset)     # Check
+                right_text(ypos, topic['CHECK'], font=smallfont, offset=topic_right_offset)     # Check
         y +=  self.SMALL
         if 'REMARK' in topic and topic['REMARK'] is not None:   # remark
             y += remark_offset
             if toprint:
-                draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill="black")  # remark
+                draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill= self.TEXT_COLOR)  # remark
             y +=  self.VERYSMALL
         if 'TASK1' in topic and topic['TASK1'] is not None:    # subtopic
             y += subtopic_offset
             if toprint:
-                draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill="black")  # subtopic
+                draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill= self.TEXT_COLOR)  # subtopic
             if 'CHECK1' in topic and topic['CHECK1'] is not None:
                 if toprint:
-                    right_text(y, topic['CHECK1'], font=smallfont, fill="black", offset=topic_right_offset)
+                    right_text(y, topic['CHECK1'], font=smallfont, fill= self.TEXT_COLOR, offset=topic_right_offset)
             y +=  self.SMALL
         if 'TASK2' in topic and topic['TASK2'] is not None:   # subtopic2
             y += subtopic_offset
             if toprint:
-                draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill="black")  # subtopic
+                draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill= self.TEXT_COLOR)  # subtopic
             if 'CHECK2' in topic and topic['CHECK2'] is not None:
                 if toprint:
-                    right_text(y, topic['CHECK2'], font=smallfont, fill="black", offset=topic_right_offset)
+                    right_text(y, topic['CHECK2'], font=smallfont, fill= self.TEXT_COLOR, offset=topic_right_offset)
             y +=  self.SMALL
         if 'TASK3' in topic and topic['TASK3'] is not None:   # subtopic3
             y += subtopic_offset
@@ -814,7 +817,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                 draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="black")  # subtopic
             if 'CHECK3' in topic and topic['CHECK3'] is not None:
                 if toprint:
-                    right_text(y, topic['CHECK3'], font=smallfont, fill="black", offset=topic_right_offset)
+                    right_text(y, topic['CHECK3'], font=smallfont, offset=topic_right_offset)
             y +=  self.SMALL
         if highlighted:   # draw frame around whole topic
             if toprint:
@@ -826,7 +829,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         checklist_y = {'from': self.LARGE + 8, 'to': self.sizey -  self.SMALL - 6}
         global top_index
 
-        centered_text(0, checklist_name, self.largefont, fill="black")
+        centered_text(0, checklist_name, self.largefont)
         if current_index == 0:
             top_index = 0     # new list, reset top index
         if current_index < top_index:
