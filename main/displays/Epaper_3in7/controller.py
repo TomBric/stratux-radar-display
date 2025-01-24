@@ -99,7 +99,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
     def display(self):
-        self.device.async_display_1Gray(self.device.getbuffer_optimized(epaper_image))
+        self.device.async_display_1Gray(self.device.getbuffer_optimized(self.epaper_image))
 
     def is_busy(self):
         return self.device.async_is_busy()
@@ -318,7 +318,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                     cdraw.text(((self.LARGE * 2 - tl) / 2, (self.LARGE * 2 - self.MORELARGE) / 2), mark, 1, font=morelargefont)
                 rotmask = self.mask.rotate(-m + heading, expand=False)
                 center = (czerox - (csize - CM_SIZE - self.LARGE / 2) * c, czeroy - (csize - CM_SIZE - self.LARGE / 2) * s)
-                epaper_image.paste( self.TEXT_COLOR, (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
+                self.epaper_image.paste( self.TEXT_COLOR, (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
         if error_message is not None:
             self.centered_text(120, error_message, self.largefont)
 
