@@ -94,7 +94,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
         self.cdraw = ImageDraw.Draw(self.mask)
         self.rlog.debug(f'Epaper_3in7 selected: sizex={self.sizex} sizey={self.sizey} zero=({self.zerox}, {self.zeroy}) '
-                        f'refresh-time: {str(round(self.display_refresh_time, 2))} secs')
+                        f'refresh-time: {str(round(self.display_refresh, 2))} secs')
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
     def display(self):
