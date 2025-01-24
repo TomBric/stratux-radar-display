@@ -73,14 +73,13 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.device.Clear(0xFF, 1)
         self.sizex = self.device.height
         self.sizey = self.device.width
-        self.zerox = sizex / 2
+        self.zerox = self.sizex / 2
         if not fullcircle:
             self.zeroy = 200  # not centered
             self.max_pixel = 400
         else:
             self.zeroy = self.sizey / 2
             self.max_pixel = self.sizey
-        rlog.debug(f'Epaper_3in7 selected: sizex={sizex} sizey={sizey} zero=({zerox}, {zeroy})')
         self.ah_zeroy = self.sizey / 2  # zero line for ahrs
         self.ah_zerox = self.sizex / 2
         # measure time for refresh
@@ -94,7 +93,8 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.compass_aircraft = Image.open(pic_path)
         self.mask = Image.new('1', (LARGE * 2, LARGE * 2))
         self.cdraw = ImageDraw.Draw(mask)
-        self.rlog.debug(f'Epaper_3in7 selected: sizex={sizex} sizey={sizey} zero=({zerox}, {zeroy}) refresh-time: {str(round(self.display_refresh_time, 2))} secs')
+        self.rlog.debug(f'Epaper_3in7 selected: sizex={self.sizex} sizey={self.sizey} zero=({self.zerox}, {self.zeroy}) '
+                        f'refresh-time: {str(round(self.display_refresh_time, 2))} secs')
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
     def display(self):
@@ -118,15 +118,15 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.device.init(1)
 
     def clear(self):
-        self.draw.rectangle((0, 0, sizex - 1, sizey - 1), fill="white")  # clear everything in image
+        self.draw.rectangle((0, 0, self.sizex - 1, self.sizey - 1), fill="white")  # clear everything in image
 
     def startup(self, version, target_ip, seconds):
         logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
         logo = Image.open(logopath)
         self.draw.bitmap((zerox-192/2, 0), logo, fill="black")
         versionstr = "Radar " + version
-        self.centered_text(188, versionstr, largefont, fill="black")
-        self.centered_text(sizey - 2 * VERYSMALL - 2, "Connecting to " + target_ip, verysmallfont, fill="black")
+        self.centered_text(188, versionstr, self.largefont, fill="black")
+        self.centered_text(sizey - 2 * VERYSMALL - 2, "Connecting to " + target_ip, self.verysmallfont, fill="black")
         self.display()
         time.sleep(seconds)
 
@@ -278,16 +278,16 @@ class Epaper3in7(dcommon.GenericDisplay):
 
 
     def compass(heading, error_message):
-        czerox = sizex / 2
-        czeroy = sizey / 2
-        csize = sizey / 2  # radius of compass rose
+        czerox = self.sizex / 2
+        czeroy = self.sizey / 2
+        csize = int(self.sizey / 2) # radius of compass rose
 
-        draw.ellipse((sizex/2-csize, 0, sizex/2+csize-1, sizey - 1), outline="black", fill="white", width=4)
+        draw.ellipse((sizex/2-csize, 0, self.sizex/2+csize-1, self.sizey - 1), outline="black", fill="white", width=4)
         draw.bitmap((zerox - 60, 70), compass_aircraft, fill="black")
         draw.line((czerox, 20, czerox, 70), fill="black", width=4)
         text = str(heading) + '°'
         tl = draw.textlength(text, smallfont)
-        draw.text((sizex - tl - 100, sizey - SMALL - 10), text, font=smallfont, fill="black", align="right")
+        draw.text((self.sizex - tl - 100, self.sizey - SMALL - 10), text, font=smallfont, fill="black", align="right")
         for m in range(0, 360, 10):
             s = math.sin(math.radians(m - heading + 90))
             c = math.cos(math.radians(m - heading + 90))
@@ -312,13 +312,13 @@ class Epaper3in7(dcommon.GenericDisplay):
                     tl = draw.textlength(mark, largefont)
                     cdraw.text(((LARGE * 2 - tl) / 2, LARGE / 2), mark, 1, font=largefont)
                 else:
-                    tl = draw.textlength(mark, morelargefont)
-                    cdraw.text(((LARGE * 2 - tl) / 2, (LARGE * 2 - MORELARGE) / 2), mark, 1, font=morelargefont)
+                    tl = draw.textlength(mark, self.morelargefont)
+                    cdraw.text(((self.LARGE * 2 - tl) / 2, (self.LARGE * 2 - self.MORELARGE) / 2), mark, 1, font=morelargefont)
                 rotmask = mask.rotate(-m + heading, expand=False)
-                center = (czerox - (csize - CM_SIZE - LARGE / 2) * c, czeroy - (csize - CM_SIZE - LARGE / 2) * s)
-                epaper_image.paste("black", (round(center[0] - LARGE), round(center[1] - LARGE)), rotmask)
+                center = (czerox - (csize - CM_SIZE - self.LARGE / 2) * c, czeroy - (csize - CM_SIZE - self.LARGE / 2) * s)
+                epaper_image.paste("black", (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
         if error_message is not None:
-            centered_text(120, error_message, largefont, fill="black")
+            self.centered_text(120, error_message, self.largefont, fill="black")
 
 
     def vsi(vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
