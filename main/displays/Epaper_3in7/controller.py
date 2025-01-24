@@ -864,3 +864,7 @@ def checklist(checklist_name, checklist_items, current_index, last_list):
         bottom_line(left, "Mode", "Checked")
     else:
         bottom_line(left, "NextList/Mode", "Checked")
+
+
+# instantiate a single object in the file, needs to be done and inherited in every display module
+radar_display = Epaper3in7()
