@@ -84,12 +84,12 @@ class GenericDisplay:
         self.cdraw = None  # pixel array to be used in compass to delete text
         self.compass_aircraft = None    # image of the compass aircraft
         # fonts
-        self.verylargefont = make_font("Font.ttc", VERYLARGE)
-        self.morelargefont = make_font("Font.ttc", MORELARGE)
-        self.largefont = make_font("Font.ttc", LARGE)  # font for height indications
-        self.smallfont = make_font("Font.ttc", SMALL)  # font for information indications
-        self.verysmallfont = make_font("Font.ttc", VERYSMALL)  # font for information indications
-        self.awesomefont = make_font("fontawesome-webfont.ttf", AWESOME_FONTSIZE)  # for bluetooth indicator
+        self.verylargefont = GenericDisplay.make_font("Font.ttc", VERYLARGE)
+        self.morelargefont = GenericDisplay.make_font("Font.ttc", MORELARGE)
+        self.largefont = GenericDisplay.make_font("Font.ttc", LARGE)  # font for height indications
+        self.smallfont = GenericDisplay.make_font("Font.ttc", SMALL)  # font for information indications
+        self.verysmallfont = GenericDisplay.make_font("Font.ttc", VERYSMALL)  # font for information indications
+        self.awesomefont = GenericDisplay.make_font("fontawesome-webfont.ttf", AWESOME_FONTSIZE)  # for bluetooth indicator
 
     def init(self, fullcircle=False):    # explicit init to be implemented for every device type
         # set device properties
