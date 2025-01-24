@@ -263,21 +263,21 @@ class GenericDisplay:
         else:
             return '---'
 
-    def centered_text(self, y, text, font, color=color):
+    def centered_text(self, y, text, font, color=textcolor):
         tl = self.draw.textlength(text, font)
-        self.draw.text((math.floor(self.zerox - tl / 2), y), text, font=font, fill=color)
+        self.draw.text((math.floor(self.zerox - tl / 2), y), text, font=font, fill=textcolor)
 
-    def right_text(self, y, text, font, color=color, offset=0):
+    def right_text(self, y, text, font, color=textcolor, offset=0):
         tl = self.draw.textlength(text, font)
-        self.draw.text((self.sizex - 5 - tl - offset, y), text, font=font, fill=color)
+        self.draw.text((self.sizex - 5 - tl - offset, y), text, font=font, fill=textcolor)
 
 
-    def bottom_line(self, left, middle, right, color=color, offset_bottom=0, offset_left=0, offset_right=0):
-        self.draw.text((offset_left, self.sizey - smallfont.size - offset_bottom), left, font=smallfont, fill=color)
+    def bottom_line(self, left, middle, right, color=textcolor, offset_bottom=0, offset_left=0, offset_right=0):
+        self.draw.text((offset_left, self.sizey - smallfont.size - offset_bottom), left, font=smallfont, fill=textcolor)
         textlength = self.draw.textlength(right, smallfont)
         self.draw.text((self.sizex - textlength - offset_right, self.sizey - smallfont.size - offset_bottom), right,
-                       font=smallfont, fill=color, align="right")
-        self.centered_text(self.sizey - smallfont.size - offset_bottom, middle, smallfont, color)
+                       font=smallfont, fill=textcolor, align="right")
+        self.centered_text(self.sizey - smallfont.size - offset_bottom, middle, smallfont, textcolor)
 
     def graph(self, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout,
               textcolor, graphcolor, linecolor, bgcolor, glinewidth, linewidth, x_val_space, x_val_linelength):
