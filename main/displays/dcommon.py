@@ -277,13 +277,15 @@ class GenericDisplay:
 
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=0, offset_left=0, offset_right=0):
+        y = self.sizey - self.smallfont.size - offset_bottom
         if color is None:
             color = self.TEXT_COLOR
-        self.draw.text((offset_left, self.sizey - smallfont.size - offset_bottom), left, font=smallfont, fill=color)
-        textlength = self.draw.textlength(right, smallfont)
-        self.draw.text((self.sizex - textlength - offset_right, self.sizey - smallfont.size - offset_bottom), right,
-                       font=smallfont, fill=color, align="right")
-        self.centered_text(self.sizey - self.smallfont.size - offset_bottom, middle, smallfont, color)
+        self.draw.text((offset_left, y), left,
+                       font=self.smallfont, fill=color)
+        textlength = self.draw.textlength(right, self.smallfont)
+        self.draw.text((self.sizex - textlength - offset_right, y), right,
+                       font=self.smallfont, fill=color, align="right")
+        self.centered_text(y, middle, smallfont, color)
 
     def graph(self, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout,
               textcolor, graphcolor, linecolor, bgcolor, glinewidth, linewidth, x_val_space, x_val_linelength):
