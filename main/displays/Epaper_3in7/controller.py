@@ -189,20 +189,21 @@ class Epaper3in7(dcommon.GenericDisplay):
 
 
     def timer(self,utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
-        draw.text((5, 0), "UTC", font=self.smallfont, fill= self.TEXT_COLOR)
-        centered_text(SMALL, utctime, self.verylargefont, fill= self.TEXT_COLOR)
+        self.draw.text((5, 0), "UTC", font=self.smallfont, fill=self.TEXT_COLOR)
+        self.centered_text(SMALL, utctime, self.verylargefont, fill=self.TEXT_COLOR)
         if stoptime is not None:
-            draw.text((5,  self.SMALL+VERYLARGE), "Timer", font=self.smallfont, fill= self.TEXT_COLOR)
-            centered_text(2*SMALL+VERYLARGE, stoptime, self.verylargefont)
+            draw.text((5, self.SMALL+VERYLARGE), "Timer", font=self.smallfont, fill= self.TEXT_COLOR)
+            self.centered_text(2*SMALL+VERYLARGE, stoptime, self.verylargefont)
             if laptime is not None:
-                draw.text((5, 2*self.SMALL + 2*self.VERYLARGE), laptime_head, font=self.smallfont, fill=self.TEXT_COLOR)
-                centered_text(3*self.SMALL+2*self.VERYLARGE, laptime, self.verylargefont, fill=self.TEXT_COLOR)
+                self.draw.text((5, 2*self.SMALL + 2*self.VERYLARGE), laptime_head, font=self.smallfont,
+                               fill=self.TEXT_COLOR)
+                self.centered_text(3*self.SMALL+2*self.VERYLARGE, laptime, self.verylargefont, fill=self.TEXT_COLOR)
 
-        draw.text((5, self.sizey-self.SMALL-3), left_text, font=self.smallfont, fill=self.TEXT_COLOR)
-        textlength = draw.textlength(right_t, self.smallfont)
-        draw.text((self.sizex-textlength-8, self.sizey-self.SMALL-3), right_t,
+        self.draw.text((5, self.sizey-self.SMALL-3), left_text, font=self.smallfont, fill=self.TEXT_COLOR)
+        textlength = self.draw.textlength(right_t, self.smallfont)
+        self.draw.text((self.sizex-textlength-8, self.sizey-self.SMALL-3), right_t,
                   font=self.smallfont, fill=self.TEXT_COLOR, align="right")
-        centered_text(sizey-self.SMALL-3, middle_text, self.smallfont, fill=self.TEXT_COLOR)
+        cself.centered_text(sizey-self.SMALL-3, middle_text, self.smallfont, fill=self.TEXT_COLOR)
 
 
     def meter(self, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
