@@ -157,9 +157,9 @@ class GenericDisplay:
         else:
             t = "-" + str(abs(height))
         if vspeed > 0:
-            t = t + UP_CHARACTER
+            t = t + self.UP_CHARACTER
         if vspeed < 0:
-            t = t + DOWN_CHARACTER
+            t = t + self.DOWN_CHARACTER
         w = self.draw.textlength(t, self.largefont)
         if w + x + 4 * self.AIRCRAFT_SIZE - 2 > sizex:
             # would draw text outside, move to the left
