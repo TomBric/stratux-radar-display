@@ -188,7 +188,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.line((self.sizex-8, 80+optical_bar*10, self.sizex-8, 80+optical_bar*10+8), fill= self.TEXT_COLOR, width=5)
 
 
-    def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
+    def timer(self,utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
         draw.text((5, 0), "UTC", font=self.smallfont, fill= self.TEXT_COLOR)
         centered_text(SMALL, utctime, self.verylargefont, fill= self.TEXT_COLOR)
         if stoptime is not None:
@@ -205,7 +205,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         centered_text(sizey-self.SMALL-3, middle_text, self.smallfont, fill=self.TEXT_COLOR)
 
 
-    def meter(current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
+    def meter(self, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
               marks_distance, small_marks_distance, middle_text1, middle_text2):
         big_mark_length = 20
         small_mark_length = 10
@@ -259,7 +259,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             draw.text((center_x-tl/2, center_y+20), middle_text2, font=smallfont, fill= self.TEXT_COLOR, align="left")
 
 
-    def gmeter(current, maxg, ming, error_message):
+    def gmeter(self, current, maxg, ming, error_message):
         gm_size = 280
         meter(current, -3, 5, 110, 430, gm_size, 140, 140, 1, 0.25, "G-Force", None)
 
@@ -280,7 +280,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         bottom_line("", "    Mode", "Reset")
 
 
-    def compass(heading, error_message):
+    def compass(self, heading, error_message):
         czerox = self.sizex / 2
         czeroy = self.sizey / 2
         csize = int(self.sizey / 2) # radius of compass rose
@@ -324,7 +324,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.centered_text(120, error_message, self.largefont)
 
 
-    def vsi(vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
+    def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
         meter(vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
         draw.text((35, sizey/2 -  self.VERYSMALL - 25), "up", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
@@ -357,7 +357,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         bottom_line("", "    Mode", "Reset")
 
 
-    def shutdown(countdown, shutdownmode):
+    def shutdown(self, countdown, shutdownmode):
         if shutdownmode == 0:   # shutdown stratux + display
             message = "Shutdown stratux & display"
         elif shutdownmode == 1:
@@ -377,7 +377,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         bottom_line("Cancel", "Display only", "Reboot")
 
 
-    def rollmarks(roll):
+    def rollmarks(self, roll):
         if ah_zerox > ah_zeroy:
             di = ah_zeroy
         else:
