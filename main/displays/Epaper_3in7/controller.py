@@ -198,12 +198,13 @@ class Epaper3in7(dcommon.GenericDisplay):
                 self.draw.text((5, 2*self.SMALL + 2*self.VERYLARGE), laptime_head, font=self.smallfont,
                                fill=self.TEXT_COLOR)
                 self.centered_text(3*self.SMALL+2*self.VERYLARGE, laptime, self.verylargefont)
+        self.bottom_line(left_text, middle_text, right_t)
 
-        self.draw.text((5, self.sizey-self.SMALL-3), left_text, font=self.smallfont, fill=self.TEXT_COLOR)
-        textlength = self.draw.textlength(right_t, self.smallfont)
-        self.draw.text((self.sizex-textlength-8, self.sizey-self.SMALL-3), right_t,
-                  font=self.smallfont, fill=self.TEXT_COLOR, align="right")
-        self.centered_text(sizey-self.SMALL-3, middle_text, self.smallfont)
+        # self.draw.text((5, self.sizey-self.SMALL-3), left_text, font=self.smallfont, fill=self.TEXT_COLOR)
+        # textlength = self.draw.textlength(right_t, self.smallfont)
+        # self.draw.text((self.sizex-textlength-8, self.sizey-self.SMALL-3), right_t,
+        #          font=self.smallfont, fill=self.TEXT_COLOR, align="right")
+        # self.centered_text(self.sizey-self.SMALL-3, middle_text, self.smallfont)
 
 
     def meter(self, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
