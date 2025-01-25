@@ -166,7 +166,7 @@ class GenericDisplay:
             tposition = (x - 4 * self.AIRCRAFT_SIZE - w, int(y - self.LARGE / 2))
         else:
             tposition = (x + 4 * self.AIRCRAFT_SIZE + 1, int(y - self.LARGE / 2))
-        self.draw.text(tposition, t, font=largefont, fill=self.AIRCRAFT_COLOR)
+        self.draw.text(tposition, t, font=self.largefont, fill=self.AIRCRAFT_COLOR)
         if tail is not None:
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.verysmallfont, fill=self.AIRCRAFT_COLOR)
 
