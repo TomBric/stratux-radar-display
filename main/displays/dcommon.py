@@ -142,10 +142,10 @@ class GenericDisplay:
                            font=self.verysmallfont, fill=self.AIRCRAFT_COLOR)
 
     def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, angle_offset=0):
-        p1 = posn(direction, 2 * AIRCRAFT_SIZE, angle_offset)
-        p2 = posn(direction + 150, 4 * AIRCRAFT_SIZE, angle_offset)
-        p3 = posn(direction + 180, 2 * AIRCRAFT_SIZE, angle_offset)
-        p4 = posn(direction + 210, 4 * AIRCRAFT_SIZE, angle_offset)
+        p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, angle_offset)
+        p2 = posn(direction + 150, 4 * self.AIRCRAFT_SIZE, angle_offset)
+        p3 = posn(direction + 180, 2 * self.AIRCRAFT_SIZE, angle_offset)
+        p4 = posn(direction + 210, 4 * self.AIRCRAFT_SIZE, angle_offset)
         p5 = posn(direction, nspeed_length, angle_offset)  # line for speed
 
         self.draw.polygon(
@@ -160,15 +160,15 @@ class GenericDisplay:
             t = t + UP_CHARACTER
         if vspeed < 0:
             t = t + DOWN_CHARACTER
-        w = self.draw.textlength(t, largefont)
-        if w + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
+        w = self.draw.textlength(t, self.largefont)
+        if w + x + 4 * self.AIRCRAFT_SIZE - 2 > sizex:
             # would draw text outside, move to the left
-            tposition = (x - 4 * AIRCRAFT_SIZE - w, int(y - LARGE / 2))
+            tposition = (x - 4 * self.AIRCRAFT_SIZE - w, int(y - self.LARGE / 2))
         else:
-            tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - LARGE / 2))
+            tposition = (x + 4 * self.AIRCRAFT_SIZE + 1, int(y - self.LARGE / 2))
         self.draw.text(tposition, t, font=largefont, fill=self.AIRCRAFT_COLOR)
         if tail is not None:
-            self.draw.text((tposition[0], tposition[1] + LARGE), tail, font=verysmallfont, fill=self.AIRCRAFT_COLOR)
+            self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.verysmallfont, fill=self.AIRCRAFT_COLOR)
 
 
     def display(self):
@@ -412,10 +412,10 @@ class GenericDisplay:
             self.draw.line(mark, fill="black", width=4)
             # text
             marktext = str(m)
-            tl = self.draw.textlength(marktext, largefont)
-            t_center = translate(angle, ((0, -size / 2 + big_mark_length + LARGE / 2 + text_distance),),
+            tl = self.draw.textlength(marktext, self.largefont)
+            t_center = translate(angle, ((0, -size / 2 + big_mark_length + self.LARGE / 2 + text_distance),),
                                  (center_x, center_y))
-            self.draw.text((t_center[0][0] - tl / 2, t_center[0][1] - LARGE / 2), marktext, fill="black", font=largefont)
+            self.draw.text((t_center[0][0] - tl / 2, t_center[0][1] - self.LARGE / 2), marktext, fill="black", font=largefont)
             m += marks_distance
         # arrow
         if current > end_value:  # normalize values in allowed ranges
