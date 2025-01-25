@@ -283,7 +283,7 @@ class GenericDisplay:
         textlength = self.draw.textlength(right, smallfont)
         self.draw.text((self.sizex - textlength - offset_right, self.sizey - smallfont.size - offset_bottom), right,
                        font=smallfont, fill=color, align="right")
-        self.centered_text(self.sizey - smallfont.size - offset_bottom, middle, smallfont, color)
+        self.centered_text(self.sizey - self.smallfont.size - offset_bottom, middle, smallfont, color)
 
     def graph(self, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout,
               textcolor, graphcolor, linecolor, bgcolor, glinewidth, linewidth, x_val_space, x_val_linelength):
