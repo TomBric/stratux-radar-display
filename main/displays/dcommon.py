@@ -130,7 +130,7 @@ class GenericDisplay:
             t = t + self.UP_CHARACTER
         if vspeed < 0:
             t = t + self.DOWN_CHARACTER
-        w = self.draw.textlength(t, largefont)
+        w = self.draw.textlength(t, self.largefont)
         tposition = (int(self.zerox+arctext[0]-w/2), int(self.zeroy+arctext[1]-self.LARGE/2))
         self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.LARGE+2)), fill=self.BG_COLOR)
         self.draw.text(tposition, t, font=self.largefont, fill=self.AIRCRAFT_COLOR)
