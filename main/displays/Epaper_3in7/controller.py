@@ -198,7 +198,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                 self.draw.text((5, 2*self.SMALL + 2*self.VERYLARGE), laptime_head, font=self.smallfont,
                                fill=self.TEXT_COLOR)
                 self.centered_text(3*self.SMALL+2*self.VERYLARGE, laptime, self.verylargefont)
-        self.bottom_line(left_text, middle_text, right_t, offset=3)
+        self.bottom_line(left_text, middle_text, right_t, offset_bottom=3)
 
         # self.draw.text((5, self.sizey-self.SMALL-3), left_text, font=self.smallfont, fill=self.TEXT_COLOR)
         # textlength = self.draw.textlength(right_t, self.smallfont)
