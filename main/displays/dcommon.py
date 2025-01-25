@@ -161,7 +161,7 @@ class GenericDisplay:
         if vspeed < 0:
             t = t + self.DOWN_CHARACTER
         w = self.draw.textlength(t, self.largefont)
-        if w + x + 4 * self.AIRCRAFT_SIZE - 2 > sizex:
+        if w + x + 4 * self.AIRCRAFT_SIZE - 2 > self.sizex:
             # would draw text outside, move to the left
             tposition = (x - 4 * self.AIRCRAFT_SIZE - w, int(y - self.LARGE / 2))
         else:
