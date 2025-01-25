@@ -205,6 +205,17 @@ class GenericDisplay:
         pass
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
+        self.draw.text((5, 0), "UTC", font=self.smallfont, fill=self.TEXT_COLOR)
+        self.centered_text(self.SMALL, utctime, self.verylargefont)
+        if stoptime is not None:
+            self.draw.text((5, self.SMALL + self.VERYLARGE), "Timer", font=self.smallfont, fill=self.TEXT_COLOR)
+            self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.verylargefont)
+            if laptime is not None:
+                self.draw.text((5, 2 * self.SMALL + 2 * self.VERYLARGE), laptime_head, font=self.smallfont,
+                               fill=self.TEXT_COLOR)
+                self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.verylargefont)
+        self.bottom_line(left_text, middle_text, right_t)
+
         pass
 
     def gmeter(self, current, maxg, ming, error_message):
@@ -277,7 +288,7 @@ class GenericDisplay:
         self.draw.text((self.sizex - 5 - tl - offset, y), text, font=font, fill=color)
 
 
-    def bottom_line(self, left, middle, right, color=None, offset_bottom=0, offset_left=0, offset_right=0):
+    def bottom_line(self, left, middle, right, color=None, offset_bottom=3, offset_left=3, offset_right=3):
         y = self.sizey - self.smallfont.size - offset_bottom
         if color is None:
             color = self.TEXT_COLOR
