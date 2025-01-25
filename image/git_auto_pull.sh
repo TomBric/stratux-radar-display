@@ -8,6 +8,8 @@ if [ -z "$COMMAND" ]; then
 fi
 # change to local repo dir
 cd "$REPO_DIR" || { echo "GitAutoPull Error: no such directory"; exit 1; }
+echo "Executing command: $COMMAND"
+eval "$COMMAND"
 while true; do
     git fetch origin
     # check if new commits exist
