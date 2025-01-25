@@ -286,7 +286,7 @@ class GenericDisplay:
         textlength = self.draw.textlength(right, self.smallfont)
         self.draw.text((self.sizex - textlength - offset_right, y), right,
                        font=self.smallfont, fill=color, align="right")
-        self.centered_text(y, middle, smallfont, color)
+        self.centered_text(y, middle, self.smallfont, color)
 
     def graph(self, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout,
               textcolor, graphcolor, linecolor, bgcolor, glinewidth, linewidth, x_val_space, x_val_linelength):
@@ -366,7 +366,7 @@ class GenericDisplay:
         for line in lines:
             self.draw.text((x + 7, starty + (SMALL - VERYSMALL) / 2), line[0], font=verysmallfont, fill=color,
                       align="left")
-            tl = self.draw.textlength(line[1], smallfont)
+            tl = self.draw.textlength(line[1], self.smallfont)
             self.draw.text((x + dsizex - 7 - tl, starty), line[1], font=smallfont, fill=color)
             starty += SMALL + 3
         if rounding:
@@ -429,10 +429,10 @@ class GenericDisplay:
         self.draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill="black")
 
         if middle_text1 is not None:
-            tl = draw.textlength(middle_text1, smallfont)
+            tl = draw.textlength(middle_text1, self.smallfont)
             self.draw.text((center_x - tl / 2, center_y - SMALL - 20), middle_text1, font=smallfont, fill="black",
                       align="left")
         if middle_text2 is not None:
-            tl = draw.textlength(middle_text2, smallfont)
-            self.draw.text((center_x - tl / 2, center_y + 20), middle_text2, font=smallfont, fill="black", align="left")
+            tl = draw.textlength(middle_text2, self.smallfont)
+            self.draw.text((center_x - tl / 2, center_y + 20), middle_text2, font=self.smallfont, fill="black", align="left")
 
