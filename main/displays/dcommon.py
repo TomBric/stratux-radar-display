@@ -37,6 +37,24 @@ import logging
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
+# helper functions
+def posn(angle, arm_length, angle_offset=0):
+    dx = round(math.cos(math.radians(angle_offset + angle)) * arm_length)
+    dy = round(math.sin(math.radians(angle_offset + angle)) * arm_length)
+    return dx, dy
+
+
+def turn(sin_a, cos_a, p, zero):
+    return round(zero[0] + p[0] * cos_a - p[1] * sin_a), round(zero[1] + p[0] * sin_a + p[1] * cos_a)
+
+
+def translate(angle, points, zero):
+    s = math.sin(math.radians(angle))
+    c = math.cos(math.radians(angle))
+    result = tuple(turn(s, c, p, zero) for p in points)
+    return result
+
+
 class GenericDisplay:
     # display specific constants, overwrite for every display!
     VERYLARGE = 48  # timer
@@ -235,26 +253,9 @@ class GenericDisplay:
     # Generic support functions
     ####################################
     @staticmethod
-    def posn(angle, arm_length, angle_offset=0):
-        dx = round(math.cos(math.radians(angle_offset + angle)) * arm_length)
-        dy = round(math.sin(math.radians(angle_offset + angle)) * arm_length)
-        return dx, dy
-
-    @staticmethod
     def make_font(name, size):
         font_path = str(Path(__file__).resolve().parent.joinpath('fonts', name))
         return ImageFont.truetype(font_path, size)
-
-    @staticmethod
-    def turn(sin_a, cos_a, p, zero):
-        return round(zero[0] + p[0] * cos_a - p[1] * sin_a), round(zero[1] + p[0] * sin_a + p[1] * cos_a)
-
-    @staticmethod
-    def translate(angle, points, zero):
-        s = math.sin(math.radians(angle))
-        c = math.cos(math.radians(angle))
-        result = tuple(turn(s, c, p, zero) for p in points)
-        return result
 
     @staticmethod
     def form_line(values, key, format_str):  # generates line if key exists with form string, "---" else
