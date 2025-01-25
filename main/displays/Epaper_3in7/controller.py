@@ -192,7 +192,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.text((5, 0), "UTC", font=self.smallfont, fill=self.TEXT_COLOR)
         self.centered_text(self.SMALL, utctime, self.verylargefont)
         if stoptime is not None:
-            draw.text((5, self.SMALL+VERYLARGE), "Timer", font=self.smallfont, fill= self.TEXT_COLOR)
+            self.draw.text((5, self.SMALL+self.VERYLARGE), "Timer", font=self.smallfont, fill= self.TEXT_COLOR)
             self.centered_text(2*self.SMALL+self.VERYLARGE, stoptime, self.verylargefont)
             if laptime is not None:
                 self.draw.text((5, 2*self.SMALL + 2*self.VERYLARGE), laptime_head, font=self.smallfont,
