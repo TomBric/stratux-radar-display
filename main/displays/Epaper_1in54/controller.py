@@ -329,18 +329,6 @@ def situation(connected, gpsconnected, ownalt, course, range, altdifference, bt_
     draw.line((2, 150+(optical_bar % 5)*5, 2, 150+(optical_bar % 5)*5+6), fill="black", width=4)
 
 
-def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs):
-    draw.text((5, 0), "UTC", font=smallfont, fill="black")
-    centered_text(SMALL, utctime, verylargefont, fill="black")
-    if stoptime is not None:
-        draw.text((5, SMALL+VERYLARGE), "Timer", font=smallfont, fill="black")
-        centered_text(2*SMALL+VERYLARGE, stoptime, verylargefont, fill="black")
-        if laptime is not None:
-            draw.text((5, 2*SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="black")
-            centered_text(3*SMALL+2*VERYLARGE, laptime, verylargefont, fill="black")
-    bottom_line(left_text, middle_text, right_t, offset=3)
-
-
 def meter(current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
           marks_distance, small_marks_distance, middle_text1, middle_text2):
     big_mark_length = 15

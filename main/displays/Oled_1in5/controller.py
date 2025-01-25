@@ -301,21 +301,17 @@ def situation(connected, gpsconnected, ownalt, course, range, altdifference, bt_
 
 
 def timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs):
-    draw.text((0, 0), "UTC", font=smallfont, fill="cyan")
-    centered_text(SMALL, utctime, verylargefont, fill="yellow")
-    draw.text((0, SMALL + VERYLARGE), "Timer", font=smallfont, fill="cyan")
+    # is defined in subclass, since we want to have colors for oled
     if timer_runs:
         color = "lavender"
     else:
         color = "orangered"
-    centered_text(2 * SMALL + VERYLARGE, stoptime, verylargefont, fill=color)
-    draw.text((0, 2 * SMALL + 2 * VERYLARGE), laptime_head, font=smallfont, fill="cyan")
     if laptime_head == "Laptimer":
-        centered_text(3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="powderblue")
+        second_color = "powderblue"
     else:
-        centered_text(3 * SMALL + 2 * VERYLARGE, laptime, verylargefont, fill="magenta")
-
-    bottom_line(left_text, middle_text, right_text, offset=3)
+        second_color= "magenta"
+    GenericDisplay().timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs,
+                           utc_color=cyan, timer_color=color, second_color=second_color)
 
 
 def turn(sin_a, cos_a, p, zero):
