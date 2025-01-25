@@ -407,7 +407,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         draw.line((ah_zerox, sizey - slipsize * 2, ah_zerox, sizey - 1), fill="white", width=2)
 
 
-    def ahrs(pitch, roll, heading, slipskid, error_message):
+    def ahrs(self, pitch, roll, heading, slipskid, error_message):
         # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
         h1, h2 = linepoints(pitch, roll, 0, 600)  # horizon points
         h3, h4 = linepoints(pitch, roll, -180, 600)
