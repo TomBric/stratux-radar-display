@@ -198,18 +198,18 @@ class Epaper3in7(dcommon.GenericDisplay):
         gm_size = 280
         self.meter(current, -3, 5, 110, 430, gm_size, 140, 140, 1, 0.25,  20, 10, 10, 12, "G-Force", None)
 
-        right_center_x = (sizex-gm_size)/2+gm_size    # center of remaining part
+        right_center_x = (self.sizex-gm_size)/2+gm_size    # center of remaining part
         t = "G-Meter"
-        tl = draw.textlength(t, self.largefont)
-        draw.text((right_center_x - tl / 2, 30), t, font=largefont, fill= self.TEXT_COLOR, align="left")
-        draw.text((gm_size+30, 98), "max", font=smallfont, fill= self.TEXT_COLOR)
+        tl = self.draw.textlength(t, self.largefont)
+        self.draw.text((right_center_x - tl / 2, 30), t, font=self.largefont, fill= self.TEXT_COLOR, align="left")
+        self.draw.text((gm_size+30, 98), "max", font=self.smallfont, fill= self.TEXT_COLOR)
         right_text(95, "{:+1.2f}".format(maxg), self.largefont, fill= self.TEXT_COLOR)
         if error_message is None:
-            draw.text((gm_size+30, 138), "act", font=smallfont, fill= self.TEXT_COLOR)
+            self.draw.text((gm_size+30, 138), "act", font=self.smallfont, fill= self.TEXT_COLOR)
             right_text(135, "{:+1.2f}".format(current), self.largefont, fill= self.TEXT_COLOR)
         else:
-            draw.text((gm_size+30, 138), error_message, font=largefont, fill= self.TEXT_COLOR)
-        draw.text((gm_size+30, 178), "min", font=smallfont, fill= self.TEXT_COLOR)
+            self.draw.text((gm_size+30, 138), error_message, font=self.largefont, fill= self.TEXT_COLOR)
+        self.draw.text((gm_size+30, 178), "min", font=self.smallfont, fill= self.TEXT_COLOR)
         right_text(175, "{:+1.2f}".format(ming), self.largefont)
 
         bottom_line("", "    Mode", "Reset")
