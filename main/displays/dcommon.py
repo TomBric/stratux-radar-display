@@ -291,9 +291,9 @@ class GenericDisplay:
         self.draw.ellipse((self.ah_zerox - slipskid * slipscale - slipsize_y, self.sizey-1 - slipsize_y*2,
                       self.ah_zerox - slipskid * slipscale + slipsize_y, self.sizey-1), fill="white")
         # middle line with background
-        self.draw.line((self.ah_zerox, self.sizey-1 - slipsize_x * 2, self.ah_zerox, self.sizey-1),
+        self.draw.line((self.ah_zerox, self.sizey-1 - slipsize_y * 2, self.ah_zerox, self.sizey-1),
                        fill="black", width=centerline_width*3)
-        self.draw.line((self.ah_zerox, self.sizey-1 - slipsize_x * 2, self.ah_zerox, self.sizey-1),
+        self.draw.line((self.ah_zerox, self.sizey-1 - slipsize_y * 2, self.ah_zerox, self.sizey-1),
                        fill="white", width=centerline_width)
 
     def earthfill(self, pitch, roll, length, scale):   # possible function for derived classed to implement fillings for earth
