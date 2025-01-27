@@ -68,10 +68,12 @@ class GenericDisplay:
     AIRCRAFT_COLOR = "red"
     BG_COLOR = "black"
     TEXT_COLOR = "white"   # default color for text
+
     AHRS_EARTH_COLOR = "brown"   # how ahrs displays the earth
     AHRS_SKY_COLOR = "blue"   # how ahrs displays the sky
     AHRS_HORIZON_COLOR = "white"   # color of horizon line in ahrs
     AHRS_MARKS_COLOR = "white"   # color of marks and corresponding text in ahrs
+    # AHRS
     VELOCITY_WIDTH = 3  # width of indicator for velocity of aircraft
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 0
@@ -318,7 +320,7 @@ class GenericDisplay:
 
         self.earthfill(pitch, roll, max_length, pitchscale)   # draw some special fillings for the earth
 
-        for pm in PITCH_POSMARKS:  # pitchmarks
+        for pm in self.PITCH_POSMARKS:  # pitchmarks
             self.draw.line((self.linepoints(pitch, roll, pm, pitchmark_length, pitchscale)), fill=self.AHRS_MARKS_COLOR,
                            width=line_width)
 
