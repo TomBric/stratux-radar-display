@@ -203,14 +203,14 @@ class Epaper3in7(dcommon.GenericDisplay):
         tl = self.draw.textlength(t, self.largefont)
         self.draw.text((right_center_x - tl / 2, 30), t, font=self.largefont, fill= self.TEXT_COLOR, align="left")
         self.draw.text((gm_size+30, 98), "max", font=self.smallfont, fill= self.TEXT_COLOR)
-        right_text(95, "{:+1.2f}".format(maxg), self.largefont, fill= self.TEXT_COLOR)
+        self.right_text(95, "{:+1.2f}".format(maxg), self.largefont, fill= self.TEXT_COLOR)
         if error_message is None:
             self.draw.text((gm_size+30, 138), "act", font=self.smallfont, fill= self.TEXT_COLOR)
             right_text(135, "{:+1.2f}".format(current), self.largefont, fill= self.TEXT_COLOR)
         else:
             self.draw.text((gm_size+30, 138), error_message, font=self.largefont, fill= self.TEXT_COLOR)
         self.draw.text((gm_size+30, 178), "min", font=self.smallfont, fill= self.TEXT_COLOR)
-        right_text(175, "{:+1.2f}".format(ming), self.largefont)
+        self.right_text(175, "{:+1.2f}".format(ming), self.largefont)
 
         bottom_line("", "    Mode", "Reset")
 
