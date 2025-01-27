@@ -312,7 +312,7 @@ class GenericDisplay:
         line_width = max(1, int(self.sizey/60))  # the width of all lines (horizon, posmarks, rollmarks)
         pitchmark_length = int(self.sizey/6)
         pitchscale = self.sizey / 6 / 10  # scaling factor for pitchmarks, so that +-20 is displayed
-        rollmark_length = int(self.sizex/8)
+        rollmark_length = int(self.sizex/12)
         # this is the scaling factor for all drawings, 6 means: space for 6 pitch lines from -20, -10, 0, 10, 20
 
         h1, h2 = self.linepoints(pitch, roll, 0, max_length, pitchscale)  # horizon points
