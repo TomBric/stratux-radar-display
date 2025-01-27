@@ -334,8 +334,8 @@ class GenericDisplay:
         self.draw.line((self.ah_zerox - 90, self.ah_zeroy, self.ah_zerox - 30, self.ah_zeroy), width=6, fill="black")
         self.draw.line((self.ah_zerox + 90, self.ah_zeroy, self.ah_zerox + 30, self.ah_zeroy), width=6, fill="black")
         self.draw.polygon((self.ah_zerox, self.ah_zeroy,
-                           self.ah_zerox - center_pointer_x, self.ah_zeroy - center_pointer_y,
-                           self.ah_zerox + center_pointer_x, self.ah_zeroy -  center_pointer_y), fill="black")
+                           self.ah_zerox - center_pointer_x, self.ah_zeroy + center_pointer_y,
+                           self.ah_zerox + center_pointer_x, self.ah_zeroy + center_pointer_y), fill="black")
 
         # roll indicator
         self.rollmarks(roll, line_width, rollmark_length)
