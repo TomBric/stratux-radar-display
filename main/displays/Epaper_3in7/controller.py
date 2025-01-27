@@ -59,9 +59,11 @@ class Epaper3in7(dcommon.GenericDisplay):
     ARCPOSITION_EXCLUDE_FROM = 110
     ARCPOSITION_EXCLUDE_TO = 250
     # AHRS
-    AHRS_EARTH_COLOR = "brown"  # how ahrs displays the earth
-    AHRS_SKY_COLOR = "blue"  # how ahrs displays the sky
-    AHRS_MARKS_COLOR = "white"  # color of marks and corresponding text in ahrs
+    AHRS_EARTH_COLOR = "white"  # how ahrs displays the earth
+    AHRS_SKY_COLOR = "white"  # how ahrs displays the sky
+    AHRS_HORIZON_COLOR = "black"  # how ahrs displays the horizon
+    AHRS_MARKS_COLOR = "black"  # color of marks and corresponding text in ahrs
+
     CM_SIZE = 15  # size of markings in ahrs
 
 

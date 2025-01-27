@@ -70,6 +70,7 @@ class GenericDisplay:
     TEXT_COLOR = "white"   # default color for text
     AHRS_EARTH_COLOR = "brown"   # how ahrs displays the earth
     AHRS_SKY_COLOR = "blue"   # how ahrs displays the sky
+    AHRS_HORIZON_COLOR = "white"   # color of horizon line in ahrs
     AHRS_MARKS_COLOR = "white"   # color of marks and corresponding text in ahrs
     VELOCITY_WIDTH = 3  # width of indicator for velocity of aircraft
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
