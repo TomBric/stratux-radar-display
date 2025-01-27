@@ -256,7 +256,7 @@ class GenericDisplay:
         pe = (p2[0] + move[0], p2[1] + move[1])
         return ps, pe
 
-    def rollmarks(self, roll, marks_width):
+    def rollmarks(self, roll, marks_width, marks_length):
         if self.ah_zerox > self.ah_zeroy:
             di = self.ah_zeroy
         else:
@@ -266,13 +266,15 @@ class GenericDisplay:
             s = math.sin(math.radians(rm - roll + 90))
             c = math.cos(math.radians(rm - roll + 90))
             if rm % 30 == 0:
-                self.draw.line((self.ah_zerox - di * c, self.ah_zeroy - di * s, self.ah_zerox - (di - 24) * c,
-                           self.ah_zeroy - (di - 24) * s), fill=self.AHRS_MARKS_COLOR, width=marks_width)
+                self.draw.line((self.ah_zerox - di * c, self.ah_zeroy - di * s, self.ah_zerox - (di - marks_length) * c,
+                           self.ah_zeroy - (di - marks_length) * s), fill=self.AHRS_MARKS_COLOR, width=marks_width)
             else:
-                self.draw.line((self.ah_zerox - di * c, self.ah_zeroy - di * s, self.ah_zerox - (di - 16) * c,
-                           self.ah_zeroy - (di - 16) * s), fill=self.AHRS_MARKS_COLOR, width=marks_width)
-        self.draw.polygon((self.ah_zerox, 24, self.ah_zerox - 16, 24 + 12, self.ah_zerox + 16, 24 + 12),
-                     fill=self.AHRS_MARKS_COLOR)
+                self.draw.line((self.ah_zerox - di * c, self.ah_zeroy - di * s,
+                    self.ah_zerox - (di - int(marks_length/2)) * c, self.ah_zeroy - (di - int(marks_length/2)) * s),
+                    fill=self.AHRS_MARKS_COLOR, width=marks_width)
+        # triangular pointer in the middle of the rollmarks
+        self.draw.polygon((self.ah_zerox, marks_length+1, self.ah_zerox - marks_length, marks_length*2,
+                           self.ah_zerox + marks_length, marks_length*2), fill=self.AHRS_MARKS_COLOR)
 
 
     def slip(self, slipskid, centerline_width):
@@ -309,7 +311,8 @@ class GenericDisplay:
         max_length = math.ceil(math.hypot(self.sizex, self.sizey))  # maximum line length for diagonal line
         line_width = max(1, int(self.sizey/60))  # the width of all lines (horizon, posmarks, rollmarks)
         pitchmark_length = int(self.sizey/6)
-        pitchscale = self.sizey / 6 / 10
+        pitchscale = self.sizey / 6 / 10  # scaling factor for pitchmarks, so that +-20 is displayed
+        rollmark_length = int(self.sizex/8)
         # this is the scaling factor for all drawings, 6 means: space for 6 pitch lines from -20, -10, 0, 10, 20
 
         h1, h2 = self.linepoints(pitch, roll, 0, max_length, pitchscale)  # horizon points
@@ -332,7 +335,7 @@ class GenericDisplay:
                      fill="black")
 
         # roll indicator
-        self.rollmarks(roll, line_width)
+        self.rollmarks(roll, line_width, rollmark_length)
         # slip indicator
         self.slip(slipskid, line_width)
 
