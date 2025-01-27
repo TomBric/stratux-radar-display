@@ -276,8 +276,8 @@ class GenericDisplay:
 
 
     def slip(self, slipskid, centerline_width):
-        slipsize_x = int(self.size_x/3)   # slip indicator takes 2/3 of x-axis
-        slipsize_y = int(self.size_y/24)  # height of indicator (in both directions), also height of ball
+        slipsize_x = int(self.sizex/3)   # slip indicator takes 2/3 of x-axis
+        slipsize_y = int(self.sizey/24)  # height of indicator (in both directions), also height of ball
         slipscale = int(slipsize_x/10)
         if slipskid < -10:  # set min value to display
             slipskid = -10
