@@ -266,12 +266,12 @@ class GenericDisplay:
             s = math.sin(math.radians(rm - roll + 90))
             c = math.cos(math.radians(rm - roll + 90))
             if rm % 30 == 0:
-                draw.line((self.ah_zerox - di * c, self.ah_zeroy - di * s, self.ah_zerox - (di - 24) * c,
+                self.draw.line((self.ah_zerox - di * c, self.ah_zeroy - di * s, self.ah_zerox - (di - 24) * c,
                            self.ah_zeroy - (di - 24) * s), fill=self.AHRS_MARKS_COLOR, width=marks_width)
             else:
-                draw.line((self.ah_zerox - di * c, self.ah_zeroy - di * s, self.ah_zerox - (di - 16) * c,
+                self.draw.line((self.ah_zerox - di * c, self.ah_zeroy - di * s, self.ah_zerox - (di - 16) * c,
                            self.ah_zeroy - (di - 16) * s), fill=self.AHRS_MARKS_COLOR, width=marks_width)
-        draw.polygon((self.ah_zerox, 24, self.ah_zerox - 16, 24 + 12, self.ah_zerox + 16, 24 + 12),
+        self.draw.polygon((self.ah_zerox, 24, self.ah_zerox - 16, 24 + 12, self.ah_zerox + 16, 24 + 12),
                      fill=self.AHRS_MARKS_COLOR)
 
 
