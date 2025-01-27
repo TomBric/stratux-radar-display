@@ -250,8 +250,8 @@ class GenericDisplay:
         move = (dist * s, dist * c)
         s1 = math.sin(math.radians(-90 - roll))
         c1 = math.cos(math.radians(-90 - roll))
-        p1 = (self.zerox - length * s1, self.zeroy + length * c1)
-        p2 = (self.zerox + length * s1, self.zeroy - length * c1)
+        p1 = (self.ah_zerox - length * s1, self.ah_zeroy + length * c1)
+        p2 = (self.ah_zerox + length * s1, self.ah_zeroy - length * c1)
         ps = (p1[0] + move[0], p1[1] + move[1])
         pe = (p2[0] + move[0], p2[1] + move[1])
         return ps, pe
