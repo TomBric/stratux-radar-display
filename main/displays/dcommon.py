@@ -229,6 +229,59 @@ class GenericDisplay:
                 self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.verylargefont, color=second_color)
         self.bottom_line(left_text, middle_text, right_t)
 
+    def meter(self, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
+              marks_distance, small_marks_distance, big_mark_length, small_mark_length, text_distance, arrow_line_size,
+              middle_text1, middle_text2):
+
+        arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + 50),
+                 (0, -size / 2 + 10), (arrow_line_size / 2, -size / 2 + 50), (arrow_line_size / 2, 0))
+        # points of arrow at angle 0 (pointing up) for line drawing
+        deg_per_value = (to_degree - from_degree) / (end_value - start_value)
+
+        self.draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
+                 from_degree-90, to_degree-90, width=6, fill= self.TEXT_COLOR)
+        # small marks first
+        line = ((0, -size/2+1), (0, -size/2+small_mark_length))
+        m = start_value
+        while m <= end_value:
+            angle = deg_per_value * (m-start_value) + from_degree
+            mark = translate(angle, line, (center_x, center_y))
+            self.draw.line(mark, fill= self.TEXT_COLOR, width=2)
+            m += small_marks_distance
+        # self.LARG marks
+        line = ((0, -size/2+1), (0, -size/2+big_mark_length))
+        m = start_value
+        while m <= end_value:
+            angle = deg_per_value*(m-start_value) + from_degree
+            mark = translate(angle, line, (center_x, center_y))
+            self.draw.line(mark, fill= self.TEXT_COLOR, width=4)
+            # text
+            marktext = str(m)
+            tl = self.draw.textlength(marktext, self.largefont)
+            t_center = translate(angle, ((0, -size/2 + big_mark_length + self.LARG/2 + text_distance), ), (center_x, center_y))
+            self.draw.text((t_center[0][0]-tl/2, t_center[0][1]-LARGE/2), marktext, fill= self.TEXT_COLOR, font=largefont)
+            m += marks_distance
+        # arrow
+        if current > end_value:   # normalize values in allowed ranges
+            current = end_value
+        elif current < start_value:
+            current = start_value
+        angle = deg_per_value * (current - start_value) + from_degree
+        ar = translate(angle, arrow, (center_x, center_y))
+        self.draw.line(ar, fill= self.TEXT_COLOR, width=4)
+        # centerpoint
+        self.draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill= self.TEXT_COLOR)
+
+        if middle_text1 is not None:
+            tl = self.draw.textlength(middle_text1, self.smallfont)
+            self.draw.text((center_x - tl/2, center_y -  self.SMALL - 20), middle_text1, font=self.smallfont,
+                           fill= self.TEXT_COLOR, align="left")
+        if middle_text2 is not None:
+            tl = self.draw.textlength(middle_text2, self.smallfont)
+            self.draw.text((center_x-tl/2, center_y+20), middle_text2, font=self.smallfont,
+                           fill= self.TEXT_COLOR, align="left")
+
+
 
     def gmeter(self, current, maxg, ming, error_message):
         pass
