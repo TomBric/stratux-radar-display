@@ -312,7 +312,9 @@ class GenericDisplay:
         line_width = max(1, int(self.sizey/60))  # the width of all lines (horizon, posmarks, rollmarks)
         pitchmark_length = int(self.sizey/6)
         pitchscale = self.sizey / 6 / 10  # scaling factor for pitchmarks, so that +-20 is displayed
-        rollmark_length = int(self.sizex/12)
+        rollmark_length = int(self.sizex/16)
+        center_pointer_x = int(self.sizex/8)
+        center_pointer_y = int(self.sizey/16)
         # this is the scaling factor for all drawings, 6 means: space for 6 pitch lines from -20, -10, 0, 10, 20
 
         h1, h2 = self.linepoints(pitch, roll, 0, max_length, pitchscale)  # horizon points
@@ -331,8 +333,9 @@ class GenericDisplay:
         # pointer in the middle
         self.draw.line((self.ah_zerox - 90, self.ah_zeroy, self.ah_zerox - 30, self.ah_zeroy), width=6, fill="black")
         self.draw.line((self.ah_zerox + 90, self.ah_zeroy, self.ah_zerox + 30, self.ah_zeroy), width=6, fill="black")
-        self.draw.polygon((self.ah_zerox, self.ah_zeroy + 4, self.ah_zerox - 20, self.ah_zeroy + 16, self.ah_zerox + 20, self.ah_zeroy + 16),
-                     fill="black")
+        self.draw.polygon((self.ah_zerox, self.ah_zeroy,
+                           self.ah_zerox - center_pointer_x, self.ah_zeroy - center_pointer_y,
+                           self.ah_zerox + center_pointer_x, self.ah_zeroy -  center_pointer_y), fill="black")
 
         # roll indicator
         self.rollmarks(roll, line_width, rollmark_length)
