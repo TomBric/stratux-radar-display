@@ -273,8 +273,8 @@ class GenericDisplay:
                     self.ah_zerox - (di - int(marks_length/2)) * c, self.ah_zeroy - (di - int(marks_length/2)) * s),
                     fill=self.AHRS_MARKS_COLOR, width=marks_width)
         # triangular pointer in the middle of the rollmarks
-        self.draw.polygon((self.ah_zerox, marks_length+1, self.ah_zerox - int(marks_length/2), marks_length,
-                           self.ah_zerox + int(marks_length/2), marks_length), fill=self.AHRS_MARKS_COLOR)
+        self.draw.polygon((self.ah_zerox, marks_length+1, self.ah_zerox - int(marks_length/2), 1+int(marks_length*3/2),
+                           self.ah_zerox + int(marks_length/2), 1+int(marks_length*3/2)), fill=self.AHRS_MARKS_COLOR)
 
 
     def slip(self, slipskid, centerline_width):
