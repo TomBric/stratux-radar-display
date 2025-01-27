@@ -212,7 +212,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.text((gm_size+30, 178), "min", font=self.smallfont, fill= self.TEXT_COLOR)
         self.right_text(175, "{:+1.2f}".format(ming), self.largefont, color=self.TEXT_COLOR)
 
-        bottom_line("", "    Mode", "Reset")
+        self.bottom_line("", "    Mode", "Reset")
 
 
     def compass(self, heading, error_message):
