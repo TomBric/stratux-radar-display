@@ -62,7 +62,6 @@ class Epaper3in7(dcommon.GenericDisplay):
     AHRS_EARTH_COLOR = "brown"  # how ahrs displays the earth
     AHRS_SKY_COLOR = "blue"  # how ahrs displays the sky
     AHRS_MARKS_COLOR = "white"  # color of marks and corresponding text in ahrs
-    PITCH_SCALE = 4.0
     CM_SIZE = 15  # size of markings in ahrs
 
 
@@ -364,10 +363,10 @@ class Epaper3in7(dcommon.GenericDisplay):
 
         bottom_line("Cancel", "Display only", "Reboot")
 
-    def earthfill(self, pitch, roll, length):   # possible function for derived classed to implement fillings for earth
+    def earthfill(self, pitch, roll, length, scale):   # possible function for derived classed to implement fillings for earth
         # draws some type of black shading for the earth
         for earthfill in range(0, -180, -3):
-            self.draw.line((linepoints(pitch, roll, earthfill, length)), fill="black", width=1)
+            self.draw.line((self.linepoints(pitch, roll, earthfill, length, scale)), fill="black", width=1)
 
 
     def text_screen(headline, subline, text, left_text, middle_text, r_text):

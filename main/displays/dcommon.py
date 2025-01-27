@@ -55,20 +55,6 @@ def translate(angle, points, zero):
     return result
 
 
-def linepoints(pitch, roll, pitch_distance, length, scale):
-    s = math.sin(math.radians(180 + roll))
-    c = math.cos(math.radians(180 + roll))
-    dist = (-pitch + pitch_distance) * scale
-    move = (dist * s, dist * c)
-    s1 = math.sin(math.radians(-90 - roll))
-    c1 = math.cos(math.radians(-90 - roll))
-    p1 = (zerox - length * s1, zeroy + length * c1)
-    p2 = (zerox + length * s1, zeroy - length * c1)
-    ps = (p1[0] + move[0], p1[1] + move[1])
-    pe = (p2[0] + move[0], p2[1] + move[1])
-    return ps, pe
-
-
 class GenericDisplay:
     # display specific constants, overwrite for every display!
     VERYLARGE = 48  # timer
@@ -254,6 +240,19 @@ class GenericDisplay:
     def shutdown(self, countdown, shutdownmode):
         pass
 
+    def linepoints(self, pitch, roll, pitch_distance, length, scale):
+        s = math.sin(math.radians(180 + roll))
+        c = math.cos(math.radians(180 + roll))
+        dist = (-pitch + pitch_distance) * scale
+        move = (dist * s, dist * c)
+        s1 = math.sin(math.radians(-90 - roll))
+        c1 = math.cos(math.radians(-90 - roll))
+        p1 = (self.zerox - length * s1, self.zeroy + length * c1)
+        p2 = (self.zerox + length * s1, self.zeroy - length * c1)
+        ps = (p1[0] + move[0], p1[1] + move[1])
+        pe = (p2[0] + move[0], p2[1] + move[1])
+        return ps, pe
+
     def rollmarks(self, roll, marks_width):
         if ah_zerox > ah_zeroy:
             di = ah_zeroy
@@ -293,10 +292,10 @@ class GenericDisplay:
         self.draw.line((self.ah_zerox, self.sizey-1 - slipsize_x * 2, self.ah_zerox, self.sizey-1),
                        fill="white", width=centerline_width)
 
-    def earthfill(self, pitch, roll, length):   # possible function for derived classed to implement fillings for earth
+    def earthfill(self, pitch, roll, length, scale):   # possible function for derived classed to implement fillings for earth
         # e.g. for epaper, this draws some type of black shading for the earth
         # for earthfill in range(0, -180, -3):
-        #     self.draw.line((linepoints(pitch, roll, earthfill, max_length)), fill="black", width=1)
+        #     self.draw.line((self.linepoints(pitch, roll, earthfill, max_length)), fill="black", width=1)
         # does not to be redefined if no filling is to be drawn
         pass
 
@@ -309,17 +308,17 @@ class GenericDisplay:
         pitchscale = self.sizey / 6 / 10
         # this is the scaling factor for all drawings, 6 means: space for 6 pitch lines from -20, -10, 0, 10, 20
 
-        h1, h2 = linepoints(pitch, roll, 0, max_length, pitchscale)  # horizon points
-        h3, h4 = linepoints(pitch, roll, -180, max_length, pitchscale)
+        h1, h2 = self.linepoints(pitch, roll, 0, max_length, pitchscale)  # horizon points
+        h3, h4 = self.linepoints(pitch, roll, -180, max_length, pitchscale)
         self.draw.polygon((h1, h2, h4, h3), fill=self.AHRS_EARTH_COLOR)  # earth
-        h3, h4 = linepoints(pitch, roll, 180, max_length, pitchscale)
+        h3, h4 = self.linepoints(pitch, roll, 180, max_length, pitchscale)
         self.draw.polygon((h1, h2, h4, h3), fill=self.AHRS_SKY_COLOR)  # sky
         self.draw.line((h1, h2), fill=self.AHRS_HORIZON_COLOR, width=line_width)  # horizon line
 
-        self.earthfill(pitch, roll, max_length)   # draw some special fillings for the earth
+        self.earthfill(pitch, roll, max_length, pitchscale)   # draw some special fillings for the earth
 
         for pm in PITCH_POSMARKS:  # pitchmarks
-            self.draw.line((linepoints(pitch, roll, pm, pitchmark_length, pitchscale)), fill=self.AHRS_MARKS_COLOR,
+            self.draw.line((self.linepoints(pitch, roll, pm, pitchmark_length, pitchscale)), fill=self.AHRS_MARKS_COLOR,
                            width=line_width)
 
         # pointer in the middle
