@@ -257,21 +257,22 @@ class GenericDisplay:
         return ps, pe
 
     def rollmarks(self, roll, marks_width):
-        if ah_zerox > ah_zeroy:
-            di = ah_zeroy
+        if self.ah_zerox > self.ah_zeroy:
+            di = self.ah_zeroy
         else:
-            di = ah_zerox
+            di = self.ah_zerox
 
-        for rm in ROLL_POSMARKS:
+        for rm in self.ROLL_POSMARKS:
             s = math.sin(math.radians(rm - roll + 90))
             c = math.cos(math.radians(rm - roll + 90))
             if rm % 30 == 0:
-                draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 24) * c,
-                           ah_zeroy - (di - 24) * s), fill="black", width=marks_width)
+                draw.line((self.ah_zerox - di * c, self.ah_zeroy - di * s, self.ah_zerox - (di - 24) * c,
+                           self.ah_zeroy - (di - 24) * s), fill=self.AHRS_MARKS_COLOR, width=marks_width)
             else:
-                draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 16) * c,
-                           ah_zeroy - (di - 16) * s), fill="black", width=marks_width)
-        draw.polygon((ah_zerox, 24, ah_zerox - 16, 24 + 12, ah_zerox + 16, 24 + 12), fill="black")
+                draw.line((self.ah_zerox - di * c, self.ah_zeroy - di * s, self.ah_zerox - (di - 16) * c,
+                           self.ah_zeroy - (di - 16) * s), fill=self.AHRS_MARKS_COLOR, width=marks_width)
+        draw.polygon((self.ah_zerox, 24, self.ah_zerox - 16, 24 + 12, self.ah_zerox + 16, 24 + 12),
+                     fill=self.AHRS_MARKS_COLOR)
 
 
     def slip(self, slipskid, centerline_width):
