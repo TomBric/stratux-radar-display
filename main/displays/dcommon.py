@@ -68,12 +68,12 @@ class GenericDisplay:
     AIRCRAFT_COLOR = "red"
     BG_COLOR = "black"
     TEXT_COLOR = "white"   # default color for text
-
+    # AHRS
     AHRS_EARTH_COLOR = "brown"   # how ahrs displays the earth
     AHRS_SKY_COLOR = "blue"   # how ahrs displays the sky
     AHRS_HORIZON_COLOR = "white"   # color of horizon line in ahrs
     AHRS_MARKS_COLOR = "white"   # color of marks and corresponding text in ahrs
-    # AHRS
+    # RADAR
     VELOCITY_WIDTH = 3  # width of indicator for velocity of aircraft
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 0
@@ -307,7 +307,7 @@ class GenericDisplay:
     def ahrs(self, pitch, roll, heading, slipskid, error_message):
         # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
         max_length = math.ceil(math.hypot(self.sizex, self.sizey))  # maximum line length for diagonal line
-        line_width = max(1, int(self.sizey/100))  # the width of all lines (horizon, posmarks, rollmarks)
+        line_width = max(1, int(self.sizey/60))  # the width of all lines (horizon, posmarks, rollmarks)
         pitchmark_length = int(self.sizey/6)
         pitchscale = self.sizey / 6 / 10
         # this is the scaling factor for all drawings, 6 means: space for 6 pitch lines from -20, -10, 0, 10, 20
