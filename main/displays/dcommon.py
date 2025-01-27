@@ -55,6 +55,20 @@ def translate(angle, points, zero):
     return result
 
 
+def linepoints(pitch, roll, pitch_distance, length):
+    s = math.sin(math.radians(180 + roll))
+    c = math.cos(math.radians(180 + roll))
+    dist = (-pitch + pitch_distance) * PITCH_SCALE
+    move = (dist * s, dist * c)
+    s1 = math.sin(math.radians(-90 - roll))
+    c1 = math.cos(math.radians(-90 - roll))
+    p1 = (zerox - length * s1, zeroy + length * c1)
+    p2 = (zerox + length * s1, zeroy - length * c1)
+    ps = (p1[0] + move[0], p1[1] + move[1])
+    pe = (p2[0] + move[0], p2[1] + move[1])
+    return ps, pe
+
+
 class GenericDisplay:
     # display specific constants, overwrite for every display!
     VERYLARGE = 48  # timer
@@ -68,6 +82,9 @@ class GenericDisplay:
     AIRCRAFT_COLOR = "red"
     BG_COLOR = "black"
     TEXT_COLOR = "white"   # default color for text
+    AHRS_EARTH_COLOR = "brown"   # how ahrs displays the earth
+    AHRS_SKY_COLOR = "blue"   # how ahrs displays the sky
+    AHRS_MARKS_COLOR = "white"   # color of marks and corresponding text in ahrs
     VELOCITY_WIDTH = 3  # width of indicator for velocity of aircraft
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 0
@@ -237,8 +254,86 @@ class GenericDisplay:
     def shutdown(self, countdown, shutdownmode):
         pass
 
-    def ahrs(self, pitch, roll, heading, slipskid, error_message):
+    def rollmarks(self, roll, marks_width):
+        if ah_zerox > ah_zeroy:
+            di = ah_zeroy
+        else:
+            di = ah_zerox
+
+        for rm in ROLL_POSMARKS:
+            s = math.sin(math.radians(rm - roll + 90))
+            c = math.cos(math.radians(rm - roll + 90))
+            if rm % 30 == 0:
+                draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 24) * c,
+                           ah_zeroy - (di - 24) * s), fill="black", width=marks_width)
+            else:
+                draw.line((ah_zerox - di * c, ah_zeroy - di * s, ah_zerox - (di - 16) * c,
+                           ah_zeroy - (di - 16) * s), fill="black", width=marks_width)
+        draw.polygon((ah_zerox, 24, ah_zerox - 16, 24 + 12, ah_zerox + 16, 24 + 12), fill="black")
+
+
+    def slip(self, slipskid, centerline_width):
+        slipsize_x = int(self.size_x/3)   # slip indicator takes 2/3 of x-axis
+        slipsize_y = int(self.size_y/24)  # height of indicator (in both directions), also height of ball
+        slipscale = int(slipsize_x/10)
+        if slipskid < -10:  # set min value to display
+            slipskid = -10
+        elif slipskid > 10: # set max value to display
+            slipskid = 10
+
+        # position slip at the bottom for 2/3 of x
+        self.draw.rectangle((self.ah_zerox - slipsize_x, self.sizey-1 - slipsize_y*2,
+                             self.ah_zerox + slipsize_x, self.sizey-1), fill="black")
+        # now draw ball
+        self.draw.ellipse((self.ah_zerox - slipskid * slipscale - slipsize_y, self.sizey-1 - slipsize_y*2,
+                      self.ah_zerox - slipskid * slipscale + slipsize_y, self.sizey-1), fill="white")
+        # middle line with background
+        self.draw.line((self.ah_zerox, self.sizey-1 - slipsize_x * 2, self.ah_zerox, self.sizey-1),
+                       fill="black", width=centerline_width*3)
+        self.draw.line((self.ah_zerox, self.sizey-1 - slipsize_x * 2, self.ah_zerox, self.sizey-1),
+                       fill="white", width=centerline_width)
+
+    def earthfill(self, pitch, roll, length):   # possible function for derived classed to implement fillings for earth
+        # e.g. for epaper, this draws some type of black shading for the earth
+        # for earthfill in range(0, -180, -3):
+        #     self.draw.line((linepoints(pitch, roll, earthfill, max_length)), fill="black", width=1)
+        # does not to be redefined if no filling is to be drawn
         pass
+
+    def ahrs(self, pitch, roll, heading, slipskid, error_message):
+        # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
+        max_length = math.ceil(math.hypot(self.sizex, self.sizey))  # maximum line length for diagonal line
+        line_width = max(1, int(self.sizey/100))  # the width of all lines (horizon, posmarks, rollmarks)
+        pitchmark_length = int(self.sizey/6)
+
+        h1, h2 = linepoints(pitch, roll, 0, max_length)  # horizon points
+        h3, h4 = linepoints(pitch, roll, -180, max_length)
+        self.draw.polygon((h1, h2, h4, h3), fill=self.AHRS_EARTH_COLOR)  # earth
+        h3, h4 = linepoints(pitch, roll, 180, max_length)
+        self.draw.polygon((h1, h2, h4, h3), fill=self.AHRS_SKY_COLOR)  # sky
+        self.draw.line((h1, h2), fill=self.AHRS_HORIZON_COLOR, width=line_width)  # horizon line
+
+        self.earthfill(pitch, roll, max_length)   # draw some special fillings for the earth
+
+        for pm in PITCH_POSMARKS:  # pitchmarks
+            self.draw.line((linepoints(pitch, roll, pm, pitchmark_length)), fill=self.AHRS_MARKS_COLOR,
+                           width=line_width)
+
+        # pointer in the middle
+        self.draw.line((self.ah_zerox - 90, self.ah_zeroy, self.ah_zerox - 30, self.ah_zeroy), width=6, fill="black")
+        self.draw.line((self.ah_zerox + 90, self.ah_zeroy, self.ah_zerox + 30, self.ah_zeroy), width=6, fill="black")
+        self.draw.polygon((self.ah_zerox, self.ah_zeroy + 4, self.ah_zerox - 20, self.ah_zeroy + 16, self.ah_zerox + 20, self.ah_zeroy + 16),
+                     fill="black")
+
+        # roll indicator
+        self.rollmarks(roll, line_width)
+        # slip indicator
+        self.slip(slipskid, line_width)
+
+        # infotext = "P:" + str(pitch) + " R:" + str(roll)
+        if error_message:
+            self.centered_text( int(sizey/4), error_message, self.smallfont)
+        self.bottom_line("Levl", "", "Zero")
 
     def text_screen(self, headline, subline, text, left_text, middle_text, r_text):
         pass
