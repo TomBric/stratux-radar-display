@@ -231,14 +231,14 @@ class GenericDisplay:
 
     def meter(self, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
               marks_distance, small_marks_distance, middle_text1, middle_text2, meter_color, text_color):
-        big_mark_length = int(size/8)
+        big_mark_length = max(4, int(size/16))
         small_mark_length = int(big_mark_length/2)
         text_distance = small_mark_length
         arrow_line_size = int(size/16)  # must be an even number
-        arrow_head_size = int(arrow_line_size * 1.5)
+        arrow_head_size = arrow_line_size * 2
         arrow_distance = small_mark_length
         arc_width = max(2, int(size/64))
-        center_size = arrow_line_size
+        center_size = int(arrow_line_size/2)
         text_offset_middle = arrow_head_size
 
 
