@@ -215,38 +215,43 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.bottom_line("", "    Mode", "Reset")
 
 
-    def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
-            error_message):
-        meter(vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
-        draw.text((35, sizey/2 -  self.VERYSMALL - 25), "up", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
-        draw.text((35, sizey/2 + 25), "dn", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+    def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min, error_message):
+        self.meter(vertical_speed / 100, -20, 20, 110, 430, self.sizey, self.sizey // 2,
+                   self.sizey // 2, 5, 1, None, None,
+                   self.TEXT_COLOR, self.TEXT_COLOR)
+
+        self.draw.text((35, self.sizey / 2 - self.VERYSMALL - 25), "up", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((35, self.sizey / 2 + 25), "dn", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+
         middle_text = "Vertical Speed"
-        tl = draw.textlength(middle_text, self.smallfont)
-        draw.text((sizey/2 - tl / 2, sizey/2 -  self.VERYSMALL - 10), middle_text, font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+        tl = self.draw.textlength(middle_text, self.smallfont)
+        self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 - self.VERYSMALL - 10), middle_text, font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+
         middle_text = "100 feet per min"
-        tl = draw.textlength(middle_text, self.smallfont)
-        draw.text((sizey/2 - tl / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill= self.TEXT_COLOR, align="left")
+        tl = self.draw.textlength(middle_text, self.smallfont)
+        self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 + 10), middle_text, font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
 
         # right data display
-        draw.text((300, 10), "Vert Speed [ft/min]", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
-        draw.text((330, 31), "act", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
-        draw.text((330, 55), "max", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
-        draw.text((330, 79), "min", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
-        right_text(28, "{:+1.0f}".format(vertical_speed), self.smallfont, fill= self.TEXT_COLOR)
-        right_text(52, "{:+1.0f}".format(vertical_max), self.smallfont, fill= self.TEXT_COLOR)
-        right_text(76, "{:+1.0f}".format(vertical_min), self.smallfont, fill= self.TEXT_COLOR)
-        draw.text((300, 163), "Flight-Level", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
-        right_text(160, "{:1.0f}".format(round(flight_level/100)), self.smallfont, fill= self.TEXT_COLOR)
-        draw.text((300, 187), "GPS-Alt [ft]", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
-        right_text(184, "{:1.0f}".format(gps_altitude), self.smallfont, fill= self.TEXT_COLOR)
-        draw.text((300, 211), "GpsSpd [kts]", font=verysmallfont, fill= self.TEXT_COLOR, align="left")
-        right_text(208, "{:1.1f}".format(gps_speed), self.smallfont, fill= self.TEXT_COLOR)
+        self.draw.text((300, 10), "Vert Speed [ft/min]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((330, 31), "act", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((330, 55), "max", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((330, 79), "min", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
 
-        if error_message is not None:
-            centered_text(60, error_message, self.verylargefont)
+        self.right_text(28, f"{vertical_speed:+1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.right_text(52, f"{vertical_max:+1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.right_text(76, f"{vertical_min:+1.0f}", self.smallfont, fill=self.TEXT_COLOR)
 
-        bottom_line("", "    Mode", "Reset")
+        self.draw.text((300, 163), "Flight-Level", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.right_text(160, f"{round(flight_level / 100):1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.draw.text((300, 187), "GPS-Alt [ft]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.right_text(184, f"{gps_altitude:1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.draw.text((300, 211), "GpsSpd [kts]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.right_text(208, f"{gps_speed:1.1f}", self.smallfont, fill=self.TEXT_COLOR)
 
+        if error_message:
+            self.centered_text(60, error_message, self.verylargefont)
+
+        self.bottom_line("", "    Mode", "Reset")
 
     def shutdown(self, countdown, shutdownmode):
         if shutdownmode == 0:   # shutdown stratux + display
