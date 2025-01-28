@@ -215,50 +215,6 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.bottom_line("", "    Mode", "Reset")
 
 
-    def compass(self, heading, error_message):
-        czerox = self.sizex / 2
-        czeroy = self.sizey / 2
-        csize = int(self.sizey / 2) # radius of compass rose
-
-        draw.ellipse((self.sizex/2-csize, 0, self.sizex/2+csize-1, self.sizey - 1), outline= self.TEXT_COLOR, fill="white", width=4)
-        draw.bitmap((self.zerox - 60, 70), compass_aircraft, fill= self.TEXT_COLOR)
-        draw.line((czerox, 20, czerox, 70), fill= self.TEXT_COLOR, width=4)
-        text = str(heading) + '°'
-        tl = draw.textlength(text, self.smallfont)
-        draw.text((self.sizex - tl - 100, self.sizey -  self.SMALL - 10), text, font=smallfont, fill= self.TEXT_COLOR, align="right")
-        for m in range(0, 360, 10):
-            s = math.sin(math.radians(m - heading + 90))
-            c = math.cos(math.radians(m - heading + 90))
-            if m % 30 != 0:
-                draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - CM_SIZE) * c,
-                           czeroy - (csize - CM_SIZE) * s), fill= self.TEXT_COLOR, width=2)
-            else:
-                draw.line((czerox - (csize - 1) * c, czeroy - (csize - 1) * s, czerox - (csize - CM_SIZE) * c,
-                           czeroy - (csize - CM_SIZE) * s), fill= self.TEXT_COLOR, width=4)
-                cdraw.rectangle((0, 0, self.LARG * 2, self.LARGE * 2), fill= self.TEXT_COLOR)
-                if m == 0:
-                    mark = "N"
-                elif m == 90:
-                    mark = "E"
-                elif m == 180:
-                    mark = "S"
-                elif m == 270:
-                    mark = "W"
-                else:
-                    mark = str(int(m / 10))
-                if m % 90 != 0:
-                    tl = draw.textlength(mark, self.largefont)
-                    cdraw.text(((self.LARGE * 2 - tl) / 2, self.LARGE / 2), mark, 1, font=largefont)
-                else:
-                    tl = draw.textlength(mark, self.morelargefont)
-                    cdraw.text(((self.LARGE * 2 - tl) / 2, (self.LARGE * 2 - self.MORELARGE) / 2), mark, 1, font=morelargefont)
-                rotmask = self.mask.rotate(-m + heading, expand=False)
-                center = (czerox - (csize - CM_SIZE - self.LARGE / 2) * c, czeroy - (csize - CM_SIZE - self.LARGE / 2) * s)
-                self.epaper_image.paste( self.TEXT_COLOR, (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
-        if error_message is not None:
-            self.centered_text(120, error_message, self.largefont)
-
-
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
         meter(vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
