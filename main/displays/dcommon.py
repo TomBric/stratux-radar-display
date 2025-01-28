@@ -494,7 +494,7 @@ class GenericDisplay:
                 self.draw.text((side_offset + 3*tab_space, starty), "in the air", font=self.verysmallfont, fill=self.TEXT_COLOR)
             hours, remainder = divmod(delta, 3600)
             minutes, _ = divmod(remainder, 60)
-            out = f'  {int(hours):02}:{int(minutes):02}  '
+            out = f'{int(hours):02}:{int(minutes):02}'
             self.round_text(side_offset + 2*tab_space, starty, out, out_color=self.TEXT_COLOR)
             if starty >= self.sizey - self.VERYSMALL - 2*line_space:    # some more space
                 break
