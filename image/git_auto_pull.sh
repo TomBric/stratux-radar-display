@@ -6,7 +6,7 @@ if [ -z "$COMMAND" ]; then
     echo "No parameters provided. Usage: $0 '<command>'"
     exit 1
 fi
-COMMAND = "main/python3 radar.py" + "$COMMAND"" + "&"
+COMMAND = "main/python3 radar.py" + "$COMMAND" + "&"
 # change to local repo dir
 cd "$REPO_DIR" || { echo "GitAutoPull Error: no such directory"; exit 1; }
 git pull
