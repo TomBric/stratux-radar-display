@@ -495,7 +495,7 @@ class GenericDisplay:
             hours, remainder = divmod(delta, 3600)
             minutes, _ = divmod(remainder, 60)
             out = f'  {int(hours):02}:{int(minutes):02}  '
-            self.round_text(side_offset + 2*tab_space, starty, out, self.TEXT_COLOR, out=self.TEXT_COLOR)
+            self.round_text(side_offset + 2*tab_space, starty, out, out_color=self.TEXT_COLOR)
             if starty >= self.sizey - self.VERYSMALL - 2*line_space:    # some more space
                 break
         self.bottom_line("", "Mode", "Clear")
