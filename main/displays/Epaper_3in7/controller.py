@@ -220,8 +220,8 @@ class Epaper3in7(dcommon.GenericDisplay):
                    self.sizey // 2, 5, 1, "       Vertical Speed", "       100 feet per min",
                    middle_font=self.verysmallfont)
 
-        self.draw.text((35, self.sizey / 2 - self.VERYSMALL - 25), "up", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.draw.text((35, self.sizey / 2 + 25), "dn", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((30, self.sizey // 2 - self.VERYSMALL - 25), "up", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((30, self.sizey // 2 + 25), "dn", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
 
 
         # middle_text = "Vertical Speed"
