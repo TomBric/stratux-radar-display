@@ -319,8 +319,9 @@ class GenericDisplay:
                     mark = {0: "N", 90: "E", 180: "S", 270: "W"}.get(m, str(m // 10))
                     font = self.morelargefont if m % 90 == 0 else self.largefont
                     tl = self.draw.textlength(mark, font)
-                    self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill=self.TEXT_COLOR)
-                    self.cdraw.text(((self.LARGE * 2 - tl) / 2, (self.LARGE * 2 - self.MORELARGE) / 2), mark, font=font)
+                    self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill=self.BG_COLOR)
+                    self.cdraw.text(((self.LARGE * 2 - tl) / 2, (self.LARGE * 2 - self.MORELARGE) / 2), mark,
+                                    font=font, fill=self.TEXT_COLOR)
                     rotmask = self.mask.rotate(-m + heading, expand=False)
                     center = (czerox - (csize - self.CM_SIZE - self.LARGE / 2) * c, czeroy - (csize - self.CM_SIZE - self.LARGE / 2) * s)
                     self.epaper_image.paste(self.TEXT_COLOR, (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
