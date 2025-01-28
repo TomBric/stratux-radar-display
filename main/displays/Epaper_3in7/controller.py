@@ -388,41 +388,6 @@ class Epaper3in7(dcommon.GenericDisplay):
         round_text(x, starty, "BMP", "white", stat['BMPConnected'], out= self.TEXT_COLOR)
         bottom_line("+10 ft", "Mode", "-10 ft")
 
-
-    def flighttime(self, last_flights):
-        starty = 0
-        centered_text(0, "Flight Logs ", self.smallfont)
-        starty +=  self.SMALL + 10
-        draw.text((20, starty), "Date", font=self.verysmallfont, fill=self.TEXT_COLOR)
-        draw.text((120, starty), "Start", font=self.verysmallfont, fill=self.TEXT_COLOR)
-        draw.text((220, starty), "Duration", font=self.verysmallfont, fill=self.TEXT_COLOR)
-        draw.text((350, starty), "Ldg", font=self.verysmallfont, fill=self.TEXT_COLOR)
-        starty += self.VERYSMALL + 10
-
-        maxlines = 8
-        for f in last_flights:
-            f[0] = f[0].replace(second=0, microsecond=0)  # round down start time to minutes
-            draw.text((20, starty), f[0].strftime("%d.%m.%y"), font=self.verysmallfont, fill=self.TEXT_COLOR)
-            draw.text((120, starty), f[0].strftime("%H:%M"), font=self.verysmallfont, fill=self.TEXT_COLOR)
-            if f[1] != 0:    # ==0 means still in the air
-                f[1] = f[1].replace(second=0, microsecond=0)   # round down
-                delta = (f[1]-f[0]).total_seconds()
-                draw.text((350, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill=self.TEXT_COLOR)
-            else:
-                delta = (datetime.datetime.now(datetime.timezone.utc).replace(second=0, microsecond=0)
-                         - f[0]).total_seconds()
-                draw.text((350, starty), "in the air", font=verysmallfont, fill=self.TEXT_COLOR)
-            hours, remainder = divmod(delta, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            out = '  {:02}:{:02}  '.format(int(hours), int(minutes))
-            round_text(220, starty, out, "white", out=self.TEXT_COLOR)
-            starty += self.VERYSMALL + 5
-            maxlines -= 1
-            if maxlines <= 0:
-                break
-        bottom_line("", "Mode", "Clear")
-
-
     def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
         if alarmlevel == 0:
             centered_text(0, "CO Warner: No CO alarm", self.largefont)
