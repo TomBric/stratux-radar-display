@@ -299,28 +299,29 @@ class GenericDisplay:
             self.draw.text((center_x - tl // 2, center_y + text_offset_middle), middle_text2, font=self.smallfont,
                       fill=text_color, align="left")
 
-    def gmeter(self, current, maxg, ming, error_message):
-        pass
 
     def compass(self, heading, error_message):
             czerox = self.sizex // 2
             czeroy = self.sizey // 2
             csize = self.sizey // 2  # radius of compass rose
+            line_width = 4
 
-            self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR, fill="white", width=4)
+            self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
+                              fill="white", width=line_width)
             self.draw.bitmap((self.zerox - 60, 70), self.compass_aircraft, fill=self.TEXT_COLOR)
-            self.draw.line((czerox, 20, czerox, 70), fill=self.TEXT_COLOR, width=4)
+            self.draw.line((czerox, 20, czerox, 70), fill=self.TEXT_COLOR, width=line_width)
 
             text = f"{heading}°"
             tl = self.draw.textlength(text, self.smallfont)
-            self.draw.text((self.sizex - tl - 100, self.sizey - self.SMALL - 10), text, font=self.smallfont, fill=self.TEXT_COLOR, align="right")
+            self.draw.text((self.sizex - tl - 100, self.sizey - self.SMALL - 10), text,
+                           font=self.smallfont, fill=self.TEXT_COLOR, align="right")
 
             for m in range(0, 360, 10):
                 s = math.sin(math.radians(m - heading + 90))
                 c = math.cos(math.radians(m - heading + 90))
                 x1, y1 = czerox - (csize - 1) * c, czeroy - (csize - 1) * s
                 x2, y2 = czerox - (csize - self.CM_SIZE) * c, czeroy - (csize - self.CM_SIZE) * s
-                width = 4 if m % 30 == 0 else 2
+                width = line_width if m % 30 == 0 else line_width//2
                 self.draw.line((x1, y1, x2, y2), fill=self.TEXT_COLOR, width=width)
 
                 if m % 30 == 0:
@@ -328,11 +329,13 @@ class GenericDisplay:
                     font = self.morelargefont if m % 90 == 0 else self.largefont
                     tl = self.draw.textlength(mark, font)
                     self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill=self.TEXT_COLOR)
-                    self.cdraw.text(((self.LARGE * 2 - tl) / 2, (self.LARGE * 2 - self.MORELARGE) / 2), mark,
+                    self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
                                     font=font, fill=self.BG_COLOR)
                     rotmask = self.mask.rotate(-m + heading, expand=False)
-                    center = (czerox - (csize - self.CM_SIZE - self.LARGE / 2) * c, czeroy - (csize - self.CM_SIZE - self.LARGE / 2) * s)
-                    self.epaper_image.paste(self.TEXT_COLOR, (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
+                    center = (czerox - (csize - self.CM_SIZE - self.LARGE // 2) * c,
+                              czeroy - (csize - self.CM_SIZE - self.LARGE // 2) * s)
+                    self.epaper_image.paste(self.TEXT_COLOR, (round(center[0] - self.LARGE),
+                                                              round(center[1] - self.LARGE)), rotmask)
 
             if error_message:
                 self.centered_text(120, error_message, self.largefont)
@@ -340,6 +343,44 @@ class GenericDisplay:
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
         pass
+
+    def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min, error_message):
+        self.meter(vertical_speed / 100, -20, 20, 110, 430, self.sizey, self.sizey // 2,
+                   self.sizey // 2, 5, 1, None, None,
+                   self.TEXT_COLOR, self.TEXT_COLOR)
+
+        self.draw.text((35, self.sizey / 2 - self.VERYSMALL - 25), "up", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((35, self.sizey / 2 + 25), "dn", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+
+        middle_text = "Vertical Speed"
+        tl = self.draw.textlength(middle_text, self.smallfont)
+        self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 - self.VERYSMALL - 10), middle_text, font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+
+        middle_text = "100 feet per min"
+        tl = self.draw.textlength(middle_text, self.smallfont)
+        self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 + 10), middle_text, font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+
+        # right data display
+        self.draw.text((300, 10), "Vert Speed [ft/min]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((330, 31), "act", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((330, 55), "max", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((330, 79), "min", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+
+        self.right_text(28, f"{vertical_speed:+1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.right_text(52, f"{vertical_max:+1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.right_text(76, f"{vertical_min:+1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+
+        self.draw.text((300, 163), "Flight-Level", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.right_text(160, f"{round(flight_level / 100):1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.draw.text((300, 187), "GPS-Alt [ft]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.right_text(184, f"{gps_altitude:1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.draw.text((300, 211), "GpsSpd [kts]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.right_text(208, f"{gps_speed:1.1f}", self.smallfont, fill=self.TEXT_COLOR)
+
+        if error_message:
+            self.centered_text(60, error_message, self.verylargefont)
+
+        self.bottom_line("", "    Mode", "Reset")
 
     def shutdown(self, countdown, shutdownmode):
         pass
