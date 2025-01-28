@@ -271,7 +271,7 @@ class GenericDisplay:
             tl = self.draw.textlength(marktext, self.largefont)
             t_center = translate(angle, ((0, int(-size/2) + big_mark_length + int(self.LARGE/2) + text_distance),),
                                  (center_x, center_y))
-            draw.text((int(t_center[0][0] - tl / 2), t_center[0][1] - int(self.LARGE/2)), marktext,
+            self.draw.text((int(t_center[0][0] - tl / 2), t_center[0][1] - int(self.LARGE/2)), marktext,
                       fill=meter_color, font=self.largefont)
             m += marks_distance
         # normalize current value to be in allowed range start_value
