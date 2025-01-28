@@ -265,7 +265,7 @@ class GenericDisplay:
         while m <= end_value:
             angle = deg_per_value * (m - start_value) + from_degree
             mark = translate(angle, line, (center_x, center_y))
-            draw.line(mark, fill=meter_color, width=arc_width)
+            self.draw.line(mark, fill=meter_color, width=arc_width)
             # text
             marktext = str(m)
             tl = self.draw.textlength(marktext, self.largefont)
