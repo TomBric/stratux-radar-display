@@ -317,16 +317,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill="black", width=1)
 
 
-    def text_screen(headline, subline, text, left_text, middle_text, r_text):
-        centered_text(0, headline, self.verylargefont)
-        txt_starty = VERYLARGE
-        if subline is not None:
-            centered_text(txt_starty, subline, self.largefont)
-            txt_starty += self.LARGE
-        draw.text((5, txt_starty), text, font=smallfont)
-        bottom_line(left_text, middle_text, r_text)
-
-
     def screen_input(headline, subline, text, left, middle, right, prefix, inp, suffix):
         centered_text(0, headline, self.largefont)
         txt_starty = self.LARGE

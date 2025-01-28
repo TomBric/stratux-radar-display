@@ -274,8 +274,7 @@ class GenericDisplay:
             self.draw.text((int(t_center[0][0] - tl / 2), t_center[0][1] - int(self.LARGE/2)), marktext,
                       fill=meter_color, font=self.largefont)
             m += marks_distance
-        # normalize current value to be in allowed range start_value
-        current = min(max(current, start_value), end_value)
+        current = min(max(current, start_value), end_value) # limit to range
         angle = deg_per_value * (current - start_value) + from_degree
         ar = translate(angle, arrow, (center_x, center_y))
         self.draw.line(ar, fill=meter_color, width=arc_width)
@@ -291,7 +290,6 @@ class GenericDisplay:
             tl = self.draw.textlength(smiddle_text2, smallfont)
             self.draw.text((center_x - int(tl / 2), center_y + text_offset_middle), middle_text2, font=self.smallfont,
                       fill=text_color, align="left")
-
 
     def gmeter(self, current, maxg, ming, error_message):
         pass
@@ -344,11 +342,7 @@ class GenericDisplay:
         slipsize_x = int(self.sizex/3)   # slip indicator takes 2/3 of x-axis
         slipsize_y = int(self.sizey/24)  # height of indicator (in both directions), also height of ball
         slipscale = int(slipsize_x/10)
-        if slipskid < -10:  # set min value to display
-            slipskid = -10
-        elif slipskid > 10: # set max value to display
-            slipskid = 10
-
+        slipskid = max(min(slipskid, 10), -10)
         # position slip at the bottom for 2/3 of x
         self.draw.rectangle((self.ah_zerox - slipsize_x, self.sizey-1 - slipsize_y*2,
                              self.ah_zerox + slipsize_x, self.sizey-1), fill="black")
@@ -410,8 +404,14 @@ class GenericDisplay:
             self.centered_text( int(self.sizey/4), error_message, self.smallfont)
         self.bottom_line("Levl", "", "Zero")
 
-    def text_screen(self, headline, subline, text, left_text, middle_text, r_text):
-        pass
+    def text_screen(self, headline, subline, text, left_text, middle_text, r_text, offset=0):
+        self.centered_text(0, headline, self.morelargefont)
+        txt_starty = self.MORELARGE
+        if subline is not None:
+            self.centered_text(txt_starty, subline, self.largefont)
+            txt_starty += self.LARGE
+        self.draw.text((offset, txt_starty), text, font=self.smallfont)
+        self.bottom_line(left_text, middle_text, r_text)
 
     def screen_input(self, headline, subline, text, left, middle, right, prefix, inp, suffix):
         pass
