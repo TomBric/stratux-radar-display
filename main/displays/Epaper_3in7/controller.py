@@ -330,10 +330,10 @@ class Epaper3in7(dcommon.GenericDisplay):
         # bg color is color of background, if none given, this is the normal background for this display
         # out_color is coler of outline, if none given, outline is not
         bg_color = bg_color or self.BG_COLOR
+        tl = self.draw.textlength(text, self.smallfont)
         self.draw.rounded_rectangle([x, y, x + tl + 10, y + self.VERYSMALL + 2], radius=4, fill=color)
         if out_color is not None:
             self.draw.rounded_rectangle([x, y, x + tl + 10, y + self.VERYSMALL + 2], radius=4, outline=out_color)
-        tl = self.draw.textlength(text, self.smallfont)
         self.draw.text((x+5, y), text, font=self.verysmallfont, fill= self.TEXT_COLOR)
         if not yesno:
             self.draw.line([x, y+self.VERYSMALL+2, x+tl+10, y], fill= self.TEXT_COLOR, width=2)
