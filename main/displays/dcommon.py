@@ -297,11 +297,11 @@ class GenericDisplay:
 
         if middle_text1 is not None:
             tl = self.draw.textlength(middle_text1, self.smallfont)
-            self.draw.text((center_x - tl//2, center_y - self.SMALL - text_offset_middle), middle_text1, font=self.smallfont,
+            self.draw.text((center_x - tl//2, center_y - self.SMALL - text_offset_middle), middle_text1, font=middle_font,
                            fill=text_color, align="left")
         if middle_text2 is not None:
             tl = self.draw.textlength(middle_text2, self.smallfont)
-            self.draw.text((center_x - tl // 2, center_y + text_offset_middle), middle_text2, font=self.smallfont,
+            self.draw.text((center_x - tl // 2, center_y + text_offset_middle), middle_text2, font=middle_font,
                       fill=text_color, align="left")
 
 
