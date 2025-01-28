@@ -324,7 +324,7 @@ class GenericDisplay:
                                     font=font, fill=self.TEXT_COLOR)
                     rotmask = self.mask.rotate(-m + heading, expand=False)
                     center = (czerox - (csize - self.CM_SIZE - self.LARGE / 2) * c, czeroy - (csize - self.CM_SIZE - self.LARGE / 2) * s)
-                    self.epaper_image.paste(self.TEXT_COLOR, (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
+                    self.epaper_image.paste("white", (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
 
             if error_message:
                 self.centered_text(120, error_message, self.largefont)
