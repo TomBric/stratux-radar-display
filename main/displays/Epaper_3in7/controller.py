@@ -326,7 +326,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         return y+self.VERYSMALL+12
 
 
-    def round_text(x, y, text, color, yesno=True, out=None):
+    def round_text(self, x, y, text, color, yesno=True, out=None):
         tl = self.draw.textlength(text, self.smallfont)
         self.draw.rounded_rectangle([x, y, x+tl+10, y+self.VERYSMALL+2], radius=4, fill=color, outline=out)
         self.draw.text((x+5, y), text, font=self.verysmallfont, fill= self.TEXT_COLOR)
