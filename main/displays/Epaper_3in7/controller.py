@@ -237,16 +237,16 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.text((330, 55), "max", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
         self.draw.text((330, 79), "min", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
 
-        self.right_text(28, f"{vertical_speed:+1.0f}", self.smallfont, fill=self.TEXT_COLOR)
-        self.right_text(52, f"{vertical_max:+1.0f}", self.smallfont, fill=self.TEXT_COLOR)
-        self.right_text(76, f"{vertical_min:+1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.right_text(28, f"{vertical_speed:+1.0f}", self.smallfont, color=self.TEXT_COLOR)
+        self.right_text(52, f"{vertical_max:+1.0f}", self.smallfont, color=self.TEXT_COLOR)
+        self.right_text(76, f"{vertical_min:+1.0f}", self.smallfont, color=self.TEXT_COLOR)
 
         self.draw.text((300, 163), "Flight-Level", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.right_text(160, f"{round(flight_level / 100):1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.right_text(160, f"{round(flight_level / 100):1.0f}", self.smallfont, color=self.TEXT_COLOR)
         self.draw.text((300, 187), "GPS-Alt [ft]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.right_text(184, f"{gps_altitude:1.0f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.right_text(184, f"{gps_altitude:1.0f}", self.smallfont, color=self.TEXT_COLOR)
         self.draw.text((300, 211), "GpsSpd [kts]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.right_text(208, f"{gps_speed:1.1f}", self.smallfont, fill=self.TEXT_COLOR)
+        self.right_text(208, f"{gps_speed:1.1f}", self.smallfont, color=self.TEXT_COLOR)
 
         if error_message:
             self.centered_text(60, error_message, self.verylargefont)
