@@ -20,7 +20,7 @@ while true; do
         echo "Git changes detected. Pulling ..."
         git pull
         echo "Executing command: $COMMAND"
-        eval "$COMMAND"
+        eval "$COMMAND &"
     else
         echo "No git changes detected."
     fi
