@@ -230,7 +230,12 @@ class GenericDisplay:
         self.bottom_line(left_text, middle_text, right_t)
 
     def meter(self, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
-              marks_distance, small_marks_distance, middle_text1, middle_text2, meter_color, text_color):
+              marks_distance, small_marks_distance, middle_text1, middle_text2, meter_color=None, text_color=None,
+              middle_font=None):
+        meter_color = meter_color or self.TEXT_COLOR
+        text_color = text_color or self.TEXT_COLOR
+        middle_font = middle_font or self.smallfont
+
         big_mark_length = max(4, size // 16)
         small_mark_length = big_mark_length // 2
         arrow_line_size = size // 16
