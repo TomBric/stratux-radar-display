@@ -237,13 +237,15 @@ class GenericDisplay:
         arrow_head_size = arrow_line_size * 2
         arc_width = max(2, size // 64)
         center_size = (arrow_line_size * 3) // 4
+        text_distance = small_mark_length
+        arrow_distance = big_mark_length
 
         # points of arrow at angle 0 (pointing up) for line drawing
         arrow = [
             (arrow_line_size // 2, 0),
             (-arrow_line_size // 2, 0),
             (-arrow_line_size // 2, -size // 2 + arrow_head_size),
-            (0, -size // 2 + big_mark_length),
+            (0, -size // 2 + arrow_distance),
             (arrow_line_size // 2, -size // 2 + arrow_head_size),
             (arrow_line_size // 2, 0)
         ]
