@@ -211,22 +211,22 @@ class GenericDisplay:
         pass
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
-              utc_color=None, timer_color=None, second_color=None):
-        if utc_color is None:
-            utc_color = self.TEXT_COLOR
-        if timer_color is None:
-            timer_color = self.TEXT_COLOR
-        if second_color is None:
-            second_color = self.TEXT_COLOR
+                      utc_color=None, timer_color=None, second_color=None):
+        utc_color = utc_color or self.TEXT_COLOR
+        timer_color = timer_color or self.TEXT_COLOR
+        second_color = second_color or self.TEXT_COLOR
+
         self.draw.text((5, 0), "UTC", font=self.smallfont, fill=self.TEXT_COLOR)
         self.centered_text(self.SMALL, utctime, self.verylargefont, color=utc_color)
-        if stoptime is not None:
+
+        if stoptime:
             self.draw.text((5, self.SMALL + self.VERYLARGE), "Timer", font=self.smallfont, fill=self.TEXT_COLOR)
             self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.verylargefont, color=timer_color)
-            if laptime is not None:
-                self.draw.text((5, 2 * self.SMALL + 2 * self.VERYLARGE), laptime_head, font=self.smallfont,
-                               fill=self.TEXT_COLOR)
+
+            if laptime:
+                self.draw.text((5, 2 * self.SMALL + 2 * self.VERYLARGE), laptime_head, font=self.smallfont, fill=self.TEXT_COLOR)
                 self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.verylargefont, color=second_color)
+
         self.bottom_line(left_text, middle_text, right_t)
 
     def meter(self, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
