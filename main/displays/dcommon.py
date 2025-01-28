@@ -265,7 +265,7 @@ class GenericDisplay:
             self.draw.line(mark, fill=meter_color, width=arc_width//2)
             m += small_marks_distance
         # large marks
-        line = ((0, -size//2), (0, -size//2) + big_mark_length))
+        line = ((0, -size//2), (0, -size//2 + big_mark_length))
         m = start_value
         while m <= end_value:
             angle = deg_per_value * (m - start_value) + from_degree
