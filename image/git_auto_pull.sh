@@ -10,7 +10,7 @@ fi
 cd "$REPO_DIR" || { echo "GitAutoPull Error: no such directory"; exit 1; }
 git pull
 echo "Executing command: $COMMAND"
-eval "$COMMAND"
+eval "$COMMAND &"
 while true; do
     git fetch origin
     # check if new commits exist
