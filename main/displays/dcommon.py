@@ -295,7 +295,38 @@ class GenericDisplay:
         pass
 
     def compass(self, heading, error_message):
-        pass
+            czerox = self.sizex / 2
+            czeroy = self.sizey / 2
+            csize = int(self.sizey / 2)  # radius of compass rose
+
+            self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR, fill="white", width=4)
+            self.draw.bitmap((self.zerox - 60, 70), self.compass_aircraft, fill=self.TEXT_COLOR)
+            self.draw.line((czerox, 20, czerox, 70), fill=self.TEXT_COLOR, width=4)
+
+            text = f"{heading}°"
+            tl = self.draw.textlength(text, self.smallfont)
+            self.draw.text((self.sizex - tl - 100, self.sizey - self.SMALL - 10), text, font=self.smallfont, fill=self.TEXT_COLOR, align="right")
+
+            for m in range(0, 360, 10):
+                s = math.sin(math.radians(m - heading + 90))
+                c = math.cos(math.radians(m - heading + 90))
+                x1, y1 = czerox - (csize - 1) * c, czeroy - (csize - 1) * s
+                x2, y2 = czerox - (csize - self.CM_SIZE) * c, czeroy - (csize - self.CM_SIZE) * s
+                width = 4 if m % 30 == 0 else 2
+                self.draw.line((x1, y1, x2, y2), fill=self.TEXT_COLOR, width=width)
+
+                if m % 30 == 0:
+                    mark = {0: "N", 90: "E", 180: "S", 270: "W"}.get(m, str(m // 10))
+                    font = self.morelargefont if m % 90 == 0 else self.largefont
+                    tl = self.draw.textlength(mark, font)
+                    self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill=self.TEXT_COLOR)
+                    self.cdraw.text(((self.LARGE * 2 - tl) / 2, (self.LARGE * 2 - self.MORELARGE) / 2), mark, font=font)
+                    rotmask = self.mask.rotate(-m + heading, expand=False)
+                    center = (czerox - (csize - self.CM_SIZE - self.LARGE / 2) * c, czeroy - (csize - self.CM_SIZE - self.LARGE / 2) * s)
+                    self.epaper_image.paste(self.TEXT_COLOR, (round(center[0] - self.LARGE), round(center[1] - self.LARGE)), rotmask)
+
+            if error_message:
+                self.centered_text(120, error_message, self.largefont)
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
