@@ -217,19 +217,20 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min, error_message):
         self.meter(vertical_speed / 100, -20, 20, 110, 430, self.sizey, self.sizey // 2,
-                   self.sizey // 2, 5, 1, None, None,
+                   self.sizey // 2, 5, 1, "Vertical Speed", "100 feet per min",
                    self.TEXT_COLOR, self.TEXT_COLOR)
 
         self.draw.text((35, self.sizey / 2 - self.VERYSMALL - 25), "up", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
         self.draw.text((35, self.sizey / 2 + 25), "dn", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
 
-        middle_text = "Vertical Speed"
-        tl = self.draw.textlength(middle_text, self.smallfont)
-        self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 - self.VERYSMALL - 10), middle_text, font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
 
-        middle_text = "100 feet per min"
-        tl = self.draw.textlength(middle_text, self.smallfont)
-        self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 + 10), middle_text, font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        # middle_text = "Vertical Speed"
+        # tl = self.draw.textlength(middle_text, self.smallfont)
+        # self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 - self.VERYSMALL - 10), middle_text, font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+
+        # middle_text = "100 feet per min"
+        # tl = self.draw.textlength(middle_text, self.smallfont)
+        # self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 + 10), middle_text, font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
 
         # right data display
         self.draw.text((300, 10), "Vert Speed [ft/min]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
