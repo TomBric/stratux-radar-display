@@ -468,8 +468,37 @@ class GenericDisplay:
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         pass
 
-    def flighttime(self, last_flights):
-        pass
+    def flighttime(self, last_flights, side_offset=0):
+        # side offset is the space left on both sides, if there is enough space, the flight logs are centered
+        tab_space = (self.sizex - 2 * side_offset) // 4
+        line_space = self.VERYSMALL // 2  # this gives a line indent
+        starty = 0
+        self.centered_text(starty, "Flight Logs ", self.smallfont)
+        starty += self.SMALL + 2 * line_space
+        self.draw.text((side_offset, starty), "Date", font=self.verysmallfont, fill=self.TEXT_COLOR)
+        self.draw.text((side_offset + tab_space, starty), "Start", font=self.verysmallfont, fill=self.TEXT_COLOR)
+        self.draw.text((side_offset + 2*tab_space, starty), "Duration", font=self.verysmallfont, fill=self.TEXT_COLOR)
+        self.draw.text((side_offset + 3*tab_space, starty), "Ldg", font=self.verysmallfont, fill=self.TEXT_COLOR)
+
+        for f in last_flights:
+            starty += self.VERYSMALL + line_space
+            f[0] = f[0].replace(second=0, microsecond=0)
+            self.draw.text((side_offset, starty), f[0].strftime("%d.%m.%y"), font=self.verysmallfont, fill=self.TEXT_COLOR)
+            self.draw.text((side_offset + tab_space, starty), f[0].strftime("%H:%M"), font=self.verysmallfont, fill=self.TEXT_COLOR)
+            if f[1] != 0:
+                f[1] = f[1].replace(second=0, microsecond=0)
+                delta = (f[1] - f[0]).total_seconds()
+                self.draw.text((side_offset + 3*tab_space, starty), f[1].strftime("%H:%M"), font=self.verysmallfont, fill=self.TEXT_COLOR)
+            else:
+                delta = (datetime.datetime.now(datetime.timezone.utc).replace(second=0, microsecond=0) - f[0]).total_seconds()
+                self.draw.text((side_offset + 3*tab_space, starty), "in the air", font=self.verysmallfont, fill=self.TEXT_COLOR)
+            hours, remainder = divmod(delta, 3600)
+            minutes, _ = divmod(remainder, 60)
+            out = f'  {int(hours):02}:{int(minutes):02}  '
+            self.round_text(side_offset + 2*tab_space, starty, out, self.TEXT_COLOR, out=self.TEXT_COLOR)
+            if starty >= self.sizey - self.VERYSMALL - 2*line_space:    # some more space
+                break
+        self.bottom_line("", "Mode", "Clear")
 
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):  # draw graph and co values
         pass

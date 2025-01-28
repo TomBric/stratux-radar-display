@@ -389,7 +389,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         bottom_line("+10 ft", "Mode", "-10 ft")
 
 
-    def flighttime(last_flights):
+    def flighttime(self, last_flights):
         starty = 0
         centered_text(0, "Flight Logs ", self.smallfont)
         starty +=  self.SMALL + 10
