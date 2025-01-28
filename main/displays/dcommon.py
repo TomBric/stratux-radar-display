@@ -295,7 +295,7 @@ class GenericDisplay:
             self.draw.text((center_x - tl//2, center_y - self.SMALL - text_offset_middle), middle_text1, font=self.smallfont,
                            fill=text_color, align="left")
         if middle_text2 is not None:
-            tl = self.draw.textlength(smiddle_text2, smallfont)
+            tl = self.draw.textlength(middle_text2, smallfont)
             self.draw.text((center_x - tl // 2, center_y + text_offset_middle), middle_text2, font=self.smallfont,
                       fill=text_color, align="left")
 
