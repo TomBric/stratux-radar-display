@@ -464,7 +464,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
                 ("Roll [deg]", "{:+2d}".format(ahrs_roll)),
             )
-            starty = self.dashboard(self.zerox+offset, starty, self.zerox-offset, lines, headline="AHRS", rounding=True)
+            starty = self.dashboard(self.zerox+offset, starty, self.zerox-2*offset, lines, headline="AHRS", rounding=True)
         if baro_valid:
             if alt_diff_takeoff is not None:
                 takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
@@ -480,7 +480,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Ba-Diff r-up [ft]", alt_diff_str),
                 ("Ba-Diff tof [ft]", takeoff_str),
             )
-            self.dashboard(self.zerox+offset, starty, self.zerox-offset, lines, headline="Baro", rounding=True)
+            self.dashboard(self.zerox+offset, starty, self.zerox-2*offset, lines, headline="Baro", rounding=True)
 
         if error_message is not None:
             self.centered_text(self.sizey//4, error_message, self.verylargefont)

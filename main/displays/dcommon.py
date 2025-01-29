@@ -633,7 +633,7 @@ class GenericDisplay:
         color = color or self.TEXT_COLOR
         bgcolor = bgcolor or self.BG_COLOR
         indent = self.VERYSMALL // 2   # text indent on the left
-        side_offset = 2   # offset right and left of the rounding
+        side_offset = 0   # offset right and left of the rounding
         line_indent = 0 # additional space between lines
         heading_indent = self.draw.textlength("---", self.verysmallfont)   # just 2 characters to the right
         heading_space = self.draw.textlength("-", self.verysmallfont)  # space in front and behind heading
