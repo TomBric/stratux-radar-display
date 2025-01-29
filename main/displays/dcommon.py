@@ -483,6 +483,8 @@ class GenericDisplay:
 
         for f in last_flights:
             starty += self.VERYSMALL + line_space
+            if starty >= self.sizey - self.VERYSMALL - 2*line_space:    # screen full
+                break
             f[0] = f[0].replace(second=0, microsecond=0)
             self.draw.text((side_offset, starty), f[0].strftime("%d.%m.%y"), font=self.verysmallfont, fill=self.TEXT_COLOR)
             self.draw.text((side_offset + tab_space, starty), f[0].strftime("%H:%M"), font=self.verysmallfont, fill=self.TEXT_COLOR)
@@ -497,8 +499,6 @@ class GenericDisplay:
             minutes, _ = divmod(remainder, 60)
             out = f'{int(hours):02}:{int(minutes):02}'
             self.round_text(side_offset + 2*tab_space, starty, out, out_color=self.TEXT_COLOR)
-            if starty >= self.sizey - self.VERYSMALL - 2*line_space:    # some more space
-                break
         self.bottom_line("", "Mode", "Clear")
 
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):  # draw graph and co values
