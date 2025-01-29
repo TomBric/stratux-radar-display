@@ -325,6 +325,9 @@ class Epaper3in7(dcommon.GenericDisplay):
                   stroke_width=1, stroke_fill="white")
         return y+self.VERYSMALL+12
 
+    def flighttime(self, last_flights, side_offset=0):
+        self.GenericDisplay().flighttime(last_flights, 20)
+
 
     def round_text(self, x, y, text, bg_color=None, yesno=True, out_color=None):
         # bg color is color of background, if none given, this is the normal background for this display
@@ -335,7 +338,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
         if out_color is not None:
             self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, outline=out_color)
-        self.draw.text((x, y), text, font=self.verysmallfont, fill= self.TEXT_COLOR)
+        self.draw.text((x + VERYSMALL//2, y), text, font=self.verysmallfont, fill= self.TEXT_COLOR)
         if not yesno:
             self.draw.line([x, y+self.VERYSMALL+2, x+tl+10, y], fill= self.TEXT_COLOR, width=2)
         return x+tl+20
