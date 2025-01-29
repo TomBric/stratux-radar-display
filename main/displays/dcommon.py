@@ -663,10 +663,10 @@ class GenericDisplay:
 
         starty = y + self.VERYSMALL
         for line in lines:
-            self.draw.text((x + indent, starty + (SMALL - VERYSMALL) // 2), line[0], font=verysmallfont, fill=color,
-                      align="left")
+            self.draw.text((x + indent, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
+                           font=self.verysmallfont, fill=color,align="left")
             tl = self.draw.textlength(line[1], self.smallfont)
-            self.draw.text((x + dsizex - indent - tl, starty), line[1], font=smallfont, fill=color)
+            self.draw.text((x + dsizex - indent - tl, starty), line[1], font=self.smallfont, fill=color)
             starty += self.SMALL + line_indent
         if rounding:
             self.draw.rounded_rectangle([x, y, x + dsizex, starty + self.VERYSMALL//2 ], radius=6, fill=None,
