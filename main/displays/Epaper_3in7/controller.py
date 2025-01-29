@@ -338,7 +338,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
         if out_color is not None:
             self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, outline=out_color)
-        self.draw.text((x + VERYSMALL//2, y), text, font=self.verysmallfont, fill= self.TEXT_COLOR)
+        self.draw.text((x + self.VERYSMALL//2, y), text, font=self.verysmallfont, fill= self.TEXT_COLOR)
         if not yesno:
             self.draw.line([x, y+self.VERYSMALL+2, x+tl+10, y], fill= self.TEXT_COLOR, width=2)
         return x+tl+20
