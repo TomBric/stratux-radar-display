@@ -463,30 +463,6 @@ class GenericDisplay:
         self.draw.text((offset, txt_starty), text, font=self.smallfont)
         self.bottom_line(left_text, middle_text, r_text)
 
-    def dashboard(self, x, y, dsizex, lines, rounding=False, headline=None):
-        # generates a dashboard with smaller left sides and a bigger value on the right
-        # arguments are lines = ("text", "value"), ....
-        starty = y + self.VERYSMALL // 2
-        for line in lines:
-            if line[0] is not None:
-                self.draw.text((x + 7, starty + (self.SMALL - self.VERYSMALL) // 2), line[0], font=self.verysmallfont,
-                           fill=self.TEXT_COLOR, align="left")
-            if line[1] is not None:
-                tl = self.draw.textlength(line[1], self.smallfont)
-                self.draw.text((x + dsizex - 7 - tl, starty), line[1], font=self.smallfont, fill=self.TEXT_COLOR)
-            starty += self.SMALL + 3
-
-        if rounding:
-            starty += self.VERYSMALL // 2
-            self.draw.rounded_rectangle([x, y, x + dsizex, starty], radius=6, fill=None, outline=self.TEXT_COLOR, width=2)
-            if headline is not None:
-                tl = self.draw.textlength(headline, self.smallfont)
-                self.draw.rectangle([x + 20, y - self.SMALL // 2, x + 20 + tl + 8, y + self.SMALL // 2], fill=self.BG_COLOR, outline=None)
-
-        if headline is not None:
-            self.draw.text((x + 20 + 4, y - self.VERYSMALL // 2), headline, font=self.verysmallfont, fill=self.TEXT_COLOR)
-
-        return starty
 
     def screen_input(self, headline, subline, text, left, middle, right, prefix, inp, suffix):
         pass
