@@ -638,7 +638,7 @@ class GenericDisplay:
         heading_indent = self.draw.textlength("---", self.verysmallfont)   # just 2 characters to the right
         heading_space = self.draw.textlength("-", self.verysmallfont)  # space in front and behind heading
 
-        starty = y
+        starty = y + self.VERYSMALL  # space for heading
         for line in lines:
             self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
                            font=self.verysmallfont, fill=color,align="left")
