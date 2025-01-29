@@ -456,7 +456,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             lines = (
                 ("Grd Dist [cm]", "{:+3.1f}".format(grounddistance/10)),
             )
-            self.dashboard(offset, starty, self.zerox-offset, lines, headline="Ground Sensor", Rounding=True)
+            self.dashboard(offset, starty, self.zerox-offset, lines, headline="Ground Sensor", rounding=True)
 
         starty = self.SMALL   # right column
         if ahrs_valid:
