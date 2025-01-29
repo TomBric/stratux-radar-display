@@ -431,7 +431,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
                                                            math.floor(now.microsecond/100000)))
         )
-        starty = self.dashboard(offset, SMALL*3//2, self.zerox-offset, lines, headline="Date/Time", rounding=True)
+        starty = self.dashboard(offset, self.SMALL*3//2, self.zerox-offset, lines, headline="Date/Time", rounding=True)
         t = "GPS-NoFix"
         accuracy = ""
         if gps_quality == 1:
