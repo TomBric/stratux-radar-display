@@ -432,7 +432,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
                                                            math.floor(now.microsecond/100000)))
         )
-        starty = self.dashboard(5, 35, 225, lines, heading="Date/Time", rounding=True)
+        starty = self.dashboard(5, 35, 225, lines, headline="Date/Time", rounding=True)
 
         t = "GPS-NoFix"
         accuracy = ""
@@ -453,12 +453,12 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("GPS-Speed [kts]", gps_speed_str),
             (t, accuracy)
         )
-        starty = self.dashboard(5, starty, 225, lines, heading="GPS", rounding=True)
+        starty = self.dashboard(5, starty, 225, lines, headline="GPS", rounding=True)
         if ground_distance_valid:
             lines = (
                 ("Grd Dist [cm]", "{:+3.1f}".format(grounddistance/10)),
             )
-            self.dashboard(5, starty, 225, lines, heading="Ground Sensor", Rounding=True)
+            self.dashboard(5, starty, 225, lines, headline="Ground Sensor", Rounding=True)
 
         starty = 35   # right column
         if ahrs_valid:
@@ -466,7 +466,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
                 ("Roll [deg]", "{:+2d}".format(ahrs_roll)),
             )
-            starty = dashboard(250, 35, 225, lines, heading="AHRS", rounding=True)
+            starty = dashboard(250, 35, 225, lines, headline="AHRS", rounding=True)
         if baro_valid:
             if alt_diff_takeoff is not None:
                 takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
@@ -482,7 +482,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Ba-Diff r-up [ft]", alt_diff_str),
                 ("Ba-Diff tof [ft]", takeoff_str),
             )
-            self.dashboard(250, starty, 225, lines, heading="Baro", rounding=True)
+            self.dashboard(250, starty, 225, lines, headline="Baro", rounding=True)
 
         if error_message is not None:
             sekf.centered_text(60, error_message, self.verylargefont)
