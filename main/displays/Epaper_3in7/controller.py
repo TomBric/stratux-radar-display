@@ -326,7 +326,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         return y+self.VERYSMALL+12
 
     def flighttime(self, last_flights, side_offset=0):
-        self.GenericDisplay().flighttime(last_flights, 20)
+        dcommon.GenericDisplay().flighttime(last_flights, 20)
 
 
     def round_text(self, x, y, text, bg_color=None, yesno=True, out_color=None):
