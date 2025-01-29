@@ -424,16 +424,14 @@ class Epaper3in7(dcommon.GenericDisplay):
     def distance(self,now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                  own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                  ground_distance_valid, grounddistance, error_message):
-
+        offset = 5
         self.centered_text(0, "GPS Distance", self.smallfont)
-
         lines = (
             ("Date", "{:0>2d}.{:0>2d}.{:0>4d}".format(now.day, now.month, now.year)),
             ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
                                                            math.floor(now.microsecond/100000)))
         )
-        starty = self.dashboard(5, 35, 225, lines, headline="Date/Time", rounding=True)
-
+        starty = self.dashboard(offset, SMALL*3//2, self.zerox-offset, lines, headline="Date/Time", rounding=True)
         t = "GPS-NoFix"
         accuracy = ""
         if gps_quality == 1:
@@ -453,20 +451,20 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("GPS-Speed [kts]", gps_speed_str),
             (t, accuracy)
         )
-        starty = self.dashboard(5, starty, 225, lines, headline="GPS", rounding=True)
+        starty = self.dashboard(offset, starty, self.zerox-offset, lines, headline="GPS", rounding=True)
         if ground_distance_valid:
             lines = (
                 ("Grd Dist [cm]", "{:+3.1f}".format(grounddistance/10)),
             )
-            self.dashboard(5, starty, 225, lines, headline="Ground Sensor", Rounding=True)
+            self.dashboard(offset, starty, self.zerox-offset, lines, headline="Ground Sensor", Rounding=True)
 
-        starty = 35   # right column
+        starty = SMALL*3//2   # right column
         if ahrs_valid:
             lines = (
                 ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
                 ("Roll [deg]", "{:+2d}".format(ahrs_roll)),
             )
-            starty = self.dashboard(250, 35, 225, lines, headline="AHRS", rounding=True)
+            starty = self.dashboard(self.zerox+offset, starty, self.zerox-offset, lines, headline="AHRS", rounding=True)
         if baro_valid:
             if alt_diff_takeoff is not None:
                 takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
@@ -482,10 +480,10 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Ba-Diff r-up [ft]", alt_diff_str),
                 ("Ba-Diff tof [ft]", takeoff_str),
             )
-            self.dashboard(250, starty, 225, lines, headline="Baro", rounding=True)
+            self.dashboard(self.zerox+offset, starty, self.zerox-offset, lines, headline="Baro", rounding=True)
 
         if error_message is not None:
-            self.centered_text(60, error_message, self.verylargefont)
+            self.centered_text(self.sizey//4, error_message, self.verylargefont)
         self.bottom_line("Stats/Set", "Mode", "Start")
 
 
