@@ -332,10 +332,10 @@ class Epaper3in7(dcommon.GenericDisplay):
         # if yesno is false, the text is crossed out
         bg_color = bg_color or self.BG_COLOR
         tl = self.draw.textlength(text, self.smallfont)
-        self.draw.rounded_rectangle([x, y, x + tl + 10, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
+        self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
         if out_color is not None:
-            self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL], radius=4, outline=out_color)
-        self.draw.text((x+5, y), text, font=self.verysmallfont, fill= self.TEXT_COLOR)
+            self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, outline=out_color)
+        self.draw.text((x, y), text, font=self.verysmallfont, fill= self.TEXT_COLOR)
         if not yesno:
             self.draw.line([x, y+self.VERYSMALL+2, x+tl+10, y], fill= self.TEXT_COLOR, width=2)
         return x+tl+20
