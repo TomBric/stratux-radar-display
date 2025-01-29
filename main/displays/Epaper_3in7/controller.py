@@ -421,26 +421,6 @@ class Epaper3in7(dcommon.GenericDisplay):
 
         bottom_line("Calibrate", "Mode", "Reset")
 
-
-    def dashboard(x, y, dsizex, rounding, headline, lines):
-        # dashboard, arguments are lines = ("text", "value"), ....
-        starty = y +  self.VERYSMALL/2
-        for line in lines:
-            draw.text((x + 7, starty + (SMALL -  self.VERYSMALL) / 2), line[0], font=verysmallfont,
-                      fill=self.TEXT_COLOR, align="left")
-            tl = draw.textlength(line[1], self.smallfont)
-            draw.text((x + dsizex - 7 - tl, starty), line[1], font=smallfont, fill=self.TEXT_COLOR)
-            starty +=  self.SMALL + 3
-        if rounding:
-            starty +=  self.VERYSMALL/2
-            draw.rounded_rectangle([x, y, x + dsizex, starty], radius=6, fill=None, outline=self.TEXT_COLOR, width=2)
-            tl = draw.textlength(headline, self.smallfont)
-            draw.rectangle([x + 20, y -  self.SMALL/2, x + 20 + tl + 8, y +  self.SMALL/2],
-                           fill=self.BG_COLOR, outline=None)
-        draw.text((x+20+4, y -  self.VERYSMALL/2), headline, font=verysmallfont, fill=self.TEXT_COLOR)
-        return starty
-
-
     def distance(self,now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                  own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                  ground_distance_valid, grounddistance, error_message):
@@ -452,7 +432,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
                                                            math.floor(now.microsecond/100000)))
         )
-        starty = dashboard(5, 35, 225, True, "Date/Time", lines)
+        starty = dashboard(5, 35, 225, lines, heading="Date/Time", rounding=True)
 
         t = "GPS-NoFix"
         accuracy = ""
@@ -473,12 +453,12 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("GPS-Speed [kts]", gps_speed_str),
             (t, accuracy)
         )
-        starty = dashboard(5, starty, 225, True, "GPS", lines)
+        starty = dashboard(5, starty, 225, lines, heading="GPS", rounding=True)
         if ground_distance_valid:
             lines = (
                 ("Grd Dist [cm]", "{:+3.1f}".format(grounddistance/10)),
             )
-            dashboard(5, starty, 225, True, "Ground Sensor", lines)
+            dashboard(5, starty, 225, lines, heading="Ground Sensor", Rounding=True)
 
         starty = 35   # right column
         if ahrs_valid:
@@ -486,7 +466,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
                 ("Roll [deg]", "{:+2d}".format(ahrs_roll)),
             )
-            starty = dashboard(250, 35, 225, True, "AHRS", lines)
+            starty = dashboard(250, 35, 225, lines, heading="AHRS", rounding=True)
         if baro_valid:
             if alt_diff_takeoff is not None:
                 takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
@@ -502,7 +482,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Ba-Diff r-up [ft]", alt_diff_str),
                 ("Ba-Diff tof [ft]", takeoff_str),
             )
-            dashboard(250, starty, 225, True, "Baro", lines)
+            dashboard(250, starty, 225, lines, heading="Baro", rounding=True)
 
         if error_message is not None:
             centered_text(60, error_message, self.verylargefont)

@@ -651,19 +651,29 @@ class GenericDisplay:
         for x in range(int(xpos), int(xpos + xsize), 6):
             self.draw.line([(x, y), (x + 3, y)], fill=linecolor, width=linewidth)
 
-    def dashboard(self, x, y, dsizex, lines, color, bgcolor, rounding=False, headline=None):
+    def dashboard(self, x, y, dsizex, lines, color=None, bgcolor=None, rounding=False, headline=None):
         # dashboard, arguments are lines = ("text", "value"), ....
-        starty = y + VERYSMALL / 2
+        # x and y are the starting points of the rounded rectangle
+        color = color or self.TEXT_COLOR
+        bgcolor = color or self.BG_COLOR
+        indent = self.VERYSMALL // 2
+        line_indent = self.SMALL // 4
+        heading_indent = self.draw.textlength("---", self.verysmallfont)   # just 2 characters to the right
+        heading_space = self.draw.textlength("-", self.verysmallfont)  # space in front and behind heading
+
+        starty = y + self.VERYSMALL
         for line in lines:
-            self.draw.text((x + 7, starty + (SMALL - VERYSMALL) / 2), line[0], font=verysmallfont, fill=color,
+            self.draw.text((x + indent, starty + (SMALL - VERYSMALL) // 2), line[0], font=verysmallfont, fill=color,
                       align="left")
             tl = self.draw.textlength(line[1], self.smallfont)
-            self.draw.text((x + dsizex - 7 - tl, starty), line[1], font=smallfont, fill=color)
-            starty += SMALL + 3
+            self.draw.text((x + dsizex - indent - tl, starty), line[1], font=smallfont, fill=color)
+            starty += self.SMALL + line_indent
         if rounding:
-            starty += VERYSMALL / 2
-            self.draw.rounded_rectangle([x, y, x + dsizex, starty], radius=6, fill=None, outline=color, width=2)
-            tl = self.draw.textlength(headline, verysmallfont)
-            self.draw.rectangle([x + 20, y - SMALL / 2, x + 20 + tl + 8, y + SMALL / 2], fill=bgcolor, outline=None)
-        self.draw.text((x + 20 + 4, y - VERYSMALL / 2), headline, font=verysmallfont, fill=color)
+            self.draw.rounded_rectangle([x, y, x + dsizex, starty + self.VERYSMALL//2 ], radius=6, fill=None,
+                                        outline=color, width=2)
+            tl = self.draw.textlength(headline, self.verysmallfont)
+            self.draw.rectangle([x + heading_indent - heading_space, y,
+                                 x + heading_indent + tl + heading_space, y + self.VERYSMALL], fill=bgcolor, outline=None)
+        if headline is not None:
+            self.draw.text((x + heading_indent, y), headline, font=self.verysmallfont, fill=color)
         return starty
