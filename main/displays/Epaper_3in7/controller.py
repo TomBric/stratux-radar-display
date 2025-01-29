@@ -425,14 +425,14 @@ class Epaper3in7(dcommon.GenericDisplay):
                  own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                  ground_distance_valid, grounddistance, error_message):
 
-        centered_text(0, "GPS Distance", self.smallfont)
+        self.centered_text(0, "GPS Distance", self.smallfont)
 
         lines = (
             ("Date", "{:0>2d}.{:0>2d}.{:0>4d}".format(now.day, now.month, now.year)),
             ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
                                                            math.floor(now.microsecond/100000)))
         )
-        starty = dashboard(5, 35, 225, lines, heading="Date/Time", rounding=True)
+        starty = self.dashboard(5, 35, 225, lines, heading="Date/Time", rounding=True)
 
         t = "GPS-NoFix"
         accuracy = ""
@@ -453,12 +453,12 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("GPS-Speed [kts]", gps_speed_str),
             (t, accuracy)
         )
-        starty = dashboard(5, starty, 225, lines, heading="GPS", rounding=True)
+        starty = self.dashboard(5, starty, 225, lines, heading="GPS", rounding=True)
         if ground_distance_valid:
             lines = (
                 ("Grd Dist [cm]", "{:+3.1f}".format(grounddistance/10)),
             )
-            dashboard(5, starty, 225, lines, heading="Ground Sensor", Rounding=True)
+            self.dashboard(5, starty, 225, lines, heading="Ground Sensor", Rounding=True)
 
         starty = 35   # right column
         if ahrs_valid:
@@ -482,11 +482,11 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Ba-Diff r-up [ft]", alt_diff_str),
                 ("Ba-Diff tof [ft]", takeoff_str),
             )
-            dashboard(250, starty, 225, lines, heading="Baro", rounding=True)
+            self.dashboard(250, starty, 225, lines, heading="Baro", rounding=True)
 
         if error_message is not None:
-            centered_text(60, error_message, self.verylargefont)
-        bottom_line("Stats/Set", "Mode", "Start")
+            sekf.centered_text(60, error_message, self.verylargefont)
+        self.bottom_line("Stats/Set", "Mode", "Start")
 
 
     def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
