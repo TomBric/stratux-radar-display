@@ -632,24 +632,25 @@ class GenericDisplay:
         # x and y are the starting points of the rounded rectangle
         color = color or self.TEXT_COLOR
         bgcolor = bgcolor or self.BG_COLOR
-        indent = self.VERYSMALL // 2
+        indent = self.VERYSMALL // 2   # text indent on the left
+        side_offset = 2   # offset right and left of the rounding
         line_indent = self.SMALL // 4
         heading_indent = self.draw.textlength("---", self.verysmallfont)   # just 2 characters to the right
         heading_space = self.draw.textlength("-", self.verysmallfont)  # space in front and behind heading
 
         starty = y + self.VERYSMALL * 3 // 2
         for line in lines:
-            self.draw.text((x + indent, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
+            self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
                            font=self.verysmallfont, fill=color,align="left")
             tl = self.draw.textlength(line[1], self.smallfont)
-            self.draw.text((x + dsizex - indent - tl, starty), line[1], font=self.smallfont, fill=color)
+            self.draw.text((x + dsizex - side_offset - indent - tl, starty), line[1], font=self.smallfont, fill=color)
             starty += self.SMALL + line_indent
         if rounding is not None:
-            self.draw.rounded_rectangle([x, y + self.VERYSMALL//2, x + dsizex, starty + self.VERYSMALL//2 ], radius=6, fill=None,
-                                        outline=color, width=2)
+            self.draw.rounded_rectangle([x + side_offset, y + self.VERYSMALL//2, x + dsizex - side_offset,
+                                         starty + self.VERYSMALL//2 ], radius=6, fill=None, outline=color, width=2)
         if headline is not None:
             tl = self.draw.textlength(headline, self.verysmallfont)
-            self.draw.rectangle([x + heading_indent - heading_space, y,
+            self.draw.rectangle([x + side_offset + heading_indent - heading_space, y,
                 x + heading_indent + tl + heading_space, y + self.VERYSMALL], fill=bgcolor, outline=None)
-            self.draw.text((x + heading_indent, y), headline, font=self.verysmallfont, fill=color)
+            self.draw.text((x + side_offset + heading_indent, y), headline, font=self.verysmallfont, fill=color)
         return starty
