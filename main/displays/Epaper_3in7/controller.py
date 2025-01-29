@@ -458,7 +458,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             )
             self.dashboard(offset, starty, self.zerox-offset, lines, headline="Ground Sensor", Rounding=True)
 
-        starty = SMALL*3//2   # right column
+        starty = self.SMALL*3//2   # right column
         if ahrs_valid:
             lines = (
                 ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
