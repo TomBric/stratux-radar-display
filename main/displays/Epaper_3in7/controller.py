@@ -485,7 +485,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.dashboard(250, starty, 225, lines, headline="Baro", rounding=True)
 
         if error_message is not None:
-            sekf.centered_text(60, error_message, self.verylargefont)
+            self.centered_text(60, error_message, self.verylargefont)
         self.bottom_line("Stats/Set", "Mode", "Start")
 
 
