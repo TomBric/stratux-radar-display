@@ -466,7 +466,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
                 ("Roll [deg]", "{:+2d}".format(ahrs_roll)),
             )
-            starty = dashboard(250, 35, 225, lines, headline="AHRS", rounding=True)
+            starty = self.dashboard(250, 35, 225, lines, headline="AHRS", rounding=True)
         if baro_valid:
             if alt_diff_takeoff is not None:
                 takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
