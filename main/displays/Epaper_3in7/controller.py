@@ -199,19 +199,13 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.meter(current, -3, 5, 110, 430, gm_size, 140, 140, 1, 0.25,      "G-Force", None, "black", "black")
 
         right_center_x = (self.sizex-gm_size)/2+gm_size    # center of remaining part
-        t = "G-Meter"
-        tl = self.draw.textlength(t, self.largefont)
-        self.draw.text((right_center_x - tl / 2, 30), t, font=self.largefont, fill= self.TEXT_COLOR, align="left")
-        self.draw.text((gm_size+30, 98), "max", font=self.smallfont, fill=self.TEXT_COLOR)
-        self.right_text(95, "{:+1.2f}".format(maxg), self.largefont, color=self.TEXT_COLOR)
-        if error_message is None:
-            self.draw.text((gm_size+30, 138), "act", font=self.smallfont, fill=self.TEXT_COLOR)
-            self.right_text(135, "{:+1.2f}".format(current), self.largefont, color=self.TEXT_COLOR)
-        else:
-            self.draw.text((gm_size+30, 138), error_message, font=self.largefont, fill=self.TEXT_COLOR)
-        self.draw.text((gm_size+30, 178), "min", font=self.smallfont, fill= self.TEXT_COLOR)
-        self.right_text(175, "{:+1.2f}".format(ming), self.largefont, color=self.TEXT_COLOR)
-
+        lines = (
+            ("max", f'{maxg:+1.2f}'),
+            ("act", f'{current:+1.2f}'),
+            ("min", f'{ming:+1.2f}')
+        )
+        self.dashboard(gmsize + self.VERYLARGE, self.VERYLARGE, self.sizex - gm_size- 2* self.VERYLARGE,
+                       lines, rounding=True, headline="G-Meter")
         self.bottom_line("", "    Mode", "Reset")
 
 
