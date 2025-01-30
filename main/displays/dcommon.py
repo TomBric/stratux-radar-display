@@ -238,7 +238,7 @@ class GenericDisplay:
               middle_fontsize=0):
         meter_color = meter_color or self.TEXT_COLOR
         text_color = text_color or self.TEXT_COLOR
-        if middle_fontsize > 0:
+        if middle_fontsize == 0:
             middle_fontsize = self.SMALL
 
         big_mark_length = max(4, size // 16)
