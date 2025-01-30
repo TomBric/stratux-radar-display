@@ -112,12 +112,12 @@ class GenericDisplay:
         self.compass_aircraft = None    # image of the compass aircraft
         # fonts
         self.fonts= {
-            VERYLARGE:self.make_font("Font.ttc", self.VERYLARGE),
-            MORELARGE:self.make_font("Font.ttc", self.MORELARGE),
-            LARGE:self.make_font("Font.ttc", self.LARGE),
-            SMALL:self.make_font("Font.ttc", self.SMALL),
-            VERYSMALL:self.make_font("Font.ttc", self.VERYSMALL),
-            AWESOME_FONT:self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONT) # for bluetooth indicator
+            self.VERYLARGE:self.make_font("Font.ttc", self.VERYLARGE),
+            self.MORELARGE:self.make_font("Font.ttc", self.MORELARGE),
+            self.LARGE:self.make_font("Font.ttc", self.LARGE),
+            self.SMALL:self.make_font("Font.ttc", self.SMALL),
+            self.VERYSMALL:self.make_font("Font.ttc", self.VERYSMALL),
+            self.AWESOME_FONT:self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONT) # for bluetooth indicator
         }
 
     def init(self, fullcircle=False):    # explicit init to be implemented for every device type
