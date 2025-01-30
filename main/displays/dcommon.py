@@ -656,5 +656,6 @@ class GenericDisplay:
             tl = self.draw.textlength(headline, self.fonts[self.VERYSMALL])
             self.draw.rectangle([x + side_offset + heading_indent - heading_space, y,
                 x + heading_indent + tl + heading_space, y + self.VERYSMALL], fill=bgcolor, outline=None)
+            rlog.debug(f"self.VERYSMALL = {self.VERYSMALL}, self.SMALL = {self.SMALL}")
             self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[self.VERYSMALL], fill=color)
         return starty
