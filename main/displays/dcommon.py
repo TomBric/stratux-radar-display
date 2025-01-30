@@ -238,8 +238,7 @@ class GenericDisplay:
               middle_fontsize=0):
         meter_color = meter_color or self.TEXT_COLOR
         text_color = text_color or self.TEXT_COLOR
-        if middle_fontsize == 0:
-            middle_fontsize = self.SMALL
+        middle_fontsize = middle_fontsize or self.SMALL
 
         big_mark_length = max(4, size // 16)
         small_mark_length = big_mark_length // 2
@@ -302,6 +301,8 @@ class GenericDisplay:
 
         if middle_text1 is not None:
             tl = self.draw.textlength(middle_text1, self.fonts[middle_fontsize])
+            self.rlog.debug(f"tl {tl} center_x {center_x} center_y {center_y} ")
+
             self.draw.text((center_x - tl//2, center_y - middle_fontsize - text_offset_middle), middle_text1,
                            font=self.fonts[middle_fontsize], fill=text_color, align="left")
         if middle_text2 is not None:
