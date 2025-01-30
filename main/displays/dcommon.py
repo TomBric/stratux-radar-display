@@ -63,7 +63,7 @@ class GenericDisplay:
     LARGE = 30  # size of height indications of aircraft
     SMALL = 24  # size of information indications on top and bottom
     VERYSMALL = 18
-    AWESOME_FONT= 18  # bluetooth indicator
+    AWESOME_FONTSIZE= 18  # bluetooth indicator
     
     # radar-mode
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
@@ -117,8 +117,8 @@ class GenericDisplay:
             self.LARGE: self.make_font("Font.ttc", self.LARGE),
             self.SMALL: self.make_font("Font.ttc", self.SMALL),
             self.VERYSMALL: self.make_font("Font.ttc", self.VERYSMALL),
-            self.AWESOME_FONT: self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONT) # for bluetooth indicator
         }
+        self.awesome_font = self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONTSIZE)  # for bluetooth indicator
 
     def init(self, fullcircle=False):    # explicit init to be implemented for every device type
         # set device properties
