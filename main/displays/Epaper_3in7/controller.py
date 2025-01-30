@@ -134,8 +134,8 @@ class Epaper3in7(dcommon.GenericDisplay):
         logo = Image.open(logopath)
         self.draw.bitmap((self.zerox-192/2, 0), logo, fill= self.TEXT_COLOR)
         versionstr = "Radar " + version
-        self.centered_text(188, versionstr, self.largefont)
-        self.centered_text(self.sizey - 2 *  self.VERYSMALL - 2, "Connecting to " + target_ip, self.verysmallfont)
+        self.centered_text(188, versionstr, self.fonts[LARGE])
+        self.centered_text(self.sizey - 2 *  self.VERYSMALL - 2, "Connecting to " + target_ip, self.fonts[VERYSMALL])
         self.display()
         time.sleep(seconds)
 
@@ -147,7 +147,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.ellipse((self.zerox-self.max_pixel/4, self.zeroy-self.max_pixel/4,
                            self.zerox+self.max_pixel/4, self.zeroy+self.max_pixel/4), outline= self.TEXT_COLOR)
         self.draw.ellipse((self.zerox-2, self.zeroy-2, self.zerox+2, self.zeroy+2), outline= self.TEXT_COLOR)
-        self.draw.text((5, 1), str(range)+" nm", font=self.smallfont, fill= self.TEXT_COLOR)
+        self.draw.text((5, 1), str(range)+" nm", font=self.fonts[SMALL], fill= self.TEXT_COLOR)
         if gps_quality == 0:
             t = "GPS-NoFix"
         elif gps_quality == 1:
@@ -158,25 +158,25 @@ class Epaper3in7(dcommon.GenericDisplay):
             t = ""
         if basemode:
             t += "\nGround\nmode"
-        self.draw.text((5, self.SMALL+10), t, font=self.verysmallfont, fill= self.TEXT_COLOR)
+        self.draw.text((5, self.SMALL+10), t, font=self.fonts[VERYSMALL], fill= self.TEXT_COLOR)
 
         t = "FL"+str(round(ownalt / 100))
-        textlength = self.draw.textlength(t, self.smallfont)
-        self.draw.text((self.sizex - textlength - 5, self.SMALL+10), t, font=self.verysmallfont, fill= self.TEXT_COLOR)
+        textlength = self.draw.textlength(t, self.fonts[SMALL])
+        self.draw.text((self.sizex - textlength - 5, self.SMALL+10), t, font=self.fonts[VERYSMALL], fill= self.TEXT_COLOR)
 
         t = str(altdifference) + " ft"
-        textlength = self.draw.textlength(t, self.smallfont)
-        self.draw.text((self.sizex - textlength - 5, 1), t, font=self.smallfont, fill= self.TEXT_COLOR, align="right")
+        textlength = self.draw.textlength(t, self.fonts[SMALL])
+        self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[SMALL], fill= self.TEXT_COLOR, align="right")
 
         text = str(course) + '°'
-        self.centered_text(1, text, self.smallfont)
+        self.centered_text(1, text, self.fonts[SMALL])
 
         if not gpsconnected:
-            self.centered_text(70, "No GPS", self.smallfont)
+            self.centered_text(70, "No GPS", self.fonts[SMALL])
         if not connected:
-            self.centered_text(30, "No Connection!", self.smallfont)
+            self.centered_text(30, "No Connection!", self.fonts[SMALL])
         if co_alarmlevel > 0:
-            self.centered_text(250, "CO Alarm: " + co_alarmstring, self.smallfont)
+            self.centered_text(250, "CO Alarm: " + co_alarmstring, self.fonts[SMALL])
 
         if extsound or bt_devices > 0:
             if sound_active:
@@ -211,36 +211,36 @@ class Epaper3in7(dcommon.GenericDisplay):
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min, error_message):
         self.meter(vertical_speed / 100, -20, 20, 110, 430, self.sizey, self.sizey // 2,
                    self.sizey // 2, 5, 1, "       Vertical Speed", "       100 feet per min",
-                   middle_font=self.verysmallfont)
+                   middle_font_size=VERYSMALL)
 
-        self.draw.text((25, self.sizey // 2 - self.VERYSMALL - 25), "up", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.draw.text((25, self.sizey // 2 + 25), "dn", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((25, self.sizey // 2 - self.VERYSMALL - 25), "up", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.draw.text((25, self.sizey // 2 + 25), "dn", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
 
 
         # middle_text = "Vertical Speed"
-        # tl = self.draw.textlength(middle_text, self.smallfont)
-        # self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 - self.VERYSMALL - 10), middle_text, font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        # tl = self.draw.textlength(middle_text, self.fonts[SMALL])
+        # self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 - self.VERYSMALL - 10), middle_text, font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
 
         # middle_text = "100 feet per min"
-        # tl = self.draw.textlength(middle_text, self.smallfont)
-        # self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 + 10), middle_text, font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        # tl = self.draw.textlength(middle_text, self.fonts[SMALL])
+        # self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 + 10), middle_text, font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
 
         # right data display
-        self.draw.text((300, 10), "Vert Speed [ft/min]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.draw.text((330, 31), "act", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.draw.text((330, 55), "max", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.draw.text((330, 79), "min", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
+        self.draw.text((300, 10), "Vert Speed [ft/min]", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.draw.text((330, 31), "act", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.draw.text((330, 55), "max", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.draw.text((330, 79), "min", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
 
-        self.right_text(28, f"{vertical_speed:+1.0f}", self.smallfont, color=self.TEXT_COLOR)
-        self.right_text(52, f"{vertical_max:+1.0f}", self.smallfont, color=self.TEXT_COLOR)
-        self.right_text(76, f"{vertical_min:+1.0f}", self.smallfont, color=self.TEXT_COLOR)
+        self.right_text(28, f"{vertical_speed:+1.0f}", self.fonts[SMALL], color=self.TEXT_COLOR)
+        self.right_text(52, f"{vertical_max:+1.0f}", self.fonts[SMALL], color=self.TEXT_COLOR)
+        self.right_text(76, f"{vertical_min:+1.0f}", self.fonts[SMALL], color=self.TEXT_COLOR)
 
-        self.draw.text((300, 163), "Flight-Level", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.right_text(160, f"{round(flight_level / 100):1.0f}", self.smallfont, color=self.TEXT_COLOR)
-        self.draw.text((300, 187), "GPS-Alt [ft]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.right_text(184, f"{gps_altitude:1.0f}", self.smallfont, color=self.TEXT_COLOR)
-        self.draw.text((300, 211), "GpsSpd [kts]", font=self.verysmallfont, fill=self.TEXT_COLOR, align="left")
-        self.right_text(208, f"{gps_speed:1.1f}", self.smallfont, color=self.TEXT_COLOR)
+        self.draw.text((300, 163), "Flight-Level", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.right_text(160, f"{round(flight_level / 100):1.0f}", self.fonts[SMALL], color=self.TEXT_COLOR)
+        self.draw.text((300, 187), "GPS-Alt [ft]", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.right_text(184, f"{gps_altitude:1.0f}", self.fonts[SMALL], color=self.TEXT_COLOR)
+        self.draw.text((300, 211), "GpsSpd [kts]", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.right_text(208, f"{gps_speed:1.1f}", self.fonts[SMALL], color=self.TEXT_COLOR)
 
         if error_message:
             self.centered_text(60, error_message, self.verylargefont)
@@ -254,15 +254,15 @@ class Epaper3in7(dcommon.GenericDisplay):
             message = "Shutdown display"
         else:
             message = "Reboot"
-        centered_text(10, message, self.largefont)
+        centered_text(10, message, self.fonts[LARGE])
         message = "in " + str(countdown) + " seconds!"
-        centered_text(40, message, self.largefont)
+        centered_text(40, message, self.fonts[LARGE])
         message = "Press left button to cancel ..."
-        centered_text(110, message, self.smallfont)
+        centered_text(110, message, self.fonts[SMALL])
         message = "Press middle for display only ..."
-        centered_text(140, message, self.smallfont)
+        centered_text(140, message, self.fonts[SMALL])
         message = "Press right for reboot all ..."
-        centered_text(170, message, self.smallfont)
+        centered_text(170, message, self.fonts[SMALL])
 
         bottom_line("Cancel", "Display only", "Reboot")
 
@@ -273,10 +273,10 @@ class Epaper3in7(dcommon.GenericDisplay):
 
 
     def screen_input(headline, subline, text, left, middle, right, prefix, inp, suffix):
-        centered_text(0, headline, self.largefont)
+        centered_text(0, headline, self.fonts[LARGE])
         txt_starty = self.LARGE
         if subline is not None:
-            centered_text(LARGE, subline, self.smallfont)
+            centered_text(LARGE, subline, self.fonts[SMALL])
             txt_starty += self.LARGE
         bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
         self.draw.text((0, txt_starty), text, font=smallfont, fill=self.TEXT_COLOR)
@@ -296,7 +296,7 @@ class Epaper3in7(dcommon.GenericDisplay):
 
         draw.text((5, y), text, font=verysmallfont, fill= self.TEXT_COLOR, align="left")
         right_val = str(int(max_val)) + unit
-        textlength = draw.textlength(right_val, self.smallfont)
+        textlength = draw.textlength(right_val, self.fonts[SMALL])
         draw.text((sizex - textlength - 5, y), right_val, font=verysmallfont, fill= self.TEXT_COLOR, align="right")
         draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline= self.TEXT_COLOR, width=1)
         color =  self.TEXT_COLOR
@@ -313,7 +313,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             t = valtext
         else:
             t = str(val)
-        tl = draw.textlength(t, self.smallfont)
+        tl = draw.textlength(t, self.fonts[SMALL])
         draw.text(((bar_end-bar_start)/2+bar_start-tl/2, y), t, font=verysmallfont, fill= self.TEXT_COLOR,
                   stroke_width=1, stroke_fill="white")
         return y+self.VERYSMALL+12
@@ -327,11 +327,11 @@ class Epaper3in7(dcommon.GenericDisplay):
         # out_color is coler of outline, if none given, outline is not
         # if yesno is false, the text is crossed out
         bg_color = bg_color or self.BG_COLOR
-        tl = self.draw.textlength(text, self.smallfont)
+        tl = self.draw.textlength(text, self.fonts[SMALL])
         self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
         if out_color is not None:
             self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, outline=out_color)
-        self.draw.text((x + self.VERYSMALL//2, y), text, font=self.verysmallfont, fill= self.TEXT_COLOR)
+        self.draw.text((x + self.VERYSMALL//2, y), text, font=self.fonts[VERYSMALL], fill= self.TEXT_COLOR)
         if not yesno:
             self.draw.line([x, y+self.VERYSMALL+2, x+tl+10, y], fill= self.TEXT_COLOR, width=2)
         return x+tl+20
@@ -339,7 +339,7 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def stratux(stat, altitude, gps_alt, gps_quality):
         starty = 0
-        centered_text(0, "Stratux " + stat['version'], self.smallfont)
+        centered_text(0, "Stratux " + stat['version'], self.fonts[SMALL])
         starty +=  self.SMALL+8
         starty = bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
         if stat['OGN_connected']:
@@ -392,25 +392,25 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
         if alarmlevel == 0:
-            centered_text(0, "CO Warner: No CO alarm", self.largefont)
+            centered_text(0, "CO Warner: No CO alarm", self.fonts[LARGE])
         else:
             if alarmperiod > 60:
                 alarmstr = "CO: {:d} ppm longer {:d} min".format(alarmppm, math.floor(alarmperiod/60))
             else:
                 alarmstr = "CO: {:d} ppm longer {:d} sec".format(alarmppm, math.floor(alarmperiod))
-            centered_text(0, alarmstr, self.largefont)
+            centered_text(0, alarmstr, self.fonts[LARGE])
         self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, self.TEXT_COLOR, self.TEXT_COLOR,
                    self.TEXT_COLOR, self.BG_COLOR, 3, 3, 5, 3)
         draw.text((320, 50 +  self.SMALL -  self.VERYSMALL), "Warnlevel:", font=verysmallfont, fill=self.TEXT_COLOR)
-        right_text(50, "{:3d}".format(alarmlevel), self.smallfont)
+        right_text(50, "{:3d}".format(alarmlevel), self.fonts[SMALL])
 
         if len(co_values) > 0:
             draw.text((320, 120+SMALL-VERYSMALL), "CO act:", font=verysmallfont, fill=self.TEXT_COLOR)
-            right_text(120, "{:3d}".format(co_values[len(co_values) - 1]), self.smallfont)
+            right_text(120, "{:3d}".format(co_values[len(co_values) - 1]), self.fonts[SMALL])
         draw.text((320, 140+SMALL-VERYSMALL), "CO max:", font=verysmallfont, fill=self.TEXT_COLOR)
-        right_text(140, "{:3d}".format(co_max), self.smallfont)
+        right_text(140, "{:3d}".format(co_max), self.fonts[SMALL])
         draw.text((320, 196), "R0:", font=verysmallfont, fill=self.TEXT_COLOR)
-        right_text(196, "{:.1f}k".format(r0/1000), self.smallfont)
+        right_text(196, "{:.1f}k".format(r0/1000), self.fonts[SMALL])
 
         bottom_line("Calibrate", "Mode", "Reset")
 
@@ -418,7 +418,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                  own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                  ground_distance_valid, grounddistance, error_message):
         offset = 5
-        self.centered_text(0, "GPS Distance", self.smallfont)
+        self.centered_text(0, "GPS Distance", self.fonts[SMALL])
         lines = (
             ("Date", "{:0>2d}.{:0>2d}.{:0>4d}".format(now.day, now.month, now.year)),
             ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
@@ -481,7 +481,7 @@ class Epaper3in7(dcommon.GenericDisplay):
 
 
     def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        centered_text(0, "Start-/Landing Statistics", self.smallfont)
+        centered_text(0, "Start-/Landing Statistics", self.fonts[SMALL])
 
         st = '---'
         if 'start_time' in values:
@@ -585,7 +585,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         checklist_y = {'from': self.LARGE + 8, 'to': self.sizey -  self.SMALL - 6}
         global top_index
 
-        centered_text(0, checklist_name, self.largefont)
+        centered_text(0, checklist_name, self.fonts[LARGE])
         if current_index == 0:
             top_index = 0     # new list, reset top index
         if current_index < top_index:
