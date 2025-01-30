@@ -301,15 +301,12 @@ class GenericDisplay:
 
         if middle_text1 is not None:
             tl = self.draw.textlength(middle_text1, self.fonts[middle_fontsize])
-            self.rlog.debug(f"tl {tl} center_x {center_x} center_y {center_y} ")
-
             self.draw.text((center_x - tl//2, center_y - middle_fontsize - text_offset_middle), middle_text1,
                            font=self.fonts[middle_fontsize], fill=text_color, align="left")
         if middle_text2 is not None:
             tl = self.draw.textlength(middle_text2, self.fonts[middle_fontsize])
             self.draw.text((center_x - tl // 2, center_y + text_offset_middle), middle_text2,
                            font=self.fonts[middle_fontsize], fill=text_color, align="left")
-
 
     def compass(self, heading, error_message):
             czerox = self.sizex // 2
@@ -632,31 +629,32 @@ class GenericDisplay:
         for x in range(int(xpos), int(xpos + xsize), 6):
             self.draw.line([(x, y), (x + 3, y)], fill=linecolor, width=linewidth)
 
-    def dashboard(self, x, y, dsizex, lines, color=None, bgcolor=None, rounding=False, headline=None):
+    def dashboard(self, x, y, dsizex, lines, color=None, bgcolor=None, rounding=False, headline=None,
+                  headline_size=None):
         # dashboard, arguments are lines = ("text", "value"), ....
         # x and y are the starting points of the rounded rectangle
         color = color or self.TEXT_COLOR
         bgcolor = bgcolor or self.BG_COLOR
-        indent = self.VERYSMALL // 2   # text indent on the left
+        headline_size = headline_size or self.VERYSMALL
+        indent = headline_size // 2   # text indent on the left
         side_offset = 0   # offset right and left of the rounding
         line_indent = 0 # additional space between lines
-        heading_indent = self.draw.textlength("---", self.fonts[self.VERYSMALL])   # just 2 characters to the right
-        heading_space = self.draw.textlength("-", self.fonts[self.VERYSMALL])  # space in front and behind heading
+        heading_indent = self.draw.textlength("---", self.fonts[headline_size])   # just 2 characters to the right
+        heading_space = self.draw.textlength("-", self.fonts[headline_size])  # space in front and behind heading
 
-        starty = y + self.VERYSMALL  # space for heading
+        starty = y + headline_size  # space for heading
         for line in lines:
-            self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
-                           font=self.fonts[self.VERYSMALL], fill=color,align="left")
+            self.draw.text((x + indent + side_offset, starty + (self.SMALL - headline_size) // 2), line[0],
+                           font=self.fonts[headline_size], fill=color,align="left")
             tl = self.draw.textlength(line[1], self.fonts[self.SMALL])
             self.draw.text((x + dsizex - side_offset - indent - tl, starty), line[1], font=self.fonts[self.SMALL], fill=color)
             starty += self.SMALL + line_indent
         if rounding is not None:
-            self.draw.rounded_rectangle([x + side_offset, y + self.VERYSMALL//2, x + dsizex - side_offset,
-                                         starty + self.VERYSMALL//2 ], radius=6, fill=None, outline=color, width=2)
+            self.draw.rounded_rectangle([x + side_offset, y + headline_size//2, x + dsizex - side_offset,
+                                         starty + headline_size//2 ], radius=6, fill=None, outline=color, width=2)
         if headline is not None:
-            tl = self.draw.textlength(headline, self.fonts[self.VERYSMALL])
+            tl = self.draw.textlength(headline, self.fonts[headline_size])
             self.draw.rectangle([x + side_offset + heading_indent - heading_space, y,
-                x + heading_indent + tl + heading_space, y + self.VERYSMALL], fill=bgcolor, outline=None)
-            self.rlog.debug(f"self.VERYSMALL = {self.VERYSMALL}, self.SMALL = {self.SMALL}")
-            self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[self.VERYSMALL], fill=color)
+                x + heading_indent + tl + heading_space, y + headline_size], fill=bgcolor, outline=None)
+            self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[headline_size], fill=color)
         return starty
