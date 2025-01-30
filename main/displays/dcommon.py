@@ -221,15 +221,15 @@ class GenericDisplay:
         second_color = second_color or self.TEXT_COLOR
 
         self.draw.text((5, 0), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
-        self.centered_text(self.SMALL, utctime, self.fonts[VERYLARGE], color=utc_color)
+        self.centered_text(self.SMALL, utctime, self.fonts[self.VERYLARGE], color=utc_color)
 
         if stoptime:
             self.draw.text((5, self.SMALL + self.VERYLARGE), "Timer", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
-            self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.fonts[VERYLARGE], color=timer_color)
+            self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.fonts[self.VERYLARGE], color=timer_color)
 
             if laptime:
                 self.draw.text((5, 2 * self.SMALL + 2 * self.VERYLARGE), laptime_head, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
-                self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.fonts[VERYLARGE], color=second_color)
+                self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.fonts[self.VERYLARGE], color=second_color)
 
         self.bottom_line(left_text, middle_text, right_t)
 
