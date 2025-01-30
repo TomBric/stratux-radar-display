@@ -63,7 +63,8 @@ class GenericDisplay:
     LARGE = 30  # size of height indications of aircraft
     SMALL = 24  # size of information indications on top and bottom
     VERYSMALL = 18
-    AWESOME_FONTSIZE = 18  # bluetooth indicator
+    AWESOME_FONT= 18  # bluetooth indicator
+    
     # radar-mode
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
     AIRCRAFT_COLOR = "red"
@@ -110,12 +111,14 @@ class GenericDisplay:
         self.cdraw = None  # pixel array to be used in compass to delete text
         self.compass_aircraft = None    # image of the compass aircraft
         # fonts
-        self.verylargefont = GenericDisplay.make_font("Font.ttc", self.VERYLARGE)
-        self.morelargefont = GenericDisplay.make_font("Font.ttc", self.MORELARGE)
-        self.largefont = GenericDisplay.make_font("Font.ttc", self.LARGE)  # font for height indications
-        self.smallfont = GenericDisplay.make_font("Font.ttc", self.SMALL)  # font for information indications
-        self.verysmallfont = GenericDisplay.make_font("Font.ttc", self.VERYSMALL)  # font for information indications
-        self.awesomefont = GenericDisplay.make_font("fontawesome-webfont.ttf", self.AWESOME_FONTSIZE)  # for bluetooth indicator
+        self.fonts= {
+            VERYLARGE:self.make_font("Font.ttc", self.VERYLARGE),
+            MORELARGE:self.make_font("Font.ttc", self.MORELARGE),
+            LARGE:self.make_font("Font.ttc", self.LARGE),
+            SMALL:self.make_font("Font.ttc", self.SMALL),
+            VERYSMALL:self.make_font("Font.ttc", self.VERYSMALL),
+            AWESOME_FONT:self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONT) # for bluetooth indicator
+        }
 
     def init(self, fullcircle=False):    # explicit init to be implemented for every device type
         # set device properties
@@ -137,16 +140,16 @@ class GenericDisplay:
             t = t + self.UP_CHARACTER
         if vspeed < 0:
             t = t + self.DOWN_CHARACTER
-        w = self.draw.textlength(t, self.largefont)
+        w = self.draw.textlength(t, self.fonts[LARGE])
         tposition = (int(self.zerox+arctext[0]-w/2), int(self.zeroy+arctext[1]-self.LARGE/2))
         self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.LARGE+2)), fill=self.BG_COLOR)
-        self.draw.text(tposition, t, font=self.largefont, fill=self.AIRCRAFT_COLOR)
+        self.draw.text(tposition, t, font=self.fonts[LARGE], fill=self.AIRCRAFT_COLOR)
         if tail is not None:
-            tl = self.draw.textlength(tail, self.verysmallfont)
+            tl = self.draw.textlength(tail, self.font[VERYSMALL])
             self.draw.rectangle((tposition[0], tposition[1] + self.LARGE, tposition[0] + tl,
                             tposition[1] + self.LARGE + self.VERYSMALL), fill=self.BG_COLOR)
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail,
-                           font=self.verysmallfont, fill=self.AIRCRAFT_COLOR)
+                           font=self.fonts[VERYSMALL], fill=self.AIRCRAFT_COLOR)
 
     def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, angle_offset=0):
         p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, angle_offset)
@@ -167,15 +170,15 @@ class GenericDisplay:
             t = t + self.UP_CHARACTER
         if vspeed < 0:
             t = t + self.DOWN_CHARACTER
-        w = self.draw.textlength(t, self.largefont)
+        w = self.draw.textlength(t, self.fonts[LARGE])
         if w + x + 4 * self.AIRCRAFT_SIZE - 2 > self.sizex:
             # would draw text outside, move to the left
             tposition = (x - 4 * self.AIRCRAFT_SIZE - w, int(y - self.LARGE / 2))
         else:
             tposition = (x + 4 * self.AIRCRAFT_SIZE + 1, int(y - self.LARGE / 2))
-        self.draw.text(tposition, t, font=self.largefont, fill=self.AIRCRAFT_COLOR)
+        self.draw.text(tposition, t, font=self.fonts[LARGE], fill=self.AIRCRAFT_COLOR)
         if tail is not None:
-            self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.verysmallfont, fill=self.AIRCRAFT_COLOR)
+            self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.fonts[VERYSMALL], fill=self.AIRCRAFT_COLOR)
 
 
     def display(self):
@@ -217,25 +220,26 @@ class GenericDisplay:
         timer_color = timer_color or self.TEXT_COLOR
         second_color = second_color or self.TEXT_COLOR
 
-        self.draw.text((5, 0), "UTC", font=self.smallfont, fill=self.TEXT_COLOR)
-        self.centered_text(self.SMALL, utctime, self.verylargefont, color=utc_color)
+        self.draw.text((5, 0), "UTC", font=self.fonts[SMALL], fill=self.TEXT_COLOR)
+        self.centered_text(self.SMALL, utctime, self.fonts[VERYLARGE], color=utc_color)
 
         if stoptime:
-            self.draw.text((5, self.SMALL + self.VERYLARGE), "Timer", font=self.smallfont, fill=self.TEXT_COLOR)
-            self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.verylargefont, color=timer_color)
+            self.draw.text((5, self.SMALL + self.VERYLARGE), "Timer", font=self.fonts[SMALL], fill=self.TEXT_COLOR)
+            self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.fonts[VERYLARGE], color=timer_color)
 
             if laptime:
-                self.draw.text((5, 2 * self.SMALL + 2 * self.VERYLARGE), laptime_head, font=self.smallfont, fill=self.TEXT_COLOR)
-                self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.verylargefont, color=second_color)
+                self.draw.text((5, 2 * self.SMALL + 2 * self.VERYLARGE), laptime_head, font=self.fonts[SMALL], fill=self.TEXT_COLOR)
+                self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.fonts[VERYLARGE], color=second_color)
 
         self.bottom_line(left_text, middle_text, right_t)
 
     def meter(self, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
               marks_distance, small_marks_distance, middle_text1, middle_text2, meter_color=None, text_color=None,
-              middle_font=None):
+              middle_fontsize=0):
         meter_color = meter_color or self.TEXT_COLOR
         text_color = text_color or self.TEXT_COLOR
-        middle_font = middle_font or self.smallfont
+        if middle_fontsize > 0:
+            middle_fontsize = self.SMALL
 
         big_mark_length = max(4, size // 16)
         small_mark_length = big_mark_length // 2
@@ -282,11 +286,11 @@ class GenericDisplay:
             self.draw.line(mark, fill=meter_color, width=arc_width)
             # text
             marktext = str(m)
-            tl = self.draw.textlength(marktext, self.largefont)
+            tl = self.draw.textlength(marktext, self.fonts[LARGE])
             t_center = translate(angle, ((0, -size//2 + big_mark_length + self.LARGE//2 + text_distance),),
                                  (center_x, center_y))
             self.draw.text((t_center[0][0] - tl//2, t_center[0][1] - self.LARGE//2), marktext,
-                      fill=meter_color, font=self.largefont)
+                      fill=meter_color, font=self.fonts[LARGE])
             m += marks_distance
         current = min(max(current, start_value), end_value) # limit to range
         angle = deg_per_value * (current - start_value) + from_degree
@@ -297,13 +301,13 @@ class GenericDisplay:
                      fill=meter_color)
 
         if middle_text1 is not None:
-            tl = self.draw.textlength(middle_text1, self.smallfont)
-            self.draw.text((center_x - tl//2, center_y - middle_font.size - text_offset_middle), middle_text1, font=middle_font,
-                           fill=text_color, align="left")
+            tl = self.draw.textlength(middle_text1, self.fonts[middle_fontsize])
+            self.draw.text((center_x - tl//2, center_y - middle_fontsize - text_offset_middle), middle_text1,
+                           font=self.fonts[middle_fontsize], fill=text_color, align="left")
         if middle_text2 is not None:
-            tl = self.draw.textlength(middle_text2, self.smallfont)
-            self.draw.text((center_x - tl // 2, center_y + text_offset_middle), middle_text2, font=middle_font,
-                      fill=text_color, align="left")
+            tl = self.draw.textlength(middle_text2, self.fonts[middle_fontsize])
+            self.draw.text((center_x - tl // 2, center_y + text_offset_middle), middle_text2,
+                           font=self.fonts[middle_fontsize], fill=text_color, align="left")
 
 
     def compass(self, heading, error_message):
@@ -318,9 +322,9 @@ class GenericDisplay:
             self.draw.line((czerox, 20, czerox, 70), fill=self.TEXT_COLOR, width=line_width)
 
             text = f"{heading}°"
-            tl = self.draw.textlength(text, self.smallfont)
+            tl = self.draw.textlength(text, self.fonts[SMALL])
             self.draw.text((self.sizex - tl - 100, self.sizey - self.SMALL - 10), text,
-                           font=self.smallfont, fill=self.TEXT_COLOR, align="right")
+                           font=self.fonts[SMALL], fill=self.TEXT_COLOR, align="right")
 
             for m in range(0, 360, 10):
                 s = math.sin(math.radians(m - heading + 90))
@@ -332,7 +336,7 @@ class GenericDisplay:
 
                 if m % 30 == 0:
                     mark = {0: "N", 90: "E", 180: "S", 270: "W"}.get(m, str(m // 10))
-                    font = self.morelargefont if m % 90 == 0 else self.largefont
+                    font = self.fonts[MORELARGE] if m % 90 == 0 else self.fonts[LARGE]
                     tl = self.draw.textlength(mark, font)
                     self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill=self.TEXT_COLOR)
                     self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
@@ -344,7 +348,7 @@ class GenericDisplay:
                                                               round(center[1] - self.LARGE)), rotmask)
 
             if error_message:
-                self.centered_text(120, error_message, self.largefont)
+                self.centered_text(120, error_message, self.fonts[LARGE])
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
@@ -451,16 +455,16 @@ class GenericDisplay:
 
         # infotext = "P:" + str(pitch) + " R:" + str(roll)
         if error_message:
-            self.centered_text( int(self.sizey/4), error_message, self.smallfont)
+            self.centered_text( int(self.sizey/4), error_message, self.fonts[SMALL])
         self.bottom_line("Levl", "", "Zero")
 
     def text_screen(self, headline, subline, text, left_text, middle_text, r_text, offset=0):
-        self.centered_text(0, headline, self.morelargefont)
+        self.centered_text(0, headline, self.fonts[MORELARGE])
         txt_starty = self.MORELARGE
         if subline is not None:
-            self.centered_text(txt_starty, subline, self.largefont)
+            self.centered_text(txt_starty, subline, self.fonts[LARGE])
             txt_starty += self.LARGE
-        self.draw.text((offset, txt_starty), text, font=self.smallfont)
+        self.draw.text((offset, txt_starty), text, font=self.fonts[SMALL])
         self.bottom_line(left_text, middle_text, r_text)
 
 
@@ -475,27 +479,27 @@ class GenericDisplay:
         tab_space = (self.sizex - 2 * side_offset) // 4
         line_space = self.VERYSMALL // 3  # this gives a line indent
         starty = 0
-        self.centered_text(starty, "Flight Logs ", self.smallfont)
+        self.centered_text(starty, "Flight Logs ", self.fonts[SMALL])
         starty += self.SMALL + 2 * line_space
-        self.draw.text((side_offset, starty), "Date", font=self.verysmallfont, fill=self.TEXT_COLOR)
-        self.draw.text((side_offset + tab_space, starty), "Start", font=self.verysmallfont, fill=self.TEXT_COLOR)
-        self.draw.text((side_offset + 2*tab_space, starty), "Duration", font=self.verysmallfont, fill=self.TEXT_COLOR)
-        self.draw.text((side_offset + 3*tab_space, starty), "Ldg", font=self.verysmallfont, fill=self.TEXT_COLOR)
+        self.draw.text((side_offset, starty), "Date", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((side_offset + tab_space, starty), "Start", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((side_offset + 2*tab_space, starty), "Duration", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((side_offset + 3*tab_space, starty), "Ldg", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR)
 
         for f in last_flights:
             starty += self.VERYSMALL + line_space
             if starty >= self.sizey - self.VERYSMALL - 2*line_space:    # screen full
                 break
             f[0] = f[0].replace(second=0, microsecond=0)
-            self.draw.text((side_offset, starty), f[0].strftime("%d.%m.%y"), font=self.verysmallfont, fill=self.TEXT_COLOR)
-            self.draw.text((side_offset + tab_space, starty), f[0].strftime("%H:%M"), font=self.verysmallfont, fill=self.TEXT_COLOR)
+            self.draw.text((side_offset, starty), f[0].strftime("%d.%m.%y"), font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR)
+            self.draw.text((side_offset + tab_space, starty), f[0].strftime("%H:%M"), font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR)
             if f[1] != 0:
                 f[1] = f[1].replace(second=0, microsecond=0)
                 delta = (f[1] - f[0]).total_seconds()
-                self.draw.text((side_offset + 3*tab_space, starty), f[1].strftime("%H:%M"), font=self.verysmallfont, fill=self.TEXT_COLOR)
+                self.draw.text((side_offset + 3*tab_space, starty), f[1].strftime("%H:%M"), font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR)
             else:
                 delta = (datetime.datetime.now(datetime.timezone.utc).replace(second=0, microsecond=0) - f[0]).total_seconds()
-                self.draw.text((side_offset + 3*tab_space, starty), "in the air", font=self.verysmallfont, fill=self.TEXT_COLOR)
+                self.draw.text((side_offset + 3*tab_space, starty), "in the air", font=self.fonts[VERYSMALL], fill=self.TEXT_COLOR)
             hours, remainder = divmod(delta, 3600)
             minutes, _ = divmod(remainder, 60)
             out = f'{int(hours):02}:{int(minutes):02}'
@@ -545,15 +549,15 @@ class GenericDisplay:
 
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=3, offset_left=3, offset_right=3):
-        y = self.sizey - self.smallfont.size - offset_bottom
+        y = self.sizey - self.fonts[SMALL].size - offset_bottom
         if color is None:
             color = self.TEXT_COLOR
         self.draw.text((offset_left, y), left,
-                       font=self.smallfont, fill=color)
-        textlength = self.draw.textlength(right, self.smallfont)
+                       font=self.fonts[SMALL], fill=color)
+        textlength = self.draw.textlength(right, self.fonts[SMALL])
         self.draw.text((self.sizex - textlength - offset_right, y), right,
-                       font=self.smallfont, fill=color, align="right")
-        self.centered_text(y, middle, self.smallfont, color)
+                       font=self.fonts[SMALL], fill=color, align="right")
+        self.centered_text(y, middle, self.fonts[SMALL], color)
 
     def graph(self, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout,
               textcolor, graphcolor, linecolor, bgcolor, glinewidth, linewidth, x_val_space, x_val_linelength):
@@ -635,22 +639,22 @@ class GenericDisplay:
         indent = self.VERYSMALL // 2   # text indent on the left
         side_offset = 0   # offset right and left of the rounding
         line_indent = 0 # additional space between lines
-        heading_indent = self.draw.textlength("---", self.verysmallfont)   # just 2 characters to the right
-        heading_space = self.draw.textlength("-", self.verysmallfont)  # space in front and behind heading
+        heading_indent = self.draw.textlength("---", self.fonts[VERYSMALL])   # just 2 characters to the right
+        heading_space = self.draw.textlength("-", self.fonts[VERYSMALL])  # space in front and behind heading
 
         starty = y + self.VERYSMALL  # space for heading
         for line in lines:
             self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
-                           font=self.verysmallfont, fill=color,align="left")
-            tl = self.draw.textlength(line[1], self.smallfont)
-            self.draw.text((x + dsizex - side_offset - indent - tl, starty), line[1], font=self.smallfont, fill=color)
+                           font=self.fonts[VERYSMALL], fill=color,align="left")
+            tl = self.draw.textlength(line[1], self.fonts[SMALL])
+            self.draw.text((x + dsizex - side_offset - indent - tl, starty), line[1], font=self.fonts[SMALL], fill=color)
             starty += self.SMALL + line_indent
         if rounding is not None:
             self.draw.rounded_rectangle([x + side_offset, y + self.VERYSMALL//2, x + dsizex - side_offset,
                                          starty + self.VERYSMALL//2 ], radius=6, fill=None, outline=color, width=2)
         if headline is not None:
-            tl = self.draw.textlength(headline, self.verysmallfont)
+            tl = self.draw.textlength(headline, self.fonts[VERYSMALL])
             self.draw.rectangle([x + side_offset + heading_indent - heading_space, y,
                 x + heading_indent + tl + heading_space, y + self.VERYSMALL], fill=bgcolor, outline=None)
-            self.draw.text((x + side_offset + heading_indent, y), headline, font=self.verysmallfont, fill=color)
+            self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[VERYSMALL], fill=color)
         return starty
