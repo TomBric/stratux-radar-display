@@ -204,8 +204,8 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("act", f'{current:+1.2f}'),
             ("min", f'{ming:+1.2f}')
         )
-        self.dashboard(gm_size, 6*self.SMALL // 2 , self.sizex - gm_size, lines, rounding=True, headline="G-Meter",
-                       headline_size=self.SMALL)
+        self.dashboard(gm_size+2*self.SMALL, self.sizey//2 - 3*self.SMALL//2 , self.sizex - gm_size - 3*SMALL, lines, rounding=True,
+                       headline="G-Meter", headline_size=self.SMALL)
         self.bottom_line("", "    Mode", "Reset")
 
 
