@@ -238,7 +238,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("GPS-Alt [ft]", f"{gps_altitude:1.0f}"),
             ("GpsSpd [kts]", f"{gps_speed:1.1f}")
         )
-        self.dashboard(self.sizey + self.SMALL, sizex // 2 + self.SMALL, self.sizex - self.sizey + 2 * self.SMALL,
+        self.dashboard(self.sizey + self.SMALL, self.sizex // 2 + self.SMALL, self.sizex - self.sizey + 2 * self.SMALL,
                        lines, rounding=True)
         # right data display
         # self.draw.text((300, 10), "Vert Speed [ft/min]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
