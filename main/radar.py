@@ -76,7 +76,7 @@ rlog = None  # radar specific logger
 #
 
 # constant definitions
-RADAR_VERSION = "2.06"
+RADAR_VERSION = "2.06a"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
