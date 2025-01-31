@@ -225,27 +225,40 @@ class Epaper3in7(dcommon.GenericDisplay):
         # middle_text = "100 feet per min"
         # tl = self.draw.textlength(middle_text, self.fonts[self.SMALL])
         # self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 + 10), middle_text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-
+        lines = (
+            ("act", f"{vertical_speed:+1.0f}"),
+            ("max", f"{vertical_max:+1.0f}"),
+            ("min", f"{vertical_min:+1.0f}")
+        )
+        self.dashboard(self.sizey + self.SMALL, self.SMALL,
+                       self.sizex - self.sizey + 2*SMALL, lines, rounding=True, headline="Vert Speed [ft/min]",
+                       headline_size=self.SMALL)
+        lines = (
+            ("Flight-Level", f"{round(flight_level / 100):1.0f}"),
+            ("GPS-Alt [ft]", f"{gps_altitude:1.0f}"),
+            ("GpsSpd [kts]", f"{gps_speed:1.1f}")
+        )
+        self.dashboard(self.sizey + self.SMALL, sizex // 2 + self.SMALL, self.sizex - self.sizey + 2 * SMALL, lines,
+                       rounding=True)
         # right data display
-        self.draw.text((300, 10), "Vert Speed [ft/min]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        self.draw.text((330, 31), "act", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        self.draw.text((330, 55), "max", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        self.draw.text((330, 79), "min", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        # self.draw.text((300, 10), "Vert Speed [ft/min]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        # self.draw.text((330, 31), "act", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        # self.draw.text((330, 55), "max", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        # self.draw.text((330, 79), "min", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
 
-        self.right_text(28, f"{vertical_speed:+1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
-        self.right_text(52, f"{vertical_max:+1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
-        self.right_text(76, f"{vertical_min:+1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
+        # self.right_text(28, f"{vertical_speed:+1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
+        # self.right_text(52, f"{vertical_max:+1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
+        # self.right_text(76, f"{vertical_min:+1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
 
-        self.draw.text((300, 163), "Flight-Level", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        self.right_text(160, f"{round(flight_level / 100):1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
-        self.draw.text((300, 187), "GPS-Alt [ft]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        self.right_text(184, f"{gps_altitude:1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
-        self.draw.text((300, 211), "GpsSpd [kts]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        self.right_text(208, f"{gps_speed:1.1f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
+        # self.draw.text((300, 163), "Flight-Level", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        # self.right_text(160, f"{round(flight_level / 100):1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
+        # self.draw.text((300, 187), "GPS-Alt [ft]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        # self.right_text(184, f"{gps_altitude:1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
+        # self.draw.text((300, 211), "GpsSpd [kts]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        # self.right_text(208, f"{gps_speed:1.1f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
 
         if error_message:
             self.centered_text(60, error_message, self.verylargefont)
-
         self.bottom_line("", "    Mode", "Reset")
 
     def shutdown(self, countdown, shutdownmode):
