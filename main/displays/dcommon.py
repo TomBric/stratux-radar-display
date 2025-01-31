@@ -457,7 +457,7 @@ class GenericDisplay:
         self.bottom_line("Levl", "", "Zero")
 
     def text_screen(self, headline, subline, text, left_text, middle_text, r_text, offset=0):
-        self.centered_text(0, headline, self.fonts[MORELARGE])
+        self.centered_text(0, headline, self.fonts[self.MORELARGE])
         txt_starty = self.MORELARGE
         if subline is not None:
             self.centered_text(txt_starty, subline, self.fonts[self.LARGE])
