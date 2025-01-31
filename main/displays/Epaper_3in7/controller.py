@@ -283,25 +283,6 @@ class Epaper3in7(dcommon.GenericDisplay):
         for pm in range(0, -180-1, -3):
             self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill="black", width=1)
 
-
-    def screen_input(headline, subline, text, left, middle, right, prefix, inp, suffix):
-        centered_text(0, headline, self.fonts[self.LARGE])
-        txt_starty = self.LARGE
-        if subline is not None:
-            centered_text(LARGE, subline, self.fonts[self.SMALL])
-            txt_starty += self.LARGE
-        bbox = draw.textbbox((0, txt_starty), text, font=smallfont)
-        self.draw.text((0, txt_starty), text, font=smallfont, fill=self.TEXT_COLOR)
-        bbox_p = draw.textbbox((bbox[0], bbox[3]), prefix, font=smallfont)
-        self.draw.text((bbox[0], bbox[3]), prefix, fill=self.TEXT_COLOR, font=smallfont)
-        bbox_rect = draw.textbbox((bbox_p[2], bbox[3]), inp, font=smallfont)
-        self.draw.rectangle(bbox_rect, fill="black")
-        self.draw.text((bbox_rect[0], bbox[3]), inp, font=smallfont, fill="white")
-        self.draw.text((bbox_rect[2], bbox[3]), suffix, font=smallfont, fill=self.TEXT_COLOR)
-
-        bottom_line(left, middle, right)
-
-
     def bar(y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0):
         bar_start = 100
         bar_end = 420

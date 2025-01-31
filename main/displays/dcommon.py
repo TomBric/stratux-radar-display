@@ -467,7 +467,20 @@ class GenericDisplay:
 
 
     def screen_input(self, headline, subline, text, left, middle, right, prefix, inp, suffix):
-        pass
+        self.centered_text(0, headline, self.fonts[self.LARGE])
+        txt_starty = self.LARGE
+        if subline is not None:
+            self.centered_text(txt_starty, subline, self.fonts[self.SMALL])
+            txt_starty += self.LARGE
+        bbox = self.draw.textbbox((0, txt_starty), text, font=self.fonts[self.SMALL])
+        self.draw.text((0, txt_starty), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        bbox_p = self.draw.textbbox((bbox[0], bbox[3]), prefix, font=self.fonts[self.SMALL])
+        self.draw.text((bbox[0], bbox[3]), prefix, fill=self.TEXT_COLOR, font=self.fonts[self.SMALL])
+        bbox_rect = self.draw.textbbox((bbox_p[2], bbox[3]), inp, font=self.fonts[self.SMALL])
+        self.draw.rectangle(bbox_rect, fill=self.TEXT_COLOR)
+        self.draw.text((bbox_rect[0], bbox[3]), inp, font=self.fonts[self.SMALL], fill=self.BG_COLOR)
+        self.draw.text((bbox_rect[2], bbox[3]), suffix, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.bottom_line(left, middle, right)
 
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         pass
