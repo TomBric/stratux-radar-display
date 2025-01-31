@@ -230,16 +230,14 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("max", f"{vertical_max:+1.0f}"),
             ("min", f"{vertical_min:+1.0f}")
         )
-        self.dashboard(self.sizey + self.SMALL, self.VERYSMALL,
-                       self.sizex - self.sizey - 2 * self.SMALL, lines, rounding=True, headline="Vert Speed [ft/min]",
-                       headline_size=self.SMALL)
+        self.dashboard(self.sizey + 5, self.VERYSMALL,
+                       self.sizex - self.sizey - 2 * 5, lines, rounding=True, headline="Vert Speed [ft/min]")
         lines = (
             ("Flight-Level", f"{round(flight_level / 100):1.0f}"),
             ("GPS-Alt [ft]", f"{gps_altitude:1.0f}"),
             ("GpsSpd [kts]", f"{gps_speed:1.1f}")
         )
-        self.dashboard(self.sizey + self.SMALL, self.sizey // 2 , self.sizex - self.sizey - 2 * self.SMALL,
-                       lines, rounding=True)
+        self.dashboard(self.sizey + 5, self.sizey // 2 , self.sizex - self.sizey - 2 * 5, lines, rounding=True)
         # right data display
         # self.draw.text((300, 10), "Vert Speed [ft/min]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
         # self.draw.text((330, 31), "act", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
