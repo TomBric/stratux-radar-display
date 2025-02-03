@@ -216,15 +216,6 @@ class Epaper3in7(dcommon.GenericDisplay):
 
         self.draw.text((25, self.sizey // 2 - self.VERYSMALL - 25), "up", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
         self.draw.text((25, self.sizey // 2 + 25), "dn", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-
-
-        # middle_text = "Vertical Speed"
-        # tl = self.draw.textlength(middle_text, self.fonts[self.SMALL])
-        # self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 - self.VERYSMALL - 10), middle_text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-
-        # middle_text = "100 feet per min"
-        # tl = self.draw.textlength(middle_text, self.fonts[self.SMALL])
-        # self.draw.text((self.sizey / 2 - tl / 2, self.sizey / 2 + 10), middle_text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
         lines = (
             ("act", f"{vertical_speed:+1.0f}"),
             ("max", f"{vertical_max:+1.0f}"),
@@ -238,22 +229,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("GpsSpd [kts]", f"{gps_speed:1.1f}")
         )
         self.dashboard(self.sizey + 5, self.sizey // 2 , self.sizex - self.sizey - 2 * 5, lines, rounding=True)
-        # right data display
-        # self.draw.text((300, 10), "Vert Speed [ft/min]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        # self.draw.text((330, 31), "act", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        # self.draw.text((330, 55), "max", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        # self.draw.text((330, 79), "min", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-
-        # self.right_text(28, f"{vertical_speed:+1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
-        # self.right_text(52, f"{vertical_max:+1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
-        # self.right_text(76, f"{vertical_min:+1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
-
-        # self.draw.text((300, 163), "Flight-Level", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        # self.right_text(160, f"{round(flight_level / 100):1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
-        # self.draw.text((300, 187), "GPS-Alt [ft]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        # self.right_text(184, f"{gps_altitude:1.0f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
-        # self.draw.text((300, 211), "GpsSpd [kts]", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        # self.right_text(208, f"{gps_speed:1.1f}", self.fonts[self.SMALL], color=self.TEXT_COLOR)
 
         if error_message:
             self.centered_text(60, error_message, self.verylargefont)
@@ -283,90 +258,56 @@ class Epaper3in7(dcommon.GenericDisplay):
         for pm in range(0, -180-1, -3):
             self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill="black", width=1)
 
-    def bar(y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0):
-        bar_start = 100
-        bar_end = 420
-
-        draw.text((5, y), text, font=verysmallfont, fill= self.TEXT_COLOR, align="left")
-        right_val = str(int(max_val)) + unit
-        textlength = draw.textlength(right_val, self.fonts[self.SMALL])
-        draw.text((sizex - textlength - 5, y), right_val, font=verysmallfont, fill= self.TEXT_COLOR, align="right")
-        draw.rounded_rectangle([bar_start-2, y-2, bar_end+2, y+VERYSMALL+2], radius=3, fill=None, outline= self.TEXT_COLOR, width=1)
-        color =  self.TEXT_COLOR
-        if val < minval:
-            val = minval   # to display a minimum bar, valtext should be provided in this case
-        if max_val != 0:
-            xval = bar_start + (bar_end - bar_start) * val / max_val
-        else:
-            xval = bar_start
-        for b in range(int(bar_start), int(xval), 5):
-            draw.line([(b, y), (b, y+VERYSMALL)], fill= self.TEXT_COLOR, width=1)
-        # draw.rectangle([bar_start, y, xval, y+VERYSMALL], fill=color, outline=None)
-        if valtext is not None:
-            t = valtext
-        else:
-            t = str(val)
-        tl = draw.textlength(t, self.fonts[self.SMALL])
-        draw.text(((bar_end-bar_start)/2+bar_start-tl/2, y), t, font=verysmallfont, fill= self.TEXT_COLOR,
-                  stroke_width=1, stroke_fill="white")
-        return y+self.VERYSMALL+12
-
     def flighttime(self, last_flights, side_offset=0):
         super().flighttime(last_flights, 25)
 
-
-    def stratux(stat, altitude, gps_alt, gps_quality):
+    def stratux(self, stat, altitude, gps_alt, gps_quality):
         starty = 0
-        centered_text(0, "Stratux " + stat['version'], self.fonts[self.SMALL])
-        starty +=  self.SMALL+8
-        starty = bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
+        self.centered_text(0, f"Stratux {stat['version']}", self.fonts[self.SMALL])
+        starty += self.SMALL + 8
+        colors = {'outline': 'black', 'black_white_offset': 5}
+        bar_start, bar_end = 110, 420
+
+        starty = self.bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'],
+                          bar_start, bar_end, colors, side_offset=5)
         if stat['OGN_connected']:
-            starty = bar(starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
-            noise_text = str(round(stat['OGN_noise_db'], 1)) + "@" + str(round(stat['OGN_gain_db'], 1)) + "dB"
-            starty = bar(starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext=noise_text)
+            starty = self.bar(starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'],
+                              bar_start, bar_end, colors, side_offset=5)
+            noise_text = f"{round(stat['OGN_noise_db'], 1)}@{round(stat['OGN_gain_db'], 1)}dB"
+            starty = self.bar(starty, "noise", stat['OGN_noise_db'], 25,
+                              bar_start, bar_end, colors, side_offset=5, unit="dB", minval=1, valtext=noise_text)
         if stat['UATRadio_connected']:
-            starty = bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
-        if stat['CPUTemp'] > -300:    # -300 means no value available
-            starty = bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
-        # GPS
-        draw.text((5, starty), "GPS hw", font=verysmallfont, fill= self.TEXT_COLOR)
-        draw.text((100, starty), stat['GPS_detected_type'], font=verysmallfont, fill= self.TEXT_COLOR)
-        starty +=  self.VERYSMALL + 5
-        draw.text((5, starty), "GPS sol", font=verysmallfont, fill= self.TEXT_COLOR)
-        if gps_quality == 1:
-            t = "3D GPS "
-        elif gps_quality == 2:
-            t = "DGNSS "
-        else:
-            t = ""
-        if stat['GPS_position_accuracy'] < 19999:
-            gps = str(round(stat['GPS_position_accuracy'], 1)) + "m"
-        else:
-            gps = "NoFix"
-        draw.text((100, starty), t + gps, font=verysmallfont, fill= self.TEXT_COLOR)
+            starty = self.bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'],
+                              bar_start, bar_end, colors, side_offset=5)
+        if stat['CPUTemp'] > -300:
+            starty = self.bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0),
+                              bar_start, bar_end, colors, side_offset=5, unit="°C")
 
-        t = "Sat: " + str(stat['GPS_satellites_locked']) + " sol/" + \
-            str(stat['GPS_satellites_seen']) + " seen/" + str(stat['GPS_satellites_tracked']) + " track"
-        draw.text((220, starty), t, font=verysmallfont, fill= self.TEXT_COLOR)
+        self.draw.text((5, starty), "GPS hw", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((100, starty), stat['GPS_detected_type'], font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        starty += self.VERYSMALL + 5
 
-        starty +=  self.VERYSMALL+5
+        self.draw.text((5, starty), "GPS sol", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        t = "3D GPS " if gps_quality == 1 else "DGNSS " if gps_quality == 2 else ""
+        gps = f"{round(stat['GPS_position_accuracy'], 1)}m" if stat['GPS_position_accuracy'] < 19999 else "NoFix"
+        self.draw.text((100, starty), t + gps, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
-        draw.text((5, starty), "altitudes", font=verysmallfont, fill= self.TEXT_COLOR)
-        if stat['GPS_position_accuracy'] < 19999:
-            alt = '{:5.0f}'.format(gps_alt)
-        else:
-            alt = " ---"
-        t = "P-Alt {0} ft".format(round(altitude))
-        draw.text((100, starty), t, font=verysmallfont, fill= self.TEXT_COLOR)
-        t = "Corr {0:+} ft".format(stat['AltitudeOffset'])
-        draw.text((220, starty), t, font=verysmallfont, fill= self.TEXT_COLOR)
-        t = "GPS-Alt " + alt + " ft"
-        draw.text((340, starty), t, font=verysmallfont, fill= self.TEXT_COLOR)
-        starty +=  self.VERYSMALL + 5
-        draw.text((5, starty), "sensors", font=verysmallfont, fill= self.TEXT_COLOR)
-        x = round_text(100, starty, "IMU", "white", stat['IMUConnected'], out= self.TEXT_COLOR)
-        round_text(x, starty, "BMP", "white", stat['BMPConnected'], out= self.TEXT_COLOR)
-        bottom_line("+10 ft", "Mode", "-10 ft")
+        t = f"Sat: {stat['GPS_satellites_locked']} sol/{stat['GPS_satellites_seen']} seen/{stat['GPS_satellites_tracked']} track"
+        self.draw.text((220, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        starty += self.VERYSMALL + 5
+
+        self.draw.text((5, starty), "altitudes", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        alt = f"{gps_alt:5.0f}" if stat['GPS_position_accuracy'] < 19999 else " ---"
+        self.draw.text((100, starty), f"P-Alt {round(altitude)} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((220, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((340, starty), f"GPS-Alt {alt} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        starty += self.VERYSMALL + 5
+
+        self.draw.text((5, starty), "sensors", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        x = self.round_text(100, starty, "IMU", "white", stat['IMUConnected'], out=self.TEXT_COLOR)
+        self.round_text(x, starty, "BMP", "white", stat['BMPConnected'], out=self.TEXT_COLOR)
+        self.bottom_line("+10 ft", "Mode", "-10 ft")
+
 
     def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
         if alarmlevel == 0:

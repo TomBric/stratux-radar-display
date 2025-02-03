@@ -517,28 +517,40 @@ class GenericDisplay:
             self.round_text(side_offset + 2*tab_space, starty, out, out_color=self.TEXT_COLOR)
         self.bottom_line("", "Mode", "Clear")
 
-    def bar(self, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0, side_offset=0):
-            bar_start = 100
-            bar_end = 420
+    def bar(self, y, text, val, max_val, bar_start, bar_end, color_table, unit="", valtext=None, minval=0,
+            side_offset=0):
+        # color_table example for Epaper:
+        #   color_table = {'outline': 'black', 'black_white_offset': 5}
+        # color_table example for OLED:
+        #   color_table = {'outline': 'white', 'green': 'green', 'yellow': 'DarkOrange', 'red': 'red',
+        #                   'yellow_value': 22, 'red_value': 33}
 
-            self.draw.text((5, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-            right_val = f"{int(max_val)}{unit}"
-            textlength = self.draw.textlength(right_val, self.fonts[self.SMALL])
-            self.draw.text((self.sizex - textlength - 5, y), right_val, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="right")
-            self.draw.rounded_rectangle([bar_start - 2, y - 2, bar_end + 2, y + self.VERYSMALL + 2], radius=3, fill=None, outline=self.TEXT_COLOR, width=1)
 
-            val = minval if val < minval else val
-            xval = bar_start + (bar_end - bar_start) * val / max_val if max_val != 0 else bar_start
+        self.draw.text((side_offset, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        right_val = f"{int(max_val)}{unit}"
+        self.right_text(y, right_val, self.fonts[self.VERYSMALL], offset=side_offset)
 
-            for b in range(bar_start, int(xval), 5):
-                self.draw.line([(b, y), (b, y + self.VERYSMALL)], fill=self.TEXT_COLOR, width=1)
+        if 'outline' in color_table:
+            self.draw.rounded_rectangle([bar_start - 2, y - 2, bar_end + 2, y + self.VERYSMALL + 2], radius=3,
+                fill=None, outline=color_table['outline'], width=1)
+        val = max(val, minval)
+        xval = bar_start + (bar_end - bar_start) * val // max_val if max_val != 0 else bar_start
+        t = valtext if valtext is not None else str(val)
+        tl = self.draw.textlength(t, self.fonts[self.SMALL])
 
-            t = valtext if valtext is not None else str(val)
-            tl = self.draw.textlength(t, self.fonts[self.SMALL])
-            self.draw.text(((bar_end - bar_start) / 2 + bar_start - tl / 2, y), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, stroke_width=1, stroke_fill="white")
-
-            return y + self.VERYSMALL + 12
-
+        if 'black_white_offset' in color_table and 'outline' in color_table:
+            for b in range(bar_start, xval, color_table['black_white_offset']):
+                self.draw.line([(b, y), (b, y + self.VERYSMALL)], fill=color_table['outline'], width=1)
+        else:
+            color = (color_table.get('red') if val >= color_table.get('red_value') else
+                     color_table.get('yellow') if val >= color_table.get('yellow_value') else
+                     color_table.get('green'))
+            if color:
+                self.draw.rectangle([bar_start, y, xval, y + self.VERYSMALL], fill=color, outline=None)
+        if 'outline' in color_table:
+            self.draw.text(((bar_end - bar_start) // 2 + bar_start - tl // 2, y), t, font=self.fonts[self.VERYSMALL],
+                           fill=color_table['outline'])
+        return y + self.VERYSMALL // 2
 
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):  # draw graph and co values
         pass
@@ -579,7 +591,7 @@ class GenericDisplay:
         if color is None:
             color = self.TEXT_COLOR
         tl = self.draw.textlength(text, font)
-        self.draw.text((self.sizex - 5 - tl - offset, y), text, font=font, fill=color)
+        self.draw.text((self.sizex - tl - offset, y), text, font=font, fill=color)
 
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=3, offset_left=3, offset_right=3):
