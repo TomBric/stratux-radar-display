@@ -517,6 +517,29 @@ class GenericDisplay:
             self.round_text(side_offset + 2*tab_space, starty, out, out_color=self.TEXT_COLOR)
         self.bottom_line("", "Mode", "Clear")
 
+    def bar(self, y, text, val, max_val, yellow, red, unit="", valtext=None, minval=0, side_offset=0):
+            bar_start = 100
+            bar_end = 420
+
+            self.draw.text((5, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+            right_val = f"{int(max_val)}{unit}"
+            textlength = self.draw.textlength(right_val, self.fonts[self.SMALL])
+            self.draw.text((self.sizex - textlength - 5, y), right_val, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="right")
+            self.draw.rounded_rectangle([bar_start - 2, y - 2, bar_end + 2, y + self.VERYSMALL + 2], radius=3, fill=None, outline=self.TEXT_COLOR, width=1)
+
+            val = minval if val < minval
+            xval = bar_start + (bar_end - bar_start) * val / max_val if max_val != 0 else bar_start
+
+            for b in range(bar_start, int(xval), 5):
+                self.draw.line([(b, y), (b, y + self.VERYSMALL)], fill=self.TEXT_COLOR, width=1)
+
+            t = valtext if valtext is not None else str(val)
+            tl = self.draw.textlength(t, self.fonts[self.SMALL])
+            self.draw.text(((bar_end - bar_start) / 2 + bar_start - tl / 2, y), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, stroke_width=1, stroke_fill="white")
+
+            return y + self.VERYSMALL + 12
+
+
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):  # draw graph and co values
         pass
 

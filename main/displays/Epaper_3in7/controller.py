@@ -162,7 +162,7 @@ class Epaper3in7(dcommon.GenericDisplay):
 
         t = "FL"+str(round(ownalt / 100))
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.sizex - textlength - 5, self.SMALL+10), t, font=self.fonts[self.VERYSMALL], fill= self.TEXT_COLOR)
+        self.draw.text((self.sizex - textlength - 5, self.SMALL+10), t, font=self.fonts[self.SMALL], fill= self.TEXT_COLOR)
 
         t = str(altdifference) + " ft"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
@@ -313,21 +313,6 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def flighttime(self, last_flights, side_offset=0):
         super().flighttime(last_flights, 25)
-
-
-    def round_text(self, x, y, text, bg_color=None, yesno=True, out_color=None):
-        # bg color is color of background, if none given, this is the normal background for this display
-        # out_color is coler of outline, if none given, outline is not
-        # if yesno is false, the text is crossed out
-        bg_color = bg_color or self.BG_COLOR
-        tl = self.draw.textlength(text, self.fonts[self.SMALL])
-        self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
-        if out_color is not None:
-            self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, outline=out_color)
-        self.draw.text((x + self.VERYSMALL//2, y), text, font=self.fonts[self.VERYSMALL], fill= self.TEXT_COLOR)
-        if not yesno:
-            self.draw.line([x, y+self.VERYSMALL+2, x+tl+10, y], fill= self.TEXT_COLOR, width=2)
-        return x+tl+20
 
 
     def stratux(stat, altitude, gps_alt, gps_quality):
