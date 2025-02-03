@@ -564,7 +564,7 @@ class GenericDisplay:
         if 'outline' in color_table:
             self.draw.text(((bar_end - bar_start) // 2 + bar_start - tl // 2, y), t, font=self.fonts[self.VERYSMALL],
                            fill=color_table['outline'])
-        return y + self.VERYSMALL 3 // 2
+        return y + self.VERYSMALL
 
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):  # draw graph and co values
         pass
