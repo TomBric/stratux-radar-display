@@ -548,7 +548,7 @@ class GenericDisplay:
             self.draw.rounded_rectangle([bar_start - 2, y - 2, bar_end + 2, y + self.VERYSMALL + 2], radius=3,
                 fill=None, outline=color_table['outline'], width=1)
         val = max(val, minval)
-        xval = bar_start + (bar_end - bar_start) * val // max_val if max_val != 0 else bar_start
+        xval = bar_start + (bar_end - bar_start) * val / max_val if max_val != 0 else bar_start
         t = valtext if valtext is not None else str(val)
         tl = self.draw.textlength(t, self.fonts[self.SMALL])
 
