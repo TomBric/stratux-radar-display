@@ -527,7 +527,7 @@ class GenericDisplay:
             self.draw.text((self.sizex - textlength - 5, y), right_val, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="right")
             self.draw.rounded_rectangle([bar_start - 2, y - 2, bar_end + 2, y + self.VERYSMALL + 2], radius=3, fill=None, outline=self.TEXT_COLOR, width=1)
 
-            val = minval if val < minval
+            val = minval if val < minval else val
             xval = bar_start + (bar_end - bar_start) * val / max_val if max_val != 0 else bar_start
 
             for b in range(bar_start, int(xval), 5):
