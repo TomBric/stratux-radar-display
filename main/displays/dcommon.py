@@ -465,6 +465,20 @@ class GenericDisplay:
         self.draw.text((offset, txt_starty), text, font=self.fonts[self.SMALL])
         self.bottom_line(left_text, middle_text, r_text)
 
+    def round_text(self, x, y, text, bg_color=None, yesno=True, out_color=None):
+        # bg color is color of background, if none given, this is the normal background for this display
+        # out_color is color of outline, if none given, outline is not displayed
+        # if yesno is false, the text is crossed out
+        bg_color = bg_color or self.BG_COLOR
+        tl = self.draw.textlength(text, self.fonts[self.SMALL])
+        self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
+        if out_color is not None:
+            self.draw.rounded_rectangle([x, y, x + tl, y + self.VERYSMALL + 2], radius=4, outline=out_color)
+        self.draw.text((x + self.VERYSMALL // 2, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        if not yesno:
+            self.draw.line([x, y + self.VERYSMALL + 2, x + tl + 10, y], fill=self.TEXT_COLOR, width=2)
+        return x + tl + 20
+
 
     def screen_input(self, headline, subline, text, left, middle, right, prefix, inp, suffix):
         self.centered_text(0, headline, self.fonts[self.LARGE])
