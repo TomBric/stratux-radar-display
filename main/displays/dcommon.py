@@ -532,7 +532,7 @@ class GenericDisplay:
         self.bottom_line("", "Mode", "Clear")
 
     def bar(self, y, text, val, max_val, bar_start, bar_end, color_table, unit="", valtext=None, minval=0,
-            side_offset=0):
+            side_offset=0, line_offset=0):
         # color_table example for Epaper:
         #   color_table = {'outline': 'black', 'black_white_offset': 5}
         # color_table example for OLED:
@@ -564,7 +564,7 @@ class GenericDisplay:
         if 'outline' in color_table:
             self.draw.text(((bar_end - bar_start) // 2 + bar_start - tl // 2, y), t, font=self.fonts[self.VERYSMALL],
                            fill=color_table['outline'])
-        return y + self.VERYSMALL
+        return y + self.VERYSMALL + line_offset
 
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):  # draw graph and co values
         pass
