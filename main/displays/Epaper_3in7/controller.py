@@ -234,20 +234,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.centered_text(60, error_message, self.verylargefont)
         self.bottom_line("", "    Mode", "Reset")
 
-    def shutdown(self, countdown, shutdownmode):
-            messages = {
-                0: "Shutdown stratux & display",
-                1: "Shutdown display",
-                2: "Reboot"
-            }
-            message = messages.get(shutdownmode, "Reboot")
-            self.centered_text(10, message, self.fonts[self.LARGE])
-            self.centered_text(40, f"in {countdown} seconds!", self.fonts[self.LARGE])
-            self.centered_text(110, "Press left button to cancel ...", self.fonts[self.SMALL])
-            self.centered_text(140, "Press middle for display only ...", self.fonts[self.SMALL])
-            self.centered_text(170, "Press right for reboot all ...", self.fonts[self.SMALL])
-            self.bottom_line("Cancel", "Display only", "Reboot")
-
     def earthfill(self, pitch, roll, length, scale):   # possible function for derived classed to implement fillings for earth
         # draws some type of black shading for the earth
         for pm in range(0, -180-1, -3):

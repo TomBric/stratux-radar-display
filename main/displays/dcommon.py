@@ -221,15 +221,15 @@ class GenericDisplay:
         second_color = second_color or self.TEXT_COLOR
 
         self.draw.text((5, 0), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
-        self.centered_text(self.SMALL, utctime, self.fonts[self.VERYLARGE], color=utc_color)
+        self.centered_text(self.SMALL, utctime, self.VERYLARGE, color=utc_color)
 
         if stoptime:
             self.draw.text((5, self.SMALL + self.VERYLARGE), "Timer", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
-            self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.fonts[self.VERYLARGE], color=timer_color)
+            self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.VERYLARGE, color=timer_color)
 
             if laptime:
                 self.draw.text((5, 2 * self.SMALL + 2 * self.VERYLARGE), laptime_head, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
-                self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.fonts[self.VERYLARGE], color=second_color)
+                self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.VERYLARGE, color=second_color)
 
         self.bottom_line(left_text, middle_text, right_t)
 
@@ -346,7 +346,7 @@ class GenericDisplay:
                                                               round(center[1] - self.LARGE)), rotmask)
 
             if error_message:
-                self.centered_text(120, error_message, self.fonts[self.LARGE])
+                self.centered_text(120, error_message, self.LARGE)
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
@@ -457,10 +457,10 @@ class GenericDisplay:
         self.bottom_line("Levl", "", "Zero")
 
     def text_screen(self, headline, subline, text, left_text, middle_text, r_text, offset=0):
-        self.centered_text(0, headline, self.fonts[self.MORELARGE])
+        self.centered_text(0, headline, self.MORELARGE)
         txt_starty = self.MORELARGE
         if subline is not None:
-            self.centered_text(txt_starty, subline, self.fonts[self.LARGE])
+            self.centered_text(txt_starty, subline, self.LARGE)
             txt_starty += self.LARGE
         self.draw.text((offset, txt_starty), text, font=self.fonts[self.SMALL])
         self.bottom_line(left_text, middle_text, r_text)
@@ -484,7 +484,7 @@ class GenericDisplay:
         self.centered_text(0, headline, self.fonts[self.LARGE])
         txt_starty = self.LARGE
         if subline is not None:
-            self.centered_text(txt_starty, subline, self.fonts[self.SMALL])
+            self.centered_text(txt_starty, subline, self.SMALL)
             txt_starty += self.LARGE
         bbox = self.draw.textbbox((0, txt_starty), text, font=self.fonts[self.SMALL])
         self.draw.text((0, txt_starty), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
@@ -504,7 +504,7 @@ class GenericDisplay:
         tab_space = (self.sizex - 2 * side_offset) // 4
         line_space = self.VERYSMALL // 3  # this gives a line indent
         starty = 0
-        self.centered_text(starty, "Flight Logs ", self.fonts[self.SMALL])
+        self.centered_text(starty, "Flight Logs ", self.SMALL)
         starty += self.SMALL + 2 * line_space
         self.draw.text((side_offset, starty), "Date", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.draw.text((side_offset + tab_space, starty), "Start", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
@@ -626,7 +626,7 @@ class GenericDisplay:
         checklist_y = {'from': self.LARGE + self.LARGE // 2, 'to': self.sizey - self.VERYSMALL - self.VERYSMALL//2}
         global top_index
 
-        self.centered_text(0, checklist_name, self.fonts[self.LARGE], color=color)
+        self.centered_text(0, checklist_name, self.LARGE, color=color)
         if current_index == 0:
             top_index = 0  # new list, reset top index
         if current_index < top_index:
@@ -664,6 +664,22 @@ class GenericDisplay:
         else:
             self.bottom_line(left, "NxtList", "Check")
 
+    def shutdown(self, countdown, shutdownmode):
+        messages = {
+            0: "Shutdown all",
+            1: "Shtdwn displ",
+            2: "Reboot"
+        }
+        message = messages.get(shutdownmode, "Reboot")
+        y = self.VERYSMALL
+        y = self.centered_text(y, message, self.LARGE) + self.VERYSMALL//2
+        y = self.centered_text(y, f"in {countdown} seconds!", self.LARGE) + self.VERYSMALL//2
+        y = self.centered_text(y , "Left  to cancel ...", self.SMALL)
+        y = self.centered_text(y, "Middle  display only ...",  self.SMALL)+ self.VERYSMALL//2
+        self.centered_text(y, "Right for reboot all ...", self.SMALL)
+        self.bottom_line("Canc", "Displ", "Rebo")
+
+
     ####################################
     # Generic support functions
     ####################################
@@ -679,17 +695,19 @@ class GenericDisplay:
         else:
             return '---'
 
-    def centered_text(self, y, text, font, color=None):
+    def centered_text(self, y, text, fontsize, color=None):
         if color is None:
             color = self.TEXT_COLOR
-        tl = self.draw.textlength(text, font)
-        self.draw.text((self.zerox - tl // 2, y), text, font=font, fill=color)
+        tl = self.draw.textlength(text, self.fonts[fontsize])
+        self.draw.text((self.zerox - tl // 2, y), text, font=self.fonts[fontsize], fill=color)
+        return y + fontsize
 
-    def right_text(self, y, text, font, color=None, offset=0):
+    def right_text(self, y, text, fontsize, color=None, offset=0):
         if color is None:
             color = self.TEXT_COLOR
-        tl = self.draw.textlength(text, font)
-        self.draw.text((self.sizex - tl - offset, y), text, font=font, fill=color)
+        tl = self.draw.textlength(text, self.fonts[fontsize])
+        self.draw.text((self.sizex - tl - offset, y), text, font=self.fonts[fontsize], fill=color)
+        return y + fontsize
 
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=3, offset_left=3, offset_right=3):
@@ -701,7 +719,7 @@ class GenericDisplay:
         textlength = self.draw.textlength(right, self.fonts[self.SMALL])
         self.draw.text((self.sizex - textlength - offset_right, y), right,
                        font=self.fonts[self.SMALL], fill=color, align="right")
-        self.centered_text(y, middle, self.fonts[self.SMALL], color)
+        self.centered_text(y, middle, self.SMALL, color)
 
     def graph(self, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout,
               textcolor, graphcolor, linecolor, bgcolor, glinewidth, linewidth, x_val_space, x_val_linelength):
