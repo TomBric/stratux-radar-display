@@ -130,12 +130,11 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.rectangle((0, 0, self.sizex - 1, self.sizey - 1), fill="white")  # clear everything in image
 
     def startup(self, version, target_ip, seconds):
-        logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-192x192.bmp'))
+        logopath = Path(__file__).resolve().parent / 'stratux-logo-192x192.bmp'
         logo = Image.open(logopath)
-        self.draw.bitmap((self.zerox-192/2, 0), logo, fill= self.TEXT_COLOR)
-        versionstr = "Radar " + version
-        self.centered_text(188, versionstr, self.fonts[self.LARGE])
-        self.centered_text(self.sizey - 2 *  self.VERYSMALL - 2, "Connecting to " + target_ip, self.VERYSMALL)
+        self.draw.bitmap((self.zerox - 96, 0), logo, fill=self.TEXT_COLOR)
+        self.centered_text(188, f"Radar {version}", self.LARGE)
+        self.centered_text(self.sizey - 2 * self.VERYSMALL - 2, f"Connecting to {target_ip}", self.VERYSMALL)
         self.display()
         time.sleep(seconds)
 
