@@ -145,7 +145,7 @@ class GenericDisplay:
         self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.LARGE+2)), fill=self.BG_COLOR)
         self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.AIRCRAFT_COLOR)
         if tail is not None:
-            tl = self.draw.textlength(tail, self.font[self.VERYSMALL])
+            tl = self.draw.textlength(tail, self.fonts[self.VERYSMALL])
             self.draw.rectangle((tposition[0], tposition[1] + self.LARGE, tposition[0] + tl,
                             tposition[1] + self.LARGE + self.VERYSMALL), fill=self.BG_COLOR)
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail,
