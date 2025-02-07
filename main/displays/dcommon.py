@@ -577,8 +577,92 @@ class GenericDisplay:
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
         pass
 
-    def checklist(self, checklist_name, checklist_items, current_index, last_list):
-        pass
+
+    def checklist_topic(self, ypos, topic, color=None, highlighted=False, toprint=True):
+        color=color or self.TEXT_COLOR
+
+        xpos = 2 + self.sizex // 100
+        xpos_remark = self.sizex // 10
+        xpos_sub = self.sizex // 10
+        topic_offset = 2 + self.sizey // 50
+        subtopic_offset = self.sizey // 50
+        remark_offset = self.sizey // 80
+        topic_right_offset = self.sizex // 100
+        highlight_width = 2
+
+        y = ypos
+        if toprint:
+            if topic.get('TASK'):
+                self.draw.text((xpos, ypos), topic['TASK'], font=self.fonts[self.SMALL], fill=color)
+            if topic.get('CHECK'):
+                self.right_text(ypos, topic['CHECK'], self.fonts[self.SMALL], offset=topic_right_offset)
+        y += self.SMALL
+
+        if topic.get('REMARK'):
+            y += remark_offset
+            if toprint:
+                self.draw.text((xpos_remark, y), topic['REMARK'], font=self.fonts[self.VERYSMALL], fill=color)
+            y += self.VERYSMALL
+
+        for i in range(1, 4):
+            task_key = f'TASK{i}'
+            check_key = f'CHECK{i}'
+            if topic.get(task_key):
+                y += subtopic_offset
+                if toprint:
+                    self.draw.text((xpos_sub, y), topic[task_key], font=self.fonts[self.SMALL], fill=color if i < 3 else "black")
+                if topic.get(check_key) and toprint:
+                    self.right_text(y, topic[check_key], self.fonts[self.SMALL], offset=topic_right_offset)
+                y += self.SMALL
+
+        if highlighted and toprint:
+            self.draw.rounded_rectangle([2+highlight_width, ypos - 2*highlight_width,
+                    self.sizex - highlight_width, y + 2 * highlight_width], width=highlight_width, radius=6,
+                    outline=color)
+        return y + topic_offset
+
+    def checklist(self, checklist_name, checklist_items, current_index, last_list, color=None):
+        color=color or self.TEXT_COLOR
+        checklist_y = {'from': self.LARGE + self.LARGE // 2, 'to': self.sizey - self.VERYSMALL - self.VERYSMALL//2}
+        global top_index
+
+        self.centered_text(0, checklist_name, self.fonts[self.LARGE], color=color)
+        if current_index == 0:
+            top_index = 0  # new list, reset top index
+        if current_index < top_index:
+            top_index = current_index  # scroll up
+
+        while True:  # check what would fit on the screen
+            last_item = top_index
+            size = self.checklist_topic(checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
+            while last_item + 1 < len(checklist_items):
+                last_item += 1
+                size = self.checklist_topic(size, checklist_items[last_item], highlighted=False, toprint=False)
+                if size > checklist_y['to']:  # last item did not fit
+                    last_item -= 1
+                    break
+
+            # last item now shows the last one that fits
+            if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
+                break
+            else:  # next item would not fit
+                top_index += 1  # need to scroll, but now test again what would fit
+                if current_index == len(checklist_items) - 1:  # list is finished
+                    break
+
+        # now display everything
+        y = checklist_y['from']
+        for item in range(top_index, last_item + 1):
+            if item < len(checklist_items):
+                y = self.checklist_topic(y, checklist_items[item], highlighted=(item == current_index), toprint=True)
+
+        left = "PrevL" if current_index == 0 else "Prev"
+        if last_list and current_index == len(checklist_items) - 1:  # last item
+            self.bottom_line("Prev", "Mode", "")
+        elif last_list:
+            self.bottom_line(left, "Mode", "Check")
+        else:
+            self.bottom_line(left, "NxtList", "Check")
 
     ####################################
     # Generic support functions
@@ -721,83 +805,3 @@ class GenericDisplay:
             self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[headline_size], fill=color)
         return starty
 
-    def checklist_topic(self, ypos, topic, highlighted=False, toprint=True):
-        xpos = self.sizex // 100
-        xpos_remark = self.sizex // 10
-        xpos_sub = self.sizex // 10
-        topic_offset = self.sizey // 50
-        subtopic_offset = self.sizey // 50
-        remark_offset = self.sizey // 80
-        topic_right_offset = self.sizex // 100
-
-        y = ypos
-        if toprint:
-            if topic.get('TASK'):
-                self.draw.text((xpos, ypos), topic['TASK'], font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
-            if topic.get('CHECK'):
-                self.right_text(ypos, topic['CHECK'], self.fonts[self.SMALL], offset=topic_right_offset)
-        y += self.SMALL
-
-        if topic.get('REMARK'):
-            y += remark_offset
-            if toprint:
-                self.draw.text((xpos_remark, y), topic['REMARK'], font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-            y += self.VERYSMALL
-
-        for i in range(1, 4):
-            task_key = f'TASK{i}'
-            check_key = f'CHECK{i}'
-            if topic.get(task_key):
-                y += subtopic_offset
-                if toprint:
-                    self.draw.text((xpos_sub, y), topic[task_key], font=self.fonts[self.SMALL], fill=self.TEXT_COLOR if i < 3 else "black")
-                if topic.get(check_key) and toprint:
-                    self.right_text(y, topic[check_key], self.fonts[self.SMALL], offset=topic_right_offset)
-                y += self.SMALL
-
-        if highlighted and toprint:
-            self.draw.rounded_rectangle([3, ypos - 4, self.sizex - 2, y + 6], width=3, radius=5, outline="black")
-
-        return y + topic_offset
-
-    def checklist(self, checklist_name, checklist_items, current_index, last_list):
-        checklist_y = {'from': self.SMALL + 8, 'to': self.sizey - self.VERYSMALL - 6}
-        global top_index
-
-        self.centered_text(0, checklist_name, self.fonts[self.SMALL], color="black")
-        if current_index == 0:
-            top_index = 0  # new list, reset top index
-        if current_index < top_index:
-            top_index = current_index  # scroll up
-
-        while True:  # check what would fit on the screen
-            last_item = top_index
-            size = self.checklist_topic(checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
-            while last_item + 1 < len(checklist_items):
-                last_item += 1
-                size = self.checklist_topic(size, checklist_items[last_item], highlighted=False, toprint=False)
-                if size > checklist_y['to']:  # last item did not fit
-                    last_item -= 1
-                    break
-
-            # last item now shows the last one that fits
-            if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
-                break
-            else:  # next item would not fit
-                top_index += 1  # need to scroll, but now test again what would fit
-                if current_index == len(checklist_items) - 1:  # list is finished
-                    break
-
-        # now display everything
-        y = checklist_y['from']
-        for item in range(top_index, last_item + 1):
-            if item < len(checklist_items):
-                y = self.checklist_topic(y, checklist_items[item], highlighted=(item == current_index), toprint=True)
-
-        left = "PrevL" if current_index == 0 else "Prev"
-        if last_list and current_index == len(checklist_items) - 1:  # last item
-            self.bottom_line("Prev", "Mode", "")
-        elif last_list:
-            self.bottom_line(left, "Mode", "Check")
-        else:
-            self.bottom_line(left, "NxtList", "Check")
