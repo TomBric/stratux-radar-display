@@ -616,7 +616,7 @@ class GenericDisplay:
                 y += self.SMALL
 
         if highlighted and toprint:
-            self.draw.rounded_rectangle([2+highlight_width, ypos - 2*highlight_width,
+            self.draw.rounded_rectangle([2+highlight_width, ypos - *highlight_width,
                     self.sizex - highlight_width, y + 2 * highlight_width], width=highlight_width, radius=6,
                     outline=color)
         return y + topic_offset
