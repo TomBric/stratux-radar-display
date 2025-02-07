@@ -374,9 +374,9 @@ class Epaper3in7(dcommon.GenericDisplay):
             st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
         lines = [
             ("t-off time", st),
-            ("t-off alt [ft]", form_line(values, 'start_altitude', "{:5.1f}")),
-            ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
-            ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
+            ("t-off alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
+            ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
+            ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         starty = self.dashboard(5, 35, 225, lines, headline="Takeoff", rounding=True)
 
