@@ -235,23 +235,18 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.bottom_line("", "    Mode", "Reset")
 
     def shutdown(self, countdown, shutdownmode):
-        if shutdownmode == 0:   # shutdown stratux + display
-            message = "Shutdown stratux & display"
-        elif shutdownmode == 1:
-            message = "Shutdown display"
-        else:
-            message = "Reboot"
-        centered_text(10, message, self.fonts[self.LARGE])
-        message = "in " + str(countdown) + " seconds!"
-        centered_text(40, message, self.fonts[self.LARGE])
-        message = "Press left button to cancel ..."
-        centered_text(110, message, self.fonts[self.SMALL])
-        message = "Press middle for display only ..."
-        centered_text(140, message, self.fonts[self.SMALL])
-        message = "Press right for reboot all ..."
-        centered_text(170, message, self.fonts[self.SMALL])
-
-        bottom_line("Cancel", "Display only", "Reboot")
+            messages = {
+                0: "Shutdown stratux & display",
+                1: "Shutdown display",
+                2: "Reboot"
+            }
+            message = messages.get(shutdownmode, "Reboot")
+            self.centered_text(10, message, self.fonts[self.LARGE])
+            self.centered_text(40, f"in {countdown} seconds!", self.fonts[self.LARGE])
+            self.centered_text(110, "Press left button to cancel ...", self.fonts[self.SMALL])
+            self.centered_text(140, "Press middle for display only ...", self.fonts[self.SMALL])
+            self.centered_text(170, "Press right for reboot all ...", self.fonts[self.SMALL])
+            self.bottom_line("Cancel", "Display only", "Reboot")
 
     def earthfill(self, pitch, roll, length, scale):   # possible function for derived classed to implement fillings for earth
         # draws some type of black shading for the earth
