@@ -453,7 +453,7 @@ class GenericDisplay:
 
         # infotext = "P:" + str(pitch) + " R:" + str(roll)
         if error_message:
-            self.centered_text( int(self.sizey/4), error_message, self.fonts[self.SMALL])
+            self.centered_text( int(self.sizey/4), error_message, self.SMALL)
         self.bottom_line("Levl", "", "Zero")
 
     def text_screen(self, headline, subline, text, left_text, middle_text, r_text, offset=0):
@@ -481,7 +481,7 @@ class GenericDisplay:
 
 
     def screen_input(self, headline, subline, text, left, middle, right, prefix, inp, suffix):
-        self.centered_text(0, headline, self.fonts[self.LARGE])
+        self.centered_text(0, headline, self.LARGE)
         txt_starty = self.LARGE
         if subline is not None:
             self.centered_text(txt_starty, subline, self.SMALL)
