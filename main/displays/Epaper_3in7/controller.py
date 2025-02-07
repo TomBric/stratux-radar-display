@@ -310,29 +310,28 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.bottom_line("+10 ft", "Mode", "-10 ft")
 
 
-    def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
+    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):
         if alarmlevel == 0:
-            centered_text(0, "CO Warner: No CO alarm", self.fonts[self.LARGE])
+            self.centered_text(0, "CO Warner: No CO alarm", self.fonts[self.LARGE])
         else:
-            if alarmperiod > 60:
-                alarmstr = "CO: {:d} ppm longer {:d} min".format(alarmppm, math.floor(alarmperiod/60))
-            else:
-                alarmstr = "CO: {:d} ppm longer {:d} sec".format(alarmppm, math.floor(alarmperiod))
-            centered_text(0, alarmstr, self.fonts[self.LARGE])
-        self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, self.TEXT_COLOR, self.TEXT_COLOR,
-                   self.TEXT_COLOR, self.BG_COLOR, 3, 3, 5, 3)
-        draw.text((320, 50 +  self.SMALL -  self.VERYSMALL), "Warnlevel:", font=verysmallfont, fill=self.TEXT_COLOR)
-        right_text(50, "{:3d}".format(alarmlevel), self.fonts[self.SMALL])
+            alarmstr = f"CO: {alarmppm} ppm longer {alarmperiod // 60} min" \
+                if alarmperiod > 60 else f"CO: {alarmppm} ppm longer {alarmperiod} sec"
+            self.centered_text(0, alarmstr, self.fonts[self.LARGE])
 
-        if len(co_values) > 0:
-            draw.text((320, 120+SMALL-VERYSMALL), "CO act:", font=verysmallfont, fill=self.TEXT_COLOR)
-            right_text(120, "{:3d}".format(co_values[len(co_values) - 1]), self.fonts[self.SMALL])
-        draw.text((320, 140+SMALL-VERYSMALL), "CO max:", font=verysmallfont, fill=self.TEXT_COLOR)
-        right_text(140, "{:3d}".format(co_max), self.fonts[self.SMALL])
-        draw.text((320, 196), "R0:", font=verysmallfont, fill=self.TEXT_COLOR)
-        right_text(196, "{:.1f}k".format(r0/1000), self.fonts[self.SMALL])
+        self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, self.TEXT_COLOR, self.TEXT_COLOR, self.TEXT_COLOR, self.BG_COLOR, 3, 3, 5, 3)
+        self.draw.text((320, 50 + self.SMALL - self.VERYSMALL), "Warnlevel:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.right_text(50, f"{alarmlevel:3d}", self.fonts[self.SMALL])
 
-        bottom_line("Calibrate", "Mode", "Reset")
+        if co_values:
+            self.draw.text((320, 120 + self.SMALL - self.VERYSMALL), "CO act:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+            self.right_text(120, f"{co_values[-1]:3d}", self.fonts[self.SMALL])
+
+        self.draw.text((320, 140 + self.SMALL - self.VERYSMALL), "CO max:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.right_text(140, f"{co_max:3d}", self.fonts[self.SMALL])
+        self.draw.text((320, 196), "R0:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.right_text(196, f"{r0 / 1000:.1f}k", self.fonts[self.SMALL])
+
+        self.bottom_line("Calibrate", "Mode", "Reset")
 
     def distance(self,now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                  own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
@@ -448,103 +447,6 @@ class Epaper3in7(dcommon.GenericDisplay):
         else:
             bottom_line("+100/-100ft", "Back", "+10/-10ft")
 
-
-    def checklist_topic(ypos, topic, highlighted=False, toprint=True):
-        xpos = 10
-        xpos_remark = 50
-        xpos_sub = 50
-        topic_offset = 8
-        subtopic_offset = 6
-        remark_offset = 4
-        topic_right_offset = 6
-
-        y = ypos
-        if 'TASK' in topic and topic['TASK'] is not None:
-            if toprint:
-                draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill=self.TEXT_COLOR)    # Topic
-        if 'CHECK' in topic and topic['CHECK'] is not None:
-            if toprint:
-                right_text(ypos, topic['CHECK'], font=smallfont, offset=topic_right_offset)     # Check
-        y +=  self.SMALL
-        if 'REMARK' in topic and topic['REMARK'] is not None:   # remark
-            y += remark_offset
-            if toprint:
-                draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill= self.TEXT_COLOR)  # remark
-            y +=  self.VERYSMALL
-        if 'TASK1' in topic and topic['TASK1'] is not None:    # subtopic
-            y += subtopic_offset
-            if toprint:
-                draw.text((xpos_sub, y), topic['TASK1'], font=smallfont, fill= self.TEXT_COLOR)  # subtopic
-            if 'CHECK1' in topic and topic['CHECK1'] is not None:
-                if toprint:
-                    right_text(y, topic['CHECK1'], font=smallfont, fill= self.TEXT_COLOR, offset=topic_right_offset)
-            y +=  self.SMALL
-        if 'TASK2' in topic and topic['TASK2'] is not None:   # subtopic2
-            y += subtopic_offset
-            if toprint:
-                draw.text((xpos_sub, y), topic['TASK2'], font=smallfont, fill= self.TEXT_COLOR)  # subtopic
-            if 'CHECK2' in topic and topic['CHECK2'] is not None:
-                if toprint:
-                    right_text(y, topic['CHECK2'], font=smallfont, fill= self.TEXT_COLOR, offset=topic_right_offset)
-            y +=  self.SMALL
-        if 'TASK3' in topic and topic['TASK3'] is not None:   # subtopic3
-            y += subtopic_offset
-            if toprint:
-                draw.text((xpos_sub, y), topic['TASK3'], font=smallfont, fill="black")  # subtopic
-            if 'CHECK3' in topic and topic['CHECK3'] is not None:
-                if toprint:
-                    right_text(y, topic['CHECK3'], font=smallfont, offset=topic_right_offset)
-            y +=  self.SMALL
-        if highlighted:   # draw frame around whole topic
-            if toprint:
-                draw.rounded_rectangle([3, ypos-4, sizex-2, y+6], width=3, radius=5, outline="black")
-        return y + topic_offset
-
-
-    def checklist(checklist_name, checklist_items, current_index, last_list):
-        checklist_y = {'from': self.LARGE + 8, 'to': self.sizey -  self.SMALL - 6}
-        global top_index
-
-        centered_text(0, checklist_name, self.fonts[self.LARGE])
-        if current_index == 0:
-            top_index = 0     # new list, reset top index
-        if current_index < top_index:
-            top_index = current_index    # scroll up
-        while True:  # check what would fit on the screen
-            last_item = top_index
-            size = checklist_topic(checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
-            while True:
-                if last_item + 1 < len(checklist_items):
-                    last_item += 1
-                else:
-                    break    # everything fits to the end of the list
-                size = checklist_topic(size, checklist_items[last_item], highlighted=False, toprint=False)
-                if size > checklist_y['to']:   # last item did not fit
-                    last_item -= 1
-                    break
-            # last item now shows the last one that fits
-            if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
-                # next item would also fit on screen or list is fully displayed
-                break
-            else:      # next item would not fit
-                top_index += 1  # need to scroll, but now test again what would fit
-                if current_index == len(checklist_items) - 1:  # list is finished
-                    break
-        # now display everything
-        y = checklist_y['from']
-        for item in range(top_index, last_item + 1):
-            if item < len(checklist_items):
-                y = checklist_topic(y, checklist_items[item], highlighted=(item == current_index), toprint=True)
-        if current_index == 0:  # first item
-            left = "PrevList"
-        else:
-            left = "Prev"
-        if last_list and current_index == len(checklist_items) - 1:  # last_item
-            bottom_line("Prev", "Mode", "")
-        elif last_list:
-            bottom_line(left, "Mode", "Checked")
-        else:
-            bottom_line(left, "NextList/Mode", "Checked")
 
 
 # instantiate a single object in the file, needs to be done and inherited in every display module

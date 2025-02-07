@@ -599,7 +599,7 @@ class GenericDisplay:
         if color is None:
             color = self.TEXT_COLOR
         tl = self.draw.textlength(text, font)
-        self.draw.text((math.floor(self.zerox - tl / 2), y), text, font=font, fill=color)
+        self.draw.text((self.zerox - tl // 2, y), text, font=font, fill=color)
 
     def right_text(self, y, text, font, color=None, offset=0):
         if color is None:
@@ -626,30 +626,30 @@ class GenericDisplay:
         # valueline= value for a line (threshold 1+2)
         # x_val_space = space between x values below and x-axis
         # x_val_linelength = length of lines at axis valuepoints up and down of x-axis
-        tl = math.floor(self.draw.textlength(str(maxvalue), verysmallfont))  # for adjusting x and y
+        tl = self.draw.textlength(str(maxvalue), verysmallfont)  # for adjusting x and y
         # adjust zero lines to have room for text
         xpos = xpos + tl + x_val_space
         xsize = xsize - tl - x_val_space
-        ypos = math.floor(ypos + VERYSMALL / 2)
+        ypos = ypos + VERYSMALL // 2
         ysize = ysize - VERYSMALL
 
         vlmin_y = ypos + ysize - 1
-        tl = math.floor(self.draw.textlength(str(minvalue), verysmallfont))
+        tl = self.draw.textlength(str(minvalue), verysmallfont)
         self.draw.text((xpos - tl - x_val_space, vlmin_y - VERYSMALL), str(minvalue), font=verysmallfont, fill=textcolor)
 
-        vl1_y = math.floor(ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue))
+        vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) // (maxvalue - minvalue)
         tl = self.draw.textlength(str(value_line1), verysmallfont)
-        self.draw.text((xpos - tl - x_val_space, math.floor(vl1_y - VERYSMALL / 2)), str(value_line1),
+        self.draw.text((xpos - tl - x_val_space, vl1_y - VERYSMALL // 2), str(value_line1),
                   font=verysmallfont, fill=textcolor)
-        vl2_y = math.floor(ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue))
+        vl2_y = ypos + ysize - ysize * (value_line2 - minvalue) // (maxvalue - minvalue)
         tl = self.draw.textlength(str(value_line2), verysmallfont)
-        self.draw.text((xpos - tl - x_val_space, math.floor(vl2_y - VERYSMALL / 2)), str(value_line2),
+        self.draw.text((xpos - tl - x_val_space, vl2_y - VERYSMALL // 2), str(value_line2),
                   font=verysmallfont, fill=textcolor)
 
         vlmax_y = ypos
         # outside text and frame
         tl = self.draw.textlength(str(maxvalue), verysmallfont)
-        self.draw.text((xpos - tl - x_val_space, math.floor(vlmax_y - VERYSMALL / 2)), str(maxvalue), font=verysmallfont,
+        self.draw.text((xpos - tl - x_val_space, vlmax_y - VERYSMALL // 2), str(maxvalue), font=verysmallfont,
                   fill=textcolor)
         self.draw.rectangle((xpos, ypos, xpos + xsize, ypos + ysize), outline=linecolor, width=linewidth, fill=bgcolor)
         # values below x-axis
@@ -657,9 +657,9 @@ class GenericDisplay:
         full_time = timeout * no_of_values  # time for full display in secs
         timestr = time.strftime("%H:%M", time.gmtime())
         tl = self.draw.textlength(timestr, verysmallfont)
-        no_of_time = math.floor(xsize / tl / 2) + 1  # calculate maximum number of time indications
+        no_of_time = xsize // tl // 2 + 1  # calculate maximum number of time indications
         time_offset = full_time / no_of_time
-        offset = math.floor((xsize - 1) / no_of_time)
+        offset = (xsize - 1) // no_of_time
         x = xpos
         acttime = math.floor(time.time())
         # draw values below x-axis
@@ -667,27 +667,27 @@ class GenericDisplay:
             self.draw.line((x, ypos+ysize-1 + x_val_linelength, x, ypos+ysize-1 - x_val_linelength),
                            width=linewidth, fill=linecolor)
             timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time - i) * time_offset)))
-            self.draw.text((math.floor(x - tl / 2), ypos + ysize - 1 + 1), timestr, font=verysmallfont, fill=textcolor)
+            self.draw.text(x - tl // 2, ypos + ysize - 1 + 1, timestr, font=verysmallfont, fill=textcolor)
             x = x + offset
         lastpoint = None
         for i in range(0, len(data)):
-            y = math.floor(ypos - 4 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue))
+            y = ypos - 4 + ysize - ysize * (data[i] - minvalue) // (maxvalue - minvalue)
             if y < ypos:
                 y = ypos  # if value is outside
             if y > ypos + ysize - 1:
                 y = ypos + ysize - 1 # if value is outside
             if i >= 1:  # we need at least two points before we draw
-                x = math.floor(xpos + i * xsize / (len(data) - 1))
+                x = xpos + i * xsize // (len(data) - 1)
                 self.draw.line([lastpoint, (x, y)], fill=graphcolor, width=glinewidth)
             else:
                 x = xpos
             lastpoint = (x, y)
         # value_line 1, dashed line
-        y = math.floor(ypos + ysize - ysize * (value_line1 - minvalue) / (maxvalue - minvalue))
+        y = ypos + ysize - ysize * (value_line1 - minvalue) // (maxvalue - minvalue)
         for x in range(int(xpos), int(xpos + xsize), 6):
             self.draw.line([(x, y), (x + 3, y)], fill=linecolor, width=linewidth)
         # value_line 2, dashed line
-        y = math.floor(ypos + ysize - ysize * (value_line2 - minvalue) / (maxvalue - minvalue))
+        y = ypos + ysize - ysize * (value_line2 - minvalue) // (maxvalue - minvalue)
         for x in range(int(xpos), int(xpos + xsize), 6):
             self.draw.line([(x, y), (x + 3, y)], fill=linecolor, width=linewidth)
 
@@ -720,3 +720,87 @@ class GenericDisplay:
                 x + heading_indent + tl + heading_space, y + headline_size], fill=bgcolor, outline=None)
             self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[headline_size], fill=color)
         return starty
+
+    def checklist_topic(self, ypos, topic, highlighted=False, toprint=True):
+        # highlighte: if True, the topic is highlighted
+        # toprint: if False, the topic is not printed, but the height is returned
+
+        xpos = self.sizex // 100
+        xpos_remark = self.sizex // 10
+        xpos_sub = self.sizex // 10
+        topic_offset = self.sizey // 50
+        subtopic_offset = self.sizey // 50
+        remark_offset = self.sizey // 80
+        topic_right_offset = self.sizex // 100
+
+        y = ypos
+        if toprint:
+            if 'TASK' in topic and topic['TASK']:
+                draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill=self.TEXT_COLOR)
+            if 'CHECK' in topic and topic['CHECK']:
+                right_text(ypos, topic['CHECK'], font=smallfont, offset=topic_right_offset)
+        y += self.SMALL
+
+        if 'REMARK' in topic and topic['REMARK']:
+            y += remark_offset
+            if toprint:
+                draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill=self.TEXT_COLOR)
+            y += self.VERYSMALL
+
+        for i in range(1, 4):
+            task_key = f'TASK{i}'
+            check_key = f'CHECK{i}'
+            if task_key in topic and topic[task_key]:
+                y += subtopic_offset
+                if toprint:
+                    draw.text((xpos_sub, y), topic[task_key], font=smallfont, fill=self.TEXT_COLOR if i < 3 else "black")
+                if check_key in topic and topic[check_key] and toprint:
+                    right_text(y, topic[check_key], font=smallfont, offset=topic_right_offset)
+                y += self.SMALL
+
+        if highlighted and toprint:
+            draw.rounded_rectangle([3, ypos - 4, self.sizex - 2, y + 6], width=3, radius=5, outline="black")
+
+        return y + topic_offset
+
+    def checklist(checklist_name, checklist_items, current_index, last_list):
+            checklist_y = {'from': self.SMALL + 8, 'to': self.sizey - self.VERYSMALL - 6}
+            global top_index
+
+            self.centered_text(0, checklist_name, self.fonts[self.SMALL], color="black")
+            if current_index == 0:
+                top_index = 0  # new list, reset top index
+            if current_index < top_index:
+                top_index = current_index  # scroll up
+
+            while True:  # check what would fit on the screen
+                last_item = top_index
+                size = self.checklist_topic(checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
+                while last_item + 1 < len(checklist_items):
+                    last_item += 1
+                    size = self.checklist_topic(size, checklist_items[last_item], highlighted=False, toprint=False)
+                    if size > checklist_y['to']:  # last item did not fit
+                        last_item -= 1
+                        break
+
+                # last item now shows the last one that fits
+                if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
+                    break
+                else:  # next item would not fit
+                    top_index += 1  # need to scroll, but now test again what would fit
+                    if current_index == len(checklist_items) - 1:  # list is finished
+                        break
+
+            # now display everything
+            y = checklist_y['from']
+            for item in range(top_index, last_item + 1):
+                if item < len(checklist_items):
+                    y = self.checklist_topic(y, checklist_items[item], highlighted=(item == current_index), toprint=True)
+
+            left = "PrevL" if current_index == 0 else "Prev"
+            if last_list and current_index == len(checklist_items) - 1:  # last item
+                self.bottom_line("Prev", "Mode", "")
+            elif last_list:
+                self.bottom_line(left, "Mode", "Check")
+            else:
+                self.bottom_line(left, "NxtList", "Check")
