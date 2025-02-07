@@ -313,120 +313,94 @@ class Epaper3in7(dcommon.GenericDisplay):
 
         self.bottom_line("Calibrate", "Mode", "Reset")
 
-    def distance(self,now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
-                 own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
-                 ground_distance_valid, grounddistance, error_message):
+    def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
+                         own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
+                         ground_distance_valid, grounddistance, error_message):
         offset = 5
         self.centered_text(0, "GPS Distance", self.SMALL)
-        lines = (
-            ("Date", "{:0>2d}.{:0>2d}.{:0>4d}".format(now.day, now.month, now.year)),
-            ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
-                                                           math.floor(now.microsecond/100000)))
-        )
-        starty = self.dashboard(offset, self.SMALL, self.zerox-offset, lines, headline="Date/Time", rounding=True)
-        t = "GPS-NoFix"
-        accuracy = ""
+        lines = [
+            ("Date", f"{now.day:02d}.{now.month:02d}.{now.year:04d}"),
+            ("UTC", f"{now.hour:02d}:{now.minute:02d}:{now.second:02d},{now.microsecond // 100000:1d}")
+        ]
+        starty = self.dashboard(offset, self.SMALL, self.zerox - offset, lines, headline="Date/Time", rounding=True)
+
+        t, accuracy = "GPS-NoFix", ""
         if gps_quality == 1:
-            t = "3D GPS"
-            accuracy = str(round(gps_h_accuracy, 1)) + "m"
+            t, accuracy = "3D GPS", f"{gps_h_accuracy:.1f}m"
         elif gps_quality == 2:
-            t = "DGNSS"
-            accuracy = str(round(gps_h_accuracy, 1)) + "m"
-        gps_dist_str = "---"
-        gps_speed_str = "---"
-        if distance_valid:
-            gps_dist_str = "{:4.0f}".format(gps_distance)
-        if gps_valid:
-            gps_speed_str = "{:3.1f}".format(gps_speed)
-        lines = (
+            t, accuracy = "DGNSS", f"{gps_h_accuracy:.1f}m"
+
+        gps_dist_str = f"{gps_distance:.0f}" if distance_valid else "---"
+        gps_speed_str = f"{gps_speed:.1f}" if gps_valid else "---"
+        lines = [
             ("GPS-Distance [m]", gps_dist_str),
             ("GPS-Speed [kts]", gps_speed_str),
             (t, accuracy)
-        )
-        starty = self.dashboard(offset, starty, self.zerox-offset, lines, headline="GPS", rounding=True)
+        ]
+        starty = self.dashboard(offset, starty, self.zerox - offset, lines, headline="GPS", rounding=True)
+
         if ground_distance_valid:
-            lines = (
-                ("Grd Dist [cm]", "{:+3.1f}".format(grounddistance/10)),
-            )
-            self.dashboard(offset, starty, self.zerox-offset, lines, headline="Ground Sensor", rounding=True)
+            lines = [("Grd Dist [cm]", f"{grounddistance / 10:+.1f}")]
+            self.dashboard(offset, starty, self.zerox - offset, lines, headline="Ground Sensor", rounding=True)
 
-        starty = self.SMALL   # right column
+        starty = self.SMALL
         if ahrs_valid:
-            lines = (
-                ("Pitch [deg]", "{:+2d}".format(ahrs_pitch)),
-                ("Roll [deg]", "{:+2d}".format(ahrs_roll)),
-            )
-            starty = self.dashboard(self.zerox+offset, starty, self.zerox-2*offset, lines, headline="AHRS", rounding=True)
-        if baro_valid:
-            if alt_diff_takeoff is not None:
-                takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
-            else:
-                takeoff_str = "---"
-            if alt_diff is not None:
-                alt_diff_str = "{:+5.1f}".format(alt_diff)
-            else:
-                alt_diff_str = "---"
-            lines = (
-                ("Baro-Altitude [ft]", "{:5.0f}".format(own_altitude)),
-                ("Vert Speed [ft]", "{:+4.0f}".format(vert_speed)),
-                ("Ba-Diff r-up [ft]", alt_diff_str),
-                ("Ba-Diff tof [ft]", takeoff_str),
-            )
-            self.dashboard(self.zerox+offset, starty, self.zerox-2*offset, lines, headline="Baro", rounding=True)
+            lines = [
+                ("Pitch [deg]", f"{ahrs_pitch:+2d}"),
+                ("Roll [deg]", f"{ahrs_roll:+2d}")
+            ]
+            starty = self.dashboard(self.zerox + offset, starty, self.zerox - 2 * offset, lines, headline="AHRS", rounding=True)
 
-        if error_message is not None:
-            self.centered_text(self.sizey//4, error_message, self.VERYLARGE)
+        if baro_valid:
+            takeoff_str = f"{alt_diff_takeoff:+5.1f}" if alt_diff_takeoff is not None else "---"
+            alt_diff_str = f"{alt_diff:+5.1f}" if alt_diff is not None else "---"
+            lines = [
+                ("Baro-Altitude [ft]", f"{own_altitude:.0f}"),
+                ("Vert Speed [ft]", f"{vert_speed:+4.0f}"),
+                ("Ba-Diff r-up [ft]", alt_diff_str),
+                ("Ba-Diff tof [ft]", takeoff_str)
+            ]
+            self.dashboard(self.zerox + offset, starty, self.zerox - 2 * offset, lines, headline="Baro", rounding=True)
+
+        if error_message:
+            self.centered_text(self.sizey // 4, error_message, self.VERYLARGE)
         self.bottom_line("Stats/Set", "Mode", "Start")
 
-
-    def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        centered_text(0, "Start-/Landing Statistics", self.SMALL)
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
+        self.centered_text(0, "Start-/Landing Statistics", self.SMALL)
 
         st = '---'
         if 'start_time' in values:
-            st = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['start_time'].hour, values['start_time'].minute,
-                                                        values['start_time'].second,
-                                                        math.floor(values['start_time'].microsecond / 100000))
-        lines = (
+            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+        lines = [
             ("t-off time", st),
             ("t-off alt [ft]", form_line(values, 'start_altitude', "{:5.1f}")),
             ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
-        )
-        starty = dashboard(5, 35, 225, True, "Takeoff", lines)
+        ]
+        starty = self.dashboard(5, 35, 225, lines, headline="Takeoff", rounding=True)
 
         lt = '---'
         if 'landing_time' in values:
-            lt = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['landing_time'].hour, values['landing_time'].minute,
-                                                        values['landing_time'].second,
-                                                        math.floor(values['landing_time'].microsecond / 100000))
-        lines = (
+            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+        lines = [
             ("ldg time", lt),
             ("ldg alt [ft]", form_line(values, 'landing_altitude', "{:5.1f}")),
             ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
-        )
-        starty = dashboard(250, 35, 225, True, "Landing", lines)
-        if ground_warnings:
-            if dest_alt_valid:
-                dest_alt_str = "{:+5.0f}".format(dest_altitude)
-            else:
-                dest_alt_str = "---"
-            if gps_valid:
-                gps_alt_str = "{:+5.0f}".format(gps_altitude)
-            else:
-                gps_alt_str = "---"
+        ]
+        starty = self.dashboard(250, 35, 225, lines, headline="Landing", rounding=True)
 
-            lines = (
+        if ground_warnings:
+            dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
+            gps_alt_str = f"{gps_altitude:+5.0f}" if gps_valid else "---"
+            lines = [
                 ("Act GPS-Alt [ft]", gps_alt_str),
                 ("Destination Alt [ft]", dest_alt_str),
-            )
-            dashboard(5, starty + 10, 475, True, "Destination Elevation", lines)
-        if not ground_warnings:
-            bottom_line("", "Back", "")
-        else:
-            bottom_line("+100/-100ft", "Back", "+10/-10ft")
+            ]
+            self.dashboard(5, starty + 10, 475, lines, headline="Destination Elevation", rounding=True)
 
+        self.bottom_line("", "Back", "" if not ground_warnings else "+100/-100ft", "+10/-10ft")
 
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
