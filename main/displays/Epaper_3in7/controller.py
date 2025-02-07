@@ -400,7 +400,10 @@ class Epaper3in7(dcommon.GenericDisplay):
             ]
             self.dashboard(5, starty + 10, 475, lines, headline="Destination Elevation", rounding=True)
 
-        self.bottom_line("", "Back", "" if not ground_warnings else "+100/-100ft", "+10/-10ft")
+        if not ground_warnings:
+            self.bottom_line("", "Back", "")
+        else:
+            self.bottom_line("+/-100ft", "  Back", "+/-10ft")
 
 
 # instantiate a single object in the file, needs to be done and inherited in every display module

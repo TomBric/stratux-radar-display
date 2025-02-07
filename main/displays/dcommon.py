@@ -711,11 +711,9 @@ class GenericDisplay:
 
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=3, offset_left=3, offset_right=3):
-        y = self.sizey - self.fonts[self.SMALL].size - offset_bottom
-        if color is None:
-            color = self.TEXT_COLOR
-        self.draw.text((offset_left, y), left,
-                       font=self.fonts[self.SMALL], fill=color)
+        y = self.sizey - self.SMALL - offset_bottom
+        color = color or self.TEXT_COLOR
+        self.draw.text((offset_left, y), left, font=self.fonts[self.SMALL], fill=color)
         textlength = self.draw.textlength(right, self.fonts[self.SMALL])
         self.draw.text((self.sizex - textlength - offset_right, y), right,
                        font=self.fonts[self.SMALL], fill=color, align="right")
