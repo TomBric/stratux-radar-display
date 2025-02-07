@@ -582,9 +582,9 @@ class GenericDisplay:
         color=color or self.TEXT_COLOR
 
         highlight_width = 2
-        xpos = 2 * highlight_width + self.sizex // 100
-        xpos_remark = xpos + self.sizex // 10
-        xpos_sub = xpos + self.sizex // 10
+        xpos = 2 * highlight_width + self.VERYSMALL // 2
+        xpos_remark = xpos + self.VERYSMALL * 4
+        xpos_sub = xpos + self.VERYSMALL * 2
         topic_offset = 2 + self.sizey // 50
         subtopic_offset = self.sizey // 50
         remark_offset = self.sizey // 80
@@ -610,7 +610,7 @@ class GenericDisplay:
             if topic.get(task_key):
                 y += subtopic_offset
                 if toprint:
-                    self.draw.text((xpos_sub, y), topic[task_key], font=self.fonts[self.SMALL], fill=color if i < 3 else "black")
+                    self.draw.text((xpos_sub, y), topic[task_key], font=self.fonts[self.SMALL], fill=color)
                 if topic.get(check_key) and toprint:
                     self.right_text(y, topic[check_key], self.fonts[self.SMALL], offset=topic_right_offset)
                 y += self.SMALL
