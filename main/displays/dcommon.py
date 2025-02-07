@@ -658,7 +658,7 @@ class GenericDisplay:
 
         left = "PrevL" if current_index == 0 else "Prev"
         if last_list and current_index == len(checklist_items) - 1:  # last item
-            self.bottom_line("Prev", "Mode", "")
+            self.bottom_line("Prev", "Mode", "StartL")
         elif last_list:
             self.bottom_line(left, "Mode", "Check")
         else:
