@@ -542,7 +542,7 @@ class GenericDisplay:
 
         self.draw.text((side_offset, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
         right_val = f"{int(max_val)}{unit}"
-        self.right_text(y, right_val, self.fonts[self.VERYSMALL], offset=side_offset)
+        self.right_text(y, right_val, self.VERYSMALL, offset=side_offset)
 
         if 'outline' in color_table:
             self.draw.rounded_rectangle([bar_start - 2, y - 2, bar_end + 2, y + self.VERYSMALL + 2], radius=3,
@@ -595,7 +595,7 @@ class GenericDisplay:
             if topic.get('TASK'):
                 self.draw.text((xpos, ypos), topic['TASK'], font=self.fonts[self.SMALL], fill=color)
             if topic.get('CHECK'):
-                self.right_text(ypos, topic['CHECK'], self.fonts[self.SMALL], offset=topic_right_offset)
+                self.right_text(ypos, topic['CHECK'], self.SMALL, offset=topic_right_offset)
         y += self.SMALL
 
         if topic.get('REMARK'):
@@ -612,7 +612,7 @@ class GenericDisplay:
                 if toprint:
                     self.draw.text((xpos_sub, y), topic[task_key], font=self.fonts[self.SMALL], fill=color)
                 if topic.get(check_key) and toprint:
-                    self.right_text(y, topic[check_key], self.fonts[self.SMALL], offset=topic_right_offset)
+                    self.right_text(y, topic[check_key], self.SMALL, offset=topic_right_offset)
                 y += self.SMALL
 
         if highlighted and toprint:
