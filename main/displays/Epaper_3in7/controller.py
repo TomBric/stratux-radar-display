@@ -140,42 +140,42 @@ class Epaper3in7(dcommon.GenericDisplay):
 
 
     def situation(self, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
-        self.draw.ellipse((self.zerox-self.max_pixel/2, self.zeroy-self.max_pixel/2,
-                           self.zerox+self.max_pixel/2, self.zeroy+self.max_pixel/2), outline= self.TEXT_COLOR)
-        self.draw.ellipse((self.zerox-self.max_pixel/4, self.zeroy-self.max_pixel/4,
-                           self.zerox+self.max_pixel/4, self.zeroy+self.max_pixel/4), outline= self.TEXT_COLOR)
-        self.draw.ellipse((self.zerox-2, self.zeroy-2, self.zerox+2, self.zeroy+2), outline= self.TEXT_COLOR)
-        self.draw.text((5, 1), str(range)+" nm", font=self.fonts[self.SMALL], fill= self.TEXT_COLOR)
+              gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
+        self.draw.ellipse((self.zerox - self.max_pixel / 2, self.zeroy - self.max_pixel / 2,
+                           self.zerox + self.max_pixel / 2, self.zeroy + self.max_pixel / 2), outline=self.TEXT_COLOR)
+        self.draw.ellipse((self.zerox - self.max_pixel / 4, self.zeroy - self.max_pixel / 4,
+                           self.zerox + self.max_pixel / 4, self.zeroy + self.max_pixel / 4), outline=self.TEXT_COLOR)
+        self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
+        self.draw.text((5, 1), f"{range} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+
         if gps_quality == 0:
             t = "GPS-NoFix"
         elif gps_quality == 1:
-            t = "3D GPS\n" + str(round(gps_h_accuracy, 1)) + "m"
+            t = f"3D GPS\n{round(gps_h_accuracy, 1)}m"
         elif gps_quality == 2:
-            t = "DGNSS\n" + str(round(gps_h_accuracy, 1)) + "m"
+            t = f"DGNSS\n{round(gps_h_accuracy, 1)}m"
         else:
             t = ""
         if basemode:
             t += "\nGround\nmode"
-        self.draw.text((5, self.SMALL+10), t, font=self.fonts[self.VERYSMALL], fill= self.TEXT_COLOR)
+        self.draw.text((5, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
-        t = "FL"+str(round(ownalt / 100))
+        t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.sizex - textlength - 5, self.SMALL+10), t, font=self.fonts[self.SMALL], fill= self.TEXT_COLOR)
+        self.draw.text((self.sizex - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
-        t = str(altdifference) + " ft"
+        t = f"{altdifference} ft"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill= self.TEXT_COLOR, align="right")
+        self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
-        text = str(course) + '°'
-        self.centered_text(1, text, self.fonts[self.SMALL])
+        self.centered_text(1, f"{course}°", self.SMALL)
 
         if not gpsconnected:
-            self.centered_text(70, "No GPS", self.fonts[self.SMALL])
+            self.centered_text(70, "No GPS", self.SMALL)
         if not connected:
-            self.centered_text(30, "No Connection!", self.fonts[self.SMALL])
+            self.centered_text(30, "No Connection!", self.SMALL)
         if co_alarmlevel > 0:
-            self.centered_text(250, "CO Alarm: " + co_alarmstring, self.fonts[self.SMALL])
+            self.centered_text(250, f"CO Alarm: {co_alarmstring}", self.SMALL)
 
         if extsound or bt_devices > 0:
             if sound_active:
@@ -188,10 +188,10 @@ class Epaper3in7(dcommon.GenericDisplay):
                 t = "\uf1f6"  # bell off symbol
             textlength = self.draw.textlength(t, awesomefont)
             self.draw.text((self.sizex - textlength - 5, self.sizey - self.SMALL), t,
-                           font=self.awesomefont, fill= self.TEXT_COLOR)
+                           font=self.awesomefont, fill=self.TEXT_COLOR)
 
-        # optical keep alive bar at right side
-        self.draw.line((self.sizex-8, 80+optical_bar*10, self.sizex-8, 80+optical_bar*10+8), fill= self.TEXT_COLOR, width=5)
+        self.draw.line((self.sizex - 8, 80 + optical_bar * 10, self.sizex - 8, 80 + optical_bar * 10 + 8),
+                       fill=self.TEXT_COLOR, width=5)
 
     def gmeter(self, current, maxg, ming, error_message):
         gm_size = 280
@@ -230,7 +230,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.dashboard(self.sizey + 5, self.sizey // 2 , self.sizex - self.sizey - 2 * 5, lines, rounding=True)
 
         if error_message:
-            self.centered_text(60, error_message, self.verylargefont)
+            self.centered_text(60, error_message, self.VERYLARGE)
         self.bottom_line("", "    Mode", "Reset")
 
     def earthfill(self, pitch, roll, length, scale):   # possible function for derived classed to implement fillings for earth
@@ -243,7 +243,7 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         starty = 0
-        self.centered_text(0, f"Stratux {stat['version']}", self.fonts[self.SMALL])
+        self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
         starty += self.SMALL + 8
         colors = {'outline': 'black', 'black_white_offset': 5}
         bar_start, bar_end = 100, 420
@@ -292,24 +292,24 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):
         if alarmlevel == 0:
-            self.centered_text(0, "CO Warner: No CO alarm", self.fonts[self.LARGE])
+            self.centered_text(0, "CO Warner: No CO alarm", self.LARGE)
         else:
             alarmstr = f"CO: {alarmppm} ppm longer {alarmperiod // 60} min" \
                 if alarmperiod > 60 else f"CO: {alarmppm} ppm longer {alarmperiod} sec"
-            self.centered_text(0, alarmstr, self.fonts[self.LARGE])
+            self.centered_text(0, alarmstr, self.LARGE)
 
         self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, self.TEXT_COLOR, self.TEXT_COLOR, self.TEXT_COLOR, self.BG_COLOR, 3, 3, 5, 3)
         self.draw.text((320, 50 + self.SMALL - self.VERYSMALL), "Warnlevel:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.right_text(50, f"{alarmlevel:3d}", self.fonts[self.SMALL])
+        self.right_text(50, f"{alarmlevel:3d}", self.SMALL)
 
         if co_values:
             self.draw.text((320, 120 + self.SMALL - self.VERYSMALL), "CO act:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-            self.right_text(120, f"{co_values[-1]:3d}", self.fonts[self.SMALL])
+            self.right_text(120, f"{co_values[-1]:3d}", self.SMALL)
 
         self.draw.text((320, 140 + self.SMALL - self.VERYSMALL), "CO max:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.right_text(140, f"{co_max:3d}", self.fonts[self.SMALL])
+        self.right_text(140, f"{co_max:3d}", self.SMALL)
         self.draw.text((320, 196), "R0:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.right_text(196, f"{r0 / 1000:.1f}k", self.fonts[self.SMALL])
+        self.right_text(196, f"{r0 / 1000:.1f}k", self.SMALL)
 
         self.bottom_line("Calibrate", "Mode", "Reset")
 
@@ -317,7 +317,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                  own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                  ground_distance_valid, grounddistance, error_message):
         offset = 5
-        self.centered_text(0, "GPS Distance", self.fonts[self.SMALL])
+        self.centered_text(0, "GPS Distance", self.SMALL)
         lines = (
             ("Date", "{:0>2d}.{:0>2d}.{:0>4d}".format(now.day, now.month, now.year)),
             ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
@@ -375,12 +375,12 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.dashboard(self.zerox+offset, starty, self.zerox-2*offset, lines, headline="Baro", rounding=True)
 
         if error_message is not None:
-            self.centered_text(self.sizey//4, error_message, self.verylargefont)
+            self.centered_text(self.sizey//4, error_message, self.VERYLARGE)
         self.bottom_line("Stats/Set", "Mode", "Start")
 
 
     def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        centered_text(0, "Start-/Landing Statistics", self.fonts[self.SMALL])
+        centered_text(0, "Start-/Landing Statistics", self.SMALL)
 
         st = '---'
         if 'start_time' in values:
