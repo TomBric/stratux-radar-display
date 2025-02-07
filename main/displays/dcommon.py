@@ -763,44 +763,44 @@ class GenericDisplay:
 
         return y + topic_offset
 
-    def checklist(checklist_name, checklist_items, current_index, last_list):
-            checklist_y = {'from': self.SMALL + 8, 'to': self.sizey - self.VERYSMALL - 6}
-            global top_index
+    def checklist(self, checklist_name, checklist_items, current_index, last_list):
+        checklist_y = {'from': self.SMALL + 8, 'to': self.sizey - self.VERYSMALL - 6}
+        global top_index
 
-            self.centered_text(0, checklist_name, self.fonts[self.SMALL], color="black")
-            if current_index == 0:
-                top_index = 0  # new list, reset top index
-            if current_index < top_index:
-                top_index = current_index  # scroll up
+        self.centered_text(0, checklist_name, self.fonts[self.SMALL], color="black")
+        if current_index == 0:
+            top_index = 0  # new list, reset top index
+        if current_index < top_index:
+            top_index = current_index  # scroll up
 
-            while True:  # check what would fit on the screen
-                last_item = top_index
-                size = self.checklist_topic(checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
-                while last_item + 1 < len(checklist_items):
-                    last_item += 1
-                    size = self.checklist_topic(size, checklist_items[last_item], highlighted=False, toprint=False)
-                    if size > checklist_y['to']:  # last item did not fit
-                        last_item -= 1
-                        break
-
-                # last item now shows the last one that fits
-                if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
+        while True:  # check what would fit on the screen
+            last_item = top_index
+            size = self.checklist_topic(checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
+            while last_item + 1 < len(checklist_items):
+                last_item += 1
+                size = self.checklist_topic(size, checklist_items[last_item], highlighted=False, toprint=False)
+                if size > checklist_y['to']:  # last item did not fit
+                    last_item -= 1
                     break
-                else:  # next item would not fit
-                    top_index += 1  # need to scroll, but now test again what would fit
-                    if current_index == len(checklist_items) - 1:  # list is finished
-                        break
 
-            # now display everything
-            y = checklist_y['from']
-            for item in range(top_index, last_item + 1):
-                if item < len(checklist_items):
-                    y = self.checklist_topic(y, checklist_items[item], highlighted=(item == current_index), toprint=True)
+            # last item now shows the last one that fits
+            if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
+                break
+            else:  # next item would not fit
+                top_index += 1  # need to scroll, but now test again what would fit
+                if current_index == len(checklist_items) - 1:  # list is finished
+                    break
 
-            left = "PrevL" if current_index == 0 else "Prev"
-            if last_list and current_index == len(checklist_items) - 1:  # last item
-                self.bottom_line("Prev", "Mode", "")
-            elif last_list:
-                self.bottom_line(left, "Mode", "Check")
-            else:
-                self.bottom_line(left, "NxtList", "Check")
+        # now display everything
+        y = checklist_y['from']
+        for item in range(top_index, last_item + 1):
+            if item < len(checklist_items):
+                y = self.checklist_topic(y, checklist_items[item], highlighted=(item == current_index), toprint=True)
+
+        left = "PrevL" if current_index == 0 else "Prev"
+        if last_list and current_index == len(checklist_items) - 1:  # last item
+            self.bottom_line("Prev", "Mode", "")
+        elif last_list:
+            self.bottom_line(left, "Mode", "Check")
+        else:
+            self.bottom_line(left, "NxtList", "Check")
