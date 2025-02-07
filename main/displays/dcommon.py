@@ -722,9 +722,6 @@ class GenericDisplay:
         return starty
 
     def checklist_topic(self, ypos, topic, highlighted=False, toprint=True):
-        # highlighte: if True, the topic is highlighted
-        # toprint: if False, the topic is not printed, but the height is returned
-
         xpos = self.sizex // 100
         xpos_remark = self.sizex // 10
         xpos_sub = self.sizex // 10
@@ -735,31 +732,31 @@ class GenericDisplay:
 
         y = ypos
         if toprint:
-            if 'TASK' in topic and topic['TASK']:
-                draw.text((xpos, ypos), topic['TASK'], font=smallfont, fill=self.TEXT_COLOR)
-            if 'CHECK' in topic and topic['CHECK']:
-                right_text(ypos, topic['CHECK'], font=smallfont, offset=topic_right_offset)
+            if topic.get('TASK'):
+                self.draw.text((xpos, ypos), topic['TASK'], font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+            if topic.get('CHECK'):
+                self.right_text(ypos, topic['CHECK'], self.fonts[self.SMALL], offset=topic_right_offset)
         y += self.SMALL
 
-        if 'REMARK' in topic and topic['REMARK']:
+        if topic.get('REMARK'):
             y += remark_offset
             if toprint:
-                draw.text((xpos_remark, y), topic['REMARK'], font=verysmallfont, fill=self.TEXT_COLOR)
+                self.draw.text((xpos_remark, y), topic['REMARK'], font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
             y += self.VERYSMALL
 
         for i in range(1, 4):
             task_key = f'TASK{i}'
             check_key = f'CHECK{i}'
-            if task_key in topic and topic[task_key]:
+            if topic.get(task_key):
                 y += subtopic_offset
                 if toprint:
-                    draw.text((xpos_sub, y), topic[task_key], font=smallfont, fill=self.TEXT_COLOR if i < 3 else "black")
-                if check_key in topic and topic[check_key] and toprint:
-                    right_text(y, topic[check_key], font=smallfont, offset=topic_right_offset)
+                    self.draw.text((xpos_sub, y), topic[task_key], font=self.fonts[self.SMALL], fill=self.TEXT_COLOR if i < 3 else "black")
+                if topic.get(check_key) and toprint:
+                    self.right_text(y, topic[check_key], self.fonts[self.SMALL], offset=topic_right_offset)
                 y += self.SMALL
 
         if highlighted and toprint:
-            draw.rounded_rectangle([3, ypos - 4, self.sizex - 2, y + 6], width=3, radius=5, outline="black")
+            self.draw.rounded_rectangle([3, ypos - 4, self.sizex - 2, y + 6], width=3, radius=5, outline="black")
 
         return y + topic_offset
 
