@@ -385,9 +385,9 @@ class Epaper3in7(dcommon.GenericDisplay):
             lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
         lines = [
             ("ldg time", lt),
-            ("ldg alt [ft]", form_line(values, 'landing_altitude', "{:5.1f}")),
-            ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
-            ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
+            ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
+            ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
+            ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         ]
         starty = self.dashboard(250, 35, 225, lines, headline="Landing", rounding=True)
 
