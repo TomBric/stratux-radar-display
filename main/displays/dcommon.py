@@ -582,9 +582,9 @@ class GenericDisplay:
         color=color or self.TEXT_COLOR
 
         highlight_width = 2
-        xpos = 2*highlight_width + self.sizex // 100
-        xpos_remark = self.sizex // 10
-        xpos_sub = self.sizex // 10
+        xpos = 2 * highlight_width + self.sizex // 100
+        xpos_remark = xpos + self.sizex // 10
+        xpos_sub = xpos + self.sizex // 10
         topic_offset = 2 + self.sizey // 50
         subtopic_offset = self.sizey // 50
         remark_offset = self.sizey // 80
