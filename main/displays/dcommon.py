@@ -673,8 +673,8 @@ class GenericDisplay:
         message = messages.get(shutdownmode, "Reboot")
         y = self.VERYSMALL
         y = self.centered_text(y, message, self.LARGE) + self.VERYSMALL//2
-        y = self.centered_text(y, f"in {countdown} seconds!", self.LARGE) + self.VERYSMALL//2
-        y = self.centered_text(y , "Left  to cancel ...", self.SMALL)
+        y = self.centered_text(y, f"in {countdown} seconds!", self.LARGE) + self.VERYSMALL
+        y = self.centered_text(y , "Left  to cancel ...", self.SMALL) + self.VERYSMALL//2
         y = self.centered_text(y, "Middle  display only ...",  self.SMALL)+ self.VERYSMALL//2
         self.centered_text(y, "Right for reboot all ...", self.SMALL)
         self.bottom_line("Canc", "Displ", "Rebo")
