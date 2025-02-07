@@ -583,12 +583,12 @@ class GenericDisplay:
 
         highlight_width = 2
         xpos = 2 * highlight_width + self.VERYSMALL // 2
-        xpos_remark = xpos + self.VERYSMALL * 4
-        xpos_sub = xpos + self.VERYSMALL * 2
+        xpos_remark = xpos + self.VERYSMALL * 2
+        xpos_sub = xpos + self.VERYSMALL
         topic_offset = 2 + self.sizey // 50
         subtopic_offset = self.sizey // 50
         remark_offset = self.sizey // 80
-        topic_right_offset = self.sizex // 100
+        topic_right_offset = self.VERYSMALL // 2
 
         y = ypos
         if toprint:
