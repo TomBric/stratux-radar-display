@@ -151,12 +151,12 @@ class GenericDisplay:
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail,
                            font=self.fonts[self.VERYSMALL], fill=self.AIRCRAFT_COLOR)
 
-    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, angle_offset=0):
-        p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, angle_offset)
-        p2 = posn(direction + 150, 4 * self.AIRCRAFT_SIZE, angle_offset)
-        p3 = posn(direction + 180, 2 * self.AIRCRAFT_SIZE, angle_offset)
-        p4 = posn(direction + 210, 4 * self.AIRCRAFT_SIZE, angle_offset)
-        p5 = posn(direction, nspeed_length, angle_offset)  # line for speed
+    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail):
+        p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
+        p2 = posn(direction + 150, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
+        p3 = posn(direction + 180, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
+        p4 = posn(direction + 210, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
+        p5 = posn(direction, nspeed_length, self.ANGLE_OFFSET)  # line for speed
 
         self.draw.polygon(
             ((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
@@ -674,8 +674,8 @@ class GenericDisplay:
         y = self.VERYSMALL
         y = self.centered_text(y, message, self.LARGE) + self.VERYSMALL//2
         y = self.centered_text(y, f"in {countdown} seconds!", self.LARGE) + self.VERYSMALL
-        y = self.centered_text(y , "Left  to cancel ...", self.SMALL) + self.VERYSMALL//2
-        y = self.centered_text(y, "Middle  display only ...",  self.SMALL)+ self.VERYSMALL//2
+        y = self.centered_text(y , "Left to cancel ...", self.SMALL) + self.VERYSMALL//2
+        y = self.centered_text(y, "Middle display only ...",  self.SMALL)+ self.VERYSMALL//2
         self.centered_text(y, "Right for reboot all ...", self.SMALL)
         self.bottom_line("Canc", "Displ", "Rebo")
 
