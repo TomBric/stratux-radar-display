@@ -96,7 +96,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
     def display(self):
-        self.device.async_displayPart(self.device.getbuffer_optimized(epaper_image))
+        self.device.async_displayPart(self.device.getbuffer_optimized(self.epaper_image))
 
     def is_busy(self):
         return self.device.async_is_busy()
