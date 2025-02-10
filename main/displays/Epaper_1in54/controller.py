@@ -176,7 +176,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.right_text(102, f"{ming:+1.2f}", self.SMALL)
         self.bottom_line("", "", "Rst")
 
-    def vsi(vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
+    def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
         self.meter(vertical_speed / 100, -20, 20, 110, 430, self.sizey, self.sizey // 2,
                    self.sizey // 2, 5, 1, "Vertical Speed", "100 feet per min",
