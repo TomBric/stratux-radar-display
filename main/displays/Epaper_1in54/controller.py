@@ -174,7 +174,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.centered_text(57, error_message, self.LARGE)
         self.draw.text((self.zerox + 13, 102), "min", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.right_text(102, f"{ming:+1.2f}", self.SMALL)
-        self.bottom_line("", "", "Reset")
+        self.bottom_line("", "", "Rst")
 
     def vsi(vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
