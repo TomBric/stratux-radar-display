@@ -165,72 +165,16 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.draw.line((2, 150 + (optical_bar % 5) * 5, 2, 150 + (optical_bar % 5) * 5 + 6),
                        fill=self.TEXT_COLOR, width=4)
 
-    def meter(current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
-              marks_distance, small_marks_distance, middle_text1, middle_text2):
-        big_mark_length = 15
-        small_mark_length = 8
-        text_distance = 4
-        arrow_line_size = 8  # must be an even number
-        arrow = ((arrow_line_size / 2, 0), (-arrow_line_size / 2, 0), (-arrow_line_size / 2, -size / 2 + 50),
-                 (0, -size / 2 + 10), (arrow_line_size / 2, -size / 2 + 50), (arrow_line_size / 2, 0))
-        # points of arrow at angle 0 (pointing up) for line drawing
-
-        deg_per_value = (to_degree - from_degree) / (end_value - start_value)
-
-        draw.arc((center_x-size/2, center_y-size/2, center_x+size/2, center_y+size/2),
-                 from_degree-90, to_degree-90, width=4, fill="black")
-        # small marks first
-        line = ((0, -size/2+1), (0, -size/2+small_mark_length))
-        m = start_value
-        while m <= end_value:
-            angle = deg_per_value * (m-start_value) + from_degree
-            mark = translate(angle, line, (center_x, center_y))
-            draw.line(mark, fill="black", width=2)
-            m += small_marks_distance
-        # large marks
-        line = ((0, -size/2+1), (0, -size/2+big_mark_length))
-        m = start_value
-        while m <= end_value:
-            angle = deg_per_value*(m-start_value) + from_degree
-            mark = translate(angle, line, (center_x, center_y))
-            draw.line(mark, fill="black", width=3)
-            # text
-            marktext = str(m)
-            tl = draw.textlength(marktext, largefont)
-            t_center = translate(angle, ((0, -size/2 + big_mark_length + LARGE/2 + text_distance), ), (center_x, center_y))
-            draw.text((t_center[0][0]-tl/2, t_center[0][1]-LARGE/2), marktext, fill="black", font=largefont)
-            m += marks_distance
-        # arrow
-        if current > end_value:   # normalize values in allowed ranges
-            current = end_value
-        elif current < start_value:
-            current = start_value
-        angle = deg_per_value * (current - start_value) + from_degree
-        ar = translate(angle, arrow, (center_x, center_y))
-        draw.line(ar, fill="black", width=4)
-        # centerpoint
-        draw.ellipse((center_x - 10, center_y - 10, center_x + 10, center_y + 10), fill="black")
-
-        if middle_text1 is not None:
-            tl = draw.textlength(middle_text1, smallfont)
-            draw.text((center_x-tl/2, center_y-SMALL-20), middle_text1, font=smallfont, fill="black", align="left")
-        if middle_text2 is not None:
-            tl = draw.textlength(middle_text2, smallfont)
-            draw.text((center_x-tl/2, center_y+20), middle_text2, font=smallfont, fill="black", align="left")
-
-
-    def gmeter(current, maxg, ming, error_message):
-        gm_size = sizex
-        meter(current, -3, 5, 120, 420, gm_size, zerox, zeroy, 1, 0.25, "G-Force", None)
-
-        draw.text((zerox + 13, 80), "max", font=verysmallfont, fill="black")
-        right_text(80, "{:+1.2f}".format(maxg), smallfont, fill="black")
+    def gmeter(self, current, maxg, ming, error_message):
+        gm_size = self.sizex
+        self.meter(current, -3, 5, 120, 420, gm_size, self.zerox, self.zeroy, 1, 0.25, "G-Force", None)
+        self.draw.text((self.zerox + 13, 80), "max", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.right_text(80, f"{maxg:+1.2f}", self.fonts[self.SMALL])
         if error_message:
-            centered_text(57, error_message, largefont, fill="black")
-        draw.text((zerox + 13, 102), "min", font=verysmallfont, fill="black")
-        right_text(102, "{:+1.2f}".format(ming), smallfont, fill="black")
-
-        bottom_line("", "", "Reset")
+            self.centered_text(57, error_message, self.fonts[self.LARGE])
+        self.draw.text((self.zerox + 13, 102), "min", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.right_text(102, f"{ming:+1.2f}", self.SMALL)
+        self.bottom_line("", "", "Reset")
 
     def vsi(vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
