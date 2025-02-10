@@ -391,9 +391,9 @@ class GenericDisplay:
 
 
     def slip(self, slipskid, centerline_width):
-        slipsize_x = int(self.sizex/3)   # slip indicator takes 2/3 of x-axis
-        slipsize_y = int(self.sizey/24)  # height of indicator (in both directions), also height of ball
-        slipscale = int(slipsize_x/10)
+        slipsize_x = self.sizex//4   # slip indicator takes 1/2 of x-axis
+        slipsize_y = self.sizey//24  # height of indicator (in both directions), also height of ball
+        slipscale = slipsize_x//10
         slipskid = max(min(slipskid, 10), -10)
         # position slip at the bottom for 2/3 of x
         self.draw.rectangle((self.ah_zerox - slipsize_x, self.sizey-1 - slipsize_y*2,
@@ -418,12 +418,12 @@ class GenericDisplay:
     def ahrs(self, pitch, roll, heading, slipskid, error_message):
         # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
         max_length = math.ceil(math.hypot(self.sizex, self.sizey))  # maximum line length for diagonal line
-        line_width = max(1, int(self.sizey/60))  # the width of all lines (horizon, posmarks, rollmarks)
-        pitchmark_length = int(self.sizey/6)
+        line_width = max(1, self.sizey//60)  # the width of all lines (horizon, posmarks, rollmarks)
+        pitchmark_length = self.sizey//6
         pitchscale = self.sizey / 6 / 10  # scaling factor for pitchmarks, so that +-20 is displayed
-        rollmark_length = int(self.sizex/16)
-        center_pointer_x = int(self.sizex/8)
-        center_pointer_y = int(self.sizey/16)
+        rollmark_length = self.sizex//10
+        center_pointer_x = self.sizex//8
+        center_pointer_y = self.sizey//16
         # this is the scaling factor for all drawings, 6 means: space for 6 pitch lines from -20, -10, 0, 10, 20
 
         h1, h2 = self.linepoints(pitch, roll, 0, max_length, pitchscale)  # horizon points
@@ -440,17 +440,19 @@ class GenericDisplay:
                            width=line_width)
 
         # pointer in the middle
-        self.draw.line((self.ah_zerox - 90, self.ah_zeroy, self.ah_zerox - 30, self.ah_zeroy), width=6, fill="black")
-        self.draw.line((self.ah_zerox + 90, self.ah_zeroy, self.ah_zerox + 30, self.ah_zeroy), width=6, fill="black")
+        self.draw.line((self.ah_zerox - 90, self.ah_zeroy, self.ah_zerox - 30, self.ah_zeroy),
+                       width=6, fill=self.TEXT_COLOR)
+        self.draw.line((self.ah_zerox + 90, self.ah_zeroy, self.ah_zerox + 30, self.ah_zeroy),
+                       width=6, fill=self.TEXT_COLOR)
         self.draw.polygon((self.ah_zerox, self.ah_zeroy,
                            self.ah_zerox - center_pointer_x, self.ah_zeroy + center_pointer_y,
-                           self.ah_zerox + center_pointer_x, self.ah_zeroy + center_pointer_y), fill="black")
+                           self.ah_zerox + center_pointer_x, self.ah_zeroy + center_pointer_y),
+                          fill=self.AHRS_MARKS_COLOR)
 
         # roll indicator
         self.rollmarks(roll, line_width, rollmark_length)
         # slip indicator
         self.slip(slipskid, line_width)
-
         # infotext = "P:" + str(pitch) + " R:" + str(roll)
         if error_message:
             self.centered_text( int(self.sizey/4), error_message, self.SMALL)
