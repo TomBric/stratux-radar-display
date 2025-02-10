@@ -199,7 +199,7 @@ class GenericDisplay:
         return new_arcposition
 
     def clear(self):
-        self.draw.rectangle((0, 0, self.sizex - 1, self.sizey - 1), fill="BG_COLOR")  # clear everything in imagepass
+        self.draw.rectangle((0, 0, self.sizex - 1, self.sizey - 1), fill=self.BG_COLOR)  # clear everything in imagepass
 
     def cleanup(self):
         pass
