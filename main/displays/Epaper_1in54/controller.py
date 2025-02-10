@@ -178,19 +178,16 @@ class Epaper1in54(dcommon.GenericDisplay):
 
     def vsi(vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
-        meter(vertical_speed/100, -20, 20, 110, 430, sizey, sizey/2, sizey/2, 5, 1, None, None)
-        draw.text((15, sizey/2 - VERYSMALL - 10), "up", font=verysmallfont, fill="black", align="left")
-        draw.text((15, sizey/2 + 10), "dn", font=verysmallfont, fill="black", align="left")
-        middle_text = "Vert Spd"
-        tl = draw.textlength(middle_text, verysmallfont)
-        draw.text((sizey/2 - tl/2, sizey/2 - VERYSMALL - 10), middle_text, font=verysmallfont, fill="black", align="left")
-        middle_text = "100 ft/min"
-        tl = draw.textlength(middle_text, verysmallfont)
-        draw.text((sizey/2 - tl / 2, sizey/2 + 10), middle_text, font=verysmallfont, fill="black", align="left")
-
-        if error_message is not None:
-            centered_text(40, error_message, verylargefont, fill="black")
-
+        self.meter(vertical_speed / 100, -20, 20, 110, 430, self.sizey, self.sizey // 2,
+                   self.sizey // 2, 5, 1, "Vertical Speed", "100 feet per min",
+                   middle_fontsize=self.VERYSMALL)
+        self.draw.text((15, self.sizey // 2 - self.VERYSMALL - 10), "up", font=self.fonts[self.VERYSMALL],
+                       fill=self.TEXT_COLOR, align="left")
+        self.draw.text((15, self.sizey // 2 + 10), "dn", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR,
+                       align="left"
+        if error_message:
+            self.centered_text(40, error_message, self.VERYLARGE)
+        self.bottom_line("", "Mode", "Rst")
 
     def shutdown(countdown, shutdownmode):
         message = ""
