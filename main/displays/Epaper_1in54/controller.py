@@ -67,7 +67,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     def init(self, fullcircle=False):
         self.device = epd1in54_V2.EPD()
         self.device.init(0)
-        self.device.Clear(0xFF, 0)  # necessary to overwrite everything
+        self.device.Clear(0xFF)  # necessary to overwrite everything
         self.epaper_image = Image.new('1', (self.device.height, self.device.width), 0xFF)
         self.draw = ImageDraw.Draw(self.epaper_image)
         self.device.init(1)
