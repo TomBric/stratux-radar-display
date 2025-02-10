@@ -82,7 +82,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         # measure time for refresh
         start = time.time()
         # do sync version of display to measure time
-        self.device.display_1Gray(self.device.getbuffer_optimized(self.epaper_image))
+        self.device.displayPart_mod(device.getbuffer_optimized(epaper_image))
         end = time.time()
         self.display_refresh = end - start
         # compass preparation
@@ -96,7 +96,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
     def display(self):
-        self.device.async_display_1Gray(self.device.getbuffer_optimized(self.epaper_image))
+        self.device.async_displayPart(device.getbuffer_optimized(epaper_image))
 
     def is_busy(self):
         return self.device.async_is_busy()
@@ -106,11 +106,10 @@ class Epaper1in54(dcommon.GenericDisplay):
         return dcommon.GenericDisplay().next_arcposition(old_arcposition,
             exclude_from=Epaper1in54().ARCPOSITION_EXCLUDE_FROM, exclude_to=Epaper1in54().ARCPOSITION_EXCLUDE_TO)
 
-    def cleanup(self):
-        self.device.init(0)
-        self.device.Clear(0xFF)
-        self.device.sleep()
-        self.device.Dev_exit()
+    def cleanup():
+        device.init(0)
+        device.Clear(0xFF)
+        device.sleep_nowait()
 
     def refresh(self):
         self.device.Clear(0xFF)  # necessary to overwrite everything
