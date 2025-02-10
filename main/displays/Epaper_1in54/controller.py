@@ -179,7 +179,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
         self.meter(vertical_speed / 100, -20, 20, 110, 430, self.sizey, self.sizey // 2,
-                   self.sizey // 2, 5, 1, "Vertical Speed", "100 feet per min",
+                   self.sizey // 2, 5, 1, "Vert Spd", "100 ftm/min",
                    middle_fontsize=self.VERYSMALL)
         self.draw.text((15, self.sizey // 2 - self.VERYSMALL - 10), "up", font=self.fonts[self.VERYSMALL],
                        fill=self.TEXT_COLOR, align="left")
@@ -187,7 +187,7 @@ class Epaper1in54(dcommon.GenericDisplay):
                        align="left")
         if error_message:
             self.centered_text(40, error_message, self.VERYLARGE)
-        self.bottom_line("", "Mode", "Rst")
+        self.bottom_line("", "", "Rst")
 
     def shutdown(countdown, shutdownmode):
         message = ""
