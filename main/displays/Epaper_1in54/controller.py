@@ -184,7 +184,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.draw.text((15, self.sizey // 2 - self.VERYSMALL - 10), "up", font=self.fonts[self.VERYSMALL],
                        fill=self.TEXT_COLOR, align="left")
         self.draw.text((15, self.sizey // 2 + 10), "dn", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR,
-                       align="left"
+                       align="left")
         if error_message:
             self.centered_text(40, error_message, self.VERYLARGE)
         self.bottom_line("", "Mode", "Rst")
