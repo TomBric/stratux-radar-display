@@ -122,9 +122,6 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.device.Clear(0xFF, 0)  # necessary to overwrite everything
         self.device.init(1)
 
-    def clear(self):
-        self.draw.rectangle((0, 0, self.sizex - 1, self.sizey - 1), fill="white")  # clear everything in image
-
     def startup(self, version, target_ip, seconds):
         logopath = Path(__file__).resolve().parent / 'stratux-logo-192x192.bmp'
         logo = Image.open(logopath)
