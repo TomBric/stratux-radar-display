@@ -187,7 +187,7 @@ class Epaper1in54(dcommon.GenericDisplay):
                        align="left")
         if error_message:
             self.centered_text(40, error_message, self.VERYLARGE)
-        self.bottom_line("", "", "Rst")
+        self.bottom_line("", "", "")
 
     def shutdown(countdown, shutdownmode):
         message = ""
