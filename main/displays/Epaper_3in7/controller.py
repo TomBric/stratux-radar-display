@@ -134,10 +134,10 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def situation(self, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
               gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
-        self.draw.ellipse((self.zerox - self.max_pixel / 2, self.zeroy - self.max_pixel / 2,
-                           self.zerox + self.max_pixel / 2, self.zeroy + self.max_pixel / 2), outline=self.TEXT_COLOR)
-        self.draw.ellipse((self.zerox - self.max_pixel / 4, self.zeroy - self.max_pixel / 4,
-                           self.zerox + self.max_pixel / 4, self.zeroy + self.max_pixel / 4), outline=self.TEXT_COLOR)
+        self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
+                           self.zerox + self.max_pixel // 2, self.zeroy + self.max_pixel // 2), outline=self.TEXT_COLOR)
+        self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
+                           self.zerox + self.max_pixel // 4, self.zeroy + self.max_pixel // 4), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
         self.draw.text((5, 1), f"{range} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 

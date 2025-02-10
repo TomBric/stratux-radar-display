@@ -106,10 +106,10 @@ class Epaper1in54(dcommon.GenericDisplay):
         return dcommon.GenericDisplay().next_arcposition(old_arcposition,
             exclude_from=Epaper1in54().ARCPOSITION_EXCLUDE_FROM, exclude_to=Epaper1in54().ARCPOSITION_EXCLUDE_TO)
 
-    def cleanup():
-        device.init(0)
-        device.Clear(0xFF)
-        device.sleep_nowait()
+    def cleanup(self):
+        self.device.init(0)
+        self.device.Clear(0xFF)
+        self.device.sleep_nowait()
 
     def refresh(self):
         self.device.Clear(0xFF)  # necessary to overwrite everything
@@ -125,110 +125,45 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.display()
         time.sleep(seconds)
 
-
-    def aircraft(x, y, direction, height, vspeed, nspeed_length, tail):
-        p1 = posn(direction, 2 * AIRCRAFT_SIZE)
-        p2 = posn(direction + 150, 4 * AIRCRAFT_SIZE)
-        p3 = posn(direction + 180, 2 * AIRCRAFT_SIZE)
-        p4 = posn(direction + 210, 4 * AIRCRAFT_SIZE)
-        p5 = posn(direction, nspeed_length)  # line for speed
-
-        draw.polygon(((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
-                     fill="black", outline="black")
-        draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill="black", width=3)
-        if height >= 0:
-            t = "+" + str(abs(height))
-        else:
-            t = "-" + str(abs(height))
-        if vspeed > 0:
-            t = t + '\u2197'
-        if vspeed < 0:
-            t = t + '\u2198'
-        tl = draw.textlength(t, verylargefont)
-        if tl + x + 4 * AIRCRAFT_SIZE - 2 > sizex:
-            # would draw text outside, move to the left
-            tposition = (x - 4 * AIRCRAFT_SIZE - tl, int(y - VERYLARGE / 2))
-        else:
-            tposition = (x + 4 * AIRCRAFT_SIZE + 1, int(y - VERYLARGE / 2))
-        # draw.rectangle((tposition, (tposition[0] + tl, tposition[1] + LARGE)), fill="white")
-        draw.text(tposition, t, font=verylargefont, fill="black")
-        if tail is not None:
-            draw.text((tposition[0], tposition[1] + VERYLARGE), tail, font=verysmallfont, fill="black")
-
-
-    def modesaircraft(radius, height, arcposition, vspeed, tail):
-        if radius < MINIMAL_CIRCLE:
-            radius = MINIMAL_CIRCLE
-        draw.ellipse((zerox-radius, zeroy-radius, zerox+radius, zeroy+radius), width=3, outline="black")
-        arctext = posn(arcposition, radius)
-        if height > 0:
-            signchar = "+"
-        else:
-            signchar = "-"
-        t = signchar+str(abs(height))
-        if vspeed > 0:
-            t = t + '\u2197'
-        if vspeed < 0:
-            t = t + '\u2198'
-        tl = draw.textlength(t, verylargefont)
-        tposition = (zerox+arctext[0]-tl/2, zeroy+arctext[1]-VERYLARGE/2)
-        draw.rectangle((tposition, (tposition[0]+tl, tposition[1]+VERYLARGE)), fill="white")
-        draw.text(tposition, t, font=verylargefont, fill="black")
-        if tail is not None:
-            tl = draw.textlength(tail, verysmallfont)
-            draw.rectangle((tposition[0], tposition[1] + VERYLARGE, tposition[0] + tl,
-                            tposition[1] + VERYLARGE + VERYSMALL), fill="white")
-            draw.text((tposition[0], tposition[1] + VERYLARGE), tail, font=verysmallfont, fill="black")
-
-
-    def situation(connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
+    def situation(self, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
                   gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
-        draw.ellipse((zerox-max_pixel/2, zeroy-max_pixel/2, zerox+max_pixel/2-2, zeroy+max_pixel/2-2), outline="black")
-        draw.ellipse((zerox-max_pixel/4, zeroy-max_pixel/4, zerox+max_pixel/4-1, zeroy+max_pixel/4-1), outline="black")
-        draw.ellipse((zerox-2, zeroy-2, zerox+2, zeroy+2), outline="black")
+        self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
+                           self.zerox + self.max_pixel // 2, self.zeroy + self.max_pixel // 2), outline=self.TEXT_COLOR)
+        self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
+                           self.zerox + self.max_pixel // 4, self.zeroy + self.max_pixel // 4), outline=self.TEXT_COLOR)
+        self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
+        self.draw.text((0, 0), f"{range}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((0, self.SMALL), "nm", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((0, self.sizey - self.SMALL), f"FL{round(ownalt / 100)}", font=self.font[self.SMALL], fill="black")
 
-        draw.text((0, 0), str(range), font=smallfont, fill="black")
-        draw.text((0, SMALL), "nm", font=verysmallfont, fill="black")
-
-        draw.text((0, sizey - SMALL), "FL" + str(round(ownalt / 100)), font=smallfont, fill="black")
-
-        if altdifference >= 10000:
-            t = str(int(altdifference / 1000)) + "k"
-        else:
-            t = str(altdifference)
-        tl = draw.textlength(t, smallfont)
-        draw.text((sizex - tl, 0), t, font=smallfont, fill="black", align="right")
+        t = f"{altdifference // 1000}k" if altdifference >= 10000 else f"{altdifference}"
+        tl = self.draw.textlength(t, self.fonts[self.SMALL])
+        self.draw.text((self.sizex - tl, 0), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
         text = "ft"
-        tl = draw.textlength(text, verysmallfont)
-        draw.text((sizex - tl, SMALL), text, font=verysmallfont, fill="black", align="right")
+        tl = self.draw.textlength(text, self.fonts[self.VERYSMALL])
+        self.draw.text((self.sizex - tl, self.SMALL), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR,
+                       align="right")
 
-        text = str(course) + '°'
-        tl = draw.textlength(text, smallfont)
-        draw.text((sizex - tl, sizey - SMALL), text, font=smallfont, fill="black", align="right")
+        text = f"{course}°"
+        tl = self.draw.textlength(text, self.fonts[self.SMALL])
+        self.draw.text((self.sizex - tl, self.sizey - self.SMALL), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
         if not gpsconnected:
-            centered_text(15, "No GPS", smallfont, fill="black")
+            centered_text(15, "No GPS", self.SMALL)
         if not connected:
-            centered_text(75, "No connection!", smallfont, fill="black")
+            centered_text(75, "No connection!", self.SMALL)
         if co_alarmlevel > 0:
-            centered_text(sizey - 3 * SMALL, "CO Alarm!", smallfont, fill="black")
-            centered_text(sizey - 2 * SMALL, co_alarmstring, smallfont, fill="black")
+            centered_text(self.sizey - 3 * self.SMALL, "CO Alarm!", self.SMALL)
+            centered_text(self.sizey - 2 * self.SMALL, co_alarmstring, self.SMALL)
 
         if extsound or bt_devices > 0:
-            if sound_active:
-                t = ""
-                if extsound:
-                    t += "\uf028"  # volume symbol
-                if bt_devices > 0:
-                    t += "\uf293"  # bluetooth symbol
-            else:
-                t = "\uf1f6"  # bell off symbol
-            tl = draw.textlength(t, awesomefont)
-            draw.text((sizex - tl, sizey - 2 * SMALL), t, font=awesomefont, fill="black")
+            t = "\uf028" * extsound + "\uf293" * (bt_devices > 0) if sound_active else "\uf1f6"
+            tl = self.draw.textlength(t, self.AWESOME_FONTSIZE)
+            self.draw.text((self.sizex - tl, self.sizey - 2 * self.SMALL), t, font=self.awesomefont,
+                           fill=self.TEXT_COLOR)
 
-        # optical keep alive bar at right side, for the small display only 5 bars
-        draw.line((2, 150+(optical_bar % 5)*5, 2, 150+(optical_bar % 5)*5+6), fill="black", width=4)
-
+        self.draw.line((2, 150 + (optical_bar % 5) * 5, 2, 150 + (optical_bar % 5) * 5 + 6),
+                       fill=self.TEXT_COLOR, width=4)
 
     def meter(current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
               marks_distance, small_marks_distance, middle_text1, middle_text2):
