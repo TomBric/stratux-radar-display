@@ -842,4 +842,4 @@ class Epaper1in54(dcommon.GenericDisplay):
 
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
-radar_display = Epaper3in7()
+radar_display = Epaper1in54()
