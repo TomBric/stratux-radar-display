@@ -82,7 +82,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         # measure time for refresh
         start = time.time()
         # do sync version of display to measure time
-        self.device.displayPart_mod(self.device.getbuffer_optimized(epaper_image))
+        self.device.displayPart_mod(self.device.getbuffer_optimized(self.epaper_image))
         end = time.time()
         self.display_refresh = end - start
         # compass preparation
