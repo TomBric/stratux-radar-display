@@ -169,9 +169,9 @@ class Epaper1in54(dcommon.GenericDisplay):
         gm_size = self.sizex
         self.meter(current, -3, 5, 120, 420, gm_size, self.zerox, self.zeroy, 1, 0.25, "G-Force", None)
         self.draw.text((self.zerox + 13, 80), "max", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.right_text(80, f"{maxg:+1.2f}", self.fonts[self.SMALL])
+        self.right_text(80, f"{maxg:+1.2f}", self.SMALL)
         if error_message:
-            self.centered_text(57, error_message, self.fonts[self.LARGE])
+            self.centered_text(57, error_message, self.LARGE)
         self.draw.text((self.zerox + 13, 102), "min", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.right_text(102, f"{ming:+1.2f}", self.SMALL)
         self.bottom_line("", "", "Reset")
