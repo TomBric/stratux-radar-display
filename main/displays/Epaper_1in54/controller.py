@@ -134,7 +134,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
         self.draw.text((0, 0), f"{range}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.draw.text((0, self.SMALL), "nm", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((0, self.sizey - self.SMALL), f"FL{round(ownalt / 100)}", font=self.font[self.SMALL], fill="black")
+        self.draw.text((0, self.sizey - self.SMALL), f"FL{round(ownalt / 100)}", font=self.fonts[self.SMALL], fill="black")
 
         t = f"{altdifference // 1000}k" if altdifference >= 10000 else f"{altdifference}"
         tl = self.draw.textlength(t, self.fonts[self.SMALL])
