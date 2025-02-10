@@ -71,7 +71,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.epaper_image = Image.new('1', (self.device.height, self.device.width), 0xFF)
         self.draw = ImageDraw.Draw(self.epaper_image)
         self.device.init(1)
-        self.device.Clear(0xFF, 1)
+        self.device.Clear(0xFF)
         self.sizex = self.device.height
         self.sizey = self.device.width
         self.zerox = self.sizex / 2
@@ -108,7 +108,7 @@ class Epaper1in54(dcommon.GenericDisplay):
 
     def cleanup(self):
         self.device.init(0)
-        self.device.Clear(0xFF, 0)
+        self.device.Clear(0xFF)
         self.device.sleep()
         self.device.Dev_exit()
 
