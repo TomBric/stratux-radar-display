@@ -3,6 +3,8 @@
 {% block content %}
 <style> .no-label { label{ display: None; } } </style>
 <form method="post">
+{{ api_form.csrf_token }}
+
     <h4>Stratux Radar-Display Pushbutton Interface</h4>
 <br>
 {{ render_form_row([api_form.left_short, api_form.middle_short, api_form.right_short],
