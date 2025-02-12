@@ -76,7 +76,7 @@ class ApiForm(FlaskForm):
     right_long = SubmitField('Right Long')
 
 # section for button api, only used when option "-api" is set
-@app.route('/api')
+@app.route('/api', methods=['GET', 'POST'])
 def api():
     global last_api_input
 
