@@ -55,6 +55,7 @@ GEAR_DOWN = 19
 
 # Flask server for button api
 app = Flask(__name__, template_folder='radar-web/templates')
+csrf = CSRFProtect(app)
 app.secret_key = 'radar-api'
 # Bootstrap configuration
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True      # use local instances of css etc.
@@ -62,7 +63,9 @@ app.config['BOOTSTRAP_USE_MINIFIED'] = True
 app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 app.config['BOOTSTRAP_BTN_SIZE'] = 'md'
 bootstrap = Bootstrap5(app)
-# no csrf protect to enable push api calls without web page
+csrf = CSRFProtect(app)
+csrf.exempt('/api') # no csrf protect to enable push api calls without web page
+
 button_api_active = False
 last_api_input = 0, 0
 
