@@ -68,13 +68,12 @@ last_api_input = 0, 0
 
 
 class ApiForm(FlaskForm):
-    left_short = SwitchField('Left Short', description=' ', default=False)
-    left_long = SwitchField('Left Long', description=' ', default=False)
-    middle_short = SwitchField('Middle Short', description=' ', default=False)
-    middle_long = SwitchField('Middle Long', description=' ', default=False)
-    right_short = SwitchField('Right Short', description=' ', default=False)
-    right_long = SwitchField('Right Long', description=' ', default=False)
-
+    left_short = SubmitField('Left Short')
+    left_long = SubmitField('Left Long')
+    middle_short = SubmitField('Middle Short')
+    middle_long = SubmitField('Middle Long')
+    right_short = SubmitField('Right Short')
+    right_long = SubmitField('Right Long')
 
 # section for button api, only used when option "-api" is set
 @app.route('/api')
