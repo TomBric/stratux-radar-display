@@ -64,7 +64,7 @@ app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 app.config['BOOTSTRAP_BTN_SIZE'] = 'md'
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
-csrf.exempt('/api') # no csrf protect to enable push api calls without web page
+
 
 button_api_active = False
 last_api_input = 0, 0
@@ -80,6 +80,7 @@ class ApiForm(FlaskForm):
 
 # section for button api, only used when option "-api" is set
 @app.route('/api', methods=['GET', 'POST'])
+@csrf.exempt
 def api():
     global last_api_input
 
