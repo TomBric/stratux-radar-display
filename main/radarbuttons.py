@@ -97,7 +97,7 @@ def api():
             last_api_input = 2, 2
         else:
             last_api_input = 0, 0
-    return render_template('api.html')
+    return render_template('api.html', api_form=api_form)
 
 
 def read_api_input():
