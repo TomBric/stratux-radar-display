@@ -80,11 +80,7 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        input = read_api_input()  # is api active and something not handled yet
-        if input[0] != 0:
-            btime, button = input
-        else:
-            return 0, False
+        return 0, False
     if button == 0:
         if btime == 2:    # left and long
             return 3, False  # start next mode shutdown!
