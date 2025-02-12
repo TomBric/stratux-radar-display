@@ -795,9 +795,10 @@ def main():
     global display_refresh_time
     global extsound_active
     global bluetooth_active
+    global button_api_active
 
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
-    if not radarui.init(url_settings_set):
+    if not radarui.init(url_settings_set, button_api_active):
         print("GPIO Error, is  another radar process running? Terminating.")
         return 1
     shutdownui.init(url_shutdown, url_reboot)
@@ -902,6 +903,7 @@ if __name__ == "__main__":
     groundbeep = args['groundbeep']
     gear_indication = args ['gearindicate']
     simulation_mode = args['simulation']
+    button_api_active = args['buttonapi']
     xml_checklist = args['checklist']
     sound_mixer = args['mixer']
     radarmodes.parse_modes(args['displaymodes'])

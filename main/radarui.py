@@ -35,6 +35,8 @@ import logging
 import requests
 import radarbuttons
 import radarmodes
+import threading   # for flask server in case of button api
+from flask import Flask, jsonify
 
 # status variables for state machine
 display_radius = (2, 3, 5, 10, 20, 40)
@@ -43,9 +45,34 @@ sound_on = True
 
 url_settings_set = ""
 rlog = None
+app = Flask(__name__, template_folder='radar-web/templates')
 
 
-def init(url):
+# section for button api, just used with option "-api"
+@app.route('/buttonapi/<param1>/<param2>', methods=['GET'])
+def get_items_with_params(param1, param2):
+    # Example logic using the parameters
+    result = {
+        "param1": param1,
+        "param2": param2,
+        "message": f"Received parameters: {param1} and {param2}"
+    }
+    return jsonify(result)
+
+@app.route('/api')
+def api_page():
+    return render_template('api_page.html')
+
+
+@app.route('/')
+def home():
+    return "Hello, Flask!"
+
+def run_flask():
+    app.run(debug=False, use_reloader=False)
+
+
+def init(url, button_api):
     global url_settings_set
     global rlog
 
@@ -54,6 +81,11 @@ def init(url):
     url_settings_set = url
     rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Radar UI: Initialized POST settings to " + url_settings_set)
+    if button_api: # start an api for the buttons
+        rlog.debug("Radar UI: Starting button API via flask")
+        # baue ein python programm, dass eine API anbietet, die die Buttons abfragt
+        flask_thread = threading.Thread(target=run_flask)
+        flask_thread.start()
     return True
 
 def communicate_limits(radarrange, threshold):

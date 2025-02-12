@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Interaction Page</title>
+    <script>
+        async function fetchData() {
+            const param1 = document.getElementById('param1').value;
+            const param2 = document.getElementById('param2').value;
+            const response = await fetch(`/buttonapi/${param1}/${param2}`);
+            const data = await response.json();
+            document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+        }
+    </script>
+</head>
+<body>
+    <h1>API Interaction Page</h1>
+    <label for="param1">Parameter 1:</label>
+    <input type="text" id="param1" name="param1">
+    <br>
+    <label for="param2">Parameter 2:</label>
+    <input type="text" id="param2" name="param2">
+    <br>
+    <button onclick="fetchData()">Fetch Data</button>
+    <pre id="result"></pre>
+</body>
+</html>

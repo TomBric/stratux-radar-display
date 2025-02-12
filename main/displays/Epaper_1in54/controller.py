@@ -196,41 +196,40 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill="black", width=1)
 
 
-
-
-
-
-    def stratux(stat, altitude, gps_alt, gps_quality):
+    def stratux(self, stat, altitude, gps_alt, gps_quality):
         starty = 0
-        centered_text(0, "Stratux " + stat['version'], smallfont, fill="black")
-        starty += SMALL + 4
-        starty = bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'], 0, 0)
+        self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
+        starty += self.SMALL + 4
+        colors = {'outline': 'black', 'black_white_offset': 5}
+        bar_start, bar_end = 50, 150
+        starty = self.bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'],
+                          bar_start, bar_end, colors, side_offset=5, line_offset=10)
         if stat['OGN_connected']:
-            starty = bar(starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'], 0, 0)
-            noise_text = str(round(stat['OGN_noise_db'], 1)) + " dB"
-            starty = bar(starty, "noise", stat['OGN_noise_db'], 25, 12, 18, unit="dB", minval=1, valtext=noise_text)
+            starty = self.bar(starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'],
+                              bar_start, bar_end, colors, side_offset=5, line_offset=10)
+            noise_text = f"{round(stat['OGN_noise_db'], 1)}@{round(stat['OGN_gain_db'], 1)}dB"
+            starty = self.bar(starty, "noise", stat['OGN_noise_db'], 25,
+                              bar_start, bar_end, colors, side_offset=5, unit="dB", minval=1, valtext=noise_text,
+                              line_offset=10)
         if stat['UATRadio_connected']:
-            starty = bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'], 0, 0)
-        if stat['CPUTemp'] > -300:    # -300 means no value available
-            starty = bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
+            starty = self.bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'],
+                              bar_start, bar_end, colors, side_offset=5, line_offset=10)
+        if stat['CPUTemp'] > -300:
+            starty = self.bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0),
+                              bar_start, bar_end, colors, side_offset=5, unit="°C", line_offset=10)
+        t = "3D GPS " if gps_quality == 1 else "DGNSS " if gps_quality == 2 else "GPS"
         # GPS
-        if gps_quality == 1:
-            t = "3D GPS "
-        elif gps_quality == 2:
-            t = "DGNSS "
-        else:
-            t = "GPS"
-        draw.text((0, starty), t, font=verysmallfont, fill="black")
+        self.draw.text((0, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        t = f"Sat: {stat['GPS_satellites_locked']}/{stat['GPS_satellites_seen']}/{stat['GPS_satellites_tracked']} "
+        self.draw.text((70, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        gps = f"{round(stat['GPS_position_accuracy'], 1)}m" if stat['GPS_position_accuracy'] < 19999 else "NoFix"
+        right_text(starty, gps, self.VERYSMALL)
+        starty += self.VERYSMALL+2
 
-        t = str(stat['GPS_satellites_locked']) + "/" + \
-            str(stat['GPS_satellites_seen']) + "/" + str(stat['GPS_satellites_tracked']) + " "
-        draw.text((70, starty), t, font=verysmallfont, fill="black")
-        if stat['GPS_position_accuracy'] < 19999:
-            gps = str(round(stat['GPS_position_accuracy'], 1)) + "m"
-        else:
-            gps = "NoFix"
-        right_text(starty, gps, verysmallfont, "black")
-        starty += VERYSMALL+2
+
+
+
+
 
         draw.text((0, starty), "P-Alt {0:.0f}ft".format(altitude), font=verysmallfont, fill="black")
         right_text(starty, "Corr {0:+}ft".format(stat['AltitudeOffset']), verysmallfont, "black")
