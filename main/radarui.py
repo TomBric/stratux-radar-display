@@ -60,8 +60,8 @@ def get_items_with_params(param1, param2):
     return jsonify(result)
 
 @app.route('/api')
-def api_page():
-    return render_template('api_page.html')
+def api():
+    return render_template('api.html')
 
 
 @app.route('/')
