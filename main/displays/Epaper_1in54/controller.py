@@ -149,12 +149,12 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.draw.text((self.sizex - tl, self.sizey - self.SMALL), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
         if not gpsconnected:
-            centered_text(15, "No GPS", self.SMALL)
+            self.centered_text(15, "No GPS", self.SMALL)
         if not connected:
-            centered_text(75, "No connection!", self.SMALL)
+            self.centered_text(75, "No connection!", self.SMALL)
         if co_alarmlevel > 0:
-            centered_text(self.sizey - 3 * self.SMALL, "CO Alarm!", self.SMALL)
-            centered_text(self.sizey - 2 * self.SMALL, co_alarmstring, self.SMALL)
+            self.centered_text(self.sizey - 3 * self.SMALL, "CO Alarm!", self.SMALL)
+            self.centered_text(self.sizey - 2 * self.SMALL, co_alarmstring, self.SMALL)
 
         if extsound or bt_devices > 0:
             t = "\uf028" * extsound + "\uf293" * (bt_devices > 0) if sound_active else "\uf1f6"
