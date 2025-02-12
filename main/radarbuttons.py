@@ -99,6 +99,7 @@ def api():
             last_api_input = 2, 2
         else:
             last_api_input = 0, 0
+    rlog.debug(f"API: last_api_input={last_api_input}")
     return render_template('api.html', api_form=api_form)
 
 
