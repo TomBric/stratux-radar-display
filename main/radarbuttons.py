@@ -36,7 +36,7 @@ from gpiozero import Button
 from gpiozero.exc import GPIOZeroError, GPIODeviceError
 import threading   # for flask server in case of button api
 from flask import Flask, jsonify, render_template
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, CSRFProtect
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
