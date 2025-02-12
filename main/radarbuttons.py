@@ -55,6 +55,7 @@ GEAR_DOWN = 19
 
 # Flask server for button api
 app = Flask(__name__, template_folder='radar-web/templates')
+app.secret_key = 'radar-api'
 # Bootstrap configuration
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True      # use local instances of css etc.
 app.config['BOOTSTRAP_USE_MINIFIED'] = True
