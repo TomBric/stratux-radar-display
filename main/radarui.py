@@ -37,55 +37,29 @@ import radarbuttons
 import radarmodes
 import threading   # for flask server in case of button api
 from flask import Flask, jsonify, render_template
+from flask_wtf import FlaskForm, CSRFProtect
+from wtforms.fields import *
+from flask_bootstrap import Bootstrap5, SwitchField
 
 # status variables for state machine
 display_radius = (2, 3, 5, 10, 20, 40)
 height_diff = (1000, 2000, 5000, 10000, 50000)
 sound_on = True
+button_api_active = False
 
 url_settings_set = ""
 rlog = None
-app = Flask(__name__, template_folder='radar-web/templates')
-
-
-# section for button api, just used with option "-api"
-@app.route('/buttonapi/<param1>/<param2>', methods=['GET'])
-def get_items_with_params(param1, param2):
-    # Example logic using the parameters
-    result = {
-        "param1": param1,
-        "param2": param2,
-        "message": f"Received parameters: {param1} and {param2}"
-    }
-    return jsonify(result)
-
-@app.route('/api')
-def api():
-    return render_template('api.html')
-
-
-@app.route('/')
-def home():
-    return "Hello, Flask!"
-
-def run_flask():
-    app.run(debug=False, use_reloader=False)
 
 
 def init(url, button_api):
     global url_settings_set
     global rlog
 
-    if not radarbuttons.init():   # error occured, e.g. gpio pins are buse
+    if not radarbuttons.init(button_api):   # error occured, e.g. gpio pins are buse
         return False
     url_settings_set = url
     rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Radar UI: Initialized POST settings to " + url_settings_set)
-    if button_api: # start an api for the buttons
-        rlog.debug("Radar UI: Starting button API via flask")
-        # baue ein python programm, dass eine API anbietet, die die Buttons abfragt
-        flask_thread = threading.Thread(target=run_flask)
-        flask_thread.start()
     return True
 
 def communicate_limits(radarrange, threshold):
@@ -106,7 +80,11 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        return 0, False
+        input = read_api_input()  # is api active and something not handled yet
+        if input[0] != 0:
+            btime, button = input
+        else:
+            return 0, False
     if button == 0:
         if btime == 2:    # left and long
             return 3, False  # start next mode shutdown!
