@@ -36,7 +36,7 @@ import requests
 import radarbuttons
 import radarmodes
 import threading   # for flask server in case of button api
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 # status variables for state machine
 display_radius = (2, 3, 5, 10, 20, 40)
