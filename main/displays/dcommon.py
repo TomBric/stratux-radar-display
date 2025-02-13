@@ -317,7 +317,7 @@ class GenericDisplay:
             self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
                               fill="white", width=line_width)
             bw, bh = self.compass_aircraft.size
-            self.draw.bitmap((self.zerox - bw // 2, self.zeroy - bh //2), self.compass_aircraft, fill=self.TEXT_COLOR)
+            self.draw.bitmap((czerox - bw // 2, czeroy - bh //2), self.compass_aircraft, fill=self.TEXT_COLOR)
             self.draw.line((czerox - line_width//2, self.CM_SIZE, czerox - line_width//2 , czeroy - bh//2),
                            fill=self.TEXT_COLOR, width=line_width)
 
