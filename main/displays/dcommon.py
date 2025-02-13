@@ -316,7 +316,8 @@ class GenericDisplay:
 
             self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
                               fill="white", width=line_width)
-            self.draw.bitmap((self.zerox - 60, 70), self.compass_aircraft, fill=self.TEXT_COLOR)
+            bw, bh = self.compass_aircraft.size
+            self.draw.bitmap((self.zerox - bw // 2, self.zeroy - bh //2), self.compass_aircraft, fill=self.TEXT_COLOR)
             self.draw.line((czerox, 20, czerox, 70), fill=self.TEXT_COLOR, width=line_width)
 
             text = f"{heading}°"
