@@ -3,17 +3,15 @@
 {% block content %}
 <style> .no-label { label{ display: None; } } </style>
 <form method="post">
-
-
     <h4>Stratux Radar-Display Pushbutton Interface</h4>
 <br>
 <div class="form-control form-control-sm">
 {{ render_form_row([api_form.left_short, api_form.middle_short, api_form.right_short],
-    col_map={'left_short': 'col-md-1', 'middle_short': 'col-md-1', 'right_short': 'col-md-1'},
-    button_map={'left_short': 'success', 'middle_short': 'success', 'right_short': 'success'}) }}
+    button_map={'left_short': 'success', 'middle_short': 'success', 'right_short': 'success'},
+    col_map={'left_short': 'col-md-1', 'middle_short': 'col-md-1', 'right_short': 'col-md-1'}) }}
 {{ render_form_row([api_form.left_long, api_form.middle_long, api_form.right_long],
-    col_map={'left_long': 'col-md-1', 'middle_long': 'col-md-1', 'right_long': 'col-md-1'},
-    button_map={'left_long': 'primary', 'middle_long: 'primary', 'right_long': 'primary'}) }}
+    button_map={'left_long': 'primary', 'middle_long': 'primary', 'right_long': 'primary'},
+    col_map={'left_long': 'col-md-1', 'middle_long': 'col-md-1', 'right_long': 'col-md-1'}) }}
 </div>
 </form>
 
