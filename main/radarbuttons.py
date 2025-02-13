@@ -71,12 +71,12 @@ last_api_input = 0, 0
 
 
 class ApiForm(FlaskForm):
-    left_short = SubmitField('Left Short')
-    left_long = SubmitField('Left Long')
-    middle_short = SubmitField('Middle Short')
-    middle_long = SubmitField('Middle Long')
-    right_short = SubmitField('Right Short')
-    right_long = SubmitField('Right Long')
+    left_short =   SubmitField('  Left Short ')
+    left_long =    SubmitField('  Left Long  ')
+    middle_short = SubmitField(' Middle Short')
+    middle_long =  SubmitField(' Middle Long ')
+    right_short =  SubmitField(' Right Short ')
+    right_long =   SubmitField(' Right Long  ')
 
 # section for button api, only used when option "-api" is set
 @app.route('/api', methods=['GET', 'POST'])
@@ -167,6 +167,7 @@ def init(button_api):
         button_api_active = True
         rlog.debug("Radarbuttons UI: Starting button API via flask")
         flask_thread = threading.Thread(target=run_flask)
+        thread.daemon = True # to stop the thread when the main program stops
         flask_thread.start()
     return True    # indicate everything is fine
 
