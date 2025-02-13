@@ -167,7 +167,7 @@ def init(button_api):
         button_api_active = True
         rlog.debug("Radarbuttons UI: Starting button API via flask")
         flask_thread = threading.Thread(target=run_flask)
-        thread.daemon = True # to stop the thread when the main program stops
+        flask_thread.daemon = True # to stop the thread when the main program stops
         flask_thread.start()
     return True    # indicate everything is fine
 
