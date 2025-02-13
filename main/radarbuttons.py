@@ -80,7 +80,6 @@ class ApiForm(FlaskForm):
 
 # section for button api, only used when option "-api" is set
 @app.route('/api', methods=['GET', 'POST'])
-@csrf.exempt
 def api():
     global last_api_input
 
