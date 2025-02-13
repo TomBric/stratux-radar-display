@@ -318,12 +318,10 @@ class GenericDisplay:
                               fill="white", width=line_width)
             bw, bh = self.compass_aircraft.size
             self.draw.bitmap((self.zerox - bw // 2, self.zeroy - bh //2), self.compass_aircraft, fill=self.TEXT_COLOR)
-            self.draw.line((czerox, 20, czerox, 70), fill=self.TEXT_COLOR, width=line_width)
+            self.draw.line((czerox - line_width//2, self.CM_SIZE, czerox - line_width//2 , czeroy - bh//2),
+                           fill=self.TEXT_COLOR, width=line_width)
 
-            text = f"{heading}°"
-            tl = self.draw.textlength(text, self.fonts[self.SMALL])
-            self.draw.text((self.sizex - tl - 100, self.sizey - self.SMALL - 10), text,
-                           font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
+            self.bottom_line("", "", f"{heading}°")
 
             for m in range(0, 360, 10):
                 s = math.sin(math.radians(m - heading + 90))
