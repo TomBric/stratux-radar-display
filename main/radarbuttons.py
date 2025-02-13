@@ -87,15 +87,15 @@ def api():
     if api_form.validate_on_submit() is True:  # POST request
         rlog.debug(f"API: POST request received")
         if api_form.left_short.data is True:
-            last_api_input = 0, 1
+            last_api_input = 1, 0
         elif api_form.left_long.data is True:
-            last_api_input = 0, 2
+            last_api_input = 2, 0
         elif api_form.middle_short.data is True:
             last_api_input = 1, 1
         elif api_form.middle_long.data is True:
-            last_api_input = 1, 2
-        elif api_form.right_short.data is True:
             last_api_input = 2, 1
+        elif api_form.right_short.data is True:
+            last_api_input = 1, 2
         elif api_form.right_long.data is True:
             last_api_input = 2, 2
         else:
