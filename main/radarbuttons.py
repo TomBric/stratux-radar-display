@@ -84,7 +84,8 @@ def api():
     global last_api_input
 
     api_form = ApiForm()
-    if api_form.validate_on_submit() is  True:  # POST request
+    if api_form.validate_on_submit() is True:  # POST request
+        rlog.debug(f"API: POST request received")
         if api_form.left_short.data is True:
             last_api_input = 0, 1
         elif api_form.left_long.data is True:
