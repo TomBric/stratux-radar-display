@@ -61,8 +61,9 @@ app.config['BOOTSTRAP_SERVE_LOCAL'] = True      # use local instances of css etc
 app.config['BOOTSTRAP_USE_MINIFIED'] = True
 app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 app.config['BOOTSTRAP_BTN_SIZE'] = 'md'
+app.config['WTF_CSRF_ENABLED'] = False    # to enable api call without csrf token
 bootstrap = Bootstrap5(app)
-csrf = CSRFProtect(app)
+# csrf = CSRFProtect(app)
 
 
 button_api_active = False
