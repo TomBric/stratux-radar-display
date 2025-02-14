@@ -355,18 +355,16 @@ class Epaper1in54(dcommon.GenericDisplay):
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
         self.centered_text(0, "Start-/Landing", self.SMALL)
-
         st = '---'
         if 'start_time' in values:
             st = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['start_time'].hour, values['start_time'].minute,
-                                                        values['start_time'].second,
-                                                        math.floor(values['start_time'].microsecond / 100000))
+                        values['start_time'].second, values['start_time'].microsecond // 100000)
         lines = (
             ("t-off time", st),
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         )
-        starty = self.dashboard(0, self.SMALL+2 , sizex, lines)
+        starty = self.dashboard(0, self.SMALL+2 , self.sizex, lines)
 
         lt = '---'
         if 'landing_time' in values:
@@ -377,14 +375,13 @@ class Epaper1in54(dcommon.GenericDisplay):
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         )
-        starty = self.dashboard(0, starty, sizex, lines)
-
+        starty = self.dashboard(0, starty, self.sizex, lines)
         if ground_warnings:
             dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
             lines = (
                 ("Dest. Alt [ft]", dest_alt_str),
             )
-            self.dashboard(0, starty, sizex, lines)
+            self.dashboard(0, starty, self.sizex, lines)
         if not ground_warnings:
             self.bottom_line("", "Back", "")
         else:
