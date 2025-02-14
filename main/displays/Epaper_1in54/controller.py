@@ -347,7 +347,7 @@ class Epaper1in54(dcommon.GenericDisplay):
                 ("GPS-Dist [m]", gps_dist_str),
                 ("GPS-Spd [kts]", gps_speed_str),
             )
-            starty = self.dashboard(0, SMALL + 2, sizex, lines)
+            starty = self.dashboard(0, self.SMALL + 2, sizex, lines)
             if baro_valid:
                 takeoff_str = f"{alt_diff_takeoff:+5.1f}" if alt_diff_takeoff is not None else "---"
                 lines = (
