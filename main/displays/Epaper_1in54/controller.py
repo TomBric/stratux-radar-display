@@ -230,7 +230,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         x = round_text(0, starty, "IMU", "white", stat['IMUConnected'], out=self.TEXT_COLOR)
         round_text(x + 10, starty, "BMP", "white", stat['BMPConnected'], out=self.TEXT_COLOR)
         alt = f"{gps_alt:.0f}" if stat['GPS_position_accuracy'] < 19999 else "---"
-        self.right_text(starty, f"GAlt {alt}ft", self.VERYSMALL")
+        self.right_text(starty, f"GAlt {alt}ft", self.VERYSMALL)
 
 
     def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
