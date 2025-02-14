@@ -202,20 +202,20 @@ class Epaper1in54(dcommon.GenericDisplay):
         colors = {'outline': 'black', 'black_white_offset': 5}
         bar_start, bar_end = 50, 150
         starty = self.bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'],
-                          bar_start, bar_end, colors, side_offset=5, line_offset=10)
+                          bar_start, bar_end, colors, line_offset=5)
         if stat['OGN_connected']:
             starty = self.bar(starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'],
-                              bar_start, bar_end, colors, side_offset=5, line_offset=10)
+                              bar_start, bar_end, colors, line_offset=5)
             noise_text = f"{round(stat['OGN_noise_db'], 1)}@{round(stat['OGN_gain_db'], 1)}dB"
             starty = self.bar(starty, "noise", stat['OGN_noise_db'], 25,
-                              bar_start, bar_end, colors, side_offset=5, unit="dB", minval=1, valtext=noise_text,
-                              line_offset=10)
+                              bar_start, bar_end, colors, unit="dB", minval=1, valtext=noise_text,
+                              line_offset=5)
         if stat['UATRadio_connected']:
             starty = self.bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'],
-                              bar_start, bar_end, colors, side_offset=5, line_offset=10)
+                              bar_start, bar_end, colors, line_offset=5)
         if stat['CPUTemp'] > -300:
             starty = self.bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0),
-                              bar_start, bar_end, colors, side_offset=5, unit="°C", line_offset=10)
+                              bar_start, bar_end, colors, unit="°C", line_offset=5)
         t = "3D GPS " if gps_quality == 1 else "DGNSS " if gps_quality == 2 else "GPS"
         # GPS
         self.draw.text((0, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)

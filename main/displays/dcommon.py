@@ -545,8 +545,6 @@ class GenericDisplay:
         # color_table example for OLED:
         #   color_table = {'outline': 'white', 'green': 'green', 'yellow': 'DarkOrange', 'red': 'red',
         #                   'yellow_value': 22, 'red_value': 33}
-
-
         self.draw.text((side_offset, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
         right_val = f"{int(max_val)}{unit}"
         self.right_text(y, right_val, self.VERYSMALL, offset=side_offset)
