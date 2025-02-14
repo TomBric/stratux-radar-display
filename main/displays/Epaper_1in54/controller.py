@@ -378,7 +378,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.bottom_line("+/-100ft", "  Back", "+/-10ft")
 
 
-    def checklist_topic(ypos, topic, highlighted=False, toprint=True):
+    def _delete_checklist_topic(ypos, topic, highlighted=False, toprint=True):
         xpos = 2
         xpos_remark = 20
         xpos_sub = 20
@@ -430,7 +430,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         return y + topic_offset
 
 
-    def checklist(checklist_name, checklist_items, current_index, last_list):
+    def _delete_checklist(checklist_name, checklist_items, current_index, last_list):
         checklist_y = {'from': SMALL + 8, 'to': sizey - VERYSMALL - 6}
         global top_index
 
