@@ -508,7 +508,7 @@ class GenericDisplay:
         starty += self.SMALL + 2 * line_space
         self.draw.text((side_offset, starty), "Date", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.draw.text((side_offset + tab_space, starty), "Start", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((side_offset + 2*tab_space, starty), "Duration", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((side_offset + 2*tab_space, starty), "Dur", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.draw.text((side_offset + 3*tab_space, starty), "Ldg", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         for f in last_flights:
@@ -516,7 +516,7 @@ class GenericDisplay:
             if starty >= self.sizey - self.VERYSMALL - 2*line_space:    # screen full
                 break
             f[0] = f[0].replace(second=0, microsecond=0)
-            self.draw.text((side_offset, starty), f[0].strftime("%d.%m.%y"), font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+            self.draw.text((side_offset, starty), f[0].strftime("%d.%m."), font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
             self.draw.text((side_offset + tab_space, starty), f[0].strftime("%H:%M"), font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
             if f[1] != 0:
                 f[1] = f[1].replace(second=0, microsecond=0)
@@ -524,7 +524,7 @@ class GenericDisplay:
                 self.draw.text((side_offset + 3*tab_space, starty), f[1].strftime("%H:%M"), font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
             else:
                 delta = (datetime.datetime.now(datetime.timezone.utc).replace(second=0, microsecond=0) - f[0]).total_seconds()
-                self.draw.text((side_offset + 3*tab_space, starty), "in the air", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+                self.draw.text((side_offset + 3*tab_space, starty), "air", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
             hours, remainder = divmod(delta, 3600)
             minutes, _ = divmod(remainder, 60)
             out = f'{int(hours):02}:{int(minutes):02}'
