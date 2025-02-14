@@ -198,7 +198,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         starty = 0
         self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
-        starty += self.SMALL + 4
+        starty += self.SMALL + 6
         colors = {'outline': 'black', 'black_white_offset': 5}
         bar_start, bar_end = 50, 150
         starty = self.bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'],
