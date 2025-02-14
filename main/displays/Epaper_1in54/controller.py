@@ -361,7 +361,7 @@ class Epaper1in54(dcommon.GenericDisplay):
 
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        centered_text(0, "Start-/Landing", smallfont, fill="black")
+        self.centered_text(0, "Start-/Landing", smallfont, fill="black")
 
         st = '---'
         if 'start_time' in values:
@@ -388,11 +388,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         starty = self.dashboard(0, starty, sizex, lines, headline_size=0)
 
         if ground_warnings:
-            if dest_alt_valid:
-                dest_alt_str = "{:+5.0f}".format(dest_altitude)
-            else:
-                dest_alt_str = "---"
-
+            dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
             lines = (
                 ("Dest. Alt [ft]", dest_alt_str),
             )

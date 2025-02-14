@@ -804,7 +804,8 @@ class GenericDisplay:
         # x and y are the starting points of the rounded rectangle
         color = color or self.TEXT_COLOR
         bgcolor = bgcolor or self.BG_COLOR
-        headline_size = headline_size or self.VERYSMALL
+        if headline_size is  None:
+            headline_size = self.VERYSMALL
         indent = headline_size // 2   # text indent on the left
         side_offset = 0   # offset right and left of the rounding
         line_indent = 0 # additional space between lines
@@ -813,7 +814,7 @@ class GenericDisplay:
 
         starty = y + headline_size  # space for heading
         for line in lines:
-            self.draw.text((x + indent + side_offset, starty + (self.SMALL - headline_size) // 2), line[0],
+            self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
                            font=self.fonts[self.VERYSMALL], fill=color,align="left")
             tl = self.draw.textlength(line[1], self.fonts[self.SMALL])
             self.draw.text((x + dsizex - side_offset - indent - tl, starty), line[1], font=self.fonts[self.SMALL], fill=color)
