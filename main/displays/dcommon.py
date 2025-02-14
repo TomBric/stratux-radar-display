@@ -87,8 +87,6 @@ class GenericDisplay:
     ROLL_POSMARKS = (-90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90)
     PITCH_POSMARKS = (-30, -20, -10, 10, 20, 30)
     PITCH_SCALE = 3.0   # larger displays need larger scaling
-    # COMPASS specific constants
-    CM_SIZE = 15  # length of compass marks
     # CO warner specific constants
     GRAPH_SPACE = 3  # space between scale figures and zero line
     GRAPH_X_AXIS_LINE_LENGTH = 5  # line length for values in graph
@@ -312,13 +310,14 @@ class GenericDisplay:
             czerox = self.sizex // 2
             czeroy = self.sizey // 2
             csize = self.sizey // 2  # radius of compass rose
+            cmsize = self.sizey // 20 # size of compass marks
             line_width = 4
 
             self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
                               fill="white", width=line_width)
             bw, bh = self.compass_aircraft.size
             self.draw.bitmap((czerox - bw // 2, czeroy - bh //2), self.compass_aircraft, fill=self.TEXT_COLOR)
-            self.draw.line((czerox - line_width//2, self.CM_SIZE, czerox - line_width//2 , czeroy - bh//2),
+            self.draw.line((czerox - line_width//2, cmsize, czerox - line_width//2 , czeroy - bh//2),
                            fill=self.TEXT_COLOR, width=line_width)
 
             self.bottom_line("", "", f"{heading}°")
@@ -327,7 +326,7 @@ class GenericDisplay:
                 s = math.sin(math.radians(m - heading + 90))
                 c = math.cos(math.radians(m - heading + 90))
                 x1, y1 = czerox - (csize - 1) * c, czeroy - (csize - 1) * s
-                x2, y2 = czerox - (csize - self.CM_SIZE) * c, czeroy - (csize - self.CM_SIZE) * s
+                x2, y2 = czerox - (csize - cmsize) * c, czeroy - (csize - cmsize) * s
                 width = line_width if m % 30 == 0 else line_width//2
                 self.draw.line((x1, y1, x2, y2), fill=self.TEXT_COLOR, width=width)
 
@@ -339,8 +338,8 @@ class GenericDisplay:
                     self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
                                     font=font, fill=self.BG_COLOR)
                     rotmask = self.mask.rotate(-m + heading, expand=False)
-                    center = (czerox - (csize - self.CM_SIZE - self.LARGE // 2) * c,
-                              czeroy - (csize - self.CM_SIZE - self.LARGE // 2) * s)
+                    center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
+                              czeroy - (csize - cmsize - self.LARGE // 2) * s)
                     self.epaper_image.paste(self.TEXT_COLOR, (round(center[0] - self.LARGE),
                                                               round(center[1] - self.LARGE)), rotmask)
 

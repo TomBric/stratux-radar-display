@@ -61,7 +61,6 @@ class Epaper1in54(dcommon.GenericDisplay):
     AHRS_SKY_COLOR = "white"  # how ahrs displays the sky
     AHRS_HORIZON_COLOR = "black"  # how ahrs displays the horizon
     AHRS_MARKS_COLOR = "black"  # color of marks and corresponding text in ahrs
-    CM_SIZE = 10  # size of markings in ahrs
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
 
     def init(self, fullcircle=False):
@@ -243,7 +242,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         right_text(starty, "GAlt" + alt + "ft", verysmallfont, "black")
 
 
-    def flighttime(last_flights):
+    def to_delete_flighttime(last_flights):
         starty = 0
         centered_text(0, "Flight Logs", smallfont, fill="black")
         starty += SMALL + 5

@@ -63,7 +63,6 @@ class Epaper3in7(dcommon.GenericDisplay):
     AHRS_SKY_COLOR = "white"  # how ahrs displays the sky
     AHRS_HORIZON_COLOR = "black"  # how ahrs displays the horizon
     AHRS_MARKS_COLOR = "black"  # color of marks and corresponding text in ahrs
-    CM_SIZE = 15  # size of markings in ahrs
     ANGLE_OFFSET=270 # offset for calculating angles in displays
 
 
