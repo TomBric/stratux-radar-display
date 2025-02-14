@@ -335,19 +335,19 @@ class Epaper1in54(dcommon.GenericDisplay):
             ("GPS-Dist [m]", gps_dist_str),
             ("GPS-Spd [kts]", gps_speed_str),
         )
-        starty = self.dashboard(0, self.SMALL, self.sizex, lines, rounding=False, headline_size=0)
+        starty = self.dashboard(0, self.SMALL, self.sizex, lines)
         if baro_valid:
             takeoff_str = f"{alt_diff_takeoff:+5.1f}" if alt_diff_takeoff is not None else "---"
             lines = (
                 ("VSpeed [ft]", f"{vert_speed:+4.0f}"),
                 ("BaDif tof [ft]", takeoff_str),
             )
-            starty = self.dashboard(0, starty, self.sizex, lines, rounding=False, headline_size=0)
+            starty = self.dashboard(0, starty, self.sizex, lines)
         if ground_distance_valid:
             lines = (
                 ("GrdDist [cm]", f"{grounddistance / 10:+3.1f}"),
             )
-            self.dashboard(0, starty, self.sizex, lines, rounding=False, headline_size=0)
+            self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
             self.centered_text(80, error_message, self.VERYLARGE)
         self.bottom_line("Stat/Set", "   Mode", "Start")
@@ -370,29 +370,28 @@ class Epaper1in54(dcommon.GenericDisplay):
                                                         math.floor(values['start_time'].microsecond / 100000))
         lines = (
             ("t-off time", st),
-            ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
-            ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
+            ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
+            ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         )
-        starty = self.dashboard(0, self.SMALL+2 , sizex, lines, headline_size=0)
+        starty = self.dashboard(0, self.SMALL+2 , sizex, lines)
 
         lt = '---'
         if 'landing_time' in values:
             lt = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['landing_time'].hour, values['landing_time'].minute,
-                                                        values['landing_time'].second,
-                                                        math.floor(values['landing_time'].microsecond / 100000))
+                            values['landing_time'].second, values['landing_time'].microsecond // 100000)
         lines = (
             ("ldg time", lt),
-            ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
-            ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
+            ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
+            ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         )
-        starty = self.dashboard(0, starty, sizex, lines, headline_size=0)
+        starty = self.dashboard(0, starty, sizex, lines)
 
         if ground_warnings:
             dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
             lines = (
                 ("Dest. Alt [ft]", dest_alt_str),
             )
-            self.dashboard(0, starty, sizex, lines, headline_size=0)
+            self.dashboard(0, starty, sizex, lines)
         if not ground_warnings:
             self.bottom_line("", "Back", "")
         else:

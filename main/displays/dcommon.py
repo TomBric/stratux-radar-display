@@ -799,12 +799,12 @@ class GenericDisplay:
             self.draw.line([(x, y), (x + 3, y)], fill=linecolor, width=linewidth)
 
     def dashboard(self, x, y, dsizex, lines, color=None, bgcolor=None, rounding=False, headline=None,
-                  headline_size=None):
+                  headline_size=0):
         # dashboard, arguments are lines = ("text", "value"), ....
         # x and y are the starting points of the rounded rectangle
         color = color or self.TEXT_COLOR
         bgcolor = bgcolor or self.BG_COLOR
-        if headline_size is None:
+        if headline is not None and headline_size==0:  # set headline_size to default
             headline_size = self.VERYSMALL
         indent = headline_size // 2   # text indent on the left
         side_offset = 0   # offset right and left of the rounding
