@@ -202,7 +202,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         colors = {'outline': 'black', 'black_white_offset': 5}
         bar_start, bar_end = 50, 150
         starty = self.bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'],
-                          bar_start, bar_end, colors, line_offset=5)
+                          bar_start, bar_end, colors, line_offset=10)
         if stat['OGN_connected']:
             starty = self.bar(starty, "OGN", stat['OGN_messages_last_minute'], stat['OGN_messages_max'],
                               bar_start, bar_end, colors, line_offset=5)
