@@ -227,8 +227,8 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.draw.text((0, starty), f"P-Alt {altitude:.0f}ft", font=self.fonts[self.VERYSMALL])
         self.right_text(starty, f"Corr {stat['AltitudeOffset']:+}ft", self.VERYSMALL)
         starty += self.VERYSMALL + 6
-        x = round_text(0, starty, "IMU", "white", stat['IMUConnected'], out=self.TEXT_COLOR)
-        round_text(x + 10, starty, "BMP", "white", stat['BMPConnected'], out=self.TEXT_COLOR)
+        x = self.round_text(0, starty, "IMU", "white", stat['IMUConnected'], out_color =self.TEXT_COLOR)
+        self.round_text(x + 10, starty, "BMP", "white", stat['BMPConnected'], out_color=self.TEXT_COLOR)
         alt = f"{gps_alt:.0f}" if stat['GPS_position_accuracy'] < 19999 else "---"
         self.right_text(starty, f"GAlt {alt}ft", self.VERYSMALL)
 
