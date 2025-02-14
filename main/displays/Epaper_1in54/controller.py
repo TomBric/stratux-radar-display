@@ -242,41 +242,6 @@ class Epaper1in54(dcommon.GenericDisplay):
         right_text(starty, "GAlt" + alt + "ft", verysmallfont, "black")
 
 
-    def to_delete_flighttime(last_flights):
-        starty = 0
-        centered_text(0, "Flight Logs", smallfont, fill="black")
-        starty += SMALL + 5
-
-        draw.text((0, starty), "Date", font=verysmallfont, fill="black")
-        draw.text((50, starty), "Start", font=verysmallfont, fill="black")
-        draw.text((100, starty), "Dur", font=verysmallfont, fill="black")
-        draw.text((155, starty), "Ldg", font=verysmallfont, fill="black")
-        starty += VERYSMALL + 5
-
-        maxlines = 6
-        for f in last_flights:
-            f[0] = f[0].replace(second=0, microsecond=0)   # round down start time to minutes
-            draw.text((0, starty), f[0].strftime("%d.%m."), font=verysmallfont, fill="black")
-            draw.text((50, starty), f[0].strftime("%H:%M"), font=verysmallfont, fill="black")
-            if f[1] != 0:  # ==0 means still in the air
-                f[1] = f[1].replace(second=0, microsecond=0)   # round down
-                delta = (f[1] - f[0]).total_seconds()
-                draw.text((155, starty), f[1].strftime("%H:%M"), font=verysmallfont, fill="black")
-            else:
-                delta = (datetime.datetime.now(datetime.timezone.utc).replace(second=0, microsecond=0)
-                         - f[0]).total_seconds()
-                draw.text((155, starty), "air", font=verysmallfont, fill="black")
-            hours, remainder = divmod(delta, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            out = '{:02}:{:02}'.format(int(hours), int(minutes))
-            round_text(95, starty, out, "white", out="black")
-            starty += VERYSMALL + 2
-            maxlines -= 1
-            if maxlines <= 0:
-                break
-        bottom_line("", "Mode", "Clear")
-
-
     def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
         tl = draw.textlength(str(maxvalue), verysmallfont)    # for adjusting x and y
         # adjust zero lines to have room for text
@@ -370,7 +335,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         return starty
 
 
-    def distance(now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
+    def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                  own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                  ground_distance_valid, grounddistance, error_message):
         centered_text(0, "GPS-Distance", smallfont, fill="black")
