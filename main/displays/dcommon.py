@@ -818,7 +818,7 @@ class GenericDisplay:
             tl = self.draw.textlength(line[1], self.fonts[self.SMALL])
             self.draw.text((x + dsizex - side_offset - indent - tl, starty), line[1], font=self.fonts[self.SMALL], fill=color)
             starty += self.SMALL + line_indent
-        if rounding is not None:
+        if rounding:
             self.draw.rounded_rectangle([x + side_offset, y + headline_size//2, x + dsizex - side_offset,
                                          starty + headline_size//2 ], radius=6, fill=None, outline=color, width=2)
         if headline is not None:
