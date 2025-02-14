@@ -335,7 +335,7 @@ class Epaper1in54(dcommon.GenericDisplay):
                 ("GPS-Dist [m]", gps_dist_str),
                 ("GPS-Spd [kts]", gps_speed_str),
             )
-            starty = self.dashboard(0, self.SMALL, self.sizex, lines, rounding=False, headline_size=0)
+            starty = self.dashboard(0, 2, self.sizex, lines, rounding=False, headline_size=0)
             if baro_valid:
                 takeoff_str = f"{alt_diff_takeoff:+5.1f}" if alt_diff_takeoff is not None else "---"
                 lines = (
@@ -360,7 +360,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             return '---'
 
 
-    def distance_statistics(values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
         centered_text(0, "Start-/Landing", smallfont, fill="black")
 
         st = '---'
@@ -373,7 +373,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         )
-        starty = self.dashboard(0, SMALL + 2, sizex, lines, headline_size=0)
+        starty = self.dashboard(0, self.SMALL+2 , sizex, lines, headline_size=0)
 
         lt = '---'
         if 'landing_time' in values:
