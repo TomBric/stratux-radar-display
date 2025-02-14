@@ -222,24 +222,15 @@ class Epaper1in54(dcommon.GenericDisplay):
         t = f"Sat: {stat['GPS_satellites_locked']}/{stat['GPS_satellites_seen']}/{stat['GPS_satellites_tracked']} "
         self.draw.text((70, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         gps = f"{round(stat['GPS_position_accuracy'], 1)}m" if stat['GPS_position_accuracy'] < 19999 else "NoFix"
-        right_text(starty, gps, self.VERYSMALL)
-        starty += self.VERYSMALL+2
-
-
-
-
-
-
-        draw.text((0, starty), "P-Alt {0:.0f}ft".format(altitude), font=verysmallfont, fill="black")
-        right_text(starty, "Corr {0:+}ft".format(stat['AltitudeOffset']), verysmallfont, "black")
+        self.right_text(starty, gps, self.VERYSMALL)
+        starty += self.VERYSMALL + 2
+        self.draw.text((0, starty), f"P-Alt {altitude:.0f}ft", font=self.fonts[self.VERYSMALL])
+        self.right_text(starty, f"Corr {stat['AltitudeOffset']:+}ft", self.VERYSMALL)
         starty += VERYSMALL + 6
-        x = round_text(0, starty, "IMU", "white", stat['IMUConnected'], out="black")
-        round_text(x+10, starty, "BMP", "white", stat['BMPConnected'], out="black")
-        if stat['GPS_position_accuracy'] < 19999:
-            alt = '{:5.0f}'.format(gps_alt)
-        else:
-            alt = " ---"
-        right_text(starty, "GAlt" + alt + "ft", verysmallfont, "black")
+        x = round_text(0, starty, "IMU", "white", stat['IMUConnected'], out=self.TEXT_COLOR)
+        round_text(x + 10, starty, "BMP", "white", stat['BMPConnected'], out=self.TEXT_COLOR)
+        alt = f"{gps_alt:.0f}" if stat['GPS_position_accuracy'] < 19999 else "---"
+        self.right_text(starty, f"GAlt {alt}ft", self.VERYSMALL")
 
 
     def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
