@@ -335,19 +335,19 @@ class Epaper1in54(dcommon.GenericDisplay):
             ("GPS-Dist [m]", gps_dist_str),
             ("GPS-Spd [kts]", gps_speed_str),
         )
-        starty = self.dashboard(0, self.SMALL, self.sizex, lines, rounding=False)
+        starty = self.dashboard(0, self.SMALL, self.sizex, lines, rounding=False, headline_size=0)
         if baro_valid:
             takeoff_str = f"{alt_diff_takeoff:+5.1f}" if alt_diff_takeoff is not None else "---"
             lines = (
                 ("VSpeed [ft]", f"{vert_speed:+4.0f}"),
                 ("BaDif tof [ft]", takeoff_str),
             )
-            starty = self.dashboard(0, starty, self.sizex, lines, rounding=False)
+            starty = self.dashboard(0, starty, self.sizex, lines, rounding=False, headline_size=0)
         if ground_distance_valid:
             lines = (
                 ("GrdDist [cm]", f"{grounddistance / 10:+3.1f}"),
             )
-            self.dashboard(0, starty, self.sizex, lines, rounding=False)
+            self.dashboard(0, starty, self.sizex, lines, rounding=False, headline_size=0)
         if error_message is not None:
             self.centered_text(80, error_message, self.VERYLARGE)
         self.bottom_line("Stat/Set", "   Mode", "Start")
