@@ -814,7 +814,7 @@ class GenericDisplay:
         starty = y + headline_size  # space for heading
         for line in lines:
             self.draw.text((x + indent + side_offset, starty + (self.SMALL - headline_size) // 2), line[0],
-                           font=self.fonts[headline_size], fill=color,align="left")
+                           font=self.fonts[self.VERYSMALL], fill=color,align="left")
             tl = self.draw.textlength(line[1], self.fonts[self.SMALL])
             self.draw.text((x + dsizex - side_offset - indent - tl, starty), line[1], font=self.fonts[self.SMALL], fill=color)
             starty += self.SMALL + line_indent
