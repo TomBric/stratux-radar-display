@@ -219,7 +219,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         t = "3D GPS " if gps_quality == 1 else "DGNSS " if gps_quality == 2 else "GPS"
         # GPS
         self.draw.text((0, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        t = f"Sat: {stat['GPS_satellites_locked']}/{stat['GPS_satellites_seen']}/{stat['GPS_satellites_tracked']} "
+        t = f"{t} {stat['GPS_satellites_locked']}/{stat['GPS_satellites_seen']}/{stat['GPS_satellites_tracked']}"
         self.draw.text((70, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         gps = f"{round(stat['GPS_position_accuracy'], 1)}m" if stat['GPS_position_accuracy'] < 19999 else "NoFix"
         self.right_text(starty, gps, self.VERYSMALL)
