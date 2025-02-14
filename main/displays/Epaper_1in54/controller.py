@@ -323,18 +323,6 @@ class Epaper1in54(dcommon.GenericDisplay):
         round_text(sizex/2+5, sizey-2*SMALL, "max: {:3d}".format(co_max), "white", out="black")
         bottom_line("Cal", "Mode", "Reset")
 
-
-    def dashboard(x, y, sizex, lines):
-        # dashboard, arguments are lines = ("text", "value"), ....
-        starty = y
-        for line in lines:
-            draw.text((x, starty), line[0], font=smallfont, fill="black", align="left")
-            tl = draw.textlength(line[1], smallfont)
-            draw.text((x+sizex-tl, starty), line[1], font=smallfont, fill="black")
-            starty += SMALL+2
-        return starty
-
-
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                          own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                          ground_distance_valid, grounddistance, error_message):
