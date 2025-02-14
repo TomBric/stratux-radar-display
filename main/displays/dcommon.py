@@ -471,10 +471,10 @@ class GenericDisplay:
         # if yesno is false, the text is crossed out
         bg_color = bg_color or self.BG_COLOR
         tl = self.draw.textlength(text, self.fonts[self.VERYSMALL])
-        self.draw.rounded_rectangle([x, y, x + tl + self.VERYSMALL, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
+        self.draw.rounded_rectangle([x, y, x + tl + 4, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
         if out_color is not None:
-            self.draw.rounded_rectangle([x, y, x + tl + self.VERYSMALL // 2, y + self.VERYSMALL + 2], radius=4, outline=out_color)
-        self.draw.text((x, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+            self.draw.rounded_rectangle([x, y, x + tl + 4, y + self.VERYSMALL + 2], radius=4, outline=out_color)
+        self.draw.text((x + 2, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         if not yesno:
             self.draw.line([x, y + self.VERYSMALL + 2, x + tl + self.VERYSMALL // 2, y], fill=self.TEXT_COLOR, width=2)
         return x + tl + self.VERYSMALL
