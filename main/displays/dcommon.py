@@ -499,24 +499,30 @@ class GenericDisplay:
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         pass
 
-    def flighttime(self, last_flights, side_offset=0):
+    def flighttime(self, last_flights, side_offset=0, long_version=False):
         # side offset is the space left on both sides, if there is enough space, the flight logs are centered
+        headlines = (
+            ("Date", "Start", "Dur", "Ldg"),
+            ("Date", "Start", "Duration", "Landing"),
+        )
+        headline = headlines[1] if long_version else headlines[0]
         tab_space = (self.sizex - 2 * side_offset) // 4
         line_space = self.VERYSMALL // 3  # this gives a line indent
         starty = 0
         self.centered_text(starty, "Flight Logs ", self.SMALL)
         starty += self.SMALL + 2 * line_space
-        self.draw.text((side_offset, starty), "Date", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((side_offset + tab_space, starty), "Start", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((side_offset + 2*tab_space, starty), "Dur", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((side_offset + 3*tab_space, starty), "Ldg", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((side_offset, starty), headline[0], font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((side_offset + tab_space, starty), headline[1], font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((side_offset + 2*tab_space, starty), headline[2], font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((side_offset + 3*tab_space, starty), headline[3], font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         for f in last_flights:
             starty += self.VERYSMALL + line_space
             if starty >= self.sizey - self.VERYSMALL - 2*line_space:    # screen full
                 break
             f[0] = f[0].replace(second=0, microsecond=0)
-            self.draw.text((side_offset, starty), f[0].strftime("%d.%m."), font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+            date_string = f[0].strftime("%d.%m.%y" if long_version else "%d.%m.")
+            self.draw.text((side_offset, starty), date_string, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
             self.draw.text((side_offset + tab_space, starty), f[0].strftime("%H:%M"), font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
             if f[1] != 0:
                 f[1] = f[1].replace(second=0, microsecond=0)
@@ -524,10 +530,11 @@ class GenericDisplay:
                 self.draw.text((side_offset + 3*tab_space, starty), f[1].strftime("%H:%M"), font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
             else:
                 delta = (datetime.datetime.now(datetime.timezone.utc).replace(second=0, microsecond=0) - f[0]).total_seconds()
-                self.draw.text((side_offset + 3*tab_space, starty), "air", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+                state_string = "in the air" if long_version else "air"
+                self.draw.text((side_offset + 3*tab_space, starty), state_string, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
             hours, remainder = divmod(delta, 3600)
             minutes, _ = divmod(remainder, 60)
-            out = f'{int(hours):02}:{int(minutes):02}'
+            out = f' {int(hours):02}:{int(minutes):02} ' if long_version else f'{int(hours):02}:{int(minutes):02}'
             self.round_text(side_offset + 2*tab_space, starty, out, out_color=self.TEXT_COLOR)
         self.bottom_line("", "Mode", "Clear")
 

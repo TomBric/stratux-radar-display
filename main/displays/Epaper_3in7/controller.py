@@ -231,7 +231,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill="black", width=1)
 
     def flighttime(self, last_flights, side_offset=0):
-        super().flighttime(last_flights, 25)
+        super().flighttime(last_flights, side_offset=25, long_version=True)
 
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         starty = 0
