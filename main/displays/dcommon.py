@@ -470,7 +470,7 @@ class GenericDisplay:
         # out_color is color of outline, if none given, outline is not displayed
         # if yesno is false, the text is crossed out
         bg_color = bg_color or self.BG_COLOR
-        tl = self.draw.textlength(text, self.fonts[self.SMALL])
+        tl = self.draw.textlength(text, self.fonts[self.VERYSMALL])
         self.draw.rounded_rectangle([x, y, x + tl + self.VERYSMALL, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
         if out_color is not None:
             self.draw.rounded_rectangle([x, y, x + tl + self.VERYSMALL // 2, y + self.VERYSMALL + 2], radius=4, outline=out_color)
