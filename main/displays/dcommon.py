@@ -813,7 +813,7 @@ class GenericDisplay:
         heading_space = self.draw.textlength("-", self.fonts[headline_size])  # space in front and behind heading
 
         starty = y + headline_size  # space for heading
-        rlog.debug(f"headline_size={headline_size} starty={starty}")
+        self.rlog.debug(f"headline_size={headline_size} starty={starty}")
         for line in lines:
             self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
                            font=self.fonts[self.VERYSMALL], fill=color,align="left")
