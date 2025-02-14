@@ -121,8 +121,8 @@ def run_flask():
     button_api_active = True
     rlog.debug(f"radar-buttons: sudo systemctl start nginx")
     ret = os.system('sudo systemctl start nginx') # just in case it has been stopped before
-    if return_code != 0:
-        rlog.error(f"radarbuttons: Failed to start nginx, return code: {return_code}")
+    if ret != 0:
+        rlog.error(f"radarbuttons: Failed to start nginx, return code: {ret}")
     else:
         rlog.debug(f"radarbuttons: starting flask app")
     app.run(debug=False, use_reloader=False)
