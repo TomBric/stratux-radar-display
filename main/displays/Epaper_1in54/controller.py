@@ -208,8 +208,7 @@ class Epaper1in54(dcommon.GenericDisplay):
                               bar_start, bar_end, colors, line_offset=8)
             noise_text = f"{round(stat['OGN_noise_db'], 1)}@{round(stat['OGN_gain_db'], 1)}dB"
             starty = self.bar(starty, "noise", stat['OGN_noise_db'], 25,
-                              bar_start, bar_end, colors, unit="dB", minval=1, valtext=noise_text,
-                              line_offset=8)
+                              bar_start, bar_end, colors, unit="dB", minval=1, valtext=noise_text, line_offset=8)
         if stat['UATRadio_connected']:
             starty = self.bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'],
                               bar_start, bar_end, colors, line_offset=8)
@@ -228,7 +227,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.right_text(starty, f"Corr {stat['AltitudeOffset']:+}ft", self.VERYSMALL)
         starty += self.VERYSMALL + 6
         x = self.round_text(0, starty, "IMU", "white", stat['IMUConnected'], out_color =self.TEXT_COLOR)
-        self.round_text(x + 10, starty, "BMP", "white", stat['BMPConnected'], out_color=self.TEXT_COLOR)
+        self.round_text(x, starty, "BMP", "white", stat['BMPConnected'], out_color=self.TEXT_COLOR)
         alt = f"{gps_alt:.0f}" if stat['GPS_position_accuracy'] < 19999 else "---"
         self.right_text(starty, f"GAlt {alt}ft", self.VERYSMALL)
 
