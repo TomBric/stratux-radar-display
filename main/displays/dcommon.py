@@ -811,7 +811,6 @@ class GenericDisplay:
         line_indent = 0 # additional space between lines
 
         starty = y + headline_size  # space for heading
-        self.rlog.debug(f"headline_size={headline_size} starty={starty}")
         for line in lines:
             self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
                            font=self.fonts[self.VERYSMALL], fill=color,align="left")
