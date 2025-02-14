@@ -326,31 +326,31 @@ class Epaper1in54(dcommon.GenericDisplay):
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                          own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                          ground_distance_valid, grounddistance, error_message):
-            self.centered_text(0, "GPS-Distance", self.SMALL)
-            gps_dist_str = f"{gps_distance:.0f}" if distance_valid else "---"
-            gps_speed_str = f"{gps_speed:.1f}" if gps_valid else "---"
+        self.centered_text(0, "GPS-Distance", self.SMALL)
+        gps_dist_str = f"{gps_distance:.0f}" if distance_valid else "---"
+        gps_speed_str = f"{gps_speed:.1f}" if gps_valid else "---"
+        lines = (
+            ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
+                                                           math.floor(now.microsecond / 100000))),
+            ("GPS-Dist [m]", gps_dist_str),
+            ("GPS-Spd [kts]", gps_speed_str),
+        )
+        starty = self.dashboard(0, self.SMALL, self.sizex, lines, rounding=False)
+        if baro_valid:
+            takeoff_str = f"{alt_diff_takeoff:+5.1f}" if alt_diff_takeoff is not None else "---"
             lines = (
-                ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
-                                                               math.floor(now.microsecond / 100000))),
-                ("GPS-Dist [m]", gps_dist_str),
-                ("GPS-Spd [kts]", gps_speed_str),
+                ("VSpeed [ft]", f"{vert_speed:+4.0f}"),
+                ("BaDif tof [ft]", takeoff_str),
             )
-            starty = self.dashboard(0, 2, self.sizex, lines, rounding=False)
-            if baro_valid:
-                takeoff_str = f"{alt_diff_takeoff:+5.1f}" if alt_diff_takeoff is not None else "---"
-                lines = (
-                    ("VSpeed [ft]", f"{vert_speed:+4.0f}"),
-                    ("BaDif tof [ft]", takeoff_str),
-                )
-                starty = self.dashboard(0, starty, self.sizex, lines, rounding=False)
-            if ground_distance_valid:
-                lines = (
-                    ("GrdDist [cm]", f"{grounddistance / 10:+3.1f}"),
-                )
-                self.dashboard(0, starty, self.sizex, lines, rounding=False)
-            if error_message is not None:
-                self.centered_text(80, error_message, self.VERYLARGE)
-            self.bottom_line("Stat/Set", "   Mode", "Start")
+            starty = self.dashboard(0, starty, self.sizex, lines, rounding=False)
+        if ground_distance_valid:
+            lines = (
+                ("GrdDist [cm]", f"{grounddistance / 10:+3.1f}"),
+            )
+            self.dashboard(0, starty, self.sizex, lines, rounding=False)
+        if error_message is not None:
+            self.centered_text(80, error_message, self.VERYLARGE)
+        self.bottom_line("Stat/Set", "   Mode", "Start")
 
 
     def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
@@ -361,7 +361,7 @@ class Epaper1in54(dcommon.GenericDisplay):
 
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        self.centered_text(0, "Start-/Landing", smallfont, fill="black")
+        self.centered_text(0, "Start-/Landing", self.SMALL)
 
         st = '---'
         if 'start_time' in values:
