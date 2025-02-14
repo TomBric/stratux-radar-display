@@ -350,7 +350,7 @@ class Epaper1in54(dcommon.GenericDisplay):
                 self.dashboard(0, starty, self.sizex, lines)
             if error_message is not None:
                 self.centered_text(80, error_message, self.VERYLARGE)
-            bottom_line("Stats/Set", "  Mode", "Start")
+            self.bottom_line("Stats/Set", "  Mode", "Start")
 
 
     def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
