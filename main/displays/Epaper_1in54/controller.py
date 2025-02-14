@@ -353,13 +353,6 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.bottom_line("Stat/Set", "   Mode", "Start")
 
 
-    def form_line(values, key, format_str):    # generates line if key exists with form string, "---" else
-        if key in values:
-            return format_str.format(values[key])
-        else:
-            return '---'
-
-
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
         self.centered_text(0, "Start-/Landing", self.SMALL)
 
