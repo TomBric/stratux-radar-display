@@ -373,7 +373,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             ("t-off dist [m]", form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         )
-        starty = dashboard(0, SMALL + 2, sizex, lines)
+        starty = self.dashboard(0, SMALL + 2, sizex, lines, headline_size=0)
 
         lt = '---'
         if 'landing_time' in values:
@@ -385,7 +385,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             ("ldg dist [m]", form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         )
-        starty = dashboard(0, starty, sizex, lines)
+        starty = self.dashboard(0, starty, sizex, lines, headline_size=0)
 
         if ground_warnings:
             if dest_alt_valid:
@@ -396,11 +396,11 @@ class Epaper1in54(dcommon.GenericDisplay):
             lines = (
                 ("Dest. Alt [ft]", dest_alt_str),
             )
-            dashboard(0, starty, sizex, lines)
+            self.dashboard(0, starty, sizex, lines, headline_size=0)
         if not ground_warnings:
-            bottom_line("", "Back", "")
+            self.bottom_line("", "Back", "")
         else:
-            bottom_line("+/-100ft", "  Back", "+/-10ft")
+            self.bottom_line("+/-100ft", "  Back", "+/-10ft")
 
 
     def checklist_topic(ypos, topic, highlighted=False, toprint=True):
