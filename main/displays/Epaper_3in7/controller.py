@@ -282,7 +282,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.bottom_line("+10 ft", "Mode", "-10 ft")
 
 
-    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):
+    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod, simulation_mode=False):
         if alarmlevel == 0:
             self.centered_text(0, "CO Warner: No CO alarm", self.LARGE)
         else:
@@ -305,6 +305,8 @@ class Epaper3in7(dcommon.GenericDisplay):
         loffset = 320  # start of text
         roffset = 10
         self.dashboard(loffset, 40 + self.VERYSMALL, self.sizex - loffset - roffset, lines)
+        if simulation_mode:
+            self.centered_text(self.sizey//2, "simulation mode", self.VERYSMALL)
         self.bottom_line("Calibrate", "Mode", "Reset")
 
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,

@@ -243,7 +243,7 @@ def draw_cowarner(display_control, changed):
         display_control.clear()
         if co_warner_status == 0:   # normal mode, display status line
             display_control.cowarner(co_values, co_max, r0, co_timeout, alarmlevel, WARNLEVEL[alarmlevel][0],
-                                     WARNLEVEL[alarmlevel][1])
+                                     WARNLEVEL[alarmlevel][1], co_simulation)
         elif co_warner_status == 1:   # calibration mode
             countdown = calibration_end - math.floor(time.time())
             if countdown < 0:

@@ -297,7 +297,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             draw.line([(x, y), (x + 3, y)], fill="black", width=1)
 
 
-    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
+    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod, simulation_mode=False):   # draw graph and co values
         if alarmlevel == 0:
             self.centered_text(0, "CO: No CO alarm", self.LARGE)
         else:
@@ -313,6 +313,8 @@ class Epaper1in54(dcommon.GenericDisplay):
                             out_color=self.TEXT_COLOR)
         self.round_text(self.sizex // 2 + 15, self.sizey-2*self.VERYSMALL-5, "max: {:3d}".format(co_max),
                         out_color=self.TEXT_COLOR)
+        if simulation_mode:
+            self.centered_text(self.sizey//2, "simulation mode", self.VERYSMALL)
         self.bottom_line("Cal", "Mode", "Reset")
 
 
