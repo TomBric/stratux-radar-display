@@ -254,7 +254,7 @@ def draw_cowarner(display_control, changed):
         display_control.display()
 
 
-def calibration():   # called by user-input thread, performs calibration and ends calibration mode
+def calibration():   # called by co-reader thread, performs calibration and ends calibration mode
     global co_warner_status
     global sample_sum
     global no_samples
@@ -312,8 +312,7 @@ def user_input():
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
         sample_sum = 0.0
         no_samples = 0
-        calibration()
-        co_warner_status = 1
+        co_warner_status = 1   # start calibration mode, co reader will do this end mode
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, reset max value
