@@ -779,11 +779,8 @@ class GenericDisplay:
         # Draw graph lines
         lastpoint = None
         for i in range(0, len(data)):
-            y = math.floor(xpos - 1 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue))
-            if y < xpos:
-                y = xpos  # if value is outside
-            if y > ypos + ysize - 1:
-                x = yposs + ysize - 1
+            y = math.floor(ypos - 1 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue))
+            y = max(min(y, ypos + ysize - 1), ypos)
             if i >= 1:  # we need at least two points before we draw
                 x = math.floor(xpos + i * xsize / (len(data) - 1))
                 self.draw.line([lastpoint, (x, y)], fill=graphcolor, width=glinewidth)
