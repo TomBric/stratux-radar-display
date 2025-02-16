@@ -351,24 +351,23 @@ async def read_sensors():
                 await asyncio.sleep(INDICATION_TEST_TIME)
                 GPIO.output(IOPIN, GPIO.LOW)
             while True:
-                if not co_simulation:
-                    request_read()
-                    while not ready():
-                        await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
-                    if co_warner_status == 0:   # normal read
+                if co_warner_status == 0:   # normal read
+                    if not co_simulation:
+                        request_read()
+                        while not ready():
+                            await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
                         changed = read_co_value()
                         speak_co_warning(changed)
                         set_co_indication(changed)
                         await asyncio.sleep(MIN_SENSOR_READ_TIME)
-                    else:
-                        calibration()
-                        await asyncio.sleep(MIN_SENSOR_CALIBRATION_WAIT_TIME)
-                else:  # simulation mode
-                    while True:
-                        await asyncio.sleep(MIN_SENSOR_READ_TIME)
+                    else: # simulation mode
                         changed = read_co_value_simulated()
                         speak_co_warning(changed)
                         set_co_indication(changed)
+                        await asyncio.sleep(MIN_SENSOR_READ_TIME)
+                else:  # calibration mode
+                    calibration()
+                    await asyncio.sleep(MIN_SENSOR_CALIBRATION_WAIT_TIME)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("CO sensor reader terminating ...")
     else:
