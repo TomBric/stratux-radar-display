@@ -264,20 +264,30 @@ def calibration():   # called by user-input thread, performs calibration and end
 
     cowarner_changed = True  # to display new value
     countdown = calibration_end - math.floor(time.time())
-    if countdown > 0:   # continue sensor reading
-        value = ADS.getValue()
-        sensor_volt = value * voltage_factor
-        rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
-        r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
-        sample_sum += r0_act
-        no_samples += 1
-    else:
-        r0 = sample_sum / no_samples
-        rlog.debug("CO-Warner: Calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
-                   .format(no_samples, r0))
-        g_config['CO_warner_R0'] = r0
-        statusui.write_config(g_config)
-        co_warner_status = 0
+    if not co_simulation:
+        if countdown > 0:   # continue sensor reading
+            value = ADS.getValue()
+            sensor_volt = value * voltage_factor
+            rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
+            r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
+            sample_sum += r0_act
+            no_samples += 1
+        else:
+            r0 = sample_sum / no_samples
+            rlog.debug("CO-Warner: Calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
+                       .format(no_samples, r0))
+            g_config['CO_warner_R0'] = r0
+            statusui.write_config(g_config)
+            co_warner_status = 0
+    else:  # simulation mode
+        if countdown > 0:  # continue sensor reading
+            pass
+        else:
+            rlog.debug("CO-Warner: Simulaton calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
+                       .format(no_samples, r0))
+            g_config['CO_warner_R0'] = r0
+            statusui.write_config(g_config)
+            co_warner_status = 0
 
 
 def user_input():
@@ -302,8 +312,7 @@ def user_input():
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
         sample_sum = 0.0
         no_samples = 0
-        if not co_simulation:
-            calibration()
+        calibration()
         co_warner_status = 1
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
