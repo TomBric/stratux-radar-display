@@ -115,8 +115,8 @@ class GenericDisplay:
             self.LARGE: self.make_font("Font.ttc", self.LARGE),
             self.SMALL: self.make_font("Font.ttc", self.SMALL),
             self.VERYSMALL: self.make_font("Font.ttc", self.VERYSMALL),
+            self.AWESOME_FONTSIZE : self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONTSIZE)
         }
-        self.awesome_font = self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONTSIZE)  # for bluetooth indicator
 
     def init(self, fullcircle=False):    # explicit init to be implemented for every device type
         # set device properties
