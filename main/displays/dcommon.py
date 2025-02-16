@@ -766,7 +766,7 @@ class GenericDisplay:
             self.draw.line((x, ypos + ysize - 1 + x_val_linelength, x, ypos + ysize - 1 - x_val_linelength),
                            width=linewidth, fill=linecolor)
             timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time - i) * time_offset)))
-            self.draw.text(x - tl // 2, ypos + ysize - 1 + 1, timestr, font=self.fonts[self.VERYSMALL], fill=textcolor)
+            self.draw.text((x - tl // 2, ypos + ysize - 1 + 1), timestr, font=self.fonts[self.VERYSMALL], fill=textcolor)
             x += offset
 
         # Draw graph lines
