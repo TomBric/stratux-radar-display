@@ -726,7 +726,7 @@ class GenericDisplay:
 
     def graph(self, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout,
                       textcolor, graphcolor, linecolor, bgcolor, glinewidth, linewidth, x_val_space, x_val_linelength):
-                # Adjust zero lines to have room for text
+        # Adjust zero lines to have room for text
         tl = self.draw.textlength(str(maxvalue), self.fonts[self.VERYSMALL])
         xpos += tl + x_val_space
         xsize -= tl + x_val_space
@@ -771,12 +771,17 @@ class GenericDisplay:
 
         # Draw graph lines
         lastpoint = None
-        for i, value in enumerate(data):
-            y = ypos - 4 + ysize - ysize * (value - minvalue) // (maxvalue - minvalue)
-            y = max(min(y, ypos + ysize - 1), ypos)
-            x = xpos + i * xsize // (len(data) - 1)
-            if lastpoint:
-                self.draw.line([lastpoint, (x, y)], fill=graphcolor, width=glinewidth)
+        for i in range(0, len(data)):
+            y = math.floor(ypos - 1 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue))
+            if y < ypos:
+                y = ypos  # if value is outside
+            if y > ypos + ysize - 1:
+                x = ypos + ysize - 1
+            if i >= 1:  # we need at least two points before we draw
+                x = math.floor(xpos + i * xsize / (len(data) - 1))
+                draw.line([lastpoint, (x, y)], fill=graphcolor, width=glinewidth)
+            else:
+                x = xpos
             lastpoint = (x, y)
 
         # Draw dashed value lines
