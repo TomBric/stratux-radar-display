@@ -291,7 +291,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.centered_text(0, alarmstr, self.LARGE)
         self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, self.TEXT_COLOR, self.TEXT_COLOR, self.TEXT_COLOR, self.BG_COLOR, 3, 3, 5, 3)
         lines = [
-            ("Warnlevel:", f"{alarmlevel:3d}")
+            ("Warnlevel:", f"{alarmlevel:3d}"),
             ("",""),
             ("CO act:", f"{co_values[-1]:3d}") if co_values else ("CO act:", "---"),
             ("CO max:", f"{co_max:3d}")
