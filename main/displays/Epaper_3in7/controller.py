@@ -292,7 +292,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         graphpos = (0,40)
         graphsize = (300, 200)
         self.graph(graphpos, graphsize, co_values, 0, 120, timeout, value_line1=50, value_line2=100,
-                   glinewidth=3, linewidth=3)
+                   glinewidth=5, linewidth=4)
         lines = [
             ("Warnlevel:", f"{alarmlevel:3d}"),
             ("",""),

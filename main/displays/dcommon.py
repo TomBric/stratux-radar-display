@@ -727,7 +727,7 @@ class GenericDisplay:
     def graph(self, pos, size, data, minvalue, maxvalue, timeout, value_line1=None, value_line2=None,
             textcolor=None, graphcolor=None, linecolor=None, bgcolor=None, glinewidth=1, linewidth=1):
         x_val_space = self.VERYSMALL // 2   # space between value and graph
-        x_val_linelength = self.VERYSMALL // 4  # length of value line
+        x_val_linelength = self.VERYSMALL // 2  # length of value line
         y_offset = self.VERYSMALL // 4    # offset between x-axis and left corner of x-axis values
         textcolor = textcolor or self.TEXT_COLOR
         graphcolor = graphcolor or self.TEXT_COLOR
