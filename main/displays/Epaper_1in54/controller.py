@@ -314,7 +314,8 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.round_text(self.sizex // 2 + 15, self.sizey-2*self.VERYSMALL-5, "max: {:3d}".format(co_max),
                         out_color=self.TEXT_COLOR)
         if simulation_mode:
-            self.centered_text(self.sizey//3, "simulation mode", self.SMALL)
+            self.round_text(6*self.VERYSMALL, self.sizey//4, "simulation mode", self.VERYSMALL,
+                            out_color=self.TEXT_COLOR)
         self.bottom_line("Cal", "Mode", "Reset")
 
 
