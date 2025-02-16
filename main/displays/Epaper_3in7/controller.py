@@ -289,7 +289,10 @@ class Epaper3in7(dcommon.GenericDisplay):
             alarmstr = f"CO: {alarmppm} ppm longer {alarmperiod // 60} min" \
                 if alarmperiod > 60 else f"CO: {alarmppm} ppm longer {alarmperiod} sec"
             self.centered_text(0, alarmstr, self.LARGE)
-        self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, self.TEXT_COLOR, self.TEXT_COLOR, self.TEXT_COLOR, self.BG_COLOR, 3, 3, 5, 3)
+        graphpos = (0,40)
+        graphsize = (300, 200)
+        self.graph(graphpos, graphsize, co_values, 0, 120, timeout, value_line1=50, value_line2=100,
+                   glinewidth=3, linewidth=3)
         lines = [
             ("Warnlevel:", f"{alarmlevel:3d}"),
             ("",""),
@@ -301,7 +304,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         ]
         loffset = 320  # start of text
         roffset = 10
-        self.dashboard(loffset, 40, self.sizex - loffset - roffset, lines)
+        self.dashboard(loffset, 40 + self.SMALL, self.sizex - loffset - roffset, lines)
         self.bottom_line("Calibrate", "Mode", "Reset")
 
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
