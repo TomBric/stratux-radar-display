@@ -306,7 +306,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         roffset = 10
         self.dashboard(loffset, 40 + self.VERYSMALL, self.sizex - loffset - roffset, lines)
         if simulation_mode:
-            self.round_text(self.sizex//2, self.sizey//3, "simulation mode", self.SMALL)
+            self.round_text(self.sizex//4, self.sizey//3, "simulation mode", self.SMALL, out_color=self.TEXT_COLOR)
         self.bottom_line("Calibrate", "Mode", "Reset")
 
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
