@@ -226,9 +226,9 @@ def read_co_value_simulated():
     global co_max
 
     cowarner_changed = True  # to display new value
-    simvalue = 0 if simvalue > 150.0 else simvalue + 0.1
+    simvalue = 0 if simvalue > 150.0 else simvalue + 0.2
     co_max = round(max(co_max, simvalue))
-    co_values.append(simvalue)
+    co_values.append(round(simvalue))
     if len(co_values) > co_max_values:
         co_values.pop(0)
     return check_alarm_level()
