@@ -289,6 +289,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             alarmstr = f"CO: {alarmppm} ppm longer {alarmperiod // 60} min" \
                 if alarmperiod > 60 else f"CO: {alarmppm} ppm longer {alarmperiod} sec"
             self.centered_text(0, alarmstr, self.LARGE)
+        self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, self.TEXT_COLOR, self.TEXT_COLOR, self.TEXT_COLOR, self.BG_COLOR, 3, 3, 5, 3)
         self.dashboard(320, 50, self.sizex - 320 - 5, [("Warnlevel:", f"{alarmlevel:3d}")])
         lines = [
             ("CO act:", f"{co_values[-1]:3d}") if co_values else ("CO act:", "---"),
