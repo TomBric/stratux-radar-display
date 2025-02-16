@@ -157,8 +157,8 @@ class Epaper1in54(dcommon.GenericDisplay):
 
         if extsound or bt_devices > 0:
             t = "\uf028" * extsound + "\uf293" * (bt_devices > 0) if sound_active else "\uf1f6"
-            tl = self.draw.textlength(t, self.AWESOME_FONTSIZE)
-            self.draw.text((self.sizex - tl, self.sizey - 2 * self.SMALL), t, font=self.awesomefont,
+            tl = self.draw.textlength(t, self.fonts[self.AWESOME_FONTSIZE])
+            self.draw.text((self.sizex - tl, self.sizey - 2 * self.SMALL), t, font=self.fonts[self.AWESOME_FONTSIZE],
                            fill=self.TEXT_COLOR)
 
         self.draw.line((2, 150 + (optical_bar % 5) * 5, 2, 150 + (optical_bar % 5) * 5 + 6),

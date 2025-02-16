@@ -178,9 +178,9 @@ class Epaper3in7(dcommon.GenericDisplay):
                     t += "\uf293"  # bluetooth symbol
             else:
                 t = "\uf1f6"  # bell off symbol
-            textlength = self.draw.textlength(t, awesomefont)
+            textlength = self.draw.textlength(t, self.fonts[self.AWESOME_FONTSIZE])
             self.draw.text((self.sizex - textlength - 5, self.sizey - self.SMALL), t,
-                           font=self.awesomefont, fill=self.TEXT_COLOR)
+                           font=self.fonts[self.AWESOME_FONTSIZE], fill=self.TEXT_COLOR)
 
         self.draw.line((self.sizex - 8, 80 + optical_bar * 10, self.sizex - 8, 80 + optical_bar * 10 + 8),
                        fill=self.TEXT_COLOR, width=5)
