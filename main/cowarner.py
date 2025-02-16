@@ -302,7 +302,7 @@ def user_input():
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
         sample_sum = 0.0
         no_samples = 0
-        if not simulation_mode:
+        if not co_simulation:
             calibration()
         co_warner_status = 1
     if button == 0 and btime == 2:  # left and long
