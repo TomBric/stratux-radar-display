@@ -79,7 +79,7 @@ WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time betwe
 # globals
 alarmlevel = 0   # see above level for warnlevel 0-5
 # time when this alarmlevel was first reached or underrun
-r0 = 900.0     # value for R0 in clean air. Calculated during calibration, 900 is a good starting point
+r0 = 900.0 * 1000   # value for R0 in clean air. Calculated during calibration, 900k is a good starting point
 cowarner_active = False
 voltage_factor = 1.0
 ADS = None
