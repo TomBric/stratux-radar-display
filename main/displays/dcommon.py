@@ -756,7 +756,7 @@ class GenericDisplay:
         full_time = timeout * no_of_values
         timestr = time.strftime("%H:%M", time.gmtime())
         tl = self.draw.textlength(timestr, self.fonts[self.VERYSMALL])
-        no_of_time = xsize // tl // 2 + 1
+        no_of_time = int(xsize // tl // 2 + 1)
         time_offset = full_time / no_of_time
         offset = (xsize - 1) // no_of_time
         x = xpos
