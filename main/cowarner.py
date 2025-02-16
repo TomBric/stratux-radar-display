@@ -302,7 +302,8 @@ def user_input():
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
         sample_sum = 0.0
         no_samples = 0
-        calibration()
+        if not simulation_mode:
+            calibration()
         co_warner_status = 1
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
