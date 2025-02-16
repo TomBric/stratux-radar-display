@@ -727,7 +727,8 @@ class GenericDisplay:
     def graph(self, pos, size, data, minvalue, maxvalue, timeout, value_line1=None, value_line2=None,
             textcolor=None, graphcolor=None, linecolor=None, bgcolor=None, glinewidth=1, linewidth=1):
         x_val_space = self.VERYSMALL // 2   # space between value and graph
-        x_val_linelength = self.VERYSMALL // 2  # length of value line
+        x_val_linelength = self.VERYSMALL // 4  # length of value line
+        y_offset = self.VERYSMALL // 4    # offset between x-axis and left corner of x-axis values
         textcolor = textcolor or self.TEXT_COLOR
         graphcolor = graphcolor or self.TEXT_COLOR
         linecolor = linecolor or self.TEXT_COLOR
@@ -740,9 +741,8 @@ class GenericDisplay:
         ypos = pos[1] + self.VERYSMALL // 2
         ysize = size[1] - self.VERYSMALL
 
-        # Draw min, max, and value lines
         def draw_value_line(value, y_offset):
-            y = ypos + ysize - ysize * (value - minvalue) // (maxvalue - minvalue)
+            y = ypos + ysize - 1 - ysize * (value - minvalue) // (maxvalue - minvalue)
             tl = self.draw.textlength(str(value), self.fonts[self.VERYSMALL])
             self.draw.text((xpos - tl - x_val_space, y - y_offset), str(value),
                            font=self.fonts[self.VERYSMALL], fill=textcolor)
@@ -757,7 +757,7 @@ class GenericDisplay:
         self.draw.text((xpos - tl - x_val_space, vlmax_y - self.VERYSMALL // 2), str(maxvalue),
                        font=self.fonts[self.VERYSMALL], fill=textcolor)
         # Draw outside text and frame
-        self.draw.rectangle((xpos, ypos, xpos + xsize, ypos + ysize), outline=linecolor, width=linewidth, fill=bgcolor)
+        self.draw.rectangle((xpos, ypos, xpos + xsize-1 , ypos + ysize-1), outline=linecolor, width=linewidth, fill=bgcolor)
         # Draw values below x-axis
         no_of_values = len(data)
         full_time = timeout * no_of_values
@@ -768,12 +768,12 @@ class GenericDisplay:
         offset = (xsize - 1) // no_of_time
         x = xpos
         acttime = math.floor(time.time())
-
+        # draw x-axis values
         for i in range(no_of_time + 1):
-            self.draw.line((x, ypos + ysize - 1 + x_val_linelength, x, ypos + ysize - 1 - x_val_linelength),
+            self.draw.line((x, ypos + ysize - 1, x, ypos + ysize - 1 - x_val_linelength),
                            width=linewidth, fill=linecolor)
             timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time - i) * time_offset)))
-            self.draw.text((x - tl // 2, ypos + ysize - 1 + 1), timestr, font=self.fonts[self.VERYSMALL], fill=textcolor)
+            self.draw.text((x - tl // 2, ypos + ysize - 1 + y_offset), timestr, font=self.fonts[self.VERYSMALL], fill=textcolor)
             x += offset
 
         # Draw graph lines
