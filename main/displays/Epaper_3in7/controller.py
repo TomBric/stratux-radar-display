@@ -219,7 +219,8 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("GPS-Alt [ft]", f"{gps_altitude:1.0f}"),
             ("GpsSpd [kts]", f"{gps_speed:1.1f}")
         )
-        self.dashboard(self.sizey + 5, self.sizey // 2 , self.sizex - self.sizey - 2 * 5, lines, rounding=True)
+        self.dashboard(self.sizey + 5, self.sizey // 2 ,
+                       self.sizex - self.sizey - 2 * 5, lines, rounding=True)
 
         if error_message:
             self.centered_text(60, error_message, self.VERYLARGE)
