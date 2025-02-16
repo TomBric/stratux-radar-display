@@ -737,7 +737,8 @@ class GenericDisplay:
         def draw_value_line(value, y_offset):
             y = ypos + ysize - ysize * (value - minvalue) // (maxvalue - minvalue)
             tl = self.draw.textlength(str(value), self.fonts[self.VERYSMALL])
-            self.draw.text((xpos - tl - x_val_space, y - y_offset), str(value), font=verysmallfont, fill=textcolor)
+            self.draw.text((xpos - tl - x_val_space, y - y_offset), str(value),
+                           font=self.fonts[self.VERYSMALL], fill=textcolor)
             return y
 
         vlmin_y = ypos + ysize - 1
