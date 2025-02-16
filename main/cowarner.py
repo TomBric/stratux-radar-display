@@ -226,8 +226,8 @@ def read_co_value_simulated():
     global co_max
 
     cowarner_changed = True  # to display new value
-    simvalue = 0 if simvalue > 150 else simvalue + 0.01
-    co_max = max(co_max, simvalue)
+    simvalue = 0 if simvalue > 150.0 else simvalue + 0.1
+    co_max = round(max(co_max, simvalue))
     co_values.append(simvalue)
     if len(co_values) > co_max_values:
         co_values.pop(0)
