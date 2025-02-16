@@ -810,7 +810,7 @@ def main():
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
-    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
+    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication, co_simulation_mode)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
                         groundbeep, situation, simulation_mode, global_config)
     simulation.init(simulation_mode)
@@ -903,6 +903,7 @@ if __name__ == "__main__":
     groundbeep = args['groundbeep']
     gear_indication = args ['gearindicate']
     simulation_mode = args['simulation']
+    co_simulation_mode = args['cosimulation']
     button_api_active = args['buttonapi']
     xml_checklist = args['checklist']
     sound_mixer = args['mixer']

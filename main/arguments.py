@@ -76,6 +76,8 @@ def add(ap):
                     action="store_true", default=False)
     ap.add_argument("-sim", "--simulation", required=False, help="Simulation mode for testing",
                     action="store_true", default=False)
+    ap.add_argument("-cosim", "--cosimulation", required=False, help="CO simulation mode for testing",
+                    action="store_true", default=False)
     ap.add_argument("-mx", "--mixer", required=False, help="Mixer name to be used for sound output",
                     default=DEFAULT_MIXER)
     ap.add_argument("-api", "--buttonapi", required=False, help="use api for button handling",
