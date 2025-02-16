@@ -725,76 +725,66 @@ class GenericDisplay:
         self.centered_text(y, middle, self.SMALL, color)
 
     def graph(self, xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout,
-              textcolor, graphcolor, linecolor, bgcolor, glinewidth, linewidth, x_val_space, x_val_linelength):
-        # textcolor = text in graph, graphcolor = graph itself, linecolor = lines outside, linewidth=lines outside
-        # glinewidth = graph linewidth
-        # valueline= value for a line (threshold 1+2)
-        # x_val_space = space between x values below and x-axis
-        # x_val_linelength = length of lines at axis valuepoints up and down of x-axis
-        tl = self.draw.textlength(str(maxvalue), verysmallfont)  # for adjusting x and y
-        # adjust zero lines to have room for text
-        xpos = xpos + tl + x_val_space
-        xsize = xsize - tl - x_val_space
-        ypos = ypos + VERYSMALL // 2
-        ysize = ysize - VERYSMALL
+                      textcolor, graphcolor, linecolor, bgcolor, glinewidth, linewidth, x_val_space, x_val_linelength):
+                # Adjust zero lines to have room for text
+        tl = self.draw.textlength(str(maxvalue), self.fonts[self.VERYSMALL])
+        xpos += tl + x_val_space
+        xsize -= tl + x_val_space
+        ypos += self.VERYSMALL // 2
+        ysize -= self.VERYSMALL
+
+            # Draw min, max, and value lines
+        def draw_value_line(value, y_offset):
+            y = ypos + ysize - ysize * (value - minvalue) // (maxvalue - minvalue)
+            tl = self.draw.textlength(str(value), self.fonts[self.VERYSMALL])
+            self.draw.text((xpos - tl - x_val_space, y - y_offset), str(value), font=verysmallfont, fill=textcolor)
+            return y
 
         vlmin_y = ypos + ysize - 1
-        tl = self.draw.textlength(str(minvalue), verysmallfont)
-        self.draw.text((xpos - tl - x_val_space, vlmin_y - VERYSMALL), str(minvalue), font=verysmallfont, fill=textcolor)
-
-        vl1_y = ypos + ysize - ysize * (value_line1 - minvalue) // (maxvalue - minvalue)
-        tl = self.draw.textlength(str(value_line1), verysmallfont)
-        self.draw.text((xpos - tl - x_val_space, vl1_y - VERYSMALL // 2), str(value_line1),
-                  font=verysmallfont, fill=textcolor)
-        vl2_y = ypos + ysize - ysize * (value_line2 - minvalue) // (maxvalue - minvalue)
-        tl = self.draw.textlength(str(value_line2), verysmallfont)
-        self.draw.text((xpos - tl - x_val_space, vl2_y - VERYSMALL // 2), str(value_line2),
-                  font=verysmallfont, fill=textcolor)
-
+        self.draw.text((xpos - tl - x_val_space, vlmin_y - self.VERYSMALL), str(minvalue),
+                       font=self.fonts[self.VERYSMALL], fill=textcolor)
+        vl1_y = draw_value_line(value_line1, VERYSMALL // 2)
+        vl2_y = draw_value_line(value_line2, VERYSMALL // 2)
         vlmax_y = ypos
-        # outside text and frame
-        tl = self.draw.textlength(str(maxvalue), verysmallfont)
-        self.draw.text((xpos - tl - x_val_space, vlmax_y - VERYSMALL // 2), str(maxvalue), font=verysmallfont,
-                  fill=textcolor)
+        self.draw.text((xpos - tl - x_val_space, vlmax_y - VERYSMALL // 2), str(maxvalue),
+                       font=self.fonts[self.VERYSMALL], fill=textcolor)
+        # Draw outside text and frame
         self.draw.rectangle((xpos, ypos, xpos + xsize, ypos + ysize), outline=linecolor, width=linewidth, fill=bgcolor)
-        # values below x-axis
+        # Draw values below x-axis
         no_of_values = len(data)
-        full_time = timeout * no_of_values  # time for full display in secs
+        full_time = timeout * no_of_values
         timestr = time.strftime("%H:%M", time.gmtime())
-        tl = self.draw.textlength(timestr, verysmallfont)
-        no_of_time = xsize // tl // 2 + 1  # calculate maximum number of time indications
+        tl = self.draw.textlength(timestr, self.fonts[self.VERYSMALL])
+        no_of_time = xsize // tl // 2 + 1
         time_offset = full_time / no_of_time
         offset = (xsize - 1) // no_of_time
         x = xpos
         acttime = math.floor(time.time())
-        # draw values below x-axis
-        for i in range(0, no_of_time + 1):
-            self.draw.line((x, ypos+ysize-1 + x_val_linelength, x, ypos+ysize-1 - x_val_linelength),
+
+        for i in range(no_of_time + 1):
+            self.draw.line((x, ypos + ysize - 1 + x_val_linelength, x, ypos + ysize - 1 - x_val_linelength),
                            width=linewidth, fill=linecolor)
             timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time - i) * time_offset)))
-            self.draw.text(x - tl // 2, ypos + ysize - 1 + 1, timestr, font=verysmallfont, fill=textcolor)
-            x = x + offset
+            self.draw.text(x - tl // 2, ypos + ysize - 1 + 1, timestr, font=self.fonts[self.VERYSMALL], fill=textcolor)
+            x += offset
+
+        # Draw graph lines
         lastpoint = None
-        for i in range(0, len(data)):
-            y = ypos - 4 + ysize - ysize * (data[i] - minvalue) // (maxvalue - minvalue)
-            if y < ypos:
-                y = ypos  # if value is outside
-            if y > ypos + ysize - 1:
-                y = ypos + ysize - 1 # if value is outside
-            if i >= 1:  # we need at least two points before we draw
-                x = xpos + i * xsize // (len(data) - 1)
+        for i, value in enumerate(data):
+            y = ypos - 4 + ysize - ysize * (value - minvalue) // (maxvalue - minvalue)
+            y = max(min(y, ypos + ysize - 1), ypos)
+            x = xpos + i * xsize // (len(data) - 1)
+            if lastpoint:
                 self.draw.line([lastpoint, (x, y)], fill=graphcolor, width=glinewidth)
-            else:
-                x = xpos
             lastpoint = (x, y)
-        # value_line 1, dashed line
-        y = ypos + ysize - ysize * (value_line1 - minvalue) // (maxvalue - minvalue)
-        for x in range(int(xpos), int(xpos + xsize), 6):
-            self.draw.line([(x, y), (x + 3, y)], fill=linecolor, width=linewidth)
-        # value_line 2, dashed line
-        y = ypos + ysize - ysize * (value_line2 - minvalue) // (maxvalue - minvalue)
-        for x in range(int(xpos), int(xpos + xsize), 6):
-            self.draw.line([(x, y), (x + 3, y)], fill=linecolor, width=linewidth)
+
+        # Draw dashed value lines
+        def draw_dashed_line(y):
+            for x in range(int(xpos), int(xpos + xsize), 6):
+                self.draw.line([(x, y), (x + 3, y)], fill=linecolor, width=linewidth)
+
+        draw_dashed_line(vl1_y)
+        draw_dashed_line(vl2_y)
 
     def dashboard(self, x, y, dsizex, lines, color=None, bgcolor=None, rounding=False, headline=None,
                   headline_size=0):
