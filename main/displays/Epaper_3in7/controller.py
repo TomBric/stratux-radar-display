@@ -294,7 +294,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("Warnlevel:", f"{alarmlevel:3d}"),
             ("",""),
             ("CO act:", f"{co_values[-1]:3d}") if co_values else ("CO act:", "---"),
-            ("CO max:", f"{co_max:3d}")
+            ("CO max:", f"{co_max:3d}"),
             ("", ""),
             ("", ""),
             ("R0", f"{r0 / 1000:.1f}k")
