@@ -779,7 +779,7 @@ class GenericDisplay:
                 x = ypos + ysize - 1
             if i >= 1:  # we need at least two points before we draw
                 x = math.floor(xpos + i * xsize / (len(data) - 1))
-                draw.line([lastpoint, (x, y)], fill=graphcolor, width=glinewidth)
+                self.draw.line([lastpoint, (x, y)], fill=graphcolor, width=glinewidth)
             else:
                 x = xpos
             lastpoint = (x, y)
