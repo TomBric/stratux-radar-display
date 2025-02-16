@@ -309,9 +309,9 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.graph(graphpos, graphsize, co_values, 0, 120, timeout, value_line1=50, value_line2=100,
                    glinewidth=2, linewidth=2)
         if len(co_values) > 0:
-            self.round_text(25, self.sizey-2*self.VERYSMALL-2, "act: {:3d}".format(co_values[len(co_values) - 1]),
+            self.round_text(25, self.sizey-2*self.VERYSMALL-4, "act: {:3d}".format(co_values[len(co_values) - 1]),
                             out_color=self.TEXT_COLOR)
-        self.round_text(self.sizex // 2 + 15, self.sizey - 2 * self.VERYSMALL-2, "max: {:3d}".format(co_max),
+        self.round_text(self.sizex // 2 + 15, self.sizey-2*self.VERYSMALL-4, "max: {:3d}".format(co_max),
                         out_color=self.TEXT_COLOR)
         self.bottom_line("Cal", "Mode", "Reset")
 
