@@ -297,7 +297,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             draw.line([(x, y), (x + 3, y)], fill="black", width=1)
 
 
-    def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
+    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
         if alarmlevel == 0:
             self.centered_text(0, "CO: No CO alarm", self.LARGE)
         else:
