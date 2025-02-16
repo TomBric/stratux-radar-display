@@ -292,16 +292,14 @@ class Epaper3in7(dcommon.GenericDisplay):
 
         self.graph(0, 40, 300, 200, co_values, 0, 120, 50, 100, timeout, self.TEXT_COLOR, self.TEXT_COLOR, self.TEXT_COLOR, self.BG_COLOR, 3, 3, 5, 3)
         self.draw.text((320, 50 + self.SMALL - self.VERYSMALL), "Warnlevel:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.right_text(50, f"{alarmlevel:3d}", self.SMALL)
+        self.right_text(50, f"{alarmlevel:3d}", self.SMALL, offset=5)
 
-        if co_values:
-            self.draw.text((320, 120 + self.SMALL - self.VERYSMALL), "CO act:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-            self.right_text(120, f"{co_values[-1]:3d}", self.SMALL)
-
-        self.draw.text((320, 140 + self.SMALL - self.VERYSMALL), "CO max:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.right_text(140, f"{co_max:3d}", self.SMALL)
-        self.draw.text((320, 196), "R0:", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.right_text(196, f"{r0 / 1000:.1f}k", self.SMALL)
+        lines = [
+            ("CO act:", f"{co_values[-1]:3d}") if co_values else ("CO act:", "---"),
+            ("CO max:", f"{co_max:3d}")
+        ]
+        self.dashboard(320, 100, self.sizex - 320 - 5, lines)
+        self.dashboard(320, 196, self.sizex - 320 - 5, [("R0", f"{r0 / 1000:.1f}k")])
 
         self.bottom_line("Calibrate", "Mode", "Reset")
 
