@@ -749,15 +749,17 @@ class GenericDisplay:
             return y
 
         vlmin_y = ypos + ysize - 1
-        self.draw.text((xpos - tl - x_val_space, vlmin_y - self.VERYSMALL), str(minvalue),
+        atl = self.draw.textlength(str(minvalue), self.fonts[self.VERYSMALL])
+        self.draw.text((xpos - atl - x_val_space, vlmin_y - self.VERYSMALL), str(minvalue),
                        font=self.fonts[self.VERYSMALL], fill=textcolor)
         vl1_y = draw_value_line(value_line1, self.VERYSMALL // 2)
         vl2_y = draw_value_line(value_line2, self.VERYSMALL // 2)
         vlmax_y = ypos
-        self.draw.text((xpos - tl - x_val_space, vlmax_y - self.VERYSMALL // 2), str(maxvalue),
+        self.draw.text((xpos - tl - x_val_space, vlmax_y - self.VERYSMALL//2), str(maxvalue),
                        font=self.fonts[self.VERYSMALL], fill=textcolor)
         # Draw outside text and frame
-        self.draw.rectangle((xpos, ypos, xpos + xsize-1 , ypos + ysize-1), outline=linecolor, width=linewidth, fill=bgcolor)
+        self.draw.line([(xpos, ypos), (xpos+xsize-1, ypos), (xpos+xsize-1, ypos+ysize-1),
+                        (xpos, ypos+ysize-1 ), (xpos, ypos)], outline=linecolor, width=linewidth)
         # Draw values below x-axis
         no_of_values = len(data)
         full_time = timeout * no_of_values
