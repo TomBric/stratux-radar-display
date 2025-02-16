@@ -743,8 +743,8 @@ class GenericDisplay:
         vlmin_y = ypos + ysize - 1
         self.draw.text((xpos - tl - x_val_space, vlmin_y - self.VERYSMALL), str(minvalue),
                        font=self.fonts[self.VERYSMALL], fill=textcolor)
-        vl1_y = draw_value_line(value_line1, VERYSMALL // 2)
-        vl2_y = draw_value_line(value_line2, VERYSMALL // 2)
+        vl1_y = draw_value_line(value_line1, self.VERYSMALL // 2)
+        vl2_y = draw_value_line(value_line2, self.VERYSMALL // 2)
         vlmax_y = ypos
         self.draw.text((xpos - tl - x_val_space, vlmax_y - VERYSMALL // 2), str(maxvalue),
                        font=self.fonts[self.VERYSMALL], fill=textcolor)
