@@ -746,7 +746,7 @@ class GenericDisplay:
         vl1_y = draw_value_line(value_line1, self.VERYSMALL // 2)
         vl2_y = draw_value_line(value_line2, self.VERYSMALL // 2)
         vlmax_y = ypos
-        self.draw.text((xpos - tl - x_val_space, vlmax_y - VERYSMALL // 2), str(maxvalue),
+        self.draw.text((xpos - tl - x_val_space, vlmax_y - self.VERYSMALL // 2), str(maxvalue),
                        font=self.fonts[self.VERYSMALL], fill=textcolor)
         # Draw outside text and frame
         self.draw.rectangle((xpos, ypos, xpos + xsize, ypos + ysize), outline=linecolor, width=linewidth, fill=bgcolor)
