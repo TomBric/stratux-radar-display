@@ -246,7 +246,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.round_text(30, self.sizey-2*self.VERYSMALL-5, "act: {:3d}".format(co_values[len(co_values) - 1]),
                             out_color=self.TEXT_COLOR)
         self.round_text(self.sizex // 2 + 15, self.sizey-2*self.VERYSMALL-5, "max: {:3d}".format(co_max),
-                        out_color=self.TEXT_COLOR)
+                        bg_color=self.TEXT_COLOR, text_color=self.BG_COLOR)
         if simulation_mode:
             self.round_text(3*self.VERYSMALL-4, self.sizey//4+4, "simulation mode", self.VERYSMALL,
                             out_color=self.TEXT_COLOR)

@@ -465,18 +465,19 @@ class GenericDisplay:
         self.draw.text((offset, txt_starty), text, font=self.fonts[self.SMALL])
         self.bottom_line(left_text, middle_text, r_text)
 
-    def round_text(self, x, y, text, bg_color=None, yesno=True, out_color=None):
+    def round_text(self, x, y, text, text_color=None, bg_color=None, yesno=True, out_color=None):
         # bg color is color of background, if none given, this is the normal background for this display
         # out_color is color of outline, if none given, outline is not displayed
         # if yesno is false, the text is crossed out
         bg_color = bg_color or self.BG_COLOR
+        text_color = text_color or self.TEXT_COLOR
         tl = self.draw.textlength(text, self.fonts[self.VERYSMALL])
         self.draw.rounded_rectangle([x, y, x + tl + 4, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
         if out_color is not None:
             self.draw.rounded_rectangle([x, y, x + tl + 4, y + self.VERYSMALL + 2], radius=4, outline=out_color)
-        self.draw.text((x + 2, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((x + 2, y), text, font=self.fonts[self.VERYSMALL], fill=text_color)
         if not yesno:
-            self.draw.line([x, y + self.VERYSMALL + 2, x + tl + self.VERYSMALL // 2, y], fill=self.TEXT_COLOR, width=2)
+            self.draw.line([x, y + self.VERYSMALL + 2, x + tl + self.VERYSMALL // 2, y], fill=text_color, width=2)
         return x + tl + self.VERYSMALL
 
 
