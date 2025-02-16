@@ -232,7 +232,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.right_text(starty, f"GAlt {alt}ft", self.VERYSMALL)
 
 
-    def graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
+    def _delete_graph(xpos, ypos, xsize, ysize, data, minvalue, maxvalue, value_line1, value_line2, timeout):
         tl = draw.textlength(str(maxvalue), verysmallfont)    # for adjusting x and y
         # adjust zero lines to have room for text
         xpos = xpos + tl + space
@@ -299,19 +299,22 @@ class Epaper1in54(dcommon.GenericDisplay):
 
     def cowarner(co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):   # draw graph and co values
         if alarmlevel == 0:
-            centered_text(0, "CO: No CO alarm", smallfont, fill="black")
+            self.centered_text(0, "CO: No CO alarm", self.LARGE)
         else:
-            if alarmperiod > 60:
-                alarmstr = "CO: {:d}ppm>{:d}min".format(alarmppm, math.floor(alarmperiod/60))
-            else:
-                alarmstr = "CO: {:d}ppm>{:d} sec".format(alarmppm, math.floor(alarmperiod))
-            centered_text(0, alarmstr, smallfont, fill="black")
-        graph(0, SMALL+5, sizex-19, sizey-80, co_values, 0, 120, 50, 100, timeout)
-
+            alarmstr = f"CO: {alarmppm} ppm longer {alarmperiod // 60} min" \
+                if alarmperiod > 60 else f"CO: {alarmppm} ppm longer {alarmperiod} sec"
+            self.centered_text(0, alarmstr, self.LARGE)
+        graphpos = (0, self.SMALL + 5)
+        graphsize = (self.sizex, self.sizey-3*self.VERYSMALL)
+        self.graph(graphpos, graphsize, co_values, 0, 120, timeout, value_line1=50, value_line2=100,
+                   glinewidth=1, linewidth=1)
         if len(co_values) > 0:
-            round_text(5, sizey-2*SMALL, "act: {:3d}".format(co_values[len(co_values)-1]), "white", out="black")
-        round_text(sizex/2+5, sizey-2*SMALL, "max: {:3d}".format(co_max), "white", out="black")
-        bottom_line("Cal", "Mode", "Reset")
+            self.round_text(5, self.sizey-2*self.VERYSMALL, "act: {:3d}".format(co_values[len(co_values) - 1]),
+                            out_color=self.TEXT_COLOR)
+        self.round_text(self.sizex / 2 + 5, self.sizey - 2 * self.VERYSMALL, "max: {:3d}".format(co_max),
+                        out_color=self.TEXT_COLOR)
+        self.bottom_line("Cal", "Mode", "Reset")
+
 
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                          own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
