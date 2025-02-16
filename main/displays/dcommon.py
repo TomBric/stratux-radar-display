@@ -726,7 +726,7 @@ class GenericDisplay:
 
     def graph(self, pos, size, data, minvalue, maxvalue, timeout, value_line1=None, value_line2=None,
             textcolor=None, graphcolor=None, linecolor=None, bgcolor=None, glinewidth=1, linewidth=1):
-        x_val_space = self.VERYSMALL // 4   # space between value and graph
+        x_val_space = self.VERYSMALL // 2   # space between value and graph
         x_val_linelength = self.VERYSMALL // 2  # length of value line
         textcolor = textcolor or self.TEXT_COLOR
         graphcolor = graphcolor or self.TEXT_COLOR
@@ -770,7 +770,7 @@ class GenericDisplay:
         acttime = math.floor(time.time())
 
         for i in range(no_of_time + 1):
-            self.draw.line((x, ypos + ysize - 1 + x_val_linelength, x, xpos + ysize - 1 - x_val_linelength),
+            self.draw.line((x, ypos + ysize - 1 + x_val_linelength, x, ypos + ysize - 1 - x_val_linelength),
                            width=linewidth, fill=linecolor)
             timestr = time.strftime("%H:%M", time.gmtime(math.floor(acttime - (no_of_time - i) * time_offset)))
             self.draw.text((x - tl // 2, ypos + ysize - 1 + 1), timestr, font=self.fonts[self.VERYSMALL], fill=textcolor)
