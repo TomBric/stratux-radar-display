@@ -342,7 +342,7 @@ class GenericDisplay:
                     rotmask = self.mask.rotate(-m + heading, expand=False)
                     center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
                               czeroy - (csize - cmsize - self.LARGE // 2) * s)
-                    self.epaper_image.paste(self.TEXT_COLOR, (round(center[0] - self.LARGE),
+                    self.image.paste(self.TEXT_COLOR, (round(center[0] - self.LARGE),
                                                               round(center[1] - self.LARGE)), rotmask)
 
             if error_message:
