@@ -71,7 +71,7 @@ class Oled1in5(dcommon.GenericDisplay):
         config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
         self.device = radar_opts.get_device(['-f', config_path])
         self.device.contrast(255)  # set full contrast
-        image = Image.new(device.mode, device.size)
+        image = Image.new(self.device.mode, self.device.size)
         self.draw = ImageDraw.Draw(image)
         self.sizex = self.device.height
         self.sizey = self.device.width
