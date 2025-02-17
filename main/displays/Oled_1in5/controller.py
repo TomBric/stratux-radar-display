@@ -88,11 +88,11 @@ class Oled1in5(dcommon.GenericDisplay):
         # compass
         pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
         self.compass_aircraft = Image.open(pic_path).convert("RGBA")
-        self.mask = Image.new('1', (LARGE * 2, LARGE * 2))
-        self.cdraw = ImageDraw.Draw(mask)
+        self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
+        self.cdraw = ImageDraw.Draw(self.mask)
         self.rlog.debug(f'Oled_1in5 selected: sizex={self.sizex} sizey={self.sizey} '
                         f'zero=({self.zerox}, {self.zeroy}) refresh-time: {round(self.display_refresh, 2)} secs')
-        return sizex, zerox, zeroy, display_refresh
+        return self.sizex, self.zerox, self.zeroy, display_refresh
 
 
     def cleanup(self):
