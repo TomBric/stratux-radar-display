@@ -38,6 +38,35 @@ class NoDisplay(dcommon.GenericDisplay):
         self.rlog.debug("Running Radar with NoDisplay! ")
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
+    # define all functions which are defined in dcommon for external calls
+    def clear(self):
+        pass
+
+    def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
+              utc_color=None, timer_color=None, second_color=None):
+        pass
+
+    def compass(self, heading, error_message):
+        pass
+
+    def ahrs(self, pitch, roll, heading, slipskid, error_message):
+        pass
+
+    def screen_input(self, headline, subline, text, left, middle, right, prefix, inp, suffix):
+        pass
+
+    def flighttime(self, last_flights, side_offset=0, long_version=False):
+        pass
+
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
+        pass
+
+    def checklist(self, checklist_name, checklist_items, current_index, last_list, color=None):
+        pass
+
+    def shutdown(self, countdown, shutdownmode):
+        pass
+
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = NoDisplay()
