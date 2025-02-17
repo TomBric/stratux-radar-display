@@ -114,11 +114,11 @@ class Oled1in5(dcommon.GenericDisplay):
     def startup(self, version, target_ip, seconds):
         logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
         logo = Image.open(logopath)
-        self.draw.rectangle(((0, 0), (sizex, 64)), fill="blue")
-        self.draw.bitmap((zerox - 32, 0), logo, fill="white")
+        self.draw.rectangle(((0, 0), (self.sizex, 64)), fill="blue")
+        self.draw.bitmap((self.zerox - 32, 0), logo, fill="white")
         self.centered_text(64, "Radar "+version, self.LARGE)
-        self.centered_text(sizey - 3 * self.SMALL, "Connecting to", self.SMALL)
-        self.centered_text(sizey - 2*SMALL, target_ip, self.SMALL)
+        self.centered_text(self.sizey - 3 * self.SMALL, "Connecting to", self.SMALL)
+        self.centered_text(self.sizey - 2*SMALL, target_ip, self.SMALL)
         self.display()
         time.sleep(seconds)
 
