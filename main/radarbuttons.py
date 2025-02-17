@@ -80,6 +80,11 @@ class ApiForm(FlaskForm):
     right_long =   SubmitField(' Right Long  ')
 
 # section for button api, only used when option "-api" is set
+# to trigger interactively you can use CURL
+# e.g. to trigger middle-long:
+# curl -s -o /dev/null -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "middle_long=Middle Long" http://192.168.10.15/api
+# e.g. to trigger right-short:
+# curl -s -o /dev/null -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "right_short=Right Short" http://192.168.10.15/api
 @app.route('/api', methods=['GET', 'POST'])
 def api():
     global last_api_input
