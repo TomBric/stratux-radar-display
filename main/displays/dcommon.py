@@ -585,6 +585,8 @@ class GenericDisplay:
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
         pass
 
+    def gmeter(self, current, maxg, ming, error_message):
+        pass
 
     def checklist_topic(self, ypos, topic, color=None, highlighted=False, toprint=True):
         color=color or self.TEXT_COLOR
