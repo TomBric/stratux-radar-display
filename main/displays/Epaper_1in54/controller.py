@@ -231,9 +231,8 @@ class Epaper1in54(dcommon.GenericDisplay):
         alt = f"{gps_alt:.0f}" if stat['GPS_position_accuracy'] < 19999 else "---"
         self.right_text(starty, f"GAlt {alt}ft", self.VERYSMALL)
 
-    def cowarner(self, co_values, co_max, r0, timeout, simulation_mode=False):   # draw graph and co values
-        t = cowarner.alarm_level()[1]   # gives string for alarm_level
-        self.centered_text(0, t, self.LARGE)
+    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):   # draw graph and co values
+        self.centered_text(0, alarmtext, self.LARGE)
         graphpos = (0, self.SMALL + 5)
         graphsize = (self.sizex-1, self.sizey-3*self.VERYSMALL-self.SMALL-5)
         self.graph(graphpos, graphsize, co_values, 0, 120, timeout, value_line1=50, value_line2=100,
