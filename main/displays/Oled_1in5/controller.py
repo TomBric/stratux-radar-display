@@ -118,7 +118,7 @@ class Oled1in5(dcommon.GenericDisplay):
         self.draw.bitmap((self.zerox - 32, 0), logo, fill="white")
         self.centered_text(64, "Radar "+version, self.LARGE)
         self.centered_text(self.sizey - 3 * self.SMALL, "Connecting to", self.SMALL)
-        self.centered_text(self.sizey - 2*SMALL, target_ip, self.SMALL)
+        self.centered_text(self.sizey - 2*self.SMALL, target_ip, self.SMALL)
         self.display()
         time.sleep(seconds)
 
