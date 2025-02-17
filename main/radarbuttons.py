@@ -124,7 +124,7 @@ def run_flask():
         rlog.error(f"radarbuttons: Failed to start nginx, return code: {ret}")
     else:
         rlog.debug(f"radarbuttons: starting flask app")
-    app.run(debug=False, use_reloader=False)
+    app.run(debug=True, use_reloader=False)
 
 
 
