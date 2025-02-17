@@ -424,6 +424,7 @@ class GenericDisplay:
         pitchmark_length = self.sizey//6
         pitchscale = self.sizey / 6 / 10  # scaling factor for pitchmarks, so that +-20 is displayed
         rollmark_length = self.sizex//10
+        line_width_middle = self.sizey//32  # middle right and left of pointer
         center_pointer_x = self.sizex//8
         center_pointer_y = self.sizey//16
         # this is the scaling factor for all drawings, 6 means: space for 6 pitch lines from -20, -10, 0, 10, 20
@@ -443,9 +444,9 @@ class GenericDisplay:
 
         # pointer in the middle
         self.draw.line((self.ah_zerox - 90, self.ah_zeroy, self.ah_zerox - 30, self.ah_zeroy),
-                       width=6, fill=self.TEXT_COLOR)
+                       width=line_width_middle, fill=self.TEXT_COLOR)
         self.draw.line((self.ah_zerox + 90, self.ah_zeroy, self.ah_zerox + 30, self.ah_zeroy),
-                       width=6, fill=self.TEXT_COLOR)
+                       width=line_width_middle, fill=self.TEXT_COLOR)
         self.draw.polygon((self.ah_zerox, self.ah_zeroy,
                            self.ah_zerox - center_pointer_x, self.ah_zeroy + center_pointer_y,
                            self.ah_zerox + center_pointer_x, self.ah_zeroy + center_pointer_y),
