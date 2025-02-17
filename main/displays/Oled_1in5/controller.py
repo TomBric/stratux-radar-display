@@ -109,7 +109,7 @@ class Oled1in5(dcommon.GenericDisplay):
         return False
 
     def clear(self):
-        self.draw.rectangle((0, 0, sizex - 1, sizey - 1), fill=self.BG_COLOR)
+        self.draw.rectangle((0, 0, self.sizex - 1, self.sizey - 1), fill=self.BG_COLOR)
 
     def startup(self, version, target_ip, seconds):
         logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
