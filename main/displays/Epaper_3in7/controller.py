@@ -283,7 +283,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.bottom_line("+10 ft", "Mode", "-10 ft")
 
 
-    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, imulation_mode=False):
+    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):
         self.centered_text(0, alarmtext, self.LARGE)
         graphpos = (0,40)
         graphsize = (300, 200)
