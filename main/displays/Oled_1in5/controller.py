@@ -71,8 +71,8 @@ class Oled1in5(dcommon.GenericDisplay):
         config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
         self.device = radar_opts.get_device(['-f', config_path])
         self.device.contrast(255)  # set full contrast
-        image = Image.new(self.device.mode, self.device.size)
-        self.draw = ImageDraw.Draw(image)
+        self.image = Image.new(self.device.mode, self.device.size)
+        self.draw = ImageDraw.Draw(self.image)
         self.sizex = self.device.height
         self.sizey = self.device.width
         self.zerox = self.sizex // 2
@@ -102,7 +102,7 @@ class Oled1in5(dcommon.GenericDisplay):
         pass
 
     def display(self):
-        self.device.display(image)
+        self.device.display(self.image)
 
     def is_busy(self):
         # oled is never busy, no refresh
