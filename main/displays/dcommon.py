@@ -803,30 +803,32 @@ class GenericDisplay:
                   headline_size=0):
         # dashboard, arguments are lines = ("text", "value"), ....
         # x and y are the starting points of the rounded rectangle
-        # rounding triggers a box around the text
+        # rounding triggers a box around the text with a headline of provided,
+        # if rounding is not set, no headline is displayed
         color = color or self.TEXT_COLOR
         bgcolor = bgcolor or self.BG_COLOR
-        headline_size = headline_size or self.VERYSMALL
+        if rounding:
+            headline_size = headline_size or self.VERYSMALL
         indent = self.VERYSMALL // 2   # text indent on the left
         side_offset = 0   # offset right and left of the rounding
         line_indent = 0 # additional space between lines
 
-        starty = y + headline_size  # space for heading
+        if rounding:
+            self.draw.rounded_rectangle([x + side_offset, y + headline_size//2, x + dsizex - side_offset,
+                                         starty + headline_size//2 ], radius=6, fill=None, outline=color, width=2)
+            if headline is not None:
+                heading_indent = self.draw.textlength("---", self.fonts[headline_size])  # just 2 characters to the right
+                heading_space = self.draw.textlength("-", self.fonts[headline_size])  # space in front and behind heading
+                tl = self.draw.textlength(headline, self.fonts[headline_size])
+                self.draw.rectangle([x + side_offset + heading_indent - heading_space, y,
+                    x + heading_indent + tl + heading_space, y + headline_size], fill=bgcolor, outline=None)
+                self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[headline_size], fill=color)
+            starty = y + headline_size  # was space for heading
         for line in lines:
             self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
                            font=self.fonts[self.VERYSMALL], fill=color,align="left")
             tl = self.draw.textlength(line[1], self.fonts[self.SMALL])
             self.draw.text((x + dsizex - side_offset - indent - tl, starty), line[1], font=self.fonts[self.SMALL], fill=color)
             starty += self.SMALL + line_indent
-        if rounding:
-            self.draw.rounded_rectangle([x + side_offset, y + headline_size//2, x + dsizex - side_offset,
-                                         starty + headline_size//2 ], radius=6, fill=None, outline=color, width=2)
-        if headline is not None:
-            heading_indent = self.draw.textlength("---", self.fonts[headline_size])  # just 2 characters to the right
-            heading_space = self.draw.textlength("-", self.fonts[headline_size])  # space in front and behind heading
-            tl = self.draw.textlength(headline, self.fonts[headline_size])
-            self.draw.rectangle([x + side_offset + heading_indent - heading_space, y,
-                x + heading_indent + tl + heading_space, y + headline_size], fill=bgcolor, outline=None)
-            self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[headline_size], fill=color)
         return starty
 

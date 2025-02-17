@@ -86,7 +86,6 @@ def api():
 
     api_form = ApiForm()
     if api_form.validate_on_submit() is True:  # POST request
-        rlog.debug(f"API: POST request received")
         if api_form.left_short.data is True:
             last_api_input = 1, 0
         elif api_form.left_long.data is True:
@@ -101,7 +100,7 @@ def api():
             last_api_input = 2, 2
         else:
             last_api_input = 0, 0
-    rlog.debug(f"API: last_api_input={last_api_input}")
+    rlog.debug(f"API: api_input={last_api_input}")
     return render_template('api.html', api_form=api_form)
 
 
