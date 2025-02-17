@@ -830,6 +830,5 @@ class GenericDisplay:
                 self.draw.rectangle([x + side_offset + heading_indent - heading_space, y,
                     x + heading_indent + tl + heading_space, y + headline_size], fill=bgcolor, outline=None)
                 self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[headline_size], fill=color)
-            starty += headline_size  # was space for heading
         return starty
 
