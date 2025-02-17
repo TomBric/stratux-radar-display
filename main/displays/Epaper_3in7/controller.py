@@ -278,8 +278,8 @@ class Epaper3in7(dcommon.GenericDisplay):
         starty += self.VERYSMALL + 5
 
         self.draw.text((5, starty), "sensors", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        x = self.round_text(100, starty, "IMU", "white", stat['IMUConnected'], out_color=self.TEXT_COLOR)
-        self.round_text(x, starty, "BMP", "white", stat['BMPConnected'], out_color=self.TEXT_COLOR)
+        x = self.round_text(100, starty, "IMU", yesno=stat['IMUConnected'], out_color=self.TEXT_COLOR)
+        self.round_text(x, starty, "BMP", yesno=stat['BMPConnected'], out_color=self.TEXT_COLOR)
         self.bottom_line("+10 ft", "Mode", "-10 ft")
 
 

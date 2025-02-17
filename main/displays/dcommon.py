@@ -803,10 +803,10 @@ class GenericDisplay:
                   headline_size=0):
         # dashboard, arguments are lines = ("text", "value"), ....
         # x and y are the starting points of the rounded rectangle
+        # rounding triggers a box around the text
         color = color or self.TEXT_COLOR
         bgcolor = bgcolor or self.BG_COLOR
-        if headline is not None and headline_size==0:  # set headline_size to default
-            headline_size = self.VERYSMALL
+        headline_size = headline_size or self.VERYSMALL
         indent = self.VERYSMALL // 2   # text indent on the left
         side_offset = 0   # offset right and left of the rounding
         line_indent = 0 # additional space between lines
