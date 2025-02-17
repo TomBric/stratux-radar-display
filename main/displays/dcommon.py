@@ -813,9 +813,10 @@ class GenericDisplay:
         side_offset = 0   # offset right and left of the rounding
         line_indent = 0 # additional space between lines
 
+        starty = y
         if rounding:
             self.draw.rounded_rectangle([x + side_offset, y + headline_size//2, x + dsizex - side_offset,
-                                         starty + headline_size//2 ], radius=6, fill=None, outline=color, width=2)
+                                         y + headline_size//2 ], radius=6, fill=None, outline=color, width=2)
             if headline is not None:
                 heading_indent = self.draw.textlength("---", self.fonts[headline_size])  # just 2 characters to the right
                 heading_space = self.draw.textlength("-", self.fonts[headline_size])  # space in front and behind heading
@@ -823,7 +824,7 @@ class GenericDisplay:
                 self.draw.rectangle([x + side_offset + heading_indent - heading_space, y,
                     x + heading_indent + tl + heading_space, y + headline_size], fill=bgcolor, outline=None)
                 self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[headline_size], fill=color)
-            starty = y + headline_size  # was space for heading
+            starty += headline_size  # was space for heading
         for line in lines:
             self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
                            font=self.fonts[self.VERYSMALL], fill=color,align="left")
