@@ -56,6 +56,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     BG_COLOR = "white"
     TEXT_COLOR = "black"
     AIRCRAFT_COLOR = "black"
+    AIRCRAFT_OUTLINE = "black"
     # AHRS
     AHRS_EARTH_COLOR = "white"  # how ahrs displays the earth
     AHRS_SKY_COLOR = "white"  # how ahrs displays the sky
@@ -133,7 +134,8 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
         self.draw.text((0, 0), f"{range}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.draw.text((0, self.SMALL), "nm", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((0, self.sizey - self.SMALL), f"FL{round(ownalt / 100)}", font=self.fonts[self.SMALL], fill="black")
+        self.draw.text((0, self.sizey - self.SMALL), f"FL{round(ownalt / 100)}", font=self.fonts[self.SMALL],
+                       fill=self.TEXT_COLOR)
 
         t = f"{altdifference // 1000}k" if altdifference >= 10000 else f"{altdifference}"
         tl = self.draw.textlength(t, self.fonts[self.SMALL])
@@ -230,6 +232,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.round_text(x, starty, "BMP", yesno=stat['BMPConnected'], out_color=self.TEXT_COLOR)
         alt = f"{gps_alt:.0f}" if stat['GPS_position_accuracy'] < 19999 else "---"
         self.right_text(starty, f"GAlt {alt}ft", self.VERYSMALL)
+        self.bottom_line("+10ft", "Mode", "-10ft")
 
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):   # draw graph and co values
         self.centered_text(0, alarmtext, self.LARGE)

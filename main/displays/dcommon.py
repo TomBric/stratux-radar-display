@@ -68,6 +68,7 @@ class GenericDisplay:
     # radar-mode
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
     AIRCRAFT_COLOR = "red"
+    AIRCRAFT_OUTLINE = "white"
     BG_COLOR = "black"
     TEXT_COLOR = "white"   # default color for text
     # AHRS
@@ -158,8 +159,8 @@ class GenericDisplay:
 
         self.draw.polygon(
             ((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
-            fill=self.AIRCRAFT_COLOR, outline=self.AIRCRAFT_COLOR)
-        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=self.AIRCRAFT_COLOR, width=self.VELOCITY_WIDTH)
+            fill=self.AIRCRAFT_COLOR, outline=self.AIRCRAFT_OUTLINE)
+        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=self.AIRCRAFT_OUTLINE, width=self.VELOCITY_WIDTH)
         if height >= 0:
             t = "+" + str(abs(height))
         else:
@@ -174,9 +175,10 @@ class GenericDisplay:
             tposition = (x - 4 * self.AIRCRAFT_SIZE - w, int(y - self.LARGE / 2))
         else:
             tposition = (x + 4 * self.AIRCRAFT_SIZE + 1, int(y - self.LARGE / 2))
-        self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.AIRCRAFT_COLOR)
+        self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.TEXT_COLOR)
         if tail is not None:
-            self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.fonts[self.VERYSMALL], fill=self.AIRCRAFT_COLOR)
+            self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.fonts[self.VERYSMALL],
+                           fill=self.TEXT_COLOR)
 
 
     def display(self):
