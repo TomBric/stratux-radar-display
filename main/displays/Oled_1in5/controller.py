@@ -176,7 +176,7 @@ class Oled1in5(dcommon.GenericDisplay):
                            fill=btcolor, align="right")
 
 
-    def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
+    def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs,
               utc_color=None, timer_color=None, second_color=None):
         # is defined in subclass, since we want to have colors for oled
         if timer_runs:
