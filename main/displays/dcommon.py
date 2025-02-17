@@ -467,6 +467,7 @@ class GenericDisplay:
         if subline is not None:
             self.centered_text(txt_starty, subline, self.SMALL)
             txt_starty += self.SMALL
+        txt_starty += self.SMALL//2   # some line indent
         self.draw.text((offset, txt_starty), text, font=self.fonts[self.SMALL])
         self.bottom_line(left_text, middle_text, r_text)
 
@@ -567,9 +568,13 @@ class GenericDisplay:
             for b in range(bar_start, int(xval), color_table['black_white_offset']):
                 self.draw.line([(b, y), (b, y + self.VERYSMALL)], fill=color_table['outline'], width=1)
         else:
-            color = (color_table.get('red') if val >= color_table.get('red_value') else
-                     color_table.get('yellow') if val >= color_table.get('yellow_value') else
-                     color_table.get('green'))
+            if 'red' in color_table:
+                color = color_table.get('red') if val >= color_table.get('red_value') else self.TEXT_COLOR
+            elif 'yellow' in color_table:
+                color = color_table.get('yellow') if val >= color_table.get('yellow_value') else self.TEXT_COLOR
+            else:
+                color = color_table.get('green') if 'green' in color_table else self.TEXTCOLOR
+
             if color:
                 self.draw.rectangle([bar_start, y, xval, y + self.VERYSMALL], fill=color, outline=None)
         if 'outline' in color_table:
