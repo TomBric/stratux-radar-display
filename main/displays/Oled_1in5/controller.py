@@ -56,6 +56,7 @@ class Oled1in5(dcommon.GenericDisplay):
     # colors
     BG_COLOR = "black"
     TEXT_COLOR = "white"
+    WARNING_COLOR = "red"
     AIRCRAFT_COLOR = "red"
     AIRCRAFT_OUTLINE = "white"
     # AHRS
@@ -151,12 +152,12 @@ class Oled1in5(dcommon.GenericDisplay):
                        align="right")
 
         if not gpsconnected:
-            self.centered_text(15, "No GPS", self.SMALL)
+            self.centered_text(15, "No GPS", self.SMALL, color=self.WARNING_COLOR)
         if not connected:
-            self.centered_text(75, "No connection!", self.SMALL)
+            self.centered_text(75, "No connection!", self.SMALL, color=self.WARNING_COLOR)
         if co_alarmlevel > 0:
-            self.centered_text(self.sizey - 3 * self.SMALL, "CO Alarm!", self.SMALL)
-            self.centered_text(self.sizey - 2 * self.SMALL, co_alarmstring, self.SMALL)
+            self.centered_text(self.sizey - 3 * self.SMALL, "CO Alarm!", self.SMALL, color=self.WARNING_COLOR)
+            self.centered_text(self.sizey - 2 * self.SMALL, co_alarmstring, self.SMALL, color=self.WARNING_COLOR)
 
         if extsound or bt_devices > 0:  # extsound means and sound devices has been found
             if sound_active:  # means user left sound switched on
@@ -174,7 +175,6 @@ class Oled1in5(dcommon.GenericDisplay):
             tl = self.draw.textlength(text, self.awesomefont)
             self.draw.text((self.sizex - tl, self.sizey - 2 * self.SMALL), text, font=self.awesomefont,
                            fill=btcolor, align="right")
-
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs,
               utc_color=None, timer_color=None, second_color=None):
@@ -198,7 +198,7 @@ class Oled1in5(dcommon.GenericDisplay):
         self.right_text(52, f"{maxg:+1.2f}", self.SMALL, color="magenta")
         if error_message:
             self.entered_text(57, error_message, self.LARGE, color="red")
-        self.draw.text((zerox+8, 65), "min", font=self.fonts[self.VERYSMALL], fill="cyan")
+        self.draw.text((self.zerox+8, 65), "min", font=self.fonts[self.VERYSMALL], fill="cyan")
         self.right_text(65, "{:+1.2f}".format(ming), self.VERYSMALL, color="magenta")
         self.bottom_line("", "", "Reset")
 
