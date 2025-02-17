@@ -813,10 +813,16 @@ class GenericDisplay:
         side_offset = 0   # offset right and left of the rounding
         line_indent = 0 # additional space between lines
 
-        starty = y
+        starty = y if not rounding else y + headline_size
+        for line in lines:
+            self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
+                           font=self.fonts[self.VERYSMALL], fill=color,align="left")
+            tl = self.draw.textlength(line[1], self.fonts[self.SMALL])
+            self.draw.text((x + dsizex - side_offset - indent - tl, starty), line[1], font=self.fonts[self.SMALL], fill=color)
+            starty += self.SMALL + line_indent
         if rounding:
             self.draw.rounded_rectangle([x + side_offset, y + headline_size//2, x + dsizex - side_offset,
-                                         y + headline_size//2 ], radius=6, fill=None, outline=color, width=2)
+                                         starty + headline_size//2 ], radius=6, fill=None, outline=color, width=2)
             if headline is not None:
                 heading_indent = self.draw.textlength("---", self.fonts[headline_size])  # just 2 characters to the right
                 heading_space = self.draw.textlength("-", self.fonts[headline_size])  # space in front and behind heading
@@ -825,11 +831,5 @@ class GenericDisplay:
                     x + heading_indent + tl + heading_space, y + headline_size], fill=bgcolor, outline=None)
                 self.draw.text((x + side_offset + heading_indent, y), headline, font=self.fonts[headline_size], fill=color)
             starty += headline_size  # was space for heading
-        for line in lines:
-            self.draw.text((x + indent + side_offset, starty + (self.SMALL - self.VERYSMALL) // 2), line[0],
-                           font=self.fonts[self.VERYSMALL], fill=color,align="left")
-            tl = self.draw.textlength(line[1], self.fonts[self.SMALL])
-            self.draw.text((x + dsizex - side_offset - indent - tl, starty), line[1], font=self.fonts[self.SMALL], fill=color)
-            starty += self.SMALL + line_indent
         return starty
 
