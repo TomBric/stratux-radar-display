@@ -198,9 +198,9 @@ class Oled1in5(dcommon.GenericDisplay):
         self.right_text(52, f"{maxg:+1.2f}", self.SMALL, color="magenta")
         if error_message:
             self.entered_text(57, error_message, self.LARGE, color="red")
-        self.draw.text((self.zerox+8, 65), "min", font=self.fonts[self.VERYSMALL], fill="cyan")
-        self.right_text(65, "{:+1.2f}".format(ming), self.VERYSMALL, color="magenta")
-        self.bottom_line("", "", "Reset")
+        self.draw.text((self.zerox+13, 65), "min", font=self.fonts[self.VERYSMALL], fill="cyan")
+        self.right_text(65, "{:+1.2f}".format(ming), self.SMALL, color="magenta")
+        self.bottom_line("", "", "Rst")
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
