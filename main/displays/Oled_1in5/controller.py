@@ -82,7 +82,7 @@ class Oled1in5(dcommon.GenericDisplay):
         self.ah_zerox = self.sizex // 2
         start = time.time()
         # do sync version of display to measure time
-        device.display(image)
+        self.device.display(image)
         end = time.time()
         display_refresh = end - start
         # compass
