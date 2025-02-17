@@ -187,7 +187,7 @@ class Oled1in5(dcommon.GenericDisplay):
             second_color = "powderblue"
         else:
             second_color= "magenta"
-        dcommon.GenericDisplay().timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs,
+        self.GenericDisplay().timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs,
                                utc_color="cyan", timer_color=color, second_color=second_color)
 
     def gmeter(self, current, maxg, ming, error_message):
