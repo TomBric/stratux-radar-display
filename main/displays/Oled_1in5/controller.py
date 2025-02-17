@@ -218,7 +218,7 @@ class Oled1in5(dcommon.GenericDisplay):
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         starty = 0
         self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
-        starty += self.SMALL+3
+        starty += self.SMALL+6
         bar_start, bar_end = 30, 100
         line_offset = 4
         colors = {'outline': 'white', 'green': 'white'}
