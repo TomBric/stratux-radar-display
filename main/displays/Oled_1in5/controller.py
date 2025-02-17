@@ -43,7 +43,7 @@ import logging
 
 class Oled1in5(dcommon.GenericDisplay):
     VERYLARGE = 24
-    MORELARGE = 22
+    MORELARGE = 20
     LARGE = 18  # size of height indications of aircraft
     MEDIUM = 14
     SMALL = 12  # size of information indications on top and bottom
@@ -219,7 +219,7 @@ class Oled1in5(dcommon.GenericDisplay):
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         starty = 0
         self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
-        starty += SMALL+3
+        starty += self.SMALL+3
         bar_start, bar_end = 30, 100
         line_offset = 4
         colors = {'outline': 'white', 'green': 'white'}
