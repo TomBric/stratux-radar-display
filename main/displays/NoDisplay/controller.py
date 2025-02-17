@@ -42,6 +42,13 @@ class NoDisplay(dcommon.GenericDisplay):
     def clear(self):
         pass
 
+    def modesaircraft(self, radius, height, arcposition, vspeed, tail, width=3):
+        pass
+
+    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail):
+        pass
+
+
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
               utc_color=None, timer_color=None, second_color=None):
         pass
