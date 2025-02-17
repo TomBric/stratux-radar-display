@@ -572,7 +572,7 @@ class GenericDisplay:
                            fill=color_table['outline'])
         return y + self.VERYSMALL + line_offset
 
-    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmppm, alarmperiod):  # draw graph and co values
+    def cowarner(self, co_values, co_max, r0, timeout, simulation_mode=False):  # draw graph and co values
         pass
 
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
