@@ -473,7 +473,7 @@ class GenericDisplay:
         text_color = text_color or self.TEXT_COLOR
         tl = self.draw.textlength(text, self.fonts[self.VERYSMALL])
         self.draw.rounded_rectangle([x, y, x + tl + 4, y + self.VERYSMALL + 2], radius=4, fill=bg_color)
-        if out_color is not None:
+        if out_color:
             self.draw.rounded_rectangle([x, y, x + tl + 4, y + self.VERYSMALL + 2], radius=4, outline=out_color)
         self.draw.text((x + 2, y), text, font=self.fonts[self.VERYSMALL], fill=text_color)
         if not yesno:
