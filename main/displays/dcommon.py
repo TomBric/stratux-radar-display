@@ -350,6 +350,8 @@ class GenericDisplay:
             error_message):
         pass
 
+    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):
+        pass
 
     def shutdown(self, countdown, shutdownmode):
         pass
