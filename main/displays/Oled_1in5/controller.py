@@ -238,7 +238,6 @@ class Oled1in5(dcommon.GenericDisplay):
         if stat['CPUTemp'] > -300:    # -300 means no value available
             starty = self.bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0),
                               bar_start, bar_end, colors, unit="°C", line_offset=line_offset)
-            starty = bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0), 70, 80, "°C")
         t = "3D GPS " if gps_quality == 1 else "DGNSS " if gps_quality == 2 else "GPS"
         self.draw.text((0, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         t = f"{stat['GPS_satellites_locked']}/{stat['GPS_satellites_seen']}/{stat['GPS_satellites_tracked']}"
