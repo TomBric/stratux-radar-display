@@ -303,42 +303,10 @@ class Oled1in5(dcommon.GenericDisplay):
             )
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
-            self.centered_text(80, error_message, self.VERYLARGE)
+            self.centered_text(80, error_message, self.VERYLARGE, self.WARNING_COLOR)
         self.bottom_line("Stat/Set", "   Mode", "Start")
 
-        centered_text(0, "GPS-Distance", smallfont, fill="yellow")
-        gps_dist_str = "---"
-        gps_speed_str = "---"
-        if distance_valid:
-            gps_dist_str = "{:4.0f}".format(gps_distance)
-        if gps_valid:
-            gps_speed_str = "{:3.1f}".format(gps_speed)
-        lines = (
-            ("UTC", "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(now.hour, now.minute, now.second,
-                                                           math.floor(now.microsecond / 100000))),
-            ("GPS-Dist[m]", gps_dist_str),
-            ("GPS-Spd[kts]", gps_speed_str),
-        )
-        starty = dashboard(0, SMALL+2, sizex, lines)
-        if baro_valid:
-            if alt_diff_takeoff is not None:
-                takeoff_str = "{:+5.1f}".format(alt_diff_takeoff)
-            else:
-                takeoff_str = "---"
-            lines = (
-                ("VSpeed [ft]", "{:+4.0f}".format(vert_speed)),
-                ("BaDif tof [ft]", takeoff_str),
-            )
-            starty = dashboard(0, starty, sizex, lines)
-        if ground_distance_valid:
-            lines = (
-                ("GrdDist [cm]", "{:+3.1f}".format(grounddistance/10)),
-            )
-            dashboard(0, starty, sizex, lines)
 
-        if error_message is not None:
-            centered_text(80, error_message, verylargefont, fill="red")
-        bottom_line("Stats/Set", "  Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
         self.centered_text(0, "Start-/Landing", self.SMALL)
