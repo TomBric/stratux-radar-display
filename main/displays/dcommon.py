@@ -124,11 +124,12 @@ class GenericDisplay:
         self.rlog.debug("Running Radar with NoDisplay! ")
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
-    def modesaircraft(self, radius, height, arcposition, vspeed, tail, width=3):
+    def modesaircraft(self, radius, height, arcposition, vspeed, tail):
+        circle_width = max(2, self.max_pixel // 128)
         if radius < self.MINIMAL_CIRCLE:
             radius = self.MINIMAL_CIRCLE
         self.draw.ellipse((self.zerox-radius, self.zeroy-radius, self.zerox+radius, self.zeroy+radius),
-                          width=width, outline=self.MODE_S_COLOR)
+                          width=circle_width, outline=self.MODE_S_COLOR)
         arctext = posn(arcposition, radius, angle_offset=self.ANGLE_OFFSET)
         if height > 0:
             signchar = "+"
