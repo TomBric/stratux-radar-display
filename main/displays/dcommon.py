@@ -334,13 +334,13 @@ class GenericDisplay:
                     font = self.fonts[self.MORELARGE] if m % 90 == 0 else self.fonts[self.LARGE]
                     color = self.HIGHLIGHT_COLOR if m % 90 == 0 else self.TEXT_COLOR
                     tl = self.draw.textlength(mark, font)
-                    self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill=self.TEXT_COLOR)
+                    self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill=self.BG_COLOR)
                     self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
-                                    font=font, fill=color)
+                                    font=font)
                     rotmask = self.mask.rotate(-m + heading, expand=False)
                     center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
                               czeroy - (csize - cmsize - self.LARGE // 2) * s)
-                    self.image.paste(self.TEXT_COLOR, (round(center[0] - self.LARGE),
+                    self.image.paste(color, (round(center[0] - self.LARGE),
                                                               round(center[1] - self.LARGE)), rotmask)
 
             if error_message:
