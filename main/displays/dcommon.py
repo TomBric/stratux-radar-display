@@ -125,7 +125,7 @@ class GenericDisplay:
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
     def modesaircraft(self, radius, height, arcposition, vspeed, tail):
-        circle_width = max(2, self.max_pixel // 128)
+        circle_width = max(2, 1 + self.max_pixel // 128)
         if radius < self.MINIMAL_CIRCLE:
             radius = self.MINIMAL_CIRCLE
         self.draw.ellipse((self.zerox-radius, self.zeroy-radius, self.zerox+radius, self.zeroy+radius),
@@ -152,7 +152,7 @@ class GenericDisplay:
                            font=self.fonts[self.VERYSMALL], fill=self.MODE_S_COLOR)
 
     def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail):
-        velocity_width = max(1, self.AIRCRAFT_SIZE // 3)
+        velocity_width = max(1, self.AIRCRAFT_SIZE // 2)
         p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
         p2 = posn(direction + 150, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
         p3 = posn(direction + 180, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
