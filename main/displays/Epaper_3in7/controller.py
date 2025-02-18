@@ -54,6 +54,7 @@ class Epaper3in7(dcommon.GenericDisplay):
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
     BG_COLOR = "white"
     TEXT_COLOR = "black"
+    HIGHLIGHT_COLOR = "black"
     AIRCRAFT_COLOR = "black"
     AIRCRAFT_OUTLINE = "black"
     MODE_S_COLOR = "black"

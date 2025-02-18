@@ -55,6 +55,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     # colors
     BG_COLOR = "white"
     TEXT_COLOR = "black"
+    HIGHLIGHT_COLOR = "black"
     AIRCRAFT_COLOR = "black"
     AIRCRAFT_OUTLINE = "black"
     MODE_S_COLOR = "black"
