@@ -310,7 +310,7 @@ class GenericDisplay:
         czeroy = self.sizey // 2
         csize = self.sizey // 2  # radius of compass rose
         cmsize = self.sizey // 20 # size of compass marks
-        line_width = 4
+        line_width = 1 + min(self.sizex, self.sizey) // 64
 
         self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
                           fill=self.BG_COLOR, width=line_width)
@@ -338,6 +338,7 @@ class GenericDisplay:
                 # in any case black, this is used as the rotation mask
                 self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
                                 font=font, fill="white")
+                # "white" in any case, since the mask is binary, color is set later on with image.paste
                 rotmask = self.mask.rotate(-m + heading, expand=False)
                 center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
                           czeroy - (csize - cmsize - self.LARGE // 2) * s)
