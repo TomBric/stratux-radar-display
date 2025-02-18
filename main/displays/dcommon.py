@@ -306,45 +306,46 @@ class GenericDisplay:
                            font=self.fonts[middle_fontsize], fill=text_color, align="left")
 
     def compass(self, heading, error_message):
-            czerox = self.sizex // 2
-            czeroy = self.sizey // 2
-            csize = self.sizey // 2  # radius of compass rose
-            cmsize = self.sizey // 20 # size of compass marks
-            line_width = 4
+        czerox = self.sizex // 2
+        czeroy = self.sizey // 2
+        csize = self.sizey // 2  # radius of compass rose
+        cmsize = self.sizey // 20 # size of compass marks
+        line_width = 4
 
-            self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
-                              fill=self.BG_COLOR, width=line_width)
-            bw, bh = self.compass_aircraft.size
-            self.draw.bitmap((czerox - bw // 2, czeroy - bh //2), self.compass_aircraft, fill=self.TEXT_COLOR)
-            self.draw.line((czerox - line_width//2, cmsize, czerox - line_width//2 , czeroy - bh//2),
-                           fill=self.TEXT_COLOR, width=line_width)
+        self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
+                          fill=self.BG_COLOR, width=line_width)
+        bw, bh = self.compass_aircraft.size
+        self.draw.bitmap((czerox - bw // 2, czeroy - bh //2), self.compass_aircraft, fill=self.TEXT_COLOR)
+        self.draw.line((czerox - line_width//2, cmsize, czerox - line_width//2 , czeroy - bh//2),
+                       fill=self.TEXT_COLOR, width=line_width)
 
-            self.bottom_line("", "", f"{heading}°")
+        self.bottom_line("", "", f"{heading}°")
 
-            for m in range(0, 360, 10):
-                s = math.sin(math.radians(m - heading + 90))
-                c = math.cos(math.radians(m - heading + 90))
-                x1, y1 = czerox - (csize - 1) * c, czeroy - (csize - 1) * s
-                x2, y2 = czerox - (csize - cmsize) * c, czeroy - (csize - cmsize) * s
-                width = line_width if m % 30 == 0 else line_width//2
-                self.draw.line((x1, y1, x2, y2), fill=self.TEXT_COLOR, width=width)
+        for m in range(0, 360, 10):
+            s = math.sin(math.radians(m - heading + 90))
+            c = math.cos(math.radians(m - heading + 90))
+            x1, y1 = czerox - (csize - 1) * c, czeroy - (csize - 1) * s
+            x2, y2 = czerox - (csize - cmsize) * c, czeroy - (csize - cmsize) * s
+            width = line_width if m % 30 == 0 else line_width//2
+            self.draw.line((x1, y1, x2, y2), fill=self.TEXT_COLOR, width=width)
 
-                if m % 30 == 0:
-                    mark = {0: "N", 90: "E", 180: "S", 270: "W"}.get(m, str(m // 10))
-                    font = self.fonts[self.MORELARGE] if m % 90 == 0 else self.fonts[self.LARGE]
-                    color = self.HIGHLIGHT_COLOR if m % 90 == 0 else self.TEXT_COLOR
-                    tl = self.draw.textlength(mark, font)
-                    self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill=self.BG_COLOR)
-                    self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
-                                    font=font, fill=color)
-                    rotmask = self.mask.rotate(-m + heading, expand=False)
-                    center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
-                              czeroy - (csize - cmsize - self.LARGE // 2) * s)
-                    self.image.paste(self.BG_COLOR, (round(center[0] - self.LARGE),
-                                                              round(center[1] - self.LARGE)), rotmask)
+            if m % 30 == 0:
+                mark = {0: "N", 90: "E", 180: "S", 270: "W"}.get(m, str(m // 10))
+                font = self.fonts[self.MORELARGE] if m % 90 == 0 else self.fonts[self.LARGE]
+                color = self.HIGHLIGHT_COLOR if m % 90 == 0 else self.TEXT_COLOR
+                tl = self.draw.textlength(mark, font)
+                self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill="black")
+                # in any case black, this is used as the rotation mask
+                self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
+                                font=font)
+                rotmask = self.mask.rotate(-m + heading, expand=False)
+                center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
+                          czeroy - (csize - cmsize - self.LARGE // 2) * s)
+                self.image.paste(color, (round(center[0] - self.LARGE),
+                                                          round(center[1] - self.LARGE)), rotmask)
 
-            if error_message:
-                self.centered_text(120, error_message, self.LARGE)
+        if error_message:
+            self.centered_text(120, error_message, self.LARGE)
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
