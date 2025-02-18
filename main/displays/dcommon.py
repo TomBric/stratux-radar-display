@@ -152,7 +152,7 @@ class GenericDisplay:
                            font=self.fonts[self.VERYSMALL], fill=self.MODE_S_COLOR)
 
     def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail):
-        velocity_width = self.AIRCRAFT_SIZE // 2
+        velocity_width = max(1, self.AIRCRAFT_SIZE // 3)
         p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
         p2 = posn(direction + 150, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
         p3 = posn(direction + 180, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
