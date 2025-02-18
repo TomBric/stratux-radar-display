@@ -226,7 +226,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                        self.sizex - self.sizey - 2 * 5, lines, rounding=True)
 
         if error_message:
-            self.centered_text(60, error_message, self.VERYLARGE)
+            self.centered_text(60, error_message, self.LARGE)
         self.bottom_line("", "    Mode", "Reset")
 
     def earthfill(self, pitch, roll, length, scale):   # possible function for derived classed to implement fillings for earth

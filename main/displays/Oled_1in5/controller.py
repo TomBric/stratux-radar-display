@@ -213,7 +213,7 @@ class Oled1in5(dcommon.GenericDisplay):
         self.draw.text((12, self.sizey // 2 + 10), "dn", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR,
                        align="left")
         if error_message:
-            self.centered_text(30, error_message, self.VERYLARGE, color="red")
+            self.centered_text(30, error_message, self.LARGE, color="red")
         self.bottom_line("", "", "")
 
 
