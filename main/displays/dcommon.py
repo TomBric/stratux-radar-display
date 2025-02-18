@@ -315,7 +315,10 @@ class GenericDisplay:
         self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
                           fill=self.BG_COLOR, width=line_width)
         bw, bh = self.compass_aircraft.size
-        self.image.paste(self.TEXT_COLOR, (czerox - bw // 2, czeroy - bh //2), self.compass_aircraft)
+        if self.compass_aircraft.mode == "RGBA":
+            self.image.paste(self.compass_aircraft, (czerox - bw // 2, czeroy - bh // 2))
+        else:
+            self.image.paste(self.TEXT_COLOR, (czerox - bw // 2, czeroy - bh //2), self.compass_aircraft)
         self.draw.line((czerox - line_width, cmsize, czerox - line_width , czeroy - bh//2),
                        fill=self.TEXT_COLOR, width=line_width)
 
