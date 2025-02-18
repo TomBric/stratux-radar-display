@@ -315,7 +315,10 @@ class GenericDisplay:
         self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
                           fill=self.BG_COLOR, width=line_width)
         bw, bh = self.compass_aircraft.size
-        self.draw.bitmap((czerox - bw // 2, czeroy - bh //2), self.compass_aircraft, fill=self.TEXT_COLOR)
+        if self.compass_aircraft.mode == "1":   # this is a bitmap, e.g. on Epaper
+            self.draw.bitmap((czerox - bw // 2, czeroy - bh //2), self.compass_aircraft, fill=self.TEXT_COLOR)
+        else:   # RGBA image, e.g. with OLED
+            self.image.paste(compass_aircraft, (czerox - bw // 2, czeroy - bh //2))
         self.draw.line((czerox - line_width//2, cmsize, czerox - line_width//2 , czeroy - bh//2),
                        fill=self.TEXT_COLOR, width=line_width)
 
