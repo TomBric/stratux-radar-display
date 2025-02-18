@@ -78,7 +78,6 @@ class GenericDisplay:
     AHRS_HORIZON_COLOR = "white"   # color of horizon line in ahrs
     AHRS_MARKS_COLOR = "white"   # color of marks and corresponding text in ahrs
     # RADAR
-    VELOCITY_WIDTH = 3  # width of indicator for velocity of aircraft
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 0
     ARCPOSITION_EXCLUDE_TO = 0
@@ -152,6 +151,7 @@ class GenericDisplay:
                            font=self.fonts[self.VERYSMALL], fill=self.MODE_S_COLOR)
 
     def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail):
+        velocity_width = self.AIRCRAFT_SIZE // 2
         p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
         p2 = posn(direction + 150, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
         p3 = posn(direction + 180, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
@@ -161,7 +161,7 @@ class GenericDisplay:
         self.draw.polygon(
             ((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
             fill=self.AIRCRAFT_COLOR, outline=self.AIRCRAFT_OUTLINE)
-        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=self.AIRCRAFT_OUTLINE, width=self.VELOCITY_WIDTH)
+        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=self.AIRCRAFT_OUTLINE, width=velocity_width)
         if height >= 0:
             t = "+" + str(abs(height))
         else:
