@@ -72,6 +72,7 @@ class GenericDisplay:
     AIRCRAFT_OUTLINE = "white"
     BG_COLOR = "black"
     TEXT_COLOR = "white"   # default color for text
+    HIGHLIGHT_COLOR = TEXT_COLOR
     # AHRS
     AHRS_EARTH_COLOR = "brown"   # how ahrs displays the earth
     AHRS_SKY_COLOR = "blue"   # how ahrs displays the sky
@@ -312,7 +313,7 @@ class GenericDisplay:
             line_width = 4
 
             self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
-                              fill="white", width=line_width)
+                              fill=self.BG_COLOR, width=line_width)
             bw, bh = self.compass_aircraft.size
             self.draw.bitmap((czerox - bw // 2, czeroy - bh //2), self.compass_aircraft, fill=self.TEXT_COLOR)
             self.draw.line((czerox - line_width//2, cmsize, czerox - line_width//2 , czeroy - bh//2),
@@ -331,10 +332,11 @@ class GenericDisplay:
                 if m % 30 == 0:
                     mark = {0: "N", 90: "E", 180: "S", 270: "W"}.get(m, str(m // 10))
                     font = self.fonts[self.MORELARGE] if m % 90 == 0 else self.fonts[self.LARGE]
+                    color = self.HIGHLIGHT_COLOR if m % 90 == 0 else self.TEXT_COLOR
                     tl = self.draw.textlength(mark, font)
                     self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill=self.TEXT_COLOR)
                     self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
-                                    font=font, fill=self.BG_COLOR)
+                                    font=font, fill=self.color)
                     rotmask = self.mask.rotate(-m + heading, expand=False)
                     center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
                               czeroy - (csize - cmsize - self.LARGE // 2) * s)
