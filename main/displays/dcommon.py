@@ -337,7 +337,7 @@ class GenericDisplay:
                 self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill="black")
                 # in any case black, this is used as the rotation mask
                 self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
-                                font=font fill="white")
+                                font=font, fill="white")
                 rotmask = self.mask.rotate(-m + heading, expand=False)
                 center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
                           czeroy - (csize - cmsize - self.LARGE // 2) * s)
