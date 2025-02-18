@@ -131,18 +131,12 @@ class GenericDisplay:
         self.draw.ellipse((self.zerox-radius, self.zeroy-radius, self.zerox+radius, self.zeroy+radius),
                           width=circle_width, outline=self.MODE_S_COLOR)
         arctext = posn(arcposition, radius, angle_offset=self.ANGLE_OFFSET)
-        if height > 0:
-            signchar = "+"
-        else:
-            signchar = "-"
-        t = signchar+str(abs(height))
-        if vspeed > 0:
-            t = t + self.UP_CHARACTER
-        if vspeed < 0:
-            t = t + self.DOWN_CHARACTER
+        signchar = "+" if height > 0 else "-"
+        t = signchar + str(abs(height))
+        t += self.UP_CHARACTER if vspeed > 0 else self.DOWN_CHARACTER if vspeed < 0 else ""
         w = self.draw.textlength(t, self.fonts[self.LARGE])
-        tposition = (int(self.zerox+arctext[0]-w/2), int(self.zeroy+arctext[1]-self.LARGE/2))
-        self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.LARGE+2)), fill=self.BG_COLOR)
+        tposition = (int(self.zerox+arctext[0]-w//2), int(self.zeroy+arctext[1]-self.LARGE//2))
+        self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.LARGE)), fill=self.BG_COLOR)
         self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.MODE_S_COLOR)
         if tail is not None:
             tl = self.draw.textlength(tail, self.fonts[self.VERYSMALL])
