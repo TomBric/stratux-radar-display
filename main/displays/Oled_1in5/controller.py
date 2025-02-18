@@ -58,6 +58,7 @@ class Oled1in5(dcommon.GenericDisplay):
     WARNING_COLOR = "red"
     AIRCRAFT_COLOR = "red"
     AIRCRAFT_OUTLINE = "white"
+    MODE_S_COLOR = "white"
     # AHRS
     AHRS_EARTH_COLOR = "brown" # how ahrs displays the earth
     AHRS_SKY_COLOR = "blue"  # how ahrs displays the sky

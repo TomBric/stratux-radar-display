@@ -56,6 +56,7 @@ class Epaper3in7(dcommon.GenericDisplay):
     TEXT_COLOR = "black"
     AIRCRAFT_COLOR = "black"
     AIRCRAFT_OUTLINE = "black"
+    MODE_S_COLOR = "black"
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 110
     ARCPOSITION_EXCLUDE_TO = 250

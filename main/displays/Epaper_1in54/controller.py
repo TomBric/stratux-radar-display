@@ -57,6 +57,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     TEXT_COLOR = "black"
     AIRCRAFT_COLOR = "black"
     AIRCRAFT_OUTLINE = "black"
+    MODE_S_COLOR = "black"
     # AHRS
     AHRS_EARTH_COLOR = "white"  # how ahrs displays the earth
     AHRS_SKY_COLOR = "white"  # how ahrs displays the sky

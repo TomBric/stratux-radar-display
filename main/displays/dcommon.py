@@ -68,6 +68,7 @@ class GenericDisplay:
     # radar-mode
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
     AIRCRAFT_COLOR = "red"
+    MODE_S_COLOR = "white"
     AIRCRAFT_OUTLINE = "white"
     BG_COLOR = "black"
     TEXT_COLOR = "white"   # default color for text
@@ -128,7 +129,7 @@ class GenericDisplay:
         if radius < self.MINIMAL_CIRCLE:
             radius = self.MINIMAL_CIRCLE
         self.draw.ellipse((self.zerox-radius, self.zeroy-radius, self.zerox+radius, self.zeroy+radius),
-                          width=width, outline=self.AIRCRAFT_COLOR)
+                          width=width, outline=self.MODE_S_COLOR)
         arctext = posn(arcposition, radius, angle_offset=self.ANGLE_OFFSET)
         if height > 0:
             signchar = "+"
@@ -142,13 +143,13 @@ class GenericDisplay:
         w = self.draw.textlength(t, self.fonts[self.LARGE])
         tposition = (int(self.zerox+arctext[0]-w/2), int(self.zeroy+arctext[1]-self.LARGE/2))
         self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.LARGE+2)), fill=self.BG_COLOR)
-        self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.AIRCRAFT_COLOR)
+        self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.MODE_S_COLOR)
         if tail is not None:
             tl = self.draw.textlength(tail, self.fonts[self.VERYSMALL])
             self.draw.rectangle((tposition[0], tposition[1] + self.LARGE, tposition[0] + tl,
                             tposition[1] + self.LARGE + self.VERYSMALL), fill=self.BG_COLOR)
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail,
-                           font=self.fonts[self.VERYSMALL], fill=self.AIRCRAFT_COLOR)
+                           font=self.fonts[self.VERYSMALL], fill=self.MODE_S_COLOR)
 
     def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail):
         p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
