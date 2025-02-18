@@ -334,7 +334,7 @@ class GenericDisplay:
                 font = self.fonts[self.MORELARGE] if m % 90 == 0 else self.fonts[self.LARGE]
                 color = self.HIGHLIGHT_COLOR if m % 90 == 0 else self.TEXT_COLOR
                 tl = self.draw.textlength(mark, font)
-                self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill="black")
+                self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill="white")
                 # in any case black, this is used as the rotation mask
                 self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
                                 font=font)
