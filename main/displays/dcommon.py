@@ -336,7 +336,7 @@ class GenericDisplay:
                     tl = self.draw.textlength(mark, font)
                     self.cdraw.rectangle((0, 0, self.LARGE * 2, self.LARGE * 2), fill=self.BG_COLOR)
                     self.cdraw.text(((self.LARGE * 2 - tl) // 2, (self.LARGE * 2 - self.MORELARGE) // 2), mark,
-                                    font=font)
+                                    font=font), fill=self.TEXT_COLOR)
                     rotmask = self.mask.rotate(-m + heading, expand=False)
                     center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
                               czeroy - (csize - cmsize - self.LARGE // 2) * s)
