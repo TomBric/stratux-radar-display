@@ -613,7 +613,7 @@ class GenericDisplay:
         topic_offset = 2 + self.sizey // 50
         subtopic_offset = self.sizey // 50
         remark_offset = self.sizey // 80
-        topic_right_offset = self.VERYSMALL // 4 - higlight_width
+        topic_right_offset = self.VERYSMALL // 4 - highlight_width
 
 
         y = ypos
