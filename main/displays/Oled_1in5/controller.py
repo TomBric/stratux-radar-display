@@ -222,7 +222,7 @@ class Oled1in5(dcommon.GenericDisplay):
         self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
         starty += self.SMALL+6
         bar_start, bar_end = 30, 100
-        line_offset = 2
+        line_offset = 4
         colors = {'outline': 'white', 'green': 'white'}
         starty = self.bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'],
                           bar_start, bar_end, colors, line_offset=line_offset)

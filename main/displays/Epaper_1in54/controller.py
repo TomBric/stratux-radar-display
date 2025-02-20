@@ -213,7 +213,7 @@ class Epaper1in54(dcommon.GenericDisplay):
                               bar_start, bar_end, colors, line_offset=line_offset)
             noise_text = f"{round(stat['OGN_noise_db'], 1)}@{round(stat['OGN_gain_db'], 1)}dB"
             starty = self.bar(starty, "noise", stat['OGN_noise_db'], 25,
-                              bar_start, bar_end, colors, unit="dB", minval=1, valtext=noise_text, line_offset=8)
+                bar_start, bar_end, colors, unit="dB", minval=1, valtext=noise_text, line_offset=line_offset)
         if stat['UATRadio_connected']:
             starty = self.bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'],
                               bar_start, bar_end, colors, line_offset=line_offset)
