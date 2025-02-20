@@ -243,7 +243,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):   # draw graph and co values
         self.centered_text(0, alarmtext, self.LARGE)
         graphpos = (0, self.SMALL + 5)
-        graphsize = (self.sizex-1, self.sizey-3*self.VERYSMALL-self.SMALL-5)
+        graphsize = (self.sizex-18, self.sizey-3*self.VERYSMALL-self.SMALL-5)
         self.graph(graphpos, graphsize, co_values, 0, 120, timeout, value_line1=50, value_line2=100,
                    glinewidth=2, linewidth=2)
         if len(co_values) > 0:
