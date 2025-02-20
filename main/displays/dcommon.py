@@ -551,7 +551,7 @@ class GenericDisplay:
         self.bottom_line("", "Mode", "Clear")
 
     def bar(self, y, text, val, max_val, bar_start, bar_end, color_table, unit="", valtext=None, minval=0,
-            side_offset=0, line_offset=0, outline_offset=1):
+            side_offset=0, line_offset=0, outline_offset=2):
         # color_table example for Epaper:
         #   color_table = {'outline': 'black', 'black_white_offset': 5}
         # color_table example for OLED:
