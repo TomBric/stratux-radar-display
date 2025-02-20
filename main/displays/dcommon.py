@@ -551,7 +551,7 @@ class GenericDisplay:
         self.bottom_line("", "Mode", "Clear")
 
     def bar(self, y, text, val, max_val, bar_start, bar_end, color_table, unit="", valtext=None, minval=0,
-            side_offset=0, line_offset=0):
+            side_offset=0, line_offset=0, outline_offset=1):
         # color_table example for Epaper:
         #   color_table = {'outline': 'black', 'black_white_offset': 5}
         # color_table example for OLED:
@@ -562,7 +562,8 @@ class GenericDisplay:
         self.right_text(y, right_val, self.VERYSMALL, offset=side_offset)
 
         if 'outline' in color_table:
-            self.draw.rounded_rectangle([bar_start, y, bar_end, y + self.VERYSMALL], radius=3,
+            self.draw.rounded_rectangle([bar_start - outline_offset, y - outline_offset,
+                        bar_end + outline_offset, y + self.VERYSMALL + outline_offset], radius=3,
                 fill=None, outline=color_table['outline'], width=1)
         val = max(val, minval)
         xval = bar_start + (bar_end - bar_start) * val / max_val if max_val != 0 else bar_start
