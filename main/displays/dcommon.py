@@ -569,14 +569,15 @@ class GenericDisplay:
         t = valtext if valtext is not None else str(val)
         tl = self.draw.textlength(t, self.fonts[self.SMALL])
 
+        color = None
         if 'black_white_offset' in color_table and 'outline' in color_table:
             for b in range(bar_start, int(xval), color_table['black_white_offset']):
                 self.draw.line([(b, y), (b, y + self.VERYSMALL)], fill=color_table['outline'], width=1)
         else:
-            if 'red' in color_table:
-                color = color_table.get('red') if val >= color_table.get('red_value') else self.TEXT_COLOR
-            elif 'yellow' in color_table:
-                color = color_table.get('yellow') if val >= color_table.get('yellow_value') else self.TEXT_COLOR
+            if 'red' in color_table and val >= color_table.get('red_value'):
+                color = color_table.get('red')
+            elif 'yellow' in color_table and val >= color_table.get('yellow_value'):
+                color = color_table.get('yellow')
             else:
                 color = color_table.get('green') if 'green' in color_table else self.TEXTCOLOR
 

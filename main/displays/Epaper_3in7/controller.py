@@ -358,7 +358,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.dashboard(self.zerox + offset, starty, self.zerox - 2 * offset, lines, headline="Baro", rounding=True)
 
         if error_message:
-            self.centered_text(self.sizey // 4, error_message, self.VERYLARGE)
+            self.centered_text(self.sizey // 4, error_message, self.LARGE)
         self.bottom_line("Stats/Set", "Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):

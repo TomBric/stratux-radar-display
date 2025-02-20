@@ -278,7 +278,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             )
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
-            self.centered_text(80, error_message, self.VERYLARGE)
+            self.centered_text(80, error_message, self.LARGE)
         self.bottom_line("Stat/Set", "   Mode", "Start")
 
 

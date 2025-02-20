@@ -303,7 +303,7 @@ class Oled1in5(dcommon.GenericDisplay):
             )
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
-            self.centered_text(80, error_message, self.VERYLARGE, self.WARNING_COLOR)
+            self.centered_text(80, error_message, self.LARGE, self.WARNING_COLOR)
         self.bottom_line("Stat/Set", "   Mode", "Start")
 
 
