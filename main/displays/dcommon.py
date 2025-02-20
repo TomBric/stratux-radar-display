@@ -562,7 +562,7 @@ class GenericDisplay:
         self.right_text(y, right_val, self.VERYSMALL, offset=side_offset)
 
         if 'outline' in color_table:
-            self.draw.rounded_rectangle([bar_start - 2, y - 2, bar_end + 2, y + self.VERYSMALL + 2], radius=3,
+            self.draw.rounded_rectangle([bar_start, y, bar_end, y + self.VERYSMALL], radius=3,
                 fill=None, outline=color_table['outline'], width=1)
         val = max(val, minval)
         xval = bar_start + (bar_end - bar_start) * val / max_val if max_val != 0 else bar_start
