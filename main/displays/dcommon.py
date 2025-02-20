@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 #
 # BSD 3-Clause License
-# Copyright (c) 2024, Thomas Breitbach
+# Copyright (c) 2025, Thomas Breitbach
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,6 @@ class GenericDisplay:
     SMALL = 24  # size of information indications on top and bottom
     VERYSMALL = 18
     AWESOME_FONTSIZE= 18  # bluetooth indicator
-    
     # radar-mode
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
     AIRCRAFT_COLOR = "red"
@@ -93,7 +92,6 @@ class GenericDisplay:
     GRAPH_SPACE = 3  # space between scale figures and zero line
     GRAPH_X_AXIS_LINE_LENGTH = 5  # line length for values in graph
     # end constant definitions
-
 
     def __init__(self):
         self.rlog = logging.getLogger('stratux-radar-log')
@@ -177,13 +175,11 @@ class GenericDisplay:
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.fonts[self.VERYSMALL],
                            fill=self.TEXT_COLOR)
 
-
     def display(self):
         pass
 
     def is_busy(self):
         pass
-
 
     @staticmethod
     def next_arcposition(old_arcposition, exclude_from=0, exclude_to=0):
@@ -219,7 +215,6 @@ class GenericDisplay:
 
         self.draw.text((5, 0), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.centered_text(self.SMALL, utctime, self.VERYLARGE, color=utc_color)
-
         if stoptime:
             self.draw.text((5, self.SMALL + self.VERYLARGE), "Timer", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
             self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.VERYLARGE, color=timer_color)
@@ -227,7 +222,6 @@ class GenericDisplay:
             if laptime:
                 self.draw.text((5, 2 * self.SMALL + 2 * self.VERYLARGE), laptime_head, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
                 self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.VERYLARGE, color=second_color)
-
         self.bottom_line(left_text, middle_text, right_t)
 
     def meter(self, current, start_value, end_value, from_degree, to_degree, size, center_x, center_y,
@@ -256,15 +250,12 @@ class GenericDisplay:
             (arrow_line_size // 2, -size // 2 + arrow_head_size),
             (arrow_line_size // 2, 0)
         ]
-
         deg_per_value = (to_degree - from_degree) / (end_value - start_value)
-
         # outside arc
         self.draw.arc(
             (center_x - size // 2, center_y - size // 2, center_x + size // 2, center_y + size // 2),
             from_degree - 90, to_degree - 90, width=arc_width, fill=meter_color
         )
-
         # small marks first
         line = (0, -size // 2), (0, -size // 2 + small_mark_length)
         m = start_value
@@ -357,12 +348,6 @@ class GenericDisplay:
             error_message):
         pass
 
-    def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):
-        pass
-
-    def shutdown(self, countdown, shutdownmode):
-        pass
-
     def linepoints(self, pitch, roll, pitch_distance, length, scale):
         s = math.sin(math.radians(180 + roll))
         c = math.cos(math.radians(180 + roll))
@@ -396,7 +381,6 @@ class GenericDisplay:
         self.draw.polygon((self.ah_zerox, marks_length+1, self.ah_zerox - int(marks_length/2), 1+int(marks_length*3/2),
                            self.ah_zerox + int(marks_length/2), 1+int(marks_length*3/2)), fill=self.AHRS_MARKS_COLOR)
 
-
     def slip(self, slipskid, centerline_width):
         slipsize_x = self.sizex//4   # slip indicator takes 1/2 of x-axis
         slipsize_y = self.sizey//24  # height of indicator (in both directions), also height of ball
@@ -421,9 +405,7 @@ class GenericDisplay:
         # does not to be redefined if no filling is to be drawn
         pass
 
-
     def ahrs(self, pitch, roll, heading, slipskid, error_message):
-        # print("AHRS: pitch ", pitch, " roll ", roll, " heading ", heading, " slipskid ", slipskid)
         max_length = math.ceil(math.hypot(self.sizex, self.sizey))  # maximum line length for diagonal line
         line_width = max(1, self.sizey//60)  # the width of all lines (horizon, posmarks, rollmarks)
         pitchmark_length = self.sizey//6
@@ -440,13 +422,10 @@ class GenericDisplay:
         h3, h4 = self.linepoints(pitch, roll, 180, max_length, pitchscale)
         self.draw.polygon((h1, h2, h4, h3), fill=self.AHRS_SKY_COLOR)  # sky
         self.draw.line((h1, h2), fill=self.AHRS_HORIZON_COLOR, width=line_width)  # horizon line
-
         self.earthfill(pitch, roll, max_length, pitchscale)   # draw some special fillings for the earth
-
         for pm in self.PITCH_POSMARKS:  # pitchmarks
             self.draw.line((self.linepoints(pitch, roll, pm, pitchmark_length, pitchscale)), fill=self.AHRS_MARKS_COLOR,
                            width=line_width)
-
         # pointer in the middle
         self.draw.line((self.ah_zerox - 90, self.ah_zeroy, self.ah_zerox - 30, self.ah_zeroy),
                        width=line_width_middle, fill=self.TEXT_COLOR)
@@ -456,12 +435,8 @@ class GenericDisplay:
                            self.ah_zerox - center_pointer_x, self.ah_zeroy + center_pointer_y,
                            self.ah_zerox + center_pointer_x, self.ah_zeroy + center_pointer_y),
                           fill=self.AHRS_MARKS_COLOR)
-
-        # roll indicator
-        self.rollmarks(roll, line_width, rollmark_length)
-        # slip indicator
-        self.slip(slipskid, line_width)
-        # infotext = "P:" + str(pitch) + " R:" + str(roll)
+        self.rollmarks(roll, line_width, rollmark_length)   # roll indicator
+        self.slip(slipskid, line_width)     # slip indicator
         if error_message:
             self.centered_text( int(self.sizey/4), error_message, self.SMALL)
         self.bottom_line("Levl", "", "Zero")
@@ -570,7 +545,6 @@ class GenericDisplay:
         t = valtext if valtext is not None else str(val)
         tl = self.draw.textlength(t, self.fonts[self.SMALL])
 
-        color = None
         if 'black_white_offset' in color_table and 'outline' in color_table:
             for b in range(bar_start, int(xval), color_table['black_white_offset']):
                 self.draw.line([(b, y), (b, y + self.VERYSMALL)], fill=color_table['outline'], width=1)
@@ -581,9 +555,7 @@ class GenericDisplay:
                 color = color_table.get('yellow')
             else:
                 color = color_table.get('green') if 'green' in color_table else self.TEXTCOLOR
-
-            if color:
-                self.draw.rectangle([bar_start, y, xval, y + self.VERYSMALL], fill=color, outline=None)
+            self.draw.rectangle([bar_start, y, xval, y + self.VERYSMALL], fill=color, outline=None)
         if 'outline' in color_table:
             self.draw.text(((bar_end - bar_start) // 2 + bar_start - tl // 2, y), t, font=self.fonts[self.VERYSMALL],
                            fill=color_table['outline'])
@@ -746,14 +718,13 @@ class GenericDisplay:
         self.centered_text(y, middle, self.SMALL, color)
 
     def graph(self, pos, size, data, minvalue, maxvalue, timeout, value_line1=None, value_line2=None,
-            textcolor=None, graphcolor=None, linecolor=None, bgcolor=None, glinewidth=1, linewidth=1):
+            textcolor=None, graphcolor=None, linecolor=None, glinewidth=1, linewidth=1):
         x_val_space = self.VERYSMALL // 2   # space between value and graph
         x_val_linelength = self.VERYSMALL // 2  # length of value line
         y_offset = self.VERYSMALL // 4    # offset between x-axis and left corner of x-axis values
         textcolor = textcolor or self.TEXT_COLOR
         graphcolor = graphcolor or self.TEXT_COLOR
         linecolor = linecolor or self.TEXT_COLOR
-        bgcolor = bgcolor or self.BG_COLOR
 
         # Adjust zero lines to have room for text
         tl = self.draw.textlength(str(maxvalue), self.fonts[self.VERYSMALL])
@@ -762,12 +733,12 @@ class GenericDisplay:
         ypos = pos[1] + self.VERYSMALL // 2
         ysize = size[1] - self.VERYSMALL
 
-        def draw_value_line(value, y_offset):
-            y = ypos + ysize - 1 - ysize * (value - minvalue) // (maxvalue - minvalue)
-            tl = self.draw.textlength(str(value), self.fonts[self.VERYSMALL])
-            self.draw.text((xpos - tl - x_val_space, y - y_offset), str(value),
+        def draw_value_line(value, y_off):
+            ly = ypos + ysize - 1 - ysize * (value - minvalue) // (maxvalue - minvalue)
+            ltl = self.draw.textlength(str(value), self.fonts[self.VERYSMALL])
+            self.draw.text((xpos - ltl - x_val_space, ly - y_off), str(value),
                            font=self.fonts[self.VERYSMALL], fill=textcolor)
-            return y
+            return ly
 
         vlmin_y = ypos + ysize - 1
         atl = self.draw.textlength(str(minvalue), self.fonts[self.VERYSMALL])
@@ -812,9 +783,9 @@ class GenericDisplay:
             lastpoint = (x, y)
 
         # Draw dashed value lines
-        def draw_dashed_line(y):
-            for x in range(int(xpos), int(xpos + xsize), 6):
-                self.draw.line([(x, y), (x + 3, y)], fill=linecolor, width=linewidth)
+        def draw_dashed_line(ly):
+            for lx in range(int(xpos), int(xpos + xsize), 6):
+                self.draw.line([(lx, ly), (lx + 3, ly)], fill=linecolor, width=linewidth)
 
         draw_dashed_line(vl1_y)
         draw_dashed_line(vl2_y)

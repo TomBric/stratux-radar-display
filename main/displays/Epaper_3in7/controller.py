@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 #
 # BSD 3-Clause License
-# Copyright (c) 2020, Thomas Breitbach
+# Copyright (c) 2025, Thomas Breitbach
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,7 @@ import logging
 
 top_index = 0    # top index being displayed in checklist
 
+
 class Epaper3in7(dcommon.GenericDisplay):
     # display constants
     VERYLARGE = 48  # timer
@@ -67,7 +68,10 @@ class Epaper3in7(dcommon.GenericDisplay):
     AHRS_HORIZON_COLOR = "black"  # how ahrs displays the horizon
     AHRS_MARKS_COLOR = "black"  # color of marks and corresponding text in ahrs
     ANGLE_OFFSET=270 # offset for calculating angles in displays
-
+    device = None
+    image = None
+    draw = None
+    mask = None
 
     def init(self, fullcircle=False):
         self.device = epd3in7.EPD()
@@ -110,7 +114,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         return self.device.async_is_busy()
 
     @staticmethod
-    def next_arcposition(old_arcposition):
+    def next_arcposition(old_arcposition, exclude_from=0, exclude_to=0):
         return dcommon.GenericDisplay().next_arcposition(old_arcposition,
             exclude_from=Epaper3in7().ARCPOSITION_EXCLUDE_FROM, exclude_to=Epaper3in7().ARCPOSITION_EXCLUDE_TO)
 
@@ -133,15 +137,14 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.display()
         time.sleep(seconds)
 
-
-    def situation(self, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
+    def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
+                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
                            self.zerox + self.max_pixel // 2, self.zeroy + self.max_pixel // 2), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
                            self.zerox + self.max_pixel // 4, self.zeroy + self.max_pixel // 4), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
-        self.draw.text((5, 1), f"{range} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((5, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
         if gps_quality == 0:
             t = "GPS-NoFix"
@@ -191,8 +194,6 @@ class Epaper3in7(dcommon.GenericDisplay):
     def gmeter(self, current, maxg, ming, error_message):
         gm_size = 280
         self.meter(current, -3, 5, 110, 430, gm_size, 140, 140, 1, 0.25,      "G-Force", None)
-
-        right_center_x = (self.sizex-gm_size)/2+gm_size    # center of remaining part
         lines = (
             ("max", f'{maxg:+1.2f}'),
             ("act", f'{current:+1.2f}'),
@@ -201,7 +202,6 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.dashboard(gm_size+self.SMALL, self.sizey//2 - 5*self.SMALL//2 , self.sizex-gm_size-self.SMALL-5, lines, rounding=True,
                        headline="G-Meter", headline_size=self.SMALL)
         self.bottom_line("", "    Mode", "Reset")
-
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min, error_message):
         self.meter(vertical_speed / 100, -20, 20, 110, 430, self.sizey, self.sizey // 2,
@@ -234,7 +234,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         for pm in range(0, -180-1, -3):
             self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill="black", width=1)
 
-    def flighttime(self, last_flights, side_offset=0):
+    def flighttime(self, last_flights, side_offset=0, long_version=False):
         super().flighttime(last_flights, side_offset=35, long_version=True)
 
     def stratux(self, stat, altitude, gps_alt, gps_quality):
@@ -285,7 +285,6 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.round_text(x, starty, "BMP", yesno=stat['BMPConnected'], out_color=self.TEXT_COLOR)
         self.bottom_line("+10 ft", "Mode", "-10 ft")
 
-
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):
         self.centered_text(0, alarmtext, self.LARGE)
         graphpos = (0,40)
@@ -324,7 +323,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             t, accuracy = "3D GPS", f"{gps_h_accuracy:.1f}m"
         elif gps_quality == 2:
             t, accuracy = "DGNSS", f"{gps_h_accuracy:.1f}m"
-
         gps_dist_str = f"{gps_distance:.0f}" if distance_valid else "---"
         gps_speed_str = f"{gps_speed:.1f}" if gps_valid else "---"
         lines = [
@@ -345,7 +343,6 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Roll [deg]", f"{ahrs_roll:+2d}")
             ]
             starty = self.dashboard(self.zerox + offset, starty, self.zerox - 2 * offset, lines, headline="AHRS", rounding=True)
-
         if baro_valid:
             takeoff_str = f"{alt_diff_takeoff:+5.1f}" if alt_diff_takeoff is not None else "---"
             alt_diff_str = f"{alt_diff:+5.1f}" if alt_diff is not None else "---"
@@ -356,7 +353,6 @@ class Epaper3in7(dcommon.GenericDisplay):
                 ("Ba-Diff tof [ft]", takeoff_str)
             ]
             self.dashboard(self.zerox + offset, starty, self.zerox - 2 * offset, lines, headline="Baro", rounding=True)
-
         if error_message:
             self.centered_text(self.sizey // 4, error_message, self.LARGE)
         self.bottom_line("Stats/Set", "Mode", "Start")
@@ -373,8 +369,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
-        starty = self.dashboard(5, 35, 225, lines, headline="Takeoff", rounding=True)
-
+        self.dashboard(5, 35, 225, lines, headline="Takeoff", rounding=True)
         lt = '---'
         if 'landing_time' in values:
             lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
@@ -385,7 +380,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         ]
         starty = self.dashboard(250, 35, 225, lines, headline="Landing", rounding=True)
-
         if ground_warnings:
             dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
             gps_alt_str = f"{gps_altitude:+5.0f}" if gps_valid else "---"

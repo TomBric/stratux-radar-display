@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 #
 # BSD 3-Clause License
-# Copyright (c) 2020, Thomas Breitbach
+# Copyright (c) 2025, Thomas Breitbach
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,6 @@ from . import radar_opts
 from pathlib import Path
 import logging
 
-
 class Oled1in5(dcommon.GenericDisplay):
     VERYLARGE = 24
     MORELARGE = 20
@@ -68,6 +67,11 @@ class Oled1in5(dcommon.GenericDisplay):
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
     UP_CHARACTER = '\u2191'  # character to show ascending aircraft
     DOWN_CHARACTER = '\u2193'  # character to show descending aircraft
+    # vars later on set by init
+    device = None
+    image = None
+    draw = None
+    mask = None
 
     def init(self, fullcircle=False):
         config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
@@ -125,8 +129,8 @@ class Oled1in5(dcommon.GenericDisplay):
         time.sleep(seconds)
 
 
-    def situation(self, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
-              gps_quality, gps_h_accuracy, optical_alive, basemode, extsound, co_alarmlevel, co_alarmstring):
+    def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
+                  gps_quality, gps_h_accuracy, optical_alive, basemode, extsound, co_alarmlevel, co_alarmstring):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
                            self.zerox + self.max_pixel // 2 - 1, self.zeroy + self.max_pixel // 2 - 1),
                           outline=self.TEXT_COLOR)
@@ -134,7 +138,7 @@ class Oled1in5(dcommon.GenericDisplay):
                            self.zerox + self.max_pixel // 4 - 1, self.zeroy + self.max_pixel // 4 - 1),
                           outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
-        self.draw.text((0, 0), f"{range}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((0, 0), f"{rrange}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.draw.text((0, self.SMALL), "nm", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.draw.text((0, self.sizey - self.SMALL), f"FL{round(ownalt / 100)}", font=self.fonts[self.SMALL],
                        fill=self.TEXT_COLOR)

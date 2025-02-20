@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 #
 # BSD 3-Clause License
-# Copyright (c) 2020, Thomas Breitbach
+# Copyright (c) 2025, Thomas Breitbach
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -65,6 +65,10 @@ class Epaper1in54(dcommon.GenericDisplay):
     AHRS_HORIZON_COLOR = "black"  # how ahrs displays the horizon
     AHRS_MARKS_COLOR = "black"  # color of marks and corresponding text in ahrs
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
+    # attributes later defined in explicit init
+    device = None
+    image = None
+    mask = None
 
     def init(self, fullcircle=False):
         self.device = epd1in54_V2.EPD()
@@ -104,7 +108,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         return self.device.async_is_busy()
 
     @staticmethod
-    def next_arcposition(old_arcposition):
+    def next_arcposition(old_arcposition, exclude_from=0, exclude_to=0):
         return dcommon.GenericDisplay().next_arcposition(old_arcposition,
             exclude_from=Epaper1in54().ARCPOSITION_EXCLUDE_FROM, exclude_to=Epaper1in54().ARCPOSITION_EXCLUDE_TO)
 
@@ -117,7 +121,6 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.device.Clear(0xFF)  # necessary to overwrite everything
         self.device.init(1)
 
-
     def startup(self, version, target_ip, seconds):
         logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-150x150.bmp'))
         logo = Image.open(logopath)
@@ -127,14 +130,14 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.display()
         time.sleep(seconds)
 
-    def situation(self, connected, gpsconnected, ownalt, course, range, altdifference, bt_devices, sound_active,
+    def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
                   gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
                            self.zerox + self.max_pixel // 2 - 1, self.zeroy + self.max_pixel // 2 - 1), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
                            self.zerox + self.max_pixel // 4 - 1, self.zeroy + self.max_pixel // 4 - 1), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
-        self.draw.text((0, 0), f"{range}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((0, 0), f"{rrange}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.draw.text((0, self.SMALL), "nm", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.draw.text((0, self.sizey - self.SMALL), f"FL{round(ownalt / 100)}", font=self.fonts[self.SMALL],
                        fill=self.TEXT_COLOR)
@@ -158,13 +161,11 @@ class Epaper1in54(dcommon.GenericDisplay):
         if co_alarmlevel > 0:
             self.centered_text(self.sizey - 3 * self.SMALL, "CO Alarm!", self.SMALL)
             self.centered_text(self.sizey - 2 * self.SMALL, co_alarmstring, self.SMALL)
-
         if extsound or bt_devices > 0:
             t = "\uf028" * extsound + "\uf293" * (bt_devices > 0) if sound_active else "\uf1f6"
             tl = self.draw.textlength(t, self.awesomefont)
             self.draw.text((self.sizex - tl, self.sizey - 2 * self.SMALL), t, font=self.awesomefont,
                            fill=self.TEXT_COLOR)
-
         self.draw.line((2, 150 + (optical_bar % 5) * 5, 2, 150 + (optical_bar % 5) * 5 + 6),
                        fill=self.TEXT_COLOR, width=4)
 
@@ -192,12 +193,10 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.centered_text(40, error_message, self.LARGE)
         self.bottom_line("", "", "")
 
-
     def earthfill(self, pitch, roll, length, scale):   # possible function for derived classed to implement fillings for earth
         # draws some type of black shading for the earth
         for pm in range(0, -180-1, -3):
             self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill="black", width=1)
-
 
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         starty = 0
@@ -255,7 +254,6 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.round_text(3*self.VERYSMALL-4, self.sizey//4+4, "simulation mode", out_color=self.TEXT_COLOR)
         self.bottom_line("Cal", "Mode", "Reset")
 
-
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                          own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                          ground_distance_valid, grounddistance, error_message):
@@ -284,7 +282,6 @@ class Epaper1in54(dcommon.GenericDisplay):
         if error_message is not None:
             self.centered_text(80, error_message, self.LARGE)
         self.bottom_line("Stat/Set", "   Mode", "Start")
-
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
         self.centered_text(0, "Start-/Landing", self.SMALL)
@@ -319,7 +316,6 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.bottom_line("", "Back", "")
         else:
             self.bottom_line("+/-100ft", "  Back", "+/-10ft")
-
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = Epaper1in54()
