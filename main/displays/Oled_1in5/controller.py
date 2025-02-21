@@ -43,7 +43,7 @@ import logging
 class Oled1in5(dcommon.GenericDisplay):
     VERYLARGE = 24
     MORELARGE = 20
-    LARGE = 18  # size of height indications of aircraft
+    LARGE = 16  # size of height indications of aircraft
     SMALL = 12  # size of information indications on top and bottom
     VERYSMALL = 10  # used for "nm" and "ft"
     AIRCRAFT_SIZE = 3  # size of aircraft arrow
