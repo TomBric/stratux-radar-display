@@ -344,9 +344,8 @@ def read_app_arguments(rf):
     rlog.debug(f'Read web timeout of {rf.webtimeout.data} mins')
 
 def app_option_string(radarform):
-    res = f' -t {radarform.webtimeout.data} &'
-    return res
-
+        option = '--stratux' if stratux_mode else ''
+        return f'{option} -t {radarform.webtimeout.data} &'
 
 def build_mode_string(radarform):
     res = ''

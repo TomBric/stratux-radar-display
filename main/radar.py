@@ -75,7 +75,7 @@ AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBU
 rlog = None  # radar specific logger
 #
 
-# constant definitions
+# constants
 RADAR_VERSION = "2.07"
 
 RETRY_TIMEOUT = 1
