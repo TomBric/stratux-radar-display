@@ -67,7 +67,8 @@ def parse_modes(modes):
         mode_no = mode_codes(c)
         if mode_no > 0:
             mode_sequence.append(mode_no)
-
+    if len(mode_sequence) == 0:
+        mode_sequence.append(1) # default mode is radar if no valid mode is given
 
 def next_mode_sequence(current_mode):
     iterator = iter(mode_sequence)

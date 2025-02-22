@@ -79,7 +79,7 @@ WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time betwe
 # globals
 alarmlevel = 0   # see above level for warnlevel 0-5
 # time when this alarmlevel was first reached or underrun
-r0 = 900.0     # value for R0 in clean air. Calculated during calibration, 900 is a good starting point
+r0 = 900.0 * 1000   # value for R0 in clean air. Calculated during calibration, 900k is a good starting point
 cowarner_active = False
 voltage_factor = 1.0
 ADS = None
@@ -98,7 +98,9 @@ co_max_values = 100   # max number of values, is calculated in init
 speak_warning = True
 indicate_co_warning = False    # GPIO 16 indication
 last_warning = 0.0   # timestamp of last warning
-#
+# simulation mode
+co_simulation = False
+simvalue = 0.0
 
 
 def ppm(rsr0):
@@ -112,7 +114,7 @@ def ppm(rsr0):
     # based on own measurements compared with a CO warner
 
 
-def init(activate, config, debug_level, co_indication):
+def init(activate, config, debug_level, co_indication, simulation_mode=False):
     global rlog
     global cowarner_active
     global voltage_factor
@@ -123,9 +125,10 @@ def init(activate, config, debug_level, co_indication):
     global co_timeout
     global co_max_values
     global indicate_co_warning
+    global co_simulation
 
     rlog = logging.getLogger('stratux-radar-log')
-    if not activate:
+    if not activate and not simulation_mode:
         rlog.debug("CO-Warner - not activated")
         cowarner_active = False
         return False
@@ -136,18 +139,22 @@ def init(activate, config, debug_level, co_indication):
     value_debug_level = debug_level
     co_timeout = MIN_SENSOR_READ_TIME
     co_max_values = math.floor(CO_MEASUREMENT_WINDOW / co_timeout)
-    try:
-        ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
-    except OSError:
-        cowarner_active = False
-        rlog.debug("CO-Warner - AD sensor not found")
-        return False
-    # set gain to 4.096V max
-    ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
-    ADS.setGain(ADS.PGA_4_096V)
-    voltage_factor = ADS.toVoltage()
+    if not simulation_mode:
+        try:
+            ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
+        except OSError:
+            cowarner_active = False
+            rlog.debug("CO-Warner - AD sensor not found")
+            return False
+        # set gain to 4.096V max
+        ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
+        ADS.setGain(ADS.PGA_4_096V)
+        voltage_factor = ADS.toVoltage()
+        rlog.debug("CO-Warner: AD converter active.")
+    else:
+        rlog.debug("CO-Warner: simulation mode active.")
+        co_simulation = True
     cowarner_active = True
-    rlog.debug("CO-Warner: AD converter active.")
     if co_indication:
         indicate_co_warning = True
         GPIO.setmode(GPIO.BCM)
@@ -212,6 +219,21 @@ def read_co_value():     # called by sensor_read thread
     return check_alarm_level()
 
 
+def read_co_value_simulated():
+    global simvalue
+    global cowarner_changed
+    global co_values
+    global co_max
+
+    cowarner_changed = True  # to display new value
+    simvalue = 0 if simvalue > 150.0 else simvalue + 0.2
+    co_max = round(max(co_max, simvalue))
+    co_values.append(round(simvalue))
+    if len(co_values) > co_max_values:
+        co_values.pop(0)
+    return check_alarm_level()
+
+
 def draw_cowarner(display_control, changed):
     global cowarner_changed
     global co_warner_status
@@ -220,19 +242,18 @@ def draw_cowarner(display_control, changed):
         cowarner_changed = False
         display_control.clear()
         if co_warner_status == 0:   # normal mode, display status line
-            display_control.cowarner(co_values, co_max, r0, co_timeout, alarmlevel, WARNLEVEL[alarmlevel][0],
-                                     WARNLEVEL[alarmlevel][1])
+            display_control.cowarner(co_values, co_max, r0, co_timeout, alarmlevel,
+                                     WARNLEVEL[alarmlevel][2], co_simulation)
         elif co_warner_status == 1:   # calibration mode
             countdown = calibration_end - math.floor(time.time())
             if countdown < 0:
                 countdown = 0   # sometimes draw thread was quicker, thus to avoid -1
             timeleft = str(countdown) + " secs"
-            display_control.text_screen("Calibrate sensor", timeleft,
-                                        "\n\nKeep sensor in fresh air.\n", "", "", "")
+            display_control.text_screen("Calibrate sensor", timeleft, "\n\n  Keep sensor in fresh air.\n", "", "", "")
         display_control.display()
 
 
-def calibration():   # called by user-input thread, performs calibration and ends calibration mode
+def calibration():   # called by co-reader thread, performs calibration and ends calibration mode
     global co_warner_status
     global sample_sum
     global no_samples
@@ -242,20 +263,30 @@ def calibration():   # called by user-input thread, performs calibration and end
 
     cowarner_changed = True  # to display new value
     countdown = calibration_end - math.floor(time.time())
-    if countdown > 0:   # continue sensor reading
-        value = ADS.getValue()
-        sensor_volt = value * voltage_factor
-        rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
-        r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
-        sample_sum += r0_act
-        no_samples += 1
-    else:
-        r0 = sample_sum / no_samples
-        rlog.debug("CO-Warner: Calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
-                   .format(no_samples, r0))
-        g_config['CO_warner_R0'] = r0
-        statusui.write_config(g_config)
-        co_warner_status = 0
+    if not co_simulation:
+        if countdown > 0:   # continue sensor reading
+            value = ADS.getValue()
+            sensor_volt = value * voltage_factor
+            rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
+            r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
+            sample_sum += r0_act
+            no_samples += 1
+        else:
+            r0 = sample_sum / no_samples
+            rlog.debug("CO-Warner: Calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
+                       .format(no_samples, r0))
+            g_config['CO_warner_R0'] = r0
+            statusui.write_config(g_config)
+            co_warner_status = 0
+    else:  # simulation mode
+        if countdown > 0:  # continue sensor reading
+            pass
+        else:
+            rlog.debug("CO-Warner: Simulaton calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
+                       .format(no_samples, r0))
+            g_config['CO_warner_R0'] = r0
+            statusui.write_config(g_config)
+            co_warner_status = 0
 
 
 def user_input():
@@ -280,8 +311,7 @@ def user_input():
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
         sample_sum = 0.0
         no_samples = 0
-        calibration()
-        co_warner_status = 1
+        co_warner_status = 1   # start calibration mode, co reader will do this end mode
     if button == 0 and btime == 2:  # left and long
         return 3  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, reset max value
@@ -320,18 +350,24 @@ async def read_sensors():
                 await asyncio.sleep(INDICATION_TEST_TIME)
                 GPIO.output(IOPIN, GPIO.LOW)
             while True:
-                request_read()
-                while not ready():
-                    await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
                 if co_warner_status == 0:   # normal read
-                    changed = read_co_value()
-                    speak_co_warning(changed)
-                    set_co_indication(changed)
-                    await asyncio.sleep(MIN_SENSOR_READ_TIME)
-                else:
+                    if not co_simulation:
+                        request_read()
+                        while not ready():
+                            await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
+                        changed = read_co_value()
+                        speak_co_warning(changed)
+                        set_co_indication(changed)
+                        await asyncio.sleep(MIN_SENSOR_READ_TIME)
+                    else: # simulation mode
+                        changed = read_co_value_simulated()
+                        speak_co_warning(changed)
+                        set_co_indication(changed)
+                        await asyncio.sleep(MIN_SENSOR_READ_TIME)
+                else:  # calibration mode
                     calibration()
                     await asyncio.sleep(MIN_SENSOR_CALIBRATION_WAIT_TIME)
         except (asyncio.CancelledError, RuntimeError):
-            rlog.debug("Sensor reader terminating ...")
+            rlog.debug("CO sensor reader terminating ...")
     else:
         rlog.debug("No co-sensor active.")

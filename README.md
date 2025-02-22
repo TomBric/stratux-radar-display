@@ -1,4 +1,5 @@
 
+
 # stratux-radar-display
 Implementation of a Radar display for Stratux Europe Edition. Can run on a separate Raspberry (e.g. Zero W or Zero 2 W) or directly with the display attached to your stratux.
 Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, an automatic flight-time measurement, a g-meter, an artificial horizon, a compass (based on GPS), a VSI display and other features are also implemented.
