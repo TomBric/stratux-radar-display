@@ -35,21 +35,27 @@ import logging
 import requests
 import radarbuttons
 import radarmodes
+import threading   # for flask server in case of button api
+from flask import Flask, jsonify, render_template
+from flask_wtf import FlaskForm, CSRFProtect
+from wtforms.fields import *
+from flask_bootstrap import Bootstrap5, SwitchField
 
 # status variables for state machine
 display_radius = (2, 3, 5, 10, 20, 40)
 height_diff = (1000, 2000, 5000, 10000, 50000)
 sound_on = True
+button_api_active = False
 
 url_settings_set = ""
 rlog = None
 
 
-def init(url):
+def init(url, button_api):
     global url_settings_set
     global rlog
 
-    if not radarbuttons.init():   # error occured, e.g. gpio pins are buse
+    if not radarbuttons.init(button_api):   # error occured, e.g. gpio pins are buse
         return False
     url_settings_set = url
     rlog = logging.getLogger('stratux-radar-log')

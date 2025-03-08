@@ -75,8 +75,8 @@ AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBU
 rlog = None  # radar specific logger
 #
 
-# constant definitions
-RADAR_VERSION = "2.06a"
+# constants
+RADAR_VERSION = "2.07"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -245,7 +245,7 @@ def speaktraffic(hdiff, direction=None, dist=None):
             txt += str(direction) + ' o\'clock '
         txt += sign + ' ' + str(abs(feet)) + ' feet'
         if global_config['distance_warnings'] and dist:
-            txt += str(dist) + ' miles '
+            txt += f" {dist} miles "
         radarbluez.speak(txt)
 
 
@@ -795,9 +795,10 @@ def main():
     global display_refresh_time
     global extsound_active
     global bluetooth_active
+    global button_api_active
 
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
-    if not radarui.init(url_settings_set):
+    if not radarui.init(url_settings_set, button_api_active):
         print("GPIO Error, is  another radar process running? Terminating.")
         return 1
     shutdownui.init(url_shutdown, url_reboot)
@@ -809,7 +810,7 @@ def main():
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
-    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication)
+    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication, co_simulation_mode)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
                         groundbeep, situation, simulation_mode, global_config)
     simulation.init(simulation_mode)
@@ -886,7 +887,8 @@ if __name__ == "__main__":
 
     url_host_base = args['connect']
     try:
-        display_control = importlib.import_module('displays.' + args['device'] + '.controller')
+        display_control_module = importlib.import_module('displays.' + args['device'] + '.controller')
+        display_control = display_control_module.radar_display  # inherited instance of GenericDisplay in imported module
     except ModuleNotFoundError as e:
         print("Error: Controller for device '{0}' not found. Aborting. ".format(args['device']))
         syslog.syslog(syslog.LOG_ERR, "Error: Controller for device '{0}' not found. Aborting. ".format(args['device']))
@@ -901,6 +903,8 @@ if __name__ == "__main__":
     groundbeep = args['groundbeep']
     gear_indication = args ['gearindicate']
     simulation_mode = args['simulation']
+    co_simulation_mode = args['cosimulation']
+    button_api_active = args['buttonapi']
     xml_checklist = args['checklist']
     sound_mixer = args['mixer']
     radarmodes.parse_modes(args['displaymodes'])

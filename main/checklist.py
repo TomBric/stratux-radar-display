@@ -152,7 +152,7 @@ def draw_checklist(display_control, ui_changed):
                 display_control.checklist(checklist_name, checklist_items, g_iterator[1], last_list)
             except TypeError:
                 display_control.clear()
-                s = f'Checklist:"{checklist_name}"\n   Item #{g_iterator[1]+1}\n\nCorrect XML!'
+                s = f'Checklist: "{checklist_name}"\n   Item #{g_iterator[1]+1}\n\nCorrect XML!'
                 display_control.text_screen("Error", "in checklist", s, "", "Mode", "")
         else:
             display_control.text_screen("Error", "reading checklist", "\n - check file \n - check XML-format",
@@ -190,6 +190,8 @@ def user_input():
         last_item = (g_iterator == [len(g_checklist) - 1, len(g_checklist[g_iterator[0]]['ITEM']) - 1])
         if not last_item:
             g_iterator = next_item(g_iterator)
+        else:
+            g_iterator = [0, 0]  # reset checklist, start in checklist 0 at item 0
         return 0
     if button == 2 and btime == 2:  # right and long, refresh
         return 24  # start next mode for display driver: refresh called
