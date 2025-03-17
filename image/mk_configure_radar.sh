@@ -31,13 +31,6 @@ done
 set -x
 
 apt update
-# remove unneeded packages, cloned from stratux
-apt purge -y cifs-utils eject gcc g++ git-man
-apt purge -y libfontconfig1 libfreetype6 gdb ntfs-3g xauth cpp cpp-12 ed libqt5core5a
-apt purge -y libsource-highlight-common libsource-highlight4v5 libtiff6 strace v4l-utils apparmor
-apt purge -y ncdu libc6-dev pkgconf python3-apt python3-colorzero udisks2 xkb-data m4 make nfs-common
-apt purge -y ppp fbset manpages manpages-dev man-db
-
 # do an upgrade, otherwise bluez is not working properly in version 2024-07-04
 apt upgrade -y
 apt -y autoremove
