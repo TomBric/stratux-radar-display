@@ -28,18 +28,34 @@ while getopts ":i" opt; do
 done
 
 
-# set -x
+set -x
 
 apt update
+# remove unneeded packages
+apt purge -y cifs-utils eject gcc g++ git-man
+apt purge -y libfontconfig1 libfreetype6 gdb ntfs-3g xauth cpp cpp-12 ed libqt5core5a
+apt purge -y libsource-highlight-common libsource-highlight4v5 libtiff6 strace v4l-utils apparmor
+apt purge -y ncdu libc6-dev pkgconf python3-apt python3-colorzero udisks2 xkb-data m4 make nfs-common
+apt purge -y ppp fbset manpages manpages-dev man-db
+apt -y autoremove
 
 # do an upgrade, otherwise bluez is not working properly in version 2024-07-04
 apt upgrade -y
+apt -y autoremove
 
 # enable ssh
 raspi-config nonint do_ssh 0
 # enable spi and i2c (for cowarner)
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
+
+# Disable swap...
+systemctl disable dphys-swapfile
+apt purge -y dphys-swapfile
+# Generate ssh key for all installs. Otherwise it would have to be done on each boot, which takes a couple of seconds
+ssh-keygen -A -v
+systemctl disable regenerate_ssh_host_keys
+
 
 # for groundsensor, disable ssh over serial cause it is needed for the sensor
 # disable ssh over serial otherwise

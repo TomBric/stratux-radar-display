@@ -116,9 +116,17 @@ sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
   echo "dtoverlay=miniuart-bt"
 } | tee -a mnt/boot/config.txt
 
+# Disable swap...
+chroot mnt systemctl disable dphys-swapfile
+chroot mnt apt purge -y dphys-swapfile
+# Generate ssh key for all installs. Otherwise it would have to be done on each boot, which takes a couple of seconds
+chroot mnt ssh-keygen -A -v
+chroot mnt systemctl disable regenerate_ssh_host_keys
+
 
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt install git -y
+
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
 su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git"
