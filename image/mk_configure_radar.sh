@@ -9,6 +9,7 @@
 
 DEBIAN=false
 
+
 while getopts ":i" opt; do
   case $opt in
     i)
@@ -26,7 +27,6 @@ while getopts ":i" opt; do
       ;;
   esac
 done
-
 
 set -x
 
