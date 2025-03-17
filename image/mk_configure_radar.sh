@@ -40,8 +40,8 @@ apt purge -y ppp fbset manpages manpages-dev man-db
 apt -y autoremove
 
 # do an upgrade, otherwise bluez is not working properly in version 2024-07-04
-apt upgrade -y
-apt -y autoremove
+# apt upgrade -y
+# apt -y autoremove
 
 # enable ssh
 raspi-config nonint do_ssh 0
