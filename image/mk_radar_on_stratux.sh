@@ -67,7 +67,7 @@ cd $TMPDIR || die "cd failed"
 
 # Download/extract image
 wget -c "$BASE_IMAGE_URL" || die "Download failed"
-unzip "$ZIPNAME" || die "Extracting image failed"
+unxz -k "$ZIPNAME" || die "Extracting image failed"
 
 # Check where in the image the root partition begins:
 bootoffset=$(parted $IMGNAME unit B p | grep fat32 | awk -F ' ' '{print $2}')
