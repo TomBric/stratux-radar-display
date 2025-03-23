@@ -32,30 +32,16 @@ USB_NAME=""
 DISPLAY_NAME="Epaper_3in7"
 
 # check parameters
-while getopts ":b:d:u:f" opt; do
-  case $opt in
-    b)
-      BRANCH="$OPTARG"
-      ;;
-    u)
-      USB_NAME="$OPTARG"
-      ;;
-    d)
-      DISPLAY_NAME="$OPTARG"
-      ;;
-    f)
-      FLASH="$OPTARG"
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG"
-      exit 1
-      ;;
-    :)
-      echo "option -$OPTARG requires a value."
-      exit 1
-      ;;
-  esac
-done
+while getopts ":b:d:u:f:" opt; do
+      case $opt in
+        b) BRANCH="$OPTARG" ;;
+        u) USB_NAME="$OPTARG" ;;
+        d) DISPLAY_NAME="$OPTARG" ;;
+        f) FLASH="$OPTARG" ;;
+        \?) echo "Invalid option: -$OPTARG"; exit 1 ;;
+        :) echo "Option -$OPTARG requires a value."; exit 1 ;;
+      esac
+    done
 
 echo "Building stratux image for branch '$BRANCH' and display '$DISPLAY_NAME'"
 
