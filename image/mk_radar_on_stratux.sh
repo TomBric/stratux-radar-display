@@ -96,7 +96,7 @@ cd mnt/$DISPLAY_SRC || die "cd failed"
 su pi -c "git clone --recursive -b ${BRANCH} https://github.com/TomBric/stratux-radar-display.git"
 # copy T-Beam flash directory
 if [ -n "$FLASH" ]; then
-  cp -r "$FLASH" stratux-radar-display/to_flash
+  su pi -c "cp -r $FLASH stratux-radar-display/to_flash"
   # modify stratux_radar.sh to execute flash-t-beam-once.sh during first startup
   sed -i "/\/bin\/bash/a\/bin/bash /$DISPLAY_SRC/stratux-radar-display/image/flash-t-beam-once.sh /$DISPLAY_SRC/stratux-radar-display/to_flash" stratux-radar-display/image/stratux_radar.sh
 fi
