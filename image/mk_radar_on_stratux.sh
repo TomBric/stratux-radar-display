@@ -16,7 +16,7 @@
 # install a first time flashing of the t-beam
 #   sudo /bin/bash mk_radar_on_stratux.sh -flash /home/pi/GxAirCom81
 
-# set -x
+set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
