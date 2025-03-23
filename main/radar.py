@@ -928,6 +928,7 @@ if __name__ == "__main__":
             global_config['sound_volume'] = saved_config['sound_volume']
         if 'CO_warner_R0' in saved_config:
             global_config['CO_warner_R0'] = saved_config['CO_warner_R0']
+
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_status_ws = "ws://" + url_host_base + "/status"

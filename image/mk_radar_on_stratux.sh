@@ -13,6 +13,8 @@
 #   sudo /bin/bash mk_radar_on_stratux.sh
 #   sudo /bin/bash mk_radar_on_stratux.sh -b dev
 #   sudo /bin/bash mk_radar_on_stratux.sh -d Epaper_1in54
+# install a first time flashing of the t-beam
+#   sudo /bin/bash mk_radar_on_stratux.sh -flash /home/pi/GxAirCom81
 
 # set -x
 TMPDIR="/home/pi/image-tmp"
@@ -30,7 +32,7 @@ USB_NAME=""
 DISPLAY_NAME="Epaper_3in7"
 
 # check parameters
-while getopts ":b:d:u:" opt; do
+while getopts ":b:d:u:flash" opt; do
   case $opt in
     b)
       BRANCH="$OPTARG"
@@ -40,6 +42,9 @@ while getopts ":b:d:u:" opt; do
       ;;
     d)
       DISPLAY_NAME="$OPTARG"
+      ;;
+    flash)
+      FLASH="$OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG"
@@ -112,6 +117,12 @@ chroot mnt overlayctl disable
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
 su pi -c "git clone --recursive -b ${BRANCH} https://github.com/TomBric/stratux-radar-display.git"
+# copy T-Beam flash directory
+if [ -n "$FLASH" ]; then
+  cp -r "$FLASH" mnt/$DISPLAY_SRC/stratux-radar-display
+  # modify stratux_radar.sh to execute flash-t-beam-once.sh
+  sed -i '/\/bin\/bash/a\/bin/bash $DISPLAY_SRC/stratux-radar-display/image/flash-t-beam-once.sh $DISPLAY_SRC/stratux-radar-display/$FLASH'
+fi
 # set display
 sed -i "s/Oled_1in5/${DISPLAY_NAME}/g" stratux-radar-display/image/stratux_radar.sh
 # back to root directory of stratux image
