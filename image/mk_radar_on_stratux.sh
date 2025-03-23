@@ -32,7 +32,7 @@ USB_NAME=""
 DISPLAY_NAME="Epaper_3in7"
 
 # check parameters
-while getopts ":b:d:u:flash" opt; do
+while getopts ":b:d:u:f" opt; do
   case $opt in
     b)
       BRANCH="$OPTARG"
@@ -43,7 +43,7 @@ while getopts ":b:d:u:flash" opt; do
     d)
       DISPLAY_NAME="$OPTARG"
       ;;
-    flash)
+    f)
       FLASH="$OPTARG"
       ;;
     \?)
@@ -102,15 +102,6 @@ cp "$LOCAL_DIR"/stratux.conf.radar mnt/boot/stratux.conf
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt update
 chroot mnt apt install git python3-pip -y
-# Disable swap...
-chroot systemctl disable dphys-swapfile
-chroot apt purge -y dphys-swapfile
-# Generate ssh key for all installs. Otherwise it would have to be done on each boot, which takes a couple of seconds
-chroot ssh-keygen -A -v
-chroot systemctl disable regenerate_ssh_host_keys
-
-
-
 
 # enable persistent logging
 chroot mnt overlayctl disable

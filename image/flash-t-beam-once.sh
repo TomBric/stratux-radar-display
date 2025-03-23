@@ -1,4 +1,7 @@
 #!/bin/bash
+# script to flash T-Beam with firmware
+# firmware including esptool etc. has to be in directory paramter one
+# example usage:  /bin/bash flash-t-beam-once.sh /home/pi/stratux-radar-display/Gx811
 
 cd "$1" || exit 1
 FLAG_FILE="t-beam-flashed.flag"
