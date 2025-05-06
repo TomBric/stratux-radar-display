@@ -441,6 +441,7 @@ def index():
     watchdog.refresh()
     radar_form = RadarForm(cards_and_mixers())
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
+    rlog.debug(f'index(): stratux-ip is {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
         read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
