@@ -335,6 +335,7 @@ def read_arguments(rf):
         rf.autorefresh.data = str(args['refresh'])
 
     rlog.debug(f'RadarForm Autorefresh: {rf.autorefresh.data}')
+    rlog.debug(f'RadarForm IP: {rf.stratux_ip.data}')
 
     parsemodes(args['displaymodes'], rf)
 
