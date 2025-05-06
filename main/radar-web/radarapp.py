@@ -195,7 +195,7 @@ class RadarForm(FlaskForm):
                             choices=[('0', 'no automatic refresh (recommended)'), ('300', 'after 5 mins'),
                                      ('600', 'after 10 mins'),
                                      ('1800', 'after 30 mins'), ],
-                            default=0)
+                            default='0')
 
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
