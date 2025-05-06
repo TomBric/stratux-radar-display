@@ -334,6 +334,8 @@ def read_arguments(rf):
     if args['refresh'] is not None:
         rf.autorefresh.data = args['refresh']
 
+    rlog.debug(f'RadarForm: {rf}')
+
     parsemodes(args['displaymodes'], rf)
 
 def read_app_arguments(rf):
