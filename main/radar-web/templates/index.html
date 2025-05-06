@@ -56,6 +56,8 @@
     {{ render_form_row([radar_form.no_flighttime], col_map={ 'no_flighttime': 'col-md-3'}) }}
 {% endif %}
 
+{{ render_field(radar_form.autorefresh, form_type='horizontal') }}
+
 {% if on_stratux == False %}
     <h5>Ground sensor (LIDAR) options</h5>
     {{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.gearindicate],

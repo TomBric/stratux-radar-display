@@ -191,6 +191,11 @@ class RadarForm(FlaskForm):
     no_cowarner = SwitchField('Suppress activation of co sensor', default=False)
     coindicate = SwitchField('Indicate CO warning on GPIO16', default = False)
     no_flighttime = SwitchField('Suppress detection and display of flighttime', default=False)
+    autorefresh = RadioField('E-paper display autorefresh cycle',
+                            choices=[('0', 'no automatic refresh (recommended)'), ('5', 'after 5 mins'),
+                                     ('10', 'after 10 mins'),
+                                     ('30', 'after 30 mins'), ],
+                            default=0)
 
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
@@ -326,6 +331,7 @@ def read_arguments(rf):
     rf.coindicate.data = args['coindicate']
     rf.no_flighttime.data = args['noflighttime']
     rf.checklist_filename.data = args['checklist']
+    rf.autorefresh.data = args['refresh']
 
     parsemodes(args['displaymodes'], rf)
 
@@ -404,6 +410,8 @@ def build_option_string(rf):
         out += ' -nf'
     if rf.checklist.data is True and len(rf.checklist_filename.data) > 0:
         out += f' -chl {secure_filename(rf.checklist_filename.data)}'
+    if rf.autorefresh.data > 0:
+        out += f' -ref {rf.autorefresh.data * 60}'   # convert to seconds
     return out
 
 
