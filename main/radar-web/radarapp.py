@@ -61,6 +61,9 @@ RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
 MAX_SEQUENCE = 99   # maximum value accepted as sequence of modes
 MAX_CHECKLIST_SIZE = 256 * 1024  # max size of checklist, set to 256K
+DEFAULT_IP_DIRECT_ON_STRATUX = "127.0.0.1"
+# IP address of stratux when running on stratux. The field is not rendered in stratux-mode,
+# so it has to be set explicitly after each request
 
 stratux_mode = False  # if this mode is True (--stratux) start configuration for radar directly on stratux
 app = Flask(__name__)
@@ -204,10 +207,12 @@ class RadarForm(FlaskForm):
     all_mixers = RadioField('Select detected devices/mixers', choices=[('other', 'Other')], default='other')
 
 
-    def __init__(self, detected_mixers):   # detected mixers is a list of (device, mixername) tuples
+    def __init__(self, detected_mixers, on_stratux = False):   # detected mixers is a list of (device, mixername) tuples
         FlaskForm.__init__(self)
         options = [(t[1],t[0]+'/'+t[1]) for t in detected_mixers]
         self.all_mixers.choices += options
+        if on_stratux:
+            self.stratux_ip.data = DEFAULT_IP_DIRECT_ON_STRATUX
 
 
 def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called from radar_app
@@ -439,7 +444,7 @@ def index():
     global local_checklist_filename
 
     watchdog.refresh()
-    radar_form = RadarForm(cards_and_mixers())
+    radar_form = RadarForm(cards_and_mixers(), stratux_mode)
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     rlog.debug(f'index(): stratux-ip is {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit() is not True:   # no POST request
