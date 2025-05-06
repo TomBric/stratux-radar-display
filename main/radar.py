@@ -646,7 +646,7 @@ async def user_interface():
         rlog.debug("UI task terminating ...")
 
 
-def refresh_display(manual = false):
+def refresh_display(manual = False):
     global last_auto_refresh
     global display_control
     global auto_refresh_time
@@ -690,7 +690,7 @@ async def display_and_cutoff():
                         return
                 elif global_mode == 4:  # refresh display, only relevant for epaper, mode was radar
                     rlog.debug("Radar: Display driver - Refreshing")
-                    refresh_display(manuel=true)
+                    refresh_display(manual=True)
                     global_mode = 1
                 elif global_mode == 5:  # ahrs'
                     ahrsui.draw_ahrs(display_control, situation['connected'], ui_changed or ahrs['was_changed'],
