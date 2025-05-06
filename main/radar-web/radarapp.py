@@ -52,7 +52,7 @@ from flask_wtf import FlaskForm, CSRFProtect
 from flask_wtf.file import FileField
 from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRange
 from wtforms.fields import *
-from flask_bootstrap import Bootstrap5, SwitchField, RadioField, StringField, SubmitField, IntegerField
+from flask_bootstrap import Bootstrap5, SwitchField
 
 RADAR_WEB_VERSION = "1.0"
 START_RADAR_FILE = "../../image/stratux_radar.sh"
