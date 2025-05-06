@@ -82,6 +82,8 @@ def add(ap):
                     default=DEFAULT_MIXER)
     ap.add_argument("-api", "--buttonapi", required=False, help="use api for button handling",
                     action="store_true", default=False)
+    ap.add_argument("-ref", "--refresh", type=int, required=False,
+                    help="Time intervall for automatic refresh in seconds", default=0)
     ap.add_argument("-modes", "--displaymodes", required=False,
                     help="Select display modes that you want to see ""R=radar T=timer A=ahrs D=display-status "
                          "G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "
