@@ -180,7 +180,7 @@ class RadarForm(FlaskForm):
     # web options
     webtimeout = RadioField('Configuration shutdown',
                              choices=[ ('0', 'never shutdown'), ('10', 'after 10 mins inactivity'),('3', 'after 3 mins inactivity'),
-                                      ('1', 'after 1 min inactivity'), ('-1', 'disable web server configuration'),], default=10)
+                                      ('1', 'after 1 min inactivity'), ('-1', 'disable web server configuration'),], default='10')
 
 
     save_restart = SubmitField('Save and reboot radar')
@@ -332,7 +332,7 @@ def read_arguments(rf):
     rf.no_flighttime.data = args['noflighttime']
     rf.checklist_filename.data = args['checklist']
     if args['refresh'] is not None:
-        rf.autorefresh.data = args['refresh']
+        rf.autorefresh.data = str(args['refresh'])
 
     rlog.debug(f'RadarForm Autorefresh: {rf.autorefresh.data}')
 
