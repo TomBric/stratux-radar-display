@@ -445,7 +445,9 @@ def index():
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
         read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
+        rlog.debug(f'index() after read_arguments: stratux-ip is {radar_form.stratux_ip.data}')
     else:
+        rlog.debug(f'index() in else for POST: stratux-ip is {radar_form.stratux_ip.data}')
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
