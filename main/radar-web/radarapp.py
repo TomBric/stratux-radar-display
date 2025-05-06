@@ -331,7 +331,8 @@ def read_arguments(rf):
     rf.coindicate.data = args['coindicate']
     rf.no_flighttime.data = args['noflighttime']
     rf.checklist_filename.data = args['checklist']
-    rf.autorefresh.data = args['refresh']
+    if args['refresh'] is not None:
+        rf.autorefresh.data = args['refresh']
 
     parsemodes(args['displaymodes'], rf)
 
