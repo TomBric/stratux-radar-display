@@ -413,7 +413,7 @@ def build_option_string(rf):
         out += ' -nf'
     if rf.checklist.data is True and len(rf.checklist_filename.data) > 0:
         out += f' -chl {secure_filename(rf.checklist_filename.data)}'
-    if rf.autorefresh.data > 0:
+    if rf.autorefresh.data != '0':
         out += f' -ref {rf.autorefresh.data}'
     return out
 
