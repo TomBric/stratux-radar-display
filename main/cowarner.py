@@ -104,6 +104,8 @@ simvalue = 0.0
 
 
 def ppm(rsr0):
+    if rsr0 == 0:   # avoid zero log
+        return 0
     val = 10 ** ((math.log10(rsr0) - 0.9) / -0.75)
     # val = 10 ** ((rsr0 - 3.3) / -1.33)
     if val < 5:
