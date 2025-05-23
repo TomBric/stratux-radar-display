@@ -119,7 +119,7 @@ class Epaper1in54(dcommon.GenericDisplay):
 
     def refresh(self):
         self.device.Clear(0xFF)  # necessary to overwrite everything
-        self.device.init(0)
+        self.device.init(1)
 
     def startup(self, version, target_ip, seconds):
         logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-150x150.bmp'))
