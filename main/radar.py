@@ -660,6 +660,7 @@ def refresh_display(manual = False):
         if manual or time.time() - last_auto_refresh > auto_refresh_time:
             last_auto_refresh = time.time()
             display_control.refresh()
+            display_control.display()   # show last content
             if not manual:
                 rlog.debug("Display driver - Auto Refreshing")
 
