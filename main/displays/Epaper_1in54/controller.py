@@ -118,7 +118,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.device.sleep_nowait()
 
     def refresh(self):
-        self.async_Clear()
+        self.device.async_Clear()
         # self.device.Clear(0xFF)  # necessary to overwrite everything
         # self.device.init(1)
 
