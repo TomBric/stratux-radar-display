@@ -364,7 +364,7 @@ class EPD:
         self.send_data(0x01)
         epdconfig.module_exit()
 
-    def asyncClear(self, color=0xFF):
+    def async_Clear(self, color=0xFF):
         self.send_command(0x24)
         for j in range(0, self.height):
             for i in range(0, int(self.width / 8)):
