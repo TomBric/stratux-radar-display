@@ -832,7 +832,7 @@ def main():
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
-    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication, co_simulation_mode)
+    cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication, co_simulation_mode, co_i2c_0)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
                         groundbeep, situation, simulation_mode, global_config)
     simulation.init(simulation_mode)
@@ -921,6 +921,7 @@ if __name__ == "__main__":
     measure_flighttime = not args['noflighttime']
     co_warner_activated = not args['nocowarner']
     co_indication = args['coindicate']
+    co_i2c_0 = args['coi2c0']
     grounddistance_activated = args['grounddistance']
     groundbeep = args['groundbeep']
     gear_indication = args ['gearindicate']
