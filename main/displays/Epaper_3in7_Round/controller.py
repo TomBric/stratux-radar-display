@@ -405,11 +405,11 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             self.bottom_line("+/-100ft", "  Back", "+/-10ft")
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=3, offset_left=3, offset_right=3):
-        GenericDisplay().bottom_line(left, middle, right, color, offset_bottom, offset_left=LEFT+offset_left,
+        dcommon.GenericDisplay().bottom_line(left, middle, right, color, offset_bottom, offset_left=LEFT+offset_left,
             offset_right=RIGHT+offset_right)
 
     def right_text(self, y, text, fontsize, color=None, offset=0):
-        GenericDisplay().right_text(y, text, fontsize, color, offset=RIGHT-offset)
+        dcommon.GenericDisplay().right_text(y, text, fontsize, color, offset=RIGHT-offset)
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = Epaper3in7_Round()
