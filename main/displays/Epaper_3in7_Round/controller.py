@@ -202,14 +202,14 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
                        fill=self.TEXT_COLOR, width=5)
 
     def gmeter(self, current, maxg, ming, error_message):
-        gm_size = 280
+        gm_size = 250
         self.meter(current, -3, 5, 110, 430, gm_size, 140, 140, 1, 0.25,      "G-Force", None)
         lines = (
             ("max", f'{maxg:+1.2f}'),
             ("act", f'{current:+1.2f}'),
             ("min", f'{ming:+1.2f}')
         )
-        self.dashboard(gm_size+self.SMALL, self.sizey//2 - 5*self.SMALL//2 , self.sizex-gm_size-self.SMALL-5, lines, rounding=True,
+        self.dashboard(gm_size+self.SMALL, self.sizey//2 - 5*self.SMALL//2 , RIGHT-gm_size-self.SMALL-5, lines, rounding=True,
                        headline="G-Meter", headline_size=self.SMALL)
         self.bottom_line("", "    Mode", "Reset")
 
