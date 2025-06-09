@@ -46,8 +46,8 @@ import logging
 top_index = 0    # top index being displayed in checklist
 
 DISPLAY_OFFSET = -15   # to center display in the 3 1/8 inch instrument hole
-RIGHT = 410
-LEFT = 35
+RIGHT = 400
+LEFT = 40
 
 class Epaper3in7_Round(dcommon.GenericDisplay):
     # display constants
@@ -161,11 +161,11 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             t = ""
         if basemode:
             t += "\nGround\nmode"
-        self.draw.text((LEFT, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((LEFT - 10, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((RIGHT - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((RIGHT+10 - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
         t = f"{altdifference} ft"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
