@@ -152,16 +152,21 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.draw.text((LEFT, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
         if gps_quality == 0:
-            t = "GPS-NoFix"
+            t1 = "GPS"
+            t2 = "NoFix"
         elif gps_quality == 1:
-            t = f"3D GPS\n{round(gps_h_accuracy, 1)}m"
+            t1 = f"3DGPS"
+            t2 = f"{round(gps_h_accuracy, 1)}m"
         elif gps_quality == 2:
-            t = f"DGNSS\n{round(gps_h_accuracy, 1)}m"
+            t1 = f"DGNSS"
+            t2 = f"{round(gps_h_accuracy, 1)}m"
         else:
-            t = ""
+            t1 = ""
+            t2 = ""
         if basemode:
-            t += "\nGround\nmode"
-        self.draw.text((LEFT - 20, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+            t2 += "\nGround\nmode"
+        self.draw.text((LEFT-20, self.SMALL + 10), t1, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((LEFT-30, self.SMALL+self.VERYSMALL+10), t2, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.VERYSMALL])
@@ -190,7 +195,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             else:
                 t = "\uf1f6"  # bell off symbol
             textlength = self.draw.textlength(t, self.awesomefont)
-            self.draw.text((LEFT - textlength - 5, self.VERYSMALL + self.SMALL + 10), t,
+            self.draw.text((LEFT-30 - textlength - 5, self.VERYSMALL + self.SMALL + 10), t,
                            font=self.awesomefont, fill=self.TEXT_COLOR)
 
         self.draw.line((RIGHT+20, 80 + optical_bar * 10, RIGHT+20, 80 + optical_bar * 10 + 8),
