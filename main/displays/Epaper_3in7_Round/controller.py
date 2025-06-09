@@ -46,7 +46,6 @@ import logging
 top_index = 0    # top index being displayed in checklist
 
 DISPLAY_OFFSET = -15   # to center display in the 3 1/8 inch instrument hole
-DISPLAY_REDUCTION_WIDTH = 30  # this is unusable pixel in sum left and right, approx 5 mm each
 
 class Epaper3in7_Round(dcommon.GenericDisplay):
     # display constants
@@ -86,11 +85,11 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.device.init(1)
         self.device.Clear(0xFF, 1)
         self.sizex = self.device.height
-        self.sizey = self.device.width - DISPLAY_REDUCTION_WIDTH
+        self.sizey = self.device.width
         self.zerox = self.sizex / 2 + DISPLAY_OFFSET
         if not fullcircle:
             self.zeroy = 200  # not centered
-            self.max_pixel = 400
+            self.max_pixel = 370
         else:
             self.zeroy = self.sizey / 2
             self.max_pixel = self.sizey
