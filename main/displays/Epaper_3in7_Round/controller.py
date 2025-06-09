@@ -159,17 +159,17 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             t = ""
         if basemode:
             t += "\nGround\nmode"
-        self.draw.text((5, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((40, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.sizex - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((self.max_pixel - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
         t = f"{altdifference} ft"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
+        self.draw.text((self.max_pixel - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
-        self.centered_text(1, f"{course}°", self.SMALL)
+        self.centered_text(10, f"{course}°", self.SMALL)
 
         if not gpsconnected:
             self.centered_text(70, "No GPS", self.SMALL)
