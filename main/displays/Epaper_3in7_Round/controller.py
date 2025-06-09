@@ -106,7 +106,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.compass_aircraft = Image.open(pic_path)
         self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
         self.cdraw = ImageDraw.Draw(self.mask)
-        self.rlog.debug(f'Epaper_3in7 selected: sizex={self.sizex} sizey={self.sizey} zero=({self.zerox}, {self.zeroy}) '
+        self.rlog.debug(f'Epaper_3in7_Round: sizex={self.sizex} sizey={self.sizey} zero=({self.zerox}, {self.zeroy}) '
                         f'refresh-time: {str(round(self.display_refresh, 2))} secs')
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
@@ -119,7 +119,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     @staticmethod
     def next_arcposition(old_arcposition, exclude_from=0, exclude_to=0):
         return dcommon.GenericDisplay().next_arcposition(old_arcposition,
-            exclude_from=Epaper3in7().ARCPOSITION_EXCLUDE_FROM, exclude_to=Epaper3in7().ARCPOSITION_EXCLUDE_TO)
+            exclude_from=Epaper3in7_Round().ARCPOSITION_EXCLUDE_FROM, exclude_to=Epaper3in7_Round().ARCPOSITION_EXCLUDE_TO)
 
     def cleanup(self):
         self.device.init(0)
