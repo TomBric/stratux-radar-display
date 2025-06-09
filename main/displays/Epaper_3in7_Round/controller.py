@@ -164,7 +164,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.draw.text((LEFT - 20, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"FL{round(ownalt / 100)}"
-        textlength = self.draw.textlength(t, self.fonts[self.SMALL])
+        textlength = self.draw.textlength(t, self.fonts[self.VERYSMALL])
         self.draw.text((RIGHT+10 - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"{altdifference} ft"
@@ -190,7 +190,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             else:
                 t = "\uf1f6"  # bell off symbol
             textlength = self.draw.textlength(t, self.awesomefont)
-            self.draw.text((LEFT-20 - textlength - 5, self.VERYSMALL + self.SMALL + 10), t,
+            self.draw.text((LEFT - textlength - 5, self.VERYSMALL + self.SMALL + 10), t,
                            font=self.awesomefont, fill=self.TEXT_COLOR)
 
         self.draw.line((RIGHT+20, 80 + optical_bar * 10, RIGHT+20, 80 + optical_bar * 10 + 8),
