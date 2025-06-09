@@ -165,8 +165,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             t2 = ""
         if basemode:
             t2 += "\nGround\nmode"
-        self.draw.text((LEFT-20, self.SMALL + 10), t1, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((LEFT-30, self.SMALL+self.VERYSMALL+15), t2, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((LEFT-15, self.SMALL + 10), t1, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((LEFT-25, self.SMALL+self.VERYSMALL+15), t2, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.VERYSMALL])
