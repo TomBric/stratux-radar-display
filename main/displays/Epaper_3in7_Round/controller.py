@@ -405,11 +405,12 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             self.bottom_line("+/-100ft", "  Back", "+/-10ft")
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=3, offset_left=3, offset_right=3):
-        super().bottom_line(left, middle, right, color, offset_bottom, offset_left=LEFT+offset_left,
+        print(f"Epaper Round bottom line called")
+        super().bottom_line(left, middle, right, color=color, offset_bottom=offset_bottom, offset_left=LEFT+offset_left,
             offset_right=RIGHT+offset_right)
 
     def right_text(self, y, text, fontsize, color=None, offset=0):
-        super().right_text(y, text, fontsize, color, offset=RIGHT-offset)
+        super().right_text(y, text, fontsize, color=color, offset=RIGHT-offset)
 
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
