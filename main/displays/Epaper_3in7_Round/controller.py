@@ -46,6 +46,8 @@ import logging
 top_index = 0    # top index being displayed in checklist
 
 DISPLAY_OFFSET = -15   # to center display in the 3 1/8 inch instrument hole
+RIGHT = 410
+LEFT = 35
 
 class Epaper3in7_Round(dcommon.GenericDisplay):
     # display constants
@@ -147,7 +149,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
                            self.zerox + self.max_pixel // 4, self.zeroy + self.max_pixel // 4), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
-        self.draw.text((5, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((LEFT, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
         if gps_quality == 0:
             t = "GPS-NoFix"
@@ -159,17 +161,17 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             t = ""
         if basemode:
             t += "\nGround\nmode"
-        self.draw.text((40, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((LEFT, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.max_pixel - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((RIGHT - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
         t = f"{altdifference} ft"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.max_pixel - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
+        self.draw.text((RIGHT - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
-        self.centered_text(10, f"{course}°", self.SMALL)
+        self.centered_text(15, f"{course}°", self.SMALL)
 
         if not gpsconnected:
             self.centered_text(70, "No GPS", self.SMALL)
@@ -188,10 +190,10 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             else:
                 t = "\uf1f6"  # bell off symbol
             textlength = self.draw.textlength(t, self.awesomefont)
-            self.draw.text((self.sizex - textlength - 5, self.sizey - self.SMALL), t,
+            self.draw.text((RIGHT - textlength - 5, self.sizey - self.SMALL), t,
                            font=self.awesomefont, fill=self.TEXT_COLOR)
 
-        self.draw.line((self.sizex - 8, 80 + optical_bar * 10, self.sizex - 8, 80 + optical_bar * 10 + 8),
+        self.draw.line((RIGHT - 8, 80 + optical_bar * 10, self.sizex - 8, 80 + optical_bar * 10 + 8),
                        fill=self.TEXT_COLOR, width=5)
 
     def gmeter(self, current, maxg, ming, error_message):
