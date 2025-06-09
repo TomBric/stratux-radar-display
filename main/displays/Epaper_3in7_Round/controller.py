@@ -411,6 +411,22 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     def right_text(self, y, text, fontsize, color=None, offset=0):
         super().right_text(y, text, fontsize, color=color, offset=RIGHT-offset)
 
+    def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
+                      utc_color=None, timer_color=None, second_color=None):
+        utc_color = utc_color or self.TEXT_COLOR
+        timer_color = timer_color or self.TEXT_COLOR
+        second_color = second_color or self.TEXT_COLOR
+
+        self.draw.text((LEFT, 0), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.centered_text(self.SMALL, utctime, self.VERYLARGE, color=utc_color)
+        if stoptime:
+            self.draw.text((LEFT, self.SMALL + self.VERYLARGE), "Timer", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+            self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.VERYLARGE, color=timer_color)
+
+            if laptime:
+                self.draw.text((LEFT, 2 * self.SMALL + 2 * self.VERYLARGE), laptime_head, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+                self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.VERYLARGE, color=second_color)
+        self.bottom_line(left_text, middle_text, right_t)
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = Epaper3in7_Round()
