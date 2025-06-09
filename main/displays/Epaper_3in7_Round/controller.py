@@ -214,27 +214,27 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.bottom_line("", "    Mode", "Reset")
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min, error_message):
-        vsi_size = 250
+        vsi_size = 230
         self.meter(vertical_speed / 100, -20, 20, 110, 430, vsi_size, 140,
                    140, 5, 1, "Vertical Speed", "100 feet per min",
                    middle_fontsize=self.VERYSMALL)
 
-        self.draw.text((25, vsi_size - self.VERYSMALL - 25), "up", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        self.draw.text((25, vsi_size + 25), "dn", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.draw.text((25, vsi_size//2 - self.VERYSMALL - 25), "up", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.draw.text((25, vsi_size//2 + 25), "dn", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
         lines = (
             ("act", f"{vertical_speed:+1.0f}"),
             ("max", f"{vertical_max:+1.0f}"),
             ("min", f"{vertical_min:+1.0f}")
         )
         self.dashboard(vsi_size + self.SMALL, self.VERYSMALL,
-                       RIGHT-vsi_size-self.SMALL-5 - 2 * 5, lines, rounding=True, headline="Vert Speed [ft/min]")
+                       RIGHT-vsi_size-5 - 2 * 5, lines, rounding=True, headline="V Spd [ft/min]")
         lines = (
             ("Flight-Level", f"{round(flight_level / 100):1.0f}"),
             ("GPS-Alt [ft]", f"{gps_altitude:1.0f}"),
             ("GpsSpd [kts]", f"{gps_speed:1.1f}")
         )
-        self.dashboard(RIGHT-vsi_size-self.SMALL-5, self.sizey // 2 ,
-                       RIGHT-vsi_size-self.SMALL-5 - 2 * 5, lines, rounding=True)
+        self.dashboard(vsi_size + self.SMALL, self.sizey // 2 ,
+                       RIGHT-vsi_size-5 - 2 * 5, lines, rounding=True)
 
         if error_message:
             self.centered_text(60, error_message, self.LARGE)
