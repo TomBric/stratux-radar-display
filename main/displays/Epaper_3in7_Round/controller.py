@@ -406,7 +406,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=3, offset_left=3, offset_right=3):
         super().bottom_line(left, middle, right, color=color, offset_bottom=offset_bottom, offset_left=LEFT+offset_left,
-            offset_right=RIGHT+offset_right)
+            offset_right=self.sizex-RIGHT+offset_right)
 
     def right_text(self, y, text, fontsize, color=None, offset=0):
         super().right_text(y, text, fontsize, color=color, offset=RIGHT-offset)
