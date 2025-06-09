@@ -193,7 +193,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             self.draw.text((RIGHT - textlength - 5, self.sizey - self.SMALL), t,
                            font=self.awesomefont, fill=self.TEXT_COLOR)
 
-        self.draw.line((RIGHT - 8, 80 + optical_bar * 10, self.sizex - 8, 80 + optical_bar * 10 + 8),
+        self.draw.line((RIGHT+20, 80 + optical_bar * 10, RIGHT+20, 80 + optical_bar * 10 + 8),
                        fill=self.TEXT_COLOR, width=5)
 
     def gmeter(self, current, maxg, ming, error_message):
