@@ -47,7 +47,7 @@ top_index = 0    # top index being displayed in checklist
 
 DISPLAY_OFFSET = -15   # to center display in the 3 1/8 inch instrument hole
 RIGHT = 400
-LEFT = 40
+LEFT = 50
 
 class Epaper3in7_Round(dcommon.GenericDisplay):
     # display constants
@@ -161,11 +161,11 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             t = ""
         if basemode:
             t += "\nGround\nmode"
-        self.draw.text((LEFT - 10, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((LEFT - 20, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((RIGHT+10 - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((RIGHT+10 - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"{altdifference} ft"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
@@ -190,7 +190,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             else:
                 t = "\uf1f6"  # bell off symbol
             textlength = self.draw.textlength(t, self.awesomefont)
-            self.draw.text((RIGHT - textlength - 5, self.sizey - self.SMALL), t,
+            self.draw.text((LEFT-20 - textlength - 5, self.VERYSMALL + self.SMALL + 10), t,
                            font=self.awesomefont, fill=self.TEXT_COLOR)
 
         self.draw.line((RIGHT+20, 80 + optical_bar * 10, RIGHT+20, 80 + optical_bar * 10 + 8),
