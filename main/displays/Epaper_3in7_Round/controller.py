@@ -411,5 +411,6 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     def right_text(self, y, text, fontsize, color=None, offset=0):
         dcommon.GenericDisplay().right_text(y, text, fontsize, color, offset=RIGHT-offset)
 
+
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = Epaper3in7_Round()
