@@ -233,7 +233,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("GPS-Alt [ft]", f"{gps_altitude:1.0f}"),
             ("GpsSpd [kts]", f"{gps_speed:1.1f}")
         )
-        self.dashboard(RIGHT-gm_size-self.SMALL-5, self.sizey // 2 ,
+        self.dashboard(RIGHT-vsi_size-self.SMALL-5, self.sizey // 2 ,
                        RIGHT-vsi_size-self.SMALL-5 - 2 * 5, lines, rounding=True)
 
         if error_message:
