@@ -273,7 +273,6 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         if stat['CPUTemp'] > -300:
             starty = self.bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0),
                               bar_start, bar_end, colors, side_offset=side_offset, unit="°C", line_offset=10)
-
         self.draw.text((side_offset, starty), "GPS hw", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.draw.text((bar_start, starty), stat['GPS_detected_type'], font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         starty += self.VERYSMALL + 5
