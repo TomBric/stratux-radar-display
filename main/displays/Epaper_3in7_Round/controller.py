@@ -410,7 +410,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             offset_right=self.sizex-RIGHT+offset_right)
 
     def right_text(self, y, text, fontsize, color=None, offset=0):
-        super().right_text(y, text, fontsize, color=color, offset=RIGHT-offset)
+        super().right_text(y, text, fontsize, color=color, offset=self.sizex-RIGHT+offset)
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
                       utc_color=None, timer_color=None, second_color=None, datestr=None):
