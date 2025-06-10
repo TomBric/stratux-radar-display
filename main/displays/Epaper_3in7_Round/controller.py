@@ -176,12 +176,12 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
         self.draw.text((RIGHT - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
-        self.centered_text(15, f"{course}°", self.SMALL)
+        self.centered_text(8, f"{course}°", self.SMALL)
 
         if not gpsconnected:
-            self.centered_text(70, "No GPS", self.SMALL)
+            self.centered_text(60, "No GPS", self.SMALL)
         if not connected:
-            self.centered_text(30, "No Connection!", self.SMALL)
+            self.centered_text(60, "No Connection!", self.SMALL)
         if co_alarmlevel > 0:
             self.centered_text(250, f"CO Alarm: {co_alarmstring}", self.SMALL)
 
