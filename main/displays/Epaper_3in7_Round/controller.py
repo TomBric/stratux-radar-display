@@ -255,8 +255,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
         starty += self.SMALL + 8
         colors = {'outline': 'black', 'black_white_offset': 5}
-        bar_start, bar_end = 110, 340
-        side_offset = 30
+        bar_start, bar_end = 130, 340
+        side_offset = 70
 
         starty = self.bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'],
                           bar_start, bar_end, colors, side_offset=side_offset, line_offset=10)
