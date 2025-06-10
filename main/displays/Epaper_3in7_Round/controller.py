@@ -418,7 +418,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         timer_color = timer_color or self.TEXT_COLOR
         second_color = second_color or self.TEXT_COLOR
 
-        starty = 8
+        starty = self.SMALL
         self.draw.text((LEFT, starty), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.centered_text(self.SMALL, utctime, self.VERYLARGE, color=utc_color)
         if stoptime:
