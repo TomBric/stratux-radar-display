@@ -218,7 +218,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min, error_message):
         vsi_size = 240
         self.meter(vertical_speed / 100, -20, 20, 110, 430, vsi_size, 125,
-                   140, 5, 1, "Vertical Speed", "100 feet per min",
+                   140, 5, 1, "Vertical Spd", "100 ft/min",
                    middle_fontsize=self.VERYSMALL)
 
         self.draw.text((30, 140 - self.VERYSMALL - 20), "up", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
