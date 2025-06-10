@@ -90,7 +90,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.sizey = self.device.width
         self.zerox = self.sizex / 2 + DISPLAY_OFFSET
         if not fullcircle:
-            self.zeroy = 200  # not centered
+            self.zeroy = 190  # not centered
             self.max_pixel = 370
         else:
             self.zeroy = self.sizey / 2
