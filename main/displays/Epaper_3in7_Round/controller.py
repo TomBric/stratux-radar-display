@@ -287,7 +287,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.draw.text((250, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         starty += self.VERYSMALL + 5
 
-        self.draw.text(side_offset, starty), "altitudes", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((side_offset, starty), "altitudes", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         alt = f"{gps_alt:5.0f}" if stat['GPS_position_accuracy'] < 19999 else " ---"
         self.draw.text((bar_start, starty), f"P-Alt {round(altitude)} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.draw.text((250, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
