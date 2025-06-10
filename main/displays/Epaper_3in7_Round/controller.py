@@ -418,15 +418,16 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         timer_color = timer_color or self.TEXT_COLOR
         second_color = second_color or self.TEXT_COLOR
 
-        self.draw.text((LEFT, 0), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        starty = 8
+        self.draw.text((LEFT, starty), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.centered_text(self.SMALL, utctime, self.VERYLARGE, color=utc_color)
         if stoptime:
-            self.draw.text((LEFT, self.SMALL + self.VERYLARGE), "Timer", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
-            self.centered_text(2 * self.SMALL + self.VERYLARGE, stoptime, self.VERYLARGE, color=timer_color)
+            self.draw.text((LEFT, starty+self.SMALL+self.VERYLARGE), "Timer", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+            self.centered_text(starty+2*self.SMALL+self.VERYLARGE, stoptime, self.VERYLARGE, color=timer_color)
 
             if laptime:
-                self.draw.text((LEFT, 2 * self.SMALL + 2 * self.VERYLARGE), laptime_head, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
-                self.centered_text(3 * self.SMALL + 2 * self.VERYLARGE, laptime, self.VERYLARGE, color=second_color)
+                self.draw.text((LEFT, starty+2*self.SMALL+2*self.VERYLARGE), laptime_head, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+                self.centered_text(starty+3*self.SMALL+2*self.VERYLARGE, laptime, self.VERYLARGE, color=second_color)
         self.bottom_line(left_text, middle_text, right_t)
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
