@@ -97,6 +97,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             self.max_pixel = self.sizey
         self.ah_zeroy = int(self.sizey / 2) # zero line for ahrs
         self.ah_zerox = int(self.sizex / 2) + DISPLAY_OFFSET
+        self.czerox = int(self.sizex / 2) + DISPLAY_OFFSET
+        self.czeroy = int(self.sizey / 2) # center of compass
         # measure time for refresh
         start = time.time()
         # do sync version of display to measure time
@@ -209,7 +211,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("act", f'{current:+1.2f}'),
             ("min", f'{ming:+1.2f}')
         )
-        self.dashboard(gm_size+self.SMALL, self.sizey//2 - 5*self.SMALL//2 , RIGHT-gm_size-self.SMALL+10, lines, rounding=True,
+        self.dashboard(gm_size+self.SMALL, self.sizey//2 - 5*self.SMALL//2 , RIGHT-gm_size-self.SMALL+16, lines, rounding=True,
                        headline="G-Meter", headline_size=self.SMALL)
         self.bottom_line("", "    Mode", "Reset")
 

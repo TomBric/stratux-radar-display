@@ -86,6 +86,8 @@ class Oled1in5(dcommon.GenericDisplay):
         self.max_pixel = self.sizey
         self.ah_zeroy = self.sizey // 2  # zero line for ahrs
         self.ah_zerox = self.sizex // 2
+        self.czerox = self.sizex // 2
+        self.czeroy = self.sizey // 2
         start = time.time()
         # do sync version of display to measure time
         self.display()

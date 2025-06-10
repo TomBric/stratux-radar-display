@@ -102,7 +102,9 @@ class GenericDisplay:
         self.zeroy = 0  # zero position y-axis in pixel (typically half of sizex)
         self.ah_zerox = 0  # zero point x for ahrs
         self.ah_zeroy = 0  # zero point x for ahrs
-        self.max_pixel = 0  # maximum pixel size which is typicall max(sizex, sizey)
+        self.czerox = 0  # center x for compass
+        self.czeroy = 0  # center y for compass
+        self.max_pixel = 0  # maximum pixel size which is typical max(sizex, sizey)
         self.display_refresh = 0.1  # display refresh time, is to be calculated or set in init
         self.arcposition = 0    # angle where the height for mode-s targets is displayed on the arc
         self.draw = None  # pixel array to be used for draw functions generally
@@ -299,22 +301,20 @@ class GenericDisplay:
                            font=self.fonts[middle_fontsize], fill=text_color, align="left")
 
     def compass(self, heading, error_message):
-        czerox = self.sizex // 2
-        czeroy = self.sizey // 2
         csize = self.sizey // 2  # radius of compass rose
         cmsize = self.sizey // 20 # size of compass marks
         line_width = 1 + min(self.sizex, self.sizey) // 64
 
-        self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
+        self.draw.ellipse((self.czerox - csize, 0, self.czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
                           fill=self.BG_COLOR, width=line_width)
         bw, bh = self.compass_aircraft.size
         if self.compass_aircraft.mode == "RGBA":
-            self.image.paste(self.compass_aircraft, (czerox - bw // 2 + bw//32, czeroy - bh // 2))
+            self.image.paste(self.compass_aircraft, (self.czerox - bw // 2 + bw//32, self.czeroy - bh // 2))
             #  +bw//32 on x-axis, since image is not totally centered
         else:
-            self.image.paste(self.TEXT_COLOR, (czerox - bw // 2 + bw//32, czeroy - bh //2), self.compass_aircraft)
+            self.image.paste(self.TEXT_COLOR, (self.czerox - bw // 2 + bw//32, self.czeroy - bh //2), self.compass_aircraft)
             # +bw//32 on x-axis, since image is not totally centered
-        self.draw.line((czerox, cmsize, czerox, czeroy - bh//2),
+        self.draw.line((self.czerox, cmsize, self.czerox, self.czeroy - bh//2),
                        fill=self.TEXT_COLOR, width=line_width)     # -bw//2 on x-axis, since image is not totally centered
 
         self.bottom_line("", "", f"{heading}°")
@@ -322,8 +322,8 @@ class GenericDisplay:
         for m in range(0, 360, 10):
             s = math.sin(math.radians(m - heading + 90))
             c = math.cos(math.radians(m - heading + 90))
-            x1, y1 = czerox - (csize - 1) * c, czeroy - (csize - 1) * s
-            x2, y2 = czerox - (csize - cmsize) * c, czeroy - (csize - cmsize) * s
+            x1, y1 = self.czerox - (csize - 1) * c, self.czeroy - (csize - 1) * s
+            x2, y2 = self.czerox - (csize - cmsize) * c, self.czeroy - (csize - cmsize) * s
             width = line_width if m % 30 == 0 else line_width//2
             self.draw.line((x1, y1, x2, y2), fill=self.TEXT_COLOR, width=width)
 
@@ -338,8 +338,8 @@ class GenericDisplay:
                                 font=font, fill="white")
                 # "white" in any case, since the mask is binary, color is set later on with image.paste
                 rotmask = self.mask.rotate(-m + heading, expand=False)
-                center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
-                          czeroy - (csize - cmsize - self.LARGE // 2) * s)
+                center = (self.czerox - (csize - cmsize - self.LARGE // 2) * c,
+                          self.czeroy - (csize - cmsize - self.LARGE // 2) * s)
                 self.image.paste(color, (round(center[0] - self.LARGE),
                                                           round(center[1] - self.LARGE)), rotmask)
 

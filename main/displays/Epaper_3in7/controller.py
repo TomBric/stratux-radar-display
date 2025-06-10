@@ -90,8 +90,10 @@ class Epaper3in7(dcommon.GenericDisplay):
         else:
             self.zeroy = self.sizey / 2
             self.max_pixel = self.sizey
-        self.ah_zeroy = int(self.sizey / 2) # zero line for ahrs
-        self.ah_zerox = int(self.sizex / 2)
+        self.ah_zeroy = self.sizey // 2 # zero line for ahrs
+        self.ah_zerox = self.sizex // 2
+        self.czerox = self.sizex // 2
+        self.czeroy = self.sizey // 2
         # measure time for refresh
         start = time.time()
         # do sync version of display to measure time
