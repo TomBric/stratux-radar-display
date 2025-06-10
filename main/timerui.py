@@ -150,7 +150,7 @@ def draw_timer(display_control, refresh_time):
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time))
 
     display_control.timer(utctimestr, stoptimestr, laptimestr, lap_head, left_text, middle_text, right_text,
-                          timer_running, datestr)
+                          timer_running, datestr=datestr)
     display_control.display()
 
 
