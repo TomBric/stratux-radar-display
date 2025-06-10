@@ -255,7 +255,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
         starty += self.SMALL + 8
         colors = {'outline': 'black', 'black_white_offset': 5}
-        bar_start, bar_end = 120, 360
+        bar_start, bar_end = 110, 340
         side_offset = 30
 
         starty = self.bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'],
@@ -411,9 +411,6 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         super().bottom_line(left, middle, right, color=color, offset_bottom=offset_bottom, offset_left=LEFT+offset_left,
             offset_right=self.sizex-RIGHT+offset_right)
 
-    def right_text(self, y, text, fontsize, color=None, offset=0):
-        super().right_text(y, text, fontsize, color=color, offset=self.sizex-RIGHT+offset)
-
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
                       utc_color=None, timer_color=None, second_color=None, datestr=None):
         utc_color = utc_color or self.TEXT_COLOR
@@ -423,7 +420,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         starty = self.VERYSMALL
         self.draw.text((LEFT, starty), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         if datestr:
-            self.right_text(starty, datestr, self.SMALL, color=self.TEXT_COLOR)
+            self.right_text(starty, datestr, self.SMALL, color=self.TEXT_COLOR, offset=self.sizex-RIGHT)
         self.centered_text(starty+self.SMALL, utctime, self.VERYLARGE, color=utc_color)
         if stoptime:
             self.draw.text((LEFT, starty+self.SMALL+self.VERYLARGE), "Timer", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
