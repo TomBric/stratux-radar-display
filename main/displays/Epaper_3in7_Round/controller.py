@@ -46,7 +46,7 @@ import logging
 top_index = 0    # top index being displayed in checklist
 
 DISPLAY_OFFSET = -15   # to center display in the 3 1/8 inch instrument hole
-RIGHT = 395
+RIGHT = 400
 LEFT = 55
 
 class Epaper3in7_Round(dcommon.GenericDisplay):
