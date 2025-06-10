@@ -90,7 +90,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.sizey = self.device.width
         self.zerox = self.sizex / 2 + DISPLAY_OFFSET
         if not fullcircle:
-            self.zeroy = 190  # not centered
+            self.zeroy = 185  # not centered
             self.max_pixel = 370
         else:
             self.zeroy = self.sizey / 2
@@ -172,7 +172,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         textlength = self.draw.textlength(t, self.fonts[self.VERYSMALL])
         self.draw.text((RIGHT+13 - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
-        t = f"{altdifference} ft"
+        t = f"{altdifference // 1000}k" if altdifference >= 10000 else f"{altdifference}"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
         self.draw.text((RIGHT - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
