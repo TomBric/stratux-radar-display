@@ -233,7 +233,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         lines = (
             ("Flight-Level", f"{round(flight_level / 100):1.0f}"),
             ("GAlt [ft]", f"{gps_altitude:1.0f}"),
-            ("GSpd [kts]", f"{gps_speed:1.1f}")
+            ("GSpd [kts]", f"{gps_speed:1.0f}")
         )
         self.dashboard(vsi_size + 3, self.sizey // 2 ,
                        RIGHT-vsi_size-5, lines, rounding=True)
