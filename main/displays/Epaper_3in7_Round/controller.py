@@ -216,13 +216,13 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.bottom_line("", "    Mode", "Reset")
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min, error_message):
-        vsi_size = 230
-        self.meter(vertical_speed / 100, -20, 20, 110, 430, vsi_size, 140,
+        vsi_size = 240
+        self.meter(vertical_speed / 100, -20, 20, 110, 430, vsi_size, 125,
                    140, 5, 1, "Vertical Speed", "100 feet per min",
                    middle_fontsize=self.VERYSMALL)
 
-        self.draw.text((25, vsi_size//2 - self.VERYSMALL - 25), "up", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
-        self.draw.text((25, vsi_size//2 + 25), "dn", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.draw.text((35, 140 - self.VERYSMALL - 25), "up", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.draw.text((35, 140 + 25), "dn", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
         lines = (
             ("act", f"{vertical_speed:+1.0f}"),
             ("max", f"{vertical_max:+1.0f}"),
