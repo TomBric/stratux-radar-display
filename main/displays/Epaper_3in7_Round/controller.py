@@ -172,7 +172,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         textlength = self.draw.textlength(t, self.fonts[self.VERYSMALL])
         self.draw.text((RIGHT+13 - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
-        t = f"{altdifference // 1000}k" if altdifference >= 10000 else f"{altdifference}"
+        t = f"{altdifference // 1000}k ft" if altdifference >= 10000 else f"{altdifference} ft"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
         self.draw.text((RIGHT - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
