@@ -255,8 +255,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
         starty += self.SMALL + 8
         colors = {'outline': 'black', 'black_white_offset': 5}
-        bar_start, bar_end = 100, 420
-        side_offset = 50
+        bar_start, bar_end = 120, 360
+        side_offset = 30
 
         starty = self.bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'],
                           bar_start, bar_end, colors, side_offset=side_offset, line_offset=10)
@@ -283,14 +283,14 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.draw.text((bar_start, starty), t + gps, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"Sat: {stat['GPS_satellites_locked']} sol/{stat['GPS_satellites_seen']} seen/{stat['GPS_satellites_tracked']} track"
-        self.draw.text((250, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((200, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         starty += self.VERYSMALL + 5
 
         self.draw.text((side_offset, starty), "altitudes", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         alt = f"{gps_alt:5.0f}" if stat['GPS_position_accuracy'] < 19999 else " ---"
         self.draw.text((bar_start, starty), f"P-Alt {round(altitude)} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((250, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((380, starty), f"GPS-Alt {alt} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((200, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((330, starty), f"GPS-Alt {alt} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         starty += self.VERYSMALL + 5
 
         self.draw.text((side_offset, starty), "sensors", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
