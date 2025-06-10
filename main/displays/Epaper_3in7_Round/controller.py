@@ -209,7 +209,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("act", f'{current:+1.2f}'),
             ("min", f'{ming:+1.2f}')
         )
-        self.dashboard(gm_size+self.SMALL, self.sizey//2 - 5*self.SMALL//2 , RIGHT-gm_size-self.SMALL-5, lines, rounding=True,
+        self.dashboard(gm_size+self.SMALL, self.sizey//2 - 5*self.SMALL//2 , RIGHT-gm_size-self.SMALL+10, lines, rounding=True,
                        headline="G-Meter", headline_size=self.SMALL)
         self.bottom_line("", "    Mode", "Reset")
 
