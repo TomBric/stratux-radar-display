@@ -413,13 +413,15 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         super().right_text(y, text, fontsize, color=color, offset=RIGHT-offset)
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
-                      utc_color=None, timer_color=None, second_color=None):
+                      utc_color=None, timer_color=None, second_color=None, datestr=None):
         utc_color = utc_color or self.TEXT_COLOR
         timer_color = timer_color or self.TEXT_COLOR
         second_color = second_color or self.TEXT_COLOR
 
         starty = self.SMALL
         self.draw.text((LEFT, starty), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        if datestr:
+            self.right_text(0, datestr, self.SMALL, color=self.TEXT_COLOR)
         self.centered_text(starty+self.SMALL, utctime, self.VERYLARGE, color=utc_color)
         if stoptime:
             self.draw.text((LEFT, starty+self.SMALL+self.VERYLARGE), "Timer", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)

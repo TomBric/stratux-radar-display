@@ -208,12 +208,14 @@ class GenericDisplay:
         pass
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
-                      utc_color=None, timer_color=None, second_color=None):
+                      utc_color=None, timer_color=None, second_color=None, datestr=None):
         utc_color = utc_color or self.TEXT_COLOR
         timer_color = timer_color or self.TEXT_COLOR
         second_color = second_color or self.TEXT_COLOR
 
         self.draw.text((5, 0), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        if datestr:
+            self.right_text(0, datestr, self.SMALL, color=self.TEXT_COLOR)
         self.centered_text(self.SMALL, utctime, self.VERYLARGE, color=utc_color)
         if stoptime:
             self.draw.text((5, self.SMALL + self.VERYLARGE), "Timer", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)

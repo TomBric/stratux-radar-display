@@ -109,7 +109,8 @@ def draw_timer(display_control, refresh_time):
     was_in_secs = now_in_secs
     timer_ui_changed = False
     display_control.clear()
-    utctimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs))
+    utctimestr = time.strftime("%H:%M:%S", time.gmtime())
+    datestr = time.strftime("%Y-%m-%d", time.gmtime())
     if timer_running:
         stoptimestr = time.strftime("%H:%M:%S", time.gmtime(now_in_secs-stoptime))
         if laptime != 0:
@@ -149,7 +150,7 @@ def draw_timer(display_control, refresh_time):
             laptimestr = time.strftime("%H:%M:%S", time.gmtime(cdown_time))
 
     display_control.timer(utctimestr, stoptimestr, laptimestr, lap_head, left_text, middle_text, right_text,
-                          timer_running)
+                          timer_running, datestr)
     display_control.display()
 
 
