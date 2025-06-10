@@ -228,14 +228,14 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("max", f"{vertical_max:+1.0f}"),
             ("min", f"{vertical_min:+1.0f}")
         )
-        self.dashboard(vsi_size + self.VERYSMALL, self.VERYSMALL,
+        self.dashboard(vsi_size + 3, self.VERYSMALL,
                        RIGHT-vsi_size-5, lines, rounding=True, headline="V Spd [ft/min]")
         lines = (
             ("Flight-Level", f"{round(flight_level / 100):1.0f}"),
-            ("GPS-Alt [ft]", f"{gps_altitude:1.0f}"),
-            ("GpsSpd [kts]", f"{gps_speed:1.1f}")
+            ("GAlt [ft]", f"{gps_altitude:1.0f}"),
+            ("GSpd [kts]", f"{gps_speed:1.1f}")
         )
-        self.dashboard(vsi_size + self.VERYSMALL, self.sizey // 2 ,
+        self.dashboard(vsi_size + 3, self.sizey // 2 ,
                        RIGHT-vsi_size-5, lines, rounding=True)
 
         if error_message:
@@ -291,8 +291,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.draw.text((side_offset_l, starty), "altitudes", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         alt = f"{gps_alt:5.0f}" if stat['GPS_position_accuracy'] < 19999 else " ---"
         self.draw.text((bar_start, starty), f"P-Alt {round(altitude)} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((230, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((290, starty), f"GPS-Alt {alt} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((220, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((310, starty), f"GPS-Alt {alt} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         starty += self.VERYSMALL + 5
 
         self.draw.text((side_offset_l, starty), "sensors", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
