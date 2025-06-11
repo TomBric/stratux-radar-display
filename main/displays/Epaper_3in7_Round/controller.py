@@ -302,8 +302,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
 
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):
         self.centered_text(0, alarmtext, self.LARGE)
-        graphpos = (0,40)
-        graphsize = (300, 200)
+        graphpos = (30,40)
+        graphsize = (250, 200)
         self.graph(graphpos, graphsize, co_values, 0, 120, timeout, value_line1=50, value_line2=100,
                    glinewidth=3, linewidth=3)
         lines = [
@@ -315,8 +315,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("", ""),
             ("R0", f"{r0 / 1000:.1f}k")
         ]
-        loffset = 320  # start of text
-        roffset = 10
+        loffset = 290  # start of text
+        roffset = RIGHT
         self.dashboard(loffset, 40 + self.VERYSMALL, self.sizex - loffset - roffset, lines)
         if simulation_mode:
             self.round_text(self.sizex//4, self.sizey//3, "simulation mode", out_color=self.TEXT_COLOR)
