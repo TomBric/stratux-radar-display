@@ -157,7 +157,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             t1 = "GPS"
             t2 = "NoFix"
         elif gps_quality == 1:
-            t1 = f"3D-GPS"
+            t1 = f"3DGPS"
             t2 = f"{round(gps_h_accuracy, 1)}m"
         elif gps_quality == 2:
             t1 = f"DGNSS"
