@@ -367,7 +367,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
                 ("Ba-Diff r-up [ft]", alt_diff_str),
                 ("Ba-Diff tof [ft]", takeoff_str)
             ]
-            self.dashboard(self.zerox + offset, starty, self.zerox - 2 * offset, lines, headline="Baro", rounding=True)
+            self.dashboard(self.zerox + 5, starty, self.zerox - offset - 5, lines, headline="Baro", rounding=True)
         if error_message:
             self.centered_text(self.sizey // 4, error_message, self.LARGE)
         self.bottom_line("Stats/Set", "Mode", "Start")
