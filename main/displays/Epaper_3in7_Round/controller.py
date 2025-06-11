@@ -375,6 +375,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
         self.centered_text(0, "Start-/Landing Statistics", self.SMALL)
 
+        offset = 30
         st = '---'
         if 'start_time' in values:
             st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
@@ -384,7 +385,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
-        self.dashboard(5, 35, 225, lines, headline="Takeoff", rounding=True)
+        self.dashboard(offset, 35, self.zerox-offset, lines, headline="Takeoff", rounding=True)
         lt = '---'
         if 'landing_time' in values:
             lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
@@ -394,7 +395,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         ]
-        starty = self.dashboard(250, 35, 225, lines, headline="Landing", rounding=True)
+        starty = self.dashboard(self.zerox + 5, 35, self.zerox-offset-5, lines, headline="Landing", rounding=True)
         if ground_warnings:
             dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
             gps_alt_str = f"{gps_altitude:+5.0f}" if gps_valid else "---"
@@ -402,7 +403,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
                 ("Act GPS-Alt [ft]", gps_alt_str),
                 ("Destination Alt [ft]", dest_alt_str),
             ]
-            self.dashboard(5, starty + 10, 475, lines, headline="Destination Elevation", rounding=True)
+            self.dashboard(30, starty + 10, 475, lines, headline="Destination Elevation", rounding=True)
 
         if not ground_warnings:
             self.bottom_line("", "Back", "")
@@ -412,6 +413,9 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     def bottom_line(self, left, middle, right, color=None, offset_bottom=3, offset_left=3, offset_right=3):
         super().bottom_line(left, middle, right, color=color, offset_bottom=offset_bottom, offset_left=LEFT+offset_left,
             offset_right=self.sizex-RIGHT+offset_right)
+
+    def text_screen(self, headline, subline, text, left_text, middle_text, r_text, offset=0):
+        super().def text_screen(self, headline, subline, text, left_text, middle_text, r_text, offset=LEFT):
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
                       utc_color=None, timer_color=None, second_color=None, datestr=None):
