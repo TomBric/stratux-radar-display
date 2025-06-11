@@ -325,7 +325,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                          own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                          ground_distance_valid, grounddistance, error_message):
-        offset = 5
+        offset = 30
         self.centered_text(0, "GPS Distance", self.SMALL)
         lines = [
             ("Date", f"{now.day:02d}.{now.month:02d}.{now.year:04d}"),
@@ -357,13 +357,13 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
                 ("Pitch [deg]", f"{ahrs_pitch:+2d}"),
                 ("Roll [deg]", f"{ahrs_roll:+2d}")
             ]
-            starty = self.dashboard(self.zerox + offset, starty, self.zerox - 2 * offset, lines, headline="AHRS", rounding=True)
+            starty = self.dashboard(self.zerox + 5, starty, self.zerox - offset - 5, lines, headline="AHRS", rounding=True)
         if baro_valid:
             takeoff_str = f"{alt_diff_takeoff:+5.1f}" if alt_diff_takeoff is not None else "---"
             alt_diff_str = f"{alt_diff:+5.1f}" if alt_diff is not None else "---"
             lines = [
-                ("Baro-Altitude [ft]", f"{own_altitude:.0f}"),
-                ("Vert Speed [ft]", f"{vert_speed:+4.0f}"),
+                ("Baro-Alt [ft]", f"{own_altitude:.0f}"),
+                ("Vert Spd [ft]", f"{vert_speed:+4.0f}"),
                 ("Ba-Diff r-up [ft]", alt_diff_str),
                 ("Ba-Diff tof [ft]", takeoff_str)
             ]
