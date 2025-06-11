@@ -316,7 +316,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("R0", f"{r0 / 1000:.1f}k")
         ]
         loffset = 290  # start of text
-        roffset = self.sizex-RIGHT+20
+        roffset = self.sizex-RIGHT-20
         self.dashboard(loffset, 40 + self.VERYSMALL, self.sizex - loffset - roffset, lines)
         if simulation_mode:
             self.round_text(self.sizex//4, self.sizey//3, "simulation mode", out_color=self.TEXT_COLOR)
