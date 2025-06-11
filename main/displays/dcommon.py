@@ -476,7 +476,7 @@ class GenericDisplay:
             self.centered_text(txt_starty, subline, self.SMALL)
             txt_starty += self.LARGE
         bbox = self.draw.textbbox((offset, txt_starty), text, font=self.fonts[self.SMALL])
-        self.draw.text((0, txt_starty), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((offset, txt_starty), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         bbox_p = self.draw.textbbox((bbox[0], bbox[3]), prefix, font=self.fonts[self.SMALL])
         self.draw.text((bbox[0], bbox[3]), prefix, fill=self.TEXT_COLOR, font=self.fonts[self.SMALL])
         bbox_rect = self.draw.textbbox((bbox_p[2], bbox[3]), inp, font=self.fonts[self.SMALL])
