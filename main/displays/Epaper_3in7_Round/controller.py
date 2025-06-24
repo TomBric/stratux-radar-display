@@ -183,7 +183,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         if not gpsconnected:
             self.centered_text(60, "No GPS", self.SMALL)
         if not connected:
-            self.centered_text(60, "No Connection!", self.SMALL)
+            self.centered_text(80, "No Connection!", self.SMALL)
         if co_alarmlevel > 0:
             self.centered_text(250, f"CO Alarm: {co_alarmstring}", self.SMALL)
 
