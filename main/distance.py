@@ -149,8 +149,11 @@ def user_input():
     if btime == 0:
         return 0, False  # stay in current mode
     if dist_user_mode == 0:
-        if button == 1 and (btime == 2 or btime == 1):  # middle
+        if button == 1 and btime == 2:  # middle
             return radarmodes.next_mode_sequence(21), False  # next mode to be radar
+        if button == 1 and btime == 1:  # middle and short, display history statistics
+            dist_user_mode == 2
+            return 21, False
         if button == 0 and btime == 2:  # left and long
             return 3, False  # start next mode shutdown!
         if button == 0 and btime == 1:  # left and short - display statistics
@@ -162,11 +165,8 @@ def user_input():
             return 22, False  # start next mode for display driver: refresh called from vsi
         return 21, False  # no mode change for any other interaction
     elif dist_user_mode == 1:  # statistics/set mode
-        if button == 1 and btime == 2:  # middle and long - return to display mode
+        if button == 1 and (btime == 2 or btime == 1):  # middle and long/short - return to display mode
             dist_user_mode = 0
-            return 21, False
-        if button == 1 and btime == 1:  # middle and short, display history statistics
-            dist_user_mode == 2
             return 21, False
         if button == 0 and btime == 1:  # left and short - +100 ft
             grounddistance.set_dest_elevation(+100)
