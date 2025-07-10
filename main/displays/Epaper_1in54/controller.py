@@ -232,7 +232,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     def earthfill(self, pitch, roll, length, scale):   # possible function for derived classed to implement fillings for earth
         # draws some type of black shading for the earth
         for pm in range(0, -180-1, -3):
-            self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill="black", width=1)
+            self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill=self.TEXT_COLOR, width=1)
 
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         starty = 0
