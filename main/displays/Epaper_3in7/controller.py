@@ -54,30 +54,32 @@ class Epaper3in7(dcommon.GenericDisplay):
     AWESOME_FONTSIZE = 18  # bluetooth indicator
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
     
-    # Default to light mode colors
-    BG_COLOR = "white"
-    TEXT_COLOR = "black"
-    HIGHLIGHT_COLOR = "black"
-    AIRCRAFT_COLOR = "black"
-    AIRCRAFT_OUTLINE = "black"
-    MODE_S_COLOR = "black"
-    
+    # Display constants
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 110
     ARCPOSITION_EXCLUDE_TO = 250
     
-    # AHRS
-    AHRS_EARTH_COLOR = "white"  # how ahrs displays the earth
-    AHRS_SKY_COLOR = "white"  # how ahrs displays the sky
-    AHRS_HORIZON_COLOR = "black"  # how ahrs displays the horizon
-    AHRS_MARKS_COLOR = "black"  # color of marks and corresponding text in ahrs
-    
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
-    device = None
-    image = None
-    draw = None
-    mask = None
-    dark_mode = False
+    def __init__(self):
+        super().__init__()
+        # Initialize color attributes
+        self.BG_COLOR = "white"
+        self.TEXT_COLOR = "black"
+        self.HIGHLIGHT_COLOR = "black"
+        self.AIRCRAFT_COLOR = "black"
+        self.AIRCRAFT_OUTLINE = "black"
+        self.MODE_S_COLOR = "black"
+        # AHRS colors
+        self.AHRS_EARTH_COLOR = "white"
+        self.AHRS_SKY_COLOR = "white"
+        self.AHRS_HORIZON_COLOR = "black"
+        self.AHRS_MARKS_COLOR = "black"
+        # Other attributes
+        self.device = None
+        self.image = None
+        self.draw = None
+        self.mask = None
+        self.dark_mode = False
     
     def set_dark_mode(self, dark_mode):
         """Set dark mode and update color constants accordingly"""
@@ -105,7 +107,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.AHRS_HORIZON_COLOR = "black"
             self.AHRS_MARKS_COLOR = "black"
 
-    def init(self, fullcircle=False):
+    def init(self, fullcircle=False, dark_mode=False):
         self.device = epd3in7.EPD()
         self.device.init(0)
         self.device.Clear(0xFF, 0)  # necessary to overwrite everything
@@ -113,6 +115,9 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw = ImageDraw.Draw(self.image)
         self.device.init(1)
         self.device.Clear(0xFF, 1)
+        # Initialize dark mode
+        self.dark_mode = dark_mode
+        self.set_dark_mode(dark_mode)
         self.sizex = self.device.height
         self.sizey = self.device.width
         self.zerox = self.sizex / 2
