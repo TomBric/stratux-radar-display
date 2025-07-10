@@ -826,7 +826,7 @@ def main():
     shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
-    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
+    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
     ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
@@ -911,9 +911,6 @@ if __name__ == "__main__":
     try:
         display_control_module = importlib.import_module('displays.' + args['device'] + '.controller')
         display_control = display_control_module.radar_display  # inherited instance of GenericDisplay in imported module
-        # Set dark mode if specified in arguments
-        if hasattr(display_control, 'set_dark_mode') and args['dark']:
-            display_control.set_dark_mode(True)
     except ModuleNotFoundError as e:
         print("Error: Controller for device '{0}' not found. Aborting. ".format(args['device']))
         syslog.syslog(syslog.LOG_ERR, "Error: Controller for device '{0}' not found. Aborting. ".format(args['device']))
