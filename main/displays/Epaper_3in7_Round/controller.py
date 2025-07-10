@@ -58,6 +58,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     VERYSMALL = 18
     AWESOME_FONTSIZE = 18  # bluetooth indicator
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
+    # colors - default to light mode
     BG_COLOR = "white"
     TEXT_COLOR = "black"
     HIGHLIGHT_COLOR = "black"
@@ -77,11 +78,39 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     image = None
     draw = None
     mask = None
+    dark_mode = False
+    
+    def set_dark_mode(self, dark_mode):
+        """Set dark mode and update color constants accordingly"""
+        self.dark_mode = dark_mode
+        if dark_mode:
+            self.BG_COLOR = "black"
+            self.TEXT_COLOR = "white"
+            self.HIGHLIGHT_COLOR = "white"
+            self.AIRCRAFT_COLOR = "white"
+            self.AIRCRAFT_OUTLINE = "white"
+            self.MODE_S_COLOR = "white"
+            self.AHRS_EARTH_COLOR = "black"
+            self.AHRS_SKY_COLOR = "black"
+            self.AHRS_HORIZON_COLOR = "white"
+            self.AHRS_MARKS_COLOR = "white"
+        else:
+            self.BG_COLOR = "white"
+            self.TEXT_COLOR = "black"
+            self.HIGHLIGHT_COLOR = "black"
+            self.AIRCRAFT_COLOR = "black"
+            self.AIRCRAFT_OUTLINE = "black"
+            self.MODE_S_COLOR = "black"
+            self.AHRS_EARTH_COLOR = "white"
+            self.AHRS_SKY_COLOR = "white"
+            self.AHRS_HORIZON_COLOR = "black"
+            self.AHRS_MARKS_COLOR = "black"
 
     def init(self, fullcircle=False):
         self.device = epd3in7.EPD()
         self.device.init(0)
         self.device.Clear(0xFF, 0)  # necessary to overwrite everything
+        self.image = Image.new('1', (self.device.height, self.device.width), 0xFF if not self.dark_mode else 0x00)
         self.image = Image.new('1', (self.device.height, self.device.width), 0xFF)
         self.draw = ImageDraw.Draw(self.image)
         self.device.init(1)

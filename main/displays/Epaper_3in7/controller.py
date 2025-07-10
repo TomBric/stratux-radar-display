@@ -53,25 +53,57 @@ class Epaper3in7(dcommon.GenericDisplay):
     VERYSMALL = 18
     AWESOME_FONTSIZE = 18  # bluetooth indicator
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
+    
+    # Default to light mode colors
     BG_COLOR = "white"
     TEXT_COLOR = "black"
     HIGHLIGHT_COLOR = "black"
     AIRCRAFT_COLOR = "black"
     AIRCRAFT_OUTLINE = "black"
     MODE_S_COLOR = "black"
+    
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 110
     ARCPOSITION_EXCLUDE_TO = 250
+    
     # AHRS
     AHRS_EARTH_COLOR = "white"  # how ahrs displays the earth
     AHRS_SKY_COLOR = "white"  # how ahrs displays the sky
     AHRS_HORIZON_COLOR = "black"  # how ahrs displays the horizon
     AHRS_MARKS_COLOR = "black"  # color of marks and corresponding text in ahrs
-    ANGLE_OFFSET=270 # offset for calculating angles in displays
+    
+    ANGLE_OFFSET = 270  # offset for calculating angles in displays
     device = None
     image = None
     draw = None
     mask = None
+    dark_mode = False
+    
+    def set_dark_mode(self, dark_mode):
+        """Set dark mode and update color constants accordingly"""
+        self.dark_mode = dark_mode
+        if dark_mode:
+            self.BG_COLOR = "black"
+            self.TEXT_COLOR = "white"
+            self.HIGHLIGHT_COLOR = "white"
+            self.AIRCRAFT_COLOR = "white"
+            self.AIRCRAFT_OUTLINE = "white"
+            self.MODE_S_COLOR = "white"
+            self.AHRS_EARTH_COLOR = "black"
+            self.AHRS_SKY_COLOR = "black"
+            self.AHRS_HORIZON_COLOR = "white"
+            self.AHRS_MARKS_COLOR = "white"
+        else:
+            self.BG_COLOR = "white"
+            self.TEXT_COLOR = "black"
+            self.HIGHLIGHT_COLOR = "black"
+            self.AIRCRAFT_COLOR = "black"
+            self.AIRCRAFT_OUTLINE = "black"
+            self.MODE_S_COLOR = "black"
+            self.AHRS_EARTH_COLOR = "white"
+            self.AHRS_SKY_COLOR = "white"
+            self.AHRS_HORIZON_COLOR = "black"
+            self.AHRS_MARKS_COLOR = "black"
 
     def init(self, fullcircle=False):
         self.device = epd3in7.EPD()

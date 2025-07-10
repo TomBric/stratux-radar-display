@@ -49,8 +49,8 @@
 {{ render_form_row([radar_form.external_sound, radar_form.sound_volume, radar_form.all_mixers, radar_form.mixername],
     col_map={'external_sound': 'col-md-3', 'sound_volume': 'col-md-2', 'all_mixers': 'col-md-3', 'mixername': 'col-md-2'}) }}
 <h5>Special options</h5>
-{{ render_form_row([radar_form.coindicate, radar_form.no_cowarner, radar_form.coi2c0, radar_form.no_flighttime],
-    col_map={'coindicate': 'col-md-3', 'no_cowarner': 'col-md-3', 'coi2c0': 'col-md-3', 'no_flighttime': 'col-md-3'}) }}
+{{ render_form_row([radar_form.coindicate, radar_form.no_cowarner, radar_form.coi2c0, radar_form.no_flighttime, radar_form.darkmode],
+    col_map={'coindicate': 'col-md-2', 'no_cowarner': 'col-md-2', 'coi2c0': 'col-md-3', 'no_flighttime': 'col-md-2', 'darkmode': 'col-md-3'}) }}
 
 {{ render_field(radar_form.autorefresh, form_type='horizontal') }}
 

@@ -52,7 +52,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     MINIMAL_CIRCLE = 10  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 0
     ARCPOSITION_EXCLUDE_TO = 0
-    # colors
+    # colors - default to light mode
     BG_COLOR = "white"
     TEXT_COLOR = "black"
     HIGHLIGHT_COLOR = "black"
@@ -69,6 +69,33 @@ class Epaper1in54(dcommon.GenericDisplay):
     device = None
     image = None
     mask = None
+    dark_mode = False
+
+    def set_dark_mode(self, dark_mode):
+        """Set dark mode and update color constants accordingly"""
+        self.dark_mode = dark_mode
+        if dark_mode:
+            self.BG_COLOR = "black"
+            self.TEXT_COLOR = "white"
+            self.HIGHLIGHT_COLOR = "white"
+            self.AIRCRAFT_COLOR = "white"
+            self.AIRCRAFT_OUTLINE = "white"
+            self.MODE_S_COLOR = "white"
+            self.AHRS_EARTH_COLOR = "black"
+            self.AHRS_SKY_COLOR = "black"
+            self.AHRS_HORIZON_COLOR = "white"
+            self.AHRS_MARKS_COLOR = "white"
+        else:
+            self.BG_COLOR = "white"
+            self.TEXT_COLOR = "black"
+            self.HIGHLIGHT_COLOR = "black"
+            self.AIRCRAFT_COLOR = "black"
+            self.AIRCRAFT_OUTLINE = "black"
+            self.MODE_S_COLOR = "black"
+            self.AHRS_EARTH_COLOR = "white"
+            self.AHRS_SKY_COLOR = "white"
+            self.AHRS_HORIZON_COLOR = "black"
+            self.AHRS_MARKS_COLOR = "black"
 
     def init(self, fullcircle=False):
         self.device = epd1in54_V2.EPD()
