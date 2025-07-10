@@ -153,7 +153,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     def startup(self, version, target_ip, seconds):
         logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-150x150.bmp'))
         logo = Image.open(logopath)
-        self.draw.bitmap((self.zerox-150//2, 0), logo, fill="black")
+        self.draw.bitmap((self.zerox-150//2, 0), logo, fill=self.TEXT_COLOR)
         versionstr = f"Radar {version}"
         self.centered_text(150, versionstr, self.VERYLARGE)
         self.display()
