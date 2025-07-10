@@ -66,17 +66,7 @@ class GenericDisplay:
     AWESOME_FONTSIZE= 18  # bluetooth indicator
     # radar-mode
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
-    AIRCRAFT_COLOR = "red"
-    MODE_S_COLOR = "white"
-    AIRCRAFT_OUTLINE = "white"
-    BG_COLOR = "black"
-    TEXT_COLOR = "white"   # default color for text
-    HIGHLIGHT_COLOR = TEXT_COLOR
-    # AHRS
-    AHRS_EARTH_COLOR = "brown"   # how ahrs displays the earth
-    AHRS_SKY_COLOR = "blue"   # how ahrs displays the sky
-    AHRS_HORIZON_COLOR = "white"   # color of horizon line in ahrs
-    AHRS_MARKS_COLOR = "white"   # color of marks and corresponding text in ahrs
+    # Colors will be initialized in __init__
     # RADAR
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 0
@@ -95,9 +85,23 @@ class GenericDisplay:
 
     def __init__(self):
         self.rlog = logging.getLogger('stratux-radar-log')
+        # Initialize color attributes with default light mode
+        self.AIRCRAFT_COLOR = "red"
+        self.MODE_S_COLOR = "black"
+        self.AIRCRAFT_OUTLINE = "black"
+        self.BG_COLOR = "white"
+        self.TEXT_COLOR = "black"
+        self.HIGHLIGHT_COLOR = self.TEXT_COLOR
+        # AHRS colors
+        self.AHRS_EARTH_COLOR = "brown"
+        self.AHRS_SKY_COLOR = "lightblue"
+        self.AHRS_HORIZON_COLOR = "black"
+        self.AHRS_MARKS_COLOR = "black"
+        
         # these variables below need to be set for every display!
         self.sizex = 0  # display size x axis in pixel
         self.sizey = 0  # display size y axis in pixel
+        self.dark_mode = False
         self.zerox = 0  # zero position (center) in pixel (typically half of sizex)
         self.zeroy = 0  # zero position y-axis in pixel (typically half of sizex)
         self.ah_zerox = 0  # zero point x for ahrs
@@ -120,7 +124,36 @@ class GenericDisplay:
         }
         self.awesomefont = self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONTSIZE)
 
-    def init(self, fullcircle=False):    # explicit init to be implemented for every device type
+    def set_dark_mode(self, dark_mode):
+        """Set dark mode and update color constants accordingly"""
+        self.dark_mode = dark_mode
+        if dark_mode:
+            self.BG_COLOR = "black"
+            self.TEXT_COLOR = "white"
+            self.HIGHLIGHT_COLOR = "white"
+            self.AIRCRAFT_COLOR = "white"
+            self.AIRCRAFT_OUTLINE = "white"
+            self.MODE_S_COLOR = "white"
+            self.AHRS_EARTH_COLOR = "black"
+            self.AHRS_SKY_COLOR = "black"
+            self.AHRS_HORIZON_COLOR = "white"
+            self.AHRS_MARKS_COLOR = "white"
+        else:
+            self.BG_COLOR = "white"
+            self.TEXT_COLOR = "black"
+            self.HIGHLIGHT_COLOR = "black"
+            self.AIRCRAFT_COLOR = "red"
+            self.AIRCRAFT_OUTLINE = "black"
+            self.MODE_S_COLOR = "black"
+            self.AHRS_EARTH_COLOR = "brown"
+            self.AHRS_SKY_COLOR = "lightblue"
+            self.AHRS_HORIZON_COLOR = "black"
+            self.AHRS_MARKS_COLOR = "black"
+
+    def init(self, fullcircle=False, dark_mode=False):
+        """Initialize display with optional dark mode"""
+        self.set_dark_mode(dark_mode)
+        # explicit init to be implemented for every device type
         # set device properties
         self.rlog.debug("Running Radar with NoDisplay! ")
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
