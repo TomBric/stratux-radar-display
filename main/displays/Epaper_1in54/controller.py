@@ -317,9 +317,10 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
             self.centered_text(80, error_message, self.LARGE)
-        self.bottom_line("Stat/Set", "   Mode", "Start")
+        self.bottom_line("Stat/Set", "Hist/Mode", "Start")
 
-    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
+                            current_stats=True, next_stat=False, prev_stat=False):
         self.centered_text(0, "Start-/Landing", self.SMALL)
         st = '---'
         if 'start_time' in values:
@@ -348,10 +349,16 @@ class Epaper1in54(dcommon.GenericDisplay):
                 ("Dest. Alt [ft]", dest_alt_str),
             )
             self.dashboard(0, starty, self.sizex, lines)
-        if not ground_warnings:
-            self.bottom_line("", "Back", "")
-        else:
-            self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+        if current_stats:
+            if not ground_warnings:
+                self.bottom_line("", "Back", "")
+            else:
+                self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+        else: # stored stats
+            left="Prev" if prev_stat else ""
+            right="Next" if next_stat else ""
+            self.bottom_line(left, right, "Exit")
+
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = Epaper1in54()

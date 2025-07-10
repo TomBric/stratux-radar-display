@@ -589,7 +589,7 @@ class GenericDisplay:
             elif 'yellow' in color_table and val >= color_table.get('yellow_value'):
                 color = color_table.get('yellow')
             else:
-                color = color_table.get('green') if 'green' in color_table else self.TEXTCOLOR
+                color = color_table.get('green') if 'green' in color_table else self.TEXT_COLOR
             self.draw.rectangle([bar_start, y, xval, y + self.VERYSMALL], fill=color, outline=None)
         if 'outline' in color_table:
             self.draw.text(((bar_end - bar_start) // 2 + bar_start - tl // 2, y), t, font=self.fonts[self.VERYSMALL],
@@ -604,7 +604,10 @@ class GenericDisplay:
                  ground_distance_valid, grounddistance, error_message):
         pass
 
-    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
+                            current_stats=True, prev_stat=False, next_stat=False):
+        # current stats means: display stats of this session (e.g. while still flying)
+        # if not: values displayed are stored stats
         pass
 
     def gmeter(self, current, maxg, ming, error_message):
@@ -655,9 +658,10 @@ class GenericDisplay:
         return y + topic_offset
 
     def checklist(self, checklist_name, checklist_items, current_index, last_list, color=None):
+        global top_index
         color=color or self.TEXT_COLOR
         checklist_y = {'from': self.LARGE + self.LARGE // 2, 'to': self.sizey - self.VERYSMALL - self.VERYSMALL//2}
-        global top_index
+
 
         self.centered_text(0, checklist_name, self.LARGE, color=color)
         if current_index == 0:

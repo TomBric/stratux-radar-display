@@ -357,7 +357,33 @@ def write_stats():
             json.dump(calculate_output_values(), out, indent=4, default=str)
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + saved_statistics)
-    rlog.debug("Grounddistance: Statistics saved to " + saved_statistics)
+
+
+def read_stats(stats_file=None):   # returns a list of all written stats
+    global rlog
+    
+    if rlog is None:
+        rlog = logging.getLogger('stratux-radar-log')
+    if stats_file is None:
+        stats_file = saved_statistics
+    try:
+        with open(stats_file, 'rt') as f:
+            # Read the entire file and split by '}{' to handle multiple JSON objects
+            content = f.read()
+            # Replace '}{' with '}\n{' to properly separate JSON objects
+            json_objects = content.replace('}{', '}\n{')
+            # Parse each JSON object
+            stats = [json.loads(obj) for obj in json_objects.split('\n') if obj.strip()]
+            return stats
+    except FileNotFoundError:
+        rlog.debug(f"Grounddistance: Statistics file {stats_file} not found")
+        return []
+    except json.JSONDecodeError as e:
+        rlog.debug(f"Grounddistance: Error decoding JSON from {stats_file}: {str(e)}")
+        return []
+    except (OSError, IOError) as e:
+        rlog.debug(f"Grounddistance: Error reading {stats_file}: {str(e)}")
+        return []
 
 
 def prepare_sounds():
