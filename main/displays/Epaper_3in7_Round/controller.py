@@ -45,9 +45,9 @@ import logging
 
 top_index = 0    # top index being displayed in checklist
 
-DISPLAY_OFFSET = -15   # to center display in the 3 1/8 inch instrument hole
-RIGHT = 400
-LEFT = 55
+DISPLAY_OFFSET = -15   # x offset to center display in the 3 1/8 inch instrument hole
+RIGHT = 400           # x position on the right side which is fully visible in the round
+LEFT = 55           # x position on the left wich is fully visible
 
 class Epaper3in7_Round(dcommon.GenericDisplay):
     # display constants
@@ -477,6 +477,51 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
                 self.draw.text((LEFT, starty+2*self.SMALL+2*self.VERYLARGE), laptime_head, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
                 self.centered_text(starty+3*self.SMALL+2*self.VERYLARGE, laptime, self.VERYLARGE, color=second_color)
         self.bottom_line(left_text, middle_text, right_t)
+
+    def checklist_topic(self, ypos, topic, color=None, highlighted=False, toprint=True):   #
+        # this overrides superclass checklist_topic, to get the offset right and left for the round display
+        color=color or self.TEXT_COLOR
+
+        highlight_width = 1 + self.sizey // 200
+        xpos = 2 * highlight_width + self.VERYSMALL // 4 + LEFT
+        xpos_remark = xpos + self.VERYSMALL * 2
+        xpos_sub = xpos + self.VERYSMALL
+        topic_offset = 2 + self.sizey // 50
+        subtopic_offset = self.sizey // 50
+        remark_offset = self.sizey // 80
+        topic_right_offset = self.VERYSMALL // 4 - highlight_width + self.sizex - RIGHT
+
+
+        y = ypos
+        if toprint:
+            if topic.get('TASK'):
+                self.draw.text((xpos, ypos), topic['TASK'], font=self.fonts[self.SMALL], fill=color)
+            if topic.get('CHECK'):
+                self.right_text(ypos, topic['CHECK'], self.SMALL, offset=topic_right_offset)
+        y += self.SMALL
+
+        if topic.get('REMARK'):
+            y += remark_offset
+            if toprint:
+                self.draw.text((xpos_remark, y), topic['REMARK'], font=self.fonts[self.VERYSMALL], fill=color)
+            y += self.VERYSMALL
+
+        for i in range(1, 4):
+            task_key = f'TASK{i}'
+            check_key = f'CHECK{i}'
+            if topic.get(task_key):
+                y += subtopic_offset
+                if toprint:
+                    self.draw.text((xpos_sub, y), topic[task_key], font=self.fonts[self.SMALL], fill=color)
+                if topic.get(check_key) and toprint:
+                    self.right_text(y, topic[check_key], self.SMALL, offset=topic_right_offset)
+                y += self.SMALL
+
+        if highlighted and toprint:
+            self.draw.rounded_rectangle([2+highlight_width, ypos - highlight_width,
+                    self.sizex - highlight_width, y + 2 * highlight_width], width=highlight_width, radius=6,
+                    outline=color)
+        return y + topic_offset
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = Epaper3in7_Round()

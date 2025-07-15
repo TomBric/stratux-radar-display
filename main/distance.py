@@ -132,12 +132,15 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
                                             grounddistance.indicate_distance, current_stats=True)
         display_control.display()
     elif dist_user_mode == 2:  # show stored statistics
+        display_control.clear()
         display_control.distance_statistics(statistic_list[statistic_index], situation['gps_active'],
                                             situation['gps_altitude'], grounddistance.dest_elevation,
                                             grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
                                             grounddistance.indicate_distance, current_stats=False,
                                             prev_stat=statistic_index == 0,
                                             next_stat=statistic_index == len(statistic_list) - 1)
+        display_control.display()
+
 
 def user_input():
     global dist_user_mode
