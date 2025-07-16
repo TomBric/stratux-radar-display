@@ -317,11 +317,17 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
             self.centered_text(80, error_message, self.LARGE)
-        self.bottom_line("Set", "Hi/Mode", "Start")
+        self.bottom_line("Set", "His/Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
-                            current_stats=True, next_stat=False, prev_stat=False):
-        self.centered_text(0, "Start-/Landing", self.SMALL)
+                            current_stats=True, next_stat=False, prev_stat=False, index=-1):
+        if current_stats:  # historical data
+            self.centered_text(0, "Act Start-/Landing", self.SMALL)
+        else:
+            if index >= 0:
+                self.centered_text(0, f"Start-/Land #{index + 1}", self.SMALL)
+            else:
+                self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         st = '---'
         if 'start_time' in values:
             st = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['start_time'].hour, values['start_time'].minute,
@@ -343,17 +349,16 @@ class Epaper1in54(dcommon.GenericDisplay):
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         )
         starty = self.dashboard(0, starty, self.sizex, lines)
-        if ground_warnings:
-            dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
-            lines = (
-                ("Dest. Alt [ft]", dest_alt_str),
-            )
-            self.dashboard(0, starty, self.sizex, lines)
         if current_stats:
-            if not ground_warnings:
-                self.bottom_line("", "Back", "")
-            else:
+            if ground_warnings:
+                dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
+                lines = (
+                    ("Dest. Alt [ft]", dest_alt_str),
+                )
+                self.dashboard(0, starty, self.sizex, lines)
                 self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+            else:
+                self.bottom_line("", "Back", "")
         else: # stored stats
             left="Prev" if prev_stat else ""
             right="Next" if next_stat else ""
