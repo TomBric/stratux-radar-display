@@ -605,7 +605,7 @@ class GenericDisplay:
         pass
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
-                            current_stats=True, prev_stat=False, next_stat=False):
+                            current_stats=True, prev_stat=False, next_stat=False, index=-1):
         # current stats means: display stats of this session (e.g. while still flying)
         # if not: values displayed are stored stats
         pass
