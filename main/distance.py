@@ -160,7 +160,7 @@ def user_input():
         if button == 1 and btime == 2:  # middle
             return radarmodes.next_mode_sequence(21), False  # next mode to be radar
         if button == 1 and btime == 1:  # middle and short, display history statistics
-            dist_user_mode == 2
+            dist_user_mode = 2
             return 21, False
         if button == 0 and btime == 2:  # left and long
             return 3, False  # start next mode shutdown!

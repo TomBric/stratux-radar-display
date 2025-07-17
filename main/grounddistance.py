@@ -72,6 +72,8 @@ rlog = None  # radar specific logger
 MEASUREMENTS_PER_SECOND = 10     # number of distance ranging meaurements per second
 # A22 usonic sensor allows approx. 10 per second
 # TFMini-Plus sensor allows 100 per second
+UART_WAIT_TIME = 100   # wait time if no data is coming from the sensor
+UART_BREAK_TIME = 1000   # time to break waiting
 
 # GPS-Measurement of start-distance
 DISTANCE_START_DETECTED = 30 * 10  # in mm where measurement assumes that plane is in the air
