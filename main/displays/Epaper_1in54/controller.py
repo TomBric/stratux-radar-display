@@ -321,7 +321,7 @@ class Epaper1in54(dcommon.GenericDisplay):
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
                             current_stats=True, next_stat=False, prev_stat=False, index=-1):
-        if current_stats:  # historical data
+        if current_stats:  # current data, still flying
             self.centered_text(0, "Act Start-/Landing", self.SMALL)
         else:
             if index >= 0:
