@@ -362,7 +362,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         else: # stored stats
             left="Prev" if prev_stat else ""
             right="Next" if next_stat else ""
-            self.bottom_line(left, right, "Exit")
+            self.bottom_line(left, "Exit", right)
 
 
 # instantiate a single object in the file, needs to be done and inherited in every display module

@@ -368,6 +368,8 @@ def read_stats(stats_file=None):   # returns a list of all written stats
         rlog = logging.getLogger('stratux-radar-log')
     if stats_file is None:
         stats_file = saved_statistics
+        if stats_file is None:
+            return []    # groundsensor not initialized, return empty
     try:
         with open(stats_file, 'rt') as f:
             # Read the entire file and split by '}{' to handle multiple JSON objects
