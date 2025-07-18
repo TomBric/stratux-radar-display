@@ -321,6 +321,9 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
     simulation_mode = sim_mode
     global_config = g_config
     rlog = logging.getLogger('stratux-radar-log')
+    value_debug_level = debug_level
+    saved_statistics = stat_file
+    global_situation = situation  # to be able to read and store situation info
     if not activate:
         rlog.debug("Ground Distance Measurement - not activated.")
         ground_distance_active = False
@@ -337,9 +340,6 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
         return False
 
     ground_distance_active = True
-    value_debug_level = debug_level
-    saved_statistics = stat_file
-    global_situation = situation  # to be able to read and store situation info
     rlog.debug("Ground Distance Measurement - Ground sensor active.")
 
     if distance_indication:
