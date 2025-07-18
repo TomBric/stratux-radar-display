@@ -410,9 +410,15 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             self.centered_text(self.sizey // 4, error_message, self.LARGE)
         self.bottom_line("Stats/Set", "Mode", "Start")
 
-    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        self.centered_text(0, "Start-/Landing Statistics", self.SMALL)
-
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
+                            current_stats=True, next_stat=False, prev_stat=False, index=-1):
+        if current_stats:  # current data, still flying
+            self.centered_text(0, "Act Start-/Landing", self.SMALL)
+        else:
+            if index >= 0:
+                self.centered_text(0, f"Start-/Land #{index + 1}", self.SMALL)
+            else:
+                self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = 30
         st = '---'
         if 'start_time' in values:
@@ -433,20 +439,41 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         ]
-        starty = self.dashboard(self.zerox + 5, 35, self.zerox-offset-5, lines, headline="Landing", rounding=True)
-        if ground_warnings:
-            dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
-            gps_alt_str = f"{gps_altitude:+5.0f}" if gps_valid else "---"
-            lines = [
-                ("Act GPS-Alt [ft]", gps_alt_str),
-                ("Destination Alt [ft]", dest_alt_str),
-            ]
-            self.dashboard(30, starty + 10, 475, lines, headline="Destination Elevation", rounding=True)
+        starty = self.dashboard(offset, 35, self.zerox-offset-5, lines, headline="Landing", rounding=True)
+        if current_stats:
+            if ground_warnings:
+                dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
+                lines = (
+                    ("Dest. Alt [ft]", dest_alt_str),
+                )
+                self.dashboard(offset, starty, self.sizex, lines)
+                self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+            else:
+                self.bottom_line("", "Back", "")
+        else: # stored stats
+            left="Prev" if prev_stat else ""
+            right="Next" if next_stat else ""
+            self.bottom_line(left, "Exit", right)
 
-        if not ground_warnings:
-            self.bottom_line("", "Back", "")
-        else:
-            self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+
+
+        if current_stats:
+            if ground_warnings:
+                dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
+                gps_alt_str = f"{gps_altitude:+5.0f}" if gps_valid else "---"
+                lines = [
+                    ("Act GPS-Alt [ft]", gps_alt_str),
+                    ("Destination Alt [ft]", dest_alt_str),
+                ]
+                self.dashboard(30, starty + 10, 475, lines, headline="Destination Elevation", rounding=True)
+                self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+            else:
+                self.bottom_line("", "Back", "")
+        else:  # stored stats
+            left = "Prev" if prev_stat else ""
+            right = "Next" if next_stat else ""
+            self.bottom_line(left, "Exit", right)
+
 
     def bottom_line(self, left, middle, right, color=None, offset_bottom=3, offset_left=3, offset_right=3):
         super().bottom_line(left, middle, right, color=color, offset_bottom=offset_bottom, offset_left=LEFT+offset_left,

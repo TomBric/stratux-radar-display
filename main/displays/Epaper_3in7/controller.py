@@ -396,9 +396,16 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.centered_text(self.sizey // 4, error_message, self.LARGE)
         self.bottom_line("Stats/Set", "Mode", "Start")
 
-    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        self.centered_text(0, "Start-/Landing Statistics", self.SMALL)
-
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
+                            current_stats=True, next_stat=False, prev_stat=False, index=-1):
+        if current_stats:  # current data, still flying
+            self.centered_text(0, "Act Start-/Landing", self.SMALL)
+        else:
+            if index >= 0:
+                self.centered_text(0, f"Start-/Land #{index + 1}", self.SMALL)
+            else:
+                self.centered_text(0, f"No Start-/Land Data", self.SMALL)
+        offset = 5
         st = '---'
         if 'start_time' in values:
             st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
@@ -408,7 +415,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
-        self.dashboard(5, 35, 225, lines, headline="Takeoff", rounding=True)
+        self.dashboard(offset, 35, self.zerox - offset, lines, headline="Takeoff", rounding=True)
         lt = '---'
         if 'landing_time' in values:
             lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
@@ -418,20 +425,22 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         ]
-        starty = self.dashboard(250, 35, 225, lines, headline="Landing", rounding=True)
-        if ground_warnings:
-            dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
-            gps_alt_str = f"{gps_altitude:+5.0f}" if gps_valid else "---"
-            lines = [
-                ("Act GPS-Alt [ft]", gps_alt_str),
-                ("Destination Alt [ft]", dest_alt_str),
-            ]
-            self.dashboard(5, starty + 10, 475, lines, headline="Destination Elevation", rounding=True)
+        starty = self.dashboard(offset, 35, self.zerox - offset - 5, lines, headline="Landing", rounding=True)
+        if current_stats:
+            if ground_warnings:
+                dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
+                lines = (
+                    ("Dest. Alt [ft]", dest_alt_str),
+                )
+                self.dashboard(offset, starty, self.sizex, lines)
+                self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+            else:
+                self.bottom_line("", "Back", "")
+        else:  # stored stats
+            left = "Prev" if prev_stat else ""
+            right = "Next" if next_stat else ""
+            self.bottom_line(left, "Exit", right)
 
-        if not ground_warnings:
-            self.bottom_line("", "Back", "")
-        else:
-            self.bottom_line("+/-100ft", "  Back", "+/-10ft")
 
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
