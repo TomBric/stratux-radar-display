@@ -192,14 +192,17 @@ def user_input():
     elif dist_user_mode == 2:  # history values list
         if statistic_list is None:
             statistic_list = grounddistance.read_stats()  # returns empty list if nothing available
-            statistic_index = len(statistic_list) - 1
+            if statistic_list is not None:
+                statistic_index = len(statistic_list) - 1
         if button == 1 and (btime == 1 or btime == 2):  # middle - return to display mode
             dist_user_mode = 0
             return 21, False
         if button == 2 and btime == 1:  # right and short - next element
-            statistic_index = (statistic_index + 1) % len(statistic_list)
+            if statistic_list is not None:
+                statistic_index = (statistic_index + 1) % len(statistic_list)
             return 21, False
         if button == 0 and btime == 1:  # left and short - previous element
-            statistic_index = (statistic_index - 1) % len(statistic_list)
+            if statistic_list is not None:
+                statistic_index = (statistic_index - 1) % len(statistic_list)
             return 21, False
         return 21, False  # no mode change for any other interaction
