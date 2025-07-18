@@ -425,14 +425,14 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         ]
-        starty = self.dashboard(offset, 35, self.zerox - offset - 5, lines, headline="Landing", rounding=True)
+        starty = self.dashboard(self.zerox, 35, self.zerox - offset - 5, lines, headline="Landing", rounding=True)
         if current_stats:
             if ground_warnings:
                 dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
                 lines = (
                     ("Dest. Alt [ft]", dest_alt_str),
                 )
-                self.dashboard(offset, starty, self.sizex, lines)
+                self.dashboard(offset, starty, self.sizex-offset, lines)
                 self.bottom_line("+/-100ft", "  Back", "+/-10ft")
             else:
                 self.bottom_line("", "Back", "")

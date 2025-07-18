@@ -419,7 +419,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
                 self.centered_text(0, f"Start-/Land #{index + 1}", self.SMALL)
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
-        offset = 30
+        offset = LEFT
         st = '---'
         if 'start_time' in values:
             st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
@@ -439,7 +439,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         ]
-        starty = self.dashboard(offset, 35, self.zerox-offset-5, lines, headline="Landing", rounding=True)
+        starty = self.dashboard(self.zerox, 35, RIGHT - self.zerox - 5, lines, headline="Landing", rounding=True)
         if current_stats:
             if ground_warnings:
                 dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
@@ -448,7 +448,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
                     ("Act GPS-Alt [ft]", gps_alt_str),
                     ("Destination Alt [ft]", dest_alt_str),
                 ]
-                self.dashboard(30, starty + 10, 475, lines, headline="Destination Elevation", rounding=True)
+                self.dashboard(offset, starty + 10, RIGHT-offset-5, lines, headline="Destination Elevation", rounding=True)
                 self.bottom_line("+/-100ft", "  Back", "+/-10ft")
             else:
                 self.bottom_line("", "Back", "")
