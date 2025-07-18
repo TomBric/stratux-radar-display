@@ -443,23 +443,6 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         if current_stats:
             if ground_warnings:
                 dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
-                lines = (
-                    ("Dest. Alt [ft]", dest_alt_str),
-                )
-                self.dashboard(offset, starty, self.sizex, lines)
-                self.bottom_line("+/-100ft", "  Back", "+/-10ft")
-            else:
-                self.bottom_line("", "Back", "")
-        else: # stored stats
-            left="Prev" if prev_stat else ""
-            right="Next" if next_stat else ""
-            self.bottom_line(left, "Exit", right)
-
-
-
-        if current_stats:
-            if ground_warnings:
-                dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
                 gps_alt_str = f"{gps_altitude:+5.0f}" if gps_valid else "---"
                 lines = [
                     ("Act GPS-Alt [ft]", gps_alt_str),
