@@ -378,6 +378,7 @@ def read_stats(stats_file=None):   # returns a list of all written stats
             json_objects = content.replace('}{', '}\n{')
             # Parse each JSON object
             stats = [json.loads(obj) for obj in json_objects.split('\n') if obj.strip()]
+            rlog.debug(f"Grounddistance: Read Statistics: {stats}")
             return stats
     except FileNotFoundError:
         rlog.debug(f"Grounddistance: Statistics file {stats_file} not found")
