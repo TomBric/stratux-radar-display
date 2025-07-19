@@ -241,8 +241,9 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar Sensor
     def last_distance(self):
         return self.distance
     def calc_distance(self):
-        if  self.ser.inWaiting() < self.lidar_bytes and not simulation_mode:
-            rlog.debug("Error, no data received from Lidar sensor")
+        if  self.ser.inWaiting() < self.lidar_bytes:
+            if not simulation_mode:
+                rlog.debug("Error, no data received from Lidar sensor")
             return
         result = self.ser.read(self.ser.inWaiting())
         rlog.log(value_debug_level, f"Lidar sensor - Bytes received: {len(result)} : {binascii.hexlify(result)} ")
