@@ -408,7 +408,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             self.dashboard(self.zerox + 5, starty, self.zerox - offset - 5, lines, headline="Baro", rounding=True)
         if error_message:
             self.centered_text(self.sizey // 4, error_message, self.LARGE)
-        self.bottom_line("Stats/Set", "Mode", "Start")
+        self.bottom_line("Set", "Hist/Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
                             current_stats=True, next_stat=False, prev_stat=False, index=-1):
@@ -424,9 +424,9 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         if 'start_time' in values:
             st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
         lines = [
-            ("t-off time", st),
-            ("t-off alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
-            ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
+            ("to", st),
+            ("to alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
+            ("to dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         self.dashboard(offset, 35, self.zerox-offset, lines, headline="Takeoff", rounding=True)
@@ -434,7 +434,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         if 'landing_time' in values:
             lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
         lines = [
-            ("ldg time", lt),
+            ("ldg", lt),
             ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
