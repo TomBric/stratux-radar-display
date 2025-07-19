@@ -422,7 +422,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         offset = LEFT
         st = '---'
         if 'start_time' in values:
-            dt = values['starttime']
+            dt = values['start_time']
             if not isinstance(dt, datetime):
                 dt = datetime.fromisoformat(dt)
             st = dt.strftime("%H:%M:%S,%f")[:-5]
