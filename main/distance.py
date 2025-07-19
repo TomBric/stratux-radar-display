@@ -161,6 +161,11 @@ def user_input():
             return radarmodes.next_mode_sequence(21), False  # next mode to be radar
         if button == 1 and btime == 1:  # middle and short, display history statistics
             dist_user_mode = 2
+            statistic_list = grounddistance.read_stats()  # returns empty list if nothing available
+            if statistic_list is not None and len(statistic_list) > 0:
+                statistic_index = len(statistic_list) - 1
+            else:
+                statistic_index = -1
             return 21, False
         if button == 0 and btime == 2:  # left and long
             return 3, False  # start next mode shutdown!
@@ -190,19 +195,21 @@ def user_input():
             return 21, False
         return 21, False  # no mode change for any other interaction
     elif dist_user_mode == 2:  # history values list
-        if statistic_list is None:
-            statistic_list = grounddistance.read_stats()  # returns empty list if nothing available
-            if statistic_list is not None and len(statistic_list) > 0:
-                statistic_index = len(statistic_list) - 1
         if button == 1 and (btime == 1 or btime == 2):  # middle - return to display mode
             dist_user_mode = 0
             return 21, False
         if button == 2 and btime == 1:  # right and short - next element
+            statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
             if statistic_list is not None and len(statistic_list) > 0:
                 statistic_index = (statistic_index + 1) % len(statistic_list)
+            else:
+                statistic_index = -1
             return 21, False
         if button == 0 and btime == 1:  # left and short - previous element
+            statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
             if statistic_list is not None and len(statistic_list) > 0:
                 statistic_index = (statistic_index - 1) % len(statistic_list)
+            else:
+                statistic_index = -1
             return 21, False
         return 21, False  # no mode change for any other interaction
