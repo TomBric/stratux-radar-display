@@ -356,7 +356,8 @@ def write_stats():
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(saved_statistics, 'at') as out:
-            json.dump(calculate_output_values(), out, indent=4, default=str)
+            json.dump(calculate_output_values(), out, default=str)
+            out.write('\n')  # Add newline after each JSON object
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + saved_statistics)
 
@@ -372,13 +373,13 @@ def read_stats(stats_file=None):   # returns a list of all written stats
             return []    # groundsensor not initialized, return empty
     try:
         with open(stats_file, 'rt') as f:
-            # Read the entire file and split by '}{' to handle multiple JSON objects
-            content = f.read()
-            # Replace '}{' with '}\n{' to properly separate JSON objects
-            json_objects = content.replace('}{', '}\n{')
-            # Parse each JSON object
-            stats = [json.loads(obj) for obj in json_objects.split('\n') if obj.strip()]
-            rlog.debug(f"Grounddistance: Read Statistics: {stats}")
+            # Read and parse each line as a separate JSON object
+            stats = []
+            for line in f:
+                line = line.strip()
+                if line:  # Skip empty lines
+                    stats.append(json.loads(line))
+            rlog.debug(f"Grounddistance: Read {len(stats)} statistics records")
             return stats
     except FileNotFoundError:
         rlog.debug(f"Grounddistance: Statistics file {stats_file} not found")
