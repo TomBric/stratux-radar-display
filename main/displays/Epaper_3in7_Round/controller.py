@@ -38,7 +38,7 @@ from .. import dcommon
 from PIL import Image, ImageDraw, ImageFont
 import math
 import time
-import datetime
+from datetime import datetime
 from pathlib import Path
 import logging
 
@@ -422,7 +422,10 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         offset = LEFT
         st = '---'
         if 'start_time' in values:
-            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+            dt = values['starttime']
+            if not isinstance(dt, datetime):
+                dt = datetime.fromisoformat(dt)
+            st = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = [
             ("to", st),
             ("to alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
@@ -432,7 +435,10 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.dashboard(offset, 35, self.zerox-offset, lines, headline="Takeoff", rounding=True)
         lt = '---'
         if 'landing_time' in values:
-            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+            dt = values['landing_time']
+            if not isinstance(dt, datetime):
+                dt = datetime.fromisoformat(dt)
+            lt = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = [
             ("ldg", lt),
             ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
