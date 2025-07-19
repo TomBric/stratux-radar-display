@@ -54,7 +54,6 @@
 # }
 
 import logging
-import radarmodes
 import time
 import datetime
 import asyncio
