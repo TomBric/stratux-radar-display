@@ -135,8 +135,8 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
                                                 grounddistance.dest_elevation,
                                                 grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
                                                 grounddistance.indicate_distance, current_stats=False,
-                                                prev_stat=statistic_index == 0,
-                                                next_stat=statistic_index == len(statistic_list) - 1,
+                                                prev_stat=statistic_index != 0,
+                                                next_stat=statistic_index != len(statistic_list) - 1,
                                                 index=statistic_index)
         else: # no data available till now
             display_control.distance_statistics({}, situation['gps_active'], situation['gps_altitude'],
