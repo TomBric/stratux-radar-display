@@ -36,7 +36,7 @@ import time
 import logging
 import datetime
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+from PIL import ImageFont
 
 # helper functions
 def posn(angle, arm_length, angle_offset=0):
@@ -113,6 +113,8 @@ class GenericDisplay:
         self.arcposition = 0    # angle where the height for mode-s targets is displayed on the arc
         self.draw = None  # pixel array to be used for draw functions generally
         self.cdraw = None  # pixel array to be used in compass to delete text
+        self.image = None # pixel array to be used in compass to rotate text
+        self.mask = None
         self.compass_aircraft = None    # image of the compass aircraft
         # fonts
         self.fonts= {
@@ -123,6 +125,7 @@ class GenericDisplay:
             self.VERYSMALL: self.make_font("Font.ttc", self.VERYSMALL)
         }
         self.awesomefont = self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONTSIZE)
+        self.top_index = 0   # checklist number
 
     def set_dark_mode(self, dark_mode):
         """Set dark mode and update color constants accordingly"""
@@ -483,7 +486,7 @@ class GenericDisplay:
             self.centered_text(txt_starty, subline, self.SMALL)
             txt_starty += self.SMALL
         txt_starty += self.SMALL//2   # some line indent
-        self.draw.text((offset, txt_starty), text, font=self.fonts[self.SMALL])
+        self.draw.text((offset, txt_starty), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.bottom_line(left_text, middle_text, r_text)
 
     def round_text(self, x, y, text, text_color=None, bg_color=None, yesno=True, out_color=None):
@@ -658,19 +661,18 @@ class GenericDisplay:
         return y + topic_offset
 
     def checklist(self, checklist_name, checklist_items, current_index, last_list, color=None):
-        global top_index
         color=color or self.TEXT_COLOR
         checklist_y = {'from': self.LARGE + self.LARGE // 2, 'to': self.sizey - self.VERYSMALL - self.VERYSMALL//2}
 
 
         self.centered_text(0, checklist_name, self.LARGE, color=color)
         if current_index == 0:
-            top_index = 0  # new list, reset top index
-        if current_index < top_index:
-            top_index = current_index  # scroll up
+            self.top_index = 0  # new list, reset top index
+        if current_index < self.top_index:
+            self.top_index = current_index  # scroll up
 
         while True:  # check what would fit on the screen
-            last_item = top_index
+            last_item = self.top_index
             size = self.checklist_topic(checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
             while last_item + 1 < len(checklist_items):
                 last_item += 1
@@ -683,13 +685,13 @@ class GenericDisplay:
             if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
                 break
             else:  # next item would not fit
-                top_index += 1  # need to scroll, but now test again what would fit
+                self.top_index += 1  # need to scroll, but now test again what would fit
                 if current_index == len(checklist_items) - 1:  # list is finished
                     break
 
         # now display everything
         y = checklist_y['from']
-        for item in range(top_index, last_item + 1):
+        for item in range(self.top_index, last_item + 1):
             if item < len(checklist_items):
                 y = self.checklist_topic(y, checklist_items[item], highlighted=(item == current_index), toprint=True)
 
