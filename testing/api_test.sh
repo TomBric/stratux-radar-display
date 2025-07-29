@@ -42,10 +42,10 @@ test_button() {
 
 # Test all button combinations
 echo "Testing Radar User Interface at $BASE_URL"
-echo "-----------------------------------------"
+echo ""
 
 echo Radar screen distance
-for i in {1..6}; do
+for i in {1..7}; do
   test_button "left_short=Left Short"
   sleep 1  # Small delay between tests
 done
@@ -67,6 +67,82 @@ echo shutdown + cancel
 test_button "left_long=Left Long"
 sleep 1
 test_button "left_short=Left Short"
+sleep 1
+
+echo refresh 2 times
+test_button "right_long=Right Long"
+sleep 1
+test_button "right_long=Right Long"
+sleep 1
+
+echo "------------------------------------"
+echo "Timer"
+test_button "middle_long=Middle Long"
+sleep 1
+test_button "right_short=Right Short"
+sleep 1
+test_button "right_short=Right Short"
+sleep 1
+test_button "right_short=Right Short"
+sleep 1
+test_button "left_short=Left Short"
+sleep 1
+test_button "middle_short=Middle Short"
+sleep 1
+test_button "left_short=Left Short"
+sleep 1
+test_button "left_short=Left Short"
+sleep 1
+test_button "right_short=Right Short"
+sleep 1
+test_button "right_short=Right Short"
+sleep 1
+test_button "middle_short=Middle Short"
+sleep 1
+test_button "right_short=Right Short"
+sleep 3
+test_button "right_short=Right Short"
+sleep 3
+test_button "left_short=Left Short"
+sleep 1
+
+echo "------------------------------------"
+echo "AHRS"
+test_button "middle_long=Middle Long"
+sleep 1
+test_button "right_short=Right Short"
+sleep 3
+test_button "left_short=Left Short"
+sleep 1
+
+echo "------------------------------------"
+echo "G-Force"
+test_button "middle_long=Middle Long"
+sleep 1
+test_button "right_short=Right Short"
+sleep 1
+
+echo "------------------------------------"
+echo "Compass"
+test_button "middle_long=Middle Long"
+sleep 3
+test_button "right_long=Right Long"
+sleep 1
+
+echo "------------------------------------"
+echo "Vertical Speed"
+test_button "middle_long=Middle Long"
+sleep 3
+test_button "right_short=Right Short"
+sleep 1
+
+echo "------------------------------------"
+echo "Flight Logs"
+test_button "middle_long=Middle Long"
+sleep 3
+test_button "right_short=Right Short"
+sleep 1
+
 echo "------------------------------------"
 echo "Testing complete!"
 
