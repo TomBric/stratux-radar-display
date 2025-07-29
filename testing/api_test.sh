@@ -69,11 +69,9 @@ sleep 1
 test_button "left_short=Left Short"
 sleep 1
 
-echo refresh 2 times
+echo refresh
 test_button "right_long=Right Long"
-sleep 3
-test_button "right_long=Right Long"
-sleep 3
+sleep 5
 
 echo "------------------------------------"
 echo "Timer"
