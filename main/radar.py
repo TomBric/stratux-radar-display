@@ -701,13 +701,13 @@ async def display_and_cutoff():
                     ui_changed = False
                 elif global_mode == 6:  # refresh display, only relevant for epaper, mode was radar
                     rlog.debug("AHRS: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(display_control, bluetooth_active, extsound_active)
                 elif global_mode == 8:  # refresh display, only relevant for epaper, mode was status
                     rlog.debug("Status: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 7
                 elif global_mode == 9:  # gmeter display
                     gmeterui.draw_gmeter(display_control, ui_changed, situation['connected'], gmeter)
@@ -715,7 +715,7 @@ async def display_and_cutoff():
                     ui_changed = False
                 elif global_mode == 10:  # refresh display, only relevant for epaper, mode was gmeter
                     rlog.debug("Gmeter: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 9
                 elif global_mode == 11:  # compass display
                     compassui.draw_compass(display_control, situation['was_changed'], situation['connected'],
@@ -723,7 +723,7 @@ async def display_and_cutoff():
                     situation['was_changed'] = False
                 elif global_mode == 12:  # refresh display, only relevant for epaper, mode was gmeter
                     rlog.debug("Compass: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 11
                 elif global_mode == 13:  # vsi display
                     verticalspeed.draw_vsi(display_control, situation['was_changed'] or ui_changed,
@@ -736,7 +736,7 @@ async def display_and_cutoff():
                     ui_changed = False
                 elif global_mode == 14:  # refresh display, only relevant for epaper, mode was gmeter
                     rlog.debug("VSI: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 13
                 elif global_mode == 15:  # stratux_statux display
                     stratuxstatus.draw_status(display_control, ui_changed, situation['connected'],
@@ -745,21 +745,21 @@ async def display_and_cutoff():
                     ui_changed = False
                 elif global_mode == 16:  # refresh display, only relevant for epaper, mode was stratux_status
                     rlog.debug("StratusStatus: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 15
                 elif global_mode == 17:  # display flight time
                     flighttime.draw_flighttime(display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 18:  # refresh display, only relevant for epaper, mode was flighttime
                     rlog.debug("StratusStatus: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 17
                 elif global_mode == 19:  # co-warner
                     cowarner.draw_cowarner(display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 20:  # refresh display, only relevant for epaper, mode was co-warner
                     rlog.debug("CO-Warner: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 19
                 elif global_mode == 21:  # situation
                     distance.draw_distance(display_control, situation['was_changed'] or ui_changed,
@@ -767,14 +767,14 @@ async def display_and_cutoff():
                     ui_changed = False
                 elif global_mode == 22:  # refresh display, only relevant for epaper, mode was situation
                     rlog.debug("Situation: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 21
                 elif global_mode == 23:  # checklist
                     checklist.draw_checklist(display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 24:  # refresh display, only relevant for epaper, mode was situation
                     rlog.debug("Checklist: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 23
 
             to_delete = []
