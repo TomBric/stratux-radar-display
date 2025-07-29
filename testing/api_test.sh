@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Test script for Stratux Radar Buttons API
-# Usage: ./test_radar_buttons.sh [host:port]
+# Usage: ./api_test.sh [host:port]
 # Tests all screen functions
 # start Stratux display with options
 # python3 radar.py -d <display> -api -v 1
@@ -21,12 +21,7 @@ NC='\033[0m' # No Color
 
 # Function to test a button press
 test_button() {
-  "middle_long=Middle Long"
-    local button_name=$1
-    local button_desc=$2
-    local data_param=$3
-
-    echo -n "Testing $button_desc... "
+    local data_param=$1
 
     # Send the request
     response=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
@@ -51,26 +46,26 @@ echo "-----------------------------------------"
 
 # radar screen - distance
 for i in {1..6}; do
-  test_button "left_short" "Left Short Press" "left_short=Left+Short"
+  test_button "left_short=Left Short"
   sleep 1  # Small delay between tests
 done
 
 # radar-screen - height
 for i in {1..5}; do
-  test_button "right_short" "Right Short Press" "right_short=Right+Short"
+  test_button "right_short=Right Short"
   sleep 1
 done
 
 # sound on off
-test_button "middle_short" "Middle Short Press" "middle_short=Middle+Short"
+test_button "middle_short=Middle Short"
 sleep 1
-test_button "middle_short" "Middle Short Press" "middle_short=Middle+Short"
+test_button "middle_short=Middle Short"
 sleep 1
 
 # shutdown + cancel
-test_button "left_long" "Left Long Press" "left_long=Left+Long"
+test_button "left_long=Left Long"
 sleep 1
-test_button "left_short" "Left Short Press" "left_short=Left+Short"
+test_button "left_short=Left Short"
 echo "------------------------------------"
 echo "Testing complete!"
 
