@@ -111,7 +111,7 @@ echo "AHRS"
 test_button "middle_long=Middle Long"
 sleep 1
 test_button "right_short=Right Short"
-sleep 3
+sleep 4
 test_button "left_short=Left Short"
 sleep 1
 
@@ -125,9 +125,9 @@ sleep 1
 echo "------------------------------------"
 echo "Compass"
 test_button "middle_long=Middle Long"
-sleep 3
+sleep 4
 test_button "right_long=Right Long"
-sleep 3
+sleep 4
 
 echo "------------------------------------"
 echo "Vertical Speed"
@@ -141,6 +141,53 @@ echo "Flight Logs"
 test_button "middle_long=Middle Long"
 sleep 3
 test_button "right_short=Right Short"
+sleep 1
+
+echo "------------------------------------"
+echo "GPS Distance"
+test_button "middle_long=Middle Long"
+sleep 3
+test_button "right_short=Right Short"
+sleep 1
+test_button "left_short=Left Short"
+sleep 1
+test_button "middle_short=Middle Short"
+sleep 1
+test_button "middle_short=Middle Short"
+sleep 1
+test_button "left_short=Left Short"
+sleep 1
+test_button "left_short=Left Short"
+sleep 1
+test_button "middle_short=Middle Short"
+sleep 1
+
+echo "------------------------------------"
+echo "Display Status"
+test_button "middle_long=Middle Long"
+sleep 3
+echo "Options"
+test_button "left_short=Left Short"
+sleep 1
+test_button "left_short=Left Short"
+sleep 1
+test_button "right_short=Right Short"
+sleep 1
+test_button "middle_short=Middle Short"
+sleep 1
+
+echo "------------------------------------"
+echo "Stratux Status"
+test_button "middle_short=Middle Short"
+sleep 1
+test_button "left_short=Left Short"
+sleep 1
+test_button "right_short=Right Short"
+sleep 1
+
+echo "------------------------------------"
+echo "Checklist"
+test_button "middle_short=Middle Short"
 sleep 1
 
 echo "------------------------------------"
