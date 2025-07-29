@@ -171,7 +171,25 @@ test_button "left_short=Left Short"
 sleep 1
 test_button "left_short=Left Short"
 sleep 1
-test_button "right_short=Right Short"
+test_button "Right_short=Right Short"
+sleep 1
+echo "Change Network"
+test_button "Right_short=Right Short"
+sleep 1
+echo "Change Network"
+test_button "left_short=Left Short"
+sleep 3
+test_button "middle_long=Middle Long"
+sleep 3
+test_button "middle_long=Middle Long"
+sleep 3
+for i in {1..5}; do
+  test_button "middle_short=Middle Short"
+  sleep 1
+done
+test_button "middle_long=Middle Long"
+sleep 3
+test_button "Right_short=Right Short"
 sleep 1
 test_button "middle_short=Middle Short"
 sleep 1
@@ -189,8 +207,20 @@ echo "------------------------------------"
 echo "Checklist"
 test_button "middle_short=Middle Short"
 sleep 1
-
+for i in {1..10}; do
+  test_button "right_short=Right Short"
+  sleep 1
+test_button "middle_short=Middle Short"
+sleep 1
+test_button "middle_short=Middle Short"
+sleep 1
+test_button "left_short=Left Short"
+sleep 1
+test_button "left_short=Left Short"
+sleep 1
 echo "------------------------------------"
+test_button "middle_long=Middle Long"
+sleep 3
 echo "Testing complete!"
 
 # Test the API form (GET request)
