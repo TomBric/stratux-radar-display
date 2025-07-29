@@ -76,7 +76,7 @@ sleep 5
 echo "------------------------------------"
 echo "Timer"
 test_button "middle_long=Middle Long"
-sleep 1
+sleep 2
 test_button "right_short=Right Short"
 sleep 1
 test_button "right_short=Right Short"
@@ -107,7 +107,7 @@ sleep 1
 echo "------------------------------------"
 echo "AHRS"
 test_button "middle_long=Middle Long"
-sleep 1
+sleep 2
 test_button "right_short=Right Short"
 sleep 4
 test_button "left_short=Left Short"
@@ -116,14 +116,14 @@ sleep 1
 echo "------------------------------------"
 echo "G-Force"
 test_button "middle_long=Middle Long"
-sleep 1
+sleep 2
 test_button "right_short=Right Short"
 sleep 1
 
 echo "------------------------------------"
 echo "Compass"
 test_button "middle_long=Middle Long"
-sleep 4
+sleep 2
 test_button "right_long=Right Long"
 sleep 4
 
@@ -169,24 +169,27 @@ test_button "left_short=Left Short"
 sleep 1
 test_button "left_short=Left Short"
 sleep 1
+test_button "left_short=Left Short"
+sleep 1
 test_button "Right_short=Right Short"
 sleep 1
 echo "Change Network"
 test_button "Right_short=Right Short"
 sleep 1
-echo "Change Network"
 test_button "left_short=Left Short"
 sleep 3
 test_button "middle_long=Middle Long"
 sleep 3
 test_button "middle_long=Middle Long"
 sleep 3
+echo "Enter IP"
 for i in {1..5}; do
   test_button "middle_short=Middle Short"
   sleep 1
 done
 test_button "middle_long=Middle Long"
 sleep 3
+echo "Confirm No"
 test_button "Right_short=Right Short"
 sleep 1
 test_button "middle_short=Middle Short"
@@ -196,8 +199,10 @@ echo "------------------------------------"
 echo "Stratux Status"
 test_button "middle_short=Middle Short"
 sleep 1
+echo "+10"
 test_button "left_short=Left Short"
 sleep 1
+echo "-10"
 test_button "right_short=Right Short"
 sleep 1
 
