@@ -210,6 +210,7 @@ sleep 1
 for i in {1..10}; do
   test_button "right_short=Right Short"
   sleep 1
+done
 test_button "middle_short=Middle Short"
 sleep 1
 test_button "middle_short=Middle Short"
