@@ -44,25 +44,26 @@ test_button() {
 echo "Testing Radar User Interface at $BASE_URL"
 echo "-----------------------------------------"
 
-# radar screen - distance
+echo Radar screen distance
 for i in {1..6}; do
   test_button "left_short=Left Short"
   sleep 1  # Small delay between tests
 done
 
-# radar-screen - height
+
+echo Radar screen height
 for i in {1..5}; do
   test_button "right_short=Right Short"
   sleep 1
 done
 
-# sound on off
+echo Sound on/off
 test_button "middle_short=Middle Short"
 sleep 1
 test_button "middle_short=Middle Short"
 sleep 1
 
-# shutdown + cancel
+echo shutdown + cancel
 test_button "left_long=Left Long"
 sleep 1
 test_button "left_short=Left Short"
