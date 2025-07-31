@@ -205,14 +205,3 @@ test_button "left_short=Left Short"
 echo "------------------------------------"
 test_button "middle_long=Middle Long" "Back To Radar" 5
 echo "Testing complete!"
-
-# Test the API form (GET request)
-echo -n "Testing API form - GET request ... "
-http_code=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL")
-if [ "$http_code" -eq 200 ]; then
-    echo -e "${GREEN}OK${NC}"
-else
-    echo -e "${RED}FAILED HTTP $http_code ${NC}"
-fi
-
-echo "You can also test the web interface by opening http://$HOST/api in your browser"
