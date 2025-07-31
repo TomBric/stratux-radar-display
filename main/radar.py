@@ -933,25 +933,22 @@ if __name__ == "__main__":
     auto_refresh_time = args['refresh']
     radarmodes.parse_modes(args['displaymodes'])
     global_mode = radarmodes.first_mode_sequence()
-    global_config['display_tail'] = args['registration']  # display registration if set
-    global_config['distance_warnings'] = args['speakdistance']  # display registration if set
-    global_config['sound_volume'] = args['extsound']  # 0 if not enabled
-    if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
-        global_config['sound_volume'] = 50  # set to a medium value if strange number used
-    # check config file, if extistent use config from there
 
-    saved_config = statusui.read_config(CONFIG_FILE)
-    if saved_config is not None:
-        if 'stratux_ip' in saved_config:
-            url_host_base = saved_config['stratux_ip']  # set stratux ip if interactively changed one time
-        if 'display_tail' in saved_config:
-            global_config['display_tail'] = saved_config['display_tail']
-        if 'distance_warnings' in saved_config:
-            global_config['distance_warnings'] = saved_config['distance_warnings']
-        if 'sound_volume' in saved_config:
-            global_config['sound_volume'] = saved_config['sound_volume']
-        if 'CO_warner_R0' in saved_config:
-            global_config['CO_warner_R0'] = saved_config['CO_warner_R0']
+    # check if we have a saved config file
+    if os.path.isfile(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, 'r') as f:
+                saved_config = json.load(f)
+            # Use the --url parameter if provided, otherwise fall back to --connect (deprecated)
+            url_host_base = args['url'] if args['url'] != arguments.DEFAULT_URL_HOST_BASE else args['connect']
+            # Only use saved config if no URL was provided via command line
+            if url_host_base == arguments.DEFAULT_URL_HOST_BASE and 'stratux_ip' in saved_config:
+                url_host_base = saved_config['stratux_ip']  # set stratux ip if interactively changed one time
+            if 'global_config' in saved_config:
+                global_config = saved_config['global_config']
+        except (json.JSONDecodeError, KeyError) as e:
+            rlog.error(f"Error reading config file: {e}")
+            # if there is an error, we just use the default values
 
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"

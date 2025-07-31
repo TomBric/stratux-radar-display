@@ -55,7 +55,8 @@ def add(ap):
                     default=False)
     ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use",
                     default=DEFAULT_CHECKLIST)
-    ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
+    ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP (deprecated, use --url instead)", default=DEFAULT_URL_HOST_BASE)
+    ap.add_argument("-u", "--url", required=False, help=f"Base URL or IP address of the Stratux (default: {DEFAULT_URL_HOST_BASE})", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
                     default=0)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no (epaper only)",

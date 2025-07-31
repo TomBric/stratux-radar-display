@@ -1,18 +1,49 @@
 #!/bin/bash
 
 # Test script for Stratux Radar Buttons API
-# Usage: ./api_test.sh [host:port]
-# Tests all screen functions
-# start Stratux display with options
-# python3 radar.py -d <display> -api -v 1
-# or for full functionality
-# python3 radar.py -d <display> -api -v1 -gd -gb -y 50
-# or in dark mode
-# python3 radar.py -d <display> -api -v1 -gd -gb -y 50 --dark
+# Usage: ./api_test.sh [host[:port]]
+#   host:  The hostname or IP address of the Stratux Radar Display (default: localhost)
+#   port:  The port number (default: 5000)
+#
+# Examples:
+#   ./api_test.sh                     # Uses default localhost:5000
+#   ./api_test.sh 192.168.1.100       # Connects to 192.168.1.100:5000
+#   ./api_test.sh 192.168.1.100:8080  # Connects to 192.168.1.100:8080
+#
+# Start Stratux display with options:
+#   python3 radar.py -d <display> -api -v 1
+# or for full functionality:
+#   python3 radar.py -d <display> -api -v1 -gd -gb -y 50
+# or in dark mode:
+#   python3 radar.py -d <display> -api -v1 -gd -gb -y 50 --dark
 
-# Default host and port
-HOST=${1:-"localhost:5000"}
-BASE_URL="http://$HOST/api"
+# Default values
+DEFAULT_HOST="localhost"
+DEFAULT_PORT="5000"
+
+# Parse command line arguments
+if [ $# -eq 0 ]; then
+    # No arguments, use default host and port
+    HOST_PORT="$DEFAULT_HOST:$DEFAULT_PORT"
+elif [[ "$1" == *""* ]]; then
+    # Argument contains port number (contains a colon)
+    HOST_PORT="$1"
+else
+    # Only host provided, use default port
+    HOST_PORT="$1:$DEFAULT_PORT"
+fi
+
+# Ensure the URL has the correct format
+if [[ "$HOST_PORT" != http* ]]; then
+    HOST_PORT="http://$HOST_PORT"
+fi
+
+# Set the base URL for API requests
+BASE_URL="${HOST_PORT}/api"
+
+# Extract just the host:port part for display
+DISPLAY_HOST_PORT=${HOST_PORT#http://}
+DISPLAY_HOST_PORT=${DISPLAY_HOST_PORT#https://}
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -41,7 +72,8 @@ test_button() {
 }
 
 # Test all button combinations
-echo "Testing Radar User Interface at $BASE_URL"
+echo "Testing Radar User Interface at $DISPLAY_HOST_PORT"
+echo "Base API URL: $BASE_URL"
 echo ""
 
 echo Radar screen distance
