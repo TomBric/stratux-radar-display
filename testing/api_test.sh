@@ -183,7 +183,7 @@ for i in {1..5}; do
   test_button "middle_short=Middle Short"
 done
 test_button "middle_long=Middle Long" "Fin" 3
-test_button "Right_short=Right Short" "Confirm No" 3
+test_button "right_short=Right Short" "Confirm No" 3
 test_button "middle_short=Middle Short" "Cont"
 
 echo "------------------------------------"
