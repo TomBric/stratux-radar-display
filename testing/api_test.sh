@@ -168,11 +168,11 @@ test_button "middle_short=Middle Short"
 echo "------------------------------------"
 echo "Display Status"
 test_button "middle_long=Middle Long" "Status" 3
-test_button "left_short=Left Short" "Opt/Net"
+test_button "left_short=Left Short" "Net/Net"
 test_button "left_short=Left Short" "Opt"
 test_button "left_short=Left Short" "Show reg YES"
-test_button "Right_short=Right Short" "Speak Dist NO"
-test_button "Right_short=Right Short" "Chg Network"
+test_button "Right_short=Right Short" "Speak Dist NO" 3
+test_button "Right_short=Right Short" "Chg Network" 3
 test_button "left_short=Left Short" "+"
 test_button "middle_short=Middle Short" "Next"
 test_button "middle_short=Middle Short" "Next"
