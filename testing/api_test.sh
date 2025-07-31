@@ -70,11 +70,9 @@ test_button() {
     # Check if the request was successful
     if [[ $? -eq 0 ]]; then
         echo -e "${GREEN}OK${NC}"
-        return 0
     else
         echo -e "${RED}FAILED${NC}"
         echo "Response: $response"
-        return 1
     fi
     if [ -n "$sleep" ]; then
         sleep $sleep
