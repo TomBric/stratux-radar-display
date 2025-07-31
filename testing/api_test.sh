@@ -53,6 +53,13 @@ NC='\033[0m' # No Color
 # Function to test a button press
 test_button() {
     local data_param=$1
+    local output=$2
+    local sleep=$3
+
+    # Display output if second parameter is provided
+    if [ -n "$output" ]; then
+        echo -n "$output "
+    fi
 
     # Send the request
     response=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
@@ -69,6 +76,12 @@ test_button() {
         echo "Response: $response"
         return 1
     fi
+    if [ -n "$sleep" ]; then
+        sleep $sleep
+    else
+        sleep 1
+    fi
+
 }
 
 # Test all button combinations
@@ -79,184 +92,120 @@ echo ""
 echo Radar screen distance
 for i in {1..7}; do
   test_button "left_short=Left Short"
-  sleep 1  # Small delay between tests
 done
 
 
 echo Radar screen height
 for i in {1..5}; do
   test_button "right_short=Right Short"
-  sleep 1
 done
 
 echo Sound on/off
 test_button "middle_short=Middle Short"
-sleep 1
 test_button "middle_short=Middle Short"
-sleep 1
 
 echo shutdown + cancel
 test_button "left_long=Left Long"
-sleep 1
 test_button "left_short=Left Short"
-sleep 1
 
 echo refresh
-test_button "right_long=Right Long"
-sleep 5
+test_button "right_long=Right Long" "Refresh" 5
 
 echo "------------------------------------"
 echo "Timer"
 test_button "middle_long=Middle Long"
-sleep 2
 test_button "right_short=Right Short"
-sleep 1
 test_button "right_short=Right Short"
-sleep 1
 test_button "right_short=Right Short"
-sleep 1
 test_button "left_short=Left Short"
-sleep 1
 test_button "middle_short=Middle Short"
-sleep 1
 test_button "left_short=Left Short"
-sleep 1
 test_button "left_short=Left Short"
-sleep 1
 test_button "right_short=Right Short"
-sleep 1
 test_button "right_short=Right Short"
-sleep 1
 test_button "middle_short=Middle Short"
-sleep 1
 test_button "right_short=Right Short"
-sleep 3
 test_button "right_short=Right Short"
-sleep 3
 test_button "left_short=Left Short"
 sleep 1
 
 echo "------------------------------------"
 echo "AHRS"
-test_button "middle_long=Middle Long"
+test_button "middle_long=Middle Long" "AHRS" 2
 sleep 2
-test_button "right_short=Right Short"
-sleep 4
-test_button "left_short=Left Short"
-sleep 1
+test_button "right_short=Right Short" "Zero" 4
+test_button "left_short=Left Short" "Level" 4
 
 echo "------------------------------------"
 echo "G-Force"
 test_button "middle_long=Middle Long"
-sleep 2
 test_button "right_short=Right Short"
-sleep 1
 
 echo "------------------------------------"
 echo "Compass"
 test_button "middle_long=Middle Long"
-sleep 2
-test_button "right_long=Right Long"
-sleep 4
+test_button "right_long=Right Long" "Refresh" 4
 
 echo "------------------------------------"
 echo "Vertical Speed"
-test_button "middle_long=Middle Long"
-sleep 3
-test_button "right_short=Right Short"
-sleep 1
+test_button "middle_long=Middle Long" "VSI" 3
+test_button "right_short=Right Short" "Reset"
 
 echo "------------------------------------"
 echo "Flight Logs"
-test_button "middle_long=Middle Long"
-sleep 3
-test_button "right_short=Right Short"
-sleep 1
+test_button "middle_long=Middle Long" "Display Logs" 3
+test_button "right_short=Right Short" "Clear" 3
 
 echo "------------------------------------"
 echo "GPS Distance"
-test_button "middle_long=Middle Long"
-sleep 3
+test_button "middle_long=Middle Long" "Display Dist" 3
 test_button "right_short=Right Short"
-sleep 1
 test_button "left_short=Left Short"
-sleep 1
 test_button "middle_short=Middle Short"
-sleep 1
 test_button "middle_short=Middle Short"
-sleep 1
 test_button "left_short=Left Short"
-sleep 1
 test_button "left_short=Left Short"
-sleep 1
 test_button "middle_short=Middle Short"
-sleep 1
 
 echo "------------------------------------"
 echo "Display Status"
-test_button "middle_long=Middle Long"
-sleep 3
-echo "Options"
-test_button "left_short=Left Short"
-sleep 1
-test_button "left_short=Left Short"
-sleep 1
-test_button "left_short=Left Short"
-sleep 1
-test_button "Right_short=Right Short"
-sleep 1
-echo "Change Network"
-test_button "Right_short=Right Short"
-sleep 1
-test_button "left_short=Left Short"
-sleep 3
-test_button "middle_long=Middle Long"
-sleep 3
-test_button "middle_long=Middle Long"
-sleep 3
+test_button "middle_long=Middle Long" "Status" 3
+test_button "left_short=Left Short" "Opt/Net"
+test_button "left_short=Left Short" "Opt"
+test_button "left_short=Left Short" "Show reg YES"
+test_button "Right_short=Right Short" "Speak Dist NO"
+test_button "Right_short=Right Short" "Chg Network"
+test_button "left_short=Left Short" "+"
+test_button "middle_short=Middle Short" "Next"
+test_button "middle_short=Middle Short" "Next"
+test_button "middle_long=Middle Long" "Fin" 3
+test_button "middle_long=Middle Long" "Enter Passwd" 3
 echo "Enter IP"
 for i in {1..5}; do
   test_button "middle_short=Middle Short"
-  sleep 1
 done
-test_button "middle_long=Middle Long"
-sleep 3
-echo "Confirm No"
-test_button "Right_short=Right Short"
-sleep 1
-test_button "middle_short=Middle Short"
-sleep 1
+test_button "middle_long=Middle Long" "Fin" 3
+test_button "Right_short=Right Short" "Confirm No" 3
+test_button "middle_short=Middle Short" "Cont"
 
 echo "------------------------------------"
 echo "Stratux Status"
 test_button "middle_short=Middle Short"
-sleep 1
-echo "+10"
-test_button "left_short=Left Short"
-sleep 1
-echo "-10"
-test_button "right_short=Right Short"
-sleep 1
+test_button "left_short=Left Short" "+10"
+test_button "right_short=Right Short" "-10"
 
 echo "------------------------------------"
 echo "Checklist"
 test_button "middle_short=Middle Short"
-sleep 1
 for i in {1..10}; do
   test_button "right_short=Right Short"
-  sleep 1
 done
 test_button "middle_short=Middle Short"
-sleep 1
 test_button "middle_short=Middle Short"
-sleep 1
 test_button "left_short=Left Short"
-sleep 1
 test_button "left_short=Left Short"
-sleep 1
 echo "------------------------------------"
-test_button "middle_long=Middle Long"
-sleep 3
+test_button "middle_long=Middle Long" "Back To Radar" 5
 echo "Testing complete!"
 
 # Test the API form (GET request)
