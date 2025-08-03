@@ -936,6 +936,7 @@ if __name__ == "__main__":
     global_mode = radarmodes.first_mode_sequence()
 
     saved_config = statusui.read_config(CONFIG_FILE)
+    rlog.debug(f"Saved config read: {saved_config}")
     if saved_config is not None:
         if 'stratux_ip' in saved_config:
             url_host_base = saved_config['stratux_ip']  # set stratux ip if interactively changed one time
