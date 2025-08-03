@@ -934,10 +934,13 @@ if __name__ == "__main__":
     auto_refresh_time = args['refresh']
     radarmodes.parse_modes(args['displaymodes'])
     global_mode = radarmodes.first_mode_sequence()
+    global_config['display_tail'] = args['registration']  # display registration if set
+    global_config['distance_warnings'] = args['speakdistance']  # display registration if set
+    global_config['sound_volume'] = args['extsound']  # 0 if not enabled
+    if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
+        global_config['sound_volume'] = 50  # set to a medium value if strange number used
 
-    # set global_config to provided parameters, will be changed if set in saved_config file below
-    global_config['sound_volume'] = args['extsound']
-
+    # check config file, if existent use config from there
     saved_config = statusui.read_config(CONFIG_FILE)
     rlog.debug(f"Saved config read: {saved_config}")
     if saved_config is not None:
