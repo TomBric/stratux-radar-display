@@ -838,6 +838,7 @@ def main():
     simulation.init(simulation_mode)
     checklist.init(xml_checklist)
     radarbuttons.init_gear_indicator(global_config, gear_indication)
+    rlog.debug(f"Initialization finished. Global config {global_config}")
     display_control.startup(RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())

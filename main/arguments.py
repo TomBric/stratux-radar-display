@@ -58,7 +58,7 @@ def add(ap):
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP (deprecated, use --url instead)", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
                     default=0)
-    ap.add_argument("-r", "--registration", required=False, help="Display registration no (epaper only)",
+    ap.add_argument("-r", "--registration", required=False, help="Display registration no",
                     action="store_true", default=False)
     ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (3.7 epaper only)",
                     action="store_true", default=False)
