@@ -65,7 +65,8 @@ class NoDisplay(dcommon.GenericDisplay):
     def flighttime(self, last_flights, side_offset=0, long_version=False):
         pass
 
-    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
+                            current_stats=True, prev_stat=False, next_stat=False, index=-1):
         pass
 
     def checklist(self, checklist_name, checklist_items, current_index, last_list, color=None):
