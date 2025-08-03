@@ -34,7 +34,7 @@
 from .. import dcommon
 
 class NoDisplay(dcommon.GenericDisplay):
-    def init(self, fullcircle=False):    # explicit init to be implemented for every device type
+    def init(self, fullcircle=False, dark_mode=False):    # explicit init to be implemented for every device type
         self.rlog.debug("Running Radar with NoDisplay! ")
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
