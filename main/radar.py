@@ -935,6 +935,9 @@ if __name__ == "__main__":
     radarmodes.parse_modes(args['displaymodes'])
     global_mode = radarmodes.first_mode_sequence()
 
+    # set global_config to provided parameters, will be changed if set in saved_config file below
+    global_config['sound_volume'] = args['extsound']
+
     saved_config = statusui.read_config(CONFIG_FILE)
     rlog.debug(f"Saved config read: {saved_config}")
     if saved_config is not None:
