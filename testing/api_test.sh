@@ -128,25 +128,24 @@ test_button "right_long=Right Long" "Refresh" 5
 echo "------------------------------------"
 echo "Timer"
 test_button "middle_long=Middle Long"
-test_button "right_short=Right Short"
-test_button "right_short=Right Short"
-test_button "right_short=Right Short"
-test_button "left_short=Left Short"
-test_button "middle_short=Middle Short"
-test_button "left_short=Left Short"
-test_button "left_short=Left Short"
-test_button "right_short=Right Short"
-test_button "right_short=Right Short"
-test_button "middle_short=Middle Short"
-test_button "right_short=Right Short"
-test_button "right_short=Right Short"
-test_button "left_short=Left Short"
-sleep 1
+test_button "right_short=Right Short" "Start"
+test_button "right_short=Right Short" "Stop"
+test_button "right_short=Right Short" "Cont"
+test_button "left_short=Left Short" "Lap"
+test_button "left_short=Left Short" "Stop"
+test_button "middle_short=Middle Short" "Countdown Mode"
+test_button "left_short=Left Short" "+10"
+test_button "left_short=Left Short" "+10"
+test_button "right_short=Right Short" "+1"
+test_button "right_short=Right Short" "+1"
+test_button "middle_short=Middle Short"  "Back"
+test_button "right_short=Right Short" "Cont" 5
+test_button "right_short=Right Short" "Stop"
+test_button "left_short=Left Short" "Reset" 2
 
 echo "------------------------------------"
 echo "AHRS"
 test_button "middle_long=Middle Long" "AHRS" 2
-sleep 2
 test_button "right_short=Right Short" "Zero" 4
 test_button "left_short=Left Short" "Level" 4
 
