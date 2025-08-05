@@ -120,7 +120,7 @@ test_button "middle_short=Middle Short"
 
 echo shutdown + cancel
 test_button "left_long=Left Long"
-test_button "left_short=Left Short"
+test_button "left_short=Left Short" "Cancel" 3
 
 echo refresh
 test_button "right_long=Right Long" "Refresh" 5
