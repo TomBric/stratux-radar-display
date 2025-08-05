@@ -104,7 +104,7 @@ echo "Base API URL: $BASE_URL"
 echo ""
 
 echo Radar screen distance
-for i in {1..7}; do
+for i in {1..6}; do
   test_button "left_short=Left Short"
 done
 
