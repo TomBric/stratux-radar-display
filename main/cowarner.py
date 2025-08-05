@@ -104,6 +104,8 @@ simvalue = 0.0
 
 
 def ppm(rsr0):
+    if rsr0 == 0:   # avoid zero log
+        return 0
     val = 10 ** ((math.log10(rsr0) - 0.9) / -0.75)
     # val = 10 ** ((rsr0 - 3.3) / -1.33)
     if val < 5:
@@ -114,7 +116,7 @@ def ppm(rsr0):
     # based on own measurements compared with a CO warner
 
 
-def init(activate, config, debug_level, co_indication, simulation_mode=False):
+def init(activate, config, debug_level, co_indication, simulation_mode=False, co_i2c_0=False):
     global rlog
     global cowarner_active
     global voltage_factor
@@ -141,7 +143,10 @@ def init(activate, config, debug_level, co_indication, simulation_mode=False):
     co_max_values = math.floor(CO_MEASUREMENT_WINDOW / co_timeout)
     if not simulation_mode:
         try:
-            ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default adress
+            if co_i2c_0:
+                ADS = ADS1x15.ADS1115(0, 0x48)    # ADS on I2C bus 0 with default address
+            else:                    
+                ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default address
         except OSError:
             cowarner_active = False
             rlog.debug("CO-Warner - AD sensor not found")

@@ -36,7 +36,7 @@ import time
 import logging
 import datetime
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+from PIL import ImageFont
 
 # helper functions
 def posn(angle, arm_length, angle_offset=0):
@@ -66,17 +66,7 @@ class GenericDisplay:
     AWESOME_FONTSIZE= 18  # bluetooth indicator
     # radar-mode
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
-    AIRCRAFT_COLOR = "red"
-    MODE_S_COLOR = "white"
-    AIRCRAFT_OUTLINE = "white"
-    BG_COLOR = "black"
-    TEXT_COLOR = "white"   # default color for text
-    HIGHLIGHT_COLOR = TEXT_COLOR
-    # AHRS
-    AHRS_EARTH_COLOR = "brown"   # how ahrs displays the earth
-    AHRS_SKY_COLOR = "blue"   # how ahrs displays the sky
-    AHRS_HORIZON_COLOR = "white"   # color of horizon line in ahrs
-    AHRS_MARKS_COLOR = "white"   # color of marks and corresponding text in ahrs
+    # Colors will be initialized in __init__
     # RADAR
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 0
@@ -95,18 +85,36 @@ class GenericDisplay:
 
     def __init__(self):
         self.rlog = logging.getLogger('stratux-radar-log')
+        # Initialize color attributes with default light mode
+        self.AIRCRAFT_COLOR = "red"
+        self.MODE_S_COLOR = "black"
+        self.AIRCRAFT_OUTLINE = "black"
+        self.BG_COLOR = "white"
+        self.TEXT_COLOR = "black"
+        self.HIGHLIGHT_COLOR = self.TEXT_COLOR
+        # AHRS colors
+        self.AHRS_EARTH_COLOR = "brown"
+        self.AHRS_SKY_COLOR = "lightblue"
+        self.AHRS_HORIZON_COLOR = "black"
+        self.AHRS_MARKS_COLOR = "black"
+        
         # these variables below need to be set for every display!
         self.sizex = 0  # display size x axis in pixel
         self.sizey = 0  # display size y axis in pixel
+        self.dark_mode = False
         self.zerox = 0  # zero position (center) in pixel (typically half of sizex)
         self.zeroy = 0  # zero position y-axis in pixel (typically half of sizex)
         self.ah_zerox = 0  # zero point x for ahrs
         self.ah_zeroy = 0  # zero point x for ahrs
-        self.max_pixel = 0  # maximum pixel size which is typicall max(sizex, sizey)
+        self.czerox = 0  # center x for compass
+        self.czeroy = 0  # center y for compass
+        self.max_pixel = 0  # maximum pixel size which is typical max(sizex, sizey)
         self.display_refresh = 0.1  # display refresh time, is to be calculated or set in init
         self.arcposition = 0    # angle where the height for mode-s targets is displayed on the arc
         self.draw = None  # pixel array to be used for draw functions generally
         self.cdraw = None  # pixel array to be used in compass to delete text
+        self.image = None # pixel array to be used in compass to rotate text
+        self.mask = None
         self.compass_aircraft = None    # image of the compass aircraft
         # fonts
         self.fonts= {
@@ -117,8 +125,38 @@ class GenericDisplay:
             self.VERYSMALL: self.make_font("Font.ttc", self.VERYSMALL)
         }
         self.awesomefont = self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONTSIZE)
+        self.top_index = 0   # checklist number
 
-    def init(self, fullcircle=False):    # explicit init to be implemented for every device type
+    def set_dark_mode(self, dark_mode):
+        """Set dark mode and update color constants accordingly"""
+        self.dark_mode = dark_mode
+        if dark_mode:
+            self.BG_COLOR = "black"
+            self.TEXT_COLOR = "white"
+            self.HIGHLIGHT_COLOR = "white"
+            self.AIRCRAFT_COLOR = "white"
+            self.AIRCRAFT_OUTLINE = "white"
+            self.MODE_S_COLOR = "white"
+            self.AHRS_EARTH_COLOR = "black"
+            self.AHRS_SKY_COLOR = "black"
+            self.AHRS_HORIZON_COLOR = "white"
+            self.AHRS_MARKS_COLOR = "white"
+        else:
+            self.BG_COLOR = "white"
+            self.TEXT_COLOR = "black"
+            self.HIGHLIGHT_COLOR = "black"
+            self.AIRCRAFT_COLOR = "red"
+            self.AIRCRAFT_OUTLINE = "black"
+            self.MODE_S_COLOR = "black"
+            self.AHRS_EARTH_COLOR = "brown"
+            self.AHRS_SKY_COLOR = "lightblue"
+            self.AHRS_HORIZON_COLOR = "black"
+            self.AHRS_MARKS_COLOR = "black"
+
+    def init(self, fullcircle=False, dark_mode=False):
+        """Initialize display with optional dark mode"""
+        self.set_dark_mode(dark_mode)
+        # explicit init to be implemented for every device type
         # set device properties
         self.rlog.debug("Running Radar with NoDisplay! ")
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
@@ -208,12 +246,14 @@ class GenericDisplay:
         pass
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
-                      utc_color=None, timer_color=None, second_color=None):
+                      utc_color=None, timer_color=None, second_color=None, datestr=None):
         utc_color = utc_color or self.TEXT_COLOR
         timer_color = timer_color or self.TEXT_COLOR
         second_color = second_color or self.TEXT_COLOR
 
         self.draw.text((5, 0), "UTC", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        if datestr:
+            self.right_text(0, datestr, self.SMALL, color=self.TEXT_COLOR)
         self.centered_text(self.SMALL, utctime, self.VERYLARGE, color=utc_color)
         if stoptime:
             self.draw.text((5, self.SMALL + self.VERYLARGE), "Timer", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
@@ -297,22 +337,20 @@ class GenericDisplay:
                            font=self.fonts[middle_fontsize], fill=text_color, align="left")
 
     def compass(self, heading, error_message):
-        czerox = self.sizex // 2
-        czeroy = self.sizey // 2
         csize = self.sizey // 2  # radius of compass rose
         cmsize = self.sizey // 20 # size of compass marks
         line_width = 1 + min(self.sizex, self.sizey) // 64
 
-        self.draw.ellipse((czerox - csize, 0, czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
+        self.draw.ellipse((self.czerox - csize, 0, self.czerox + csize - 1, self.sizey - 1), outline=self.TEXT_COLOR,
                           fill=self.BG_COLOR, width=line_width)
         bw, bh = self.compass_aircraft.size
         if self.compass_aircraft.mode == "RGBA":
-            self.image.paste(self.compass_aircraft, (czerox - bw // 2 + bw//32, czeroy - bh // 2))
+            self.image.paste(self.compass_aircraft, (self.czerox - bw // 2 + bw//32, self.czeroy - bh // 2))
             #  +bw//32 on x-axis, since image is not totally centered
         else:
-            self.image.paste(self.TEXT_COLOR, (czerox - bw // 2 + bw//32, czeroy - bh //2), self.compass_aircraft)
+            self.image.paste(self.TEXT_COLOR, (self.czerox - bw // 2 + bw//32, self.czeroy - bh //2), self.compass_aircraft)
             # +bw//32 on x-axis, since image is not totally centered
-        self.draw.line((czerox, cmsize, czerox, czeroy - bh//2),
+        self.draw.line((self.czerox, cmsize, self.czerox, self.czeroy - bh//2),
                        fill=self.TEXT_COLOR, width=line_width)     # -bw//2 on x-axis, since image is not totally centered
 
         self.bottom_line("", "", f"{heading}°")
@@ -320,8 +358,8 @@ class GenericDisplay:
         for m in range(0, 360, 10):
             s = math.sin(math.radians(m - heading + 90))
             c = math.cos(math.radians(m - heading + 90))
-            x1, y1 = czerox - (csize - 1) * c, czeroy - (csize - 1) * s
-            x2, y2 = czerox - (csize - cmsize) * c, czeroy - (csize - cmsize) * s
+            x1, y1 = self.czerox - (csize - 1) * c, self.czeroy - (csize - 1) * s
+            x2, y2 = self.czerox - (csize - cmsize) * c, self.czeroy - (csize - cmsize) * s
             width = line_width if m % 30 == 0 else line_width//2
             self.draw.line((x1, y1, x2, y2), fill=self.TEXT_COLOR, width=width)
 
@@ -336,8 +374,8 @@ class GenericDisplay:
                                 font=font, fill="white")
                 # "white" in any case, since the mask is binary, color is set later on with image.paste
                 rotmask = self.mask.rotate(-m + heading, expand=False)
-                center = (czerox - (csize - cmsize - self.LARGE // 2) * c,
-                          czeroy - (csize - cmsize - self.LARGE // 2) * s)
+                center = (self.czerox - (csize - cmsize - self.LARGE // 2) * c,
+                          self.czeroy - (csize - cmsize - self.LARGE // 2) * s)
                 self.image.paste(color, (round(center[0] - self.LARGE),
                                                           round(center[1] - self.LARGE)), rotmask)
 
@@ -448,7 +486,7 @@ class GenericDisplay:
             self.centered_text(txt_starty, subline, self.SMALL)
             txt_starty += self.SMALL
         txt_starty += self.SMALL//2   # some line indent
-        self.draw.text((offset, txt_starty), text, font=self.fonts[self.SMALL])
+        self.draw.text((offset, txt_starty), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.bottom_line(left_text, middle_text, r_text)
 
     def round_text(self, x, y, text, text_color=None, bg_color=None, yesno=True, out_color=None):
@@ -467,14 +505,14 @@ class GenericDisplay:
         return x + tl + self.VERYSMALL
 
 
-    def screen_input(self, headline, subline, text, left, middle, right, prefix, inp, suffix):
+    def screen_input(self, headline, subline, text, left, middle, right, prefix, inp, suffix, offset=0):
         self.centered_text(0, headline, self.LARGE)
         txt_starty = self.LARGE
         if subline is not None:
             self.centered_text(txt_starty, subline, self.SMALL)
             txt_starty += self.LARGE
-        bbox = self.draw.textbbox((0, txt_starty), text, font=self.fonts[self.SMALL])
-        self.draw.text((0, txt_starty), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        bbox = self.draw.textbbox((offset, txt_starty), text, font=self.fonts[self.SMALL])
+        self.draw.text((offset, txt_starty), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         bbox_p = self.draw.textbbox((bbox[0], bbox[3]), prefix, font=self.fonts[self.SMALL])
         self.draw.text((bbox[0], bbox[3]), prefix, fill=self.TEXT_COLOR, font=self.fonts[self.SMALL])
         bbox_rect = self.draw.textbbox((bbox_p[2], bbox[3]), inp, font=self.fonts[self.SMALL])
@@ -526,15 +564,15 @@ class GenericDisplay:
         self.bottom_line("", "Mode", "Clear")
 
     def bar(self, y, text, val, max_val, bar_start, bar_end, color_table, unit="", valtext=None, minval=0,
-            side_offset=0, line_offset=0, outline_offset=2):
+            side_offset_r=0, side_offset_l=0,  line_offset=0, outline_offset=2):
         # color_table example for Epaper:
         #   color_table = {'outline': 'black', 'black_white_offset': 5}
         # color_table example for OLED:
         #   color_table = {'outline': 'white', 'green': 'green', 'yellow': 'DarkOrange', 'red': 'red',
         #                   'yellow_value': 22, 'red_value': 33}
-        self.draw.text((side_offset, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
+        self.draw.text((side_offset_l, y), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR, align="left")
         right_val = f"{int(max_val)}{unit}"
-        self.right_text(y, right_val, self.VERYSMALL, offset=side_offset)
+        self.right_text(y, right_val, self.VERYSMALL, offset=side_offset_r)
 
         if 'outline' in color_table:
             self.draw.rounded_rectangle([bar_start - outline_offset, y - outline_offset,
@@ -554,7 +592,7 @@ class GenericDisplay:
             elif 'yellow' in color_table and val >= color_table.get('yellow_value'):
                 color = color_table.get('yellow')
             else:
-                color = color_table.get('green') if 'green' in color_table else self.TEXTCOLOR
+                color = color_table.get('green') if 'green' in color_table else self.TEXT_COLOR
             self.draw.rectangle([bar_start, y, xval, y + self.VERYSMALL], fill=color, outline=None)
         if 'outline' in color_table:
             self.draw.text(((bar_end - bar_start) // 2 + bar_start - tl // 2, y), t, font=self.fonts[self.VERYSMALL],
@@ -569,7 +607,10 @@ class GenericDisplay:
                  ground_distance_valid, grounddistance, error_message):
         pass
 
-    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
+                            current_stats=True, prev_stat=False, next_stat=False, index=-1):
+        # current stats means: display stats of this session (e.g. while still flying)
+        # if not: values displayed are stored stats
         pass
 
     def gmeter(self, current, maxg, ming, error_message):
@@ -622,16 +663,16 @@ class GenericDisplay:
     def checklist(self, checklist_name, checklist_items, current_index, last_list, color=None):
         color=color or self.TEXT_COLOR
         checklist_y = {'from': self.LARGE + self.LARGE // 2, 'to': self.sizey - self.VERYSMALL - self.VERYSMALL//2}
-        global top_index
+
 
         self.centered_text(0, checklist_name, self.LARGE, color=color)
         if current_index == 0:
-            top_index = 0  # new list, reset top index
-        if current_index < top_index:
-            top_index = current_index  # scroll up
+            self.top_index = 0  # new list, reset top index
+        if current_index < self.top_index:
+            self.top_index = current_index  # scroll up
 
         while True:  # check what would fit on the screen
-            last_item = top_index
+            last_item = self.top_index
             size = self.checklist_topic(checklist_y['from'], checklist_items[last_item], highlighted=False, toprint=False)
             while last_item + 1 < len(checklist_items):
                 last_item += 1
@@ -644,13 +685,13 @@ class GenericDisplay:
             if current_index + 1 <= last_item or last_item + 1 == len(checklist_items):
                 break
             else:  # next item would not fit
-                top_index += 1  # need to scroll, but now test again what would fit
+                self.top_index += 1  # need to scroll, but now test again what would fit
                 if current_index == len(checklist_items) - 1:  # list is finished
                     break
 
         # now display everything
         y = checklist_y['from']
-        for item in range(top_index, last_item + 1):
+        for item in range(self.top_index, last_item + 1):
             if item < len(checklist_items):
                 y = self.checklist_topic(y, checklist_items[item], highlighted=(item == current_index), toprint=True)
 

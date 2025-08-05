@@ -9,6 +9,7 @@
 
 DEBIAN=false
 
+
 while getopts ":i" opt; do
   case $opt in
     i)
@@ -27,19 +28,26 @@ while getopts ":i" opt; do
   esac
 done
 
-
-# set -x
+set -x
 
 apt update
-
 # do an upgrade, otherwise bluez is not working properly in version 2024-07-04
-apt upgrade -y
+# apt upgrade -y
+# apt -y autoremove
 
 # enable ssh
 raspi-config nonint do_ssh 0
 # enable spi and i2c (for cowarner)
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
+
+# Disable swap...
+systemctl disable dphys-swapfile
+apt purge -y dphys-swapfile
+# Generate ssh key for all installs. Otherwise it would have to be done on each boot, which takes a couple of seconds
+ssh-keygen -A -v
+systemctl disable regenerate_ssh_host_keys
+
 
 # for groundsensor, disable ssh over serial cause it is needed for the sensor
 # disable ssh over serial otherwise
@@ -75,6 +83,7 @@ apt install git python3-pip -y
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy python3-pygame -y
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
+apt -y autoremove
 
 #  enable headless connect:
 #  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen

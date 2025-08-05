@@ -34,7 +34,7 @@
 from .. import dcommon
 
 class NoDisplay(dcommon.GenericDisplay):
-    def init(self, fullcircle=False):    # explicit init to be implemented for every device type
+    def init(self, fullcircle=False, dark_mode=False):    # explicit init to be implemented for every device type
         self.rlog.debug("Running Radar with NoDisplay! ")
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
@@ -50,7 +50,7 @@ class NoDisplay(dcommon.GenericDisplay):
 
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
-              utc_color=None, timer_color=None, second_color=None):
+              utc_color=None, timer_color=None, second_color=None, datestr=None):
         pass
 
     def compass(self, heading, error_message):
@@ -65,7 +65,8 @@ class NoDisplay(dcommon.GenericDisplay):
     def flighttime(self, last_flights, side_offset=0, long_version=False):
         pass
 
-    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
+                            current_stats=True, prev_stat=False, next_stat=False, index=-1):
         pass
 
     def checklist(self, checklist_name, checklist_items, current_index, last_list, color=None):

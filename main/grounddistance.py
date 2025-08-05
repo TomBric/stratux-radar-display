@@ -54,7 +54,6 @@
 # }
 
 import logging
-import radarmodes
 import time
 import datetime
 import asyncio
@@ -72,6 +71,8 @@ rlog = None  # radar specific logger
 MEASUREMENTS_PER_SECOND = 10     # number of distance ranging meaurements per second
 # A22 usonic sensor allows approx. 10 per second
 # TFMini-Plus sensor allows 100 per second
+UART_WAIT_TIME = 100   # wait time if no data is coming from the sensor
+UART_BREAK_TIME = 1000   # time to break waiting
 
 # GPS-Measurement of start-distance
 DISTANCE_START_DETECTED = 30 * 10  # in mm where measurement assumes that plane is in the air
@@ -241,7 +242,8 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar Sensor
         return self.distance
     def calc_distance(self):
         if  self.ser.inWaiting() < self.lidar_bytes:
-            rlog.debug("Error, no data received from Lidar sensor")
+            if not simulation_mode:
+                rlog.debug("Error, no data received from Lidar sensor")
             return
         result = self.ser.read(self.ser.inWaiting())
         rlog.log(value_debug_level, f"Lidar sensor - Bytes received: {len(result)} : {binascii.hexlify(result)} ")
@@ -319,6 +321,9 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
     simulation_mode = sim_mode
     global_config = g_config
     rlog = logging.getLogger('stratux-radar-log')
+    value_debug_level = debug_level
+    saved_statistics = stat_file
+    global_situation = situation  # to be able to read and store situation info
     if not activate:
         rlog.debug("Ground Distance Measurement - not activated.")
         ground_distance_active = False
@@ -335,9 +340,6 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
         return False
 
     ground_distance_active = True
-    value_debug_level = debug_level
-    saved_statistics = stat_file
-    global_situation = situation  # to be able to read and store situation info
     rlog.debug("Ground Distance Measurement - Ground sensor active.")
 
     if distance_indication:
@@ -354,10 +356,40 @@ def write_stats():
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(saved_statistics, 'at') as out:
-            json.dump(calculate_output_values(), out, indent=4, default=str)
+            json.dump(calculate_output_values(), out, default=str)
+            out.write('\n')  # Add newline after each JSON object
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + saved_statistics)
-    rlog.debug("Grounddistance: Statistics saved to " + saved_statistics)
+
+
+def read_stats(stats_file=None):   # returns a list of all written stats
+    global rlog
+    
+    if rlog is None:
+        rlog = logging.getLogger('stratux-radar-log')
+    if stats_file is None:
+        stats_file = saved_statistics
+        if stats_file is None:
+            return []    # groundsensor not initialized, return empty
+    try:
+        with open(stats_file, 'rt') as f:
+            # Read and parse each line as a separate JSON object
+            stats = []
+            for line in f:
+                line = line.strip()
+                if line:  # Skip empty lines
+                    stats.append(json.loads(line))
+            rlog.debug(f"Grounddistance: Read {len(stats)} statistics records")
+            return stats
+    except FileNotFoundError:
+        rlog.debug(f"Grounddistance: Statistics file {stats_file} not found")
+        return []
+    except json.JSONDecodeError as e:
+        rlog.debug(f"Grounddistance: Error decoding JSON from {stats_file}: {str(e)}")
+        return []
+    except (OSError, IOError) as e:
+        rlog.debug(f"Grounddistance: Error reading {stats_file}: {str(e)}")
+        return []
 
 
 def prepare_sounds():

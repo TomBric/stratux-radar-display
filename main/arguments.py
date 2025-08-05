@@ -51,12 +51,14 @@ def add(ap):
                     default=False)
     ap.add_argument("-n", "--north", required=False, help="Ground mode: always display north up", action='store_true',
                     default=False)
+    ap.add_argument("-da", "--dark", required=False, help="Enable dark mode", action='store_true',
+                    default=False)
     ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use",
                     default=DEFAULT_CHECKLIST)
-    ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP", default=DEFAULT_URL_HOST_BASE)
+    ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP (deprecated, use --url instead)", default=DEFAULT_URL_HOST_BASE)
     ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
                     default=0)
-    ap.add_argument("-r", "--registration", required=False, help="Display registration no (epaper only)",
+    ap.add_argument("-r", "--registration", required=False, help="Display registration no",
                     action="store_true", default=False)
     ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (3.7 epaper only)",
                     action="store_true", default=False)
@@ -67,6 +69,8 @@ def add(ap):
     ap.add_argument("-nc", "--nocowarner", required=False, help="Suppress activation of co-warner",
                     action="store_true", default=False)
     ap.add_argument("-ci", "--coindicate", required=False, help="Indicate co warning via GPIO16",
+                    action="store_true", default=False)
+    ap.add_argument("-cb0", "--coi2c0", required=False, help="Use I2C bus 0 for CO",
                     action="store_true", default=False)
     ap.add_argument("-gd", "--grounddistance", required=False, help="Activate ground distance sensor",
                     action="store_true", default=False)
@@ -82,6 +86,8 @@ def add(ap):
                     default=DEFAULT_MIXER)
     ap.add_argument("-api", "--buttonapi", required=False, help="use api for button handling",
                     action="store_true", default=False)
+    ap.add_argument("-ref", "--refresh", type=int, required=False,
+                    help="Time intervall for automatic refresh in seconds", default=0)
     ap.add_argument("-modes", "--displaymodes", required=False,
                     help="Select display modes that you want to see ""R=radar T=timer A=ahrs D=display-status "
                          "G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "

@@ -61,6 +61,9 @@ RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
 MAX_SEQUENCE = 99   # maximum value accepted as sequence of modes
 MAX_CHECKLIST_SIZE = 256 * 1024  # max size of checklist, set to 256K
+DEFAULT_IP_DIRECT_ON_STRATUX = "127.0.0.1"
+# IP address of stratux when running on stratux. The field is not rendered in stratux-mode,
+# so it has to be set explicitly after each request
 
 stratux_mode = False  # if this mode is True (--stratux) start configuration for radar directly on stratux
 app = Flask(__name__)
@@ -134,7 +137,7 @@ class ChecklistForm(FlaskForm):
 
 class RadarForm(FlaskForm):
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[IPAddress()])
-    display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
+    display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch'), ('Epaper_3in7_Round', 'Epaper display 3.7 inch - Round front') ], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
     radar_seq = IntegerField('', default=1, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
@@ -180,7 +183,7 @@ class RadarForm(FlaskForm):
     # web options
     webtimeout = RadioField('Configuration shutdown',
                              choices=[ ('0', 'never shutdown'), ('10', 'after 10 mins inactivity'),('3', 'after 3 mins inactivity'),
-                                      ('1', 'after 1 min inactivity'), ('-1', 'disable web server configuration'),], default=10)
+                                      ('1', 'after 1 min inactivity'), ('-1', 'disable web server configuration'),], default='10')
 
 
     save_restart = SubmitField('Save and reboot radar')
@@ -190,19 +193,28 @@ class RadarForm(FlaskForm):
     # special options
     no_cowarner = SwitchField('Suppress activation of co sensor', default=False)
     coindicate = SwitchField('Indicate CO warning on GPIO16', default = False)
+    coi2c0 = SwitchField('Use I2C bus 0 for CO sensor (GPIO 0 and GPIO 1)', default = False)
     no_flighttime = SwitchField('Suppress detection and display of flighttime', default=False)
+    autorefresh = RadioField('E-paper display autorefresh cycle',
+                            choices=[('0', 'no automatic refresh (recommended)'), ('300', 'after 5 mins'),
+                                     ('600', 'after 10 mins'),
+                                     ('1800', 'after 30 mins'), ],
+                            default='0')
 
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
+    darkmode = SwitchField('Enable dark mode', default=False)
     all_mixers = RadioField('Select detected devices/mixers', choices=[('other', 'Other')], default='other')
 
 
-    def __init__(self, detected_mixers):   # detected mixers is a list of (device, mixername) tuples
+    def __init__(self, detected_mixers, on_stratux = False):   # detected mixers is a list of (device, mixername) tuples
         FlaskForm.__init__(self)
         options = [(t[1],t[0]+'/'+t[1]) for t in detected_mixers]
         self.all_mixers.choices += options
+        if on_stratux:
+            self.stratux_ip.data = DEFAULT_IP_DIRECT_ON_STRATUX
 
 
 def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called from radar_app
@@ -321,11 +333,19 @@ def read_arguments(rf):
     rf.groundsensor.data = args['grounddistance']
     rf.groundbeep.data = args['groundbeep']
     rf.gearindicate.data = args['gearindicate']
+    if args['dark'] is True:
+        rf.darkmode.data = True
     # special options
     rf.no_cowarner.data = args['nocowarner']
     rf.coindicate.data = args['coindicate']
+    rf.coi2c0.data = args['coi2c0']
     rf.no_flighttime.data = args['noflighttime']
     rf.checklist_filename.data = args['checklist']
+    if args['refresh'] is not None:
+        rf.autorefresh.data = str(args['refresh'])
+
+    rlog.debug(f'RadarForm Autorefresh: {rf.autorefresh.data}')
+    rlog.debug(f'RadarForm IP: {rf.stratux_ip.data}')
 
     parsemodes(args['displaymodes'], rf)
 
@@ -396,14 +416,20 @@ def build_option_string(rf):
         out += ' -gb'
     if rf.gearindicate.data is True:
         out += ' -gi'
+    if rf.darkmode.data is True:
+        out += ' --dark'
     if rf.no_cowarner.data is True:
         out += ' -nc'
     if rf.coindicate.data is True:
         out += ' -ci'
+    if rf.coi2c0.data is True:
+        out += ' -cb0'
     if rf.no_flighttime.data is True:
         out += ' -nf'
     if rf.checklist.data is True and len(rf.checklist_filename.data) > 0:
         out += f' -chl {secure_filename(rf.checklist_filename.data)}'
+    if rf.autorefresh.data != '0':
+        out += f' -ref {rf.autorefresh.data}'
     return out
 
 
@@ -427,12 +453,15 @@ def index():
     global local_checklist_filename
 
     watchdog.refresh()
-    radar_form = RadarForm(cards_and_mixers())
+    radar_form = RadarForm(cards_and_mixers(), stratux_mode)
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
+    rlog.debug(f'index(): stratux-ip is {radar_form.stratux_ip.data}')
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
         read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
+        rlog.debug(f'index() after read_arguments: stratux-ip is {radar_form.stratux_ip.data}')
     else:
+        rlog.debug(f'index() in else for POST: stratux-ip is {radar_form.stratux_ip.data}')
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')

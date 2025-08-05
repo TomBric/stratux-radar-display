@@ -13,8 +13,10 @@
 #   sudo /bin/bash mk_radar_on_stratux.sh
 #   sudo /bin/bash mk_radar_on_stratux.sh -b dev
 #   sudo /bin/bash mk_radar_on_stratux.sh -d Epaper_1in54
+# install a first time flashing of the t-beam
+#   sudo /bin/bash mk_radar_on_stratux.sh -flash /home/pi/GxAirCom81
 
-# set -x
+set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -30,27 +32,16 @@ USB_NAME=""
 DISPLAY_NAME="Epaper_3in7"
 
 # check parameters
-while getopts ":b:d:u:" opt; do
-  case $opt in
-    b)
-      BRANCH="$OPTARG"
-      ;;
-    u)
-      USB_NAME="$OPTARG"
-      ;;
-    d)
-      DISPLAY_NAME="$OPTARG"
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG"
-      exit 1
-      ;;
-    :)
-      echo "option -$OPTARG requires a value."
-      exit 1
-      ;;
-  esac
-done
+while getopts ":b:d:u:f:" opt; do
+      case $opt in
+        b) BRANCH="$OPTARG" ;;
+        u) USB_NAME="$OPTARG" ;;
+        d) DISPLAY_NAME="$OPTARG" ;;
+        f) FLASH="$OPTARG" ;;
+        \?) echo "Invalid option: -$OPTARG"; exit 1 ;;
+        :) echo "Option -$OPTARG requires a value."; exit 1 ;;
+      esac
+    done
 
 echo "Building stratux image for branch '$BRANCH' and display '$DISPLAY_NAME'"
 
@@ -97,11 +88,18 @@ cp "$LOCAL_DIR"/stratux.conf.radar mnt/boot/stratux.conf
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt update
 chroot mnt apt install git python3-pip -y
+
 # enable persistent logging
 chroot mnt overlayctl disable
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
 su pi -c "git clone --recursive -b ${BRANCH} https://github.com/TomBric/stratux-radar-display.git"
+# copy T-Beam flash directory
+if [ -n "$FLASH" ]; then
+  su pi -c "cp -r $FLASH stratux-radar-display/to_flash"
+  # modify stratux_radar.sh to execute flash-t-beam-once.sh during first startup
+  sed -i "/\/bin\/bash/a\/bin\/bash \/$DISPLAY_SRC\/stratux-radar-display\/image\/flash-once.sh \/$DISPLAY_SRC\/stratux-radar-display\/to_flash" stratux-radar-display/image/stratux_radar.sh
+fi
 # set display
 sed -i "s/Oled_1in5/${DISPLAY_NAME}/g" stratux-radar-display/image/stratux_radar.sh
 # back to root directory of stratux image

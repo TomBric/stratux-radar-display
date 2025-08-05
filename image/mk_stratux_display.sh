@@ -14,7 +14,7 @@
 #   sudo /bin/bash mk_stratux_display.sh -b dev
 #   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
 
-# set -x
+set -x
 
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
@@ -64,8 +64,8 @@ else
   outprefix="stratux-display"
 fi
 
-ZIPNAME="2024-11-19-raspios-bookworm-${IMAGE_VERSION}-lite.img.xz"
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2024-11-19/${ZIPNAME}"
+ZIPNAME="2025-05-13-raspios-bookworm-${IMAGE_VERSION}-lite.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2025-05-13/${ZIPNAME}"
 
 IMGNAME="${ZIPNAME%.*}"
 
@@ -77,7 +77,7 @@ cd $TMPDIR || die "cd failed"
 
 # Download/extract image
 wget -c $BASE_IMAGE_URL || die "Download failed"
-xz -d $ZIPNAME || die "Extracting image failed"
+unxz -k $ZIPNAME || die "Extracting image failed"
 
 # Check where in the image the root partition begins:
 bootoffset=$(parted $IMGNAME unit B p | grep fat32 | awk -F ' ' '{print $2}')
@@ -85,8 +85,8 @@ bootoffset=${bootoffset::-1}
 partoffset=$(parted $IMGNAME unit B p | grep ext4 | awk -F ' ' '{print $2}')
 partoffset=${partoffset::-1}
 
-# Original image partition is too small to hold our stuff.. resize it to 4gb
-truncate -s 4096M $IMGNAME || die "Image resize failed"
+# Original image partition is too small to hold our stuff.. resize it to 5gb
+truncate -s 5120M $IMGNAME || die "Image resize failed"
 lo=$(losetup -f)
 losetup $lo $IMGNAME
 partprobe $lo
@@ -115,7 +115,6 @@ sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
   echo "enable_uart=1"
   echo "dtoverlay=miniuart-bt"
 } | tee -a mnt/boot/config.txt
-
 
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt install git -y
