@@ -173,6 +173,7 @@ test_button "right_short=Right Short" "Clear" 3
 if [ "$CO" = true ]; then
   echo "------------------------------------"
   echo "CO display"
+  test_button "middle_long=Middle Long" "Display CO" 3
   test_button "right_short=Right Short" "Reset" 1
   test_button "left_short=Left Short" "Calibrate" 15
 fi
