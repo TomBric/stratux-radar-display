@@ -49,6 +49,8 @@ MSG_NO_CONNECTION = "No Connection!"
 gps_distance_zero = {'gps_active': False, 'longitude': 0.0, 'latitude': 0.0}
 start_distance = 0.0    # runway needed till airborne, starts when "start" button is pressed
 dist_user_mode = 0      # user input mode for distance display, 0 = normal, start   1=statistics display
+statistic_index = 0
+statistic_list = None
 # gps-starting point in meters for situation and flight testing
 baro_diff_zero = None
 # height starting point based on baro in feet for situation and flight testing
@@ -91,6 +93,7 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
     global start_distance
 
     # display in any case, even if there is no change, since time is running anyhow
+    display_control.clear()
     if dist_user_mode == 0:
         error_message = None
         gps_distance = 0.0
@@ -113,7 +116,6 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
                 gps_distance = calc_gps_distance_meters(gps_distance_zero['latitude'], gps_distance_zero['longitude'],
                                                         situation['latitude'], situation['longitude'])
         now = datetime.datetime.now(datetime.timezone.utc)
-        display_control.clear()
         display_control.distance(now, situation['gps_active'], situation['gps_quality'],
                                  situation['gps_h_accuracy'],
                                  gps_distance_zero['gps_active'], gps_distance, situation['gps_speed'],
@@ -121,25 +123,50 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
                                  situation['vertical_speed'], ahrs['ahrs_sensor'],
                                  ahrs['pitch'], ahrs['roll'], situation['g_distance_valid'], situation['g_distance'],
                                  error_message)
-        display_control.display()
-    elif dist_user_mode == 1:   # show statistics
-        display_control.clear()
+    elif dist_user_mode == 1:   # show current statistics
         display_control.distance_statistics(grounddistance.calculate_output_values(), situation['gps_active'],
                                             situation['gps_altitude'], grounddistance.dest_elevation,
                                             grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
-                                            grounddistance.indicate_distance)
-        display_control.display()
+                                            grounddistance.indicate_distance, current_stats=True)
+    elif dist_user_mode == 2:  # show stored statistics
+        if statistic_list is not None and len(statistic_list) > 0:
+            display_control.distance_statistics(statistic_list[statistic_index],
+                                                situation['gps_active'],situation['gps_altitude'],
+                                                grounddistance.dest_elevation,
+                                                grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
+                                                grounddistance.indicate_distance, current_stats=False,
+                                                prev_stat=statistic_index != 0,
+                                                next_stat=statistic_index != len(statistic_list) - 1,
+                                                index=statistic_index)
+        else: # no data available till now
+            display_control.distance_statistics({}, situation['gps_active'], situation['gps_altitude'],
+                                            grounddistance.dest_elevation,
+                                            grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
+                                            grounddistance.indicate_distance, current_stats=False,
+                                            prev_stat=False, next_stat=False, index=-1)
+    display_control.display()
 
 
 def user_input():
     global dist_user_mode
+    global statistic_index
+    global statistic_list
+
     btime, button = radarbuttons.check_buttons()
     # start of situation global behaviour, status is 21
     if btime == 0:
         return 0, False  # stay in current mode
     if dist_user_mode == 0:
-        if button == 1 and (btime == 2 or btime == 1):  # middle
+        if button == 1 and btime == 2:  # middle
             return radarmodes.next_mode_sequence(21), False  # next mode to be radar
+        if button == 1 and btime == 1:  # middle and short, display history statistics
+            dist_user_mode = 2
+            statistic_list = grounddistance.read_stats()  # returns empty list if nothing available
+            if statistic_list is not None and len(statistic_list) > 0:
+                statistic_index = len(statistic_list) - 1
+            else:
+                statistic_index = -1
+            return 21, False
         if button == 0 and btime == 2:  # left and long
             return 3, False  # start next mode shutdown!
         if button == 0 and btime == 1:  # left and short - display statistics
@@ -151,7 +178,7 @@ def user_input():
             return 22, False  # start next mode for display driver: refresh called from vsi
         return 21, False  # no mode change for any other interaction
     elif dist_user_mode == 1:  # statistics/set mode
-        if button == 1 and btime == 1:  # middle and short - return to display mode
+        if button == 1 and (btime == 2 or btime == 1):  # middle and long/short - return to display mode
             dist_user_mode = 0
             return 21, False
         if button == 0 and btime == 1:  # left and short - +100 ft
@@ -165,5 +192,24 @@ def user_input():
             return 21, False
         if button == 2 and btime == 2:  # right and long - -100 ft
             grounddistance.set_dest_elevation(-10)
+            return 21, False
+        return 21, False  # no mode change for any other interaction
+    elif dist_user_mode == 2:  # history values list
+        if button == 1 and (btime == 1 or btime == 2):  # middle - return to display mode
+            dist_user_mode = 0
+            return 21, False
+        if button == 2 and btime == 1:  # right and short - next element
+            statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
+            if statistic_list is not None and len(statistic_list) > 0:
+                statistic_index = (statistic_index + 1) % len(statistic_list)
+            else:
+                statistic_index = -1
+            return 21, False
+        if button == 0 and btime == 1:  # left and short - previous element
+            statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
+            if statistic_list is not None and len(statistic_list) > 0:
+                statistic_index = (statistic_index - 1) % len(statistic_list)
+            else:
+                statistic_index = -1
             return 21, False
         return 21, False  # no mode change for any other interaction

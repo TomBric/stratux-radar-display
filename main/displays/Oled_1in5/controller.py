@@ -73,7 +73,7 @@ class Oled1in5(dcommon.GenericDisplay):
     draw = None
     mask = None
 
-    def init(self, fullcircle=False):
+    def init(self, fullcircle=False, dark_mode=False):   # dark mode without effect in Oled display
         config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
         self.device = radar_opts.get_device(['-f', config_path])
         self.device.contrast(255)  # set full contrast
@@ -86,6 +86,8 @@ class Oled1in5(dcommon.GenericDisplay):
         self.max_pixel = self.sizey
         self.ah_zeroy = self.sizey // 2  # zero line for ahrs
         self.ah_zerox = self.sizex // 2
+        self.czerox = self.sizex // 2
+        self.czeroy = self.sizey // 2
         start = time.time()
         # do sync version of display to measure time
         self.display()
@@ -182,7 +184,7 @@ class Oled1in5(dcommon.GenericDisplay):
                            fill=btcolor, align="right")
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs,
-              utc_color=None, timer_color=None, second_color=None):
+              utc_color=None, timer_color=None, second_color=None, datestr=None):
         # is defined in subclass, since we want to have colors for oled
         if timer_runs:
             color = "lavender"
@@ -202,7 +204,7 @@ class Oled1in5(dcommon.GenericDisplay):
                        fill="cyan")
         self.right_text(52, f"{maxg:+1.2f}", self.SMALL, color="magenta")
         if error_message:
-            self.entered_text(57, error_message, self.LARGE, color="red")
+            self.centered_text(57, error_message, self.LARGE, color="red")
         self.draw.text((self.zerox+13, 65), "min", font=self.fonts[self.VERYSMALL], fill="cyan")
         self.right_text(65, "{:+1.2f}".format(ming), self.SMALL, color="magenta")
         self.bottom_line("", "", "Rst")
@@ -310,10 +312,15 @@ class Oled1in5(dcommon.GenericDisplay):
             self.centered_text(80, error_message, self.LARGE, self.WARNING_COLOR)
         self.bottom_line("Stat/Set", "   Mode", "Start")
 
-
-
-    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        self.centered_text(0, "Start-/Landing", self.SMALL)
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
+                            current_stats=True, next_stat=False, prev_stat=False, index=-1):
+        if current_stats:  # current data, still flying
+            self.centered_text(0, "Act Start-/Landing", self.SMALL)
+        else:
+            if index >= 0:
+                self.centered_text(0, f"Start-/Land #{index + 1}", self.SMALL)
+            else:
+                self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         st = '---'
         if 'start_time' in values:
             st = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['start_time'].hour, values['start_time'].minute,
@@ -335,16 +342,21 @@ class Oled1in5(dcommon.GenericDisplay):
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         )
         starty = self.dashboard(0, starty, self.sizex, lines)
-        if ground_warnings:
-            dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
-            lines = (
-                ("Dest. Alt [ft]", dest_alt_str),
-            )
-            self.dashboard(0, starty, self.sizex, lines)
-        if not ground_warnings:
-            self.bottom_line("", "Back", "")
-        else:
-            self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+        if current_stats:
+            if ground_warnings:
+                dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
+                lines = (
+                    ("Dest. Alt [ft]", dest_alt_str),
+                )
+                self.dashboard(0, starty, self.sizex, lines)
+                self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+            else:
+                self.bottom_line("", "Back", "")
+        else: # stored stats
+            left="Prev" if prev_stat else ""
+            right="Next" if next_stat else ""
+            self.bottom_line(left, "Exit", right)
+
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = Oled1in5()

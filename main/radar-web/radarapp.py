@@ -137,7 +137,7 @@ class ChecklistForm(FlaskForm):
 
 class RadarForm(FlaskForm):
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[IPAddress()])
-    display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch')], default='Epaper_3in7')
+    display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch'), ('Epaper_3in7_Round', 'Epaper display 3.7 inch - Round front') ], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
     radar_seq = IntegerField('', default=1, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
@@ -205,6 +205,7 @@ class RadarForm(FlaskForm):
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
+    darkmode = SwitchField('Enable dark mode', default=False)
     all_mixers = RadioField('Select detected devices/mixers', choices=[('other', 'Other')], default='other')
 
 
@@ -332,6 +333,8 @@ def read_arguments(rf):
     rf.groundsensor.data = args['grounddistance']
     rf.groundbeep.data = args['groundbeep']
     rf.gearindicate.data = args['gearindicate']
+    if args['dark'] is True:
+        rf.darkmode.data = True
     # special options
     rf.no_cowarner.data = args['nocowarner']
     rf.coindicate.data = args['coindicate']
@@ -413,6 +416,8 @@ def build_option_string(rf):
         out += ' -gb'
     if rf.gearindicate.data is True:
         out += ' -gi'
+    if rf.darkmode.data is True:
+        out += ' --dark'
     if rf.no_cowarner.data is True:
         out += ' -nc'
     if rf.coindicate.data is True:

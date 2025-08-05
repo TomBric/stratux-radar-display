@@ -41,6 +41,7 @@ from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 import os
 
+rlog = None  # radar specific logger
 
 btn = None   # will be set in init
 gear_down_btn = None   # will be set ini int

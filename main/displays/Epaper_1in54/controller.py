@@ -52,25 +52,56 @@ class Epaper1in54(dcommon.GenericDisplay):
     MINIMAL_CIRCLE = 10  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 0
     ARCPOSITION_EXCLUDE_TO = 0
-    # colors
-    BG_COLOR = "white"
-    TEXT_COLOR = "black"
-    HIGHLIGHT_COLOR = "black"
-    AIRCRAFT_COLOR = "black"
-    AIRCRAFT_OUTLINE = "black"
-    MODE_S_COLOR = "black"
-    # AHRS
-    AHRS_EARTH_COLOR = "white"  # how ahrs displays the earth
-    AHRS_SKY_COLOR = "white"  # how ahrs displays the sky
-    AHRS_HORIZON_COLOR = "black"  # how ahrs displays the horizon
-    AHRS_MARKS_COLOR = "black"  # color of marks and corresponding text in ahrs
+    # colors will be initialized in __init__
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
     # attributes later defined in explicit init
-    device = None
-    image = None
-    mask = None
+    def __init__(self):
+        super().__init__()
+        # Initialize color attributes
+        self.BG_COLOR = "white"
+        self.TEXT_COLOR = "black"
+        self.HIGHLIGHT_COLOR = "black"
+        self.AIRCRAFT_COLOR = "black"
+        self.AIRCRAFT_OUTLINE = "black"
+        self.MODE_S_COLOR = "black"
+        # AHRS colors
+        self.AHRS_EARTH_COLOR = "white"
+        self.AHRS_SKY_COLOR = "white"
+        self.AHRS_HORIZON_COLOR = "black"
+        self.AHRS_MARKS_COLOR = "black"
+        # Other attributes
+        self.device = None
+        self.image = None
+        self.mask = None
+        self.dark_mode = False
 
-    def init(self, fullcircle=False):
+    def set_dark_mode(self, dark_mode):
+        """Set dark mode and update color constants accordingly"""
+        self.dark_mode = dark_mode
+        if dark_mode:
+            self.BG_COLOR = "black"
+            self.TEXT_COLOR = "white"
+            self.HIGHLIGHT_COLOR = "white"
+            self.AIRCRAFT_COLOR = "white"
+            self.AIRCRAFT_OUTLINE = "white"
+            self.MODE_S_COLOR = "white"
+            self.AHRS_EARTH_COLOR = "black"
+            self.AHRS_SKY_COLOR = "black"
+            self.AHRS_HORIZON_COLOR = "white"
+            self.AHRS_MARKS_COLOR = "white"
+        else:
+            self.BG_COLOR = "white"
+            self.TEXT_COLOR = "black"
+            self.HIGHLIGHT_COLOR = "black"
+            self.AIRCRAFT_COLOR = "black"
+            self.AIRCRAFT_OUTLINE = "black"
+            self.MODE_S_COLOR = "black"
+            self.AHRS_EARTH_COLOR = "white"
+            self.AHRS_SKY_COLOR = "white"
+            self.AHRS_HORIZON_COLOR = "black"
+            self.AHRS_MARKS_COLOR = "black"
+
+    def init(self, fullcircle=False, dark_mode=False):
         self.device = epd1in54_V2.EPD()
         self.device.init(0)
         self.device.Clear(0xFF)  # necessary to overwrite everything
@@ -78,6 +109,9 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.draw = ImageDraw.Draw(self.image)
         self.device.init(1)
         self.device.Clear(0xFF)
+        # Initialize dark mode
+        self.dark_mode = dark_mode
+        self.set_dark_mode(dark_mode)
         self.sizex = self.device.height
         self.sizey = self.device.width
         self.zerox = self.sizex / 2
@@ -85,6 +119,8 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.max_pixel = self.sizey
         self.ah_zeroy = self.sizey // 2  # zero line for ahrs
         self.ah_zerox = self.sizex // 2
+        self.czerox = self.sizex // 2
+        self.czeroy = self.sizey // 2
         # measure time for refresh
         start = time.time()
         # do sync version of display to measure time
@@ -124,7 +160,7 @@ class Epaper1in54(dcommon.GenericDisplay):
     def startup(self, version, target_ip, seconds):
         logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-150x150.bmp'))
         logo = Image.open(logopath)
-        self.draw.bitmap((self.zerox-150//2, 0), logo, fill="black")
+        self.draw.bitmap((self.zerox-150//2, 0), logo, fill=self.TEXT_COLOR)
         versionstr = f"Radar {version}"
         self.centered_text(150, versionstr, self.VERYLARGE)
         self.display()
@@ -196,13 +232,13 @@ class Epaper1in54(dcommon.GenericDisplay):
     def earthfill(self, pitch, roll, length, scale):   # possible function for derived classed to implement fillings for earth
         # draws some type of black shading for the earth
         for pm in range(0, -180-1, -3):
-            self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill="black", width=1)
+            self.draw.line((self.linepoints(pitch, roll, pm, length, scale)), fill=self.TEXT_COLOR, width=1)
 
     def stratux(self, stat, altitude, gps_alt, gps_quality):
         starty = 0
         self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
         starty += self.SMALL + 6
-        colors = {'outline': 'black', 'black_white_offset': 5}
+        colors = {'outline': self.TEXT_COLOR, 'black_white_offset': 5}
         bar_start, bar_end = 50, 150
         line_offset = 4
         outline_offset = 1
@@ -281,10 +317,17 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
             self.centered_text(80, error_message, self.LARGE)
-        self.bottom_line("Stat/Set", "   Mode", "Start")
+        self.bottom_line("Set", "His/Mode", "Start")
 
-    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        self.centered_text(0, "Start-/Landing", self.SMALL)
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
+                            current_stats=True, next_stat=False, prev_stat=False, index=-1):
+        if current_stats:  # current data, still flying
+            self.centered_text(0, "Act Start-/Landing", self.SMALL)
+        else:
+            if index >= 0:
+                self.centered_text(0, f"Start-/Land #{index + 1}", self.SMALL)
+            else:
+                self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         st = '---'
         if 'start_time' in values:
             st = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['start_time'].hour, values['start_time'].minute,
@@ -306,16 +349,21 @@ class Epaper1in54(dcommon.GenericDisplay):
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         )
         starty = self.dashboard(0, starty, self.sizex, lines)
-        if ground_warnings:
-            dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
-            lines = (
-                ("Dest. Alt [ft]", dest_alt_str),
-            )
-            self.dashboard(0, starty, self.sizex, lines)
-        if not ground_warnings:
-            self.bottom_line("", "Back", "")
-        else:
-            self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+        if current_stats:
+            if ground_warnings:
+                dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
+                lines = (
+                    ("Dest. Alt [ft]", dest_alt_str),
+                )
+                self.dashboard(0, starty, self.sizex, lines)
+                self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+            else:
+                self.bottom_line("", "Back", "")
+        else: # stored stats
+            left="Prev" if prev_stat else ""
+            right="Next" if next_stat else ""
+            self.bottom_line(left, "Exit", right)
+
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = Epaper1in54()

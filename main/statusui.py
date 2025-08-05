@@ -233,7 +233,7 @@ def draw_status(display_control, bluetooth_active, extsound_active):
         char = new_stratux_ip[charpos]
         suffix = new_stratux_ip[charpos + 1:len(new_stratux_ip)]
         display_control.screen_input(headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
-    elif status_mode == 10:   # Error dispay
+    elif status_mode == 10:   # Error display
         headline = "Change WIFI"
         subline = "Input Error!"
         ip_is_invalid = False

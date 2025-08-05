@@ -76,7 +76,7 @@ rlog = None  # radar specific logger
 #
 
 # constants
-RADAR_VERSION = "2.08"
+RADAR_VERSION = "2.10"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -701,13 +701,13 @@ async def display_and_cutoff():
                     ui_changed = False
                 elif global_mode == 6:  # refresh display, only relevant for epaper, mode was radar
                     rlog.debug("AHRS: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 5
                 elif global_mode == 7:  # status display
                     statusui.draw_status(display_control, bluetooth_active, extsound_active)
                 elif global_mode == 8:  # refresh display, only relevant for epaper, mode was status
                     rlog.debug("Status: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 7
                 elif global_mode == 9:  # gmeter display
                     gmeterui.draw_gmeter(display_control, ui_changed, situation['connected'], gmeter)
@@ -715,7 +715,7 @@ async def display_and_cutoff():
                     ui_changed = False
                 elif global_mode == 10:  # refresh display, only relevant for epaper, mode was gmeter
                     rlog.debug("Gmeter: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 9
                 elif global_mode == 11:  # compass display
                     compassui.draw_compass(display_control, situation['was_changed'], situation['connected'],
@@ -723,7 +723,7 @@ async def display_and_cutoff():
                     situation['was_changed'] = False
                 elif global_mode == 12:  # refresh display, only relevant for epaper, mode was gmeter
                     rlog.debug("Compass: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 11
                 elif global_mode == 13:  # vsi display
                     verticalspeed.draw_vsi(display_control, situation['was_changed'] or ui_changed,
@@ -736,7 +736,7 @@ async def display_and_cutoff():
                     ui_changed = False
                 elif global_mode == 14:  # refresh display, only relevant for epaper, mode was gmeter
                     rlog.debug("VSI: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 13
                 elif global_mode == 15:  # stratux_statux display
                     stratuxstatus.draw_status(display_control, ui_changed, situation['connected'],
@@ -745,21 +745,21 @@ async def display_and_cutoff():
                     ui_changed = False
                 elif global_mode == 16:  # refresh display, only relevant for epaper, mode was stratux_status
                     rlog.debug("StratusStatus: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 15
                 elif global_mode == 17:  # display flight time
                     flighttime.draw_flighttime(display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 18:  # refresh display, only relevant for epaper, mode was flighttime
                     rlog.debug("StratusStatus: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 17
                 elif global_mode == 19:  # co-warner
                     cowarner.draw_cowarner(display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 20:  # refresh display, only relevant for epaper, mode was co-warner
                     rlog.debug("CO-Warner: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 19
                 elif global_mode == 21:  # situation
                     distance.draw_distance(display_control, situation['was_changed'] or ui_changed,
@@ -767,14 +767,14 @@ async def display_and_cutoff():
                     ui_changed = False
                 elif global_mode == 22:  # refresh display, only relevant for epaper, mode was situation
                     rlog.debug("Situation: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 21
                 elif global_mode == 23:  # checklist
                     checklist.draw_checklist(display_control, ui_changed)
                     ui_changed = False
                 elif global_mode == 24:  # refresh display, only relevant for epaper, mode was situation
                     rlog.debug("Checklist: Display driver - Refreshing")
-                    refresh_display(manual=true)
+                    refresh_display(manual=True)
                     global_mode = 23
 
             to_delete = []
@@ -826,7 +826,7 @@ def main():
     shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
-    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle)
+    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
     ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
@@ -838,6 +838,7 @@ def main():
     simulation.init(simulation_mode)
     checklist.init(xml_checklist)
     radarbuttons.init_gear_indicator(global_config, gear_indication)
+    rlog.debug(f"Initialization finished. Global config {global_config}")
     display_control.startup(RADAR_VERSION, url_host_base, 4)
     try:
         asyncio.run(coroutines())
@@ -938,9 +939,10 @@ if __name__ == "__main__":
     global_config['sound_volume'] = args['extsound']  # 0 if not enabled
     if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
         global_config['sound_volume'] = 50  # set to a medium value if strange number used
-    # check config file, if extistent use config from there
 
+    # check config file, if existent use config from there
     saved_config = statusui.read_config(CONFIG_FILE)
+    rlog.debug(f"Saved config read: {saved_config}")
     if saved_config is not None:
         if 'stratux_ip' in saved_config:
             url_host_base = saved_config['stratux_ip']  # set stratux ip if interactively changed one time

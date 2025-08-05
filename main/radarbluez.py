@@ -131,8 +131,8 @@ def sound_init(config, bluetooth, mixer_name):
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
         speak("Stratux Radar connected")
-    rlog.debug("SoundInit: Bluetooth active:" + str(bluetooth_active) + " ExtSound active: " + str(extsound_active) +
-               " ExtSound volume: " + str(global_config['sound_volume']) + ".")
+    rlog.debug(f"SoundInit: Bluetooth active: {bluetooth_active} ExtSound active: {extsound_active} "
+               f"ExtSound volume: {global_config['sound_volume']}.")
     return extsound_active, bluetooth_active
 
 
