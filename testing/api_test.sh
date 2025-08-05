@@ -118,12 +118,13 @@ echo Sound on/off
 test_button "middle_short=Middle Short"
 test_button "middle_short=Middle Short"
 
+echo refresh
+test_button "right_long=Right Long" "Refresh" 5
+
 echo shutdown + cancel
 test_button "left_long=Left Long"
 test_button "left_short=Left Short" "Cancel" 3
 
-echo refresh
-test_button "right_long=Right Long" "Refresh" 5
 
 echo "------------------------------------"
 echo "Timer"
