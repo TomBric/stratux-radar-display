@@ -20,18 +20,34 @@
 # Default values
 DEFAULT_HOST="localhost"
 DEFAULT_PORT="5000"
+CO=false
 
 # Parse command line arguments
-if [ $# -eq 0 ]; then
-    # No arguments, use default host and port
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -co)
+            CO=true
+            shift  # Shift past the argument and its value
+            ;;
+        *:*)
+            # Argument contains port number (contains a colon)
+            HOST_PORT="$1"
+            shift
+            ;;
+        *)
+            # Only host provided, use default port
+            HOST_PORT="$1:$DEFAULT_PORT"
+            shift
+            ;;
+    esac
+done
+
+# If no host:port was provided, use defaults
+if [ -z "$HOST_PORT" ]; then
     HOST_PORT="$DEFAULT_HOST:$DEFAULT_PORT"
-elif [[ "$1" == *""* ]]; then
-    # Argument contains port number (contains a colon)
-    HOST_PORT="$1"
-else
-    # Only host provided, use default port
-    HOST_PORT="$1:$DEFAULT_PORT"
 fi
+
+# If -co was provided, set the variable
 
 # Ensure the URL has the correct format
 if [[ "$HOST_PORT" != http* ]]; then
@@ -154,6 +170,13 @@ echo "Flight Logs"
 test_button "middle_long=Middle Long" "Display Logs" 3
 test_button "right_short=Right Short" "Clear" 3
 
+if [ "$CO" = true ]; then
+  echo "------------------------------------"
+  echo "CO display"
+  test_button "right_short=Right Short" "Reset" 1
+  test_button "left_short=Left Short" "Calibrate" 15
+fi
+
 echo "------------------------------------"
 echo "GPS Distance"
 test_button "middle_long=Middle Long" "Display Dist" 3
@@ -191,6 +214,7 @@ echo "Stratux Status"
 test_button "middle_short=Middle Short"
 test_button "left_short=Left Short" "+10"
 test_button "right_short=Right Short" "-10"
+
 
 echo "------------------------------------"
 echo "Checklist"
