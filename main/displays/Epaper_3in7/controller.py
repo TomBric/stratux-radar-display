@@ -36,7 +36,7 @@ from .. import dcommon
 from PIL import Image, ImageDraw, ImageFont
 import math
 import time
-import datetime
+from datetime import datetime
 from pathlib import Path
 import logging
 
