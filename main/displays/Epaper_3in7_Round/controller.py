@@ -452,7 +452,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
                 gps_alt_str = f"{gps_altitude:+5.0f}" if gps_valid else "---"
                 lines = [
                     ("Act GPS-Alt [ft]", gps_alt_str),
-                    ("Destination Alt [ft]", dest_alt_str),
+                    ("Dest. Alt [ft]", dest_alt_str),
                 ]
                 self.dashboard(offset, starty + 10, RIGHT-offset-5, lines, headline="Destination Elevation", rounding=True)
                 self.bottom_line("+/-100ft", "  Back", "+/-10ft")
