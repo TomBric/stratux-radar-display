@@ -440,7 +440,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                     ("Act GPS-Alt [ft]", gps_alt_str),
                     ("Dest. Alt [ft]", dest_alt_str),
                 ]
-                self.dashboard(offset, starty, self.sizex-offset, lines, headline="Destination Elevation", rounding=True)
+                self.dashboard(offset, starty, self.sizex-offset - 5 , lines, headline="Destination Elevation", rounding=True)
                 self.bottom_line("+/-100ft", "  Back", "+/-10ft")
             else:
                 self.bottom_line("", "Back", "")
