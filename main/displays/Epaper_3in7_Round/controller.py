@@ -38,7 +38,7 @@ from .. import dcommon
 from PIL import Image, ImageDraw, ImageFont
 import math
 import time
-from datetime import datetime
+import datetime
 from pathlib import Path
 import logging
 
@@ -423,7 +423,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         st = '---'
         if 'start_time' in values:
             dt = values['start_time']
-            if not isinstance(dt, datetime):
+            if not isinstance(dt, datetime.datetime):
                 dt = datetime.fromisoformat(dt)
             st = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = [
@@ -436,7 +436,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         lt = '---'
         if 'landing_time' in values:
             dt = values['landing_time']
-            if not isinstance(dt, datetime):
+            if not isinstance(dt, datetime.datetime):
                 dt = datetime.fromisoformat(dt)
             lt = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = [
