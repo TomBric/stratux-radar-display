@@ -409,7 +409,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         st = '---'
         if 'start_time' in values:
             dt = values['start_time']
-            if not isinstance(dt, datetime):
+            if not isinstance(dt, datetime.datetime):
                 dt = datetime.fromisoformat(dt)
             st = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = [
@@ -422,7 +422,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         lt = '---'
         if 'landing_time' in values:
             dt = values['landing_time']
-            if not isinstance(dt, datetime):
+            if not isinstance(dt, datetime.datetime):
                 dt = datetime.fromisoformat(dt)
             lt = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = [
@@ -440,7 +440,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                     ("Act GPS-Alt [ft]", gps_alt_str),
                     ("Dest. Alt [ft]", dest_alt_str),
                 ]
-                self.dashboard(offset, starty, self.sizex-2 - 2 * offset  , lines, headline="Destination Elevation", rounding=True)
+                self.dashboard(offset, starty, self.sizex-3 - 2 * offset  , lines, headline="Destination Elevation", rounding=True)
                 self.bottom_line("+/-100ft", "  Back", "+/-10ft")
             else:
                 self.bottom_line("", "Back", "")

@@ -323,8 +323,10 @@ class Oled1in5(dcommon.GenericDisplay):
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         st = '---'
         if 'start_time' in values:
-            st = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['start_time'].hour, values['start_time'].minute,
-                        values['start_time'].second, values['start_time'].microsecond // 100000)
+            dt = values['start_time']
+            if not isinstance(dt, datetime.datetime):
+                dt = datetime.fromisoformat(dt)
+            st = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = (
             ("t-off time", st),
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
@@ -334,8 +336,10 @@ class Oled1in5(dcommon.GenericDisplay):
 
         lt = '---'
         if 'landing_time' in values:
-            lt = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['landing_time'].hour, values['landing_time'].minute,
-                            values['landing_time'].second, values['landing_time'].microsecond // 100000)
+            dt = values['landing_time']
+            if not isinstance(dt, datetime.datetime):
+                dt = datetime.fromisoformat(dt)
+            lt = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = (
             ("ldg time", lt),
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
