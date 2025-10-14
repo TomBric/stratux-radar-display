@@ -73,7 +73,7 @@ class Tft2in4(dcommon.GenericDisplay):
     draw = None
     mask = None
 
-    def init(self, fullcircle=False):
+    def init(self, fullcircle=False, dark_mode=False):
         config_path = str(Path(__file__).resolve().parent.joinpath('st7789.conf'))
         self.device = radar_opts.get_device(['-f', config_path])
         self.device.contrast(255)  # set full contrast
