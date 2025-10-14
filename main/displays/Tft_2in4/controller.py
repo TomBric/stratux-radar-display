@@ -120,11 +120,11 @@ class Tft2in4(dcommon.GenericDisplay):
         self.draw.rectangle((0, 0, 320 - 1, 240 - 1), fill=self.BG_COLOR)
 
     def startup(self, version, target_ip, seconds):
-        logopath = str(Path(__file__).resolve().parent.joinpath('stratux-logo-64x64.bmp'))
+        logopath = Path(__file__).resolve().parent / 'stratux-logo-192x192.bmp'
         logo = Image.open(logopath)
-        self.draw.rectangle(((0, 0), (self.sizex, 64)), fill="blue")
-        self.draw.bitmap((self.zerox - 32, 0), logo, fill="white")
-        self.centered_text(68, "Radar "+version, self.LARGE)
+        self.draw.rectangle(((0, 0), (self.sizex, 192)), fill="blue")
+        self.draw.bitmap((self.zerox - 96, 0), logo, fill="white")
+        self.centered_text(210, "Radar "+version, self.LARGE)
         self.centered_text(self.sizey - 3 * self.SMALL, "Connecting to", self.SMALL)
         self.centered_text(self.sizey - 2*self.SMALL, target_ip, self.SMALL)
         self.display()
