@@ -126,9 +126,8 @@ class Tft2in4(dcommon.GenericDisplay):
         self.draw.rectangle(((0, 0), (self.sizex, self.sizey)), fill="white")
         self.draw.rectangle(((0, 0), (self.sizex, 192)), fill="blue")
         self.draw.bitmap((self.zerox - 96, 0), logo, fill="white")
-        self.centered_text(self.sizey - 2 * self.SMALL - self.LARGE, "Radar "+version, self.LARGE)
-        self.centered_text(self.sizey - 2 * self.SMALL, "Connecting to", self.SMALL)
-        self.centered_text(self.sizey - self.SMALL, target_ip, self.SMALL)
+        self.centered_text(self.sizey - self.SMALL - self.LARGE, "Radar "+version, self.LARGE)
+        self.centered_text(self.sizey - self.SMALL, "Connecting to" + target_ip, self.SMALL)
         self.display()
         time.sleep(seconds)
 
