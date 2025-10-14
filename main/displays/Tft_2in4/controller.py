@@ -81,11 +81,12 @@ class Tft2in4(dcommon.GenericDisplay):
         self.draw = ImageDraw.Draw(self.image)
         self.sizex = self.device.width
         self.sizey = self.device.height
-        # self.zerox = self.sizex // 2
-        self.zerox = 214               # BGL
-        # self.zeroy = self.sizey // 2
-        self.zeroy = 120               # BGL
-        self.max_pixel =  213 # self.sizex    # BGL  so that we get a full circle
+        self.zerox = self.sizex // 2
+        # self.zerox = 214               # BGL
+        self.zeroy = self.sizey // 2
+        # self.zeroy = 120               # BGL
+        # self.max_pixel =  213 # self.sizex    # BGL  so that we get a full circle
+        self.max_pixel =  self.sizex
         self.ah_zeroy = self.sizey // 2  # zero line for ahrs
         self.ah_zerox = self.sizex // 2
         start = time.time()
@@ -98,7 +99,7 @@ class Tft2in4(dcommon.GenericDisplay):
         self.compass_aircraft = Image.open(pic_path).convert("RGBA")
         self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
         self.cdraw = ImageDraw.Draw(self.mask)
-        self.rlog.debug(f'Tft_2in4 selected: sizex={self.sizex} sizey={self.sizey} '
+        self.rlog.debug(f'ST7789 selected: sizex={self.sizex} sizey={self.sizey} '
                         f'zero=({self.zerox}, {self.zeroy}) refresh-time: {round(self.display_refresh, 2)} secs')
         return self.sizex, self.zerox, self.zeroy, display_refresh
 
