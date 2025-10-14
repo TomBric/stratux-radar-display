@@ -41,14 +41,14 @@ from pathlib import Path
 import logging
 
 class Tft2in4(dcommon.GenericDisplay):
-    VERYLARGE = 43
-    MORELARGE = 29
-    LARGE = 23  # size of height indications of aircraft, size of meter TEXT
-    SMALL = 20  # size of information indications on top and bottom
+    VERYLARGE = 48
+    MORELARGE = 36
+    LARGE = 30  # size of height indications of aircraft, size of meter TEXT
+    SMALL = 24  # size of information indications on top and bottom
     VERYSMALL = 18  # used for "nm" and "ft"
-    AIRCRAFT_SIZE = 4  # size of aircraft arrow
-    MINIMAL_CIRCLE = 18  # minimal size of mode-s circle
-    AWESOME_FONTSIZE = 15
+    AIRCRAFT_SIZE = 6  # size of aircraft arrow
+    MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
+    AWESOME_FONTSIZE = 18
     ARCPOSITION_EXCLUDE_FROM = 0
     ARCPOSITION_EXCLUDE_TO = 0
     # colors
@@ -81,12 +81,17 @@ class Tft2in4(dcommon.GenericDisplay):
         self.draw = ImageDraw.Draw(self.image)
         self.sizex = self.device.width
         self.sizey = self.device.height
+        if not fullcircle:
+            self.zeroy = 180  # not centered
+            self.max_pixel = 280
+        else:
+            self.zeroy = self.sizey / 2
+            self.max_pixel = self.sizey
         self.zerox = self.sizex // 2
         # self.zerox = 214               # BGL
         self.zeroy = self.sizey // 2
         # self.zeroy = 120               # BGL
         # self.max_pixel =  213 # self.sizex    # BGL  so that we get a full circle
-        self.max_pixel =  self.sizex
         self.ah_zeroy = self.sizey // 2  # zero line for ahrs
         self.ah_zerox = self.sizex // 2
         start = time.time()
@@ -126,8 +131,8 @@ class Tft2in4(dcommon.GenericDisplay):
         self.draw.rectangle(((0, 0), (self.sizex, self.sizey)), fill="white")
         self.draw.rectangle(((0, 0), (self.sizex, 192)), fill="blue")
         self.draw.bitmap((self.zerox - 96, 0), logo, fill="white")
-        self.centered_text(self.sizey - self.SMALL - self.LARGE, "Radar "+version, self.LARGE)
-        self.centered_text(self.sizey - self.SMALL, "Connecting to" + target_ip, self.SMALL)
+        self.centered_text(self.sizey - 5 - self.SMALL  - self.LARGE, "Radar "+version, self.LARGE)
+        self.centered_text(self.sizey - 5 -  self.SMALL, "Connecting to" + target_ip, self.SMALL)
         self.display()
         time.sleep(seconds)
 
