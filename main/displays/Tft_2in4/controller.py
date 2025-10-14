@@ -82,8 +82,8 @@ class Tft2in4(dcommon.GenericDisplay):
         self.sizex = self.device.width
         self.sizey = self.device.height
         if not fullcircle:
-            self.zeroy = 180  # not centered
-            self.max_pixel = 280
+            self.zeroy = 150  # not centered
+            self.max_pixel = 300
         else:
             self.zeroy = self.sizey / 2
             self.max_pixel = self.sizey
@@ -137,56 +137,43 @@ class Tft2in4(dcommon.GenericDisplay):
 
 
     def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
-                  gps_quality, gps_h_accuracy, optical_alive, basemode, extsound, co_alarmlevel, co_alarmstring, 
-                  vertical_speed, baro_valid):
+                  gps_quality, gps_h_accuracy, optical_alive, basemode, extsound, co_alarmlevel, co_alarmstring):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
-                           self.zerox + self.max_pixel // 2 - 1, self.zeroy + self.max_pixel // 2 - 1),
-                          outline=self.TEXT_COLOR)
+                           self.zerox + self.max_pixel // 2, self.zeroy + self.max_pixel // 2), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
-                           self.zerox + self.max_pixel // 4 - 1, self.zeroy + self.max_pixel // 4 - 1),
-                          outline=self.TEXT_COLOR)
+                           self.zerox + self.max_pixel // 4, self.zeroy + self.max_pixel // 4), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
-        self.draw.text((104, 0), f"{rrange}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
-        self.draw.text((104, self.SMALL), "nm", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        self.draw.text((0, self.sizey - self.SMALL), f"FL{round(ownalt / 100)}", font=self.fonts[self.SMALL],
-                       fill=self.TEXT_COLOR)
 
-        t = f"{altdifference // 1000}k" if altdifference >= 10000 else f"{altdifference}"
-        tl = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.sizex - tl, 0), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
-        text = "ft"
-        tl = self.draw.textlength(text, self.fonts[self.VERYSMALL])
-        self.draw.text((self.sizex - tl, self.SMALL), text, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR,
-                       align="right")
+        self.draw.text((5, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
-        text = f"{course}°"
-        tl = self.draw.textlength(text, self.fonts[self.SMALL])
-        self.draw.text((self.sizex - tl, self.sizey - self.SMALL), text, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR,
-                       align="right")
-
-        # BGL using gmeter type as VSI on left side
-        vs_size = 195 -2
-        if baro_valid:
-          text = "100ft/m  "
+        if gps_quality == 0:
+            t = "GPS-NoFix"
+        elif gps_quality == 1:
+            t = f"3D GPS\n{round(gps_h_accuracy, 1)}m"
+        elif gps_quality == 2:
+            t = f"DGNSS\n{round(gps_h_accuracy, 1)}m"
         else:
-          text = "NO BARO"
-          # self.draw.rectangle((0, 0, 100, 100), fill=self.WARNING_COLOR)
-          xshape = [(0,0), (100,239)]
-          self.draw.line(xshape, fill="red", width =3);
-          xshape = [(100,0), (0,239)]
-          self.draw.line(xshape, fill="red", width =3);
-        self.meter(vertical_speed / 100, -15, +15, 180, 360, vs_size, 95, 120, 5, 1, "", text)
-        self.draw.text((80,80), "VSI ", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="center")
+            t = ""
+        if basemode:
+            t += "\nGround\nmode"
+        self.draw.text((5, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+
+        t = f"FL{round(ownalt / 100)}"
+        textlength = self.draw.textlength(t, self.fonts[self.SMALL])
+        self.draw.text((self.sizex - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+
+        t = f"{altdifference} ft"
+        textlength = self.draw.textlength(t, self.fonts[self.SMALL])
+        self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
+
+        self.centered_text(1, f"{course}°", self.SMALL)
 
         if not gpsconnected:
-            self.centered_text(15, "No GPS", self.SMALL, color=self.WARNING_COLOR)
+            self.centered_text(70, "No GPS", self.SMALL)
         if not connected:
-            self.centered_text(75, "No connection!", self.SMALL, color=self.WARNING_COLOR)
-        '''
+            self.centered_text(30, "No Connection!", self.SMALL)
         if co_alarmlevel > 0:
-            self.centered_text(self.sizey - 3 * self.SMALL, "CO Alarm!", self.SMALL, color=self.WARNING_COLOR)
-            self.centered_text(self.sizey - 2 * self.SMALL, co_alarmstring, self.SMALL, color=self.WARNING_COLOR)
-
+            self.centered_text(250, f"CO Alarm: {co_alarmstring}", self.SMALL)
         if extsound or bt_devices > 0:  # extsound means and sound devices has been found
             if sound_active:  # means user left sound switched on
                 if extsound:
@@ -203,7 +190,10 @@ class Tft2in4(dcommon.GenericDisplay):
             tl = self.draw.textlength(text, self.awesomefont)
             self.draw.text((self.sizex - tl, self.sizey - 2 * self.SMALL), text, font=self.awesomefont,
                            fill=btcolor, align="right")
-        '''
+
+
+
+
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs,
               utc_color=None, timer_color=None, second_color=None):
