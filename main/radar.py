@@ -202,14 +202,7 @@ def draw_display():
         # display is only triggered if there was a change
         optical_alive = new_alive
         display_control.clear()
-        if args['device'] == "Tft_2in4":
-          display_control.situation(situation['connected'], situation['gps_active'], situation['own_altitude'],
-                                  situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
-                                  sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
-                                  basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1], 
-                                  situation['vertical_speed'], situation['baro_valid'])
-        else:
-          display_control.situation(situation['connected'], situation['gps_active'], situation['own_altitude'],
+        display_control.situation(situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
                                   sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
                                   basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1]) 
