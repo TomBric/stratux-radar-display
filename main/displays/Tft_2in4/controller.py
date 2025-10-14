@@ -89,7 +89,6 @@ class Tft2in4(dcommon.GenericDisplay):
             self.max_pixel = self.sizey
         self.zerox = self.sizex // 2
         # self.zerox = 214               # BGL
-        self.zeroy = self.sizey // 2
         # self.zeroy = 120               # BGL
         # self.max_pixel =  213 # self.sizex    # BGL  so that we get a full circle
         self.ah_zeroy = self.sizey // 2  # zero line for ahrs
