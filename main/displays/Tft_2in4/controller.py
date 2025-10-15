@@ -133,8 +133,8 @@ class ST7789(dcommon.GenericDisplay):
     def startup(self, version, target_ip, seconds):
         logopath = Path(__file__).resolve().parent / 'stratux-logo-192x192.bmp'
         logo = Image.open(logopath)
-        # self.draw.rectangle(((0, 0), (self.sizex, self.sizey)), fill=self.BG_COLOR)
-        self.draw.rectangle(((self.zerox - 96, 0), (192, 192)), fill="blue")
+        self.draw.rectangle((0, 0, self.sizex-1, self.sizey-1), fill=self.BG_COLOR)
+        self.draw.rectangle((self.zerox - 96, 0, self.zerox + 96, 192), fill="blue")
         self.display()
         time.sleep(2)
         self.draw.bitmap((self.zerox - 96, 0), logo, fill="white")
