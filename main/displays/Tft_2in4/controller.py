@@ -162,11 +162,11 @@ class ST7789(dcommon.GenericDisplay):
             t = ""
         if basemode:
             t += "\nGround\nmode"
-        self.draw.text((5, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((5, self.SMALL + 5), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.sizex - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((self.sizex - textlength - 5, self.SMALL + 5), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
         t = f"{altdifference} ft"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
