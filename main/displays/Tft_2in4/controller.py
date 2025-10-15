@@ -136,8 +136,8 @@ class ST7789(dcommon.GenericDisplay):
         self.draw.rectangle((0, 0, self.sizex-1, self.sizey-1), fill=self.BG_COLOR)
         self.draw.rectangle((self.zerox - 64, 10, self.zerox + 64, 128+10), fill="blue")
         self.draw.bitmap((self.zerox - 64, 10), logo, fill="white")
-        self.centered_text(self.sizey - 10 - self.SMALL  - self.LARGE, "Radar "+version, self.LARGE, color=self.TEXT_COLOR)
-        self.centered_text(self.sizey - 10 -  self.SMALL, "Connecting to" + target_ip, self.SMALL, color=self.TEXT_COLOR)
+        self.centered_text(self.sizey -10 - 2*self.VERYLARGE, "Radar "+version, self.VERYLARGE, color=self.TEXT_COLOR)
+        self.centered_text(self.sizey - 10 - self.SMALL, "Connecting to" + target_ip, self.SMALL, color=self.TEXT_COLOR)
         self.display()
         time.sleep(seconds)
 
