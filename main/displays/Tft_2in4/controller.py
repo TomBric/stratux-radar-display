@@ -51,27 +51,31 @@ class ST7789(dcommon.GenericDisplay):
     AWESOME_FONTSIZE = 18
     ARCPOSITION_EXCLUDE_FROM = 110
     ARCPOSITION_EXCLUDE_TO = 250
-    # colors
-    BG_COLOR = "black"
-    TEXT_COLOR = "white"
-    WARNING_COLOR = "red"
-    AIRCRAFT_COLOR = "red"
-    AIRCRAFT_OUTLINE = "white"
-    MODE_S_COLOR = "white"
-    HIGHLIGHT_COLOR = "yellow"
-    # AHRS
-    AHRS_EARTH_COLOR = "brown" # how ahrs displays the earth
-    AHRS_SKY_COLOR = "blue"  # how ahrs displays the sky
-    AHRS_HORIZON_COLOR = "white"  # how ahrs displays the horizon
-    AHRS_MARKS_COLOR = "white"  # color of marks and corresponding text in ahrs
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
     UP_CHARACTER = '\u2191'  # character to show ascending aircraft
     DOWN_CHARACTER = '\u2193'  # character to show descending aircraft
-    # vars later on set by init
-    device = None
-    image = None
-    draw = None
-    mask = None
+
+
+    def __init__(self):
+        super().__init__()
+        # Initialize color attributes
+        self.BG_COLOR = "black"
+        self.TEXT_COLOR = "white"
+        self.HIGHLIGHT_COLOR = "red"
+        self.AIRCRAFT_COLOR = "red"
+        self.AIRCRAFT_OUTLINE = "white"
+        self.MODE_S_COLOR = "white"
+        # AHRS colors
+        self.AHRS_EARTH_COLOR = "brown"
+        self.AHRS_SKY_COLOR = "blue"
+        self.AHRS_HORIZON_COLOR = "white"
+        self.AHRS_MARKS_COLOR = "white"
+        # Other attributes
+        self.device = None
+        self.image = None
+        self.draw = None
+        self.mask = None
+        self.dark_mode = False
 
     def init(self, fullcircle=False, dark_mode=False):
         config_path = str(Path(__file__).resolve().parent.joinpath('st7789.conf'))
@@ -79,11 +83,13 @@ class ST7789(dcommon.GenericDisplay):
         self.device.contrast(255)  # set full contrast
         self.image = Image.new(self.device.mode, self.device.size)
         self.draw = ImageDraw.Draw(self.image)
+        self.dark_mode = dark_mode
+        self.set_dark_mode(dark_mode)
         self.sizex = self.device.width
         self.sizey = self.device.height
         if not fullcircle:
             self.zeroy = 150  # not centered
-            self.max_pixel = 300
+            self.max_pixel = 290
         else:
             self.zeroy = self.sizey / 2
             self.max_pixel = self.sizey
@@ -107,6 +113,33 @@ class ST7789(dcommon.GenericDisplay):
                         f'zero=({self.zerox}, {self.zeroy}) refresh-time: {round(self.display_refresh, 2)} secs')
         return self.sizex, self.zerox, self.zeroy, display_refresh
 
+    def set_dark_mode(self, dark_mode):
+        """Set dark mode and update color constants accordingly"""
+        self.dark_mode = dark_mode
+        if dark_mode:
+            self.BG_COLOR = "black"
+            self.TEXT_COLOR = "white"
+            self.HIGHLIGHT_COLOR = "red"
+            self.AIRCRAFT_COLOR = "red"
+            self.AIRCRAFT_OUTLINE = "white"
+            self.MODE_S_COLOR = "white"
+            # AHRS colors
+            self.AHRS_EARTH_COLOR = "brown"
+            self.AHRS_SKY_COLOR = "blue"
+            self.AHRS_HORIZON_COLOR = "white"
+            self.AHRS_MARKS_COLOR = "white"
+        else:
+            self.BG_COLOR = "white"
+            self.TEXT_COLOR = "black"
+            self.HIGHLIGHT_COLOR = "red"
+            self.AIRCRAFT_COLOR = "red"
+            self.AIRCRAFT_OUTLINE = "black"
+            self.MODE_S_COLOR = "black"
+            # AHRS colors
+            self.AHRS_EARTH_COLOR = "brown"
+            self.AHRS_SKY_COLOR = "blue"
+            self.AHRS_HORIZON_COLOR = "white"
+            self.AHRS_MARKS_COLOR = "white"
 
     def cleanup(self):
         self.device.cleanup()
@@ -137,7 +170,7 @@ class ST7789(dcommon.GenericDisplay):
         self.draw.rectangle((self.zerox - 64, 10, self.zerox + 64, 128+10), fill="blue")
         self.draw.bitmap((self.zerox - 64, 10), logo, fill="white")
         self.centered_text(self.sizey - 2*self.VERYLARGE, "Radar "+version, self.VERYLARGE, color=self.TEXT_COLOR)
-        self.centered_text(self.sizey - 10 - self.SMALL, "Connecting to" + target_ip, self.SMALL, color=self.TEXT_COLOR)
+        self.centered_text(self.sizey - 10 - self.SMALL, "Connecting to " + target_ip, self.SMALL, color=self.TEXT_COLOR)
         self.display()
         time.sleep(seconds)
 
@@ -155,9 +188,9 @@ class ST7789(dcommon.GenericDisplay):
         if gps_quality == 0:
             t = "GPS-NoFix"
         elif gps_quality == 1:
-            t = f"3D GPS\n{round(gps_h_accuracy, 1)}m"
+            t = f"3D GPS\n{round(gps_h_accuracy, 0)}m"
         elif gps_quality == 2:
-            t = f"DGNSS\n{round(gps_h_accuracy, 1)}m"
+            t = f"DGNSS\n{round(gps_h_accuracy, 0)}m"
         else:
             t = ""
         if basemode:
@@ -166,7 +199,7 @@ class ST7789(dcommon.GenericDisplay):
 
         t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.sizex - textlength - 5, self.SMALL + 5), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((self.sizex - textlength - 5, self.SMALL + 5), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"{altdifference} ft"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])

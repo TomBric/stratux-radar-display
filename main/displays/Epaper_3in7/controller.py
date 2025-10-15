@@ -58,8 +58,9 @@ class Epaper3in7(dcommon.GenericDisplay):
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 110
     ARCPOSITION_EXCLUDE_TO = 250
-    
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
+
+
     def __init__(self):
         super().__init__()
         # Initialize color attributes
