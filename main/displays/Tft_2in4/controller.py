@@ -41,7 +41,7 @@ from pathlib import Path
 import logging
 
 class ST7789(dcommon.GenericDisplay):
-    VERYLARGE = 40  # timer
+    VERYLARGE = 48  # timer
     MORELARGE = 32
     LARGE = 28  # size of height indications of aircraft, size of meter TEXT
     SMALL = 20  # size of information indications on top and bottom
