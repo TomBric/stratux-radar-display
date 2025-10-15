@@ -136,7 +136,7 @@ class ST7789(dcommon.GenericDisplay):
         self.draw.rectangle((0, 0, self.sizex-1, self.sizey-1), fill=self.BG_COLOR)
         self.draw.rectangle((self.zerox - 64, 10, self.zerox + 64, 128+10), fill="blue")
         self.draw.bitmap((self.zerox - 64, 10), logo, fill="white")
-        self.centered_text(self.sizey -10 - 2*self.VERYLARGE, "Radar "+version, self.VERYLARGE, color=self.TEXT_COLOR)
+        self.centered_text(self.sizey - 2*self.VERYLARGE, "Radar "+version, self.VERYLARGE, color=self.TEXT_COLOR)
         self.centered_text(self.sizey - 10 - self.SMALL, "Connecting to" + target_ip, self.SMALL, color=self.TEXT_COLOR)
         self.display()
         time.sleep(seconds)
@@ -196,20 +196,6 @@ class ST7789(dcommon.GenericDisplay):
             tl = self.draw.textlength(text, self.awesomefont)
             self.draw.text((self.sizex - tl, self.sizey - 2 * self.SMALL), text, font=self.awesomefont,
                            fill=btcolor, align="right")
-
-    def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs,
-              utc_color=None, timer_color=None, second_color=None, datestr=None):
-        # is defined in subclass, since we want to have colors for oled
-        if timer_runs:
-            color = "lavender"
-        else:
-            color = "orangered"
-        if laptime_head == "Laptimer":
-            second_color = "powderblue"
-        else:
-            second_color = "magenta"
-        super().timer(utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs,
-                      utc_color="cyan", timer_color=color, second_color=second_color, datestr=datestr)
 
     def gmeter(self, current, maxg, ming, error_message):
         gm_size = self.sizex-2
