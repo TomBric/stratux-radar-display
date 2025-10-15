@@ -176,9 +176,9 @@ class ST7789(dcommon.GenericDisplay):
         if gps_quality == 0:
             t = "GPS-NoFix"
         elif gps_quality == 1:
-            t = f"3D GPS\n{round(gps_h_accuracy, 0)}m"
+            t = f"3D GPS\n{round(gps_h_accuracy)}m"
         elif gps_quality == 2:
-            t = f"DGNSS\n{round(gps_h_accuracy, 0)}m"
+            t = f"DGNSS\n{round(gps_h_accuracy)}m"
         else:
             t = ""
         if basemode:
@@ -193,7 +193,7 @@ class ST7789(dcommon.GenericDisplay):
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
         self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
-        self.centered_text(3, f"{course}°", self.SMALL)
+        self.centered_text(5, f"{course}°", self.SMALL)
 
         if not gpsconnected:
             self.centered_text(70, "No GPS", self.SMALL)
@@ -219,16 +219,17 @@ class ST7789(dcommon.GenericDisplay):
                            fill=btcolor, align="right")
 
     def gmeter(self, current, maxg, ming, error_message):
-        gm_size = self.sizex-2
-        self.meter(current, -3, 5, 120, 420, gm_size, self.zerox, self.zeroy, 1, 0.25, "G-Force", None)
-        self.draw.text((self.zerox + 13, 52), "max", font=self.fonts[self.VERYSMALL],
-                       fill="cyan")
-        self.right_text(52, f"{maxg:+1.2f}", self.SMALL, color="magenta")
-        if error_message:
-            self.entered_text(57, error_message, self.LARGE, color="red")
-        self.draw.text((self.zerox+13, 65), "min", font=self.fonts[self.VERYSMALL], fill="cyan")
-        self.right_text(65, "{:+1.2f}".format(ming), self.SMALL, color="magenta")
-        self.bottom_line("", "", "Rst")
+        gm_size = self.sizey
+        self.meter(current, -3, 5, 110, 430, gm_size, self.sizey//2, self.sizey//2, 1, 0.25, "G-Force", None)
+        lines = (
+            ("max", f'{maxg:+1.2f}'),
+            ("act", f'{current:+1.2f}'),
+            ("min", f'{ming:+1.2f}')
+        )
+        self.dashboard(gm_size + self.SMALL, self.sizey // 2 - 5 * self.SMALL // 2,
+                       self.sizex - gm_size - self.SMALL - 5, lines, rounding=True,
+                       headline="G-Meter", headline_size=self.SMALL)
+        self.bottom_line("", "    Mode", "Reset")
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
