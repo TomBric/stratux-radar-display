@@ -40,7 +40,7 @@ from . import radar_opts
 from pathlib import Path
 import logging
 
-class Tft2in4(dcommon.GenericDisplay):
+class ST7789(dcommon.GenericDisplay):
     VERYLARGE = 40  # timer
     MORELARGE = 32
     LARGE = 28  # size of height indications of aircraft, size of meter TEXT
@@ -120,6 +120,12 @@ class Tft2in4(dcommon.GenericDisplay):
     def is_busy(self):
         # tft is never busy, no refresh
         return False
+
+    @staticmethod
+    def next_arcposition(old_arcposition, exclude_from=0, exclude_to=0):
+        return dcommon.GenericDisplay().next_arcposition(old_arcposition,
+                                                         exclude_from=ST7789().ARCPOSITION_EXCLUDE_FROM,
+                                                         exclude_to=ST7789().ARCPOSITION_EXCLUDE_TO)
 
     def clear(self):
         self.draw.rectangle((0, 0, self.sizex - 1, self.sizey - 1), fill=self.BG_COLOR)
@@ -358,4 +364,4 @@ class Tft2in4(dcommon.GenericDisplay):
             self.bottom_line("+/-100ft", "  Back", "+/-10ft")
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
-radar_display = Tft2in4()
+radar_display = ST7789()
