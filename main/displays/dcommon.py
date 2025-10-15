@@ -466,9 +466,9 @@ class GenericDisplay:
                            width=line_width)
         # pointer in the middle
         self.draw.line((self.ah_zerox - 90, self.ah_zeroy, self.ah_zerox - 30, self.ah_zeroy),
-                       width=line_width_middle, fill=self.TEXT_COLOR)
+                       width=line_width_middle, fill=self.AHRS_MARKS_COLOR)
         self.draw.line((self.ah_zerox + 90, self.ah_zeroy, self.ah_zerox + 30, self.ah_zeroy),
-                       width=line_width_middle, fill=self.TEXT_COLOR)
+                       width=line_width_middle, fill=self.AHRS_MARKS_COLOR)
         self.draw.polygon((self.ah_zerox, self.ah_zeroy,
                            self.ah_zerox - center_pointer_x, self.ah_zeroy + center_pointer_y,
                            self.ah_zerox + center_pointer_x, self.ah_zeroy + center_pointer_y),

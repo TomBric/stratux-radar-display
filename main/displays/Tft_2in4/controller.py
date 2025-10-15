@@ -58,18 +58,7 @@ class ST7789(dcommon.GenericDisplay):
 
     def __init__(self):
         super().__init__()
-        # Initialize color attributes
-        self.BG_COLOR = "black"
-        self.TEXT_COLOR = "white"
-        self.HIGHLIGHT_COLOR = "red"
-        self.AIRCRAFT_COLOR = "red"
-        self.AIRCRAFT_OUTLINE = "white"
-        self.MODE_S_COLOR = "white"
-        # AHRS colors
-        self.AHRS_EARTH_COLOR = "brown"
-        self.AHRS_SKY_COLOR = "blue"
-        self.AHRS_HORIZON_COLOR = "white"
-        self.AHRS_MARKS_COLOR = "white"
+        # color attributes are later set in set_dark_mode
         # Other attributes
         self.device = None
         self.image = None
@@ -83,7 +72,6 @@ class ST7789(dcommon.GenericDisplay):
         self.device.contrast(255)  # set full contrast
         self.image = Image.new(self.device.mode, self.device.size)
         self.draw = ImageDraw.Draw(self.image)
-        self.dark_mode = dark_mode
         self.set_dark_mode(dark_mode)
         self.sizex = self.device.width
         self.sizey = self.device.height
@@ -205,7 +193,7 @@ class ST7789(dcommon.GenericDisplay):
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
         self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
-        self.centered_text(1, f"{course}°", self.SMALL)
+        self.centered_text(3, f"{course}°", self.SMALL)
 
         if not gpsconnected:
             self.centered_text(70, "No GPS", self.SMALL)
