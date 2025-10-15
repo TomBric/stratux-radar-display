@@ -133,11 +133,12 @@ class ST7789(dcommon.GenericDisplay):
     def startup(self, version, target_ip, seconds):
         logopath = Path(__file__).resolve().parent / 'stratux-logo-192x192.bmp'
         logo = Image.open(logopath)
-        self.draw.rectangle(((0, 0), (self.sizex, self.sizey)), fill=self.BG_COLOR)
-        time.sleep(2)
+        # self.draw.rectangle(((0, 0), (self.sizex, self.sizey)), fill=self.BG_COLOR)
         self.draw.rectangle(((self.zerox - 96, 0), (192, 192)), fill="blue")
+        self.display()
         time.sleep(2)
         self.draw.bitmap((self.zerox - 96, 0), logo, fill="white")
+        self.display()
         time.sleep(2)
         self.centered_text(self.sizey - 5 - self.SMALL  - self.LARGE, "Radar "+version, self.LARGE, color=self.TEXT_COLOR)
         self.centered_text(self.sizey - 5 -  self.SMALL, "Connecting to" + target_ip, self.SMALL, color=self.TEXT_COLOR)
