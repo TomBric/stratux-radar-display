@@ -87,6 +87,8 @@ class ST7789(dcommon.GenericDisplay):
         # self.max_pixel =  213 # self.sizex    # BGL  so that we get a full circle
         self.ah_zeroy = self.sizey // 2  # zero line for ahrs
         self.ah_zerox = self.sizex // 2
+        self.czerox = self.sizex // 2
+        self.czeroy = self.sizey // 2
         start = time.time()
         # do sync version of display to measure time
         self.display()
