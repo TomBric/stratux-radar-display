@@ -93,7 +93,7 @@ class ST7789(dcommon.GenericDisplay):
         end = time.time()
         display_refresh = end - start
         # compass
-        pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
+        pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
         self.compass_aircraft = Image.open(pic_path).convert("RGBA")
         self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
         self.cdraw = ImageDraw.Draw(self.mask)
@@ -229,7 +229,7 @@ class ST7789(dcommon.GenericDisplay):
             self.centered_text(77, error_message, self.LARGE, color="red")
         self.draw.text((self.zerox + 40, self.sizey//2), f"min:", font=self.fonts[self.SMALL], fill="magenta")
         self.draw.text((self.zerox + 90, self.sizey//2), f"{ming:+1.2f}", font=self.fonts[self.SMALL], fill="magenta")
-        self.bottom_line("", "              Mode", "Reset")
+        self.bottom_line("", "                   Mode", "Reset")
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
