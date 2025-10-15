@@ -49,8 +49,8 @@ class Tft2in4(dcommon.GenericDisplay):
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     AWESOME_FONTSIZE = 18
-    ARCPOSITION_EXCLUDE_FROM = 0
-    ARCPOSITION_EXCLUDE_TO = 0
+    ARCPOSITION_EXCLUDE_FROM = 110
+    ARCPOSITION_EXCLUDE_TO = 250
     # colors
     BG_COLOR = "black"
     TEXT_COLOR = "white"
@@ -127,7 +127,7 @@ class Tft2in4(dcommon.GenericDisplay):
     def startup(self, version, target_ip, seconds):
         logopath = Path(__file__).resolve().parent / 'stratux-logo-192x192.bmp'
         logo = Image.open(logopath)
-        self.draw.rectangle(((0, 0), (self.sizex, self.sizey)), fill="white")
+        self.draw.rectangle(((0, 0), (self.sizex, self.sizey)), fill=self.BG_COLOR)
         self.draw.rectangle(((self.zerox - 96, 0), (192, 192)), fill="blue")
         self.draw.bitmap((self.zerox - 96, 0), logo, fill="white")
         self.centered_text(self.sizey - 5 - self.SMALL  - self.LARGE, "Radar "+version, self.LARGE, color=self.TEXT_COLOR)
@@ -190,9 +190,6 @@ class Tft2in4(dcommon.GenericDisplay):
             tl = self.draw.textlength(text, self.awesomefont)
             self.draw.text((self.sizex - tl, self.sizey - 2 * self.SMALL), text, font=self.awesomefont,
                            fill=btcolor, align="right")
-
-
-
 
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_text, timer_runs,
