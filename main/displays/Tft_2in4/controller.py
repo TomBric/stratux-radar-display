@@ -43,9 +43,9 @@ import logging
 class Tft2in4(dcommon.GenericDisplay):
     VERYLARGE = 40  # timer
     MORELARGE = 32
-    LARGE = 24  # size of height indications of aircraft, size of meter TEXT
-    SMALL = 16  # size of information indications on top and bottom
-    VERYSMALL = 12  # used for "nm" and "ft"
+    LARGE = 28  # size of height indications of aircraft, size of meter TEXT
+    SMALL = 20  # size of information indications on top and bottom
+    VERYSMALL = 16  # used for "nm" and "ft"
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     AWESOME_FONTSIZE = 18
