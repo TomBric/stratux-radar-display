@@ -221,14 +221,10 @@ class ST7789(dcommon.GenericDisplay):
     def gmeter(self, current, maxg, ming, error_message):
         gm_size = self.sizey
         self.meter(current, -3, 5, 110, 430, gm_size, self.sizey//2, self.sizey//2, 1, 0.25, "G-Force", None)
-        lines = (
-            ("max", f'{maxg:+1.2f}'),
-            ("act", f'{current:+1.2f}'),
-            ("min", f'{ming:+1.2f}')
-        )
-        self.dashboard(gm_size + self.SMALL, self.sizey // 2 - 5 * self.SMALL // 2,
-                       self.sizex - gm_size - self.SMALL - 5, lines, rounding=True,
-                       headline="G-Meter", headline_size=self.SMALL)
+        self.draw.text((self.zerox + 40, self.sizey//2-self.VERYSMALL), f"max: {maxg:+1.2f}", font=self.fonts[self.VERYSMALL], fill="magenta")
+        if error_message:
+            self.centered_text(57, error_message, self.LARGE, color="red")
+        self.draw.text((self.zerox + 40, self.sizey//2), f"min: {ming:+1.2f}", font=self.fonts[self.VERYSMALL], fill="magenta")
         self.bottom_line("", "    Mode", "Reset")
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
