@@ -136,7 +136,7 @@ class ST7789(dcommon.GenericDisplay):
         self.draw.rectangle((0, 0, self.sizex-1, self.sizey-1), fill=self.BG_COLOR)
         self.draw.rectangle((self.zerox - 64, 10, self.zerox + 64, 128+10), fill="blue")
         self.draw.bitmap((self.zerox - 64, 10), logo, fill="white")
-        self.centered_text(self.sizey - 2*self.VERYLARGE, "Radar "+version, self.VERYLARGE, color=self.TEXT_COLOR)
+        self.centered_text(self.sizey - 10 - 2*self.MORELARGE, "Radar "+version, self.MORELARGE, color=self.TEXT_COLOR)
         self.centered_text(self.sizey - 10 - self.SMALL, "Connecting to" + target_ip, self.SMALL, color=self.TEXT_COLOR)
         self.display()
         time.sleep(seconds)
@@ -162,17 +162,17 @@ class ST7789(dcommon.GenericDisplay):
             t = ""
         if basemode:
             t += "\nGround\nmode"
-        self.draw.text((5, self.SMALL + 10), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((5, self.SMALL + 5), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
 
         t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
-        self.draw.text((self.sizex - textlength - 5, self.SMALL + 10), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
+        self.draw.text((self.sizex - textlength - 5, self.SMALL + 5), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
         t = f"{altdifference} ft"
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
         self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
-        self.centered_text(1, f"{course}°", self.SMALL)
+        self.centered_text(3, f"{course}°", self.SMALL)
 
         if not gpsconnected:
             self.centered_text(70, "No GPS", self.SMALL)
