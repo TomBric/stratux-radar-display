@@ -220,12 +220,17 @@ class ST7789(dcommon.GenericDisplay):
 
     def gmeter(self, current, maxg, ming, error_message):
         gm_size = self.sizey
-        self.meter(current, -3, 5, 110, 430, gm_size, self.sizey//2, self.sizey//2, 1, 0.25, "G-Force", None)
-        self.draw.text((self.zerox + 40, self.sizey//2-self.VERYSMALL), f"max: {maxg:+1.2f}", font=self.fonts[self.VERYSMALL], fill="magenta")
+        self.meter(current, -3, 5, 110, 430, gm_size, self.sizey//2, self.sizey//2, 1, 0.25,
+                   "G-Force", None)
+        self.draw.text((self.zerox + 50, self.sizey//2-self.SMALL), f"max:", font=self.fonts[self.SMALL], fill="magenta")
+        self.draw.text((self.zerox + 80, self.sizey // 2 - self.SMALL), f"{maxg:+1.2f}", font=self.fonts[self.SMALL],
+                       fill="magenta")
         if error_message:
-            self.centered_text(57, error_message, self.LARGE, color="red")
-        self.draw.text((self.zerox + 40, self.sizey//2), f"min: {ming:+1.2f}", font=self.fonts[self.VERYSMALL], fill="magenta")
-        self.bottom_line("", "    Mode", "Reset")
+            self.centered_text(77, error_message, self.LARGE, color="red")
+        self.draw.text((self.zerox + 50, self.sizey//2), f"min:", font=self.fonts[self.SMALL], fill="magenta")
+        self.draw.text((self.zerox + 80, self.sizey//2), f"{ming:+1.2f}", font=self.fonts[self.SMALL], fill="magenta")
+
+        self.bottom_line("", "         Mode", "Reset")
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
