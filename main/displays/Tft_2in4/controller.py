@@ -278,18 +278,18 @@ class ST7789(dcommon.GenericDisplay):
         self.draw.text((bar_start, starty), stat['GPS_detected_type'], font=self.fonts[self.VERYSMALL],
                        fill=self.TEXT_COLOR)
         starty += self.VERYSMALL + 2
-        self.draw.text((0, starty), "GPS sol", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         t = "3D GPS " if gps_quality == 1 else "DGNSS " if gps_quality == 2 else "GPS"
+        self.draw.text((0, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         gps = f"{round(stat['GPS_position_accuracy'], 1)}m" if stat['GPS_position_accuracy'] < 19999 else "NoFix"
-        self.draw.text((bar_start, starty), t + gps, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        t = f"{stat['GPS_satellites_locked']} sol/{stat['GPS_satellites_seen']} seen/{stat['GPS_satellites_tracked']} track"
+        self.draw.text((bar_start, starty), gps, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        t = f"{stat['GPS_satellites_locked']}/{stat['GPS_satellites_seen']}/{stat['GPS_satellites_tracked']}"
         self.right_text(starty, t, self.VERYSMALL)
         starty += self.VERYSMALL + 2
 
-        alt = f"{gps_alt:5.0f}" if stat['GPS_position_accuracy'] < 19999 else " ---"
+        alt = f"{gps_alt:.0f}" if stat['GPS_position_accuracy'] < 19999 else " ---"
         self.draw.text((0, starty), f"P-Alt {round(altitude)} ft", font=self.fonts[self.VERYSMALL],
                        fill=self.TEXT_COLOR)
-        self.draw.text((bar_start, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL],
+        self.draw.text((bar_start + 20, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL],
                        fill=self.TEXT_COLOR)
         self.right_text(starty, f"GPS-Alt {alt} ft", self.VERYSMALL)
         starty += self.VERYSMALL + 4
