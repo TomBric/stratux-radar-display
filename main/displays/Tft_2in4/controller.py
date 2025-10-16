@@ -255,9 +255,9 @@ class ST7789(dcommon.GenericDisplay):
         starty = 0
         self.centered_text(0, f"Stratux {stat['version']}", self.SMALL)
         starty += self.SMALL+6
-        bar_start, bar_end = 30, 100
+        bar_start, bar_end = 80, 260
         line_offset = 4
-        colors = {'outline': 'white', 'green': 'white'}
+        colors = {'outline': self.TEXT_COLOR, 'green': self.TEXT_COLOR}
         starty = self.bar(starty, "1090", stat['ES_messages_last_minute'], stat['ES_messages_max'],
                           bar_start, bar_end, colors, line_offset=line_offset)
         if stat['OGN_connected']:
@@ -269,7 +269,7 @@ class ST7789(dcommon.GenericDisplay):
         if stat['UATRadio_connected']:
             starty = self.bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'],
                               bar_start, bar_end, colors, line_offset=line_offset)
-        colors = {'outline': 'white', 'green': 'green', 'yellow': 'DarkOrange',
+        colors = {'outline': self.TEXT_COLOR, 'green': 'green', 'yellow': 'DarkOrange',
                   'red': 'red', 'yellow_value': 70, 'red_value': 80}
         if stat['CPUTemp'] > -300:    # -300 means no value available
             starty = self.bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0),
