@@ -345,9 +345,7 @@ class GenericDisplay:
                           fill=self.BG_COLOR, width=line_width)
         bw, bh = self.compass_aircraft.size
         if self.compass_aircraft.mode == "RGBA":
-            self.image.paste(self.TEXT_COLOR, (self.czerox - bw // 2 + bw // 32, self.czeroy - bh // 2),
-                             self.compass_aircraft)
-            # self.image.paste(self.compass_aircraft, (self.czerox - bw // 2 + bw//32, self.czeroy - bh // 2))
+            self.image.paste(self.compass_aircraft, (self.czerox - bw // 2 + bw//32, self.czeroy - bh // 2))
             #  +bw//32 on x-axis, since image is not totally centered
         else:
             self.image.paste(self.TEXT_COLOR, (self.czerox - bw // 2 + bw//32, self.czeroy - bh //2), self.compass_aircraft)

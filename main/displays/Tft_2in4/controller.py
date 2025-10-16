@@ -96,7 +96,9 @@ class ST7789(dcommon.GenericDisplay):
         display_refresh = end - start
         # compass
         pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
-        self.compass_aircraft = Image.open(pic_path).convert("RGBA")
+        self.compass_aircraft = Image.open(pic_path).convert("RGB")
+        if self.dark_mode:
+            self.compass_aircraft = Image.eval(self.compass_aircraft, lambda x: 255 - x)
         self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
         self.cdraw = ImageDraw.Draw(self.mask)
         self.rlog.debug(f'ST7789 selected: sizex={self.sizex} sizey={self.sizey} '
