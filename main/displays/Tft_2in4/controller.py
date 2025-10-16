@@ -97,7 +97,7 @@ class ST7789(dcommon.GenericDisplay):
         # compass
         pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
         self.compass_aircraft = Image.open(pic_path).convert("RGBA")
-        if self.dark_mode:
+        if not self.dark_mode:
             self.compass_aircraft = Image.eval(self.compass_aircraft, lambda x: 255 - x)
         self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
         self.cdraw = ImageDraw.Draw(self.mask)
