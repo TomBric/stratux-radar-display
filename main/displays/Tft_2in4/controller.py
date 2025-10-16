@@ -277,21 +277,21 @@ class ST7789(dcommon.GenericDisplay):
         self.draw.text((0, starty), "GPS hw", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.draw.text((bar_start, starty), stat['GPS_detected_type'], font=self.fonts[self.VERYSMALL],
                        fill=self.TEXT_COLOR)
+        starty += self.VERYSMALL + 2
         self.draw.text((0, starty), "GPS sol", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         t = "3D GPS " if gps_quality == 1 else "DGNSS " if gps_quality == 2 else "GPS"
         gps = f"{round(stat['GPS_position_accuracy'], 1)}m" if stat['GPS_position_accuracy'] < 19999 else "NoFix"
         self.draw.text((bar_start, starty), t + gps, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        t = f"Sat: {stat['GPS_satellites_locked']} sol/{stat['GPS_satellites_seen']} seen/{stat['GPS_satellites_tracked']} track"
+        t = f"{stat['GPS_satellites_locked']} sol/{stat['GPS_satellites_seen']} seen/{stat['GPS_satellites_tracked']} track"
         self.right_text(starty, t, self.VERYSMALL)
         starty += self.VERYSMALL + 2
 
-        self.draw.text((0, starty), "altitudes", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         alt = f"{gps_alt:5.0f}" if stat['GPS_position_accuracy'] < 19999 else " ---"
-        self.draw.text((bar_start, starty), f"P-Alt {round(altitude)} ft", font=self.fonts[self.VERYSMALL],
+        self.draw.text((0, starty), f"P-Alt {round(altitude)} ft", font=self.fonts[self.VERYSMALL],
                        fill=self.TEXT_COLOR)
-        self.draw.text((180, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL],
+        self.draw.text((bar_start, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL],
                        fill=self.TEXT_COLOR)
-        self.draw.text((270, starty), f"GPS-Alt {alt} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.right_text(starty, f"GPS-Alt {alt} ft", self.VERYSMALL)
         starty += self.VERYSMALL + 4
 
         self.draw.text((0, starty), "sensors", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
@@ -345,8 +345,7 @@ class ST7789(dcommon.GenericDisplay):
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
             self.centered_text(80, error_message, self.LARGE, self.WARNING_COLOR)
-        self.bottom_line("Stat/Set", "   Mode", "Start")
-
+        self.bottom_line("Set", "His/Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
                             current_stats=True, next_stat=False, prev_stat=False, index=-1):
