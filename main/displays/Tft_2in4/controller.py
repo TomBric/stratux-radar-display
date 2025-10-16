@@ -116,8 +116,8 @@ class ST7789(dcommon.GenericDisplay):
             self.AIRCRAFT_OUTLINE = "white"
             self.MODE_S_COLOR = "white"
             # AHRS colors
-            self.AHRS_EARTH_COLOR = "light brown"
-            self.AHRS_SKY_COLOR = "blue"
+            self.AHRS_EARTH_COLOR = "sandybrown"
+            self.AHRS_SKY_COLOR = "skyblue"
             self.AHRS_HORIZON_COLOR = "white"
             self.AHRS_MARKS_COLOR = "white"
             self.WARNING_COLOR = "red"
@@ -129,8 +129,8 @@ class ST7789(dcommon.GenericDisplay):
             self.AIRCRAFT_OUTLINE = "black"
             self.MODE_S_COLOR = "black"
             # AHRS colors
-            self.AHRS_EARTH_COLOR = "light brown"
-            self.AHRS_SKY_COLOR = "blue"
+            self.AHRS_EARTH_COLOR = "sandybrown"
+            self.AHRS_SKY_COLOR = "skyblue"
             self.AHRS_HORIZON_COLOR = "white"
             self.AHRS_MARKS_COLOR = "white"
             self.WARNING_COLOR = "red"
