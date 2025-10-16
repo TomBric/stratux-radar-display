@@ -309,13 +309,13 @@ class ST7789(dcommon.GenericDisplay):
                    glinewidth=2, linewidth=2)
         if len(co_values) > 0:
             color = "green" if co_values[-1] < 50 else "red"
-            self.round_text(30, self.sizey - 2 * self.VERYSMALL - 6, "act: {:3d}".format(co_values[-1]),
+            self.round_text(50, self.sizey - 2 * self.VERYSMALL - 6, "act: {:3d}".format(co_values[-1]),
                             bg_color=color, text_color=self.TEXT_COLOR)
         color = "green" if co_max < 50 else "red"
-        self.round_text(self.sizex // 2 + 15, self.sizey - 2 * self.VERYSMALL - 6, "max: {:3d}".format(co_max),
+        self.round_text(self.sizex // 2 + 50, self.sizey - 2 * self.VERYSMALL - 6, "max: {:3d}".format(co_max),
                         bg_color=color, text_color=self.TEXT_COLOR)
         if simulation_mode:
-            self.round_text(3 * self.VERYSMALL - 4, self.sizey // 4 + 4, "simulation mode", out_color=self.TEXT_COLOR)
+            self.round_text(4 * self.VERYSMALL, self.sizey // 4 + 4, "simulation mode", out_color=self.TEXT_COLOR)
         self.bottom_line("Cal", "Mode", "Reset")
 
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
