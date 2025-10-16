@@ -792,7 +792,7 @@ class GenericDisplay:
                        font=self.fonts[self.VERYSMALL], fill=textcolor)
         # Draw outside text and frame
         self.draw.line([(xpos, ypos), (xpos+xsize-1, ypos), (xpos+xsize-1, ypos+ysize-1),
-                        (xpos, ypos+ysize-1 ), (xpos, ypos)], width=linewidth)
+                        (xpos, ypos+ysize-1 ), (xpos, ypos)], width=linewidth, fill=linecolor)
         # Draw values below x-axis
         no_of_values = len(data)
         full_time = timeout * no_of_values

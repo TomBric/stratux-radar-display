@@ -304,7 +304,7 @@ class ST7789(dcommon.GenericDisplay):
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False): # draw graph and co values
         self.centered_text(0, alarmtext, self.LARGE)
         graphpos = (0, self.LARGE + 5)
-        graphsize = (250, 150)
+        graphsize = (300, 150)
         self.graph(graphpos, graphsize, co_values, 0, 120, timeout, value_line1=50, value_line2=100,
                    glinewidth=2, linewidth=2)
         if len(co_values) > 0:
@@ -315,7 +315,7 @@ class ST7789(dcommon.GenericDisplay):
         self.round_text(self.sizex // 2 + 50, self.sizey - 2 * self.VERYSMALL - 6, "max: {:3d}".format(co_max),
                         bg_color=color, text_color=self.TEXT_COLOR)
         if simulation_mode:
-            self.round_text(4 * self.VERYSMALL, self.sizey // 4 + 4, "simulation mode", out_color=self.TEXT_COLOR)
+            self.round_text(4 * self.VERYSMALL + 10, self.sizey // 4 + 4, "simulation mode", out_color=self.TEXT_COLOR)
         self.bottom_line("Cal", "Mode", "Reset")
 
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
