@@ -274,24 +274,31 @@ class ST7789(dcommon.GenericDisplay):
         if stat['CPUTemp'] > -300:    # -300 means no value available
             starty = self.bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0),
                               bar_start, bar_end, colors, unit="°C", line_offset=line_offset)
+        self.draw.text((0, starty), "GPS hw", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        self.draw.text((bar_start, starty), stat['GPS_detected_type'], font=self.fonts[self.VERYSMALL],
+                       fill=self.TEXT_COLOR)
+        self.draw.text((0, starty), "GPS sol", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         t = "3D GPS " if gps_quality == 1 else "DGNSS " if gps_quality == 2 else "GPS"
-        self.draw.text((0, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        t = f"{stat['GPS_satellites_locked']}/{stat['GPS_satellites_seen']}/{stat['GPS_satellites_tracked']}"
-        self.draw.text((55, starty), t, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         gps = f"{round(stat['GPS_position_accuracy'], 1)}m" if stat['GPS_position_accuracy'] < 19999 else "NoFix"
-        self.right_text(starty, gps, self.VERYSMALL)
+        self.draw.text((bar_start, starty), t + gps, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        t = f"Sat: {stat['GPS_satellites_locked']} sol/{stat['GPS_satellites_seen']} seen/{stat['GPS_satellites_tracked']} track"
+        self.right_text(starty, t, self.VERYSMALL)
         starty += self.VERYSMALL + 2
-        self.draw.text((0, starty), f"P-Alt {altitude:.0f}ft", font=self.fonts[self.VERYSMALL])
-        self.right_text(starty, f"Corr {stat['AltitudeOffset']:+}ft", self.VERYSMALL)
+
+        self.draw.text((0, starty), "altitudes", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        alt = f"{gps_alt:5.0f}" if stat['GPS_position_accuracy'] < 19999 else " ---"
+        self.draw.text((bar_start, starty), f"P-Alt {round(altitude)} ft", font=self.fonts[self.VERYSMALL],
+                       fill=self.TEXT_COLOR)
+        self.draw.text((180, starty), f"Corr {stat['AltitudeOffset']:+} ft", font=self.fonts[self.VERYSMALL],
+                       fill=self.TEXT_COLOR)
+        self.draw.text((270, starty), f"GPS-Alt {alt} ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         starty += self.VERYSMALL + 4
 
+        self.draw.text((0, starty), "sensors", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         col = "green" if stat['IMUConnected'] else "red"
-        x = self.round_text(0, starty, "IMU", bg_color=col, text_color=self.TEXT_COLOR)
-
+        x = self.round_text(bar_start, starty, "IMU", bg_color=col, text_color=self.TEXT_COLOR)
         col = "green" if stat['BMPConnected'] else "red"
         self.round_text(x, starty, "BMP", bg_color=col, text_color=self.TEXT_COLOR)
-        alt = f"{gps_alt:.0f}" if stat['GPS_position_accuracy'] < 19999 else "---"
-        self.right_text(starty, f"GAlt {alt}ft", self.VERYSMALL)
         self.bottom_line("+10ft", "Mode", "-10ft")
 
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False): # draw graph and co values
