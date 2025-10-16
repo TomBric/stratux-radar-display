@@ -341,40 +341,59 @@ class ST7789(dcommon.GenericDisplay):
         self.bottom_line("Stat/Set", "   Mode", "Start")
 
 
-
-    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings):
-        self.centered_text(0, "Start-/Landing", self.SMALL)
+    def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
+                            current_stats=True, next_stat=False, prev_stat=False, index=-1):
+        if current_stats:  # current data, still flying
+            self.centered_text(0, "Act Start-/Landing", self.SMALL)
+        else:
+            if index >= 0:
+                self.centered_text(0, f"Start-/Land #{index + 1}", self.SMALL)
+            else:
+                self.centered_text(0, f"No Start-/Land Data", self.SMALL)
+        offset = 5
         st = '---'
         if 'start_time' in values:
-            st = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['start_time'].hour, values['start_time'].minute,
-                        values['start_time'].second, values['start_time'].microsecond // 100000)
-        lines = (
+            dt = values['start_time']
+            if not isinstance(dt, datetime.datetime):
+                dt = datetime.fromisoformat(dt)
+            st = dt.strftime("%H:%M:%S,%f")[:-5]
+        lines = [
             ("t-off time", st),
+            ("t-off alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
-        )
-        starty = self.dashboard(0, self.SMALL+2 , self.sizex, lines)
-
+        ]
+        self.dashboard(offset, 35, self.zerox - offset, lines, headline="Takeoff", rounding=True)
         lt = '---'
         if 'landing_time' in values:
-            lt = "{:0>2d}:{:0>2d}:{:0>2d},{:1d}".format(values['landing_time'].hour, values['landing_time'].minute,
-                            values['landing_time'].second, values['landing_time'].microsecond // 100000)
-        lines = (
+            dt = values['landing_time']
+            if not isinstance(dt, datetime.datetime):
+                dt = datetime.fromisoformat(dt)
+            lt = dt.strftime("%H:%M:%S,%f")[:-5]
+        lines = [
             ("ldg time", lt),
+            ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
-        )
-        starty = self.dashboard(0, starty, self.sizex, lines)
-        if ground_warnings:
-            dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
-            lines = (
-                ("Dest. Alt [ft]", dest_alt_str),
-            )
-            self.dashboard(0, starty, self.sizex, lines)
-        if not ground_warnings:
-            self.bottom_line("", "Back", "")
-        else:
-            self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+        ]
+        starty = self.dashboard(self.zerox + 2, 35, self.zerox - 2 * offset, lines, headline="Landing", rounding=True)
+        if current_stats:
+            if ground_warnings:
+                dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
+                gps_alt_str = f"{gps_altitude:+5.0f}" if gps_valid else "---"
+                lines = [
+                    ("Act GPS-Alt [ft]", gps_alt_str),
+                    ("Dest. Alt [ft]", dest_alt_str),
+                ]
+                self.dashboard(offset, starty, self.sizex-3 - 2 * offset  , lines, headline="Destination Elevation", rounding=True)
+                self.bottom_line("+/-100ft", "  Back", "+/-10ft")
+            else:
+                self.bottom_line("", "Back", "")
+        else:  # stored stats
+            left = "Prev" if prev_stat else ""
+            right = "Next" if next_stat else ""
+            self.bottom_line(left, "Exit", right)
+
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = ST7789()
