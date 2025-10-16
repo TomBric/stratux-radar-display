@@ -51,27 +51,19 @@ class Oled1in5(dcommon.GenericDisplay):
     AWESOME_FONTSIZE = 10
     ARCPOSITION_EXCLUDE_FROM = 0
     ARCPOSITION_EXCLUDE_TO = 0
-    # colors
-    BG_COLOR = "black"
-    TEXT_COLOR = "white"
-    WARNING_COLOR = "red"
-    AIRCRAFT_COLOR = "red"
-    AIRCRAFT_OUTLINE = "white"
-    MODE_S_COLOR = "white"
-    HIGHLIGHT_COLOR = "yellow"
-    # AHRS
-    AHRS_EARTH_COLOR = "brown" # how ahrs displays the earth
-    AHRS_SKY_COLOR = "blue"  # how ahrs displays the sky
-    AHRS_HORIZON_COLOR = "white"  # how ahrs displays the horizon
-    AHRS_MARKS_COLOR = "white"  # color of marks and corresponding text in ahrs
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
     UP_CHARACTER = '\u2191'  # character to show ascending aircraft
     DOWN_CHARACTER = '\u2193'  # character to show descending aircraft
-    # vars later on set by init
-    device = None
-    image = None
-    draw = None
-    mask = None
+
+    def __init__(self):
+        super().__init__()
+        # color attributes are later set in set_dark_mode
+        # Other attributes
+        self.device = None
+        self.image = None
+        self.draw = None
+        self.mask = None
+        self.dark_mode = False
 
     def init(self, fullcircle=False, dark_mode=False):   # dark mode without effect in Oled display
         config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
@@ -79,6 +71,7 @@ class Oled1in5(dcommon.GenericDisplay):
         self.device.contrast(255)  # set full contrast
         self.image = Image.new(self.device.mode, self.device.size)
         self.draw = ImageDraw.Draw(self.image)
+        self.set_dark_mode(dark_mode)
         self.sizex = self.device.height
         self.sizey = self.device.width
         self.zerox = self.sizex // 2
@@ -102,6 +95,35 @@ class Oled1in5(dcommon.GenericDisplay):
                         f'zero=({self.zerox}, {self.zeroy}) refresh-time: {round(self.display_refresh, 2)} secs')
         return self.sizex, self.zerox, self.zeroy, display_refresh
 
+    def set_dark_mode(self, dark_mode):
+        """Set dark mode and update color constants accordingly"""
+        self.dark_mode = dark_mode
+        if dark_mode:
+            self.BG_COLOR = "black"
+            self.TEXT_COLOR = "white"
+            self.HIGHLIGHT_COLOR = "red"
+            self.AIRCRAFT_COLOR = "red"
+            self.AIRCRAFT_OUTLINE = "white"
+            self.MODE_S_COLOR = "white"
+            # AHRS colors
+            self.AHRS_EARTH_COLOR = "brown"
+            self.AHRS_SKY_COLOR = "blue"
+            self.AHRS_HORIZON_COLOR = "white"
+            self.AHRS_MARKS_COLOR = "white"
+            self.WARNING_COLOR = "red"
+        else:
+            self.BG_COLOR = "white"
+            self.TEXT_COLOR = "black"
+            self.HIGHLIGHT_COLOR = "red"
+            self.AIRCRAFT_COLOR = "red"
+            self.AIRCRAFT_OUTLINE = "black"
+            self.MODE_S_COLOR = "black"
+            # AHRS colors
+            self.AHRS_EARTH_COLOR = "brown"
+            self.AHRS_SKY_COLOR = "blue"
+            self.AHRS_HORIZON_COLOR = "white"
+            self.AHRS_MARKS_COLOR = "white"
+            self.WARNING_COLOR = "red"
 
     def cleanup(self):
         self.device.cleanup()

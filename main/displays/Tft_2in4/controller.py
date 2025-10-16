@@ -95,7 +95,7 @@ class ST7789(dcommon.GenericDisplay):
         end = time.time()
         display_refresh = end - start
         # compass
-        pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
+        pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-128x128.bmp'))
         self.compass_aircraft = Image.open(pic_path).convert("RGBA")
         self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
         self.cdraw = ImageDraw.Draw(self.mask)
@@ -118,6 +118,7 @@ class ST7789(dcommon.GenericDisplay):
             self.AHRS_SKY_COLOR = "blue"
             self.AHRS_HORIZON_COLOR = "white"
             self.AHRS_MARKS_COLOR = "white"
+            self.WARNING_COLOR = "red"
         else:
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
@@ -130,6 +131,7 @@ class ST7789(dcommon.GenericDisplay):
             self.AHRS_SKY_COLOR = "blue"
             self.AHRS_HORIZON_COLOR = "white"
             self.AHRS_MARKS_COLOR = "white"
+            self.WARNING_COLOR = "red"
 
     def cleanup(self):
         self.device.cleanup()
