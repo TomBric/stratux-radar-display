@@ -269,7 +269,7 @@ class ST7789(dcommon.GenericDisplay):
         if stat['UATRadio_connected']:
             starty = self.bar(starty, "UAT", stat['UAT_messages_last_minute'], stat['UAT_messages_max'],
                               bar_start, bar_end, colors, line_offset=line_offset)
-        colors = {'outline': self.TEXT_COLOR, 'green': 'green', 'yellow': 'DarkOrange',
+        colors = {'outline': self.TEXT_COLOR, 'green': 'lime', 'yellow': 'DarkOrange',
                   'red': 'red', 'yellow_value': 70, 'red_value': 80}
         if stat['CPUTemp'] > -300:    # -300 means no value available
             starty = self.bar(starty, "temp", round(stat['CPUTemp'], 1), round(stat['CPUTempMax'], 0),
@@ -295,9 +295,9 @@ class ST7789(dcommon.GenericDisplay):
         starty += self.VERYSMALL + 4
 
         self.draw.text((0, starty), "sensors", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
-        col = "green" if stat['IMUConnected'] else "red"
+        col = "lime" if stat['IMUConnected'] else "red"
         x = self.round_text(bar_start, starty, "IMU", bg_color=col, text_color=self.TEXT_COLOR)
-        col = "green" if stat['BMPConnected'] else "red"
+        col = "lime" if stat['BMPConnected'] else "red"
         self.round_text(x, starty, "BMP", bg_color=col, text_color=self.TEXT_COLOR)
         self.bottom_line("+10ft", "Mode", "-10ft")
 
@@ -308,10 +308,10 @@ class ST7789(dcommon.GenericDisplay):
         self.graph(graphpos, graphsize, co_values, 0, 120, timeout, value_line1=50, value_line2=100,
                    glinewidth=2, linewidth=2)
         if len(co_values) > 0:
-            color = "green" if co_values[-1] < 50 else "red"
+            color = "lime" if co_values[-1] < 50 else "red"
             self.round_text(50, self.sizey - 2 * self.VERYSMALL - 6, "act: {:3d}".format(co_values[-1]),
                             bg_color=color, text_color=self.TEXT_COLOR)
-        color = "green" if co_max < 50 else "red"
+        color = "lime" if co_max < 50 else "red"
         self.round_text(self.sizex // 2 + 50, self.sizey - 2 * self.VERYSMALL - 6, "max: {:3d}".format(co_max),
                         bg_color=color, text_color=self.TEXT_COLOR)
         if simulation_mode:
