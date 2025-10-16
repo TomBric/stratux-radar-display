@@ -89,6 +89,8 @@ class Oled1in5(dcommon.GenericDisplay):
         # compass
         pic_path = str(Path(__file__).resolve().parent.joinpath('plane-white-64x64.bmp'))
         self.compass_aircraft = Image.open(pic_path).convert("RGBA")
+        if not self.dark_mode:
+            self.compass_aircraft = Image.eval(self.compass_aircraft, lambda x: 255 - x)
         self.mask = Image.new('1', (self.LARGE * 2, self.LARGE * 2))
         self.cdraw = ImageDraw.Draw(self.mask)
         self.rlog.debug(f'Oled_1in5 selected: sizex={self.sizex} sizey={self.sizey} '

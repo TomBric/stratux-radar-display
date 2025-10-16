@@ -45,7 +45,7 @@ class ST7789(dcommon.GenericDisplay):
     MORELARGE = 32
     LARGE = 28  # size of height indications of aircraft, size of meter TEXT
     SMALL = 20  # size of information indications on top and bottom
-    VERYSMALL = 16  # used for "nm" and "ft"
+    VERYSMALL = 18  # used for "nm" and "ft"
     AIRCRAFT_SIZE = 6  # size of aircraft arrow
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     AWESOME_FONTSIZE = 18
@@ -239,9 +239,9 @@ class ST7789(dcommon.GenericDisplay):
 
     def vsi(self, vertical_speed, flight_level, gps_speed, gps_course, gps_altitude, vertical_max, vertical_min,
             error_message):
-        self.meter(vertical_speed / 100, -20, 20, 110, 430, self.sizey, 160,
-                   self.zeroy, 5, 1, "Vert Spd", "100ft/min",
-                   middle_fontsize=self.VERYSMALL)
+        self.meter(vertical_speed / 100, -20, 20, 110, 430, self.sizey, self.czerox,
+                   self.czeroy, 5, 1, "Vert Spd", "100ft/min",
+                   middle_fontsize=self.SMALL)
         self.draw.text((12, self.sizey // 2 - self.VERYSMALL - 10), "up", font=self.fonts[self.VERYSMALL],
                        fill=self.TEXT_COLOR, align="left")
         self.draw.text((12, self.sizey // 2 + 10), "dn", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR,
