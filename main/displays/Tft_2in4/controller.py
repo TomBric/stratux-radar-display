@@ -369,7 +369,7 @@ class ST7789(dcommon.GenericDisplay):
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
-        self.dashboard(offset, 35, self.zerox - offset, lines, headline="Takeoff", rounding=True)
+        starty = self.dashboard(offset, self.SMALL+2, self.sizex - 2* offset, lines)
         lt = '---'
         if 'landing_time' in values:
             dt = values['landing_time']
@@ -382,7 +382,7 @@ class ST7789(dcommon.GenericDisplay):
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         ]
-        starty = self.dashboard(self.zerox + 2, 35, self.zerox - 2 * offset, lines, headline="Landing", rounding=True)
+        starty = self.dashboard(offset, starty, self.sizex - 2 * offset, lines)
         if current_stats:
             if ground_warnings:
                 dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
@@ -391,7 +391,7 @@ class ST7789(dcommon.GenericDisplay):
                     ("Act GPS-Alt [ft]", gps_alt_str),
                     ("Dest. Alt [ft]", dest_alt_str),
                 ]
-                self.dashboard(offset, starty, self.sizex-3 - 2 * offset  , lines, headline="Destination Elevation", rounding=True)
+                self.dashboard(offset, starty, self.sizex- 2 * offset  , lines)
                 self.bottom_line("+/-100ft", "  Back", "+/-10ft")
             else:
                 self.bottom_line("", "Back", "")

@@ -410,7 +410,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         st = '---'
         if 'start_time' in values:
             dt = values['start_time']
-            if not isinstance(dt, datetime.datetime):
+            if not isinstance(dt, datetime):
                 dt = datetime.fromisoformat(dt)
             st = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = [
@@ -423,7 +423,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         lt = '---'
         if 'landing_time' in values:
             dt = values['landing_time']
-            if not isinstance(dt, datetime.datetime):
+            if not isinstance(dt, datetime):
                 dt = datetime.fromisoformat(dt)
             lt = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = [
