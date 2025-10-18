@@ -369,7 +369,7 @@ class ST7789(dcommon.GenericDisplay):
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
-        starty = self.dashboard(offset, self.SMALL+2, self.sizex - 2* offset, lines)
+        starty = self.dashboard(offset, self.SMALL, self.sizex - 2* offset, lines)
         lt = '---'
         if 'landing_time' in values:
             dt = values['landing_time']
