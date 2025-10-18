@@ -35,7 +35,7 @@ from .. import dcommon
 from PIL import Image, ImageDraw, ImageFont
 import math
 import time
-import datetime
+from datetime import datetime
 from . import radar_opts
 from pathlib import Path
 import logging
