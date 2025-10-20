@@ -137,7 +137,10 @@ class ChecklistForm(FlaskForm):
 
 class RadarForm(FlaskForm):
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[IPAddress()])
-    display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'), ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'), ('Epaper_3in7', 'Epaper display 3.7 inch'), ('Epaper_3in7_Round', 'Epaper display 3.7 inch - Round front') ], default='Epaper_3in7')
+    display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'),
+            ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'),
+            ('Epaper_3in7', 'Epaper display 3.7 inch'), ('Epaper_3in7_Round', 'Epaper display 3.7 inch - Round front'),
+            ('ST7789', 'ST7789 controller based displays 240x320px')  ], default='Epaper_3in7')
 
     radar = SwitchField('Radar', description=' ', default=True)
     radar_seq = IntegerField('', default=1, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
@@ -169,7 +172,7 @@ class RadarForm(FlaskForm):
     upload_checklist = SubmitField('Upload a checklist')
 
     #traffic options
-    registration = SwitchField('Display call sign (epaper only)', default=True)
+    registration = SwitchField('Display call sign', default=True)
     ground_mode = SwitchField('Ground mode, north always up', default=False)
     full_circle = SwitchField('Full circle on epaper 3.7', default=False)
 
