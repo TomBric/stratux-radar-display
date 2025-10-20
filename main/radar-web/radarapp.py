@@ -172,7 +172,7 @@ class RadarForm(FlaskForm):
     upload_checklist = SubmitField('Upload a checklist')
 
     #traffic options
-    registration = SwitchField('Display call sign (epaper only)', default=True)
+    registration = SwitchField('Display call sign', default=True)
     ground_mode = SwitchField('Ground mode, north always up', default=False)
     full_circle = SwitchField('Full circle on epaper 3.7', default=False)
 
