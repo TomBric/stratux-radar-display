@@ -75,7 +75,7 @@ AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBU
 #
 
 # constants
-RADAR_VERSION = "2.10"
+RADAR_VERSION = "2.11"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
