@@ -202,7 +202,7 @@ class ST7789(dcommon.GenericDisplay):
         self.centered_text(5, f"{course}°", self.SMALL)
 
         if not gpsconnected:
-            self.centered_text(70, "No GPS", self.SMALL)
+            self.centered_text(55, "No GPS", self.SMALL)
         if not connected:
             self.centered_text(30, "No Connection!", self.SMALL)
         if co_alarmlevel > 0:
