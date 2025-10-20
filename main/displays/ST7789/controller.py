@@ -206,7 +206,7 @@ class ST7789(dcommon.GenericDisplay):
         if not connected:
             self.centered_text(30, "No Connection!", self.SMALL)
         if co_alarmlevel > 0:
-            self.centered_text(250, f"CO Alarm: {co_alarmstring}", self.SMALL)
+            self.centered_text(self.sizey - 2 * self.SMALL, f"CO Alarm: {co_alarmstring}", self.SMALL)
         if extsound or bt_devices > 0:  # extsound means and sound devices has been found
             if sound_active:  # means user left sound switched on
                 if extsound:
