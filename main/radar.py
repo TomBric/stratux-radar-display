@@ -72,11 +72,10 @@ import syslog
 # logging
 SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
 AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBUG
-rlog = None  # radar specific logger
 #
 
 # constants
-RADAR_VERSION = "2.10"
+RADAR_VERSION = "2.11"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -205,7 +204,7 @@ def draw_display():
         display_control.situation(situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
                                   sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
-                                  basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1])
+                                  basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1]) 
         draw_all_ac(all_ac)
         display_control.display()
         situation['was_changed'] = False

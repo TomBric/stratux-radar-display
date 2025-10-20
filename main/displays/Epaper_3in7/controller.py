@@ -36,7 +36,7 @@ from .. import dcommon
 from PIL import Image, ImageDraw, ImageFont
 import math
 import time
-import datetime
+from datetime import datetime
 from pathlib import Path
 import logging
 
@@ -58,8 +58,9 @@ class Epaper3in7(dcommon.GenericDisplay):
     MINIMAL_CIRCLE = 20  # minimal size of mode-s circle
     ARCPOSITION_EXCLUDE_FROM = 110
     ARCPOSITION_EXCLUDE_TO = 250
-    
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
+
+
     def __init__(self):
         super().__init__()
         # Initialize color attributes
@@ -408,7 +409,10 @@ class Epaper3in7(dcommon.GenericDisplay):
         offset = 5
         st = '---'
         if 'start_time' in values:
-            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+            dt = values['start_time']
+            if not isinstance(dt, datetime):
+                dt = datetime.fromisoformat(dt)
+            st = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = [
             ("t-off time", st),
             ("t-off alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
@@ -418,21 +422,26 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.dashboard(offset, 35, self.zerox - offset, lines, headline="Takeoff", rounding=True)
         lt = '---'
         if 'landing_time' in values:
-            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+            dt = values['landing_time']
+            if not isinstance(dt, datetime):
+                dt = datetime.fromisoformat(dt)
+            lt = dt.strftime("%H:%M:%S,%f")[:-5]
         lines = [
             ("ldg time", lt),
             ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         ]
-        starty = self.dashboard(self.zerox, 35, self.zerox - offset - 5, lines, headline="Landing", rounding=True)
+        starty = self.dashboard(self.zerox + 2, 35, self.zerox - 2 * offset, lines, headline="Landing", rounding=True)
         if current_stats:
             if ground_warnings:
                 dest_alt_str = f"{dest_altitude:+5.0f}" if dest_alt_valid else "---"
-                lines = (
+                gps_alt_str = f"{gps_altitude:+5.0f}" if gps_valid else "---"
+                lines = [
+                    ("Act GPS-Alt [ft]", gps_alt_str),
                     ("Dest. Alt [ft]", dest_alt_str),
-                )
-                self.dashboard(offset, starty, self.sizex-offset, lines)
+                ]
+                self.dashboard(offset, starty, self.sizex-3 - 2 * offset  , lines, headline="Destination Elevation", rounding=True)
                 self.bottom_line("+/-100ft", "  Back", "+/-10ft")
             else:
                 self.bottom_line("", "Back", "")
