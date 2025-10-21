@@ -13,13 +13,17 @@ Current supported displays are:
 - Oled Display 1.5 inch (waveshare)
 - Epaper Display 3.7 inch (waveshare)
 - Epaper Display 1.54 inch (waveshare)
+- ST7789 controller based displays (LCD, 240x320 e.g. waveshare or Crystalfontz)
 
-The best user experience is with the epaper-display. They are perfectly readable even in bright cockpits in the sun
+The best user experience is with the epaper-display. They are perfectly readable even in bright cockpits in the sun.
 
-| 3.7 inch Epaper for 80 mm instrument hole      |      1.54 inch Epaper for 57 mm instrument hole | Oled for 57 mm instrument hole |
-|---------------------------------|----------------------------|----------------|
-| ![](https://github.com/TomBric/stratux-radar-display/blob/main/.github/images/All-in-one%20Epaper%201.jpg) | ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/1.54-front-ahrs.jpg) |  ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/All-in-one%20OLED%205.jpg) |
+| 3.7 inch Epaper round for 80 mm instrument hole | 3.7 inch Epaper for 80 mm instrument hole |
+|-------------------------------------------------|---------------------------------|
+| ![3 7-Round](https://github.com/user-attachments/assets/ae222a08-6492-4109-afd7-b78ef93f96e0) | ![](https://github.com/TomBric/stratux-radar-display/blob/main/.github/images/All-in-one%20Epaper%201.jpg) |
 
+| 1.54 inch Epaper for 57 mm instrument hole | Oled for 57 mm instrument hole | ST 7789 controller display |
+|-------------------------|--------------------------------|----------------------------|
+| ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/All-in-one%20OLED%205.jpg) |![2 0 LCD](https://github.com/user-attachments/assets/395df2c8-c7a5-4718-957e-17fd32838e0b) | ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/1.54-front-ahrs.jpg) |
 
 - [Hardware and Wiring the displays](https://github.com/TomBric/stratux-radar-display/wiki/Hardware-and-wiring)
 - [Connecting pushbuttons for a user interface](https://github.com/TomBric/stratux-radar-display/wiki/Connecting-pushbuttons-for-a-user-interface)
