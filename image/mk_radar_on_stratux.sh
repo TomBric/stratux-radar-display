@@ -49,6 +49,9 @@ while getopts ":b:d:u:f:s" opt; do
     done
 
 echo "Building stratux image for branch '$BRANCH' and display '$DISPLAY_NAME'"
+if [ "$UART" = true ]; then
+  echo "Enabling UART Ground Sensor support"
+fi
 
 ZIPNAME="stratux-v1.6r1-eu032-ff1f01dc.img.zip"
 BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu032/${ZIPNAME}"

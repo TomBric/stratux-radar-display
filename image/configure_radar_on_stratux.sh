@@ -19,7 +19,11 @@ while getopts ":u" opt; do
       esac
     done
 
-# set -x
+if [ "$UART" = true ]; then
+  echo "Enabling UART Ground Sensor support"
+fi
+
+
 apt update
 apt install git python3-pip -y
 # no sound or bluetooth on stratux
