@@ -7,7 +7,7 @@
 #  use option -u to enable UART for GroundSensor (if hardware is connected)
 #  example: /bin/bash configure_radar_on_stratux.sh -u
 
-
+set -x
 UART=false
 
 # check parameters
