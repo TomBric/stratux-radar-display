@@ -15,6 +15,9 @@
 #   sudo /bin/bash mk_radar_on_stratux.sh -d Epaper_1in54
 # install a first time flashing of the t-beam
 #   sudo /bin/bash mk_radar_on_stratux.sh -flash /home/pi/GxAirCom81
+# Enable sound output and UART Ground Sensor
+#   sudo /bin/bash mk_radar_on_stratux.sh -s
+
 
 set -x
 TMPDIR="/home/pi/image-tmp"
@@ -30,14 +33,16 @@ die() {
 BRANCH=main
 USB_NAME=""
 DISPLAY_NAME="Epaper_3in7"
+UART=false
 
 # check parameters
-while getopts ":b:d:u:f:" opt; do
+while getopts ":b:d:u:f:s" opt; do
       case $opt in
         b) BRANCH="$OPTARG" ;;
         u) USB_NAME="$OPTARG" ;;
         d) DISPLAY_NAME="$OPTARG" ;;
         f) FLASH="$OPTARG" ;;
+        s) UART=true ;;
         \?) echo "Invalid option: -$OPTARG"; exit 1 ;;
         :) echo "Option -$OPTARG requires a value."; exit 1 ;;
       esac
@@ -105,7 +110,11 @@ sed -i "s/Oled_1in5/${DISPLAY_NAME}/g" stratux-radar-display/image/stratux_radar
 # back to root directory of stratux image
 cd ../../../
 # run stratux configuration skript
-chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
+if [ "$UART" = true ]; then
+  chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh -u
+else
+  chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
+fi
 
 umount mnt/boot
 umount mnt
