@@ -123,7 +123,7 @@ saved_statistics = None    # filename for statistics, set in init
 
 gps_warnings = (1000, 500)    # speech warnings in feet, when calculated with gps
 gps_upper = [False] * len(gps_warnings)  # is true, if height + hysteresis was met
-sensor_warnings = (10, 5, 4, 3, 2, 1)   # speech warnings in feet, when calculated with groundsensor
+sensor_warnings = (50, 40, 30, 20, 15, 10, 5, 4, 3, 2, 1)   # speech warnings in feet, when calculated with groundsensor
 sensor_upper = [False] * len(sensor_warnings) # is true, if height + hysteresis was met
 
 gear_gps_warnings = (1000, 500, 400, 300, 200, 100)  # speech warnings if gear is not down, calculated with gps
@@ -222,10 +222,12 @@ class UsonicSensor:   # definition adapted from DFRobot code
                         self.distance = 0
 
 
-class LidarSensor:   # Implementation for TFMini-Plus Lidar Sensor
+class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Sensor
     lidar_bytes = 9
-    distance_max = 5000    # sensor is able to detect till 12 meters but reliable only to 4 m in bad conditions
-    distance_min = 100     # 10 cm min
+    distance_max = 20000    # in mm = 20 meters
+                            # TFMini Plus, sensor is able to detect till 12 meters but reliable only to 4 m in bad conditions
+                            # TF02 Pro Lidar, sensor is able to detect till 40 meters but reliable only to 12 m in bad conditions
+    distance_min = 100     # in mm, 10 cm min
     ser = None
     distance = 0
     strength = 0
