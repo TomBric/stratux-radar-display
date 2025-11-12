@@ -383,7 +383,7 @@ def write_stats():
     try:
         with open(saved_statistics, 'at') as out:
             serial = _to_serializable(calculate_output_values())
-            json.dump(serial, out, ensure_ascii=False, indent=2)
+            json.dumps(serial, out, ensure_ascii=False, indent=2)
             out.write('\n')  # Add newline after each JSON object
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + saved_statistics)
@@ -405,7 +405,7 @@ def read_stats(stats_file=None):   # returns a list of all written stats
             for line in f:
                 line = line.strip()
                 if line:  # Skip empty lines
-                    raw = json.load(line)
+                    raw = json.loads(line)
                     stats.append(_from_serializable(raw))
             rlog.debug(f"Grounddistance: Read {len(stats)} statistics records")
             return stats
