@@ -55,7 +55,7 @@
 
 import logging
 import time
-import datetime
+from datetime import datetime, timezone
 import asyncio
 import json
 import math
@@ -64,6 +64,7 @@ import simulation
 import radarbluez
 import radarbuttons
 import binascii
+from typing import Any
 
 rlog = None  # radar specific logger
 
@@ -351,6 +352,29 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
     return ground_distance_active
 
 
+def _to_serializable(obj: Any) -> Any:    # necessary to store datetime in json
+    if isinstance(obj, datetime):
+        return {"__type__": "datetime", "value": obj.isoformat()}
+    if isinstance(obj, dict):
+        return {k: _to_serializable(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_to_serializable(v) for v in obj]
+    return obj
+
+
+def _from_serializable(obj: Any) -> Any: # necessary to load datetime in json
+    if isinstance(obj, dict):
+        if obj.get("__type__") == "datetime" and "value" in obj:
+            return datetime.fromisoformat(obj["value"])
+        # regular dict
+        return {k: _from_serializable(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_from_serializable(v) for v in obj]
+    return obj
+
+
+
+
 def write_stats():
     global rlog
 
@@ -358,7 +382,8 @@ def write_stats():
         rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(saved_statistics, 'at') as out:
-            json.dump(calculate_output_values(), out, default=str)
+            serial = _to_serializable(calculate_output_values())
+            json.dump(serial, out, ensure_ascii=False, indent=2)
             out.write('\n')  # Add newline after each JSON object
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + saved_statistics)
@@ -380,7 +405,8 @@ def read_stats(stats_file=None):   # returns a list of all written stats
             for line in f:
                 line = line.strip()
                 if line:  # Skip empty lines
-                    stats.append(json.loads(line))
+                    raw = json.load(line)
+                    stats.append(_from_serializable(raw))
             rlog.debug(f"Grounddistance: Read {len(stats)} statistics records")
             return stats
     except FileNotFoundError:
@@ -641,7 +667,7 @@ def store_statistics(sit):
                 sit['gear_down'] = False
     if time.perf_counter() > stats_next_store:
         stats_next_store = time.perf_counter() + (1 / STATS_PER_SECOND)
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.now(timezone.utc)
         stat_value = {'Time': now, 'baro_valid': sit['baro_valid'], 'own_altitude': sit['own_altitude'],
                       'gps_active': sit['gps_active'], 'longitude': sit['longitude'], 'latitude': sit['latitude'],
                       'gps_speed': sit['gps_speed'], 'gps_altitude': sit['gps_altitude'],
