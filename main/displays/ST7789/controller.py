@@ -32,13 +32,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 from .. import dcommon
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 import math
 import time
-from datetime import datetime
 from . import radar_opts
 from pathlib import Path
-import logging
 
 class ST7789(dcommon.GenericDisplay):
     VERYLARGE = 48  # timer
@@ -358,12 +356,10 @@ class ST7789(dcommon.GenericDisplay):
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = 5
-        st = '---'
         if 'start_time' in values:
-            dt = values['start_time']
-            if not isinstance(dt, datetime):
-                dt = datetime.fromisoformat(dt)
-            st = dt.strftime("%H:%M:%S,%f")[:-5]
+            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+        else:
+            st = '---'
         lines = [
             ("t-off time", st),
             ("t-off alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
@@ -371,12 +367,10 @@ class ST7789(dcommon.GenericDisplay):
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         starty = self.dashboard(offset, self.SMALL, self.sizex - 2* offset, lines)
-        lt = '---'
         if 'landing_time' in values:
-            dt = values['landing_time']
-            if not isinstance(dt, datetime):
-                dt = datetime.fromisoformat(dt)
-            lt = dt.strftime("%H:%M:%S,%f")[:-5]
+            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+        else:
+            lt = '---'
         lines = [
             ("ldg time", lt),
             ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),

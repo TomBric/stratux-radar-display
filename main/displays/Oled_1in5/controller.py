@@ -32,13 +32,12 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 from .. import dcommon
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 import math
 import time
-import datetime
 from . import radar_opts
 from pathlib import Path
-import logging
+
 
 class Oled1in5(dcommon.GenericDisplay):
     VERYLARGE = 24
@@ -345,12 +344,10 @@ class Oled1in5(dcommon.GenericDisplay):
                 self.centered_text(0, f"Start-/Land #{index + 1}", self.SMALL)
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
-        st = '---'
         if 'start_time' in values:
-            dt = values['start_time']
-            if not isinstance(dt, datetime.datetime):
-                dt = datetime.fromisoformat(dt)
-            st = dt.strftime("%H:%M:%S,%f")[:-5]
+            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+        else:
+            st = '---'
         lines = (
             ("t-off time", st),
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
@@ -358,12 +355,10 @@ class Oled1in5(dcommon.GenericDisplay):
         )
         starty = self.dashboard(0, self.SMALL+2 , self.sizex, lines)
 
-        lt = '---'
         if 'landing_time' in values:
-            dt = values['landing_time']
-            if not isinstance(dt, datetime.datetime):
-                dt = datetime.fromisoformat(dt)
-            lt = dt.strftime("%H:%M:%S,%f")[:-5]
+            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+        else:
+            lt = '---'
         lines = (
             ("ldg time", lt),
             ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),

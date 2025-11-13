@@ -35,13 +35,9 @@
 # Does not use full display size, but creates a round display with a diameter of 3.5 inch.
 from . import epd3in7
 from .. import dcommon
-from PIL import Image, ImageDraw, ImageFont
-import math
+from PIL import Image, ImageDraw
 import time
-import datetime
 from pathlib import Path
-import logging
-
 
 top_index = 0    # top index being displayed in checklist
 
