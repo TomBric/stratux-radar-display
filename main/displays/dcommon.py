@@ -353,7 +353,7 @@ class GenericDisplay:
         self.draw.line((self.czerox, cmsize, self.czerox, self.czeroy - bh//2),
                        fill=self.TEXT_COLOR, width=line_width)     # -bw//2 on x-axis, since image is not totally centered
 
-        self.bottom_line("", "", f"{heading}°")
+        self.bottom_line("TRK", "", f"{heading}°")
 
         for m in range(0, 360, 10):
             s = math.sin(math.radians(m - heading + 90))
