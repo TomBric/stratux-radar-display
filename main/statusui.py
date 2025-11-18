@@ -31,7 +31,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import logging
+from globals import rlog
 import requests
 import radarbuttons
 import time
@@ -85,10 +85,6 @@ def default(obj):
 
 
 def read_config(config_file):
-    global rlog
-
-    if rlog is None:   # may be called before init
-        rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(config_file) as f:
             config = json.load(f)
@@ -101,11 +97,8 @@ def read_config(config_file):
 
 
 def write_config(config):
-    global rlog
     global g_config_file
 
-    if rlog is None:   # may be called before init
-        rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(g_config_file, 'wt') as out:
             json.dump(config, out, sort_keys=True, indent=4, default=default)
@@ -123,13 +116,11 @@ def init(config_file, url, target_ip, refresh, config):   # prepare everything
     global new_stratux_ip
     global new_pass
     global new_wifi
-    global rlog
     global g_config_file
 
     g_config_file = config_file
     status_url = url
     stratux_ip = target_ip
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Status UI: Initialized GET settings to " + status_url)
     refresh_time = refresh
     global_config = config

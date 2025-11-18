@@ -32,7 +32,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import logging
 import math
 import radarbuttons
 import ADS1x15       # https://github.com/chandrawi/ADS1x15-ADC
@@ -43,6 +42,7 @@ import radarbluez
 from RPi import GPIO
 import numpy
 import radarmodes
+from globals import rlog, global_config, display_control, global_mode, co_warner_activated
 
 
 # constants
@@ -83,17 +83,15 @@ r0 = 900.0 * 1000   # value for R0 in clean air. Calculated during calibration, 
 cowarner_active = False
 voltage_factor = 1.0
 ADS = None
-rlog = None
-g_config = {}
 value_debug_level = 0   # debug level for printing ad-values
 co_values = []    # all values are here in ppm, maximum
 co_max = 0      # max value read during this run or after reset
-co_warner_status = 0     # 0 - nomal status  1 - calibration in progress  2 - calibration done
+co_warner_status = 0     # 0 - normal status  1 - calibration in progress  2 - calibration done
 calibration_end = 0.0     # timer for calibration
 sample_sum = 0.0        # sum of sample-values
 no_samples = 0       # no of samples taken during calibration
 cowarner_changed = True   # for display driver, true if there is something to display
-co_timeout = 1.0    # timeout of reader process, time intervall of readings
+co_timeout = 1.0    # timeout of reader process, time interval of readings
 co_max_values = 100   # max number of values, is calculated in init
 speak_warning = True
 indicate_co_warning = False    # GPIO 16 indication
@@ -117,30 +115,31 @@ def ppm(rsr0):
 
 
 def init(activate, config, debug_level, co_indication, simulation_mode=False, co_i2c_0=False):
-    global rlog
     global cowarner_active
     global voltage_factor
     global ADS
-    global g_config
     global value_debug_level
     global r0
     global co_timeout
     global co_max_values
     global indicate_co_warning
     global co_simulation
+    global co_warner_activated
 
-    rlog = logging.getLogger('stratux-radar-log')
     if not activate and not simulation_mode:
         rlog.debug("CO-Warner - not activated")
         cowarner_active = False
+        co_warner_activated = False
         return False
-    g_config = config
-    if 'CO_warner_R0' in g_config:
-        r0 = g_config['CO_warner_R0']
+    
+    if 'CO_warner_R0' in global_config:
+        r0 = global_config['CO_warner_R0']
         rlog.debug("CO-Warner: found R0 in config, set to {:.1f} Ohms".format(r0))
+        
     value_debug_level = debug_level
     co_timeout = MIN_SENSOR_READ_TIME
     co_max_values = math.floor(CO_MEASUREMENT_WINDOW / co_timeout)
+    
     if not simulation_mode:
         try:
             if co_i2c_0:
@@ -149,8 +148,10 @@ def init(activate, config, debug_level, co_indication, simulation_mode=False, co
                 ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default address
         except OSError:
             cowarner_active = False
+            co_warner_activated = False
             rlog.debug("CO-Warner - AD sensor not found")
             return False
+            
         # set gain to 4.096V max
         ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
         ADS.setGain(ADS.PGA_4_096V)
@@ -159,7 +160,10 @@ def init(activate, config, debug_level, co_indication, simulation_mode=False, co
     else:
         rlog.debug("CO-Warner: simulation mode active.")
         co_simulation = True
+        
     cowarner_active = True
+    co_warner_activated = True
+    
     if co_indication:
         indicate_co_warning = True
         GPIO.setmode(GPIO.BCM)

@@ -37,7 +37,6 @@ import json
 import asyncio
 import socket
 import websockets
-import logging
 import math
 import time
 
@@ -62,6 +61,7 @@ import grounddistance
 import radarmodes
 import simulation
 import checklist
+import logging
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -69,13 +69,15 @@ import sys
 import traceback
 import syslog
 
+from globals import (rlog, global_config, display_control, global_mode, bluetooth_active, extsound_active,
+                     measure_flighttime, co_warner_activated, grounddistance_activated)
 # logging
 SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
 AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBUG
 #
 
 # constants
-RADAR_VERSION = "2.11"
+RADAR_VERSION = "2.12"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
@@ -129,7 +131,6 @@ ahrs = {'was_changed': True, 'pitch': 0, 'roll': 0, 'heading': 0, 'slipskid': 0,
 # ahrs information, values are all rounded to integer
 gmeter = {'was_changed': True, 'current': 0.0, 'max': 0.0, 'min': 0.0}
 # status information as received from stratux
-global_config = {}
 last_bt_checktime = 0.0
 
 max_pixel = 0
@@ -137,27 +138,17 @@ zerox = 0
 zeroy = 0
 last_arcposition = 0
 display_refresh_time = 0
-display_control = None
 basemode = False  # True if display is always in north direction
 fullcircle = False  # True if epaper display should display full circle centered
 bt_devices = 0
-sound_on = True  # user may toogle sound off by UI
-global_mode = 1
-# 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
-# 7=status 8=refresh from status  9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
-# 13=VSI 14=refresh from VSI 15=dispay stratux status 16=refresh from stratux status
-# 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 21=situation 22=refresh situation 0=Init
-# 23=checklist 24=refresh checklist
-mode_sequence = []  # list of modes to display
+sound_on = True  # user may toggle sound off by UI
+# Modes are now defined in globals.py
+from globals import mode_sequence
+
 bluetooth = False  # True if bluetooth is enabled by parameter -b
-extsound_active = False  # external sound was successfully activated, if global_config >=0
-bluetooth_active = False  # bluetooth successfully activated
 optical_alive = -1
-measure_flighttime = False  # True if automatic measurement of flighttime is enabled
-co_warner_activated = False  # True if co-warner is activated
 co_indication = False  # True if indication via GPIO Pin 16 is on for co
-gear_indication = False # True if indication vio GPIO Pin 19 is on for reading gear statux (pull down if gear is down)
-grounddistance_activated = False  # True if measurement of grounddistance via VL53L1x is activated
+gear_indication = False  # True if indication via GPIO Pin 19 is on for reading gear status (pull down if gear is down)
 groundbeep = False  # True if indication of ground distance via audio
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
 
@@ -874,7 +865,7 @@ def radar_excepthook(exc_type, exc_value, exc_traceback):
 
 
 def logging_init():
-    # Add file rotatin handler, with level DEBUG
+    # Add file rotation handler, with level DEBUG
     # rotatingHandler = logging.handlers.RotatingFileHandler(filename='rotating.log', maxBytes=1000, backupCount=5)
     # rotatingHandler.setLevel(logging.DEBUG)
     global rlog

@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import radarbuttons
-import logging
+from globals import rlog
 import requests
 import radarmodes
 
@@ -40,16 +40,13 @@ import radarmodes
 MSG_NO_CONNECTION = "No Connection!"
 # globals
 url_gmeter_reset = ""
-rlog = None
 gmeterui_changed = True
 
 
 def init(url):
     global url_gmeter_reset
-    global rlog
 
     url_gmeter_reset = url
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("GMeterUI: Initialized POST settings to " + url_gmeter_reset)
 
 

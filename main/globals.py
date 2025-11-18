@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 #
 # BSD 3-Clause License
-# Copyright (c) 2023, Thomas Breitbach
+# Copyright (c) 2021-2025, Thomas Breitbach
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,45 +31,38 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# To use Ultrasonic sensor, which is connected via UART add the following lines to /boot/config.txt
-# enable_uart=1
-# dtoverlay=miniuart-bt
 
-from globals import rlog
-import json
+# Initialize logger
+rlog = None   # is initialized in radar.logging_init()
 
-simulation_mode = False
+# Global configuration dictionary
+global_config = {}
 
-# constants
-SIM_DATA_FILE = "simulation_data.json"
-# file with JSON content, e.g.:
-# {
-#    "g_distance": 10,
-#    "gps_speed": 0,
-#    "own_altitude": 10,
-#    "gps_altitude": 1000,
-#    "gear_down": false
-# }
-#
+# Display control object
+display_control = None
 
-def init(sim_mode):
-    global simulation_mode
+# Global mode for radar display
+global_mode = 0
 
-    simulation_mode = sim_mode
-    if simulation_mode:
-        rlog.debug('Simulation mode activated - Reading sim data from: ' + SIM_DATA_FILE + '.')
-        sim_data = read_simulation_data()
-        if sim_data is not None:
-            rlog.debug('Initial simulation data: ' + json.dumps(sim_data))
-        else:
-            rlog.debug('Error reading simulation data in file ' + SIM_DATA_FILE + '.')
+# Status flags
+bluetooth_active = False
+extsound_active = False
+measure_flighttime = False
+co_warner_activated = False
+grounddistance_activated = False
 
+# Configuration file path
+CONFIG_FILE = ""
 
-def read_simulation_data():  # returns dictionary with all contents of the SIM_DATA_FILE, None if file operation failed
-    try:
-        with open(SIM_DATA_FILE) as f:
-            sim_data = json.load(f)
-    except (OSError, IOError, ValueError) as e:
-        rlog.debug("Simulation: Error " + str(e) + " reading " + SIM_DATA_FILE)
-        return None
-    return sim_data
+# File paths
+SAVED_FLIGHTS = "saved_flights.json"
+SAVED_STATISTICS = "saved_statistics.json"
+SITUATION_DEBUG = 0  # 0=off, 1=some debug, 2=more debug
+
+# Radar display modes
+# 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
+# 7=status 8=refresh from status 9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
+# 13=VSI 14=refresh from VSI 15=display stratux status 16=refresh from stratux status
+# 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 21=situation 22=refresh situation 0=Init
+# 23=checklist 24=refresh checklist
+mode_sequence = []  # list of modes to display

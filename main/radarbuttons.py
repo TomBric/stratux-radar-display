@@ -31,7 +31,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import logging
+from globals import rlog
 from gpiozero import Button
 from gpiozero.exc import GPIOZeroError, GPIODeviceError
 import threading   # for flask server in case of button api
@@ -40,8 +40,6 @@ from flask_wtf import FlaskForm, CSRFProtect
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 import os
-
-rlog = None  # radar specific logger
 
 btn = None   # will be set in init
 gear_down_btn = None   # will be set ini int
@@ -164,11 +162,9 @@ class RadarButton:
 
 
 def init(button_api):
-    global rlog
     global btn
     global button_api_active
 
-    rlog = logging.getLogger('stratux-radar-log')
     try:
         btn = [RadarButton(LEFT), RadarButton(MIDDLE), RadarButton(RIGHT)]
     except:

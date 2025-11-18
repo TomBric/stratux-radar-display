@@ -36,24 +36,10 @@
 # dtoverlay=miniuart-bt
 
 # start and landing statistics are stored in stratux-radar.stat
-# This file has json coded statistics for every flight, see this example
-# {
-#    "start_time": "2023-01-15 12:57:21.873912+00:00",
-#    "start_altitude": 879.8726,
-#    "takeoff_distance": 0.0,
-#    "landing_time": "2023-01-15 12:57:22.106499+00:00",
-#    "landing_altitude": 879.8606,
-#    "landing_distance": 0.0
-# }{
-#    "start_time": "2023-01-15 12:57:28.223856+00:00",
-#    "start_altitude": 880.92865,
-#    "takeoff_distance": 0.0,
-#    "landing_time": "2023-01-15 12:57:28.444494+00:00",
-#    "landing_altitude": 880.77216,
-#    "landing_distance": 0.0
-# }
+# This file has json coded statistics for every flight, one line per flight, see this example
+# {"start_time": "2023-01-15 12:57:21.873912+00:00", "start_altitude": 879.8726, "takeoff_distance": 0.0, "landing_time": "2023-01-15 12:57:22.106499+00:00", "landing_altitude": 879.8606, "landing_distance": 0.0}
+# {"start_time": "2023-01-15 12:57:28.223856+00:00","start_altitude": 880.92865,"takeoff_distance": 0.0,"landing_time": "2023-01-15 12:57:28.444494+00:00","landing_altitude": 880.77216,"landing_distance": 0.0 }
 
-import logging
 import time
 from datetime import datetime, timezone
 import asyncio
@@ -65,8 +51,9 @@ import radarbluez
 import radarbuttons
 import binascii
 from typing import Any
+from globals import rlog
 
-rlog = None  # radar specific logger
+FEET_TO_MM = 304.8     # one feet in mm
 
 # constants
 MEASUREMENTS_PER_SECOND = 10     # number of distance ranging meaurements per second
@@ -146,6 +133,8 @@ sensor_warnings_sounds = None
 gear_not_down_warning_sound = None
 go_around_warning_sound = None
 
+DISTANCE_BELOW_SHOW_SCREEN = 50 * FEET_TO_MM  # this is the distance in feet! below the distance is shown on the display
+DISTANCE_ABOVE_SHOW_NO_SCREEN = 60 * FEET_TO_MM  # this is the hysteresis after the distance screen is no more shown
 
 def set_dest_elevation(dest_increment):
     global dest_elevation
@@ -243,6 +232,7 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Se
 
     def last_distance(self):
         return self.distance
+
     def calc_distance(self):
         if  self.ser.inWaiting() < self.lidar_bytes:
             if not simulation_mode:
@@ -281,7 +271,6 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Se
               rlog.debug(f"Lidar-Sensor: Error less bytes read than expected")
 
 
-
 def reset_values():
     global runup_situation
     global start_situation
@@ -310,7 +299,6 @@ def reset_values():
 
 
 def init(activate, stat_file, debug_level, distance_indication, situation, sim_mode, g_config):
-    global rlog
     global ground_distance_active
     global indicate_distance
     global distance_sensor
@@ -323,7 +311,6 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
 
     simulation_mode = sim_mode
     global_config = g_config
-    rlog = logging.getLogger('stratux-radar-log')
     value_debug_level = debug_level
     saved_statistics = stat_file
     global_situation = situation  # to be able to read and store situation info
@@ -373,13 +360,7 @@ def _from_serializable(obj: Any) -> Any: # necessary to load datetime in json
     return obj
 
 
-
-
 def write_stats():
-    global rlog
-
-    if rlog is None:  # may be called before init
-        rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(saved_statistics, 'at') as out:
             serial = _to_serializable(calculate_output_values())
@@ -391,10 +372,6 @@ def write_stats():
 
 
 def read_stats(stats_file=None):   # returns a list of all written stats
-    global rlog
-    
-    if rlog is None:
-        rlog = logging.getLogger('stratux-radar-log')
     if stats_file is None:
         stats_file = saved_statistics
         if stats_file is None:
@@ -522,6 +499,18 @@ def has_stopped():
     return False
 
 
+def show_distance_screen():    # returns true if screen with distance should be shown
+    if global_situation['g_distance_valid'] and global_situation['g_distance'] <= DISTANCE_BELOW_SHOW_SCREEN:
+        return True
+    return False
+
+
+def finish_distance_screen():
+    if global_situation['g_distance_valid'] and global_situation['g_distance'] >= DISTANCE_ABOVE_FINISH_SCREEN:
+        return True
+    return False
+
+
 def obstacle_is_clear(current_alt, alt_to_clear):
     global stats_before_obstacle_clear
 
@@ -582,7 +571,7 @@ def calculate_output_values():  # return output lines
     return output
 
 
-def evaluate_statistics(latest_stat):
+def evaluate_statistics(latest_stat):   # called via store_statistics by ground reader
     global statistics
     global fly_status
     global runup_situation
@@ -626,6 +615,11 @@ def evaluate_statistics(latest_stat):
                         rlog.debug("Grounddistance: Obstacle clearance down found " +
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                         break
+        if show_distance_screen():    # switch to screen with distance
+            distance_back_mode = current_mode   # remember current mode
+            switch_to_mode(MODE_DISTANCE)
+
+
     elif fly_status == 2:  # landing detected, waiting for stop to calculate distance
         if has_stopped():
             fly_status = 0
@@ -642,7 +636,7 @@ def evaluate_statistics(latest_stat):
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
     calc_distance_speaker(latest_stat)
 
-def store_statistics(sit):
+def store_statistics(sit):   # called from read_ground_sensor
     global stats_next_store
 
     if simulation_mode:
@@ -703,7 +697,7 @@ async def read_ground_sensor():
                 next_read = next_read + (1 / MEASUREMENTS_PER_SECOND)
                 distance_sensor.calc_distance()
                 distance = distance_sensor.last_distance()  # distance in mm
-                if distance > 0:
+                if distance > 0:    # distance==0 is invalid distance
                     global_situation['g_distance_valid'] = True
                     global_situation['g_distance'] = distance - zero_distance
                     rlog.log(value_debug_level,

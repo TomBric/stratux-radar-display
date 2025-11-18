@@ -36,7 +36,7 @@ import subprocess
 import radarbuttons
 import time
 import requests
-import logging
+from globals import rlog
 import radarmodes
 
 SHUTDOWN_WAIT_TIME = 6.0
@@ -46,7 +46,6 @@ clear_before_shutoff = False
 
 url_reboot = ""
 url_shutdown = ""
-rlog = None
 
 
 def init(shutdown, reboot):
@@ -56,7 +55,6 @@ def init(shutdown, reboot):
 
     url_reboot = reboot
     url_shutdown = shutdown
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
 
 

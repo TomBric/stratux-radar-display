@@ -53,10 +53,10 @@
 
 
 import datetime
-import logging
 import json
 import radarbuttons
 import radarmodes
+from globals import rlog
 
 
 # constants
@@ -86,7 +86,6 @@ takeoff_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_TAKEOFF)
 landing_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_LANDING)
 stop_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_STOP)
 flighttime_changed = True
-rlog = None
 g_config = {}
 
 
@@ -96,12 +95,10 @@ def default(obj):
 
 
 def init(activated, saved_flights):
-    global rlog
     global measurement_enabled
     global g_config
     global g_saved_flights
 
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Flighttime: time-measurement initialized")
     measurement_enabled = activated
     g_saved_flights = saved_flights
@@ -122,10 +119,6 @@ def new_flight(flight):
 
 
 def read_flights():
-    global rlog
-
-    if rlog is None:   # may be called before init
-        rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(g_saved_flights) as f:
             config = json.load(f)
@@ -143,10 +136,6 @@ def read_flights():
 
 
 def write_flights():
-    global rlog
-
-    if rlog is None:   # may be called before init
-        rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(g_saved_flights, 'wt') as out:
             json.dump(g_config, out, sort_keys=True, indent=4, default=default)

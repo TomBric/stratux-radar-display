@@ -31,7 +31,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import logging
+from globals import rlog
 import requests
 import radarbuttons
 import radarmodes
@@ -48,17 +48,14 @@ sound_on = True
 button_api_active = False
 
 url_settings_set = ""
-rlog = None
 
 
 def init(url, button_api):
     global url_settings_set
-    global rlog
 
     if not radarbuttons.init(button_api):   # error occured, e.g. gpio pins are buse
         return False
     url_settings_set = url
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Radar UI: Initialized POST settings to " + url_settings_set)
     return True
 

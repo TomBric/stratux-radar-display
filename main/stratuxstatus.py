@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 #
 # BSD 3-Clause License
-# Copyright (c) 2021, Thomas Breitbach
+# Copyright (c) 2021-2025, Thomas Breitbach
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ import radar
 import radarbuttons
 import asyncio
 import json
+from globals import rlog
 import radarmodes
 import requests
 
@@ -47,7 +48,6 @@ status = {}
 status_url = ""
 settings_url_get = ""
 settings_url_set = ""
-rlog = None
 status_listener = None  # couroutine task for querying statux
 strx = {'was_changed': True, 'version': "0.0", 'ES_messages_last_minute': 0, 'ES_messages_max': 0,
         'OGN_connected': False, 'OGN_messages_last_minute': 0, 'OGN_messages_max': 0,
@@ -65,12 +65,10 @@ def init(url_ws, url_settings_get, url_settings_set):  # prepare everything
     global status_url
     global settings_url_set
     global settings_url_get
-    global rlog
 
     status_url = url_ws
     settings_url_get = url_settings_get
     settings_url_set = url_settings_set
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("StratuxStatus UI: Initialized with URL " + status_url)
 
 

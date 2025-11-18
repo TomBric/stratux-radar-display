@@ -13,13 +13,13 @@
 #   sudo /bin/bash mk_radar_on_stratux.sh
 #   sudo /bin/bash mk_radar_on_stratux.sh -b dev
 #   sudo /bin/bash mk_radar_on_stratux.sh -d Epaper_1in54
-# install a first time flashing of the t-beam
+# install a first time flashing of the t-beam, copies the content of the specified directory to /home/pi/stratux-radar-display/to_flash
 #   sudo /bin/bash mk_radar_on_stratux.sh -flash /home/pi/GxAirCom81
 # Enable sound output and UART Ground Sensor
 #   sudo /bin/bash mk_radar_on_stratux.sh -s
 
 
-set -x
+set -xcd ho
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

@@ -37,7 +37,7 @@ import math
 import radarbluez
 import flighttime
 import datetime
-import logging
+from globals import rlog
 import radarmodes
 
 # constants
@@ -64,7 +64,6 @@ def init(config):
     global g_config
 
     g_config = config
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Timerui: timer initialized")
 
 

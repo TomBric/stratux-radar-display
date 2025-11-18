@@ -33,15 +33,14 @@
 
 import radarbuttons
 import radarmodes
-import logging
 import requests
+from globals import rlog
 
 # constants
 # globals
 ahrs_ui_changed = True
 calibrate_url = ""   # url of stratux to initiate AHRS calibration
 cage_url = ""        # url of stratux to initation Zero Drift
-rlog = None
 
 MSG_GROUND_TEST = "No GPS,Ground ONLY!"
 MSG_PSEUDO_AHRS = "PSEUDO AHRS ONLY!"
@@ -53,11 +52,9 @@ MSG_CALIBRATING = "CALIBRATE - FLY LEVEL"
 def init(calib_url, cage):   # prepare everything
     global calibrate_url
     global cage_url
-    global rlog
 
     calibrate_url = calib_url
     cage_url = cage
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("AHRS UI: Initialized calibrate url to {0} cage url to {1}".format(calib_url, cage))
 
 
