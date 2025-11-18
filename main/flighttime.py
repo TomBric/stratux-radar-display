@@ -56,7 +56,7 @@ import datetime
 import json
 import radarbuttons
 import radarmodes
-from globals import rlog
+from globals import rlog, Modes
 
 
 # constants
@@ -244,19 +244,19 @@ def user_input():
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     flighttime_changed = True
     switch_back_mode = 0    # cancel any switchback, if button was pressed
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return radarmodes.next_mode_sequence(17)  # next mode
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long, refresh
-        return 18  # start next mode for display driver: refresh called
+        return Modes.REFRESH_FLIGHTTIME  # start next mode for display driver: refresh called
     if button == 2 and btime == 1:  # right and short, clear flight list
         if 'last_flights' in g_config:
             g_config['last_flights'].clear()
         rlog.debug("Flight list cleared by button press")
         write_flights()  # also clear stored flights
-        return 17  # start next mode for display driver: refresh called
-    return 17  # no mode change
+        return Modes.FLIGHTTIME  # start next mode for display driver: refresh called
+    return Modes.FLIGHTTIME  # no mode change

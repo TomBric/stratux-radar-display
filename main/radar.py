@@ -634,7 +634,6 @@ async def user_interface():
 
 def refresh_display(manual = False):
     global last_auto_refresh
-    global display_control
     global auto_refresh_time
 
     if not manual and auto_refresh_time == 0:   # no autorefresh option provided, do no automatic refresh

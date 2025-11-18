@@ -33,6 +33,7 @@
 
 import radarbuttons
 import radarmodes
+from globals import Modes
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -68,7 +69,7 @@ def user_input():
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return radarmodes.next_mode_sequence(11)    # next mode
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long: refresh
-        return 12  # start next mode for display driver: refresh called
-    return 11  # no mode change
+        return Modes.REFRESH_COMPASS  # start next mode for display driver: refresh called
+    return Modes.COMPASS  # no mode change
