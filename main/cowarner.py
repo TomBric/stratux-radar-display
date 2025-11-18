@@ -42,7 +42,7 @@ import radarbluez
 from RPi import GPIO
 import numpy
 import radarmodes
-from globals import rlog, global_config, display_control, global_mode, co_warner_activated
+from globals import rlog
 
 
 # constants
@@ -132,8 +132,8 @@ def init(activate, config, debug_level, co_indication, simulation_mode=False, co
         co_warner_activated = False
         return False
     
-    if 'CO_warner_R0' in global_config:
-        r0 = global_config['CO_warner_R0']
+    if 'CO_warner_R0' in config:
+        r0 = config['CO_warner_R0']
         rlog.debug("CO-Warner: found R0 in config, set to {:.1f} Ohms".format(r0))
         
     value_debug_level = debug_level
