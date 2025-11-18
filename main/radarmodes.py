@@ -42,7 +42,7 @@ from globals import mode_sequence
 # 23=checklist 24=refresh checklist
 
 # mode_sequence is now imported from globals.py
-
+from globals import mode_sequence
 
 def mode_codes(c):
     modes = {
@@ -63,7 +63,8 @@ def mode_codes(c):
 
 
 def parse_modes(modes):
-    # mode_sequence is now a global from globals.py
+    global mode_sequence
+
     mode_sequence = []
     for c in modes:
         mode_no = mode_codes(c)
