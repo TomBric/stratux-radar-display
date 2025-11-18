@@ -31,8 +31,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from globals import mode_sequence
-
 # radar mode definitions
 # Moved to globals.py:
 # 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
@@ -42,36 +40,33 @@ from globals import mode_sequence
 # 23=checklist 24=refresh checklist
 
 # mode_sequence is now imported from globals.py
-from globals import mode_sequence
+from globals import Modes, mode_sequence
 
 def mode_codes(c):
     modes = {
-        "R": 1,
-        "T": 2,
-        "A": 5,
-        "D": 7,
-        "G": 9,
-        "K": 11,
-        "V": 13,
-        "S": 15,
-        "I": 17,
-        "C": 19,
-        "M": 21,
-        "L": 23
+        "R": Modes.RADAR,
+        "T": Modes.TIMER,
+        "A": Modes.AHRS,
+        "D": Modes.STATUS,
+        "G": Modes.GMETER,
+        "K": Modes.COMPASS,
+        "V": Modes.VSI,
+        "S": Modes.STRATUX_STATUS,
+        "I": Modes.FLIGHTTIME,
+        "C": Modes.COWARNER,
+        "M": Modes.SITUATION,
+        "L": Modes.CHECKLIST
     }
     return modes.get(c, 0)
 
 
 def parse_modes(modes):
-    global mode_sequence
-
-    mode_sequence = []
     for c in modes:
         mode_no = mode_codes(c)
         if mode_no > 0:
             mode_sequence.append(mode_no)
     if len(mode_sequence) == 0:
-        mode_sequence.append(1) # default mode is radar if no valid mode is given
+        mode_sequence.append(Modes.RADAR) # default mode is radar if no valid mode is given
 
 def next_mode_sequence(current_mode):
     iterator = iter(mode_sequence)

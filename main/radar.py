@@ -70,7 +70,7 @@ import traceback
 import syslog
 
 from globals import (rlog, global_config, display_control, global_mode, bluetooth_active, extsound_active,
-                     measure_flighttime, co_warner_activated, grounddistance_activated)
+                     measure_flighttime, co_warner_activated, grounddistance_activated, Modes)
 # logging
 SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
 AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBUG
@@ -141,10 +141,6 @@ display_refresh_time = 0
 basemode = False  # True if display is always in north direction
 fullcircle = False  # True if epaper display should display full circle centered
 bt_devices = 0
-sound_on = True  # user may toggle sound off by UI
-# Modes are now defined in globals.py
-from globals import mode_sequence
-
 bluetooth = False  # True if bluetooth is enabled by parameter -b
 optical_alive = -1
 co_indication = False  # True if indication via GPIO Pin 16 is on for co
@@ -575,7 +571,7 @@ async def user_interface():
     try:
         while True:
             await asyncio.sleep(UI_REACTION_TIME)
-            if global_mode == 1:  # Radar mode
+            if global_mode == Modes.RADAR:  # Radar mode
                 next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
                 if toggle_sound:
                     sound_on = not sound_on
@@ -584,39 +580,39 @@ async def user_interface():
                     else:
                         radarbluez.speak("Radar sound off")
                     ui_changed = True
-            elif global_mode == 2:  # Timer mode
+            elif global_mode == Modes.TIMER:  # Timer mode
                 next_mode = timerui.user_input()
-            elif global_mode == 3:  # shutdown mode
+            elif global_mode == Modes.SHUTDOWN:  # shutdown mode
                 next_mode = shutdownui.user_input()
-            elif global_mode == 5:  # ahrs
+            elif global_mode == Modes.AHRS:  # ahrs
                 next_mode = ahrsui.user_input()
-            elif global_mode == 7:  # status
+            elif global_mode == Modes.STATUS:  # status
                 next_mode = statusui.user_input(extsound_active, bluetooth_active)
-            elif global_mode == 9:  # gmeter
+            elif global_mode == Modes.GMETER:  # gmeter
                 next_mode = gmeterui.user_input()
-            elif global_mode == 11:  # compass
+            elif global_mode == Modes.COMPASS:  # compass
                 next_mode = compassui.user_input()
-            elif global_mode == 13:  # vertical speed indicator
+            elif global_mode == Modes.VSI:  # vertical speed indicator
                 next_mode, reset_vsi = verticalspeed.user_input()
                 if reset_vsi:
                     vertical_max = 0.0
                     vertical_min = 0.0
-            elif global_mode == 15:  # stratux status
+            elif global_mode == Modes.STRATUX_STATUS:  # stratux status
                 stratuxstatus.start()  # starts status_listener couroutine if not yet running
                 next_mode = stratuxstatus.user_input()
                 if next_mode != 0 and next_mode != 15:
                     stratuxstatus.stop()  # stops status_listener
-            elif global_mode == 17:  # display flighttimes
+            elif global_mode == Modes.FLIGHTTIME:  # display flighttimes
                 next_mode = flighttime.user_input()
-            elif global_mode == 19:  # co warner
+            elif global_mode == Modes.COWARNER:  # co warner
                 next_mode = cowarner.user_input()
-            elif global_mode == 21:  # ground distance
+            elif global_mode == Modes.DISTANCE:  # ground distance
                 next_mode, reset_situation = distance.user_input()
                 if reset_situation:
                     distance.reset_values(situation)
-            elif global_mode == 23:  # display checklist
+            elif global_mode == Modes.CHECKLIST:  # display checklist
                 next_mode = checklist.user_input()
-            if next_mode > 0:
+            if next_mode != Modes.NO_CHANGE:
                 ui_changed = True
                 rlog.debug("User Interface: global mode changing from: " + str(global_mode) + " to " + str(next_mode))
                 global_mode = next_mode
@@ -670,52 +666,52 @@ async def display_and_cutoff():
                 # try it several times to be as fast as possible
             else:
                 refresh_display()
-                if global_mode == 1:  # Radar
+                if global_mode == Modes.RADAR:  # Radar
                     draw_display()
-                elif global_mode == 2:  # Timer'
+                elif global_mode == Modes.TIMER:  # Timer'
                     timerui.draw_timer(display_control, display_refresh_time)
-                elif global_mode == 3:  # shutdown
+                elif global_mode == Modes.SHUTDOWN:  # shutdown
                     final_shutdown = shutdownui.draw_shutdown(display_control)
                     if final_shutdown:
                         rlog.debug("Shutdown triggered: Display task terminating ...")
                         return
-                elif global_mode == 4:  # refresh display, only relevant for epaper, mode was radar
+                elif global_mode == Modes.REFRESH_RADAR:  # refresh display, only relevant for epaper, mode was radar
                     rlog.debug("Radar: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 1
-                elif global_mode == 5:  # ahrs'
+                    global_mode = Modes.RADAR
+                elif global_mode == Modes.AHRS:  # ahrs'
                     ahrsui.draw_ahrs(display_control, situation['connected'], ui_changed or ahrs['was_changed'],
                                      ahrs['pitch'], ahrs['roll'], ahrs['heading'], ahrs['slipskid'],
                                      ahrs['gps_hor_accuracy'], ahrs['ahrs_sensor'], ahrs['is_caging'])
                     ahrs['was_changed'] = False
                     ui_changed = False
-                elif global_mode == 6:  # refresh display, only relevant for epaper, mode was radar
+                elif global_mode == Modes.REFRESH_AHRS:  # refresh display, only relevant for epaper, mode was ahrs
                     rlog.debug("AHRS: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 5
-                elif global_mode == 7:  # status display
+                    global_mode = Modes.AHRS
+                elif global_mode == Modes.STATUS:  # status display
                     statusui.draw_status(display_control, bluetooth_active, extsound_active)
-                elif global_mode == 8:  # refresh display, only relevant for epaper, mode was status
+                elif global_mode == Modes.REFRESH_STATUS:  # refresh display, only relevant for epaper, mode was status
                     rlog.debug("Status: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 7
-                elif global_mode == 9:  # gmeter display
+                    global_mode = Modes.STATUS
+                elif global_mode == Modes.GMETER:  # gmeter display
                     gmeterui.draw_gmeter(display_control, ui_changed, situation['connected'], gmeter)
                     gmeter['was_changed'] = False
                     ui_changed = False
-                elif global_mode == 10:  # refresh display, only relevant for epaper, mode was gmeter
+                elif global_mode == Modes.REFRESH_GMETER:  # refresh display, only relevant for epaper, mode was gmeter
                     rlog.debug("Gmeter: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 9
-                elif global_mode == 11:  # compass display
+                    global_mode = Modes.GMETER
+                elif global_mode == Modes.COMPASS:  # compass display
                     compassui.draw_compass(display_control, situation['was_changed'], situation['connected'],
                                            situation['course'])
                     situation['was_changed'] = False
-                elif global_mode == 12:  # refresh display, only relevant for epaper, mode was gmeter
+                elif global_mode == Modes.REFRESH_COMPASS:  # refresh display, only relevant for epaper, mode was compass
                     rlog.debug("Compass: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 11
-                elif global_mode == 13:  # vsi display
+                    global_mode = Modes.COMPASS
+                elif global_mode == Modes.VSI:  # vsi display
                     verticalspeed.draw_vsi(display_control, situation['was_changed'] or ui_changed,
                                            situation['connected'], situation['vertical_speed'],
                                            situation['own_altitude'], situation['gps_speed'],
@@ -724,48 +720,48 @@ async def display_and_cutoff():
                                            situation['baro_valid'])
                     situation['was_changed'] = False
                     ui_changed = False
-                elif global_mode == 14:  # refresh display, only relevant for epaper, mode was gmeter
+                elif global_mode == Modes.REFRESH_VSI:  # refresh display, only relevant for epaper, mode was vsi
                     rlog.debug("VSI: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 13
-                elif global_mode == 15:  # stratux_statux display
+                    global_mode = Modes.VSI
+                elif global_mode == Modes.STRATUX_STATUS:  # stratux_status display
                     stratuxstatus.draw_status(display_control, ui_changed, situation['connected'],
                                               situation['own_altitude'], situation['gps_altitude'],
                                               situation['gps_quality'])
                     ui_changed = False
-                elif global_mode == 16:  # refresh display, only relevant for epaper, mode was stratux_status
+                elif global_mode == Modes.REFRESH_STRATUX_STATUS:  # refresh display, only relevant for epaper, mode was stratux_status
                     rlog.debug("StratusStatus: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 15
-                elif global_mode == 17:  # display flight time
+                    global_mode = Modes.STRATUX_STATUS
+                elif global_mode == Modes.FLIGHTTIME:  # display flight time
                     flighttime.draw_flighttime(display_control, ui_changed)
                     ui_changed = False
-                elif global_mode == 18:  # refresh display, only relevant for epaper, mode was flighttime
+                elif global_mode == Modes.REFRESH_FLIGHTTIME:  # refresh display, only relevant for epaper, mode was flighttime
                     rlog.debug("StratusStatus: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 17
-                elif global_mode == 19:  # co-warner
+                    global_mode = Modes.FLIGHTTIME
+                elif global_mode == Modes.COWARNER:  # co-warner
                     cowarner.draw_cowarner(display_control, ui_changed)
                     ui_changed = False
-                elif global_mode == 20:  # refresh display, only relevant for epaper, mode was co-warner
+                elif global_mode == Modes.REFRESH_CO_WARNER:  # refresh display, only relevant for epaper, mode was co-warner
                     rlog.debug("CO-Warner: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 19
-                elif global_mode == 21:  # situation
+                    global_mode = Modes.COWARNER
+                elif global_mode == Modes.SITUATION:  # situation
                     distance.draw_distance(display_control, situation['was_changed'] or ui_changed,
                                            situation['connected'], situation, ahrs)
                     ui_changed = False
-                elif global_mode == 22:  # refresh display, only relevant for epaper, mode was situation
+                elif global_mode == Modes.REFRESH_SITUATION:  # refresh display, only relevant for epaper, mode was situation
                     rlog.debug("Situation: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 21
-                elif global_mode == 23:  # checklist
+                    global_mode = Modes.SITUATION
+                elif global_mode == Modes.CHECKLIST:  # checklist
                     checklist.draw_checklist(display_control, ui_changed)
                     ui_changed = False
-                elif global_mode == 24:  # refresh display, only relevant for epaper, mode was situation
+                elif global_mode == Modes.REFRESH_CHECKLIST:  # refresh display, only relevant for epaper, mode was checklist
                     rlog.debug("Checklist: Display driver - Refreshing")
                     refresh_display(manual=True)
-                    global_mode = 23
+                    global_mode = Modes.CHECKLIST
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF

@@ -33,6 +33,7 @@
 
 
 import logging
+from enum import Enum
 
 # Initialize logger
 rlog = logging.getLogger('stratux-radar-log')
@@ -44,7 +45,7 @@ global_config = {}
 display_control = None
 
 # Global mode for radar display
-global_mode = 0
+global_mode = Gmodes.RADAR  # Start with RADAR mode
 
 # Status flags
 bluetooth_active = False
@@ -67,4 +68,32 @@ SITUATION_DEBUG = 0  # 0=off, 1=some debug, 2=more debug
 # 13=VSI 14=refresh from VSI 15=display stratux status 16=refresh from stratux status
 # 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 21=situation 22=refresh situation 0=Init
 # 23=checklist 24=refresh checklist
+class Modes(Enum):
+    NO_CHANGE = 0
+    RADAR = 1
+    TIMER = 2
+    SHUTDOWN = 3
+    REFRESH_RADAR = 4
+    AHRS = 5
+    REFRESH_AHRS = 6
+    STATUS = 7
+    REFRESH_STATUS = 8
+    GMETER = 9
+    REFRESH_GMETER = 10
+    COMPASS = 11
+    REFRESH_COMPASS = 12
+    VSI = 13
+    REFRESH_VSI = 14
+    STRATUX_STATUS = 15
+    REFRESH_STRATUX_STATUS = 16
+    FLIGHTTIME = 17
+    REFRESH_FLIGHTTIME = 18
+    COWARNER = 19
+    REFRESH_CO_WARNER = 20
+    SITUATION = 21
+    REFRESH_SITUATION = 22
+    CHECKLIST = 23
+    REFRESH_CHECKLIST = 24
+
+
 mode_sequence = []  # list of modes to display
