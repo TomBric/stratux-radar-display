@@ -42,6 +42,7 @@ import radarbuttons
 import grounddistance
 import datetime
 import radarmodes
+from globals import Modes
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -158,7 +159,7 @@ def user_input():
         return 0, False  # stay in current mode
     if dist_user_mode == 0:
         if button == 1 and btime == 2:  # middle
-            return radarmodes.next_mode_sequence(21), False  # next mode to be radar
+            return radarmodes.next_mode_sequence(Modes.SITUATION), False  # next mode to be radar
         if button == 1 and btime == 1:  # middle and short, display history statistics
             dist_user_mode = 2
             statistic_list = grounddistance.read_stats()  # returns empty list if nothing available
@@ -168,48 +169,48 @@ def user_input():
                 statistic_index = -1
             return 21, False
         if button == 0 and btime == 2:  # left and long
-            return 3, False  # start next mode shutdown!
+            return Modes.SHUTDOWN, False  # start next mode shutdown!
         if button == 0 and btime == 1:  # left and short - display statistics
             dist_user_mode = 1
-            return 21, False
+            return Modes.SITUATION, False
         if button == 2 and btime == 1:  # right and short - reset values
-            return 21, True  # reset values in radar.py
+            return Modes.SITUATION, True  # reset values in radar.py
         if button == 2 and btime == 2:  # right and long - refresh
-            return 22, False  # start next mode for display driver: refresh called from vsi
-        return 21, False  # no mode change for any other interaction
+            return Modes.REFRESH_SITUATION, False  # start next mode for display driver: refresh called from vsi
+        return Modes.SITUATION, False  # no mode change for any other interaction
     elif dist_user_mode == 1:  # statistics/set mode
         if button == 1 and (btime == 2 or btime == 1):  # middle and long/short - return to display mode
             dist_user_mode = 0
-            return 21, False
+            return Modes.SITUATION, False
         if button == 0 and btime == 1:  # left and short - +100 ft
             grounddistance.set_dest_elevation(+100)
-            return 21, False
+            return Modes.SITUATION, False
         if button == 0 and btime == 2:  # left and long - -100 ft
             grounddistance.set_dest_elevation(-100)
-            return 21, False
+            return Modes.SITUATION, False
         if button == 2 and btime == 1:  # right and short - -100 ft
             grounddistance.set_dest_elevation(+10)
-            return 21, False
+            return Modes.SITUATION, False
         if button == 2 and btime == 2:  # right and long - -100 ft
             grounddistance.set_dest_elevation(-10)
-            return 21, False
-        return 21, False  # no mode change for any other interaction
+            return Modes.SITUATION, False
+        return Modes.SITUATION, False  # no mode change for any other interaction
     elif dist_user_mode == 2:  # history values list
         if button == 1 and (btime == 1 or btime == 2):  # middle - return to display mode
             dist_user_mode = 0
-            return 21, False
+            return Modes.SITUATION, False
         if button == 2 and btime == 1:  # right and short - next element
             statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
             if statistic_list is not None and len(statistic_list) > 0:
                 statistic_index = (statistic_index + 1) % len(statistic_list)
             else:
                 statistic_index = -1
-            return 21, False
+            return Modes.SITUATION, False
         if button == 0 and btime == 1:  # left and short - previous element
             statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
             if statistic_list is not None and len(statistic_list) > 0:
                 statistic_index = (statistic_index - 1) % len(statistic_list)
             else:
                 statistic_index = -1
-            return 21, False
-        return 21, False  # no mode change for any other interaction
+            return Modes.SITUATION, False
+        return Modes.SITUATION, False  # no mode change for any other interaction

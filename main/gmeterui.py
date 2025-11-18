@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import radarbuttons
-from globals import rlog
+from globals import rlog, Modes
 import requests
 import radarmodes
 
@@ -83,10 +83,10 @@ def user_input():
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return radarmodes.next_mode_sequence(9)
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long, refresh
-        return 10  # start next mode for display driver: refresh called from gmeter
+        return Modes.GMETER_REFRESH  # start next mode for display driver: refresh called from gmeter
     if button == 2 and btime == 1:  # right and short - reset
         reset_gmeter()
-        return 9
-    return 9  # no mode change
+        return Modes.GMETER
+    return Modes.GMETER  # no mode change
