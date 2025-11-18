@@ -57,13 +57,13 @@ def mode_codes(c):
         "M": Modes.SITUATION,
         "L": Modes.CHECKLIST
     }
-    return modes.get(c, 0)
+    return modes.get(c, Modes.NO_CHANGE)
 
 
 def parse_modes(modes):
     for c in modes:
         mode_no = mode_codes(c)
-        if mode_no > 0:
+        if mode_no is not Modes.NO_CHANGE:
             mode_sequence.append(mode_no)
     if len(mode_sequence) == 0:
         mode_sequence.append(Modes.RADAR) # default mode is radar if no valid mode is given
