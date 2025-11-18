@@ -35,39 +35,6 @@
 import logging
 from enum import Enum
 
-# Initialize logger
-rlog = logging.getLogger('stratux-radar-log')
-
-# Global configuration dictionary
-global_config = {}
-
-# Display control object
-display_control = None
-
-# Global mode for radar display
-global_mode = Gmodes.RADAR  # Start with RADAR mode
-
-# Status flags
-bluetooth_active = False
-extsound_active = False
-measure_flighttime = False
-co_warner_activated = False
-grounddistance_activated = False
-
-# Configuration file path
-CONFIG_FILE = ""
-
-# File paths
-SAVED_FLIGHTS = "saved_flights.json"
-SAVED_STATISTICS = "saved_statistics.json"
-SITUATION_DEBUG = 0  # 0=off, 1=some debug, 2=more debug
-
-# Radar display modes
-# 1=Radar 2=Timer 3=Shutdown 4=refresh from radar 5=ahrs 6=refresh from ahrs
-# 7=status 8=refresh from status 9=gmeter 10=refresh from gmeter 11=compass 12=refresh from compass
-# 13=VSI 14=refresh from VSI 15=display stratux status 16=refresh from stratux status
-# 17=flighttime 18=refresh flighttime 19=cowarner 20=refresh cowarner 21=situation 22=refresh situation 0=Init
-# 23=checklist 24=refresh checklist
 class Modes(Enum):
     NO_CHANGE = 0
     RADAR = 1
@@ -95,5 +62,33 @@ class Modes(Enum):
     CHECKLIST = 23
     REFRESH_CHECKLIST = 24
 
+
+
+# Initialize logger
+rlog = logging.getLogger('stratux-radar-log')
+
+# Global configuration dictionary
+global_config = {}
+
+# Display control object
+display_control = None
+
+# Global mode for radar display
+global_mode = Modes.RADAR  # Start with RADAR mode
+
+# Status flags
+bluetooth_active = False
+extsound_active = False
+measure_flighttime = False
+co_warner_activated = False
+grounddistance_activated = False
+
+# Configuration file path
+CONFIG_FILE = ""
+
+# File paths
+SAVED_FLIGHTS = "saved_flights.json"
+SAVED_STATISTICS = "saved_statistics.json"
+SITUATION_DEBUG = 0  # 0=off, 1=some debug, 2=more debug
 
 mode_sequence = []  # list of modes to display
