@@ -32,8 +32,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import logging
+
 # Initialize logger
-rlog = None   # is initialized in radar.logging_init()
+rlog = logging.getLogger('stratux-radar-log')
 
 # Global configuration dictionary
 global_config = {}

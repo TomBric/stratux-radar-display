@@ -868,8 +868,6 @@ def logging_init():
     # Add file rotation handler, with level DEBUG
     # rotatingHandler = logging.handlers.RotatingFileHandler(filename='rotating.log', maxBytes=1000, backupCount=5)
     # rotatingHandler.setLevel(logging.DEBUG)
-    global rlog
-
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     rlog = logging.getLogger('stratux-radar-log')
     logging.addLevelName(SITUATION_DEBUG, 'SITUATION_DEBUG')
