@@ -42,7 +42,7 @@ import radarbluez
 from RPi import GPIO
 import numpy
 import radarmodes
-from globals import rlog
+from globals import rlog, global_config
 
 
 # constants
@@ -267,7 +267,6 @@ def calibration():   # called by co-reader thread, performs calibration and ends
     global sample_sum
     global no_samples
     global r0
-    global g_config
     global cowarner_changed
 
     cowarner_changed = True  # to display new value
@@ -284,8 +283,8 @@ def calibration():   # called by co-reader thread, performs calibration and ends
             r0 = sample_sum / no_samples
             rlog.debug("CO-Warner: Calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
                        .format(no_samples, r0))
-            g_config['CO_warner_R0'] = r0
-            statusui.write_config(g_config)
+            global_config['CO_warner_R0'] = r0
+            statusui.write_config(global_config)
             co_warner_status = 0
     else:  # simulation mode
         if countdown > 0:  # continue sensor reading
@@ -293,8 +292,8 @@ def calibration():   # called by co-reader thread, performs calibration and ends
         else:
             rlog.debug("CO-Warner: Simulaton calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
                        .format(no_samples, r0))
-            g_config['CO_warner_R0'] = r0
-            statusui.write_config(g_config)
+            global_config['CO_warner_R0'] = r0
+            statusui.write_config(global_config)
             co_warner_status = 0
 
 
