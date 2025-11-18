@@ -38,7 +38,6 @@ import xmltodict
 from pathlib import Path
 import arguments
 from globals import rlog
-r
 # constants
 
 # globals
