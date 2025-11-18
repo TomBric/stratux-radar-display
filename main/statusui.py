@@ -57,7 +57,6 @@ DEFAULT_PASS = "                "
 MAX_WIFI_LENGTH = 16
 
 # globals
-rlog = None
 g_config_file = None   # filename of config file, set in init
 global_config = {}
 status_url = ""
