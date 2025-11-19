@@ -57,10 +57,11 @@ class Modes(Enum):
     REFRESH_FLIGHTTIME = 18
     COWARNER = 19
     REFRESH_CO_WARNER = 20
-    SITUATION = 21
+    SITUATION = 21    # for ground_distance
     REFRESH_SITUATION = 22
     CHECKLIST = 23
     REFRESH_CHECKLIST = 24
+
 
 
 
