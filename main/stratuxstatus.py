@@ -236,5 +236,5 @@ def user_input():
     elif button == 2 and btime == 2:  # right and long, refresh
         change_value(-100)
     elif button == 1 and (btime == 2 or btime == 1):  # middle
-        return radarmodes.next_mode_sequence(Modes.STATUX_STATUS)
+        return radarmodes.next_mode_sequence(Modes.STRATUX_STATUS)
     return Modes.STRATUX_STATUS  # no mode change
