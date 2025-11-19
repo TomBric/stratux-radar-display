@@ -32,6 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import radarbuttons
+from globals import Modes
 import radarmodes
 import requests
 from globals import rlog
@@ -102,18 +103,18 @@ def user_input():
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
     if btime == 0:
-        return 0  # stay in timer mode
+        return Modes.NO_CHANGE  # stay in timer mode
     ahrs_ui_changed = True
     if button == 1 and (btime == 2 or btime == 1):  # middle in any case
         return radarmodes.next_mode_sequence(5)  # next mode
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long: refresh
-        return 6  # start next mode for display driver: refresh called from ahrs
+        return Modes.REFRESH_AHRS  # start next mode for display driver: refresh called from ahrs
     if button == 2 and btime == 1:  # right and short, set zero_drift
         zero_drift()
-        return 5
+        return Modes.AHRS
     if button == 0 and btime == 1:  # left and short: set level
         set_level()
-        return 5
-    return 5  # no mode change
+        return Modes.AHRS
+    return Modes.AHRS  # no mode change

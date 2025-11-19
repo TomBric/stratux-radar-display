@@ -156,7 +156,7 @@ def user_input():
     btime, button = radarbuttons.check_buttons()
     # start of situation global behaviour, status is 21
     if btime == 0:
-        return 0, False  # stay in current mode
+        return Modes.NO_CHANGE, False  # stay in current mode
     if dist_user_mode == 0:
         if button == 1 and btime == 2:  # middle
             return radarmodes.next_mode_sequence(Modes.SITUATION), False  # next mode to be radar
@@ -167,7 +167,7 @@ def user_input():
                 statistic_index = len(statistic_list) - 1
             else:
                 statistic_index = -1
-            return 21, False
+            return Modes.SITUATION, False
         if button == 0 and btime == 2:  # left and long
             return Modes.SHUTDOWN, False  # start next mode shutdown!
         if button == 0 and btime == 1:  # left and short - display statistics

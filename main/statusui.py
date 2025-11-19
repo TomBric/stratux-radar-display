@@ -44,7 +44,7 @@ import ipaddress
 import json
 import os
 import datetime
-import radarmodes
+from radarmodes import Modes, next_mode_sequence
 
 # constants
 STATUS_TIMEOUT = 0.3
@@ -405,12 +405,12 @@ def user_input(extsound_active, bluetooth_active):
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
     if btime == 0 and status_mode != 11:   # for 11 do reboot
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if status_mode == 0:   # normal status display
         if button == 1 and (btime == 2 or btime == 1):  # middle
-            return radarmodes.next_mode_sequence(7)  # next mode
+            return next_mode_sequence(7)  # next mode
         if bluetooth_active and button == 2 and btime == 1:  # right and short
             status_mode = 1
             start_async_bt_scan()
@@ -429,7 +429,7 @@ def user_input(extsound_active, bluetooth_active):
                 status_mode = 1
                 start_async_bt_scan()
                 scan_end = time.time() + BLUETOOTH_SCAN_TIME
-                return 7
+                return Modes.STATUS
         if len(new_devices) > 0:
             if button == 0 and btime == 1:  # left short, YES
                 rlog.debug("Connecting: " + new_devices[0][1])
@@ -573,4 +573,4 @@ def user_input(extsound_active, bluetooth_active):
             write_config(global_config)
             status_mode = 3
 
-    return 7  # no mode change
+    return Modes.STATUS  # no mode change

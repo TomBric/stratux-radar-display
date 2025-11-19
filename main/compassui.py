@@ -64,7 +64,7 @@ def user_input():
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
     if btime == 0:
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     compassui_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return radarmodes.next_mode_sequence(11)    # next mode

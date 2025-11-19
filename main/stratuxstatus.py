@@ -36,7 +36,7 @@ import radar
 import radarbuttons
 import asyncio
 import json
-from globals import rlog
+from globals import rlog, Modes
 import radarmodes
 import requests
 
@@ -226,7 +226,7 @@ def change_value(difference):
 def user_input():
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     if button == 0 and btime == 1:  # left and short
         change_value(10)
     elif button == 0 and btime == 2:  # left and long
@@ -237,4 +237,4 @@ def user_input():
         change_value(-100)
     elif button == 1 and (btime == 2 or btime == 1):  # middle
         return radarmodes.next_mode_sequence(15)
-    return 15  # no mode change
+    return Modes.STRATUX_STATUS  # no mode change

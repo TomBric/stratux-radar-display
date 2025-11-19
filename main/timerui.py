@@ -37,7 +37,7 @@ import math
 import radarbluez
 import flighttime
 import datetime
-from globals import rlog
+from globals import rlog, Modes
 import radarmodes
 
 # constants
@@ -169,12 +169,12 @@ def user_input():
     btime, button = radarbuttons.check_buttons()
     # start of timer global behaviour
     if btime == 0:
-        return 0  # stay in timer mode
+        return Modes.NO_CHANGE  # stay in timer mode
     timer_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
         return radarmodes.next_mode_sequence(2)  # Timer mode was 2
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
 
     # situation dependent behavior
     if timer_mode == 0:   # normal timer mode
@@ -200,7 +200,7 @@ def user_input():
                 timer_running = True
         if button == 0:   # left
             if btime == 2:  # left and long
-                return 3    # start next mode shutdown!
+                return Modes.SHUTDOWN    # start next mode shutdown!
             else:
                 if timer_running:
                     laptime = math.floor(time.time())
@@ -259,4 +259,4 @@ def user_input():
                 middle_text = "Mode"
                 left_text = "Reset"
     timer_ui_changed = True
-    return 2   # no mode change, but refresh display
+    return Modes.TIMER   # no mode change, but update display

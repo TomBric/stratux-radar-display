@@ -36,7 +36,7 @@ import subprocess
 import radarbuttons
 import time
 import requests
-from globals import rlog
+from globals import rlog, Modes
 import radarmodes
 
 SHUTDOWN_WAIT_TIME = 6.0
@@ -51,7 +51,6 @@ url_shutdown = ""
 def init(shutdown, reboot):
     global url_reboot
     global url_shutdown
-    global rlog
 
     url_reboot = reboot
     url_shutdown = shutdown
@@ -125,7 +124,7 @@ def user_input():
         if time.time() > shutdown_time:
             rlog.debug("Shutdown now")
             clear_before_shutoff = True  # enable display driver to trigger shutdown
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     if button == 0:  # left
         shutdown_mode = 0
         shutdown_time = 0.0
@@ -133,9 +132,9 @@ def user_input():
     if button == 1:  # middle, display only shutdown
         shutdown_mode = 1
         shutdown_time = 0.0
-        return 3  # stay in shutdown mode
+        return Modes.SHUTDOWN  # stay in shutdown mode
     if button == 2:  # right, reboot all
         shutdown_mode = 2
         shutdown_time = 0.0
-        return 3  # stay in shutdown mode
-    return 3  # no mode change
+        return Modes.SHUTDOWN  # stay in shutdown mode
+    return Modes.SHUTDOWN  # no mode change

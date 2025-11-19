@@ -162,7 +162,7 @@ def user_input():
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     g_checklist_changed = True
     if g_checklist is None:    # xml reading failed
         return radarmodes.next_mode_sequence(23)  # next mode after any press
@@ -171,15 +171,15 @@ def user_input():
             g_iterator = previous_list(g_iterator)
         else:
             g_iterator = previous_item(g_iterator)
-        return Modes.NO_CHANGE
+        return Modes.CHECKLIST
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 1 and btime == 1:  # middle and short
         if g_iterator[0] == len(g_checklist)-1:   # last list
             return radarmodes.next_mode_sequence(23)  # next mode
         else:
             g_iterator = next_list(g_iterator)
-            return Modes.NO_CHANGE
+            return Modes.CHECKLIST
     if button == 1 and btime == 2:  # middle long
         return radarmodes.next_mode_sequence(23)  # next mode
     if button == 2 and btime == 1:  # right and short, next item
@@ -188,7 +188,7 @@ def user_input():
             g_iterator = next_item(g_iterator)
         else:
             g_iterator = [0, 0]  # reset checklist, start in checklist 0 at item 0
-        return Modes.NO_CHANGE
+        return Modes.CHECKLIST
     if button == 2 and btime == 2:  # right and long, refresh
         return Modes.REFRESH_CHECKLIST  # start next mode for display driver: refresh called
-    return Modes.NO_CHANGE  # no mode change
+    return Modes.CHECKLIST  # no mode change

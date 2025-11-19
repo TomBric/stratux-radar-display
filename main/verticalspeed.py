@@ -33,6 +33,7 @@
 
 import radarbuttons
 import radarmodes
+from globals import Modes
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -67,13 +68,13 @@ def user_input():
     btime, button = radarbuttons.check_buttons()
     # start of vsi global behaviour
     if btime == 0:
-        return 0, False  # stay in current mode
+        return Modes.NO_CHANGE, False  # stay in current mode
     if button == 1 and (btime == 2 or btime == 1):  # middle
         return radarmodes.next_mode_sequence(13), False  # next mode
     if button == 0 and btime == 2:  # left and long
-        return 3, False  # start next mode shutdown!
+        return Modes.SHUTDOWN, False  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short: reset values
-        return 13, True
+        return Modes.VSI, True
     if button == 2 and btime == 2:  # right and long: refresh
-        return 14, False  # start next mode for display driver: refresh called from vsi
-    return 13, False  # no mode change for any other interaction
+        return Modes.REFRESH_VSI, False  # start next mode for display driver: refresh called from vsi
+    return Modes.VSI, False  # no mode change for any other interaction

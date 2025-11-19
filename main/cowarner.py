@@ -42,7 +42,7 @@ import radarbluez
 from RPi import GPIO
 import numpy
 import radarmodes
-from globals import rlog, global_config
+from globals import rlog, global_config, Modes
 
 
 # constants
@@ -311,7 +311,7 @@ def user_input():
         return radarmodes.next_mode_sequence(19)     # immediately go to next mode, if warner is not activated
     btime, button = radarbuttons.check_buttons()
     if btime == 0 or co_warner_status == 1:   # in calibration mode, do not react
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     cowarner_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return radarmodes.next_mode_sequence(19)    # next mode
@@ -321,13 +321,13 @@ def user_input():
         no_samples = 0
         co_warner_status = 1   # start calibration mode, co reader will do this end mode
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, reset max value
         co_max = 0
         co_values.clear()  # clear all history
     if button == 2 and btime == 2:  # right and long: refresh
-        return 20  # start next mode for display driver: refresh called
-    return 19  # no mode change
+        return Modes.REFRESH_CO_WARNER  # start next mode for display driver: refresh called
+    return Modes.COWARNER  # no mode change
 
 
 def speak_co_warning(changed):
