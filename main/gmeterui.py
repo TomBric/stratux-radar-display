@@ -81,7 +81,7 @@ def user_input():
     rlog.debug("GMeter UI: button pressed")
     gmeterui_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return radarmodes.next_mode_sequence(9)
+        return radarmodes.next_mode_sequence(Modes.GMETER)
     if button == 0 and btime == 2:  # left and long
         return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long, refresh

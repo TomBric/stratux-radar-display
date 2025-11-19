@@ -410,7 +410,7 @@ def user_input(extsound_active, bluetooth_active):
         return Modes.SHUTDOWN  # start next mode shutdown!
     if status_mode == 0:   # normal status display
         if button == 1 and (btime == 2 or btime == 1):  # middle
-            return next_mode_sequence(7)  # next mode
+            return next_mode_sequence(Modes.STATUS)  # next mode
         if bluetooth_active and button == 2 and btime == 1:  # right and short
             status_mode = 1
             start_async_bt_scan()

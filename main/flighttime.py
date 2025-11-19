@@ -248,7 +248,7 @@ def user_input():
     flighttime_changed = True
     switch_back_mode = 0    # cancel any switchback, if button was pressed
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return radarmodes.next_mode_sequence(17)  # next mode
+        return radarmodes.next_mode_sequence(Modes.FLIGHTTIME)  # next mode
     if button == 0 and btime == 2:  # left and long
         return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long, refresh

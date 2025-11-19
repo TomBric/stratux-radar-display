@@ -70,7 +70,7 @@ def user_input():
     if btime == 0:
         return Modes.NO_CHANGE, False  # stay in current mode
     if button == 1 and (btime == 2 or btime == 1):  # middle
-        return radarmodes.next_mode_sequence(13), False  # next mode
+        return radarmodes.next_mode_sequence(Modes.VSI), False  # next mode
     if button == 0 and btime == 2:  # left and long
         return Modes.SHUTDOWN, False  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short: reset values

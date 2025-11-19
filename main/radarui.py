@@ -96,7 +96,7 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
             communicate_limits(display_radius[radius], height_diff[height])
     elif button == 1:
         if btime == 2:    # middle and long
-            return radarmodes.next_mode_sequence(1), False  # start next mode
+            return radarmodes.next_mode_sequence(Modes.RADAR), False  # start next mode
         else:          # middle and short
             rlog.debug("Sound  toggled by UI")
             return Modes.RADAR, True

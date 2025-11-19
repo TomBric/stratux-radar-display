@@ -106,7 +106,7 @@ def user_input():
         return Modes.NO_CHANGE  # stay in timer mode
     ahrs_ui_changed = True
     if button == 1 and (btime == 2 or btime == 1):  # middle in any case
-        return radarmodes.next_mode_sequence(5)  # next mode
+        return radarmodes.next_mode_sequence(Modes.AHRS)  # next mode
     if button == 0 and btime == 2:  # left and long
         return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long: refresh

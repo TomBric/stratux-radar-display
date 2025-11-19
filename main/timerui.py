@@ -172,7 +172,7 @@ def user_input():
         return Modes.NO_CHANGE  # stay in timer mode
     timer_ui_changed = True
     if button == 1 and btime == 2:  # middle and long
-        return radarmodes.next_mode_sequence(2)  # Timer mode was 2
+        return radarmodes.next_mode_sequence(Modes.TIMER)  # Timer mode was 2
     if button == 0 and btime == 2:  # left and long
         return Modes.SHUTDOWN  # start next mode shutdown!
 

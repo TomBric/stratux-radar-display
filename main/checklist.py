@@ -165,7 +165,7 @@ def user_input():
         return Modes.NO_CHANGE  # stay in current mode
     g_checklist_changed = True
     if g_checklist is None:    # xml reading failed
-        return radarmodes.next_mode_sequence(23)  # next mode after any press
+        return radarmodes.next_mode_sequence(Modes.CHECKLIST)  # next mode after any press
     if button == 0 and btime == 1:  # left and short, previous item
         if g_iterator[1] == 0:  # first item, goto next list
             g_iterator = previous_list(g_iterator)
@@ -176,12 +176,12 @@ def user_input():
         return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 1 and btime == 1:  # middle and short
         if g_iterator[0] == len(g_checklist)-1:   # last list
-            return radarmodes.next_mode_sequence(23)  # next mode
+            return radarmodes.next_mode_sequence(Modes.CHECKLIST)  # next mode
         else:
             g_iterator = next_list(g_iterator)
             return Modes.CHECKLIST
     if button == 1 and btime == 2:  # middle long
-        return radarmodes.next_mode_sequence(23)  # next mode
+        return radarmodes.next_mode_sequence(Modes.CHECKLIST)  # next mode
     if button == 2 and btime == 1:  # right and short, next item
         last_item = (g_iterator == [len(g_checklist) - 1, len(g_checklist[g_iterator[0]]['ITEM']) - 1])
         if not last_item:
