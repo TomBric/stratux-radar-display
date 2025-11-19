@@ -190,7 +190,7 @@ def draw_display():
         display_control.clear()
         display_control.situation(situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
-                                  sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
+                                  radarui.sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
                                   basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1]) 
         draw_all_ac(all_ac)
         display_control.display()
@@ -223,7 +223,7 @@ def calc_gps_distance(lat, lng):
 
 
 def speaktraffic(hdiff, direction=None, dist=None):
-    if sound_on:
+    if radarui.sound_on:
         feet = hdiff * 100
         sign = 'plus'
         if hdiff < 0:
@@ -559,7 +559,6 @@ async def listen_forever(path, name, callback, logger):
 
 async def user_interface():
     global bt_devices
-    global sound_on
     global ui_changed
     global global_mode
     global vertical_max
@@ -574,8 +573,8 @@ async def user_interface():
             if global_mode == Modes.RADAR:  # Radar mode
                 next_mode, toggle_sound = radarui.user_input(situation['RadarRange'], situation['RadarLimits'])
                 if toggle_sound:
-                    sound_on = not sound_on
-                    if sound_on:
+                    radarui.sound_on = not radarui.sound_on
+                    if radarui.sound_on:
                         radarbluez.speak("Radar sound on")
                     else:
                         radarbluez.speak("Radar sound off")
