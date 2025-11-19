@@ -613,7 +613,7 @@ async def user_interface():
                 next_mode = checklist.user_input()
             if next_mode != Modes.NO_CHANGE:
                 ui_changed = True
-                rlog.debug("User Interface: global mode changing from: " + global_mode.value() + " to " + next_mode.value())
+                rlog.debug("User Interface: global mode changing from: " + global_mode.name + " to " + next_mode.name)
                 global_mode = next_mode
 
             current_time = time.time()
