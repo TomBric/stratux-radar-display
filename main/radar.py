@@ -637,7 +637,7 @@ def refresh_display(manual = False):
 
     if not manual and auto_refresh_time == 0:   # no autorefresh option provided, do no automatic refresh
         return
-    if last_auto_refresh == 0:   # first run, only set the time
+    if not manual and last_auto_refresh == 0:   # first run, only set the time
         last_auto_refresh = time.time()
         return
     if display_control is not None:
@@ -663,7 +663,7 @@ async def display_and_cutoff():
                 await asyncio.sleep(display_refresh_time / 3)
                 # try it several times to be as fast as possible
             else:
-                refresh_display()
+                refresh_display()   # for automatic refresh, if necessary
                 if global_mode == Modes.RADAR:  # Radar
                     draw_display()
                 elif global_mode == Modes.TIMER:  # Timer'
