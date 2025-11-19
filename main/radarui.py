@@ -77,10 +77,10 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        return 0, False
+        return Modes.NO_CHANGE, False
     if button == 0:
         if btime == 2:    # left and long
-            return 3, False  # start next mode shutdown!
+            return Modes.SHUTDOWN, False  # start next mode shutdown!
         else:          # left and short
             radius += 1
             if radius >= len(display_radius):
@@ -88,7 +88,7 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
             communicate_limits(display_radius[radius], height_diff[height])
     elif button == 2:
         if btime == 2:   # right and long, refresh
-            return 4, False   # start next mode for display driver: refresh
+            return Modes.REFRESH_RADAR, False   # start next mode for display driver: refresh
         else:
             height += 1
             if height >= len(height_diff):
@@ -99,5 +99,5 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
             return radarmodes.next_mode_sequence(1), False  # start next mode
         else:          # middle and short
             rlog.debug("Sound  toggled by UI")
-            return 1, True
-    return 1, False
+            return Modes.RADAR, True
+    return Modes.RADAR, False
