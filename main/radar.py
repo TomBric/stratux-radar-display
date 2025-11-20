@@ -599,7 +599,7 @@ async def user_interface():
             elif global_mode == Modes.STRATUX_STATUS:  # stratux status
                 stratuxstatus.start()  # starts status_listener couroutine if not yet running
                 next_mode = stratuxstatus.user_input()
-                if next_mode != 0 and next_mode != 15:
+                if next_mode != Modes.NO_CHANGE and next_mode != Modes.STRATUX_STATUS:
                     stratuxstatus.stop()  # stops status_listener
             elif global_mode == Modes.FLIGHTTIME:  # display flighttimes
                 next_mode = flighttime.user_input()
