@@ -51,7 +51,7 @@ import radarbluez
 import radarbuttons
 import binascii
 from typing import Any
-from globals import rlog, global_mode, Modes
+from globals import rlog, Globals, Modes
 
 FEET_TO_MM = 304.8
 MM_TO_FEET = 1 / FEET_TO_MM     # one feet in mm
@@ -583,7 +583,6 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
     global landing_situation
     global obstacle_down_clear
     global stop_situation
-    global global_mode
     global switch_back_from_distance   # this is the mode to go back, when landed or airborne again
 
     if fly_status == 0:  # run up
@@ -621,13 +620,13 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                         break
         if show_distance_screen():    # show distance screen if distance is below DISTANCE_BELOW_SHOW_SCREEN
-            if global_mode != Modes.COUNTDOWN_DISTANCE:
+            if Globals.mode != Modes.COUNTDOWN_DISTANCE:
                 switch_back_from_distance = global_mode
-                global_mode = Modes.COUNTDOWN_DISTANCE
+                Globals.mode = Modes.COUNTDOWN_DISTANCE
                 rlog.debug(f"Automatic switching from {switch_back_from_distance.name} to COUNTDOWN_DISTANCE")
         elif finish_distance_screen() or has_landed:
-            if global_mode == Modes.COUNTDOWN_DISTANCE:
-                global_mode = switch_back_from_distance
+            if Globals.mode == Modes.COUNTDOWN_DISTANCE:
+                Globals.mode = switch_back_from_distance
                 rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.value}")
     elif fly_status == 2:  # landing detected, waiting for stop to calculate distance
         if has_stopped():

@@ -64,6 +64,9 @@ class Modes(Enum):
     COUNTDOWN_DISTANCE = 25    # full screen with large numbers if ground sensor has contact
 
 
+class Globals:     # global variables which need to be changed somehow from other modules
+    mode = Modes.RADAR     # Global mode for radar display
+
 # Initialize logger
 rlog = logging.getLogger('stratux-radar-log')
 
@@ -72,9 +75,6 @@ global_config = {}
 
 # Display control object
 display_control = None
-
-# Global mode for radar display
-global_mode = Modes.RADAR  # Start with RADAR mode
 
 # Status flags
 bluetooth_active = False
