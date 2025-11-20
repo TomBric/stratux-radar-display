@@ -714,6 +714,7 @@ async def read_ground_sensor():
         if simulation_mode:
             rlog.debug("Simulation Mode: Ground distance sensor active.")
             try:
+                next_read = time.perf_counter() + (1 / MEASUREMENTS_PER_SECOND)
                 while True:    # simulate readings in same manner as in real life
                     now = time.perf_counter()
                     await asyncio.sleep(next_read - now)  # wait for next time of measurement
