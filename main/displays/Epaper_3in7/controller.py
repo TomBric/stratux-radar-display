@@ -444,6 +444,10 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.bottom_line(left, "Exit", right)
 
 
+    def countdown_distance(self, feet):    # display countdown distance on a full screen, distance value is in feet
+        self.centered_text(0, "Ground Distance", self.VERYLARGE)
+        self.centered_text(self.sizey//2, f"{feet:3.0f} ft", self.VERYLARGE)
+
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = Epaper3in7()

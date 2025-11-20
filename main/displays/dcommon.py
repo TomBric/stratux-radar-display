@@ -613,6 +613,11 @@ class GenericDisplay:
         # if not: values displayed are stored stats
         pass
 
+    def countdown_distance(self, feet):
+        # display countdown distance on a full screen, distance value is in feet
+        pass
+
+
     def gmeter(self, current, maxg, ming, error_message):
         pass
 

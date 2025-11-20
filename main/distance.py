@@ -148,6 +148,15 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
     display_control.display()
 
 
+def draw_countdown_distance(display_control, situation):
+    # display in any case, even if there is no change, since values are constantly changing
+    display_control.clear()
+    if situation['g_distance_valid']:
+        feet = situation['g_distance'] * grounddistance.MM_TO_FEET   # round down
+        display_control.countdown_distance(feet)    # switch back is done by ground sensor reader
+    display_control.display()
+
+
 def user_input():
     global dist_user_mode
     global statistic_index

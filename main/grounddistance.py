@@ -51,9 +51,10 @@ import radarbluez
 import radarbuttons
 import binascii
 from typing import Any
-from globals import rlog, global_mode
+from globals import rlog, global_mode, Modes
 
-FEET_TO_MM = 304.8     # one feet in mm
+FEET_TO_MM = 304.8
+MM_TO_FEET = 1 / FEET_TO_MM     # one feet in mm
 
 # constants
 MEASUREMENTS_PER_SECOND = 10     # number of distance ranging meaurements per second
@@ -133,8 +134,10 @@ sensor_warnings_sounds = None
 gear_not_down_warning_sound = None
 go_around_warning_sound = None
 
-DISTANCE_BELOW_SHOW_SCREEN = 50 * FEET_TO_MM  # this is the distance in feet! below the distance is shown on the display
+DISTANCE_BELOW_SHOW_SCREEN = 50 * FEET_TO_MM     # this is the distance in feet! below the distance is shown on the display
 DISTANCE_ABOVE_SHOW_NO_SCREEN = 60 * FEET_TO_MM  # this is the hysteresis after the distance screen is no more shown
+# must be greater than DISTANCE_BELOW_SHOW_SCREEN
+
 
 def set_dest_elevation(dest_increment):
     global dest_elevation
@@ -418,7 +421,7 @@ def calc_distance_speaker(stat):
     else:
         gps_distance = INVALID_GPS_DISTANCE
     if stat['g_distance_valid']:
-        ground_distance = stat['g_distance'] / 328.1    # g_distance is in mm, here we need ft
+        ground_distance = stat['g_distance'] * MM_TO_FEET    # g_distance is in mm, here we need ft
     else:
         ground_distance = 0.0
     if indicate_distance and fly_status == 1:
@@ -580,6 +583,8 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
     global landing_situation
     global obstacle_down_clear
     global stop_situation
+    global global_mode
+    global switch_back_from_distance   # this is the mode to go back, when landed or airborne again
 
     if fly_status == 0:  # run up
         if is_airborne():
@@ -615,6 +620,13 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                         rlog.debug("Grounddistance: Obstacle clearance down found " +
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                         break
+        if show_distance_screen():    # show distance screen if distance is below DISTANCE_BELOW_SHOW_SCREEN
+            switch_back_from_distance = global_mode
+            global_mode = Modes.COUNTDOWN_DISTANCE
+            rlog.debug(f"Automatic switching from {switch_back_from_distance.value} to COUNTDOWN_DISTANCE")
+        elif finish_distance_screen() or has_landed:
+            global_mode = switch_back_from_distance
+            rlog.debug(f"Automatic switching back from COUNTDOWN_DISTANCE to {switch_back_from_distance.value}")
     elif fly_status == 2:  # landing detected, waiting for stop to calculate distance
         if has_stopped():
             fly_status = 0

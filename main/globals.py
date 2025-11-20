@@ -61,8 +61,7 @@ class Modes(Enum):
     REFRESH_SITUATION = 22
     CHECKLIST = 23
     REFRESH_CHECKLIST = 24
-
-
+    COUNTDOWN_DISTANCE = 25    # full screen with large numbers if ground sensor has contact
 
 
 # Initialize logger
