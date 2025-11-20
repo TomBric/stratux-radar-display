@@ -81,7 +81,7 @@ flying = False    # indicates if flying mode was detected and measurement starti
 new_flight_info = False   # indicates whether a new flight was recorded, but not yet displayed
 trigger_timestamp = None    # timestamp when threshold was overrun/underrun
 stop_timestamp = None       # timestamp when stopping after a flight was detected, may start again or stop
-switch_back_mode = 0        # mode to switch back when flying after automatic flighttime display is triggered
+switch_back_mode = Modes.FLIGHTTIME     # mode to switch back when flying after automatic flighttime display is triggered
 takeoff_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_TAKEOFF)
 landing_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_LANDING)
 stop_delta = datetime.timedelta(seconds=TRIGGER_PERIOD_STOP)
@@ -164,7 +164,7 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
     global switch_back_mode
 
     if not valid_gps or not measurement_enabled:
-        return 0
+        return Modes.NO_CHANGE
     now = datetime.datetime.now(datetime.timezone.utc)
     if not flying:
         if trigger_timestamp is None and situation['gps_speed'] >= SPEED_THRESHOLD_TAKEOFF:
@@ -178,7 +178,7 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
                 flighttime_changed = True
                 flying = True
                 trigger_timestamp = None
-                if switch_back_mode != 0:
+                if switch_back_mode != Modes.FLIGHTTIME:
                     return switch_back_mode
         elif trigger_timestamp is not None and situation['gps_speed'] < SPEED_THRESHOLD_TAKEOFF:
             # reset trigger, not several seconds above threshold
@@ -194,8 +194,8 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
                     stop_timestamp = None
                     new_flight_info = False   # stop is only triggered once
                     switch_back_mode = current_mode
-                    if radarmodes.is_mode_contained(17):  # only switch to flighttime display if flighttime is selected
-                        return 17    # return mode set to display times
+                    if radarmodes.is_mode_contained(Modes.FLIGHTTIME):  # only switch to flighttime display if flighttime is selected
+                        return Modes.FLIGHTTIME    # return mode set to display times
             elif stop_timestamp is not None and situation['gps_speed'] >= SPEED_THRESHOLD_STOPPED:
                 # reset trigger, not several seconds below threshold
                 stop_timestamp = None
@@ -220,7 +220,7 @@ def trigger_measurement(valid_gps, situation, ahrs, current_mode):
             # reset trigger, not several seconds above threshold
             trigger_timestamp = None
             rlog.debug("Flighttime: Landing threshold overrun, trigger resetted at " + str(now))
-    return 0
+    return Modes.NO_CHANGE
 
 
 def draw_flighttime(display_control, changed):
@@ -246,7 +246,7 @@ def user_input():
     if btime == 0:
         return Modes.NO_CHANGE  # stay in current mode
     flighttime_changed = True
-    switch_back_mode = 0    # cancel any switchback, if button was pressed
+    switch_back_mode = Modes.FLIGHTTIME    # cancel any switchback, if button was pressed
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
         return radarmodes.next_mode_sequence(Modes.FLIGHTTIME)  # next mode
     if button == 0 and btime == 2:  # left and long
@@ -258,5 +258,5 @@ def user_input():
             g_config['last_flights'].clear()
         rlog.debug("Flight list cleared by button press")
         write_flights()  # also clear stored flights
-        return Modes.FLIGHTTIME  # start next mode for display driver: refresh called
+        return Modes.FLIGHTTIME
     return Modes.FLIGHTTIME  # no mode change

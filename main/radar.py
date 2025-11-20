@@ -502,7 +502,7 @@ def new_situation(json_str):
 
         # automatic time measurement
         new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, global_mode)
-        if new_mode > 0:
+        if new_mode != Modes.NO_CHANGE:
             global_mode = new_mode  # automatically change to display of flight times, or back
 
     except KeyError:  # to be safe when stratux changes its message-format
@@ -859,6 +859,7 @@ def radar_excepthook(exc_type, exc_value, exc_traceback):
 
 
 def logging_init():
+    global rlog
     # Add file rotation handler, with level DEBUG
     # rotatingHandler = logging.handlers.RotatingFileHandler(filename='rotating.log', maxBytes=1000, backupCount=5)
     # rotatingHandler.setLevel(logging.DEBUG)
