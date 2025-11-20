@@ -73,6 +73,7 @@ rlog = logging.getLogger('stratux-radar-log')
 # Global configuration dictionary
 global_config = {}
 
+"""
 # Display control object
 display_control = None
 
@@ -90,5 +91,5 @@ CONFIG_FILE = ""
 SAVED_FLIGHTS = "saved_flights.json"
 SAVED_STATISTICS = "saved_statistics.json"
 SITUATION_DEBUG = 0  # 0=off, 1=some debug, 2=more debug
-
 mode_sequence = []  # list of modes to display
+"""

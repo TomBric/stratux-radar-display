@@ -40,7 +40,9 @@
 # 23=checklist 24=refresh checklist
 
 # mode_sequence is now imported from globals.py
-from globals import Modes, mode_sequence
+from globals import Modes
+
+mode_sequence = []  # list of modes to display
 
 def mode_codes(c):
     modes = {

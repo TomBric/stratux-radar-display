@@ -621,7 +621,7 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                         break
         if show_distance_screen():    # show distance screen if distance is below DISTANCE_BELOW_SHOW_SCREEN
             if Globals.mode != Modes.COUNTDOWN_DISTANCE:
-                switch_back_from_distance = global_mode
+                switch_back_from_distance = Globals.mode
                 Globals.mode = Modes.COUNTDOWN_DISTANCE
                 rlog.debug(f"Automatic switching from {switch_back_from_distance.name} to COUNTDOWN_DISTANCE")
         elif finish_distance_screen() or has_landed:
