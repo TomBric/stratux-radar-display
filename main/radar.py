@@ -761,8 +761,7 @@ async def display_and_cutoff():
                     refresh_display(manual=True)
                     global_mode = Modes.CHECKLIST
                 elif global_mode == Modes.COUNTDOWN_DISTANCE:  # Full screen distance
-                    distance.draw_countdown_distance(display_control, situation['was_changed'] or ui_changed,
-                                           situation['connected'], situation, ahrs)
+                    distance.draw_countdown_distance(display_control, situation)
                     ui_changed = False
 
             to_delete = []

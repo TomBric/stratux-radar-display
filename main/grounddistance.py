@@ -621,12 +621,14 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                         break
         if show_distance_screen():    # show distance screen if distance is below DISTANCE_BELOW_SHOW_SCREEN
-            switch_back_from_distance = global_mode
-            global_mode = Modes.COUNTDOWN_DISTANCE
-            rlog.debug(f"Automatic switching from {switch_back_from_distance.value} to COUNTDOWN_DISTANCE")
+            if global_mode != Modes.COUNTDOWN_DISTANCE:
+                switch_back_from_distance = global_mode
+                global_mode = Modes.COUNTDOWN_DISTANCE
+                rlog.debug(f"Automatic switching from {switch_back_from_distance.name} to COUNTDOWN_DISTANCE")
         elif finish_distance_screen() or has_landed:
-            global_mode = switch_back_from_distance
-            rlog.debug(f"Automatic switching back from COUNTDOWN_DISTANCE to {switch_back_from_distance.value}")
+            if global_mode == Modes.COUNTDOWN_DISTANCE:
+                global_mode = switch_back_from_distance
+                rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.value}")
     elif fly_status == 2:  # landing detected, waiting for stop to calculate distance
         if has_stopped():
             fly_status = 0
