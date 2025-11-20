@@ -264,7 +264,7 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Se
                 self.celsius = result[index + 6] + result[index + 7] * 256
                 #  Convert temp code to degrees Celsius.
                 self.celsius =  self.celsius / 8 - 256
-                rlog.log(value_debug_level, "Lidar-Sensor: Distance {self.distance} Strength {self.strength} Celsius {self.celsius}")
+                rlog.log(value_debug_level, f"Lidar-Sensor: Distance {self.distance} Strength {self.strength} Celsius {self.celsius}")
             else:
                  rlog.debug(f"Lidar-Sensor: Invalid checksum")
         else:
