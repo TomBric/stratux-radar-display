@@ -51,7 +51,7 @@ import radarbluez
 import radarbuttons
 import binascii
 from typing import Any
-from globals import rlog
+from globals import rlog, global_mode
 
 FEET_TO_MM = 304.8     # one feet in mm
 
@@ -506,7 +506,7 @@ def show_distance_screen():    # returns true if screen with distance should be 
 
 
 def finish_distance_screen():
-    if global_situation['g_distance_valid'] and global_situation['g_distance'] >= DISTANCE_ABOVE_FINISH_SCREEN:
+    if global_situation['g_distance_valid'] and global_situation['g_distance'] >= DISTANCE_ABOVE_SHOW_NO_SCREEN:
         return True
     return False
 
@@ -615,11 +615,6 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                         rlog.debug("Grounddistance: Obstacle clearance down found " +
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                         break
-        if show_distance_screen():    # switch to screen with distance
-            distance_back_mode = current_mode   # remember current mode
-            switch_to_mode(MODE_DISTANCE)
-
-
     elif fly_status == 2:  # landing detected, waiting for stop to calculate distance
         if has_stopped():
             fly_status = 0
@@ -636,32 +631,33 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
     calc_distance_speaker(latest_stat)
 
+def eval_simulation_data(sim_data, sit):
+    if 'g_distance' in sim_data and sim_data['g_distance'] > 0:
+        sit['g_distance_valid'] = True
+        sit['g_distance'] = sim_data['g_distance']
+    else:
+        sit['g_distance_valid'] = False
+        sit['g_distance'] = INVALID_GDISTANCE
+    if 'gps_speed' in sim_data:
+        sit['gps_speed'] = sim_data['gps_speed']
+        sit['gps_active'] = True
+    if 'gps_altitude' in sim_data:
+        sit['gps_altitude'] = sim_data['gps_altitude']
+        sit['gps_active'] = True
+        sit['gps_hor_accuracy'] = 50  # just any nice valud
+    if 'own_altitude' in sim_data:
+        sit['own_altitude'] = sim_data['own_altitude']
+        sit['baro_valid'] = True
+    if 'gear_down' in sim_data:
+        sit['gear_down'] = sim_data['gear_down']
+
+
 def store_statistics(sit):   # called from read_ground_sensor
     global stats_next_store
 
     if simulation_mode:
         sim_data = simulation.read_simulation_data()
-        if sim_data is not None:
-            if 'g_distance' in sim_data and sim_data['g_distance'] > 0:
-                sit['g_distance_valid'] = True
-                sit['g_distance'] = sim_data['g_distance']
-            else:
-                sit['g_distance_valid'] = False
-                sit['g_distance'] = INVALID_GDISTANCE
-            if 'gps_speed' in sim_data:
-                sit['gps_speed'] = sim_data['gps_speed']
-                sit['gps_active'] = True
-            if 'gps_altitude' in sim_data:
-                sit['gps_altitude'] = sim_data['gps_altitude']
-                sit['gps_active'] = True
-                sit['gps_hor_accuracy'] = 50  # just any nice valud
-            if 'own_altitude' in sim_data:
-                sit['own_altitude'] = sim_data['own_altitude']
-                sit['baro_valid'] = True
-            if 'gear_down' in sim_data:
-                sit['gear_down'] = sim_data['gear_down']
-            else:
-                sit['gear_down'] = False
+        eval_simulation_data(sim_data, sit)
     if time.perf_counter() > stats_next_store:
         stats_next_store = time.perf_counter() + (1 / STATS_PER_SECOND)
         now = datetime.now(timezone.utc)
@@ -715,5 +711,16 @@ async def read_ground_sensor():
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
     else:
-        rlog.debug("No ground distance sensor active.")
+        if simulation_mode:
+            rlog.debug("Simulation Mode: Ground distance sensor active.")
+            try:
+                while True:    # simulate readings in same manner as in real life
+                    now = time.perf_counter()
+                    await asyncio.sleep(next_read - now)  # wait for next time of measurement
+                    next_read = next_read + (1 / MEASUREMENTS_PER_SECOND)
+                    store_statistics(global_situation)
+            except(asyncio.CancelledError, RuntimeError):
+                rlog.debug("Simulation Mode: Ground distance reader terminating ...")
+        else:
+            rlog.debug("No ground distance sensor active.")
 
