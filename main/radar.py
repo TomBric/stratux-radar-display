@@ -69,7 +69,7 @@ import sys
 import traceback
 import syslog
 
-from globals import rlog, Globals, display_control, bluetooth_active, extsound_active, measure_flighttime, co_warner_activated, grounddistance_activated, Modes
+from globals import rlog, Globals, Modes, global_config
 
 # logging
 SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
@@ -98,10 +98,18 @@ OPTICAL_ALIVE_BARS = 10
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
 
-
 CONFIG_FILE = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.conf"))
 SAVED_FLIGHTS = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.flights"))
 SAVED_STATISTICS = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.stat"))
+
+# Display control object
+display_control = None
+# Status flags
+bluetooth_active = False
+extsound_active = False
+measure_flighttime = False
+co_warner_activated = False
+grounddistance_activated = False
 
 url_host_base = arguments.DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
@@ -649,7 +657,6 @@ def refresh_display(manual = False):
 
 async def display_and_cutoff():
     global aircraft_changed
-    global Globals.mode
     global display_control
     global ui_changed
     global situation
