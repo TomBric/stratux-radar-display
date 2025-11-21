@@ -531,6 +531,7 @@ def check_countdown_screen():   # check whether countdown screen is to be displa
             trigger_timestamp = now
         elif now - trigger_timestamp > countdown_switch_delta:
             trigger_timestamp = None
+            rlog.debug(f"Timedelta to switch back reached. ")
             stop_countdown_screen()
     else:   # g_distance_valid, reset trigger_timestamp
         trigger_timestamp = None
