@@ -449,11 +449,12 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.centered_text(0, "Ground Distance", self.SMALL)
         text = f"{feet:3.0f}"
         tl = self.draw.textlength(text, self.fonts[self.EXTREMELARGE])
-        w = 5  # width of the circle outline
+        w = 10  # width of the circle outline
         self.draw.ellipse((self.sizex//2 - tl//2, self.sizey//2 - tl//2, self.sizex//2 + tl//2, self.sizey//2 + tl//2),
-                          outline=self.TEXT_COLOR, fill=self.BG_COLOR, width=2)
-        self.centered_text(self.sizey // 2 - self.EXTREMELARGE // 2, text, self.EXTREMELARGE)
-        self.draw.text((self.sizey//2 - self.LARGE//2, self.sizex//2 + tl//2 + 2*w), "ft", font=self.fonts[self.LARGE], fill=self.TEXT_COLOR)
+                          outline=self.TEXT_COLOR, fill=self.BG_COLOR, width=w)
+        self.draw.text(self.sizex//2 - tl//2, self.sizey//2 - self.EXTREMELARGE//2, text, self.EXTREMELARGE)
+        self.draw.text((self.sizex//2 - self.LARGE//2, self.sizey//2 + tl//2 + 2*w), "ft", font=self.fonts[self.LARGE],
+                       fill=self.TEXT_COLOR)
 
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
