@@ -43,7 +43,7 @@ top_index = 0    # top index being displayed in checklist
 
 class Epaper3in7(dcommon.GenericDisplay):
     # display constants
-    EXTREMELARGE = 64  # countdown distance
+    EXTREMELARGE = 96  # countdown distance
     VERYLARGE = 48  # timer
     MORELARGE = 36
     LARGE = 30  # size of height indications of aircraft
@@ -446,7 +446,7 @@ class Epaper3in7(dcommon.GenericDisplay):
 
 
     def countdown_distance(self, feet):    # display countdown distance on a full screen, distance value is in feet
-        self.centered_text(0, "Ground Distance", self.VERYLARGE)
+        self.centered_text(0, "Ground Distance", self.SMALL)
         self.centered_text(self.sizey//2, f"{feet:3.0f} ft", self.EXTREMELARGE)
 
 
