@@ -447,7 +447,7 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def countdown_distance(self, feet):    # display countdown distance on a full screen, distance value is in feet
         self.centered_text(0, "Ground Distance", self.SMALL)
-        text = f"{feet:3.0f}"
+        text = f"{int(feet)}"   # round down
         tl = self.draw.textlength(text, self.fonts[self.EXTREMELARGE])
         w = 10  # width of the circle outline
         self.draw.ellipse((self.sizex//2 - tl//2, self.sizey//2 - tl//2, self.sizex//2 + tl//2, self.sizey//2 + tl//2),
