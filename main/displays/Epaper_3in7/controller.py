@@ -222,7 +222,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                     t += "\uf293"  # bluetooth symbol
             else:
                 t = "\uf1f6"  # bell off symbol
-            textlength = self.draw.textlength(t, self.awesomefont)
+            textlength = self.draw.textlength(t, self.fonts[self.SMALL])
             self.draw.text((self.sizex - textlength - 5, self.sizey - self.SMALL), t,
                            font=self.awesomefont, fill=self.TEXT_COLOR)
 
@@ -447,7 +447,13 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def countdown_distance(self, feet):    # display countdown distance on a full screen, distance value is in feet
         self.centered_text(0, "Ground Distance", self.SMALL)
-        self.centered_text(self.sizey//2 - self.EXTREMELARGE//2, f"{feet:3.0f} ft", self.EXTREMELARGE)
+        text = f"{feet:3.0f}"
+        tl = self.draw.textlength(text, self.fonts[self.EXTREMELARGE])
+        w = 5  # width of the circle outline
+        self.draw.ellipse((self.sizex//2 - tl//2, self.sizey//2 - tl//2, self.sizex//2 + tl//2, self.sizey//2 + tl//2),
+                          outline=self.TEXT_COLOR, fill=self.BG_COLOR, width=2)
+        self.centered_text(self.sizey // 2 - self.EXTREMELARGE // 2, text, self.EXTREMELARGE)
+        self.draw.text((self.sizey//2 - self.LARGE//2, self.sizex//2 + tl//2 + 2*w), "ft", font=self.fonts[self.LARGE], fill=self.TEXT_COLOR)
 
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
