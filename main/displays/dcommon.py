@@ -58,6 +58,7 @@ def translate(angle, points, zero):
 
 class GenericDisplay:
     # display specific constants, overwrite for every display!
+    EXTREMELARGE = 64   # distance countdown
     VERYLARGE = 48  # timer
     MORELARGE = 36
     LARGE = 30  # size of height indications of aircraft

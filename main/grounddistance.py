@@ -41,7 +41,7 @@
 # {"start_time": "2023-01-15 12:57:28.223856+00:00","start_altitude": 880.92865,"takeoff_distance": 0.0,"landing_time": "2023-01-15 12:57:28.444494+00:00","landing_altitude": 880.77216,"landing_distance": 0.0 }
 
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import asyncio
 import json
 import math
@@ -134,9 +134,11 @@ sensor_warnings_sounds = None
 gear_not_down_warning_sound = None
 go_around_warning_sound = None
 
-DISTANCE_BELOW_SHOW_SCREEN = 50 * FEET_TO_MM     # this is the distance in feet! below the distance is shown on the display
-DISTANCE_ABOVE_SHOW_NO_SCREEN = 60 * FEET_TO_MM  # this is the hysteresis after the distance screen is no more shown
-# must be greater than DISTANCE_BELOW_SHOW_SCREEN
+# variables for countdown switchback
+TRIGGER_COUNTDOWN_SWITCHBACK = 0.5   # time with invalid readings (above sensor range) to swiching back from countdown
+countdown_switch_delta = timedelta(seconds=TRIGGER_COUNTDOWN_SWITCHBACK)
+trigger_timestamp = None
+switch_back_from_distance = Modes.NO_CHANGE
 
 
 def set_dest_elevation(dest_increment):
@@ -432,6 +434,7 @@ def calc_distance_speaker(stat):
                     if gps_warnings_sounds is not None:
                         radarbluez.speak_sound(gps_warnings_sounds[i])
                     gps_upper[i] = False
+                    start_countdown_screen()
                 if gps_distance >= height * hysteresis:
                     gps_upper[i] = True
         for (i, height) in enumerate(sensor_warnings):
@@ -502,17 +505,36 @@ def has_stopped():
     return False
 
 
-def show_distance_screen():    # returns true if screen with distance should be shown
-    if global_situation['g_distance_valid'] and global_situation['g_distance'] <= DISTANCE_BELOW_SHOW_SCREEN:
-        return True
-    return False
+def start_countdown_screen():    # starts to show distance countdown
+    global switch_back_from_distance
+
+    if Globals.mode != Modes.COUNTDOWN_DISTANCE:
+        switch_back_from_distance = Globals.mode
+        Globals.mode = Modes.COUNTDOWN_DISTANCE
+        rlog.debug(f"Automatic switching from {switch_back_from_distance.name} to COUNTDOWN_DISTANCE")
 
 
-def finish_distance_screen():
-    if global_situation['g_distance_valid'] and global_situation['g_distance'] >= DISTANCE_ABOVE_SHOW_NO_SCREEN:
-        return True
-    return False
+def stop_countdown_screen():   # end countdown screen
+    if Globals.mode == Modes.COUNTDOWN_DISTANCE:  # only when no landing was detected before
+        Globals.mode = switch_back_from_distance
+        rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.value}")
 
+def check_countdown_screen():   # check whether countdown screen is to be displayed furthe
+    global trigger_timestamp
+
+    if fly_status != 1:   # not flying anymore
+        trigger_timestamp = None
+        stop_countdown_screen()
+    elif not global_situation['g_distance_valid']:  # distance above measurement range
+        now = datetime.datetime.now(datetime.timezone.utc)
+        if trigger_timestamp is None:
+            trigger_timestamp = now
+        elif now - trigger_timestamp > TRIGGER_COUNTDOWN_SWITCHBACK:
+            trigger_timestamp = None
+            stop_countdown_screen()
+    else:   # g_distance_valid, reset trigger_timestamp
+        trigger_timestamp = None
+    # situation where grounddistance is valid and distance small is handled via flying status detection
 
 def obstacle_is_clear(current_alt, alt_to_clear):
     global stats_before_obstacle_clear
@@ -583,7 +605,6 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
     global landing_situation
     global obstacle_down_clear
     global stop_situation
-    global switch_back_from_distance   # this is the mode to go back, when landed or airborne again
 
     if fly_status == 0:  # run up
         if is_airborne():
@@ -619,16 +640,10 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                         rlog.debug("Grounddistance: Obstacle clearance down found " +
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                         break
-        if show_distance_screen():    # show distance screen if distance is below DISTANCE_BELOW_SHOW_SCREEN
-            if Globals.mode != Modes.COUNTDOWN_DISTANCE:
-                switch_back_from_distance = Globals.mode
-                Globals.mode = Modes.COUNTDOWN_DISTANCE
-                rlog.debug(f"Automatic switching from {switch_back_from_distance.name} to COUNTDOWN_DISTANCE")
-        elif finish_distance_screen() or has_landed:
-            if Globals.mode == Modes.COUNTDOWN_DISTANCE:
-                Globals.mode = switch_back_from_distance
-                rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.value}")
     elif fly_status == 2:  # landing detected, waiting for stop to calculate distance
+        if Globals.mode == Modes.COUNTDOWN_DISTANCE:  # switch back to normal mode
+            Globals.mode = switch_back_from_distance
+            rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.value}")
         if has_stopped():
             fly_status = 0
             stop_situation = latest_stat
@@ -643,6 +658,7 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
             rlog.debug("Grounddistance: Re-Start detected without stop, keeping first start " +
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
     calc_distance_speaker(latest_stat)
+    check_countdown_screen()
 
 def eval_simulation_data(sim_data, sit):
     if 'g_distance' in sim_data and sim_data['g_distance'] > 0:
