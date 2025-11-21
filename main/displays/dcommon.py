@@ -119,6 +119,7 @@ class GenericDisplay:
         self.compass_aircraft = None    # image of the compass aircraft
         # fonts
         self.fonts= {
+            self.EXTREMELARGE: self.make_font("Font.ttc", self.EXTREMELARGE),
             self.VERYLARGE: self.make_font("Font.ttc", self.VERYLARGE),
             self.MORELARGE: self.make_font("Font.ttc", self.MORELARGE),
             self.LARGE: self.make_font("Font.ttc", self.LARGE),
