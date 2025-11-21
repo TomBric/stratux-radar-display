@@ -432,9 +432,8 @@ def calc_distance_speaker(stat):
                 if gps_distance <= height and gps_upper[i]:
                     # distance is reached and was before higher than hysteresis
                     if gps_warnings_sounds is not None:
-                        radarbluez.speak_sound(gps_warnings_sounds[i])
+                        radarbluez.speak_sound(gps_warnings_sounds[i], str(height))
                     gps_upper[i] = False
-                    start_countdown_screen()
                 if gps_distance >= height * hysteresis:
                     gps_upper[i] = True
         for (i, height) in enumerate(sensor_warnings):
@@ -442,8 +441,9 @@ def calc_distance_speaker(stat):
                 if ground_distance <= height and sensor_upper[i]:
                     # distance is reached and was before higher than hysteresis
                     if sensor_warnings_sounds is not None:
-                        radarbluez.speak_sound(sensor_warnings_sounds[i])
+                        radarbluez.speak_sound(sensor_warnings_sounds[i], str(height))
                     sensor_upper[i] = False
+                    start_countdown_screen()
                 if ground_distance >= height * hysteresis:
                     sensor_upper[i] = True
     if global_config['gear_indication_active'] and fly_status == 1:
