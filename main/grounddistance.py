@@ -529,7 +529,7 @@ def check_countdown_screen():   # check whether countdown screen is to be displa
         now = datetime.now(timezone.utc)
         if trigger_timestamp is None:
             trigger_timestamp = now
-        elif now - trigger_timestamp > TRIGGER_COUNTDOWN_SWITCHBACK:
+        elif now - trigger_timestamp > countdown_switch_delta:
             trigger_timestamp = None
             stop_countdown_screen()
     else:   # g_distance_valid, reset trigger_timestamp
