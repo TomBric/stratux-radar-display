@@ -452,7 +452,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         w = 10  # width of the circle outline
         self.draw.ellipse((self.sizex//2 - tl//2, self.sizey//2 - tl//2, self.sizex//2 + tl//2, self.sizey//2 + tl//2),
                           outline=self.TEXT_COLOR, fill=self.BG_COLOR, width=w)
-        self.draw.text(self.sizex//2 - tl//2, self.sizey//2 - self.EXTREMELARGE//2, text,
+        self.draw.text((self.sizex//2 - tl//2, self.sizey//2 - self.EXTREMELARGE//2), text,
                        font=self.fonts[self.EXTREMELARGE], fill=self.TEXT_COLOR)
         self.draw.text((self.sizex//2 - self.LARGE//2, self.sizey//2 + tl//2 + 2*w), "ft", font=self.fonts[self.LARGE],
                        fill=self.TEXT_COLOR)
