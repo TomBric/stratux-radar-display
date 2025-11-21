@@ -522,6 +522,8 @@ def stop_countdown_screen():   # end countdown screen
 def check_countdown_screen():   # check whether countdown screen is to be displayed furthe
     global trigger_timestamp
 
+    if Globals.mode != Modes.COUNTDOWN_DISTANCE:   # switch already performed
+        return
     if fly_status != 1:   # not flying anymore
         trigger_timestamp = None
         stop_countdown_screen()
