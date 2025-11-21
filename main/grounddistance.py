@@ -517,7 +517,7 @@ def start_countdown_screen():    # starts to show distance countdown
 def stop_countdown_screen():   # end countdown screen
     if Globals.mode == Modes.COUNTDOWN_DISTANCE:  # only when no landing was detected before
         Globals.mode = switch_back_from_distance
-        rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.value}")
+        rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.name}")
 
 def check_countdown_screen():   # check whether countdown screen is to be displayed furthe
     global trigger_timestamp
@@ -526,7 +526,7 @@ def check_countdown_screen():   # check whether countdown screen is to be displa
         trigger_timestamp = None
         stop_countdown_screen()
     elif not global_situation['g_distance_valid']:  # distance above measurement range
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.now(datetime.timezone.utc)
         if trigger_timestamp is None:
             trigger_timestamp = now
         elif now - trigger_timestamp > TRIGGER_COUNTDOWN_SWITCHBACK:
