@@ -83,8 +83,10 @@ GEAR_NOT_DOWN_GO_AROUND = '<pitch level="130"> Go around! Gear not down! </pitch
 
 
 # globals
-ground_distance_active = False  # True if sensor is found and activated
-indicate_distance = False  # True if audio indication for ground distance is active
+ground_distance_active = False    # True if started with option -gd and sensor is found and activated
+                                  # or started with -gd and -sim for simulation mode
+indicate_distance = False  # True if indication for sound ground indication is active (option -gb)
+countdown_screen = False  # True if countdown screen is to be shown (option -cd)
 distance_sensor = None
 zero_distance = 0.0  # distance of sensor when aircraft is on ground
 value_debug_level = 0  # set during init
@@ -154,67 +156,6 @@ def set_dest_elevation(dest_increment):
             # set to invalid if too high or too low
             dest_elevation = INVALID_DEST_ELEVATION
     rlog.debug('Grounddistance: Destination Altitude set to {0:5.0f}'.format(dest_elevation))
-
-
-class UsonicSensor:   # definition adapted from DFRobot code
-    distance_max = 3000
-    distance_min = 5
-    ser = None
-    distance = 0
-
-    def init(self):
-        self.ser = serial.Serial("/dev/ttyAMA0", 115200)     # A22 module has 115200 baud
-        self.ser.flushInput()
-        if not self.ser.isOpen():
-            return False
-        return True
-
-    def set_dis_range(self, mini, maxi):
-        self.distance_max = maxi
-        self.distance_min = mini
-
-    @staticmethod
-    def _check_sum(le):
-        return (le[0] + le[1] + le[2]) & 0x00ff
-
-    def last_distance(self):
-        return self.distance
-
-    async def calc_distance(self):
-        data = [0] * 4
-        timenow = time.time()
-        while self.ser.inWaiting() < 4:
-            await asyncio.sleep(UART_WAIT_TIME)
-            if (time.time() - timenow) > UART_BREAK_TIME:
-                break
-        rlt = self.ser.read(self.ser.inWaiting())
-        if len(rlt) >= 4:
-            index = len(rlt) - 4
-            while True:
-                try:
-                    data[0] = ord(rlt[index])
-                except TypeError:
-                    data[0] = rlt[index]
-                if data[0] == 0xFF:
-                    break
-                elif index > 0:
-                    index = index - 1
-                else:
-                    break
-            if data[0] == 0xFF:
-                try:
-                    data[1] = ord(rlt[index + 1])
-                    data[2] = ord(rlt[index + 2])
-                    data[3] = ord(rlt[index + 3])
-                except TypeError:
-                    data[1] = rlt[index + 1]
-                    data[2] = rlt[index + 2]
-                    data[3] = rlt[index + 3]
-                sumd = self._check_sum(data)
-                if sumd == data[3]:
-                    self.distance = data[1] * 256 + data[2]
-                    if self.distance > self.distance_max or self.distance < self.distance_min:
-                        self.distance = 0
 
 
 class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Sensor
@@ -295,17 +236,22 @@ def reset_values():
     fly_status = 0
 
     if ground_distance_active:
-        new_zero_distance = distance_sensor.last_distance()   # take last value, don't wait (no async function)
-        if new_zero_distance > 0:
-            zero_distance = new_zero_distance
-            rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
+        if simulation_mode:
+            zero_distance = 0
+            rlog.debug('Simulation Mode: Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:
-            rlog.debug('Error resetting gound zero distance')
+            new_zero_distance = distance_sensor.last_distance()   # take last value, don't wait (no async function)
+            if new_zero_distance > 0:
+                zero_distance = new_zero_distance
+                rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
+            else:
+                rlog.debug('Error resetting gound zero distance')
 
 
-def init(activate, stat_file, debug_level, distance_indication, situation, sim_mode, g_config):
+def init(activate, stat_file, debug_level, distance_indication, countdown, situation, sim_mode, g_config):
     global ground_distance_active
     global indicate_distance
+    global countdown_screen
     global distance_sensor
     global value_debug_level
     global global_situation
@@ -314,34 +260,46 @@ def init(activate, stat_file, debug_level, distance_indication, situation, sim_m
     global saved_statistics
     global global_config
 
+    # ground_distance_active: sensor is activated with -gd and is running
+    # simulation_mode: simulation mode is activated with -sim
+    # ground_distance_active + simulation_mode: ground_distance activated by -gd, but values are simulated
+    # indicate_distance:  sound output (either in simulation mode or real)
+    # countdown_screen:  countdown screen automatically activated (either in simulation mode or real)
+
     simulation_mode = sim_mode
     global_config = g_config
     value_debug_level = debug_level
     saved_statistics = stat_file
     global_situation = situation  # to be able to read and store situation info
+
     if not activate:
         rlog.debug("Ground Distance Measurement - not activated.")
         ground_distance_active = False
         return False
-    try:
-        distance_sensor = LidarSensor()
-        if not distance_sensor.init():
-            rlog.debug("Ground Distance Measurement - Error init ultrasonic sensor, serial not found")
-            ground_distance_active = False
-            return False
-    except Exception as e:
-        ground_distance_active = False
-        rlog.debug("Ground Distance Measurement - Ultrasonic sensor not found: " + str(e))
-        return False
-
-    ground_distance_active = True
-    rlog.debug("Ground Distance Measurement - Ground sensor active.")
-
+    if countdown:
+        countdown_screen = True
+        rlog.debug("Ground Distance Measurement: countdown screen activated")
     if distance_indication:
         indicate_distance = True
         rlog.debug("Ground Distance Measurement: indication distance activated")
         prepare_sounds()
-    return ground_distance_active
+    if simulation_mode:
+        rlog.debug("Ground Distance Measurement - Simulation Mode, no sensor activated")
+        ground_distance_active = True
+        return True
+    try:
+        distance_sensor = LidarSensor()
+        if not distance_sensor.init():
+            rlog.debug("Ground Distance Measurement - Error init sensor, serial not found")
+            ground_distance_active = False
+            return False
+    except Exception as e:
+        ground_distance_active = False
+        rlog.debug("Ground Distance Measurement - Sensor not found: " + str(e))
+        return False
+    ground_distance_active = True
+    rlog.debug("Ground Distance Measurement - Ground sensor active.")
+    return True
 
 
 def _to_serializable(obj: Any) -> Any:    # necessary to store datetime in json
@@ -426,12 +384,12 @@ def calc_distance_speaker(stat):
         ground_distance = stat['g_distance'] * MM_TO_FEET    # g_distance is in mm, here we need ft
     else:
         ground_distance = 0.0
-    if indicate_distance and fly_status == 1:
+    if (indicate_distance or countdown_screen) and fly_status == 1:
         for (i, height) in enumerate(gps_warnings):
             if gps_distance != INVALID_GPS_DISTANCE:
                 if gps_distance <= height and gps_upper[i]:
                     # distance is reached and was before higher than hysteresis
-                    if gps_warnings_sounds is not None:
+                    if indicate_distance and gps_warnings_sounds is not None:
                         radarbluez.speak_sound(gps_warnings_sounds[i], str(height))
                     gps_upper[i] = False
                 if gps_distance >= height * hysteresis:
@@ -440,10 +398,11 @@ def calc_distance_speaker(stat):
             if stat['g_distance_valid']:
                 if ground_distance <= height and sensor_upper[i]:
                     # distance is reached and was before higher than hysteresis
-                    if sensor_warnings_sounds is not None:
+                    if indicate_distance and sensor_warnings_sounds is not None:
                         radarbluez.speak_sound(sensor_warnings_sounds[i], str(height))
                     sensor_upper[i] = False
-                    start_countdown_screen()
+                    if countdown_screen:
+                        start_countdown_screen()
                 if ground_distance >= height * hysteresis:
                     sensor_upper[i] = True
     if global_config['gear_indication_active'] and fly_status == 1:
@@ -519,7 +478,8 @@ def stop_countdown_screen():   # end countdown screen
         Globals.mode = switch_back_from_distance
         rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.name}")
 
-def check_countdown_screen():   # check whether countdown screen is to be displayed furthe
+
+def check_countdown_screen():   # check whether countdown screen is to be displayed further
     global trigger_timestamp
 
     if Globals.mode != Modes.COUNTDOWN_DISTANCE:   # switch already performed
@@ -538,6 +498,7 @@ def check_countdown_screen():   # check whether countdown screen is to be displa
     else:   # g_distance_valid, reset trigger_timestamp
         trigger_timestamp = None
     # situation where grounddistance is valid and distance small is handled via flying status detection
+
 
 def obstacle_is_clear(current_alt, alt_to_clear):
     global stats_before_obstacle_clear
@@ -687,9 +648,6 @@ def eval_simulation_data(sim_data, sit):
 def store_statistics(sit):   # called from read_ground_sensor
     global stats_next_store
 
-    if simulation_mode:
-        sim_data = simulation.read_simulation_data()
-        eval_simulation_data(sim_data, sit)
     if time.perf_counter() > stats_next_store:
         stats_next_store = time.perf_counter() + (1 / STATS_PER_SECOND)
         now = datetime.now(timezone.utc)
@@ -710,8 +668,11 @@ async def read_ground_sensor():
 
     if ground_distance_active:
         rlog.debug("Ground distance reader active ...")
-        distance_sensor.calc_distance()
-        new_zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
+        if not simulation_mode:
+            distance_sensor.calc_distance()
+            new_zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
+        else:
+            new_zero_distance = 1     # just take one mm as zero distance for simulation
         if new_zero_distance > 0:
             zero_distance = new_zero_distance  # distance in mm this is zero
             rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
@@ -723,37 +684,26 @@ async def read_ground_sensor():
                 now = time.perf_counter()
                 await asyncio.sleep(next_read - now)  # wait for next time of measurement
                 next_read = next_read + (1 / MEASUREMENTS_PER_SECOND)
-                distance_sensor.calc_distance()
-                distance = distance_sensor.last_distance()  # distance in mm
-                if distance > 0:    # distance==0 is invalid distance
-                    global_situation['g_distance_valid'] = True
-                    global_situation['g_distance'] = distance - zero_distance
-                    rlog.log(value_debug_level,
-                             'Ground Distance: {0:5.2f} cm'.format(global_situation['g_distance'] / 10))
-                else:
-                    global_situation['g_distance_valid'] = False
-                    global_situation['g_distance'] = INVALID_GDISTANCE   # just to be safe
-                    rlog.log(value_debug_level, 'Ground Distance: Sensor value invalid, maybe out of range')
-                if global_config['gear_indication_active']:
+                if not simulation_mode:  # read sensor
+                    distance_sensor.calc_distance()
+                    distance = distance_sensor.last_distance()  # distance in mm
+                    if distance > 0:    # distance==0 is invalid distance
+                        global_situation['g_distance_valid'] = True
+                        global_situation['g_distance'] = distance - zero_distance
+                        rlog.log(value_debug_level,
+                                 'Ground Distance: {0:5.2f} cm'.format(global_situation['g_distance'] / 10))
+                    else:
+                        global_situation['g_distance_valid'] = False
+                        global_situation['g_distance'] = INVALID_GDISTANCE   # just to be safe
+                        rlog.log(value_debug_level, 'Ground Distance: Sensor value invalid, maybe out of range')
                     global_situation['gear_down'] = radarbuttons.gear_is_down()
                     rlog.log(value_debug_level, 'Ground Distance: gear-down: {0}'.format(global_situation['gear_down']))
-                else:
-                    global_situation['gear_down'] = False   # default value if not to be indicated
+                else: # simulation mode
+                    sim_data = simulation.read_simulation_data()
+                    eval_simulation_data(sim_data, global_situation)
+
                 store_statistics(global_situation)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
-    else:
-        if simulation_mode:
-            rlog.debug("Simulation Mode: Ground distance sensor active.")
-            try:
-                next_read = time.perf_counter() + (1 / MEASUREMENTS_PER_SECOND)
-                while True:    # simulate readings in same manner as in real life
-                    now = time.perf_counter()
-                    await asyncio.sleep(next_read - now)  # wait for next time of measurement
-                    next_read = next_read + (1 / MEASUREMENTS_PER_SECOND)
-                    store_statistics(global_situation)
-            except(asyncio.CancelledError, RuntimeError):
-                rlog.debug("Simulation Mode: Ground distance reader terminating ...")
-        else:
-            rlog.debug("No ground distance sensor active.")
+
 

@@ -154,6 +154,7 @@ optical_alive = -1
 co_indication = False  # True if indication via GPIO Pin 16 is on for co
 gear_indication = False  # True if indication via GPIO Pin 19 is on for reading gear status (pull down if gear is down)
 groundbeep = False  # True if indication of ground distance via audio
+countdown = False # True if ground distance with countdown screen is shown
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
 
 
@@ -826,7 +827,7 @@ def main():
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication, co_simulation_mode, co_i2c_0)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
-                        groundbeep, situation, simulation_mode, global_config)
+                        groundbeep, countdown, situation, simulation_mode, global_config)
     simulation.init(simulation_mode)
     checklist.init(xml_checklist)
     radarbuttons.init_gear_indicator(global_config, gear_indication)
@@ -916,6 +917,7 @@ if __name__ == "__main__":
     co_i2c_0 = args['coi2c0']
     grounddistance_activated = args['grounddistance']
     groundbeep = args['groundbeep']
+    countdown = args['countdown']
     gear_indication = args ['gearindicate']
     simulation_mode = args['simulation']
     co_simulation_mode = args['cosimulation']
