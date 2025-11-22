@@ -72,6 +72,13 @@ rlog = logging.getLogger('stratux-radar-log')
 
 # Global configuration dictionary
 global_config = {}
+# stores all configuration data that is also be settable by user interface or calculated
+# - display tail
+# - distance warnings
+# - sound volume
+# - R0 of co warner
+# Is not used for general global settings like display mode or display sequence
+
 
 """
 # Display control object

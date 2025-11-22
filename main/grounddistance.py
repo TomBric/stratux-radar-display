@@ -87,6 +87,7 @@ ground_distance_active = False    # True if started with option -gd and sensor i
                                   # or started with -gd and -sim for simulation mode
 indicate_distance = False  # True if indication for sound ground indication is active (option -gb)
 countdown_screen = False  # True if countdown screen is to be shown (option -cd)
+gear_indication = False  # True if gear indication is active (option -gi) and GPIO could be activated
 distance_sensor = None
 zero_distance = 0.0  # distance of sensor when aircraft is on ground
 value_debug_level = 0  # set during init
@@ -96,7 +97,6 @@ statistics = []  # values for calculating everything
 stats_max_values = STATS_PER_SECOND * STATS_TOTAL_TIME
 stats_next_store = 0
 global_situation = None
-global_config = None
 fly_status = 0  # status for evaluating statistics 0 = run up  1 = start_detected 2 = 15 m detected
 # 3 = landing detected  4 = stop detected
 runup_situation = None  # situation values, for accelleration on runway started
@@ -248,7 +248,7 @@ def reset_values():
                 rlog.debug('Error resetting gound zero distance')
 
 
-def init(activate, stat_file, debug_level, distance_indication, countdown, situation, sim_mode, g_config):
+def init(activate, stat_file, debug_level, distance_indication, countdown, gear_ind, situation, sim_mode):
     global ground_distance_active
     global indicate_distance
     global countdown_screen
@@ -258,7 +258,7 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, situa
     global zero_distance
     global simulation_mode
     global saved_statistics
-    global global_config
+    global gear_indication
 
     # ground_distance_active: sensor is activated with -gd and is running
     # simulation_mode: simulation mode is activated with -sim
@@ -267,7 +267,6 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, situa
     # countdown_screen:  countdown screen automatically activated (either in simulation mode or real)
 
     simulation_mode = sim_mode
-    global_config = g_config
     value_debug_level = debug_level
     saved_statistics = stat_file
     global_situation = situation  # to be able to read and store situation info
@@ -276,6 +275,10 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, situa
         rlog.debug("Ground Distance Measurement - not activated.")
         ground_distance_active = False
         return False
+
+    if gear_ind:
+        gear_indication = radarbuttons.init_gear_indicator()
+        # set to false if gpio could not be initialized
     if countdown:
         countdown_screen = True
         rlog.debug("Ground Distance Measurement: countdown screen activated")
@@ -405,7 +408,7 @@ def calc_distance_speaker(stat):
                         start_countdown_screen()
                 if ground_distance >= height * hysteresis:
                     sensor_upper[i] = True
-    if global_config['gear_indication_active'] and fly_status == 1:
+    if gear_indication and fly_status == 1:
         for (i, height) in enumerate(gear_gps_warnings):
             if gps_distance != INVALID_GPS_DISTANCE:
                 if gps_distance <= height and gear_gps_upper[i]:

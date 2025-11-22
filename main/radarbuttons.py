@@ -193,15 +193,13 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
 def gear_is_down():
     return gear_down_btn.is_held
 
-def init_gear_indicator(global_config, gear_down_indication):
+def init_gear_indicator():
     global gear_down_btn
 
-    global_config['gear_indication_active'] = False
-    if gear_down_indication:
-        try:
-            gear_down_btn = Button(GEAR_DOWN, bounce_time=BOUNCE_TIME, hold_time=GEAR_HOLD_TIME)
-        except:
-            rlog.debug("Radarbuttons ERROR: GPIO-Pin {0} for gear down indication busy! Please clarify!".format(GEAR_DOWN))
-        else:
-            global_config['gear_indication_active'] = True
-            rlog.debug("Radarbuttons: Gear down indicator on GPIO{0} initialized.".format(GEAR_DOWN))
+    try:
+        gear_down_btn = Button(GEAR_DOWN, bounce_time=BOUNCE_TIME, hold_time=GEAR_HOLD_TIME)
+    except:
+        rlog.debug("Radarbuttons ERROR: GPIO-Pin {0} for gear down indication busy! Please clarify!".format(GEAR_DOWN))
+        return False
+    rlog.debug("Radarbuttons: Gear down indicator on GPIO{0} initialized.".format(GEAR_DOWN))
+    return True
