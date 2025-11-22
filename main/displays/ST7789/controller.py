@@ -39,6 +39,7 @@ from . import radar_opts
 from pathlib import Path
 
 class ST7789(dcommon.GenericDisplay):
+    EXTREMELARGE = 60  # countdown distance
     VERYLARGE = 48  # timer
     MORELARGE = 32
     LARGE = 28  # size of height indications of aircraft, size of meter TEXT

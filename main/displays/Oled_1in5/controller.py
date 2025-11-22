@@ -40,6 +40,7 @@ from pathlib import Path
 
 
 class Oled1in5(dcommon.GenericDisplay):
+    EXTREMELARGE = 60  # countdown distance
     VERYLARGE = 24
     MORELARGE = 20
     LARGE = 16  # size of height indications of aircraft

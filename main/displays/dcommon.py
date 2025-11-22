@@ -617,7 +617,20 @@ class GenericDisplay:
 
     def countdown_distance(self, feet):
         # display countdown distance on a full screen, distance value is in feet
-        pass
+        self.centered_text(0, "Ground Distance", self.SMALL)
+        text = f"{int(feet)}"  # round down
+        w = 10  # width of the circle outline
+        radx = self.EXTREMELARGE  # x size of ellipse
+        rady = self.EXTREMELARGE * 0.8  # y size of ellipse
+        self.draw.ellipse(
+            (self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady),
+            outline=self.TEXT_COLOR, fill=self.BG_COLOR, width=w)
+        self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.EXTREMELARGE],
+                       fill=self.TEXT_COLOR,
+                       anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
+        self.draw.text((self.sizex // 2 + radx + 3 * w, self.sizey // 2 - self.LARGE // 2), "ft",
+                       font=self.fonts[self.LARGE],
+                       fill=self.TEXT_COLOR)
 
 
     def gmeter(self, current, maxg, ming, error_message):

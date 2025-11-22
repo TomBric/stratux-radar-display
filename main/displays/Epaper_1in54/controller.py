@@ -40,6 +40,7 @@ from pathlib import Path
 
 
 class Epaper1in54(dcommon.GenericDisplay):
+    EXTREMELARGE = 72  # countdown
     VERYLARGE = 30  # timer
     MORELARGE = 26
     LARGE = 24  # size of height indications of aircraft

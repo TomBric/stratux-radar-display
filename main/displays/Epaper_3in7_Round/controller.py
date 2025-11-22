@@ -47,6 +47,7 @@ LEFT = 55           # x position on the left wich is fully visible
 
 class Epaper3in7_Round(dcommon.GenericDisplay):
     # display constants
+    EXTREMELARGE = 120  # countdown distance
     VERYLARGE = 48  # timer
     MORELARGE = 36
     LARGE = 30  # size of height indications of aircraft
