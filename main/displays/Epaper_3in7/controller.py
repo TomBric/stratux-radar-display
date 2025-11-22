@@ -449,8 +449,8 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.centered_text(0, "Ground Distance", self.SMALL)
         text = f"{int(feet)}"   # round down
         w = 10  # width of the circle outline
-        radx = 120  # x size of ellipse
-        rady = 90   # y size of ellipse
+        radx = self.EXTREMELARGE * 1.5  # x size of ellipse
+        rady = self.EXTREMELARGE  # y size of ellipse
         self.draw.ellipse((self.sizex//2 - radx, self.sizey//2 - rady, self.sizex//2 + radx, self.sizey//2 + rady),
                           outline=self.TEXT_COLOR, fill=self.BG_COLOR, width=w)
         self.draw.text((self.sizex//2, self.sizey//2), text, font=self.fonts[self.EXTREMELARGE], fill=self.TEXT_COLOR,

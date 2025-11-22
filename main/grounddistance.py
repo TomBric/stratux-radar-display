@@ -135,7 +135,7 @@ gear_not_down_warning_sound = None
 go_around_warning_sound = None
 
 # variables for countdown switchback
-TRIGGER_COUNTDOWN_SWITCHBACK = 0.5   # time with invalid readings (above sensor range) to swiching back from countdown
+TRIGGER_COUNTDOWN_SWITCHBACK = 0.5   # seconds with invalid readings (above sensor range) to switch back from countdown
 countdown_switch_delta = timedelta(seconds=TRIGGER_COUNTDOWN_SWITCHBACK)
 trigger_timestamp = None
 switch_back_from_distance = Modes.NO_CHANGE
