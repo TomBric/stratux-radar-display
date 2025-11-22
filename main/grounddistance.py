@@ -640,12 +640,14 @@ def eval_simulation_data(sim_data, sit):
     if 'gps_altitude' in sim_data:
         sit['gps_altitude'] = sim_data['gps_altitude']
         sit['gps_active'] = True
-        sit['gps_hor_accuracy'] = 50  # just any nice valud
+        sit['gps_hor_accuracy'] = 50  # just any nice value
     if 'own_altitude' in sim_data:
         sit['own_altitude'] = sim_data['own_altitude']
         sit['baro_valid'] = True
     if 'gear_down' in sim_data:
         sit['gear_down'] = sim_data['gear_down']
+    else:
+        sit['gear_down'] = False   # must be set to make sure key is present
 
 
 def store_statistics(sit):   # called from read_ground_sensor
@@ -699,8 +701,12 @@ async def read_ground_sensor():
                         global_situation['g_distance_valid'] = False
                         global_situation['g_distance'] = INVALID_GDISTANCE   # just to be safe
                         rlog.log(value_debug_level, 'Ground Distance: Sensor value invalid, maybe out of range')
-                    global_situation['gear_down'] = radarbuttons.gear_is_down()
-                    rlog.log(value_debug_level, 'Ground Distance: gear-down: {0}'.format(global_situation['gear_down']))
+                    if gear_indication:
+                        global_situation['gear_down'] = radarbuttons.gear_is_down()
+                        rlog.log(value_debug_level,
+                                 'Ground Distance: gear-down: {0}'.format(global_situation['gear_down']))
+                    else:
+                        global_situation['gear_down'] = False   # must be set to make sure key is present
                 else: # simulation mode
                     sim_data = simulation.read_simulation_data()
                     eval_simulation_data(sim_data, global_situation)
