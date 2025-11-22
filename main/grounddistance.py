@@ -709,8 +709,7 @@ async def read_ground_sensor():
                         global_situation['gear_down'] = False   # must be set to make sure key is present
                 else: # simulation mode
                     sim_data = simulation.read_simulation_data()
-                    if sim_data is not None:
-                        eval_simulation_data(sim_data, global_situation)
+                    eval_simulation_data(sim_data, global_situation)
 
                 store_statistics(global_situation)
         except (asyncio.CancelledError, RuntimeError):

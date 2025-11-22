@@ -73,5 +73,5 @@ def read_simulation_data():  # returns dictionary with all contents of the SIM_D
             sim_data = json.load(f)
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Simulation: Error " + str(e) + " reading " + SIM_DATA_FILE)
-        return None
+        return {}     # empty dict is returned to make error handling easier
     return sim_data
