@@ -826,11 +826,11 @@ def main():
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication, co_simulation_mode, co_i2c_0)
+    radarbuttons.init_gear_indicator(global_config, gear_indication)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
                         groundbeep, countdown, situation, simulation_mode, global_config)
     simulation.init(simulation_mode)
     checklist.init(xml_checklist)
-    radarbuttons.init_gear_indicator(global_config, gear_indication)
     rlog.debug(f"Initialization finished. Global config {global_config}")
     display_control.startup(RADAR_VERSION, url_host_base, 4)
     try:
