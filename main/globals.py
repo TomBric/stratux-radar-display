@@ -66,6 +66,7 @@ class Modes(Enum):
 
 class Globals:     # global variables which need to be changed somehow from other modules
     mode = Modes.RADAR     # Global mode for radar display
+    update = True   # flag whether to update display
 
 # Initialize logger
 rlog = logging.getLogger('stratux-radar-log')
