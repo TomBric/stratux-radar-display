@@ -479,6 +479,7 @@ def start_countdown_screen():    # starts to show distance countdown
 def stop_countdown_screen():   # end countdown screen
     if Globals.mode == Modes.COUNTDOWN_DISTANCE:  # only when no landing was detected before
         Globals.mode = switch_back_from_distance
+        Globals.refresh = True
         rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.name}")
 
 
