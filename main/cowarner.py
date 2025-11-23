@@ -351,7 +351,7 @@ def set_co_indication(changed):
 async def read_sensors():
     if cowarner_active:
         try:
-            rlog.debug("Sensor reader active ...")
+            rlog.debug("CO Sensor reader active ...")
             if indicate_co_warning:
                 rlog.debug("CO-Warner: Flashing GPIO Pin " + str(IOPIN) + " to test indication")
                 GPIO.output(IOPIN, GPIO.HIGH)
