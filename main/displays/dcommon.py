@@ -130,7 +130,6 @@ class GenericDisplay:
         self.top_index = 0   # checklist number
 
     def set_dark_mode(self, dark_mode):
-        """Set dark mode and update color constants accordingly"""
         self.dark_mode = dark_mode
         if dark_mode:
             self.BG_COLOR = "black"
@@ -156,7 +155,6 @@ class GenericDisplay:
             self.AHRS_MARKS_COLOR = "black"
 
     def init(self, fullcircle=False, dark_mode=False):
-        """Initialize display with optional dark mode"""
         self.set_dark_mode(dark_mode)
         # explicit init to be implemented for every device type
         # set device properties
@@ -628,7 +626,7 @@ class GenericDisplay:
         self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.EXTREMELARGE],
                        fill=self.TEXT_COLOR,
                        anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
-        self.draw.text((self.sizex // 2 + radx + 3 * w, self.sizey // 2 - self.LARGE // 2), "ft",
+        self.draw.text((self.sizex // 2 + radx + w, self.sizey // 2 + rady- self.LARGE // 2), "ft",
                        font=self.fonts[self.LARGE],
                        fill=self.TEXT_COLOR)
 
