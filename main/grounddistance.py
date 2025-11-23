@@ -271,11 +271,6 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, gear_
     saved_statistics = stat_file
     global_situation = situation  # to be able to read and store situation info
 
-    if not activate:
-        rlog.debug("Ground Distance Measurement - not activated.")
-        ground_distance_active = False
-        return False
-
     if gear_ind:
         gear_indication = radarbuttons.init_gear_indicator()
         # set to false if gpio could not be initialized
@@ -290,6 +285,10 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, gear_
         rlog.debug("Ground Distance Measurement - Simulation Mode, no sensor activated")
         ground_distance_active = True
         return True
+    if not activate:
+        rlog.debug("Ground Distance Measurement - not activated.")
+        ground_distance_active = False
+        return False
     try:
         distance_sensor = LidarSensor()
         if not distance_sensor.init():
