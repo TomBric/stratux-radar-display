@@ -334,7 +334,7 @@ class Oled1in5(dcommon.GenericDisplay):
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
             self.centered_text(80, error_message, self.LARGE, self.WARNING_COLOR)
-        self.bottom_line("Set", "His/Mode", "Start")
+        self.bottom_line("Act", "His/Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
                             current_stats=True, next_stat=False, prev_stat=False, index=-1):
