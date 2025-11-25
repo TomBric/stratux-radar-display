@@ -230,6 +230,8 @@ def user_input():
     elif dist_user_mode == 3:   # confirm screen to delete
         if button == 0 and (btime == 1 or btime == 2):  # left, means yes
             grounddistance.delete_stats()
+            statistic_index = -1
+            statistic_list = None
             dist_user_mode = 2   # back to history values
             return Modes.SITUATION, False  # no mode change for any other interaction
         if (button == 1 or button == 2) and (btime == 1 or btime == 2):  # middle or right, short and long, cancel
