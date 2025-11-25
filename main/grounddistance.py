@@ -97,21 +97,21 @@ simulation_mode = False  # set during init
 statistics = []  # values for calculating everything
 stats_max_values = STATS_PER_SECOND * STATS_TOTAL_TIME
 stats_next_store = 0
-global_situation = None
+global_situation = {}
 fly_status = 0  # status for evaluating statistics 0 = run up  1 = start_detected 2 = 15 m detected
 # 3 = landing detected  4 = stop detected
-runup_situation = None  # situation values, for accelleration on runway started
-start_situation = None  # situation values when wheels leave the ground
-obstacle_up_clear = None  # situation values when obstacle clearance was reached when taking off
-obstacle_down_clear = None  # situation values when obstacle clearance was last reacheds when landing
-landing_situation = None  # situation when wheels touch the ground
-stop_situation = None  # siuation values when the aircraft is stopped on the runway
+runup_situation = {}  # situation values, for accelleration on runway started
+start_situation = {}  # situation values when wheels leave the ground
+obstacle_up_clear = {}  # situation values when obstacle clearance was reached when taking off
+obstacle_down_clear = {}  # situation values when obstacle clearance was last reacheds when landing
+landing_situation = {}  # situation when wheels touch the ground
+stop_situation = {}  # siuation values when the aircraft is stopped on the runway
 
 stats_before_airborne = 0
 stats_before_landing = 0
 stats_before_stop = 0
 stats_before_obstacle_clear = 0
-saved_statistics = None    # filename for statistics, set in init
+saved_statistics = ""    # filename for statistics, set in init
 
 gps_warnings = (1000, 500)    # speech warnings in feet, when calculated with gps
 gps_upper = [False] * len(gps_warnings)  # is true, if height + hysteresis was met
@@ -132,8 +132,8 @@ dest_elevation = INVALID_DEST_ELEVATION
 # elevation for destination airport for height warnings, set to maximum if not set
 
 # sound variable for prepared pygame sounds
-gps_warnings_sounds = None
-sensor_warnings_sounds = None
+gps_warnings_sounds = []
+sensor_warnings_sounds = []
 gear_not_down_warning_sound = None
 go_around_warning_sound = None
 
@@ -228,12 +228,12 @@ def reset_values():
     global zero_distance
     global fly_status
 
-    runup_situation = None
-    start_situation = None
-    obstacle_up_clear = None
-    obstacle_down_clear = None
-    landing_situation = None
-    stop_situation = None
+    runup_situation = {}
+    start_situation = {}
+    obstacle_up_clear = {}
+    obstacle_down_clear = {}
+    landing_situation = {}
+    stop_situation = {}
     fly_status = 0
 
     if ground_distance_active:
@@ -400,7 +400,7 @@ def calc_distance_speaker(stat):
             if gps_distance != INVALID_GPS_DISTANCE:
                 if gps_distance <= height and gps_upper[i]:
                     # distance is reached and was before higher than hysteresis
-                    if indicate_distance and gps_warnings_sounds is not None:
+                    if indicate_distance and len(gps_warnings_sounds) > i:
                         radarbluez.speak_sound(gps_warnings_sounds[i], str(height))
                     gps_upper[i] = False
                 if gps_distance >= height * hysteresis:
@@ -409,7 +409,7 @@ def calc_distance_speaker(stat):
             if stat['g_distance_valid']:
                 if ground_distance <= height and sensor_upper[i]:
                     # distance is reached and was before higher than hysteresis
-                    if indicate_distance and sensor_warnings_sounds is not None:
+                    if indicate_distance and len(sensor_warnings_sounds) > i:
                         radarbluez.speak_sound(sensor_warnings_sounds[i], str(height))
                     sensor_upper[i] = False
                     if countdown_screen:
@@ -543,7 +543,7 @@ def calc_gps_distance_meters(fr, to):
 
 
 def takeoff_alt():
-    if start_situation is not None and start_situation['baro_valid']:
+    if start_situation and start_situation['baro_valid']:
         return start_situation['own_altitude']
     else:
         return None
@@ -551,22 +551,22 @@ def takeoff_alt():
 
 def calculate_output_values():  # return output lines
     output = {}
-    if start_situation is not None:
+    if start_situation:
         output['start_time'] = start_situation['Time']
         if start_situation['baro_valid']:
             output['start_altitude'] = start_situation['own_altitude']
-        if runup_situation is not None and runup_situation['gps_active'] and start_situation['gps_active']:
+        if runup_situation and runup_situation['gps_active'] and start_situation['gps_active']:
             output['takeoff_distance'] = calc_gps_distance_meters(start_situation, runup_situation)
-        if runup_situation is not None and obstacle_up_clear is not None and\
+        if runup_situation and obstacle_up_clear and\
                 obstacle_up_clear['gps_active'] and runup_situation['gps_active']:
             output['obstacle_distance_start'] = calc_gps_distance_meters(obstacle_up_clear, runup_situation)
-    if landing_situation is not None:
+    if landing_situation:
         output['landing_time'] = landing_situation['Time']
         if landing_situation['baro_valid']:
             output['landing_altitude'] = landing_situation['own_altitude']
-        if stop_situation is not None and landing_situation['gps_active'] and stop_situation['gps_active']:
+        if stop_situation and landing_situation['gps_active'] and stop_situation['gps_active']:
             output['landing_distance'] = calc_gps_distance_meters(stop_situation, landing_situation)
-        if stop_situation is not None and obstacle_down_clear is not None and \
+        if stop_situation and obstacle_down_clear and \
                 obstacle_down_clear['gps_active'] and stop_situation['gps_active']:
             output['obstacle_distance_landing'] = calc_gps_distance_meters(stop_situation, obstacle_down_clear)
     return output
@@ -586,10 +586,10 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
         if is_airborne():
             fly_status = 1  # start detected
             start_situation = latest_stat  # store this value
-            obstacle_down_clear = None  # in case a second start is done, clear all values
-            obstacle_up_clear = None
-            landing_situation = None
-            stop_situation = None
+            obstacle_down_clear = {}  # in case a second start is done, clear all values
+            obstacle_up_clear = {}
+            landing_situation = {}
+            stop_situation = {}
             rlog.debug("Grounddistance: Start detected " +
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
             for stat in reversed(statistics):  # ... find begin of start where gps_speed <= STOP_SPEED
@@ -597,7 +597,7 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                     runup_situation = stat
                     break
     elif fly_status == 1:  # start was detected
-        if obstacle_up_clear is None:  # do not search for if already set
+        if obstacle_up_clear:  # do not search for if already set
             if latest_stat['baro_valid'] and start_situation['baro_valid'] and \
                     obstacle_is_clear(latest_stat['own_altitude'], start_situation['own_altitude'] + OBSTACLE_HEIGHT):
                 obstacle_up_clear = latest_stat
@@ -608,7 +608,7 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
             landing_situation = latest_stat
             rlog.debug("Grounddistance: Landing detected " +
                        json.dumps(landing_situation, indent=4, sort_keys=True, default=str))
-            if obstacle_down_clear is None:
+            if not obstacle_down_clear:
                 for stat in reversed(statistics):
                     if stat['baro_valid'] and landing_situation['baro_valid'] and \
                       obstacle_is_clear(stat['own_altitude'], landing_situation['own_altitude'] + OBSTACLE_HEIGHT):
@@ -629,8 +629,8 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
             statistics.clear()  # start fresh with statistics
         elif is_airborne():  # touch and go performed!
             fly_status = 1  # go back to flying mode
-            landing_situation = None  # clear landing situation, only last landing is recorded
-            obstacle_down_clear = None  # clear obstacle down, only last landing is recorded
+            landing_situation = {}  # clear landing situation, only last landing is recorded
+            obstacle_down_clear = {}   # clear obstacle down, only last landing is recorded
             rlog.debug("Grounddistance: Re-Start detected without stop, keeping first start " +
                        json.dumps(start_situation, indent=4, sort_keys=True, default=str))
     calc_distance_speaker(latest_stat)
