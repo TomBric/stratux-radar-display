@@ -51,9 +51,9 @@ gps_distance_zero = {'gps_active': False, 'longitude': 0.0, 'latitude': 0.0}
 start_distance = 0.0    # runway needed till airborne, starts when "start" button is pressed
 dist_user_mode = 0      # user input mode for distance display, 0 = normal, start   1=statistics display
 statistic_index = 0
-statistic_list = None
+statistic_list = []
 # gps-starting point in meters for situation and flight testing
-baro_diff_zero = None
+baro_diff_zero = {}
 # height starting point based on baro in feet for situation and flight testing
 
 
@@ -105,7 +105,7 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
         else:
             if situation['baro_valid']:
                 pressure_alt = situation['own_altitude']
-                if baro_diff_zero is not None:
+                if baro_diff_zero:
                     alt_diff = pressure_alt - baro_diff_zero['own_altitude']
                 else:
                     alt_diff = None
@@ -130,7 +130,7 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
                                             grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
                                             grounddistance.indicate_distance, current_stats=True)
     elif dist_user_mode == 2:  # show stored statistics
-        if statistic_list is not None and len(statistic_list) > 0:
+        if len(statistic_list) > 0:
             display_control.distance_statistics(statistic_list[statistic_index],
                                                 situation['gps_active'],situation['gps_altitude'],
                                                 grounddistance.dest_elevation,
@@ -174,10 +174,10 @@ def user_input():
         if button == 1 and btime == 1:  # middle and short, display history statistics
             dist_user_mode = 2
             statistic_list = grounddistance.read_stats()  # returns empty list if nothing available
-            if statistic_list is not None and len(statistic_list) > 0:
+            if len(statistic_list) > 0:
                 statistic_index = len(statistic_list) - 1
             else:
-                statistic_index = -1
+                statistic_index = 0
             return Modes.SITUATION, False
         if button == 0 and btime == 2:  # left and long
             return Modes.SHUTDOWN, False  # start next mode shutdown!
@@ -212,14 +212,14 @@ def user_input():
             return Modes.SITUATION, False
         if button == 2 and btime == 1:  # right and short - next element
             statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
-            if statistic_list is not None and len(statistic_list) > 0:
+            if len(statistic_list) > 0:
                 statistic_index = (statistic_index + 1) % len(statistic_list)
             else:
-                statistic_index = -1
+                statistic_index = 0
             return Modes.SITUATION, False
         if button == 0 and (btime == 1 or btime == 2):  # left - previous element
             statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
-            if statistic_list is not None and len(statistic_list) > 0:
+            if len(statistic_list) > 0:
                 statistic_index = (statistic_index - 1) % len(statistic_list)
             else:
                 statistic_index = -1
@@ -230,12 +230,12 @@ def user_input():
     elif dist_user_mode == 3:   # confirm screen to delete
         if button == 0 and (btime == 1 or btime == 2):  # left, means yes
             grounddistance.delete_stats()
-            statistic_index = -1
-            statistic_list = None
+            statistic_index = 0
+            statistic_list = []
             dist_user_mode = 2   # back to history values
             return Modes.SITUATION, False  # no mode change for any other interaction
         if (button == 1 or button == 2) and (btime == 1 or btime == 2):  # middle or right, short and long, cancel
             dist_user_mode = 2   # back to history values
             return Modes.SITUATION, False  # no mode change for any other interaction
-    else:   # fallback, should not happen
-        return Modes.NO_CHANGE, False
+    # fallback, should not happen
+    return Modes.NO_CHANGE, False
