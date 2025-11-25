@@ -130,7 +130,7 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
                                             grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
                                             grounddistance.indicate_distance, current_stats=True)
     elif dist_user_mode == 2:  # show stored statistics
-        if len(statistic_list) > 0:
+        if len(statistic_list) > statistic_index:
             display_control.distance_statistics(statistic_list[statistic_index],
                                                 situation['gps_active'],situation['gps_altitude'],
                                                 grounddistance.dest_elevation,
@@ -222,7 +222,7 @@ def user_input():
             if len(statistic_list) > 0:
                 statistic_index = (statistic_index - 1) % len(statistic_list)
             else:
-                statistic_index = -1
+                statistic_index = 0
             return Modes.SITUATION, False
         if button == 2 and btime == 2:   # right and long- got to confirm delete all statistics
             dist_user_mode = 3
