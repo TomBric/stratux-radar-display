@@ -80,24 +80,3 @@ global_config = {}
 # - R0 of co warner
 # Is not used for general global settings like display mode or display sequence
 
-
-"""
-# Display control object
-display_control = None
-
-# Status flags
-bluetooth_active = False
-extsound_active = False
-measure_flighttime = False
-co_warner_activated = False
-grounddistance_activated = False
-
-# Configuration file path
-CONFIG_FILE = ""
-
-# File paths
-SAVED_FLIGHTS = "saved_flights.json"
-SAVED_STATISTICS = "saved_statistics.json"
-SITUATION_DEBUG = 0  # 0=off, 1=some debug, 2=more debug
-mode_sequence = []  # list of modes to display
-"""

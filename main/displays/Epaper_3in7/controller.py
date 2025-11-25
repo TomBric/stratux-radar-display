@@ -440,8 +440,8 @@ class Epaper3in7(dcommon.GenericDisplay):
             else:
                 self.bottom_line("", "Back", "")
         else:  # stored stats
-            left = "Prev" if prev_stat else ""
-            right = "Next" if next_stat else ""
+            left = "Prev"
+            right = "Next/DelAll"
             self.bottom_line(left, "Exit", right)
 
 

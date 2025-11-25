@@ -52,6 +52,7 @@ import radarbuttons
 import binascii
 from typing import Any
 from globals import rlog, Globals, Modes
+import os      # for deleting statistics file
 
 FEET_TO_MM = 304.8
 MM_TO_FEET = 1 / FEET_TO_MM     # one feet in mm
@@ -323,6 +324,14 @@ def _from_serializable(obj: Any) -> Any: # necessary to load datetime in json
     if isinstance(obj, list):
         return [_from_serializable(v) for v in obj]
     return obj
+
+
+def delete_stats():
+    try:
+        os.remove(saved_statistics)
+        rlog.debug("Grounddistance: Statistics deleted")
+    except (OSError, IOError, ValueError) as e:
+        rlog.debug(f"Grounddistance: Error {e} deleting {saved_statistics}")
 
 
 def write_stats():

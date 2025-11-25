@@ -145,6 +145,8 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
                                             grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
                                             grounddistance.indicate_distance, current_stats=False,
                                             prev_stat=False, next_stat=False, index=-1)
+    elif dist_user_mode == 3:  # delete all statistics
+        display_control.text_screen("Delete Statistics","", "Confirm to delete all statistics?", "YES", "Cancel", "NO")
     display_control.display()
 
 
@@ -215,11 +217,21 @@ def user_input():
             else:
                 statistic_index = -1
             return Modes.SITUATION, False
-        if button == 0 and btime == 1:  # left and short - previous element
+        if button == 0 and (btime == 1 or btime == 2):  # left - previous element
             statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
             if statistic_list is not None and len(statistic_list) > 0:
                 statistic_index = (statistic_index - 1) % len(statistic_list)
             else:
                 statistic_index = -1
             return Modes.SITUATION, False
-        return Modes.SITUATION, False  # no mode change for any other interaction
+        if button == 2 and btime == 2:   # right and long- got to confirm delete all statistics
+            dist_user_mode = 3
+            return Modes.SITUATION, False
+    elif dist_user_mode == 3:   # confirm screen to delete
+        if button == 0 and (btime == 1 or btime == 2):  # right, means yes
+            grounddistance.delete_stats()
+            dist_user_mode = 2   # back to history values
+            return Modes.SITUATION, False  # no mode change for any other interaction
+        if (button == 0 or button == 1) and (btime == 1 or btime == 2):  # middle or right, short and long, cancel
+            dist_user_mode = 2   # back to history values
+            return Modes.SITUATION, False  # no mode change for any other interaction
