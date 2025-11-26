@@ -631,7 +631,7 @@ class GenericDisplay:
         arcend = arc_angle + 90   # where to end the arc, zero is top, PIL starts at 3 o'clock
         self.draw.arc(
             (self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady),
-            -90, arcend, fill=self.BG_COLOR, width=arcw)
+            -90, arcend, fill=self.TEXT_COLOR, width=arcw)
         self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.EXTREMELARGE],
                        fill=self.TEXT_COLOR,
                        anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
