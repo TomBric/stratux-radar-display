@@ -621,9 +621,7 @@ class GenericDisplay:
         arcw = w * 4  # width of the arc
         radx = self.EXTREMELARGE  # x size of ellipse
         rady = self.EXTREMELARGE * 0.8  # y size of ellipse
-        self.draw.ellipse(
-            (self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady),
-            outline=self.TEXT_COLOR, fill=self.BG_COLOR, width=w)
+        # self.draw.ellipse(  (self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady), outline=self.TEXT_COLOR, fill=self.BG_COLOR, width=w)
         if feet > 0:
             arc_angle = 360 if feet >= 10.0 else 360/10 * feet
         else:
