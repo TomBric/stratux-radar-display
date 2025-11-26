@@ -617,7 +617,7 @@ class GenericDisplay:
         # display countdown distance on a full screen, distance value is in feet
         self.centered_text(0, "Ground Distance", self.SMALL)
         text = f"{int(feet)}"  # round down
-        arcw = self.sizex//25  # width of the arc outline
+        arcw = self.sizex//32  # width of the arc outline
         radx = self.EXTREMELARGE  # x size of ellipse
         rady = self.EXTREMELARGE * 0.8  # y size of ellipse
         if feet > 0:
