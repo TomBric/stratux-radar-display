@@ -632,7 +632,7 @@ class GenericDisplay:
         self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.EXTREMELARGE],
                        fill=self.TEXT_COLOR,
                        anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
-        self.draw.text((self.sizex // 2 + radx + w, self.sizey // 2 - self.LARGE // 2), "ft",
+        self.draw.text((self.sizex // 2 + radx + arcw, self.sizey // 2 - self.LARGE // 2), "ft",
                        font=self.fonts[self.LARGE],
                        fill=self.TEXT_COLOR)
 
