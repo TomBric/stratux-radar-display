@@ -617,21 +617,20 @@ class GenericDisplay:
         # display countdown distance on a full screen, distance value is in feet
         self.centered_text(0, "Ground Distance", self.SMALL)
         text = f"{int(feet)}"  # round down
-        w = 4  # width of the circle outline
-        arcw = 10  # width of the arc
+        w = self.sizex//100  # width of the circle outline
+        arcw = w * 4  # width of the arc
         radx = self.EXTREMELARGE  # x size of ellipse
         rady = self.EXTREMELARGE * 0.8  # y size of ellipse
         self.draw.ellipse(
             (self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady),
             outline=self.TEXT_COLOR, fill=self.BG_COLOR, width=w)
         if feet > 0:
-            arc_angle = 360 if feet >= 10 else 360/10 * feet
+            arc_angle = 360 if feet >= 10.0 else 360/10 * feet
         else:
             arc_angle = 0
-        arcend = arc_angle + 90   # where to end the arc, zero is top, PIL starts at 3 o'clock
         self.draw.arc(
             (self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady),
-            -90, arcend, fill=self.TEXT_COLOR, width=arcw)
+            -90, arc_angle-90, fill=self.TEXT_COLOR, width=arcw)
         self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.EXTREMELARGE],
                        fill=self.TEXT_COLOR,
                        anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
