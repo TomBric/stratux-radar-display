@@ -505,6 +505,7 @@ def new_situation(json_str):
                     situation['gps_speed'] = sim_data['gps_speed']
                 if 'own_altitude' in sim_data:
                     situation['own_altitude'] = sim_data['own_altitude']
+                gps_active = True
 
         # automatic time measurement
         new_mode = flighttime.trigger_measurement(gps_active, situation, ahrs, Globals.mode)
