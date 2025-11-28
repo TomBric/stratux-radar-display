@@ -73,7 +73,7 @@ FLIGHT_LIST_LENGTH = 20   # maximum length of flightlist which are remembered
 
 
 # global variables
-g_saved_flights = None   # filename of saved flights, set in init
+g_saved_flights = "undef"   # filename of saved flights, set in init
 measurement_enabled = False
 takeoff_time = None
 landing_time = None
@@ -92,6 +92,7 @@ g_config = {}
 def default(obj):
     if isinstance(obj, (datetime.date, datetime.datetime)):
         return obj.isoformat()
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
 
 def init(activated, saved_flights):
@@ -108,7 +109,6 @@ def init(activated, saved_flights):
     if 'last_flights' in g_config:
         rlog.debug("Flighttime: Last flights read from config: " + json.dumps(g_config['last_flights'], indent=4,
                                                                               default=default))
-
 
 def new_flight(flight):
     if 'last_flights' not in g_config:

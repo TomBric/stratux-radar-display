@@ -33,7 +33,6 @@
 
 # radar command line arguments
 
-import argparse
 from pathlib import Path
 
 CONFIG_DIR = "config"

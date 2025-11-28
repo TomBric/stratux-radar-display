@@ -85,7 +85,7 @@ def user_input():
     if button == 0 and btime == 2:  # left and long
         return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long, refresh
-        return Modes.GMETER_REFRESH  # start next mode for display driver: refresh called from gmeter
+        return Modes.REFRESH_GMETER  # start next mode for display driver: refresh called from gmeter
     if button == 2 and btime == 1:  # right and short - reset
         reset_gmeter()
         return Modes.GMETER

@@ -57,7 +57,7 @@ DEFAULT_PASS = "                "
 MAX_WIFI_LENGTH = 16
 
 # globals
-g_config_file = None   # filename of config file, set in init
+g_config_file = "undefined"   # filename of config file, set in init
 global_config = {}
 status_url = ""
 stratux_ip = "0.0.0.0"
@@ -81,6 +81,7 @@ charpos = 0         # position of current input char
 def default(obj):
     if isinstance(obj, (datetime.date, datetime.datetime)):
         return obj.isoformat()
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
 
 def read_config(config_file):
@@ -267,6 +268,7 @@ def remove_device(bt_addr):
     res = subprocess.run(["bluetoothctl", "remove", bt_addr])
     if res.returncode != 0:
         return False
+    return True
 
 
 def scan_result(output):
