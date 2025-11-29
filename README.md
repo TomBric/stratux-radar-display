@@ -21,7 +21,7 @@ The best user experience is with the epaper-display. They are perfectly readable
 |-------------------------------------------------|---------------------------------|
 | ![3 7-Round](https://github.com/user-attachments/assets/ae222a08-6492-4109-afd7-b78ef93f96e0) | ![](https://github.com/TomBric/stratux-radar-display/blob/main/.github/images/All-in-one%20Epaper%201.jpg) |
 
-| 1.54 inch Epaper for 57 mm instrument hole | Oled for 57 mm instrument hole | ST 7789 controller display |
+|  Oled for 57 mm instrument hole | ST 7789 controller display | 1.54 inch Epaper for 57 mm instrument hole | 
 |-------------------------|--------------------------------|----------------------------|
 | ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/All-in-one%20OLED%205.jpg) |![2 0 LCD](https://github.com/user-attachments/assets/395df2c8-c7a5-4718-957e-17fd32838e0b) | ![](https://github.com/TomBric/stratux-radar-display/raw/main/.github/images/1.54-front-ahrs.jpg) |
 
