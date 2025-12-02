@@ -32,14 +32,12 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import logging
 import radarmodes
 import radarbuttons
 import xmltodict
 from pathlib import Path
 import arguments
-
-rlog = None  # radar specific logger
+from globals import rlog, Modes
 # constants
 
 # globals
@@ -49,11 +47,9 @@ g_checklist_changed = True
 
 
 def init(checklist_name):
-    global rlog
     global g_iterator
     global g_checklist
 
-    rlog = logging.getLogger('stratux-radar-log')
     checklist_xml = str(Path(arguments.FULL_CONFIG_DIR).resolve().joinpath(checklist_name))
     rlog.debug(f"Checklist - Trying to open checklist '{checklist_xml}'")
     g_iterator = [0, 0]  # start in checklist 0 at item 0
@@ -166,33 +162,33 @@ def user_input():
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     g_checklist_changed = True
     if g_checklist is None:    # xml reading failed
-        return radarmodes.next_mode_sequence(23)  # next mode after any press
+        return radarmodes.next_mode_sequence(Modes.CHECKLIST)  # next mode after any press
     if button == 0 and btime == 1:  # left and short, previous item
         if g_iterator[1] == 0:  # first item, goto next list
             g_iterator = previous_list(g_iterator)
         else:
             g_iterator = previous_item(g_iterator)
-        return 0
+        return Modes.CHECKLIST
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 1 and btime == 1:  # middle and short
         if g_iterator[0] == len(g_checklist)-1:   # last list
-            return radarmodes.next_mode_sequence(23)  # next mode
+            return radarmodes.next_mode_sequence(Modes.CHECKLIST)  # next mode
         else:
             g_iterator = next_list(g_iterator)
-            return 0
+            return Modes.CHECKLIST
     if button == 1 and btime == 2:  # middle long
-        return radarmodes.next_mode_sequence(23)  # next mode
+        return radarmodes.next_mode_sequence(Modes.CHECKLIST)  # next mode
     if button == 2 and btime == 1:  # right and short, next item
         last_item = (g_iterator == [len(g_checklist) - 1, len(g_checklist[g_iterator[0]]['ITEM']) - 1])
         if not last_item:
             g_iterator = next_item(g_iterator)
         else:
             g_iterator = [0, 0]  # reset checklist, start in checklist 0 at item 0
-        return 0
+        return Modes.CHECKLIST
     if button == 2 and btime == 2:  # right and long, refresh
-        return 24  # start next mode for display driver: refresh called
-    return 0  # no mode change
+        return Modes.REFRESH_CHECKLIST  # start next mode for display driver: refresh called
+    return Modes.CHECKLIST  # no mode change

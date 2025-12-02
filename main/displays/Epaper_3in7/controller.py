@@ -33,12 +33,9 @@
 
 from . import epd3in7
 from .. import dcommon
-from PIL import Image, ImageDraw, ImageFont
-import math
+from PIL import Image, ImageDraw
 import time
-from datetime import datetime
 from pathlib import Path
-import logging
 
 
 top_index = 0    # top index being displayed in checklist
@@ -46,6 +43,7 @@ top_index = 0    # top index being displayed in checklist
 
 class Epaper3in7(dcommon.GenericDisplay):
     # display constants
+    EXTREMELARGE = 120  # countdown distance
     VERYLARGE = 48  # timer
     MORELARGE = 36
     LARGE = 30  # size of height indications of aircraft
@@ -224,7 +222,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                     t += "\uf293"  # bluetooth symbol
             else:
                 t = "\uf1f6"  # bell off symbol
-            textlength = self.draw.textlength(t, self.awesomefont)
+            textlength = self.draw.textlength(t, self.fonts[self.SMALL])
             self.draw.text((self.sizex - textlength - 5, self.sizey - self.SMALL), t,
                            font=self.awesomefont, fill=self.TEXT_COLOR)
 
@@ -395,7 +393,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.dashboard(self.zerox + offset, starty, self.zerox - 2 * offset, lines, headline="Baro", rounding=True)
         if error_message:
             self.centered_text(self.sizey // 4, error_message, self.LARGE)
-        self.bottom_line("Set", "His/Mode", "Start")
+        self.bottom_line("Act+Set", "His/Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
                             current_stats=True, next_stat=False, prev_stat=False, index=-1):
@@ -407,12 +405,10 @@ class Epaper3in7(dcommon.GenericDisplay):
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = 5
-        st = '---'
         if 'start_time' in values:
-            dt = values['start_time']
-            if not isinstance(dt, datetime):
-                dt = datetime.fromisoformat(dt)
-            st = dt.strftime("%H:%M:%S,%f")[:-5]
+            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+        else:
+            st = '---'
         lines = [
             ("t-off time", st),
             ("t-off alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
@@ -420,12 +416,10 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         self.dashboard(offset, 35, self.zerox - offset, lines, headline="Takeoff", rounding=True)
-        lt = '---'
         if 'landing_time' in values:
-            dt = values['landing_time']
-            if not isinstance(dt, datetime):
-                dt = datetime.fromisoformat(dt)
-            lt = dt.strftime("%H:%M:%S,%f")[:-5]
+            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+        else:
+            lt = '---'
         lines = [
             ("ldg time", lt),
             ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
@@ -446,10 +440,9 @@ class Epaper3in7(dcommon.GenericDisplay):
             else:
                 self.bottom_line("", "Back", "")
         else:  # stored stats
-            left = "Prev" if prev_stat else ""
-            right = "Next" if next_stat else ""
+            left = "Prev"
+            right = "Next/DelAll"
             self.bottom_line(left, "Exit", right)
-
 
 
 # instantiate a single object in the file, needs to be done and inherited in every display module

@@ -13,10 +13,13 @@
 #   sudo /bin/bash mk_radar_on_stratux.sh
 #   sudo /bin/bash mk_radar_on_stratux.sh -b dev
 #   sudo /bin/bash mk_radar_on_stratux.sh -d Epaper_1in54
-# install a first time flashing of the t-beam
+# install a first time flashing of the t-beam, copies the content of the specified directory to /home/pi/stratux-radar-display/to_flash
 #   sudo /bin/bash mk_radar_on_stratux.sh -flash /home/pi/GxAirCom81
+# Enable sound output and UART Ground Sensor
+#   sudo /bin/bash mk_radar_on_stratux.sh -s
 
-set -x
+
+set -xcd ho
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -30,20 +33,25 @@ die() {
 BRANCH=main
 USB_NAME=""
 DISPLAY_NAME="Epaper_3in7"
+UART=false
 
 # check parameters
-while getopts ":b:d:u:f:" opt; do
+while getopts ":b:d:u:f:s" opt; do
       case $opt in
         b) BRANCH="$OPTARG" ;;
         u) USB_NAME="$OPTARG" ;;
         d) DISPLAY_NAME="$OPTARG" ;;
         f) FLASH="$OPTARG" ;;
+        s) UART=true ;;
         \?) echo "Invalid option: -$OPTARG"; exit 1 ;;
         :) echo "Option -$OPTARG requires a value."; exit 1 ;;
       esac
     done
 
 echo "Building stratux image for branch '$BRANCH' and display '$DISPLAY_NAME'"
+if [ "$UART" = true ]; then
+  echo "Enabling UART Ground Sensor support"
+fi
 
 ZIPNAME="stratux-v1.6r1-eu032-ff1f01dc.img.zip"
 BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu032/${ZIPNAME}"
@@ -105,7 +113,11 @@ sed -i "s/Oled_1in5/${DISPLAY_NAME}/g" stratux-radar-display/image/stratux_radar
 # back to root directory of stratux image
 cd ../../../
 # run stratux configuration skript
-chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
+if [ "$UART" = true ]; then
+  chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh -u
+else
+  chroot mnt /bin/bash $DISPLAY_SRC/stratux-radar-display/image/configure_radar_on_stratux.sh
+fi
 
 umount mnt/boot
 umount mnt

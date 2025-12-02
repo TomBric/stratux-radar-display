@@ -35,13 +35,9 @@
 # Does not use full display size, but creates a round display with a diameter of 3.5 inch.
 from . import epd3in7
 from .. import dcommon
-from PIL import Image, ImageDraw, ImageFont
-import math
+from PIL import Image, ImageDraw
 import time
-import datetime
 from pathlib import Path
-import logging
-
 
 top_index = 0    # top index being displayed in checklist
 
@@ -51,6 +47,7 @@ LEFT = 55           # x position on the left wich is fully visible
 
 class Epaper3in7_Round(dcommon.GenericDisplay):
     # display constants
+    EXTREMELARGE = 120  # countdown distance
     VERYLARGE = 48  # timer
     MORELARGE = 36
     LARGE = 30  # size of height indications of aircraft
@@ -234,8 +231,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
                     t += "\uf293"  # bluetooth symbol
             else:
                 t = "\uf1f6"  # bell off symbol
-            textlength = self.draw.textlength(t, self.awesomefont)
-            self.draw.text((LEFT-30 - textlength - 5, self.VERYSMALL + self.SMALL + 10), t,
+            self.draw.text((LEFT-40, 3*self.VERYSMALL + self.SMALL + 20), t,
                            font=self.awesomefont, fill=self.TEXT_COLOR)
 
         self.draw.line((RIGHT+20, 80 + optical_bar * 10, RIGHT+20, 80 + optical_bar * 10 + 8),
@@ -408,7 +404,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             self.dashboard(self.zerox + 5, starty, self.zerox - offset - 5, lines, headline="Baro", rounding=True)
         if error_message:
             self.centered_text(self.sizey // 4, error_message, self.LARGE)
-        self.bottom_line("Set", "Hist/Mode", "Start")
+        self.bottom_line("Act+Set", "Hist/Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
                             current_stats=True, next_stat=False, prev_stat=False, index=-1):
@@ -420,12 +416,10 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = LEFT
-        st = '---'
         if 'start_time' in values:
-            dt = values['start_time']
-            if not isinstance(dt, datetime.datetime):
-                dt = datetime.fromisoformat(dt)
-            st = dt.strftime("%H:%M:%S,%f")[:-5]
+            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+        else:
+            st = '---'
         lines = [
             ("to", st),
             ("to alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
@@ -433,12 +427,10 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         self.dashboard(offset, 35, self.zerox-offset, lines, headline="Takeoff", rounding=True)
-        lt = '---'
         if 'landing_time' in values:
-            dt = values['landing_time']
-            if not isinstance(dt, datetime.datetime):
-                dt = datetime.fromisoformat(dt)
-            lt = dt.strftime("%H:%M:%S,%f")[:-5]
+            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+        else:
+            lt = '---'
         lines = [
             ("ldg", lt),
             ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
@@ -459,8 +451,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             else:
                 self.bottom_line("", "Back", "")
         else:  # stored stats
-            left = "Prev" if prev_stat else ""
-            right = "Next" if next_stat else ""
+            left = "Prev"
+            right = "Next/DelAll"
             self.bottom_line(left, "Exit", right)
 
 

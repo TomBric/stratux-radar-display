@@ -2,8 +2,28 @@
 
 # script configures basic libraries necessary for stratux-radar
 # script to be run as root on stratux (without a zero pi)
+# usage /bin/bash configure_radar_on_stratux.sh
 
-# set -x
+#  use option -u to enable UART for GroundSensor (if hardware is connected)
+#  example: /bin/bash configure_radar_on_stratux.sh -u
+
+set -x
+UART=false
+
+# check parameters
+while getopts ":u" opt; do
+      case $opt in
+        u) UART=true ;;
+        \?) echo "Invalid option: -$OPTARG"; exit 1 ;;
+        :) echo "Option -$OPTARG requires a value."; exit 1 ;;
+      esac
+    done
+
+if [ "$UART" = true ]; then
+  echo "Enabling UART Ground Sensor support"
+fi
+
+
 apt update
 apt install git python3-pip -y
 # no sound or bluetooth on stratux
@@ -25,6 +45,17 @@ chown pi /home/pi/.config/systemd/user/autostart-radar.service ; chgrp pi /home/
 # create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
 su pi -c "mkdir -p /home/pi/.config/systemd/user/default.target.wants"
 su pi -c "ln -f -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
+
+if [ "$UART" = true ]; then
+  # enable sensor UART output
+  # for groundsensor, disable ssh over serial cause it is needed for the sensor
+  # disable ssh over serial otherwise
+  sed -i /boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
+  sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
+  sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
+  # for bookworm disable serial-getty, it is whatsoever started by bookworm even if cmdline is changed
+  systemctl mask serial-getty@ttyAMA0.service
+fi
 
 # change log level of rtkit, otherwise this fills journal with tons of useless info
 sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service

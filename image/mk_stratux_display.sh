@@ -14,7 +14,8 @@
 #   sudo /bin/bash mk_stratux_display.sh -b dev
 #   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
 
-set -x
+# cd .
+# set -x
 
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
@@ -74,6 +75,7 @@ cd "$(dirname "$0")" || die "cd failed"
 SRCDIR="$(realpath "$(pwd)"/..)"
 mkdir -p $TMPDIR
 cd $TMPDIR || die "cd failed"
+mkdir -p $TMPDIR/out
 
 # Download/extract image
 wget -c $BASE_IMAGE_URL || die "Download failed"

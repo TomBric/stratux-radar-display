@@ -54,11 +54,9 @@
 
 {{ render_field(radar_form.autorefresh, form_type='horizontal') }}
 
-{% if on_stratux == False %}
-    <h5>Ground sensor (LIDAR) options</h5>
-    {{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.gearindicate],
-        col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-3', 'gearindicate': 'col-md-3'}) }}
-{% endif %}
+<h5>Ground sensor (LIDAR) options</h5>
+{{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.countdown, radar_form.gearindicate],
+    col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-3', 'countdown': 'col-md-3', 'gearindicate': 'col-md-3'}) }}
 
 <h5>Configuration web server shutdown time</h5>
 {{ render_field(radar_form.webtimeout, form_type='horizontal') }}

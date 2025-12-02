@@ -207,6 +207,7 @@ class RadarForm(FlaskForm):
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
+    countdown = SwitchField('Indicate ground distance via countdown screen', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
     darkmode = SwitchField('Enable dark mode', default=False)
     all_mixers = RadioField('Select detected devices/mixers', choices=[('other', 'Other')], default='other')
@@ -335,6 +336,7 @@ def read_arguments(rf):
     # ground-options
     rf.groundsensor.data = args['grounddistance']
     rf.groundbeep.data = args['groundbeep']
+    rf.countdown.data = args['countdown']
     rf.gearindicate.data = args['gearindicate']
     if args['dark'] is True:
         rf.darkmode.data = True
@@ -417,6 +419,8 @@ def build_option_string(rf):
         out += ' -gd'
     if rf.groundbeep.data is True:
         out += ' -gb'
+    if rf.countdown.data is True:
+        out += ' -cd'
     if rf.gearindicate.data is True:
         out += ' -gi'
     if rf.darkmode.data is True:

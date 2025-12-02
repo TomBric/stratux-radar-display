@@ -42,6 +42,7 @@ import radarbuttons
 import grounddistance
 import datetime
 import radarmodes
+from globals import Modes
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -50,9 +51,9 @@ gps_distance_zero = {'gps_active': False, 'longitude': 0.0, 'latitude': 0.0}
 start_distance = 0.0    # runway needed till airborne, starts when "start" button is pressed
 dist_user_mode = 0      # user input mode for distance display, 0 = normal, start   1=statistics display
 statistic_index = 0
-statistic_list = None
+statistic_list = []
 # gps-starting point in meters for situation and flight testing
-baro_diff_zero = None
+baro_diff_zero = {}
 # height starting point based on baro in feet for situation and flight testing
 
 
@@ -104,7 +105,7 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
         else:
             if situation['baro_valid']:
                 pressure_alt = situation['own_altitude']
-                if baro_diff_zero is not None:
+                if baro_diff_zero:
                     alt_diff = pressure_alt - baro_diff_zero['own_altitude']
                 else:
                     alt_diff = None
@@ -129,7 +130,7 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
                                             grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
                                             grounddistance.indicate_distance, current_stats=True)
     elif dist_user_mode == 2:  # show stored statistics
-        if statistic_list is not None and len(statistic_list) > 0:
+        if len(statistic_list) > statistic_index:
             display_control.distance_statistics(statistic_list[statistic_index],
                                                 situation['gps_active'],situation['gps_altitude'],
                                                 grounddistance.dest_elevation,
@@ -144,6 +145,17 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
                                             grounddistance.dest_elevation != grounddistance.INVALID_DEST_ELEVATION,
                                             grounddistance.indicate_distance, current_stats=False,
                                             prev_stat=False, next_stat=False, index=-1)
+    elif dist_user_mode == 3:  # delete all statistics
+        display_control.text_screen("Delete Statistics","", "Confirm to delete all statistics?", "YES", "Cancel", "NO")
+    display_control.display()
+
+
+def draw_countdown_distance(display_control, situation):
+    # display in any case, even if there is no change, since values are constantly changing
+    display_control.clear()
+    if situation['g_distance_valid']:
+        feet = situation['g_distance'] * grounddistance.MM_TO_FEET   # round down
+        display_control.countdown_distance(feet)    # switch back is done by ground sensor reader
     display_control.display()
 
 
@@ -155,61 +167,75 @@ def user_input():
     btime, button = radarbuttons.check_buttons()
     # start of situation global behaviour, status is 21
     if btime == 0:
-        return 0, False  # stay in current mode
+        return Modes.NO_CHANGE, False  # stay in current mode
     if dist_user_mode == 0:
         if button == 1 and btime == 2:  # middle
-            return radarmodes.next_mode_sequence(21), False  # next mode to be radar
+            return radarmodes.next_mode_sequence(Modes.SITUATION), False  # next mode to be radar
         if button == 1 and btime == 1:  # middle and short, display history statistics
             dist_user_mode = 2
             statistic_list = grounddistance.read_stats()  # returns empty list if nothing available
-            if statistic_list is not None and len(statistic_list) > 0:
+            if len(statistic_list) > 0:
                 statistic_index = len(statistic_list) - 1
             else:
-                statistic_index = -1
-            return 21, False
+                statistic_index = 0
+            return Modes.SITUATION, False
         if button == 0 and btime == 2:  # left and long
-            return 3, False  # start next mode shutdown!
+            return Modes.SHUTDOWN, False  # start next mode shutdown!
         if button == 0 and btime == 1:  # left and short - display statistics
             dist_user_mode = 1
-            return 21, False
+            return Modes.SITUATION, False
         if button == 2 and btime == 1:  # right and short - reset values
-            return 21, True  # reset values in radar.py
+            return Modes.SITUATION, True  # reset values in radar.py
         if button == 2 and btime == 2:  # right and long - refresh
-            return 22, False  # start next mode for display driver: refresh called from vsi
-        return 21, False  # no mode change for any other interaction
+            return Modes.REFRESH_SITUATION, False  # start next mode for display driver: refresh called from vsi
+        return Modes.SITUATION, False  # no mode change for any other interaction
     elif dist_user_mode == 1:  # statistics/set mode
         if button == 1 and (btime == 2 or btime == 1):  # middle and long/short - return to display mode
             dist_user_mode = 0
-            return 21, False
+            return Modes.SITUATION, False
         if button == 0 and btime == 1:  # left and short - +100 ft
             grounddistance.set_dest_elevation(+100)
-            return 21, False
+            return Modes.SITUATION, False
         if button == 0 and btime == 2:  # left and long - -100 ft
             grounddistance.set_dest_elevation(-100)
-            return 21, False
+            return Modes.SITUATION, False
         if button == 2 and btime == 1:  # right and short - -100 ft
             grounddistance.set_dest_elevation(+10)
-            return 21, False
+            return Modes.SITUATION, False
         if button == 2 and btime == 2:  # right and long - -100 ft
             grounddistance.set_dest_elevation(-10)
-            return 21, False
-        return 21, False  # no mode change for any other interaction
+            return Modes.SITUATION, False
+        return Modes.SITUATION, False  # no mode change for any other interaction
     elif dist_user_mode == 2:  # history values list
         if button == 1 and (btime == 1 or btime == 2):  # middle - return to display mode
             dist_user_mode = 0
-            return 21, False
+            return Modes.SITUATION, False
         if button == 2 and btime == 1:  # right and short - next element
             statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
-            if statistic_list is not None and len(statistic_list) > 0:
+            if len(statistic_list) > 0:
                 statistic_index = (statistic_index + 1) % len(statistic_list)
             else:
-                statistic_index = -1
-            return 21, False
-        if button == 0 and btime == 1:  # left and short - previous element
+                statistic_index = 0
+            return Modes.SITUATION, False
+        if button == 0 and (btime == 1 or btime == 2):  # left - previous element
             statistic_list = grounddistance.read_stats()  # read list again, it could have been updated
-            if statistic_list is not None and len(statistic_list) > 0:
+            if len(statistic_list) > 0:
                 statistic_index = (statistic_index - 1) % len(statistic_list)
             else:
-                statistic_index = -1
-            return 21, False
-        return 21, False  # no mode change for any other interaction
+                statistic_index = 0
+            return Modes.SITUATION, False
+        if button == 2 and btime == 2:   # right and long- got to confirm delete all statistics
+            dist_user_mode = 3
+            return Modes.SITUATION, False
+    elif dist_user_mode == 3:   # confirm screen to delete
+        if button == 0 and (btime == 1 or btime == 2):  # left, means yes
+            grounddistance.delete_stats()
+            statistic_index = 0
+            statistic_list = []
+            dist_user_mode = 2   # back to history values
+            return Modes.SITUATION, False  # no mode change for any other interaction
+        if (button == 1 or button == 2) and (btime == 1 or btime == 2):  # middle or right, short and long, cancel
+            dist_user_mode = 2   # back to history values
+            return Modes.SITUATION, False  # no mode change for any other interaction
+    # fallback, should not happen
+    return Modes.NO_CHANGE, False

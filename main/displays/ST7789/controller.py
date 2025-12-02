@@ -32,15 +32,14 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 from .. import dcommon
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 import math
 import time
-from datetime import datetime
 from . import radar_opts
 from pathlib import Path
-import logging
 
 class ST7789(dcommon.GenericDisplay):
+    EXTREMELARGE = 60  # countdown distance
     VERYLARGE = 48  # timer
     MORELARGE = 32
     LARGE = 28  # size of height indications of aircraft, size of meter TEXT
@@ -346,7 +345,7 @@ class ST7789(dcommon.GenericDisplay):
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
             self.centered_text(80, error_message, self.LARGE, self.WARNING_COLOR)
-        self.bottom_line("Set", "His/Mode", "Start")
+        self.bottom_line("Act", "His/Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
                             current_stats=True, next_stat=False, prev_stat=False, index=-1):
@@ -358,12 +357,10 @@ class ST7789(dcommon.GenericDisplay):
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = 5
-        st = '---'
         if 'start_time' in values:
-            dt = values['start_time']
-            if not isinstance(dt, datetime):
-                dt = datetime.fromisoformat(dt)
-            st = dt.strftime("%H:%M:%S,%f")[:-5]
+            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+        else:
+            st = '---'
         lines = [
             ("t-off time", st),
             ("t-off alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
@@ -371,12 +368,10 @@ class ST7789(dcommon.GenericDisplay):
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         starty = self.dashboard(offset, self.SMALL, self.sizex - 2* offset, lines)
-        lt = '---'
         if 'landing_time' in values:
-            dt = values['landing_time']
-            if not isinstance(dt, datetime):
-                dt = datetime.fromisoformat(dt)
-            lt = dt.strftime("%H:%M:%S,%f")[:-5]
+            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+        else:
+            lt = '---'
         lines = [
             ("ldg time", lt),
             ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
@@ -397,8 +392,8 @@ class ST7789(dcommon.GenericDisplay):
             else:
                 self.bottom_line("", "Back", "")
         else:  # stored stats
-            left = "Prev" if prev_stat else ""
-            right = "Next" if next_stat else ""
+            left = "Prev"
+            right = "Next/Del"
             self.bottom_line(left, "Exit", right)
 
 

@@ -31,7 +31,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import logging
+from globals import rlog
 import requests
 import radarbuttons
 import time
@@ -44,7 +44,7 @@ import ipaddress
 import json
 import os
 import datetime
-import radarmodes
+from radarmodes import Modes, next_mode_sequence
 
 # constants
 STATUS_TIMEOUT = 0.3
@@ -57,8 +57,7 @@ DEFAULT_PASS = "                "
 MAX_WIFI_LENGTH = 16
 
 # globals
-rlog = None
-g_config_file = None   # filename of config file, set in init
+g_config_file = "undefined"   # filename of config file, set in init
 global_config = {}
 status_url = ""
 stratux_ip = "0.0.0.0"
@@ -82,13 +81,10 @@ charpos = 0         # position of current input char
 def default(obj):
     if isinstance(obj, (datetime.date, datetime.datetime)):
         return obj.isoformat()
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
 
 def read_config(config_file):
-    global rlog
-
-    if rlog is None:   # may be called before init
-        rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(config_file) as f:
             config = json.load(f)
@@ -101,11 +97,8 @@ def read_config(config_file):
 
 
 def write_config(config):
-    global rlog
     global g_config_file
 
-    if rlog is None:   # may be called before init
-        rlog = logging.getLogger('stratux-radar-log')
     try:
         with open(g_config_file, 'wt') as out:
             json.dump(config, out, sort_keys=True, indent=4, default=default)
@@ -123,13 +116,11 @@ def init(config_file, url, target_ip, refresh, config):   # prepare everything
     global new_stratux_ip
     global new_pass
     global new_wifi
-    global rlog
     global g_config_file
 
     g_config_file = config_file
     status_url = url
     stratux_ip = target_ip
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Status UI: Initialized GET settings to " + status_url)
     refresh_time = refresh
     global_config = config
@@ -277,6 +268,7 @@ def remove_device(bt_addr):
     res = subprocess.run(["bluetoothctl", "remove", bt_addr])
     if res.returncode != 0:
         return False
+    return True
 
 
 def scan_result(output):
@@ -415,12 +407,12 @@ def user_input(extsound_active, bluetooth_active):
     btime, button = radarbuttons.check_buttons()
     # start of ahrs global behaviour
     if btime == 0 and status_mode != 11:   # for 11 do reboot
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if status_mode == 0:   # normal status display
         if button == 1 and (btime == 2 or btime == 1):  # middle
-            return radarmodes.next_mode_sequence(7)  # next mode
+            return next_mode_sequence(Modes.STATUS)  # next mode
         if bluetooth_active and button == 2 and btime == 1:  # right and short
             status_mode = 1
             start_async_bt_scan()
@@ -439,7 +431,7 @@ def user_input(extsound_active, bluetooth_active):
                 status_mode = 1
                 start_async_bt_scan()
                 scan_end = time.time() + BLUETOOTH_SCAN_TIME
-                return 7
+                return Modes.STATUS
         if len(new_devices) > 0:
             if button == 0 and btime == 1:  # left short, YES
                 rlog.debug("Connecting: " + new_devices[0][1])
@@ -583,4 +575,4 @@ def user_input(extsound_active, bluetooth_active):
             write_config(global_config)
             status_mode = 3
 
-    return 7  # no mode change
+    return Modes.STATUS  # no mode change

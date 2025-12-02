@@ -35,30 +35,29 @@
 # enable_uart=1
 # dtoverlay=miniuart-bt
 
-import logging
+from globals import rlog
 import json
 
-rlog = None  # radar specific logger
 simulation_mode = False
 
 # constants
 SIM_DATA_FILE = "simulation_data.json"
-# file with JSON content, e.g.:
-# {
-#    "g_distance": 10,
-#    "gps_speed": 0,
-#    "own_altitude": 10,
-#    "gps_altitude": 1000,
-#    "gear_down": false
-# }
-#
+
+"""
+ file with JSON content, e.g.:
+ {
+    "g_distance": 10,
+    "gps_speed": 0,
+    "own_altitude": 10,
+    "gps_altitude": 1000,
+    "gear_down": false
+ }
+"""
 
 def init(sim_mode):
-    global rlog
     global simulation_mode
 
     simulation_mode = sim_mode
-    rlog = logging.getLogger('stratux-radar-log')
     if simulation_mode:
         rlog.debug('Simulation mode activated - Reading sim data from: ' + SIM_DATA_FILE + '.')
         sim_data = read_simulation_data()
@@ -74,5 +73,5 @@ def read_simulation_data():  # returns dictionary with all contents of the SIM_D
             sim_data = json.load(f)
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Simulation: Error " + str(e) + " reading " + SIM_DATA_FILE)
-        return None
+        return {}     # empty dict is returned to make error handling easier
     return sim_data

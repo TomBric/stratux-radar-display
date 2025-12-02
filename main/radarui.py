@@ -31,14 +31,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import logging
+from globals import rlog, Modes
 import requests
 import radarbuttons
 import radarmodes
-import threading   # for flask server in case of button api
-from flask import Flask, jsonify, render_template
-from flask_wtf import FlaskForm, CSRFProtect
-from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
 # status variables for state machine
@@ -48,17 +44,14 @@ sound_on = True
 button_api_active = False
 
 url_settings_set = ""
-rlog = None
 
 
 def init(url, button_api):
     global url_settings_set
-    global rlog
 
     if not radarbuttons.init(button_api):   # error occured, e.g. gpio pins are buse
         return False
     url_settings_set = url
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("Radar UI: Initialized POST settings to " + url_settings_set)
     return True
 
@@ -80,10 +73,10 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
 
     btime, button = radarbuttons.check_buttons()
     if btime == 0:
-        return 0, False
+        return Modes.NO_CHANGE, False
     if button == 0:
         if btime == 2:    # left and long
-            return 3, False  # start next mode shutdown!
+            return Modes.SHUTDOWN, False  # start next mode shutdown!
         else:          # left and short
             radius += 1
             if radius >= len(display_radius):
@@ -91,7 +84,7 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
             communicate_limits(display_radius[radius], height_diff[height])
     elif button == 2:
         if btime == 2:   # right and long, refresh
-            return 4, False   # start next mode for display driver: refresh
+            return Modes.REFRESH_RADAR, False   # start next mode for display driver: refresh
         else:
             height += 1
             if height >= len(height_diff):
@@ -99,8 +92,8 @@ def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
             communicate_limits(display_radius[radius], height_diff[height])
     elif button == 1:
         if btime == 2:    # middle and long
-            return radarmodes.next_mode_sequence(1), False  # start next mode
+            return radarmodes.next_mode_sequence(Modes.RADAR), False  # start next mode
         else:          # middle and short
             rlog.debug("Sound  toggled by UI")
-            return 1, True
-    return 1, False
+            return Modes.RADAR, True
+    return Modes.RADAR, False

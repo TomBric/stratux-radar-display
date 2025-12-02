@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 #
 # BSD 3-Clause License
-# Copyright (c) 2021, Thomas Breitbach
+# Copyright (c) 2021-2025, Thomas Breitbach
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,45 +31,52 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import radarbuttons
-import radarmodes
-from globals import Modes
 
-# constants
-MSG_NO_CONNECTION = "No Connection!"
-# globals
-compassui_changed = True
+import logging
+from enum import Enum
+
+class Modes(Enum):
+    NO_CHANGE = 0
+    RADAR = 1
+    TIMER = 2
+    SHUTDOWN = 3
+    REFRESH_RADAR = 4
+    AHRS = 5
+    REFRESH_AHRS = 6
+    STATUS = 7
+    REFRESH_STATUS = 8
+    GMETER = 9
+    REFRESH_GMETER = 10
+    COMPASS = 11
+    REFRESH_COMPASS = 12
+    VSI = 13
+    REFRESH_VSI = 14
+    STRATUX_STATUS = 15
+    REFRESH_STRATUX_STATUS = 16
+    FLIGHTTIME = 17
+    REFRESH_FLIGHTTIME = 18
+    COWARNER = 19
+    REFRESH_CO_WARNER = 20
+    SITUATION = 21    # for ground_distance
+    REFRESH_SITUATION = 22
+    CHECKLIST = 23
+    REFRESH_CHECKLIST = 24
+    COUNTDOWN_DISTANCE = 25    # full screen with large numbers if ground sensor has contact
 
 
-def init(url):
-    pass   # nothing to do right now
+class Globals:     # global variables which need to be changed somehow from other modules
+    mode = Modes.RADAR     # Global mode for radar display
+    update = True   # flag whether to update display
 
+# Initialize logger
+rlog = logging.getLogger('stratux-radar-log')
 
-def draw_compass(display_control, changed, connected, heading):
-    global compassui_changed
+# Global configuration dictionary
+global_config = {}
+# stores all configuration data that is also be settable by user interface or calculated
+# - display tail
+# - distance warnings
+# - sound volume
+# - R0 of co warner
+# Is not used for general global settings like display mode or display sequence
 
-    if changed or compassui_changed:
-        error_message = None
-        compassui_changed = False
-        if not connected:
-            error_message = MSG_NO_CONNECTION
-        display_control.clear()
-        display_control.compass(heading, error_message)
-        display_control.display()
-
-
-def user_input():
-    global compassui_changed
-
-    btime, button = radarbuttons.check_buttons()
-    # start of ahrs global behaviour
-    if btime == 0:
-        return Modes.NO_CHANGE  # stay in current mode
-    compassui_changed = True
-    if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return radarmodes.next_mode_sequence(Modes.COMPASS)    # next mode
-    if button == 0 and btime == 2:  # left and long
-        return Modes.SHUTDOWN  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long: refresh
-        return Modes.REFRESH_COMPASS  # start next mode for display driver: refresh called
-    return Modes.COMPASS  # no mode change

@@ -32,7 +32,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import logging
 import math
 import radarbuttons
 import ADS1x15       # https://github.com/chandrawi/ADS1x15-ADC
@@ -43,6 +42,7 @@ import radarbluez
 from RPi import GPIO
 import numpy
 import radarmodes
+from globals import rlog, global_config, Modes
 
 
 # constants
@@ -83,17 +83,15 @@ r0 = 900.0 * 1000   # value for R0 in clean air. Calculated during calibration, 
 cowarner_active = False
 voltage_factor = 1.0
 ADS = None
-rlog = None
-g_config = {}
 value_debug_level = 0   # debug level for printing ad-values
 co_values = []    # all values are here in ppm, maximum
 co_max = 0      # max value read during this run or after reset
-co_warner_status = 0     # 0 - nomal status  1 - calibration in progress  2 - calibration done
+co_warner_status = 0     # 0 - normal status  1 - calibration in progress  2 - calibration done
 calibration_end = 0.0     # timer for calibration
 sample_sum = 0.0        # sum of sample-values
 no_samples = 0       # no of samples taken during calibration
 cowarner_changed = True   # for display driver, true if there is something to display
-co_timeout = 1.0    # timeout of reader process, time intervall of readings
+co_timeout = 1.0    # timeout of reader process, time interval of readings
 co_max_values = 100   # max number of values, is calculated in init
 speak_warning = True
 indicate_co_warning = False    # GPIO 16 indication
@@ -117,30 +115,31 @@ def ppm(rsr0):
 
 
 def init(activate, config, debug_level, co_indication, simulation_mode=False, co_i2c_0=False):
-    global rlog
     global cowarner_active
     global voltage_factor
     global ADS
-    global g_config
     global value_debug_level
     global r0
     global co_timeout
     global co_max_values
     global indicate_co_warning
     global co_simulation
+    global co_warner_activated
 
-    rlog = logging.getLogger('stratux-radar-log')
     if not activate and not simulation_mode:
         rlog.debug("CO-Warner - not activated")
         cowarner_active = False
+        co_warner_activated = False
         return False
-    g_config = config
-    if 'CO_warner_R0' in g_config:
-        r0 = g_config['CO_warner_R0']
+    
+    if 'CO_warner_R0' in config:
+        r0 = config['CO_warner_R0']
         rlog.debug("CO-Warner: found R0 in config, set to {:.1f} Ohms".format(r0))
+        
     value_debug_level = debug_level
     co_timeout = MIN_SENSOR_READ_TIME
     co_max_values = math.floor(CO_MEASUREMENT_WINDOW / co_timeout)
+    
     if not simulation_mode:
         try:
             if co_i2c_0:
@@ -149,8 +148,10 @@ def init(activate, config, debug_level, co_indication, simulation_mode=False, co
                 ADS = ADS1x15.ADS1115(1, 0x48)    # ADS on I2C bus 1 with default address
         except OSError:
             cowarner_active = False
+            co_warner_activated = False
             rlog.debug("CO-Warner - AD sensor not found")
             return False
+            
         # set gain to 4.096V max
         ADS.setMode(ADS.MODE_SINGLE)  # Single shot mode
         ADS.setGain(ADS.PGA_4_096V)
@@ -159,7 +160,10 @@ def init(activate, config, debug_level, co_indication, simulation_mode=False, co
     else:
         rlog.debug("CO-Warner: simulation mode active.")
         co_simulation = True
+        
     cowarner_active = True
+    co_warner_activated = True
+    
     if co_indication:
         indicate_co_warning = True
         GPIO.setmode(GPIO.BCM)
@@ -263,7 +267,6 @@ def calibration():   # called by co-reader thread, performs calibration and ends
     global sample_sum
     global no_samples
     global r0
-    global g_config
     global cowarner_changed
 
     cowarner_changed = True  # to display new value
@@ -280,8 +283,8 @@ def calibration():   # called by co-reader thread, performs calibration and ends
             r0 = sample_sum / no_samples
             rlog.debug("CO-Warner: Calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
                        .format(no_samples, r0))
-            g_config['CO_warner_R0'] = r0
-            statusui.write_config(g_config)
+            global_config['CO_warner_R0'] = r0
+            statusui.write_config(global_config)
             co_warner_status = 0
     else:  # simulation mode
         if countdown > 0:  # continue sensor reading
@@ -289,8 +292,8 @@ def calibration():   # called by co-reader thread, performs calibration and ends
         else:
             rlog.debug("CO-Warner: Simulaton calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
                        .format(no_samples, r0))
-            g_config['CO_warner_R0'] = r0
-            statusui.write_config(g_config)
+            global_config['CO_warner_R0'] = r0
+            statusui.write_config(global_config)
             co_warner_status = 0
 
 
@@ -305,26 +308,26 @@ def user_input():
 
     if not cowarner_active:
         rlog.debug("CO-Warner: not active, switching to next mode")
-        return radarmodes.next_mode_sequence(19)     # immediately go to next mode, if warner is not activated
+        return radarmodes.next_mode_sequence(Modes.COWARNER)     # immediately go to next mode, if warner is not activated
     btime, button = radarbuttons.check_buttons()
     if btime == 0 or co_warner_status == 1:   # in calibration mode, do not react
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     cowarner_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return radarmodes.next_mode_sequence(19)    # next mode
+        return radarmodes.next_mode_sequence(Modes.COWARNER)    # next mode
     if button == 0 and btime == 1:  # left and short
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
         sample_sum = 0.0
         no_samples = 0
         co_warner_status = 1   # start calibration mode, co reader will do this end mode
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 1:  # right and short, reset max value
         co_max = 0
         co_values.clear()  # clear all history
     if button == 2 and btime == 2:  # right and long: refresh
-        return 20  # start next mode for display driver: refresh called
-    return 19  # no mode change
+        return Modes.REFRESH_CO_WARNER  # start next mode for display driver: refresh called
+    return Modes.COWARNER  # no mode change
 
 
 def speak_co_warning(changed):
@@ -348,7 +351,7 @@ def set_co_indication(changed):
 async def read_sensors():
     if cowarner_active:
         try:
-            rlog.debug("Sensor reader active ...")
+            rlog.debug("CO Sensor reader active ...")
             if indicate_co_warning:
                 rlog.debug("CO-Warner: Flashing GPIO Pin " + str(IOPIN) + " to test indication")
                 GPIO.output(IOPIN, GPIO.HIGH)

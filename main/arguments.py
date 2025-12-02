@@ -33,7 +33,6 @@
 
 # radar command line arguments
 
-import argparse
 from pathlib import Path
 
 CONFIG_DIR = "config"
@@ -75,6 +74,8 @@ def add(ap):
     ap.add_argument("-gd", "--grounddistance", required=False, help="Activate ground distance sensor",
                     action="store_true", default=False)
     ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
+                    action="store_true", default=False)
+    ap.add_argument("-cd", "--countdown", required=False, help="Show ground distance ground down screen",
                     action="store_true", default=False)
     ap.add_argument("-gi", "--gearindicate", required=False, help="Indicate gear warning",
                     action="store_true", default=False)

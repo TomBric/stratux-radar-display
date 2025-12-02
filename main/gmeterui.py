@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import radarbuttons
-import logging
+from globals import rlog, Modes
 import requests
 import radarmodes
 
@@ -40,16 +40,13 @@ import radarmodes
 MSG_NO_CONNECTION = "No Connection!"
 # globals
 url_gmeter_reset = ""
-rlog = None
 gmeterui_changed = True
 
 
 def init(url):
     global url_gmeter_reset
-    global rlog
 
     url_gmeter_reset = url
-    rlog = logging.getLogger('stratux-radar-log')
     rlog.debug("GMeterUI: Initialized POST settings to " + url_gmeter_reset)
 
 
@@ -80,16 +77,16 @@ def user_input():
     btime, button = radarbuttons.check_buttons()
     # start of gmeter global behaviour
     if btime == 0:
-        return 0  # stay in current mode
+        return Modes.NO_CHANGE  # stay in current mode
     rlog.debug("GMeter UI: button pressed")
     gmeterui_changed = True
     if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return radarmodes.next_mode_sequence(9)
+        return radarmodes.next_mode_sequence(Modes.GMETER)
     if button == 0 and btime == 2:  # left and long
-        return 3  # start next mode shutdown!
+        return Modes.SHUTDOWN  # start next mode shutdown!
     if button == 2 and btime == 2:  # right and long, refresh
-        return 10  # start next mode for display driver: refresh called from gmeter
+        return Modes.REFRESH_GMETER  # start next mode for display driver: refresh called from gmeter
     if button == 2 and btime == 1:  # right and short - reset
         reset_gmeter()
-        return 9
-    return 9  # no mode change
+        return Modes.GMETER
+    return Modes.GMETER  # no mode change

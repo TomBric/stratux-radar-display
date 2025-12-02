@@ -33,7 +33,6 @@
 
 import re
 import pydbus
-import logging
 import subprocess
 import alsaaudio
 from os import environ
@@ -42,13 +41,13 @@ import pygame
 from queue import Queue
 import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
 import time
+from globals import rlog
 
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
 ADAPTER_PATH = '/org/bluez/hci0'
 
 # global variables
-rlog = None
 bus = None
 manager = None
 adapter = None
@@ -103,13 +102,11 @@ def sound_init(config, bluetooth, mixer_name):
     global sound_thread
     global sound_card
     global audio_device
-    global rlog
     global global_config
 
     extsound_active = False
     bluetooth_active = False
     global_config = config
-    rlog = logging.getLogger('stratux-radar-log')
     sound_card, mixer, audio_device = find_mixer(mixer_name)   # search for mixer in any case
     if not mixer:
         rlog.debug("Radarbluez: Mixer not found!")
@@ -179,9 +176,8 @@ def speak(text, speed_percent = 100):
 
 
 def prepare_sounds_tuple(int_tuple):  # done during init without parallel coroutines
-    out = None
+    out = []
     if bluetooth_active or extsound_active:
-        out = []
         for i in int_tuple:
             pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", str(i)])  # generate wave
             if pico_result.returncode == 0:

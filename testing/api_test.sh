@@ -7,15 +7,17 @@
 #
 # Examples:
 #   ./api_test.sh                     # Uses default localhost:5000
+#  ./api_test.sh -co                  # Also tests CO display functionality, display must support CO
+                                      # or start with: python3 radar.py -d <display> -api -v 1 --cosimulation
 #   ./api_test.sh 192.168.1.100       # Connects to 192.168.1.100:5000
 #   ./api_test.sh 192.168.1.100:8080  # Connects to 192.168.1.100:8080
 #
 # Start Stratux display with options:
 #   python3 radar.py -d <display> -api -v 1
 # or for full functionality:
-#   python3 radar.py -d <display> -api -v1 -gd -gb -y 50
+#   python3 radar.py -d <display> -api -v 1 -gd -gb -y 50 --cosimulation
 # or in dark mode:
-#   python3 radar.py -d <display> -api -v1 -gd -gb -y 50 --dark
+#   python3 radar.py -d <display> -api -v 1 -gd -gb -y 50 --dark --cosimulation
 
 # Default values
 DEFAULT_HOST="localhost"

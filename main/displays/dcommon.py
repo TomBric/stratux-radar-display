@@ -58,6 +58,7 @@ def translate(angle, points, zero):
 
 class GenericDisplay:
     # display specific constants, overwrite for every display!
+    EXTREMELARGE = 64   # distance countdown
     VERYLARGE = 48  # timer
     MORELARGE = 36
     LARGE = 30  # size of height indications of aircraft
@@ -118,6 +119,7 @@ class GenericDisplay:
         self.compass_aircraft = None    # image of the compass aircraft
         # fonts
         self.fonts= {
+            self.EXTREMELARGE: self.make_font("Font.ttc", self.EXTREMELARGE),
             self.VERYLARGE: self.make_font("Font.ttc", self.VERYLARGE),
             self.MORELARGE: self.make_font("Font.ttc", self.MORELARGE),
             self.LARGE: self.make_font("Font.ttc", self.LARGE),
@@ -128,7 +130,6 @@ class GenericDisplay:
         self.top_index = 0   # checklist number
 
     def set_dark_mode(self, dark_mode):
-        """Set dark mode and update color constants accordingly"""
         self.dark_mode = dark_mode
         if dark_mode:
             self.BG_COLOR = "black"
@@ -154,7 +155,6 @@ class GenericDisplay:
             self.AHRS_MARKS_COLOR = "black"
 
     def init(self, fullcircle=False, dark_mode=False):
-        """Initialize display with optional dark mode"""
         self.set_dark_mode(dark_mode)
         # explicit init to be implemented for every device type
         # set device properties
@@ -353,7 +353,7 @@ class GenericDisplay:
         self.draw.line((self.czerox, cmsize, self.czerox, self.czeroy - bh//2),
                        fill=self.TEXT_COLOR, width=line_width)     # -bw//2 on x-axis, since image is not totally centered
 
-        self.bottom_line("", "", f"{heading}°")
+        self.bottom_line("TRK", "", f"{heading}°")
 
         for m in range(0, 360, 10):
             s = math.sin(math.radians(m - heading + 90))
@@ -612,6 +612,28 @@ class GenericDisplay:
         # current stats means: display stats of this session (e.g. while still flying)
         # if not: values displayed are stored stats
         pass
+
+    def countdown_distance(self, feet):
+        # display countdown distance on a full screen, distance value is in feet
+        self.centered_text(0, "Ground Distance", self.SMALL)
+        text = f"{int(feet)}"  # round down
+        arcw = self.sizex//32  # width of the arc outline
+        radx = self.EXTREMELARGE  # x size of ellipse
+        rady = self.EXTREMELARGE * 0.8  # y size of ellipse
+        if feet > 0:
+            arc_angle = 360 if feet >= 10.0 else 360/10 * feet
+        else:
+            arc_angle = 0
+        self.draw.arc(
+            (self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady),
+            -90, arc_angle-90, fill=self.TEXT_COLOR, width=arcw)
+        self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.EXTREMELARGE],
+                       fill=self.TEXT_COLOR,
+                       anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
+        self.draw.text((self.sizex // 2 + radx + arcw, self.sizey // 2 - self.LARGE // 2), "ft",
+                       font=self.fonts[self.LARGE],
+                       fill=self.TEXT_COLOR)
+
 
     def gmeter(self, current, maxg, ming, error_message):
         pass
