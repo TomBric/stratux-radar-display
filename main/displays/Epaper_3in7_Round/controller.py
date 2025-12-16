@@ -423,9 +423,9 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             st = '---'
         lines = [
             ("to", st),
-            ("to alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
-            ("to dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
-            ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
+            ("to alt[ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
+            ("to dst[m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
+            ("obst dst[m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         self.dashboard(offset, 35, self.zerox-offset, lines, headline="Takeoff", rounding=True)
         if 'landing_time' in values and isinstance(values['landing_time'], datetime.datetime):
@@ -434,9 +434,9 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             lt = '---'
         lines = [
             ("ldg", lt),
-            ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
-            ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
-            ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
+            ("ldg alt[ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
+            ("ldg dst[m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
+            ("obst dst[m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
         ]
         starty = self.dashboard(self.zerox, 35, RIGHT - self.zerox - 5, lines, headline="Landing", rounding=True)
         if current_stats:
