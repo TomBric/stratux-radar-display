@@ -61,6 +61,7 @@ import radarmodes
 import simulation
 import checklist
 import logging
+from logging.handlers import RotatingFileHandler
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -867,7 +868,7 @@ def radar_excepthook(exc_type, exc_value, exc_traceback):
 
 def logging_init():
     # Add file rotation handler, with level DEBUG
-    # rotatingHandler = logging.handlers.RotatingFileHandler(filename='rotating.log', maxBytes=1000, backupCount=5)
+    # rotatingHandler = logging.handlers.RotatingFileHandler(filename='rotating.log', maxBytes=1024*1024, backupCount=5)
     # rotatingHandler.setLevel(logging.DEBUG)
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     logging.addLevelName(SITUATION_DEBUG, 'SITUATION_DEBUG')
@@ -888,7 +889,8 @@ if __name__ == "__main__":
     # set up logging
     logging_init()
     if args['logfile']:
-        loghandler = logging.FileHandler(arguments.LOGFILE, mode='a', encoding="UTF8")
+        loghandler = RotatingFileHandler(filename=arguments.LOGFILE, mode='a', encoding="utf-8",
+                                                 maxBytes=1024*1024, backupCount=5)
         rlog.addHandler(loghandler)
     if args['verbose'] == 0:
         rlog.setLevel(logging.INFO)
