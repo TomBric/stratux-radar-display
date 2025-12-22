@@ -335,6 +335,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.round_text(x, starty, "BMP", yesno=stat['BMPConnected'], out_color=self.TEXT_COLOR)
         self.bottom_line("+10 ft", "Mode", "-10 ft")
 
+
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):
         self.centered_text(0, alarmtext, self.LARGE)
         graphpos = (30,40)
@@ -356,7 +357,6 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         if simulation_mode:
             self.round_text(self.sizex//4, self.sizey//3, "simulation mode", out_color=self.TEXT_COLOR)
         self.bottom_line("Calibrate", "Mode", "Reset")
-
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                          own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                          ground_distance_valid, grounddistance, error_message):
