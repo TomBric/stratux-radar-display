@@ -56,7 +56,7 @@ from flask_bootstrap import Bootstrap5, SwitchField
 
 RADAR_WEB_VERSION = "1.1"
 START_RADAR_FILE = "../../image/stratux_radar.sh"
-LOG_FILE = "../../main/radar-display.log"   # log file, if enabled
+LOGDIR= "../../main"   # directory for log file, if enabled
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
@@ -445,7 +445,7 @@ def build_option_string(rf):
         out += f' -ref {rf.autorefresh.data}'
     if rf.logging.data is True:
         out += ' -v 1'      # only level 1 supported via radar app to keep it simple
-        out += ' >>' + LOG_FILE + ' 2>&1'   # send stdout and stderr to log file
+        out += ' -log'   # send log to standard log file
     return out
 
 
@@ -590,10 +590,11 @@ def display_log():
         if dlf.exit.data is True:
             return redirect(url_for('index'))
     try:
-        with open(LOG_FILE, "r") as f:
+        LOGFILE = LOGDIR + "/" + arguments.LOGFILE
+        with open(LOGFILE, "r") as f:
             content = f.read()
     except FileNotFoundError:
-        content = f"Log file {LOG_FILE} not found."
+        content = f"Log file {LOGFILE} not found."
     except Exception as e:
         content = f"Error reading log file: {str(e)}"
     return render_template('display_log.html', display_log_form=dlf, content=content)

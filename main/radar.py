@@ -869,6 +869,7 @@ def logging_init():
     # Add file rotation handler, with level DEBUG
     # rotatingHandler = logging.handlers.RotatingFileHandler(filename='rotating.log', maxBytes=1000, backupCount=5)
     # rotatingHandler.setLevel(logging.DEBUG)
+    # logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     logging.addLevelName(SITUATION_DEBUG, 'SITUATION_DEBUG')
     logging.addLevelName(AIRCRAFT_DEBUG, 'AIRCRAFT_DEBUG')
