@@ -37,7 +37,6 @@ from . import epd3in7
 from .. import dcommon
 from PIL import Image, ImageDraw
 import time
-from pathlib import Path
 
 top_index = 0    # top index being displayed in checklist
 
@@ -334,6 +333,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.round_text(x, starty, "BMP", yesno=stat['BMPConnected'], out_color=self.TEXT_COLOR)
         self.bottom_line("+10 ft", "Mode", "-10 ft")
 
+
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):
         self.centered_text(0, alarmtext, self.LARGE)
         graphpos = (30,40)
@@ -355,7 +355,6 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         if simulation_mode:
             self.round_text(self.sizex//4, self.sizey//3, "simulation mode", out_color=self.TEXT_COLOR)
         self.bottom_line("Calibrate", "Mode", "Reset")
-
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                          own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                          ground_distance_valid, grounddistance, error_message):
@@ -416,12 +415,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = LEFT
-        if 'start_time' in values:
+        if 'start_time' in values and isinstance(values['start_time'], datetime.datetime):
             st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
-        else:
-            st = '---'
-        lines = [
-            ("to", st),
             ("to alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
             ("to dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
@@ -431,12 +426,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
         else:
             lt = '---'
-        lines = [
-            ("ldg", lt),
-            ("ldg alt [ft]", self.form_line(values, 'landing_altitude', "{:5.1f}")),
-            ("ldg dist [m]", self.form_line(values, 'landing_distance', "{:3.1f}")),
-            ("obst dist [m]", self.form_line(values, 'obstacle_distance_landing', "{:3.1f}")),
-        ]
+        if 'landing_time' in values:
+            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
         starty = self.dashboard(self.zerox, 35, RIGHT - self.zerox - 5, lines, headline="Landing", rounding=True)
         if current_stats:
             if ground_warnings:
