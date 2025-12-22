@@ -445,7 +445,7 @@ def build_option_string(rf):
         out += f' -ref {rf.autorefresh.data}'
     if rf.logging.data is True:
         out += ' -v 1'      # only level 1 supported via radar app to keep it simple
-        out += ' >>' + LOG_FILE + ' 2>\&1'   # send stdout and stderr to log file
+        out += ' >>' + LOG_FILE + ' 2>&1'   # send stdout and stderr to log file
     return out
 
 
