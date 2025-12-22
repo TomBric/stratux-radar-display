@@ -69,6 +69,7 @@ import traceback
 import syslog
 
 from globals import rlog, Globals, Modes, global_config
+from main.arguments import LOGFILE
 
 # logging
 SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
@@ -869,7 +870,6 @@ def logging_init():
     # Add file rotation handler, with level DEBUG
     # rotatingHandler = logging.handlers.RotatingFileHandler(filename='rotating.log', maxBytes=1000, backupCount=5)
     # rotatingHandler.setLevel(logging.DEBUG)
-    # logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     logging.addLevelName(SITUATION_DEBUG, 'SITUATION_DEBUG')
     logging.addLevelName(AIRCRAFT_DEBUG, 'AIRCRAFT_DEBUG')
@@ -888,6 +888,8 @@ if __name__ == "__main__":
     args = vars(ap.parse_args())
     # set up logging
     logging_init()
+    if args['logging']:
+        rlog.basicConfig(filename=LOGFILE)   # use logfile for logging
     if args['verbose'] == 0:
         rlog.setLevel(logging.INFO)
     elif args['verbose'] == 1:
