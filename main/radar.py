@@ -69,7 +69,6 @@ import traceback
 import syslog
 
 from globals import rlog, Globals, Modes, global_config
-from main.arguments import LOGFILE
 
 # logging
 SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
@@ -889,7 +888,7 @@ if __name__ == "__main__":
     # set up logging
     logging_init()
     if args['logging']:
-        rlog.basicConfig(filename=LOGFILE)   # use logfile for logging
+        rlog.basicConfig(filename=arguments.LOGFILE)   # use logfile for logging
     if args['verbose'] == 0:
         rlog.setLevel(logging.INFO)
     elif args['verbose'] == 1:
