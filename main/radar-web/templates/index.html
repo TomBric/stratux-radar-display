@@ -51,7 +51,9 @@
 <h5>Special options</h5>
 {{ render_form_row([radar_form.coindicate, radar_form.no_cowarner, radar_form.coi2c0, radar_form.no_flighttime, radar_form.darkmode],
     col_map={'coindicate': 'col-md-2', 'no_cowarner': 'col-md-2', 'coi2c0': 'col-md-3', 'no_flighttime': 'col-md-2', 'darkmode': 'col-md-3'}) }}
-
+{{ render_form_row([radar_form.logging, radar_form.display_log],
+    col_map={'logging': 'col-md-3'},
+    button_map={'display_log': 'primary'}) }}
 {{ render_field(radar_form.autorefresh, form_type='horizontal') }}
 
 <h5>Ground sensor (LIDAR) options</h5>
@@ -60,11 +62,6 @@
 
 <h5>Configuration web server shutdown time</h5>
 {{ render_field(radar_form.webtimeout, form_type='horizontal') }}
-
-<h5>Logging of display</h5>
-{{ render_form_row([radar_form.logging, radar_form.display_log],
-    col_map={'logging': 'col-md-5'},
-    button_map={'display_log': 'primary'}) }}
 
 {{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart],
     button_map={'save_restart': 'success', 'save': 'primary', 'restart': 'secondary'}) }}
