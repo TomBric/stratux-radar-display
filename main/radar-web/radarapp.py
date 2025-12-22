@@ -585,9 +585,14 @@ def result():
 def display_log():
     watchdog.refresh()
     dlf = DisplayLogForm()
-    with open(LOG_FILE, "r") as f:
-        content = f.read()
-    return render_template('display_log.html', display_log_form = dlf, content=content)
+    try:
+        with open(LOG_FILE, "r") as f:
+            content = f.read()
+    except FileNotFoundError:
+        content = f"Log file {LOG_FILE} not found."
+    except Exception as e:
+        content = f"Error reading log file: {str(e)}"
+    return render_template('display_log.html', display_log_form=dlf, content=content)
 
 if __name__ == '__main__':
     print("Stratux Radar Web Configuration Server " + RADAR_WEB_VERSION + " running ...")
