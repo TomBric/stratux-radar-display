@@ -888,7 +888,8 @@ if __name__ == "__main__":
     # set up logging
     logging_init()
     if args['logfile']:
-        logging.basicConfig(filename=arguments.LOGFILE)   # use logfile for logging
+        loghandler = logging.FileHandler(arguments.LOGFILE, mode='a', encoding="UTF8")
+        rlog.addHandler(loghandler)
     if args['verbose'] == 0:
         rlog.setLevel(logging.INFO)
     elif args['verbose'] == 1:
