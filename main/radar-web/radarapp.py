@@ -585,6 +585,10 @@ def result():
 def display_log():
     watchdog.refresh()
     dlf = DisplayLogForm()
+    if dlf.validate_on_submit() is True:  # POST request
+        # check if the post request has the file part
+        if dlf.exit.data is True:
+            return redirect(url_for('index'))
     try:
         with open(LOG_FILE, "r") as f:
             content = f.read()
