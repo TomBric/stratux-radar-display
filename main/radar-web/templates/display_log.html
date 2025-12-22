@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form, render_field, render_form_row %}
+{% block content %}
+<style> .no-label { label{ display: None; } } </style>
+<form method="post" enctype="multipart/form-data">
+{{ checklist_form.csrf_token }}
+
+
+<h4>Display current log file</h4>
+<br>
+{{ render_form_row([display_log_form.exit], button_map={ 'exit': 'primary'} ) }}
+<br>
+<pre>{{ content }}</pre>
+</form>
+
+{% endblock %}
