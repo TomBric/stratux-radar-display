@@ -61,13 +61,9 @@
 <h5>Configuration web server shutdown time</h5>
 {{ render_field(radar_form.webtimeout, form_type='horizontal') }}
 
-{{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart],
-    button_map={'save_restart': 'success', 'save': 'primary', 'restart': 'secondary'}) }}
-</form>
-
 <h5>Logging of display</h5>
 {{ render_form_row([radar_form.logging, radar_form.display_log],
-    col_map={'logging': 'col-md-1'},
+    col_map={'logging': 'col-md-5'},
     button_map={'display_log': 'primary'}) }}
 
 {{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart],
