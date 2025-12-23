@@ -479,7 +479,7 @@ def index():
         rlog.debug(f'index() in else for POST: stratux-ip is {radar_form.stratux_ip.data}')
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
-                flash(Markup('File error saving configuration'), 'fail')
+                flash(Markup('File error saving configuration'), 'error')
                 return redirect(url_for('index'))
             flash(Markup('Configuration saved!'), 'success')
             read_arguments(radar_form)  # reread arguments to get sequence nice
@@ -489,7 +489,7 @@ def index():
             return redirect(url_for('result'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
-                flash(Markup('File error saving configuration'), 'fail')
+                flash(Markup('File error saving configuration'), 'error')
                 return redirect(url_for('index'))
             flash(Markup('Configuration successfully saved!'), 'success')
             read_arguments(radar_form)   # reread arguments to get sequence nice
@@ -568,11 +568,6 @@ def checklist():
             flash(Markup(f'No file provided!'), 'error')
             return redirect(url_for('checklist'))
     return render_template('checklist.html', checklist_form = cf)
-
-@app.route('/negative_result', methods=['GET', 'POST'])
-def negative_result():
-    watchdog.refresh()
-    return render_template('negative_result.html', status_indication=result_message)
 
 
 @app.route('/result', methods=['GET', 'POST'])
