@@ -61,7 +61,6 @@ import radarmodes
 import simulation
 import checklist
 import logging
-from logging.handlers import RotatingFileHandler
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -870,10 +869,6 @@ if __name__ == "__main__":
     arguments.add(ap)
     args = vars(ap.parse_args())
     # set up logging
-    if args['logfile']:
-        loghandler = RotatingFileHandler(filename=arguments.LOGFILE, mode='a', encoding="utf-8",
-                                                 maxBytes=1024*1024, backupCount=5)
-        rlog.addHandler(loghandler)
     if args['verbose'] == 0:
         rlog.setLevel(logging.INFO)
     elif args['verbose'] == 1:
@@ -882,6 +877,13 @@ if __name__ == "__main__":
         rlog.setLevel(AIRCRAFT_DEBUG)  # log including aircraft
     else:
         rlog.setLevel(SITUATION_DEBUG)  # log including situation messages
+    if args['logfile']:   # set a log file
+        loghandler = logging.RotatingFileHandler(filename=arguments.LOGFILE, mode='a', encoding="utf-8",
+                                                 maxBytes=10*1024*1024, backupCount=5)
+        formatter = logging.Formatter('%(asctime)-15s > %(message)s')
+        loghandler.setFormatter(formatter)
+        rlog.addHandler(loghandler)
+
 
     url_host_base = args['connect']
     try:
