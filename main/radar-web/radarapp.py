@@ -480,6 +480,7 @@ def index():
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
+                result_message = "File error saving configuration"
                 return redirect(url_for('negative_result'))
             flash(Markup('Configuration saved!'), 'success')
             read_arguments(radar_form)  # reread arguments to get sequence nice
@@ -490,6 +491,7 @@ def index():
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
+                result_message = "File error saving configuration"
                 return redirect(url_for('negative_result'))
             flash(Markup('Configuration successfully saved!'), 'success')
             read_arguments(radar_form)   # reread arguments to get sequence nice
@@ -572,7 +574,7 @@ def checklist():
 @app.route('/negative_result', methods=['GET', 'POST'])
 def negative_result():
     watchdog.refresh()
-    return render_template('negative_result.html', status_indication=status)
+    return render_template('negative_result.html', status_indication=result_message)
 
 
 @app.route('/result', methods=['GET', 'POST'])
