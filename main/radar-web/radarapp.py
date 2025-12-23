@@ -56,7 +56,6 @@ from flask_bootstrap import Bootstrap5, SwitchField
 
 RADAR_WEB_VERSION = "1.1"
 START_RADAR_FILE = "../../image/stratux_radar.sh"
-LOGDIR= "../../main"   # directory for log file, if enabled
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
@@ -590,11 +589,10 @@ def display_log():
         if dlf.exit.data is True:
             return redirect(url_for('index'))
     try:
-        LOGFILE = LOGDIR + "/" + arguments.LOGFILE
-        with open(LOGFILE, "r") as f:
+        with open(arguments.FULL_LOG_FILE, "r") as f:
             content = f.read()
     except FileNotFoundError:
-        content = f"Log file {LOGFILE} not found."
+        content = f"Log file {arguments.FULL_LOG_FILE} not found."
     except Exception as e:
         content = f"Error reading log file: {str(e)}"
     return render_template('display_log.html', display_log_form=dlf, content=content)
