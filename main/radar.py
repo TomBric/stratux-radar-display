@@ -887,7 +887,8 @@ if __name__ == "__main__":
         loghandler.setFormatter(formatter)
         rlog.addHandler(loghandler)
 
-    rlog.debug(f"\n\nStratux-Radar-Display started.\nArgs: {args}")
+    rlog.debug("\n\n")
+    rlog.debug(f"Stratux-Radar-Display started.\nArgs: {args}")
     url_host_base = args['connect']
     try:
         display_control_module = importlib.import_module('displays.' + args['device'] + '.controller')
