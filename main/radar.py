@@ -61,6 +61,7 @@ import radarmodes
 import simulation
 import checklist
 import logging
+from logging.handlers import RotatingFileHandler
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -878,7 +879,7 @@ if __name__ == "__main__":
     else:
         rlog.setLevel(SITUATION_DEBUG)  # log including situation messages
     if args['logfile']:   # set a log file
-        loghandler = logging.RotatingFileHandler(filename=arguments.LOGFILE, mode='a', encoding="utf-8",
+        loghandler = logging.handlers.RotatingFileHandler(filename=arguments.LOGFILE, mode='a', encoding="utf-8",
                                                  maxBytes=10*1024*1024, backupCount=5)
         formatter = logging.Formatter('%(asctime)-15s > %(message)s')
         loghandler.setFormatter(formatter)
