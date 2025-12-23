@@ -69,6 +69,11 @@ class Globals:     # global variables which need to be changed somehow from othe
     update = True   # flag whether to update display
 
 # Initialize logger
+SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
+AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBUG
+logging.addLevelName(SITUATION_DEBUG, 'SITUATION_DEBUG')
+logging.addLevelName(AIRCRAFT_DEBUG, 'AIRCRAFT_DEBUG')
+logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
 rlog = logging.getLogger('stratux-radar-log')
 
 # Global configuration dictionary

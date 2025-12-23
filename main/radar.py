@@ -69,12 +69,7 @@ import sys
 import traceback
 import syslog
 
-from globals import rlog, Globals, Modes, global_config
-
-# logging
-SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
-AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBUG
-#
+from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG
 
 # constants
 RADAR_VERSION = "2.12"
@@ -866,28 +861,15 @@ def radar_excepthook(exc_type, exc_value, exc_traceback):
         print(line.strip())
 
 
-def logging_init():
-    # Add file rotation handler, with level DEBUG
-    # rotatingHandler = logging.handlers.RotatingFileHandler(filename='rotating.log', maxBytes=1024*1024, backupCount=5)
-    # rotatingHandler.setLevel(logging.DEBUG)
-    logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
-    logging.addLevelName(SITUATION_DEBUG, 'SITUATION_DEBUG')
-    logging.addLevelName(AIRCRAFT_DEBUG, 'AIRCRAFT_DEBUG')
-
-
 if __name__ == "__main__":
     # set uncaught exception logging to /var/log/messages/user
     sys.excepthook = radar_excepthook
-    # set up radar-specific logging
-    logging_init()
-    # set up logging
     shutdownui.clear_lingering_radar()
     # parse arguments for different configurations
     ap = argparse.ArgumentParser(description='Stratux radar display')
     arguments.add(ap)
     args = vars(ap.parse_args())
     # set up logging
-    logging_init()
     if args['logfile']:
         loghandler = RotatingFileHandler(filename=arguments.LOGFILE, mode='a', encoding="utf-8",
                                                  maxBytes=1024*1024, backupCount=5)
