@@ -480,8 +480,7 @@ def index():
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
-                result_message = "File error saving configuration"
-                return redirect(url_for('negative_result'))
+                return redirect(url_for('index'))
             flash(Markup('Configuration saved!'), 'success')
             read_arguments(radar_form)  # reread arguments to get sequence nice
             read_app_arguments(radar_form)
@@ -491,8 +490,7 @@ def index():
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'fail')
-                result_message = "File error saving configuration"
-                return redirect(url_for('negative_result'))
+                return redirect(url_for('index'))
             flash(Markup('Configuration successfully saved!'), 'success')
             read_arguments(radar_form)   # reread arguments to get sequence nice
             read_app_arguments(radar_form)
