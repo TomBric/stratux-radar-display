@@ -134,6 +134,7 @@ class ChecklistForm(FlaskForm):
 
 class DisplayLogForm(FlaskForm):
     exit = SubmitField('Back to configuration')
+    reload = SubmitField('Reload Log File')
 
 class RadarForm(FlaskForm):
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[IPAddress()])
@@ -583,6 +584,8 @@ def display_log():
         # check if the post request has the file part
         if dlf.exit.data is True:
             return redirect(url_for('index'))
+        if dlf.reload.data is True:
+            return redirect(url_for('display_log'))
     try:
         with open(arguments.FULL_LOG_FILE, "r") as f:
             content = f.read()

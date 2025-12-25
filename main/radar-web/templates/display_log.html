@@ -8,9 +8,13 @@
 
 <h4>Display radar display log file</h4>
 <br>
-{{ render_form_row([display_log_form.exit], button_map={ 'exit': 'primary'} ) }}
+{{ render_form_row([display_log_form.exit, display_log_form.reload],
+    button_map={ 'exit': 'primary', 'reload': 'secondary'} ) }}
 <br>
 <pre>{{ content }}</pre>
+<br>
+{{ render_form_row([display_log_form.exit, display_log_form.reload],
+    button_map={ 'exit': 'primary', 'reload': 'secondary'} ) }}
 </form>
 
 {% endblock %}
