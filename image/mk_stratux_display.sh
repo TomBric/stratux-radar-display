@@ -55,7 +55,7 @@ while getopts ":b:k:u" opt; do
   esac
 done
 
-echo "Building images for branch '$BRANCH' V32=$V32 based on Bookworm"
+echo "Building images for branch '$BRANCH' V32=$V32 based on Trixie"
 
 if [ "$V32" = true ]; then
   IMAGE_VERSION="armhf"
@@ -65,8 +65,8 @@ else
   outprefix="stratux-display"
 fi
 
-ZIPNAME="2025-05-13-raspios-bookworm-${IMAGE_VERSION}-lite.img.xz"
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2025-05-13/${ZIPNAME}"
+ZIPNAME="2025-12-04-raspios-trixie-${IMAGE_VERSION}-lite.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2025-12-04/${ZIPNAME}"
 
 IMGNAME="${ZIPNAME%.*}"
 
