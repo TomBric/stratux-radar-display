@@ -127,9 +127,9 @@ su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-ra
 cd ../../../
 # run the configuration skript, that is also executed when setting up on target device
 if [ "$V32" = true ]; then
-  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH" -i pico2tts
+  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh -i pico2tts
 else
-  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
+  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh
 fi
 unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_config_webapp.sh
 
