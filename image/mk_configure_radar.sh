@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "mk_configure_radar.sh called with arguments: $0 $@"
+
 # script configures basic libraries and settings necessary for stratux-radar
 # script to be run as root
 # called via configure_radar as sudo
@@ -9,6 +11,8 @@
 
 DEBIAN=false
 
+
+set -x
 
 while getopts ":i" opt; do
   case $opt in
@@ -28,7 +32,6 @@ while getopts ":i" opt; do
   esac
 done
 
-set -x
 
 apt update
 # do an upgrade, otherwise bluez is not working properly in version 2024-07-04
