@@ -14,7 +14,7 @@ DEBIAN=false
 
 set -x
 
-while getopts ":i" opt; do
+while getopts ":i:" opt; do
   case $opt in
     i)
       if [ "$OPTARG" = "pico2tts" ]; then
