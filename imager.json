@@ -1,23 +1,84 @@
+
 {
+  "imager": {
+    "latest_version": "2.0.3",
+    "url": "https://www.raspberrypi.com/software/",
+    "devices": [
+      {
+        "name": "Raspberry Pi 4",
+        "tags": [
+          "pi4-64bit",
+          "pi4-32bit"
+        ],
+        "default": false,
+        "icon": "https://downloads.raspberrypi.com/imager/icons/RPi_4.png",
+        "description": "Raspberry Pi 4 Model B, 400, and Compute Module 4 / 4S",
+        "matching_type": "inclusive",
+        "capabilities": []
+      },
+      {
+        "name": "Raspberry Pi 3",
+        "tags": [
+          "pi3-64bit",
+          "pi3-32bit"
+        ],
+        "default": false,
+        "icon": "https://downloads.raspberrypi.com/imager/icons/RPi_3.png",
+        "description": "Raspberry Pi 3 Model A+ / B / B+ and Compute Module 3 / 3+",
+        "matching_type": "inclusive",
+        "capabilities": []
+      },
+      {
+        "name": "Raspberry Pi Zero 2 W",
+        "tags": [
+          "pi3-64bit",
+          "pi3-32bit"
+        ],
+        "default": false,
+        "icon": "https://downloads.raspberrypi.com/imager/icons/RPi_Zero_2_W.png",
+        "description": "Raspberry Pi Zero 2 W",
+        "matching_type": "inclusive",
+        "capabilities": []
+      },
+      {
+        "name": "Raspberry Pi Zero",
+        "tags": [
+          "pi1-32bit"
+        ],
+        "default": false,
+        "icon": "https://downloads.raspberrypi.com/imager/icons/RPi_Zero.png",
+        "description": "Raspberry Pi Zero, Zero W, and Zero WH",
+        "matching_type": "inclusive",
+        "capabilities": []
+      },
+      {
+        "name": "No filtering",
+        "tags": [],
+        "default": false,
+        "description": "Show every possible image",
+        "matching_type": "inclusive",
+        "capabilities": []
+      }
+    ]
+  },
   "os_list": [
     {
-      "name": "Stratux Display",
-      "description": "description v2.12",
-      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/stratux-display-webconfig-v2.12-000d4f4b.img.zip",
+      "name": "Stratux Radar Display",
+      "description": "description",
       "icon": "https://github.com/TomBric/stratux-radar-display/blob/dev-trixie/stratux-logo-64x64.png",
-      "website": "https://github.com/TomBric/stratux-radar-display/",
-      "release_date": "2023-11-10",
+      "url": "https://downloads.raspberrypi.com/raspios_arm64/images/raspios_arm64-2025-12-04/2025-12-04-raspios-trixie-arm64.img.xz",
+      "extract_size": 6450839552,
+      "extract_sha256": "19b108fe07cff2b5cd7df0f76b6d7325e43fb2a1d5418d10f6bd56642e0e8579",
+      "image_download_size": 1327702860,
+      "release_date": "2025-12-04",
+      "init_format": "cloudinit-rpi",
       "devices": [
-        "pi4-32bit",
-        "pi3-32bit",
-        "pi2-32bit"
+        "pi5-64bit",
+        "pi4-64bit",
+        "pi3-64bit"
       ],
-      "init_format": "systemd",
-      "architecture": "armhf",
       "capabilities": [
-        "secure_boot",
-        "i2c",
-        "spi"
+        "rpi_connect"
       ]
     }
   ]
