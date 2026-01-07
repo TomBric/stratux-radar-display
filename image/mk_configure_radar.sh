@@ -73,7 +73,7 @@ if [ "$DEBIAN" = false ]; then
 else
   # pico2wave is not installable in bookworm armhf (why so ever), so include debian source to install
   {
-    echo "deb [arch=armhf, trusted=yes] http://deb.debian.org/debian bookworm main contrib non-free"
+    echo "deb [arch=armhf, trusted=yes] http://deb.debian.org/debian trixie main contrib non-free"
   } | tee -a /etc/apt/sources.list
   apt update
   apt install libttspico-utils -y
