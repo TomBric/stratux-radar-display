@@ -1,16 +1,12 @@
 {
   "os_list": [
     {
-      "name": "Your Operating System Name",
-      "description": "What your operating system does!",
-      "url": "https://path.to/your/compressed/os.img.xz",
-      "icon": "https://path.to/your/logo-as-svg-or-png-40x40.svg",
-      "website": "https://path.to/your-website",
+      "name": "Stratux Display",
+      "description": "description v2.12",
+      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/stratux-display-webconfig-v2.12-000d4f4b.img.zip",
+      "icon": "https://github.com/TomBric/stratux-radar-display/blob/dev-trixie/stratux-logo-64x64.png",
+      "website": "https://github.com/TomBric/stratux-radar-display/",
       "release_date": "2023-11-10",
-      "extract_size": 4294967296,
-      "extract_sha256": "ef1c726f03b91d81d432646c304b52d546814dec2acf173b2d218db259e8e52f",
-      "image_download_size": 1073741824,
-      "image_download_sha256": "863848ed058779d4603009e63d221b532549df1c58290c6a035bb5217922dac1",
       "devices": [
         "pi4-32bit",
         "pi3-32bit",
@@ -22,33 +18,6 @@
         "secure_boot",
         "i2c",
         "spi"
-      ]
-    },
-    {
-      "name": "Your 64-bit Operating System",
-      "description": "64-bit version of your OS for newer Pi devices",
-      "url": "https://path.to/your/compressed/os-arm64.img.xz",
-      "icon": "https://path.to/your/logo-as-svg-or-png-40x40.svg",
-      "website": "https://path.to/your-website",
-      "release_date": "2023-11-10",
-      "extract_size": 4294967296,
-      "extract_sha256": "ab1c726f03b91d81d432646c304b52d546814dec2acf173b2d218db259e8e52f",
-      "image_download_size": 1073741824,
-      "image_download_sha256": "773848ed058779d4603009e63d221b532549df1c58290c6a035bb5217922dac1",
-      "devices": [
-        "pi4",
-        "pi5"
-      ],
-      "init_format": "systemd",
-      "architecture": "armv8",
-      "capabilities": [
-        "secure_boot",
-        "rpi_connect",
-        "i2c",
-        "spi",
-        "onewire",
-        "serial",
-        "usb_otg"
       ]
     }
   ]
