@@ -30,7 +30,7 @@ root/stratux pull
 sudo apt install build-essential -y
 sudo apt install libncurses-dev -y
 sudo apt install golang -y
-sudo apt install librtlsdr-dev
+sudo apt install librtlsdr-dev -y
 
 sudo -i PWD=/root make -C /root/stratux
 sudo -i PWD=/root make -C /root/stratux install
