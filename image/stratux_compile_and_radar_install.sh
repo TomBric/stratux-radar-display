@@ -25,7 +25,7 @@ sudo systemctl stop systemd-timesyncd
 # sudo apt update
 # sudo apt upgrade -y
 
-sudo -i PWD=/root git clone --branch v1.61r1-eu032 --recursive https://github.com/stratux/stratux.git || sudo -i PWD=/root git -C /
+sudo -i PWD=/root git clone --branch v1.6r1-eu032 --recursive https://github.com/stratux/stratux.git || sudo -i PWD=/root git -C /
 root/stratux pull
 sudo apt install build-essential -y
 sudo apt install libncurses-dev -y
