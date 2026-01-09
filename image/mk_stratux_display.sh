@@ -160,6 +160,12 @@ cd $TMPDIR || die "cd failed"
 # Rename and zip webconfig version
 mv $IMGNAME ${outprefix}-webconfig"${outname}"
 zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-webconfig"${outname}"
+# create os-list entry for pi imager
+/bin/bash $DISPLAY_SRC/stratux-radar-display/image/create-repo-list.sh $outprefix-webconfig"${outname}" "Stratux Radar Display Webconfig" "Stratux Radar Display Webconfig" "https://github.com/TomBric/stratux-radar-display/raw/main/pi-imager/stratux-logo-white192x192.png" "https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/$outprefix-webconfig"${outname}".zip "pi3-32bit" $outprefix-webconfig"${outname}.json"
+# example for path of a release on github:
+# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip
+# example for logo path on github:
+# https://github.com/TomBric/stratux-radar-display/raw/dev-trixie/pi-imager/stratux-logo-white192x192.png
 
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final images have been placed into $TMPDIR/out. Please install and test the images."

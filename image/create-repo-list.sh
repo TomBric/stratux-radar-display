@@ -1,7 +1,7 @@
 #!/bin/bash
 # create-os-list.sh - Create an OS list entry, from rpi-imager documentation
-# usage: ./create-os-list.sh <image_file> <name> <description> <icon_url> <download_url> <devices>
-# example: ./create-os-list.sh my-os.img "My OS" "Custom OS for Pi" "https://example.com/icon.png" "https://example.com/my-os.img.xz" "pi4,pi5"
+# usage: ./create-os-list.sh <image_file> <name> <description> <icon_url> <download_url> <devices> <output_file>
+# example: ./create-os-list.sh my-os.img "My OS" "Custom OS for Pi" "https://example.com/icon.png" "https://example.com/my-os.img.xz" "pi4,pi5" "entry.json"
 
 set -e
 
@@ -11,9 +11,10 @@ OS_DESC="$3"
 ICON_URL="$4"
 DOWNLOAD_URL="$5"
 DEVICES="$6"  # Comma-separated, e.g., "pi4,pi5"
+OUTPUT_FILE="$7"
 
-if [ "$#" -lt 6 ]; then
-    echo "Usage: $0 <image_file> <name> <description> <icon_url> <download_url> <devices>"
+if [ "$#" -lt 7 ]; then
+    echo "Usage: $0 <image_file> <name> <description> <icon_url> <download_url> <devices> <output_file>"
     exit 1
 fi
 
@@ -53,7 +54,6 @@ ENTRY=$(jq -n \
   }')
 
 # Add to existing list or create new one
-OUTPUT_FILE="os-list.json"
 if [ -f "$OUTPUT_FILE" ]; then
     jq --argjson entry "$ENTRY" '.os_list += [$entry]' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp"
     mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE"
