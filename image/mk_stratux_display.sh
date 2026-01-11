@@ -30,6 +30,14 @@ BRANCH=main
 V32=false
 USB_NAME=""
 
+# variables for pi imager repo.json
+GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
+V64_REPONAME="Stratux Radar Display (64bit)"
+V32_REPONAME="Stratux Radar Display (32bit)"
+ICON_URL_BLACK="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
+ICON_URL_WHITE="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-white192x192.png"
+ICON_URL_BLUE="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-blue192x192.png"
+
 # check parameters
 while getopts ":b:k:u" opt; do
   case $opt in
@@ -57,25 +65,25 @@ done
 
 echo "Building images for branch '$BRANCH' V32=$V32 based on Trixie"
 
+icon_url="$ICON_URL_BLACK"
 if [ "$V32" = true ]; then
   IMAGE_VERSION="armhf"
   outprefix="v32-stratux-display"
+  icon_url="$ICON_URL_BLUE"
+  device_list='"pi3-32bit", "pi3-64bit"'
+  reponame="$V32_REPONAME"
 else
   IMAGE_VERSION="arm64"
   outprefix="stratux-display"
+  icon_url="$ICON_URL_WHITE"
+  device_list='"pi3-64bit"'
+  reponame="$V64_REPONAME"
 fi
 
 ZIPNAME="2025-12-04-raspios-trixie-${IMAGE_VERSION}-lite.img.xz"
 BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2025-12-04/${ZIPNAME}"
 
 IMGNAME="${ZIPNAME%.*}"
-
-# variables for pi imager repo.json
-GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
-REPONAME="Stratux Radar Display"
-V32_REPONAME="V32 Stratux Radar Display"
-ICON_URL_BLACK="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
-ICON_URL_WHITE="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-white192x192.png"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
@@ -169,7 +177,7 @@ cd $TMPDIR || die "cd failed"
 mv $IMGNAME ${outprefix}-webconfig"${outname}"
 zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-webconfig"${outname}"
 # create os-list entry for pi imager
-/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix"-webconfig"${outname}".zip "$REPONAME ${release}" "Description" "$ICON_URL_WHITE" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix-webconfig${outname}".zip "pi3-32bit" out/$outprefix-webconfig"${outname}.json"
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix"-webconfig"${outname}".zip "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix-webconfig${outname}".zip "${device_list}" out/$outprefix-webconfig"${outname}.json"
 # example for path of a release on github:
 # https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip
 # example for logo path on github:
