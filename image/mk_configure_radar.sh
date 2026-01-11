@@ -12,7 +12,7 @@ echo "mk_configure_radar.sh called with arguments: $0 $@"
 DEBIAN=false
 
 
-set -x
+# set -x
 
 while getopts ":i:" opt; do
   case $opt in

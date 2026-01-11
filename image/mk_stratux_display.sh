@@ -15,7 +15,7 @@
 #   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
 
 # cd .
-set -x
+# set -x
 
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
@@ -176,6 +176,7 @@ cd $TMPDIR || die "cd failed"
 # Rename and zip webconfig version
 mv $IMGNAME ${outprefix}-webconfig"${outname}"
 zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-webconfig"${outname}"
+
 # create os-list entry for pi imager
 /bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix"-webconfig"${outname}".zip "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix-webconfig${outname}".zip "${device_list}" out/$outprefix-webconfig"${outname}.json"
 # example for path of a release on github:

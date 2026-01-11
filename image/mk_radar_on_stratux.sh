@@ -35,6 +35,12 @@ USB_NAME=""
 DISPLAY_NAME="Epaper_3in7"
 UART=false
 
+# pi imager settings
+GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
+REPONAME="Stratux EU032 with Radar Display preinstalled(64-bit)"
+ICON_URL="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
+DEVICE_LIST="pi3-64bit"
+
 # check parameters
 while getopts ":b:d:u:f:s" opt; do
       case $opt in
@@ -141,6 +147,7 @@ cd "$SRCDIR" || die "cd failed"
 # make sure the local version is also on current status
 sudo -u pi git pull --rebase
 outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
+release=$(git describe --tags --abbrev=0)
 cd $TMPDIR || die "cd failed"
 
 # Rename and zip oled version
@@ -150,6 +157,13 @@ mount -t ext4 -o offset=$partoffset "$IMGNAME" mnt/ || die "root-mount failed"
 mv "$IMGNAME" "${outprefix}""${outname}"
 zip out/"${outprefix}""${outname}".zip "${outprefix}""${outname}"
 rm "${outprefix}""${outname}"
+
+# create os-list entry for pi imager
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}".zip "$REPONAME ${release}" "Description" "$ICON_URL" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".zip "$DEVICE_LIST" "out/$outprefix${outname}.json"
+# example for path of a release on github:
+# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip
+# example for logo path on github:
+# https://github.com/TomBric/stratux-radar-display/raw/dev-trixie/pi-imager/stratux-logo-white192x192.png
 
 
 if [ "${#USB_NAME}" -eq 0 ]; then
