@@ -64,7 +64,7 @@
     {
       "name": "Stratux Radar Display (32-bit) v2.12",
       "description": "Description",
-      "icon": "https://github.com/TomBric/stratux-radar-display/raw/main/pi-imager/stratux-logo-blue192x192.png",
+      "icon": "https://github.com/TomBric/stratux-radar-display/raw/dev-trixie/pi-imager/stratux-logo-blue192x192.png",
       "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-v2.12-dcd9cabf.img.zip",
       "extract_size": 1077797977,
       "extract_sha256": "0fad1c49e4f7276216879e1e7e4e11e049ed002462a3a5e61e32d88cf739fd76",
