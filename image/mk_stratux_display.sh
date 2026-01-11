@@ -161,14 +161,15 @@ truncate -s $(($bytesEnd + 4096)) $IMGNAME
 cd "$SRCDIR" || die "cd failed"
 # make sure the local version is also on current status
 sudo -u pi git pull --rebase
-outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
+release=$(git describe --tags --abbrev=0)
+outname="-$release-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
 
 # Rename and zip webconfig version
 mv $IMGNAME ${outprefix}-webconfig"${outname}"
 zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-webconfig"${outname}"
 # create os-list entry for pi imager
-/bin/bash $SRCDIR/image/create-repo-list.sh "$outprefix"-webconfig"${outname}" "$REPONAME ${outname}" "Description" "$ICON_URL_WHITE" "$GITHUB_BASE_URL/releases/download/${outname}/$outprefix-webconfig${outname}".zip "pi3-32bit" $outprefix-webconfig"${outname}.json"
+/bin/bash $SRCDIR/image/create-repo-list.sh "$outprefix"-webconfig"${outname}".zip "$REPONAME ${outname}" "Description" "$ICON_URL_WHITE" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix-webconfig${outname}".zip "pi3-32bit" out/$outprefix-webconfig"${outname}.json"
 # example for path of a release on github:
 # https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip
 # example for logo path on github:
