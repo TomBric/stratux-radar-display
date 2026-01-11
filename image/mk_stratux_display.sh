@@ -32,8 +32,8 @@ USB_NAME=""
 
 # variables for pi imager repo.json
 GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
-V64_REPONAME="Stratux Radar Display (64bit)"
-V32_REPONAME="Stratux Radar Display (32bit)"
+V64_REPONAME="Stratux Radar Display (64-bit)"
+V32_REPONAME="Stratux Radar Display (32-bit)"
 ICON_URL_BLACK="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
 ICON_URL_WHITE="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-white192x192.png"
 ICON_URL_BLUE="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-blue192x192.png"
