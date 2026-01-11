@@ -72,7 +72,7 @@ import syslog
 from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG
 
 # constants
-RADAR_VERSION = "2.12"
+RADAR_VERSION = "2.13"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
