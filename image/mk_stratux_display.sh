@@ -74,8 +74,8 @@ IMGNAME="${ZIPNAME%.*}"
 GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
 REPONAME="Stratux Radar Display"
 V32_REPONAME="V32 Stratux Radar Display"
-ICON_URL_BLACK="$GITHUB_BASE_URL/raw/main/pi-imager/stratux-logo-black192x192.png"
-ICON_URL_WHITE="$GITHUB_BASE_URL/raw/main/pi-imager/stratux-logo-white192x192.png"
+ICON_URL_BLACK="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
+ICON_URL_WHITE="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-white192x192.png"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
@@ -169,7 +169,7 @@ cd $TMPDIR || die "cd failed"
 mv $IMGNAME ${outprefix}-webconfig"${outname}"
 zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-webconfig"${outname}"
 # create os-list entry for pi imager
-/bin/bash $SRCDIR/image/create-repo-list.sh "$outprefix"-webconfig"${outname}".zip "$REPONAME ${outname}" "Description" "$ICON_URL_WHITE" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix-webconfig${outname}".zip "pi3-32bit" out/$outprefix-webconfig"${outname}.json"
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix"-webconfig"${outname}".zip "$REPONAME ${outname}" "Description" "$ICON_URL_WHITE" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix-webconfig${outname}".zip "pi3-32bit" out/$outprefix-webconfig"${outname}.json"
 # example for path of a release on github:
 # https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip
 # example for logo path on github:
