@@ -70,13 +70,13 @@ if [ "$V32" = true ]; then
   IMAGE_VERSION="armhf"
   outprefix="v32-stratux-display"
   icon_url="$ICON_URL_BLUE"
-  device_list='"pi3-32bit", "pi3-64bit"'
+  device_list="pi3-32bit, pi3-64bit"
   reponame="$V32_REPONAME"
 else
   IMAGE_VERSION="arm64"
   outprefix="stratux-display"
   icon_url="$ICON_URL_WHITE"
-  device_list='"pi3-64bit"'
+  device_list="pi3-64bit"
   reponame="$V64_REPONAME"
 fi
 
