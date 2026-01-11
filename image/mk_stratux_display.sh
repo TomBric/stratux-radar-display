@@ -173,14 +173,14 @@ release=$(git describe --tags --abbrev=0)
 outname="-$release-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
 
-# Rename and zip webconfig version
-mv $IMGNAME ${outprefix}-webconfig"${outname}"
-zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-webconfig"${outname}"
+# Rename and zip
+mv $IMGNAME ${outprefix}"${outname}"
+zip out/${outprefix}"${outname}".zip ${outprefix}"${outname}"
 
 # create os-list entry for pi imager
-/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix"-webconfig"${outname}".zip "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix-webconfig${outname}".zip "${device_list}" out/$outprefix-webconfig"${outname}.json"
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}".zip "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".zip "${device_list}" "out/$outprefix${outname}.json"
 # example for path of a release on github:
-# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip
+# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-v2.12-000d4f4b.img.zip
 # example for logo path on github:
 # https://github.com/TomBric/stratux-radar-display/raw/dev-trixie/pi-imager/stratux-logo-white192x192.png
 
