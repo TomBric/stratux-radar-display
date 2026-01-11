@@ -169,7 +169,7 @@ cd $TMPDIR || die "cd failed"
 mv $IMGNAME ${outprefix}-webconfig"${outname}"
 zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-webconfig"${outname}"
 # create os-list entry for pi imager
-/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix"-webconfig"${outname}".zip "$REPONAME ${outname}" "Description" "$ICON_URL_WHITE" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix-webconfig${outname}".zip "pi3-32bit" out/$outprefix-webconfig"${outname}.json"
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix"-webconfig"${outname}".zip "$REPONAME ${release}" "Description" "$ICON_URL_WHITE" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix-webconfig${outname}".zip "pi3-32bit" out/$outprefix-webconfig"${outname}.json"
 # example for path of a release on github:
 # https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip
 # example for logo path on github:
