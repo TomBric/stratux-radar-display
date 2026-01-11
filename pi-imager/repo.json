@@ -62,20 +62,17 @@
   },
   "os_list": [
     {
-      "name": "Stratux Radar Display 2.13 v32",
-      "description": "Radar Display based on 32bit Trixie kernel (Raspberry Pi3, Zero 2 W, Zero)",
-      "icon": "https://github.com/TomBric/stratux-radar-display/raw/dev-trixie/pi-imager/stratux-logo-white192x192.png",
-      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip",
-      "extract_size": 6450839552,
-      "extract_sha256": "19b108fe07cff2b5cd7df0f76b6d7325e43fb2a1d5418d10f6bd56642e0e8579",
-      "image_download_size": 1327702860,
-      "release_date": "2026-01-10",
-      "init_format": "cloudinit-rpi",
+      "name": "Stratux Radar Display (32-bit) v2.12",
+      "description": "Description",
+      "icon": "https://github.com/TomBric/stratux-radar-display/raw/main/pi-imager/stratux-logo-blue192x192.png",
+      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-v2.12-dcd9cabf.img.zip",
+      "extract_size": 1077797977,
+      "extract_sha256": "0fad1c49e4f7276216879e1e7e4e11e049ed002462a3a5e61e32d88cf739fd76",
+      "image_download_size": 1077797977,
+      "release_date": "2026-01-11",
       "devices": [
-        "pi3-32bit"
-      ],
-      "capabilities": [
-        "rpi_connect"
+        "pi3-32bit",
+        "pi3-64bit"
       ]
     },
     {
