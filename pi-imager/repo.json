@@ -76,7 +76,6 @@
         "pi3-64bit"
       ]
     },
-    },
     {
       "name": "Stratux Radar Display 2.13 v64",
       "description": "Radar Display based on 64bit Trixie kernel (Raspberry Pi3, Pi4)",
