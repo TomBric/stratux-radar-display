@@ -74,7 +74,8 @@
       "devices": [
         "pi3-32bit",
         "pi3-64bit"
-      ]
+      ],
+      "capabilities": []
     },
     {
       "name": "Stratux Radar Display 2.13 v64",
