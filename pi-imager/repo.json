@@ -78,7 +78,7 @@
       "capabilities": []
     },
     {
-      "name": "Stratux Radar Display 2.13 v64",
+      "name": "Stratux Radar Display (64-bit) v2.13",
       "description": "Radar Display based on 64bit Trixie kernel (Raspberry Pi3, Pi4)",
       "icon": "https://raw.githubusercontent.com/TomBric/stratux-radar-display/dev-trixie/pi-imager/stratux-logo-white192x192.png",
       "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v2.13/stratux-display-v2.12-f29e9524.img.zip",
@@ -94,8 +94,8 @@
       "capabilities": []
     },
     {
-      "name": "Stratux EU032 with radar v2.13 preinstalled",
-      "description": "Stratux image with radar software for use with display connected to stratux (Pi3, Pi4)",
+      "name": "Stratux EU032 with radar v2.13 preinstalled (64-bit)",
+      "description": "Stratux image version EU032 plus radar software for use with display preinstalled (Pi3, Pi4)",
       "icon": "https://raw.githubusercontent.com/TomBric/stratux-radar-display/dev-trixie/pi-imager/stratux-logo-black192x192.png",
       "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v2.13/stratux-eu32-radar-v2.12-faf1b4f2.img.zip",
       "release_date": "2026-01-10",
