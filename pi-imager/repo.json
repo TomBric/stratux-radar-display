@@ -66,9 +66,9 @@
       "description": "Radar Display based on 32bit Trixie kernel (Raspberry Pi Zero, Pi3, Pi4)",
       "icon": "https://github.com/TomBric/stratux-radar-display/raw/dev-trixie/pi-imager/stratux-logo-blue192x192.png",
       "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-v2.12-dcd9cabf.img.zip",
-      "extract_size": 1077797977,
-      "extract_sha256": "0fad1c49e4f7276216879e1e7e4e11e049ed002462a3a5e61e32d88cf739fd76",
-      "image_download_size": 1077797977,
+      "extract_size": 3833016320,
+      "extract_sha256": "b26c0eb6a35a335d4d1de6d4d038293e6005c3dc65c3af8b11a8796f979d707e",
+      "image_download_size": 1083830594,
       "release_date": "2026-01-11",
       "init_format": "cloudinit-rpi",
       "devices": [
