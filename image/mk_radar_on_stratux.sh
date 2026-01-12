@@ -39,7 +39,7 @@ UART=false
 GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
 REPONAME="Stratux EU032 with Radar Display preinstalled(64-bit)"
 ICON_URL="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
-DEVICE_LIST="pi3-64bit"
+DEVICE_LIST="pi3-64bit, pi4-64bit"
 
 # check parameters
 while getopts ":b:d:u:f:s" opt; do
