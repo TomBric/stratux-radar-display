@@ -158,7 +158,7 @@ mv "$IMGNAME" "${outprefix}""${outname}"
 zip out/"${outprefix}""${outname}".zip "${outprefix}""${outname}"
 
 # create os-list entry for pi imager
-/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}".zip "${outprefix}""${outname}" "$REPONAME ${release}" "Description" "$ICON_URL" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".zip "$DEVICE_LIST" "out/$outprefix${outname}.json"
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}" "${outprefix}""${outname}".zip "$REPONAME ${release}" "Description" "$ICON_URL" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".zip "$DEVICE_LIST" "out/$outprefix${outname}.json"
 # example for path of a release on github:
 # https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip
 
