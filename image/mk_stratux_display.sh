@@ -178,11 +178,11 @@ mv $IMGNAME ${outprefix}"${outname}"
 zip out/${outprefix}"${outname}".zip ${outprefix}"${outname}"
 
 # create os-list entry for pi imager
-/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}".zip "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".zip "${device_list}" "out/$outprefix${outname}.json"
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}".zip ${outprefix}"${outname}" "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".zip "${device_list}" "out/$outprefix${outname}.json"
 # example for path of a release on github:
 # https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-v2.12-000d4f4b.img.zip
-# example for logo path on github:
-# https://github.com/TomBric/stratux-radar-display/raw/dev-trixie/pi-imager/stratux-logo-white192x192.png
+
+rm "${outprefix}""${outname}"
 
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final images have been placed into $TMPDIR/out. Please install and test the images."

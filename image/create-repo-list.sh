@@ -1,4 +1,5 @@
 #!/bin/bash
+# Thomas Breitbach 2026, modified from raspberry pi imager documentation
 # create-os-list.sh - Create an OS list entry, from rpi-imager documentation
 # usage: ./create-os-list.sh <image_file> <name> <description> <icon_url> <download_url> <devices> <output_file>
 # example: ./create-os-list.sh my-os.img "My OS" "Custom OS for Pi" "https://example.com/icon.png" "https://example.com/my-os.img.xz" "pi4,pi5" "entry.json"
@@ -6,12 +7,13 @@
 set -e
 
 IMAGE_FILE="$1"
-OS_NAME="$2"
-OS_DESC="$3"
-ICON_URL="$4"
-DOWNLOAD_URL="$5"
-DEVICES="$6"  # Comma-separated, e.g., "pi4,pi5"
-OUTPUT_FILE="$7"
+COMPRESSED_FILE="$2"
+OS_NAME="$3"
+OS_DESC="$4"
+ICON_URL="$5"
+DOWNLOAD_URL="$6"
+DEVICES="$7"  # Comma-separated, e.g., "pi4,pi5"
+OUTPUT_FILE="$8"
 
 if [ "$#" -lt 7 ]; then
     echo "Usage: $0 <image_file> <name> <description> <icon_url> <download_url> <devices> <output_file>"
@@ -24,6 +26,7 @@ SHA256=$(sha256sum "$IMAGE_FILE" | awk '{print $1}')
 
 # Get file size
 SIZE=$(stat -f%z "$IMAGE_FILE" 2>/dev/null || stat -c%s "$IMAGE_FILE")
+COMPRESSED_SIZE=$(stat -f%z "$COMPRESSED_FILE" 2>/dev/null || stat -c%s "$COMPRESSED_FILE")
 
 # Get current date
 DATE=$(date +%Y-%m-%d)
@@ -39,6 +42,7 @@ ENTRY=$(jq -n \
   --arg url "$DOWNLOAD_URL" \
   --argjson size "$SIZE" \
   --arg sha "$SHA256" \
+  --argjson download_size "$COMPRESSED_SIZE" \
   --arg date "$DATE" \
   --argjson devices "$DEVICES_JSON" \
   '{
@@ -48,7 +52,7 @@ ENTRY=$(jq -n \
     url: $url,
     extract_size: $size,
     extract_sha256: $sha,
-    image_download_size: $size,
+    image_download_size: $download_size,
     release_date: $date,
     devices: $devices
   }')
@@ -63,4 +67,5 @@ fi
 
 echo "✓ Added $OS_NAME to $OUTPUT_FILE"
 echo "✓ SHA256: $SHA256"
-echo "✓ Size: $SIZE bytes"
+echo "✓ Image size: $SIZE bytes"
+echo "✓ Download size: $COMPRESSED_SIZE bytes"
