@@ -70,13 +70,10 @@
       "extract_sha256": "0fad1c49e4f7276216879e1e7e4e11e049ed002462a3a5e61e32d88cf739fd76",
       "image_download_size": 1077797977,
       "release_date": "2026-01-11",
+      "init_format": "cloudinit-rpi",
       "devices": [
         "pi3-32bit",
         "pi3-64bit"
-      ],
-      "init_format": "cloudinit-rpi",
-      "capabilities": [
-        "rpi_connect"
       ]
     },
     },
