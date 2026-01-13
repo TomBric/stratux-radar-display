@@ -97,7 +97,7 @@
       "name": "Stratux EU032 with radar v2.13 preinstalled (64-bit)",
       "description": "Stratux image version EU032 plus radar software for use with display preinstalled (Pi3, Pi4)",
       "icon": "https://raw.githubusercontent.com/TomBric/stratux-radar-display/dev-trixie/pi-imager/stratux-logo-black192x192.png",
-      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v2.13/stratux-eu32-radar-v2.12-faf1b4f2.img.zip",
+      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v2.13/stratux-eu32-radar-v2.13-03237586.img.zip",
       "release_date": "2026-01-13",
       "extract_size": 4211630080,
       "extract_sha256": "9a8c276d6dccc9b13c2f9995bdb46e512e37a86af05ad268b1dd4a77485c7680",
