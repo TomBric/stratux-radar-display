@@ -19,7 +19,7 @@
 #   sudo /bin/bash mk_radar_on_stratux.sh -s
 
 
-set -xcd ho
+set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -163,7 +163,7 @@ zip out/"${outprefix}""${outname}".zip "${outprefix}""${outname}"
 # https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip
 
 
-rm "${outprefix}""${outname}"
+# rm "${outprefix}""${outname}"
 
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final image has been placed into $TMPDIR/out. Please install and test the images."
