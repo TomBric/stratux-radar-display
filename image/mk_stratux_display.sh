@@ -165,7 +165,6 @@ parted --script $IMGNAME rm 2
 parted --script $IMGNAME unit B mkpart primary ext4 ${partoffset}B ${bytesEnd}B
 truncate -s $(($bytesEnd + 4096)) $IMGNAME
 
-
 cd "$SRCDIR" || die "cd failed"
 # make sure the local version is also on current status
 sudo -u pi git pull --rebase
@@ -174,18 +173,14 @@ outname="-$release-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
 
 # Rename and zip with xz
-mv $IMGNAME out${outprefix}"${outname}"
-xz out/${outprefix}"${outname}"
-
+mv $IMGNAME out/${outprefix}"${outname}"
+xz -k out/${outprefix}"${outname}"
 
 # create os-list entry for pi imager
-# to get exact sha256 sums, we need to unxz again
-unxz --stdout out/${outprefix}"${outname}".xz | sha256sum
-/bin/bash $SRCDIR/image/create-repo-list.sh "$outprefix""${outname}" out/${outprefix}"${outname}".xz "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".xz "${device_list}" "out/$outprefix${outname}.json"
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}" out/${outprefix}"${outname}".xz "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".xz "${device_list}" "out/$outprefix${outname}.json"
 # example for path of a release on github:
 # https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-v2.12-000d4f4b.img.xz
-
-rm "${outprefix}""${outname}"
+rm out/"${outprefix}""${outname}"
 
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
