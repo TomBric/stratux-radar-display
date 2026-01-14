@@ -150,20 +150,16 @@ outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 
 release=$(git describe --tags --abbrev=0)
 cd $TMPDIR || die "cd failed"
 
-# Rename and zip oled version
-mount -t ext4 -o offset=$partoffset "$IMGNAME" mnt/ || die "root-mount failed"
+# mount -t ext4 -o offset=$partoffset "$IMGNAME" mnt/ || die "root-mount failed"
 
-
-mv "$IMGNAME" "${outprefix}""${outname}"
-zip out/"${outprefix}""${outname}".zip "${outprefix}""${outname}"
+mv "$IMGNAME" out/"${outprefix}""${outname}"
+xz -k out/"${outprefix}""${outname}"
 
 # create os-list entry for pi imager
-/bin/bash $SRCDIR/image/create-repo-list.sh "$outprefix""${outname}" out/"${outprefix}""${outname}".zip "$REPONAME ${release}" "Description" "$ICON_URL" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".zip "$DEVICE_LIST" "out/$outprefix${outname}.json"
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}" out/"${outprefix}""${outname}".xz "$REPONAME ${release}" "Description" "$ICON_URL" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".xz "$DEVICE_LIST" "out/$outprefix${outname}.json"
 # example for path of a release on github:
-# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.zip
-
-
-# rm "${outprefix}""${outname}"
+# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.xz
+rm out/"${outprefix}""${outname}"
 
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final image has been placed into $TMPDIR/out. Please install and test the images."

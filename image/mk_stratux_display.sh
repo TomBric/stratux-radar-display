@@ -173,14 +173,17 @@ release=$(git describe --tags --abbrev=0)
 outname="-$release-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
 
-# Rename and zip
-mv $IMGNAME ${outprefix}"${outname}"
-zip out/${outprefix}"${outname}".zip ${outprefix}"${outname}"
+# Rename and zip with xz
+mv $IMGNAME out${outprefix}"${outname}"
+xz out/${outprefix}"${outname}"
+
 
 # create os-list entry for pi imager
-/bin/bash $SRCDIR/image/create-repo-list.sh "$outprefix""${outname}" out/${outprefix}"${outname}".zip "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".zip "${device_list}" "out/$outprefix${outname}.json"
+# to get exact sha256 sums, we need to unxz again
+unxz --stdout out/${outprefix}"${outname}".xz | sha256sum
+/bin/bash $SRCDIR/image/create-repo-list.sh "$outprefix""${outname}" out/${outprefix}"${outname}".xz "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".xz "${device_list}" "out/$outprefix${outname}.json"
 # example for path of a release on github:
-# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-v2.12-000d4f4b.img.zip
+# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-v2.12-000d4f4b.img.xz
 
 rm "${outprefix}""${outname}"
 

@@ -12,7 +12,7 @@ OS_NAME="$3"
 OS_DESC="$4"
 ICON_URL="$5"
 DOWNLOAD_URL="$6"
-DEVICES="$7"  # Comma-separated, e.g., "pi4,pi5"
+DEVICES="$7"  # Comma-separated, els.g., "pi4,pi5"
 OUTPUT_FILE="$8"
 
 if [ "$#" -lt 7 ]; then
@@ -22,7 +22,8 @@ fi
 
 # Calculate SHA256
 echo "Calculating SHA256..."
-SHA256=$(sha256sum "$IMAGE_FILE" | awk '{print $1}')
+# we need to unxz the xz file to calculate the sha256sum because sha256 sum of orig and decompressed files differ!
+SHA256=$(unxz --stdout $COMPRESSED_FILE | sha256sum | awk '{print $1}')
 
 # Get file size
 SIZE=$(stat -f%z "$IMAGE_FILE" 2>/dev/null || stat -c%s "$IMAGE_FILE")
