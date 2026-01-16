@@ -97,33 +97,14 @@ rfkill unblock bluetooth    # enable bluetooth which is otherwise disabled on li
 mkdir -p /etc/wireplumber/wireplumber.conf.d
 # rules for wireplumber to accept bluetooth sinks and headless connect
 cp wireplumber-bluetooth.conf /etc/wireplumber/wireplumber.conf.d/bluetooth.conf     # rules for wireplumber to accept bluetooth sinks
+# limit reconnect attempts after loss of Bluetooth connection, since this leads to network outages
+sed -i 's/#ReconnectAttempts = 7/ReconnectAttempts = 3/' /etc/bluetooth/main.conf
 
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-pygame -y
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 apt -y autoremove
 
-
-<< 'COMMENT'
-#  enable headless connect:
-#  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
-sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
-
-# configuration changes for bluetooth
-# change autoconnect feature and limit headset roles
-sed -i 's/\["bluez5.auto-connect"\]  = "\[ hfp_hf hsp_hs a2dp_sink \]",/\["bluez5.auto-connect"\]  = "\[ hfp_hf a2dp_sink \]",/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
-sed -i 's/--\["bluez5.headset-roles"\] = "\[ hsp_hs hsp_ag hfp_hf hfp_ag \]",/\["bluez5.headset-roles"\] = "\[ hfp_hf hfp_ag \]",/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
-# changes to bluetooth since the bluetooth-driver had problems with bt-le
-sed -i 's/#ControllerMode = dual/ControllerMode = bredr/' /etc/bluetooth/main.conf
-# tweaks for bluetooth on zero 2 w
-# /lib/firmware/brcm/brcmfmac43436s-sdio.raspberrypi,model-zero-2-w.txt
-# btc_mode=1
-# btc_params8=0x4e20
-# btc_params1=0x7530
-COMMENT
-
-# limit reconnect attempts after loss of Bluetooth connection, since this leads to network outages
-sed -i 's/#ReconnectAttempts = 7/ReconnectAttempts = 3/' /etc/bluetooth/main.conf
 
 # this is the same effect as loginctl enable-linger pi, starts radar without any login
 mkdir -p /var/lib/systemd/linger
