@@ -93,8 +93,9 @@ apt install git python3-pip -y
 
 # bluetooth and sound installation
 apt install pipewire libspa-0.2-bluetooth pulseaudio-module-bluetooth python3-alsaaudio -y
-rfkill unblock bluetooth
+rfkill unblock bluetooth    # enable bluetooth which is otherwise disabled on lite image
 mkdir -p /etc/wireplumber/wireplumber.conf.d
+# rules for wireplumber to accept bluetooth sinks and headless connect
 cp wireplumber-bluetooth.conf /etc/wireplumber/wireplumber.conf.d/bluetooth.conf     # rules for wireplumber to accept bluetooth sinks
 
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
