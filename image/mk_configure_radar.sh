@@ -44,9 +44,16 @@ raspi-config nonint do_ssh 0
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
 
-# Disable swap...
-systemctl disable dphys-swapfile
-apt purge -y dphys-swapfile
+# Disable swap, for Trixie modify /etc/rpi/swap.conf ...
+if grep -q '^\[Main\]' /etc/rpi/swap.conf; then
+    if ! grep -q '^Mechanism=' /etc/rpi/swap.conf; then
+        sudo sed -i '/^\[Main\]/a Mechanism=none  # modified by mk_configure_radar' /etc/rpi/swap.conf
+    else
+        sudo sed -i 's/^Mechanism=.*/Mechanism=none  # modified by mk_configure_radar/' /etc/rpi/swap.conf
+    fi
+else
+    echo -e "[Main]\nMechanism=none  # modified by mk_configure_radar" | sudo tee /etc/rpi/swap.conf >/dev/null
+fi
 # Generate ssh key for all installs. Otherwise it would have to be done on each boot, which takes a couple of seconds
 ssh-keygen -A -v
 systemctl disable regenerate_ssh_host_keys
@@ -57,7 +64,7 @@ systemctl disable regenerate_ssh_host_keys
 sed -i /boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
 sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
 sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
-# for bookworm disable serial-getty, it is whatsoever started by bookworm even if cmdline is changed
+# for bookworm and trixie disable serial-getty, it is whatsoever started by bookworm even if cmdline is changed
 systemctl mask serial-getty@ttyAMA0.service
 
 # modify /boot/firmware/config.text for groundsensor
@@ -71,7 +78,7 @@ systemctl mask serial-getty@ttyAMA0.service
 if [ "$DEBIAN" = false ]; then
   apt install libttspico-utils -y
 else
-  # pico2wave is not installable in bookworm armhf (why so ever), so include debian source to install
+  # pico2wave is not installable in trixie armhf (why so ever), so include debian source to install
   {
     echo "deb [arch=armhf, trusted=yes] http://deb.debian.org/debian trixie main contrib non-free"
   } | tee -a /etc/apt/sources.list
@@ -81,10 +88,15 @@ else
   sudo sed -i /etc/apt/sources.list -e '$d'
 fi
 
-# bookworm lite:
+# trixie lite:
 apt install git python3-pip -y
+apt install pipewire libspa-0.2-bluetooth pulseaudio-module-bluetooth
+rfkill unblock bluetooth
+mkdir -p /etc/wireplumber/wireplumber.conf.d
+cp wireplumber-bluetooth.conf /etc/wireplumber/wireplumber.conf.d/bluetooth.conf     # rules for wireplumber to accept bluetooth sinks
+
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-pip python3-numpy python3-pygame -y
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-pygame -y
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 apt -y autoremove
 
