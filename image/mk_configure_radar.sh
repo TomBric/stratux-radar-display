@@ -122,8 +122,8 @@ sed -i 's/#ControllerMode = dual/ControllerMode = bredr/' /etc/bluetooth/main.co
 # btc_params1=0x7530
 COMMENT
 
-# changes to bluetooth since the bluetooth-driver had problems with bt-le (network timeouts otherwis)
-sed -i 's/#ControllerMode = dual/ControllerMode = bredr/' /etc/bluetooth/main.conf
+# limit reconnect attempts after loss of Bluetooth connection, since this leads to network outages
+sed -i 's/#ReconnectAttempts = 7/ReconnectAttempts = 3/' /etc/bluetooth/main.conf
 
 # this is the same effect as loginctl enable-linger pi, starts radar without any login
 mkdir -p /var/lib/systemd/linger
