@@ -90,16 +90,20 @@ fi
 
 # trixie lite:
 apt install git python3-pip -y
-apt install pipewire libspa-0.2-bluetooth pulseaudio-module-bluetooth
+
+# bluetooth installation
+apt install pipewire libspa-0.2-bluetooth pulseaudio-module-bluetooth -y
 rfkill unblock bluetooth
 mkdir -p /etc/wireplumber/wireplumber.conf.d
 cp wireplumber-bluetooth.conf /etc/wireplumber/wireplumber.conf.d/bluetooth.conf     # rules for wireplumber to accept bluetooth sinks
 
-apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
+# apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-pygame -y
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 apt -y autoremove
 
+
+<< 'COMMENT'
 #  enable headless connect:
 #  in  /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua       ["with-logind"] = true,  auf false setzen
 sed -i 's/\["with-logind"\] = true/\["with-logind"\] = false/' /usr/share/wireplumber/bluetooth.lua.d/50-bluez-config.lua
@@ -119,6 +123,7 @@ sed -i 's/#ControllerMode = dual/ControllerMode = bredr/' /etc/bluetooth/main.co
 # this is the same effect as loginctl enable-linger pi
 mkdir -p /var/lib/systemd/linger
 touch /var/lib/systemd/linger/pi
+COMMENT
 
 # install and start service to start radar
 su pi -c "mkdir -p /home/pi/.config/systemd/user/"
