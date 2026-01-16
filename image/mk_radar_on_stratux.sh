@@ -153,7 +153,8 @@ cd $TMPDIR || die "cd failed"
 # mount -t ext4 -o offset=$partoffset "$IMGNAME" mnt/ || die "root-mount failed"
 
 mv "$IMGNAME" out/"${outprefix}""${outname}"
-xz -k out/"${outprefix}""${outname}"
+echo "Starting xz of $IMAGENAME to out/${outprefix}"${outname}. This may take a while ..."
+xz -v -k out/"${outprefix}""${outname}"
 
 # create os-list entry for pi imager
 /bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}" out/"${outprefix}""${outname}".xz "$REPONAME ${release}" "Description" "$ICON_URL" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".xz "$DEVICE_LIST" "out/$outprefix${outname}.json"
