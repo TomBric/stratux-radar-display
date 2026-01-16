@@ -91,8 +91,8 @@ fi
 # trixie lite:
 apt install git python3-pip -y
 
-# bluetooth installation
-apt install pipewire libspa-0.2-bluetooth pulseaudio-module-bluetooth -y
+# bluetooth and sound installation
+apt install pipewire libspa-0.2-bluetooth pulseaudio-module-bluetooth python3-alsaaudio -y
 rfkill unblock bluetooth
 mkdir -p /etc/wireplumber/wireplumber.conf.d
 cp wireplumber-bluetooth.conf /etc/wireplumber/wireplumber.conf.d/bluetooth.conf     # rules for wireplumber to accept bluetooth sinks
@@ -119,11 +119,15 @@ sed -i 's/#ControllerMode = dual/ControllerMode = bredr/' /etc/bluetooth/main.co
 # btc_mode=1
 # btc_params8=0x4e20
 # btc_params1=0x7530
+COMMENT
 
-# this is the same effect as loginctl enable-linger pi
+# changes to bluetooth since the bluetooth-driver had problems with bt-le (network timeouts otherwis)
+sed -i 's/#ControllerMode = dual/ControllerMode = bredr/' /etc/bluetooth/main.conf
+
+# this is the same effect as loginctl enable-linger pi, starts radar without any login
 mkdir -p /var/lib/systemd/linger
 touch /var/lib/systemd/linger/pi
-COMMENT
+
 
 # install and start service to start radar
 su pi -c "mkdir -p /home/pi/.config/systemd/user/"
