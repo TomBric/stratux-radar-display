@@ -63,7 +63,7 @@ import checklist
 import logging
 from logging.handlers import RotatingFileHandler
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 import sys
 import traceback
@@ -92,6 +92,9 @@ OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
+SPEAK_SAME_TRAFFIC_DELTA = 2   # time in seconds after the same traffic is spoken again (if also hysteresis was true)
+
+speaktraffic_delta = timedelta(seconds=SPEAK_SAME_TRAFFIC_DELTA)
 
 CONFIG_FILE = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.conf"))
 SAVED_FLIGHTS = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.flights"))
@@ -152,6 +155,8 @@ groundbeep = False  # True if indication of ground distance via audio
 countdown = False # True if ground distance with countdown screen is shown
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
 
+radar_sound_off_sound = None   # prepared sound output for "sound off"
+radar_sound_on_sound = None    # prepared send output for "sound on"
 
 def draw_all_ac(allac):
     dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
@@ -312,9 +317,12 @@ def new_traffic(json_str):
                         oclock += 12
                     if oclock > 12:
                         oclock -= 12
-                    if not ac['was_spoken']:
-                        speaktraffic(ac['height'], oclock, round(gps_rad))
-                        ac['was_spoken'] = True
+                    if not ac['was_spoken']:  # check hysteresis
+                        if 'last_speak_time' in ac:  # check last speak time
+                            if datetime.now(timezone.utc) - ac['last_speak_time'] > speaktraffic_delta:
+                                speaktraffic(ac['height'], oclock, round(gps_rad))
+                                ac['was_spoken'] = True
+                                ac['last_speak_time'] = datetime.now(timezone.utc)
                 else:
                     # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
                     if gps_rad >= situation['RadarRange'] * 0.75:
@@ -342,9 +350,13 @@ def new_traffic(json_str):
             ac['circradius'] = distx
 
             if ac['gps_distance'] <= situation['RadarRange'] / 2:
-                if not ac['was_spoken']:
-                    speaktraffic(ac['height'], None, round(ac['gps_distance']))
-                    ac['was_spoken'] = True
+                if not ac['was_spoken']:  # check hysteresis
+                    if 'last_speak_time' in ac:   # check last speak time
+                        if datetime.now(timezone.utc) - ac['last_speak_time'] > speaktraffic_delta:
+                            # only speak after a minimal time again, necessary if traffic esp. Mode S "flickers"
+                            speaktraffic(ac['height'], None, round(ac['gps_distance']))
+                            ac['was_spoken'] = True
+                            ac['last_speak_time'] = datetime.now(timezone.utc)
             else:
                 # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
                 if ac['gps_distance'] > situation['RadarRange'] * 0.75:
@@ -575,9 +587,10 @@ async def user_interface():
                 if toggle_sound:
                     radarui.sound_on = not radarui.sound_on
                     if radarui.sound_on:
-                        radarbluez.speak("Radar sound on")
+                        radarbluez.speak_sound(radar_sound_on_sound, "Radar sound on")
                     else:
-                        radarbluez.speak("Radar sound off")
+                        radarbluez.speak_sound(radar_sound_off_sound, "Radar sound off")
+                        radarbluez.stop_sounds()    # immediately stop all sound output and clear queue
                     Globals.refresh = True
             elif Globals.mode == Modes.TIMER:  # Timer mode
                 next_mode = timerui.user_input()
@@ -806,6 +819,8 @@ def main():
     global extsound_active
     global bluetooth_active
     global button_api_active
+    global radar_sound_on_sound
+    global radar_sound_off_sound
 
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
     if not radarui.init(url_settings_set, button_api_active):
@@ -814,6 +829,8 @@ def main():
     shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
+    radar_sound_on_sound = radarbluez.prepare_sounds_string("Radar sound on")
+    radar_sound_off_sound = radarbluez.prepare_sounds_string("Radar Sound off")
     max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
     ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
