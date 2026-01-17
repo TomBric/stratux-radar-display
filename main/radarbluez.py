@@ -194,6 +194,7 @@ def prepare_sounds_string(tospeak):   # done during init without parallel corout
     if bluetooth_active or extsound_active:
         pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", tospeak])  # generate wave
         if pico_result.returncode == 0:
+            rlog.debug(f"Sound prepared: {tospeak}")
             return pygame.mixer.Sound("/tmp/radar.wav")
         else:
             rlog.debug("Radarbluez: Error creating sound string.")

@@ -830,7 +830,7 @@ def main():
     timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
     radar_sound_on_sound = radarbluez.prepare_sounds_string("Radar sound on")
-    radar_sound_off_sound = radarbluez.prepare_sounds_string("Radar Sound off")
+    radar_sound_off_sound = radarbluez.prepare_sounds_string("Radar sound off")
     max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
     ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
