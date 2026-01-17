@@ -230,7 +230,7 @@ def connected_devices():
     if not bluetooth_active:
         return 0, []
     managed_objects = manager.GetManagedObjects()
-    r = re.compile('\/org\/bluez\/hci\d*\/dev_(.*)')
+    r = re.compile(r'\/org\/bluez\/hci\d*\/dev_(.*)')
     # to match strings like /org/bluez/hci0/dev_58_C9_35_2F_A1_EF
     device_names = []
     for key, value in managed_objects.items():
