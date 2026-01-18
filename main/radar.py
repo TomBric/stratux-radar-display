@@ -95,6 +95,8 @@ OPTICAL_ALIVE_BARS = 10
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
 SPEAK_SAME_TRAFFIC_DELTA = 2.0   # time in seconds after the same traffic is spoken again (if also hysteresis was true)
+SOURCE_1090 = 1    # source identifier from stratux
+SOURCE_FLARM = 4   # source identifier from stratux
 
 CONFIG_FILE = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.conf"))
 SAVED_FLIGHTS = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.flights"))
@@ -340,6 +342,12 @@ def new_traffic(json_str):
     try:
         if is_steering_message(traffic):
             return    # was message without aircraft content
+        if traffic.get('Last_source') == SOURCE_1090:
+            source = "1090"
+        elif traffic.get('Last_source') == SOURCE_FLARM:
+            source = "FLARM"
+        else:
+            source = "Unknown source"
         is_new = False
         if traffic['Icao_addr'] not in all_ac.keys():
             # new traffic, insert
@@ -368,8 +376,7 @@ def new_traffic(json_str):
 
         if traffic['Position_valid'] and situation['gps_active']:
             # adsb traffic and stratux has valid gps signal
-            rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB or FLARM traffic ' + hex(traffic['Icao_addr'])
-                     + " at height " + str(ac['height']))
+            rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at height {ac['height']}")
             if 'circradius' in ac:
                 del ac['circradius']
                 # was mode-s target before, now invalidate mode-s info
@@ -400,8 +407,8 @@ def new_traffic(json_str):
                 # unspecified altitude, nothing displayed for now, leave it as it is
                 return
             distcirc = traffic['DistanceEstimated'] / 1852.0
-            rlog.log(AIRCRAFT_DEBUG, "RADAR: Mode-S traffic " + hex(traffic['Icao_addr'])
-                     + " in " + str(distcirc) + " nm")
+            rlog.log(AIRCRAFT_DEBUG, "RADAR: No position traffic " + hex(traffic['Icao_addr'])
+                     + " from source {source} in " + str(distcirc) + " nm")
             # check age of last position, if age is < POSITION_VALID_DELTA, leave position valid and do not calculate circradius
             if 'last_position_timestamp' in ac and time.time() - ac['last_position_timestamp'] < POSITION_VALID_DELTA:
                 rlog.log(AIRCRAFT_DEBUG, f"Ignoring mode s distance estimation of "
