@@ -589,7 +589,7 @@ async def user_interface():
                     if radarui.sound_on:
                         radarbluez.speak_sound(radar_sound_on_sound, "Radar sound on")
                     else:
-                        radarbluez.stop_sounds()  # immediately stop all sound output and clear queue
+                        radarbluez.stop_sounds()  # immediately stop all sound output and thread clears queue
                         radarbluez.speak_sound(radar_sound_off_sound, "Radar sound off")
                     Globals.refresh = True
             elif Globals.mode == Modes.TIMER:  # Timer mode
