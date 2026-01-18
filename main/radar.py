@@ -39,9 +39,6 @@ import socket
 import websockets
 import math
 import time
-
-from numpy.ma.core import true_divide
-
 import arguments
 import radarbluez
 import radarui
@@ -74,11 +71,14 @@ import syslog
 from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG
 
 # constants
-RADAR_VERSION = "2.13"
+RADAR_VERSION = "2.14"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
-RADAR_CUTOFF = 29
+RADAR_CUTOFF = 29  # time after last message received from an aircraft is is no longer displayed
+POSITION_VALID_DELTA = 10.0   # time a received position is assumed valid, e.g. if message without position is received
+# only after this POSITION_VALID_DELTA time a switch back to mode-s (circle) is done. May e.g. happen when
+# flarm is no more received, but only mode-s. Than switch back and display circle
 UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01  # give other coroutines some time to do their jobs
 BLUEZ_CHECK_TIME = 3.0
@@ -179,9 +179,9 @@ def dump_ac(ac):    # debug function, produces one line for aircraft in a readab
     return ret
 
 
-def dump_all(all_ac):    # return string of all aircraft currently monitored, for debugging
+def dump_all(all_aircraft):    # return string of all aircraft currently monitored, for debugging
     ret = ""
-    for icao, ac in all_ac.items():
+    for icao, ac in all_aircraft.items():
         ret += f"\n  ICAO {icao:X}:"
         ret += dump_ac(ac)
     return ret
@@ -356,15 +356,24 @@ def new_traffic(json_str):
         if traffic['Tail']:
             ac['tail'] = traffic['Tail']
 
+        # Traffic in all_ac list is
+        # - ADSB or FLARM:   if 'x' is in ac   (andy 'y' also, but check for x is ok).
+        # - Mode-S only: if 'circradius' is in ac
+        # when switching, make sure other keys ('circradius' or 'x') are deleted.
+        # When position is received this immediately overrides Mode-S. The other way round may also happen
+        # e.g if FLARM of an aircraft was received, but afterwards only mode-s. So invalidate position also if
+        # no new position was received after some time
+
         if traffic['Position_valid'] and situation['gps_active']:
             # adsb traffic and stratux has valid gps signal
-            rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB traffic ' + hex(traffic['Icao_addr'])
+            rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB or FLARM traffic ' + hex(traffic['Icao_addr'])
                      + " at height " + str(ac['height']))
             if 'circradius' in ac:
                 del ac['circradius']
                 # was mode-s target before, now invalidate mode-s info
             gps_rad, gps_angle = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             ac['gps_distance'] = gps_rad
+            ac['last_position_timestamp'] = time.time()
             if 'Track' in traffic:
                 ac['direction'] = traffic['Track'] - situation['course']
                 # sometimes track is missing, then leave it as it is
@@ -385,20 +394,29 @@ def new_traffic(json_str):
 
         else:
             # mode-s traffic or no valid GPS position of stratux
-            # unspecified altitude, nothing displayed for now, leave it as it is
             if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
-                return
                 # unspecified altitude, nothing displayed for now, leave it as it is
+                return
             distcirc = traffic['DistanceEstimated'] / 1852.0
             rlog.log(AIRCRAFT_DEBUG, "RADAR: Mode-S traffic " + hex(traffic['Icao_addr'])
                      + " in " + str(distcirc) + " nm")
-            distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
+            # check age of last position, if age is < POSITION_VALID_DELTA, leave position valid and do not calculate circradius
+            if 'last_position_timestamp' in ac and time.time() - ac['last_position_timestamp'] < POSITION_VALID_DELTA:
+                rlog.log(AIRCRAFT_DEBUG, f"Ignoring mode s distance estimation of "
+                    f"{traffic['Icao_addr']:X} since, position is still younger than {POSITION_VALID_DELTA}secs")
+                # this may e.g. happen if FLARM message is received and mode-s
+                return
             if is_new or 'circradius' not in ac:
                 # calc argposition if new or adsb before
                 last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
                 ac['arcposition'] = last_arcposition
             ac['gps_distance'] = distcirc
-            ac['circradius'] = distx
+            ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
+            if 'x' in ac and 'y' in ac:   # remove keys for display position, traffic is now only estimated again
+                del ac['x']
+                del ac['y']
+                rlog.log(AIRCRAFT_DEBUG, f"Removing position of {traffic['Icao_addr']:X} since position "
+                                         f"was older than {POSITION_VALID_DELTA}secs")
             speech_output_modes(ac)
     except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.log(AIRCRAFT_DEBUG, "KeyError decoding:" + json_str)
