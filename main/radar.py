@@ -407,8 +407,8 @@ def new_traffic(json_str):
                 # unspecified altitude, nothing displayed for now, leave it as it is
                 return
             distcirc = traffic['DistanceEstimated'] / 1852.0
-            rlog.log(AIRCRAFT_DEBUG, "RADAR: No position traffic " + hex(traffic['Icao_addr'])
-                     + " from source {source} in " + str(distcirc) + " nm")
+            rlog.log(AIRCRAFT_DEBUG, f"RADAR: No position traffic {traffic['Icao_addr']:X} from source {source} "
+                                     f"in {distcirc:.1f} nm")
             # check age of last position, if age is < POSITION_VALID_DELTA, leave position valid and do not calculate circradius
             if 'last_position_timestamp' in ac and time.time() - ac['last_position_timestamp'] < POSITION_VALID_DELTA:
                 rlog.log(AIRCRAFT_DEBUG, f"Ignoring mode s distance estimation of "
