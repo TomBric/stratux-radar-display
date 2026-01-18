@@ -182,7 +182,7 @@ def dump_ac(ac):    # debug function, produces one line for aircraft in a readab
 def dump_all(all_ac):    # return string of all aircraft currently monitored, for debugging
     ret = ""
     for icao, ac in all_ac.items():
-        ret += f" ICAO {icao:X}:"
+        ret += f"\nICAO {icao:X}:"
         ret += dump_ac(ac)
     return ret
 
