@@ -276,6 +276,7 @@ def speaktraffic(hdiff, direction=None, dist=None):
         radarbluez.speak(txt)
 
 def is_steering_message(traffic):  # checks if traffic is a steering message and returns true if yes
+    changed = False
     if 'RadarRange' in traffic or 'RadarLimits' in traffic:
         if situation['RadarRange'] != traffic['RadarRange']:
             situation['RadarRange'] = traffic['RadarRange']
@@ -336,7 +337,6 @@ def new_traffic(json_str):
     aircraft_changed = True
     rlog.log(AIRCRAFT_DEBUG, "New Traffic" + json_str)
     traffic = json.loads(json_str)
-    changed = False
     try:
         if is_steering_message(traffic):
             return    # was message without aircraft content
