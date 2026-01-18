@@ -40,6 +40,8 @@ import websockets
 import math
 import time
 
+from numpy.ma.core import true_divide
+
 import arguments
 import radarbluez
 import radarui
@@ -244,6 +246,59 @@ def speaktraffic(hdiff, direction=None, dist=None):
             txt += f" {dist} miles "
         radarbluez.speak(txt)
 
+def is_steering_message(traffic):  # checks if traffic is a steering message and returns true if yes
+    if 'RadarRange' in traffic or 'RadarLimits' in traffic:
+        if situation['RadarRange'] != traffic['RadarRange']:
+            situation['RadarRange'] = traffic['RadarRange']
+            changed = True
+        if situation['RadarLimits'] != traffic['RadarLimits']:
+            situation['RadarLimits'] = traffic['RadarLimits']
+            changed = True
+        if changed:
+            # refresh all_ac
+            all_ac.clear()
+        return True
+        # ignore rest of message
+    if 'Icao_addr' not in traffic:
+        # steering message without aircraft content
+        rlog.log(AIRCRAFT_DEBUG, "No Icao_addr in message. Ignoring message.")
+        return True
+    return False
+
+
+def speech_output_adsb(ac, res_angle):   # checks if aircraft with position has to be spoken and triggers speech
+    if ac['gps_distance'] <= situation['RadarRange'] / 2:
+        oclock = round(res_angle / 30)
+        if oclock <= 0:
+            oclock += 12
+        if oclock > 12:
+            oclock -= 12
+        if not ac['was_spoken']:  # only speak again, if never spoken or hysteresis reached
+            if 'last_speak_time' not in ac or datetime.now(timezone.utc) - ac['last_speak_time'] > speaktraffic_delta:
+                # has been spoken before, now check timeout, against "flickering position"
+                # so is only spoken if never spoken, hysteresis met and last speak is long enough ago
+                speaktraffic(ac['height'], oclock, round(ac['gps_distance']))
+                ac['was_spoken'] = True
+                ac['last_speak_time'] = datetime.now(timezone.utc)
+    else:
+        # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
+        if ac['gps_distance'] >= situation['RadarRange'] * 0.75:
+            ac['was_spoken'] = False
+
+
+def speech_output_modes(ac):   # checks if modes aircraft has to be spoken
+    if ac['gps_distance'] <= situation['RadarRange'] / 2:
+        if not ac['was_spoken']:  # check hysteresis
+            if 'last_speak_time' not in ac or datetime.now(timezone.utc) - ac['last_speak_time'] > speaktraffic_delta:
+                # only speak after a minimal time again, necessary if traffic esp. Mode S "flickers"
+                speaktraffic(ac['height'], None, round(ac['gps_distance']))
+                ac['was_spoken'] = True
+                ac['last_speak_time'] = datetime.now(timezone.utc)
+    else:
+        # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
+        if ac['gps_distance'] > situation['RadarRange'] * 0.75:
+            ac['was_spoken'] = False
+
 
 def new_traffic(json_str):
     global last_arcposition
@@ -254,23 +309,8 @@ def new_traffic(json_str):
     traffic = json.loads(json_str)
     changed = False
     try:
-        if 'RadarRange' in traffic or 'RadarLimits' in traffic:
-            if situation['RadarRange'] != traffic['RadarRange']:
-                situation['RadarRange'] = traffic['RadarRange']
-                changed = True
-            if situation['RadarLimits'] != traffic['RadarLimits']:
-                situation['RadarLimits'] = traffic['RadarLimits']
-                changed = True
-            if changed:
-                # refresh all_ac
-                all_ac.clear()
-            return
-            # ignore rest of message
-        if 'Icao_addr' not in traffic:
-            # steering message without aircraft content
-            rlog.log(AIRCRAFT_DEBUG, "No Icao_addr in message" + json_str)
-            return
-
+        if is_steering_message(traffic):
+            return    # was message without aircraft content
         is_new = False
         if traffic['Icao_addr'] not in all_ac.keys():
             # new traffic, insert
@@ -310,23 +350,7 @@ def new_traffic(json_str):
                 if 'nspeed' in ac:
                     nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
                     ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
-                # speech output
-                if gps_rad <= situation['RadarRange'] / 2:
-                    oclock = round(res_angle / 30)
-                    if oclock <= 0:
-                        oclock += 12
-                    if oclock > 12:
-                        oclock -= 12
-                    if not ac['was_spoken']:  # check hysteresis
-                        if 'last_speak_time' in ac:  # check last speak time
-                            if datetime.now(timezone.utc) - ac['last_speak_time'] > speaktraffic_delta:
-                                speaktraffic(ac['height'], oclock, round(gps_rad))
-                                ac['was_spoken'] = True
-                                ac['last_speak_time'] = datetime.now(timezone.utc)
-                else:
-                    # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
-                    if gps_rad >= situation['RadarRange'] * 0.75:
-                        ac['was_spoken'] = False
+                speech_output_adsb(ac, gps_rad)
             else:
                 # do not display
                 ac['x'] = -1
@@ -348,19 +372,7 @@ def new_traffic(json_str):
                 ac['arcposition'] = last_arcposition
             ac['gps_distance'] = distcirc
             ac['circradius'] = distx
-
-            if ac['gps_distance'] <= situation['RadarRange'] / 2:
-                if not ac['was_spoken']:  # check hysteresis
-                    if 'last_speak_time' in ac:   # check last speak time
-                        if datetime.now(timezone.utc) - ac['last_speak_time'] > speaktraffic_delta:
-                            # only speak after a minimal time again, necessary if traffic esp. Mode S "flickers"
-                            speaktraffic(ac['height'], None, round(ac['gps_distance']))
-                            ac['was_spoken'] = True
-                            ac['last_speak_time'] = datetime.now(timezone.utc)
-            else:
-                # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
-                if ac['gps_distance'] > situation['RadarRange'] * 0.75:
-                    ac['was_spoken'] = False
+            speech_output_modes(ac)
     except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.log(AIRCRAFT_DEBUG, "KeyError decoding:" + json_str)
 
