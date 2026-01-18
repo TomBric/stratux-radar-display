@@ -65,7 +65,7 @@ import checklist
 import logging
 from logging.handlers import RotatingFileHandler
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from pathlib import Path
 import sys
 import traceback
@@ -94,9 +94,7 @@ OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
-SPEAK_SAME_TRAFFIC_DELTA = 2   # time in seconds after the same traffic is spoken again (if also hysteresis was true)
-
-speaktraffic_delta = timedelta(seconds=SPEAK_SAME_TRAFFIC_DELTA)
+SPEAK_SAME_TRAFFIC_DELTA = 2.0   # time in seconds after the same traffic is spoken again (if also hysteresis was true)
 
 CONFIG_FILE = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.conf"))
 SAVED_FLIGHTS = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.flights"))
@@ -160,6 +158,35 @@ simulation_mode = False  # if true, do simulation mode for grounddistance (for t
 radar_sound_off_sound = None   # prepared sound output for "sound off"
 radar_sound_on_sound = None    # prepared send output for "sound on"
 
+def dump_ac(ac):    # debug function, produces one line for aircraft in a readable manner
+    ret=""
+    ret += f" tail: {ac['tail']}" if 'tail' in ac
+    ret += f" gps_distance: {ac['gps_distance']:.1f}" if 'gps_distance' in ac
+    ret += f" last_contact_timestamp: {time.strftime("%Y/%m/%d %H:%M:%S",
+            time.gmtime(ac['last_contact_timestamp']))}" if 'last_contact_timestamp' in ac
+    ret += f" height: {ac['height']}" if 'height' in ac
+    ret += f" nspeed: {ac['nspeed']}" if 'nspeed' in ac
+    ret += f" vspeed: {ac['vspeed']}" if 'vspeed' in ac
+    ret += f" direction: {ac['direction']}" if 'direction' in ac
+    ret += f" x: {ac['x']}" if 'x' in ac
+    ret += f" y: {ac['y']}" if 'y' in ac
+    ret += f" nspeed_length: {ac['nspeed_length']}" if 'nspeed_length' in ac
+    ret += f" was_spoken: {ac['was_spoken']}" if 'was_spoken' in ac
+    ret += f" last_speak_time: {time.strftime("%Y/%m/%d %H:%M:%S",
+            time.gmtime(ac['last_speak_time']))}" if 'last_speak_time' in ac
+    ret += f" arcposition: {ac['arcposition']}" if 'arcposition' in ac
+    ret += f" circradius: {ac['circradius']}" if 'circradius' in ac
+    return ret
+
+
+def dump_all(all_ac):    # return string of all aircraft currently monitored, for debugging
+    ret = ""
+    for icao, ac in all_ac.items():
+        ret += f" ICAO {icao:X}:"
+        ret += dump_ac(ac)
+    return ret
+
+
 def draw_all_ac(allac):
     dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
     for icao, ac in dist_sorted:
@@ -192,7 +219,7 @@ def draw_display():
     global aircraft_changed
     global optical_alive
 
-    rlog.log(AIRCRAFT_DEBUG, "List of all aircraft > " + json.dumps(all_ac))
+    rlog.log(AIRCRAFT_DEBUG, "List of all aircraft > " + dump_all(all_ac))
     new_alive = int((int(time.time()) % (OPTICAL_ALIVE_BARS * OPTICAL_ALIVE_TIME)) / OPTICAL_ALIVE_TIME)
     if situation['was_changed'] or aircraft_changed or Globals.refresh or new_alive != optical_alive:
         # display is only triggered if there was a change
@@ -274,12 +301,12 @@ def speech_output_adsb(ac, res_angle):   # checks if aircraft with position has 
         if oclock > 12:
             oclock -= 12
         if not ac['was_spoken']:  # only speak again, if never spoken or hysteresis reached
-            if 'last_speak_time' not in ac or datetime.now(timezone.utc) - ac['last_speak_time'] > speaktraffic_delta:
+            if 'last_speak_time' not in ac or time.time() - ac['last_speak_time'] > SPEAK_SAME_TRAFFIC_DELTA:
                 # has been spoken before, now check timeout, against "flickering position"
                 # so is only spoken if never spoken, hysteresis met and last speak is long enough ago
                 speaktraffic(ac['height'], oclock, round(ac['gps_distance']))
                 ac['was_spoken'] = True
-                ac['last_speak_time'] = datetime.now(timezone.utc)
+                ac['last_speak_time'] = time.time()
     else:
         # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
         if ac['gps_distance'] >= situation['RadarRange'] * 0.75:
@@ -289,11 +316,11 @@ def speech_output_adsb(ac, res_angle):   # checks if aircraft with position has 
 def speech_output_modes(ac):   # checks if modes aircraft has to be spoken
     if ac['gps_distance'] <= situation['RadarRange'] / 2:
         if not ac['was_spoken']:  # check hysteresis
-            if 'last_speak_time' not in ac or datetime.now(timezone.utc) - ac['last_speak_time'] > speaktraffic_delta:
+            if 'last_speak_time' not in ac or time.time() - ac['last_speak_time'] > SPEAK_SAME_TRAFFIC_DELTA:
                 # only speak after a minimal time again, necessary if traffic esp. Mode S "flickers"
                 speaktraffic(ac['height'], None, round(ac['gps_distance']))
                 ac['was_spoken'] = True
-                ac['last_speak_time'] = datetime.now(timezone.utc)
+                ac['last_speak_time'] = time.time()
     else:
         # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
         if ac['gps_distance'] > situation['RadarRange'] * 0.75:
