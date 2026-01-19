@@ -393,8 +393,7 @@ def new_traffic(json_str):
                     nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
                     ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
                 speech_output_adsb(ac, gps_rad)
-            else:
-                # do not display
+            else: # outside of display
                 ac['x'] = -1
                 ac['y'] = -1
 
