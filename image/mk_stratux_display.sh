@@ -173,7 +173,7 @@ outname="-$release-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
 
 # Rename and zip with xz
-echo 'Starting xz of $IMAGENAME to out/${outprefix}"${outname}". This may take a while...'
+echo "Starting xz of $IMAGENAME to out/${outprefix}${outname}. This may take a while..."
 mv $IMGNAME out/${outprefix}"${outname}"
 xz -v -k out/${outprefix}"${outname}"
 
