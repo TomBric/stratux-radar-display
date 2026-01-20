@@ -30,6 +30,14 @@ BRANCH=main
 V32=false
 USB_NAME=""
 
+# variables for pi imager repo.json
+GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
+V64_REPONAME="Stratux Radar Display (64-bit)"
+V32_REPONAME="Stratux Radar Display (32-bit)"
+ICON_URL_BLACK="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
+ICON_URL_WHITE="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-white192x192.png"
+ICON_URL_BLUE="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-blue192x192.png"
+
 # check parameters
 while getopts ":b:k:u" opt; do
   case $opt in
@@ -55,18 +63,25 @@ while getopts ":b:k:u" opt; do
   esac
 done
 
-echo "Building images for branch '$BRANCH' V32=$V32 based on Bookworm"
+echo "Building images for branch '$BRANCH' V32=$V32 based on Trixie"
 
+icon_url="$ICON_URL_BLACK"
 if [ "$V32" = true ]; then
   IMAGE_VERSION="armhf"
   outprefix="v32-stratux-display"
+  icon_url="$ICON_URL_BLUE"
+  device_list="pi3-32bit, pi4-32bit"
+  reponame="$V32_REPONAME"
 else
   IMAGE_VERSION="arm64"
   outprefix="stratux-display"
+  icon_url="$ICON_URL_WHITE"
+  device_list="pi3-64bit, pi4-64bit"
+  reponame="$V64_REPONAME"
 fi
 
-ZIPNAME="2025-05-13-raspios-bookworm-${IMAGE_VERSION}-lite.img.xz"
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2025-05-13/${ZIPNAME}"
+ZIPNAME="2025-12-04-raspios-trixie-${IMAGE_VERSION}-lite.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2025-12-04/${ZIPNAME}"
 
 IMGNAME="${ZIPNAME%.*}"
 
@@ -127,9 +142,9 @@ su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-ra
 cd ../../../
 # run the configuration skript, that is also executed when setting up on target device
 if [ "$V32" = true ]; then
-  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH" -i pico2tts
+  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh -i pico2tts
 else
-  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh "$BRANCH"
+  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh
 fi
 unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_config_webapp.sh
 
@@ -150,16 +165,23 @@ parted --script $IMGNAME rm 2
 parted --script $IMGNAME unit B mkpart primary ext4 ${partoffset}B ${bytesEnd}B
 truncate -s $(($bytesEnd + 4096)) $IMGNAME
 
-
 cd "$SRCDIR" || die "cd failed"
 # make sure the local version is also on current status
 sudo -u pi git pull --rebase
-outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
+release=$(git describe --tags --abbrev=0)
+outname="-$release-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
 
-# Rename and zip webconfig version
-mv $IMGNAME ${outprefix}-webconfig"${outname}"
-zip out/${outprefix}-webconfig"${outname}".zip ${outprefix}-webconfig"${outname}"
+# Rename and zip with xz
+echo "Starting xz of $IMAGENAME to out/${outprefix}${outname}. This may take a while..."
+mv $IMGNAME out/${outprefix}"${outname}"
+xz -v -k out/${outprefix}"${outname}"
+
+# create os-list entry for pi imager
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}" out/${outprefix}"${outname}".xz "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".xz "${device_list}" "out/$outprefix${outname}.json"
+# example for path of a release on github:
+# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-v2.12-000d4f4b.img.xz
+rm out/"${outprefix}""${outname}"
 
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
@@ -167,3 +189,5 @@ else
   mv $TMPDIR/out/${outprefix}* /media/pi/"$USB_NAME"; umount /media/pi/"$USB_NAME"
   echo "Final images have been moved to usb stick $USB_NAME and umounted. Please install and test the images."
 fi
+
+

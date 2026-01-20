@@ -42,7 +42,7 @@ from queue import Queue
 import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
 import time
 from globals import rlog
-
+import radarui    # to check if radarui.sound_on
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
 ADAPTER_PATH = '/org/bluez/hci0'
@@ -167,6 +167,10 @@ def setvolume(new_volume):
     if mixer is not None:
         mixer.setvolume(new_volume)
 
+def stop_sounds():      # if mute button is pressed, stop immediately sound output and clear queue
+    if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
+        pygame.mixer.stop()
+
 
 def speak(text, speed_percent = 100):
     if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
@@ -188,9 +192,10 @@ def prepare_sounds_tuple(int_tuple):  # done during init without parallel corout
 
 def prepare_sounds_string(tospeak):   # done during init without parallel coroutines
     if bluetooth_active or extsound_active:
-        pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", tospeak])  # generate wave
+        pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar_prepared.wav", tospeak])  # generate wave
         if pico_result.returncode == 0:
-            return pygame.mixer.Sound("/tmp/radar.wav")
+            # rlog.debug(f"Sound prepared: {tospeak}")
+            return pygame.mixer.Sound("/tmp/radar_prepared.wav")
         else:
             rlog.debug("Radarbluez: Error creating sound string.")
     return None
@@ -208,7 +213,7 @@ def audio_speaker(queue):
         msg = queue.get()
         if msg == 'STOP':
             break
-        else:
+        if radarui.sound_on:    # if not ignore sound, clears queue
             pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", msg])  # generate wave
             if pico_result.returncode == 0:
                 if (bluetooth_active and bt_devices > 0) or (extsound_active and global_config['sound_volume'] > 0):
@@ -226,7 +231,7 @@ def connected_devices():
     if not bluetooth_active:
         return 0, []
     managed_objects = manager.GetManagedObjects()
-    r = re.compile('\/org\/bluez\/hci\d*\/dev_(.*)')
+    r = re.compile(r'\/org\/bluez\/hci\d*\/dev_(.*)')
     # to match strings like /org/bluez/hci0/dev_58_C9_35_2F_A1_EF
     device_names = []
     for key, value in managed_objects.items():
