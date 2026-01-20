@@ -222,7 +222,7 @@ class Epaper3in7(dcommon.GenericDisplay):
                     t += "\uf293"  # bluetooth symbol
             else:
                 t = "\uf1f6"  # bell off symbol
-            textlength = self.draw.textlength(t, self.fonts[self.SMALL])
+            textlength = self.draw.textlength(t, font=self.awesomefont)
             self.draw.text((self.sizex - textlength - 5, self.sizey - self.SMALL), t,
                            font=self.awesomefont, fill=self.TEXT_COLOR)
 
@@ -321,7 +321,7 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.draw.text((5, starty), "sensors", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         x = self.round_text(100, starty, "IMU", yesno=stat['IMUConnected'], out_color=self.TEXT_COLOR)
         self.round_text(x, starty, "BMP", yesno=stat['BMPConnected'], out_color=self.TEXT_COLOR)
-        self.bottom_line("+10 ft", "Mode", "-10 ft")
+        self.bottom_line("", "    Mode", "Reset")
 
     def cowarner(self, co_values, co_max, r0, timeout, alarmlevel, alarmtext, simulation_mode=False):
         self.centered_text(0, alarmtext, self.LARGE)
@@ -447,3 +447,4 @@ class Epaper3in7(dcommon.GenericDisplay):
 
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = Epaper3in7()
+

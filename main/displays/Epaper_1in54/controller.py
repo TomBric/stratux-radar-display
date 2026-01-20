@@ -36,6 +36,7 @@ from .. import dcommon
 from PIL import Image, ImageDraw
 import math
 import time
+import datetime
 from pathlib import Path
 
 
@@ -327,7 +328,7 @@ class Epaper1in54(dcommon.GenericDisplay):
                 self.centered_text(0, f"Start-/Land #{index + 1}", self.SMALL)
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
-        if 'start_time' in values:
+        if 'start_time' in values and isinstance(values['start_time'], datetime.datetime):
             st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
         else:
             st = '---'
@@ -338,7 +339,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         )
         starty = self.dashboard(0, self.SMALL+2 , self.sizex, lines)
 
-        if 'landing_time' in values:
+        if 'landing_time' in values and isinstance(values['landing_time'], datetime.datetime):
             lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
         else:
             lt = '---'

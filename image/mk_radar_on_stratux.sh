@@ -19,7 +19,7 @@
 #   sudo /bin/bash mk_radar_on_stratux.sh -s
 
 
-set -xcd ho
+# set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -34,6 +34,12 @@ BRANCH=main
 USB_NAME=""
 DISPLAY_NAME="Epaper_3in7"
 UART=false
+
+# pi imager settings
+GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
+REPONAME="Stratux EU032 with Radar Display preinstalled(64-bit)"
+ICON_URL="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
+DEVICE_LIST="pi3-64bit, pi4-64bit"
 
 # check parameters
 while getopts ":b:d:u:f:s" opt; do
@@ -55,7 +61,7 @@ fi
 
 ZIPNAME="stratux-v1.6r1-eu032-ff1f01dc.img.zip"
 BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu032/${ZIPNAME}"
-outprefix="stratux-eu32-radar-webconfig"
+outprefix="stratux-eu32-radar"
 IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
@@ -141,16 +147,20 @@ cd "$SRCDIR" || die "cd failed"
 # make sure the local version is also on current status
 sudo -u pi git pull --rebase
 outname="-$(git describe --tags --abbrev=0)-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
+release=$(git describe --tags --abbrev=0)
 cd $TMPDIR || die "cd failed"
 
-# Rename and zip oled version
-mount -t ext4 -o offset=$partoffset "$IMGNAME" mnt/ || die "root-mount failed"
+# mount -t ext4 -o offset=$partoffset "$IMGNAME" mnt/ || die "root-mount failed"
 
+mv "$IMGNAME" out/"${outprefix}""${outname}"
+echo "Starting xz of $IMAGENAME to out/${outprefix}${outname}. This may take a while ..."
+xz -v -k out/"${outprefix}""${outname}"
 
-mv "$IMGNAME" "${outprefix}""${outname}"
-zip out/"${outprefix}""${outname}".zip "${outprefix}""${outname}"
-rm "${outprefix}""${outname}"
-
+# create os-list entry for pi imager
+/bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}" out/"${outprefix}""${outname}".xz "$REPONAME ${release}" "Description" "$ICON_URL" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".xz "$DEVICE_LIST" "out/$outprefix${outname}.json"
+# example for path of a release on github:
+# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-webconfig-v2.12-000d4f4b.img.xz
+rm out/"${outprefix}""${outname}"
 
 if [ "${#USB_NAME}" -eq 0 ]; then
   echo "Final image has been placed into $TMPDIR/out. Please install and test the images."

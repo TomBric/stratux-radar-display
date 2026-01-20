@@ -39,7 +39,6 @@ import socket
 import websockets
 import math
 import time
-
 import arguments
 import radarbluez
 import radarui
@@ -61,6 +60,7 @@ import radarmodes
 import simulation
 import checklist
 import logging
+from logging.handlers import RotatingFileHandler
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -68,19 +68,17 @@ import sys
 import traceback
 import syslog
 
-from globals import rlog, Globals, Modes, global_config
-
-# logging
-SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
-AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBUG
-#
+from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG
 
 # constants
-RADAR_VERSION = "2.12"
+RADAR_VERSION = "2.14"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
-RADAR_CUTOFF = 29
+RADAR_CUTOFF = 29  # time after last message received from an aircraft is is no longer displayed
+POSITION_VALID_DELTA = 10.0   # time a received position is assumed valid, e.g. if message without position is received
+# only after this POSITION_VALID_DELTA time a switch back to mode-s (circle) is done. May e.g. happen when
+# flarm is no more received, but only mode-s. Than switch back and display circle
 UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01  # give other coroutines some time to do their jobs
 BLUEZ_CHECK_TIME = 3.0
@@ -96,6 +94,9 @@ OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
+SPEAK_SAME_TRAFFIC_DELTA = 2.0   # time in seconds after the same traffic is spoken again (if also hysteresis was true)
+SOURCE_1090 = 1    # source identifier from stratux
+SOURCE_FLARM = 4   # source identifier from stratux
 
 CONFIG_FILE = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.conf"))
 SAVED_FLIGHTS = str(Path(arguments.FULL_CONFIG_DIR).joinpath("stratux-radar.flights"))
@@ -156,6 +157,36 @@ groundbeep = False  # True if indication of ground distance via audio
 countdown = False # True if ground distance with countdown screen is shown
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
 
+radar_sound_off_sound = None   # prepared sound output for "sound off"
+radar_sound_on_sound = None    # prepared send output for "sound on"
+
+def dump_ac(ac):    # debug function, produces one line for aircraft in a readable manner
+    ret=""
+    ret += f" tail:{ac['tail']}" if 'tail' in ac else ""
+    ret += f" gps_distance:{ac['gps_distance']:.1f}" if 'gps_distance' in ac else ""
+    ret += f" last_contact_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_contact_timestamp']))}" if 'last_contact_timestamp' in ac else ""
+    ret += f" height:{ac['height']}" if 'height' in ac else ""
+    ret += f" nspeed:{ac['nspeed']}" if 'nspeed' in ac else ""
+    ret += f" vspeed:{ac['vspeed']}" if 'vspeed' in ac else ""
+    ret += f" direction:{ac['direction']}" if 'direction' in ac else ""
+    ret += f" x:{ac['x']}" if 'x' in ac else ""
+    ret += f" y:{ac['y']}" if 'y' in ac else ""
+    ret += f" last_position_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_position_timestamp']))}" if 'last_position_timestamp' in ac else ""
+    ret += f" nspeed_length:{ac['nspeed_length']}" if 'nspeed_length' in ac else ""
+    ret += f" was_spoken:{ac['was_spoken']}" if 'was_spoken' in ac else ""
+    ret += f" last_speak_time:{time.strftime('%H:%M:%S', time.gmtime(ac['last_speak_time']))}" if 'last_speak_time' in ac else ""
+    ret += f" arcposition:{ac['arcposition']}" if 'arcposition' in ac else ""
+    ret += f" circradius:{ac['circradius']}" if 'circradius' in ac else ""
+    return ret
+
+
+def dump_all(all_aircraft):    # return string of all aircraft currently monitored, for debugging
+    ret = ""
+    for icao, ac in all_aircraft.items():
+        ret += f"\n  ICAO {icao:X}:"
+        ret += dump_ac(ac)
+    return ret
+
 
 def draw_all_ac(allac):
     dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
@@ -189,7 +220,7 @@ def draw_display():
     global aircraft_changed
     global optical_alive
 
-    rlog.log(AIRCRAFT_DEBUG, "List of all aircraft > " + json.dumps(all_ac))
+    rlog.log(AIRCRAFT_DEBUG, "List of all aircraft > " + dump_all(all_ac))
     new_alive = int((int(time.time()) % (OPTICAL_ALIVE_BARS * OPTICAL_ALIVE_TIME)) / OPTICAL_ALIVE_TIME)
     if situation['was_changed'] or aircraft_changed or Globals.refresh or new_alive != optical_alive:
         # display is only triggered if there was a change
@@ -243,6 +274,60 @@ def speaktraffic(hdiff, direction=None, dist=None):
             txt += f" {dist} miles "
         radarbluez.speak(txt)
 
+def is_steering_message(traffic):  # checks if traffic is a steering message and returns true if yes
+    changed = False
+    if 'RadarRange' in traffic or 'RadarLimits' in traffic:
+        if situation['RadarRange'] != traffic['RadarRange']:
+            situation['RadarRange'] = traffic['RadarRange']
+            changed = True
+        if situation['RadarLimits'] != traffic['RadarLimits']:
+            situation['RadarLimits'] = traffic['RadarLimits']
+            changed = True
+        if changed:
+            # refresh all_ac
+            all_ac.clear()
+        return True
+        # ignore rest of message
+    if 'Icao_addr' not in traffic:
+        # steering message without aircraft content
+        rlog.log(AIRCRAFT_DEBUG, "No Icao_addr in message. Ignoring message.")
+        return True
+    return False
+
+
+def speech_output_adsb(ac, res_angle):   # checks if aircraft with position has to be spoken and triggers speech
+    if ac['gps_distance'] <= situation['RadarRange'] / 2:
+        oclock = round(res_angle / 30)
+        if oclock <= 0:
+            oclock += 12
+        if oclock > 12:
+            oclock -= 12
+        if not ac['was_spoken']:  # only speak again, if never spoken or hysteresis reached
+            if 'last_speak_time' not in ac or time.time() - ac['last_speak_time'] > SPEAK_SAME_TRAFFIC_DELTA:
+                # has been spoken before, now check timeout, against "flickering position"
+                # so is only spoken if never spoken, hysteresis met and last speak is long enough ago
+                speaktraffic(ac['height'], oclock, round(ac['gps_distance']))
+                ac['was_spoken'] = True
+                ac['last_speak_time'] = time.time()
+    else:
+        # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
+        if ac['gps_distance'] >= situation['RadarRange'] * 0.75:
+            ac['was_spoken'] = False
+
+
+def speech_output_modes(ac):   # checks if modes aircraft has to be spoken
+    if ac['gps_distance'] <= situation['RadarRange'] / 2:
+        if not ac['was_spoken']:  # check hysteresis
+            if 'last_speak_time' not in ac or time.time() - ac['last_speak_time'] > SPEAK_SAME_TRAFFIC_DELTA:
+                # only speak after a minimal time again, necessary if traffic esp. Mode S "flickers"
+                speaktraffic(ac['height'], None, round(ac['gps_distance']))
+                ac['was_spoken'] = True
+                ac['last_speak_time'] = time.time()
+    else:
+        # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
+        if ac['gps_distance'] > situation['RadarRange'] * 0.75:
+            ac['was_spoken'] = False
+
 
 def new_traffic(json_str):
     global last_arcposition
@@ -251,25 +336,15 @@ def new_traffic(json_str):
     aircraft_changed = True
     rlog.log(AIRCRAFT_DEBUG, "New Traffic" + json_str)
     traffic = json.loads(json_str)
-    changed = False
     try:
-        if 'RadarRange' in traffic or 'RadarLimits' in traffic:
-            if situation['RadarRange'] != traffic['RadarRange']:
-                situation['RadarRange'] = traffic['RadarRange']
-                changed = True
-            if situation['RadarLimits'] != traffic['RadarLimits']:
-                situation['RadarLimits'] = traffic['RadarLimits']
-                changed = True
-            if changed:
-                # refresh all_ac
-                all_ac.clear()
-            return
-            # ignore rest of message
-        if 'Icao_addr' not in traffic:
-            # steering message without aircraft content
-            rlog.log(AIRCRAFT_DEBUG, "No Icao_addr in message" + json_str)
-            return
-
+        if is_steering_message(traffic):
+            return    # was message without aircraft content
+        if traffic.get('Last_source') == SOURCE_1090:
+            source = "1090"
+        elif traffic.get('Last_source') == SOURCE_FLARM:
+            source = "FLARM"
+        else:
+            source = "Unknown source"
         is_new = False
         if traffic['Icao_addr'] not in all_ac.keys():
             # new traffic, insert
@@ -288,15 +363,23 @@ def new_traffic(json_str):
         if traffic['Tail']:
             ac['tail'] = traffic['Tail']
 
+        # Traffic in all_ac list is
+        # - ADSB or FLARM:   if 'x' is in ac   (andy 'y' also, but check for x is ok).
+        # - Mode-S only: if 'circradius' is in ac
+        # when switching, make sure other keys ('circradius' or 'x') are deleted.
+        # When position is received this immediately overrides Mode-S. The other way round may also happen
+        # e.g if FLARM of an aircraft was received, but afterwards only mode-s. So invalidate position also if
+        # no new position was received after some time
+
         if traffic['Position_valid'] and situation['gps_active']:
             # adsb traffic and stratux has valid gps signal
-            rlog.log(AIRCRAFT_DEBUG, 'RADAR: ADSB traffic ' + hex(traffic['Icao_addr'])
-                     + " at height " + str(ac['height']))
+            rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at height {ac['height']}")
             if 'circradius' in ac:
                 del ac['circradius']
                 # was mode-s target before, now invalidate mode-s info
             gps_rad, gps_angle = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             ac['gps_distance'] = gps_rad
+            ac['last_position_timestamp'] = time.time()
             if 'Track' in traffic:
                 ac['direction'] = traffic['Track'] - situation['course']
                 # sometimes track is missing, then leave it as it is
@@ -309,50 +392,37 @@ def new_traffic(json_str):
                 if 'nspeed' in ac:
                     nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
                     ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
-                # speech output
-                if gps_rad <= situation['RadarRange'] / 2:
-                    oclock = round(res_angle / 30)
-                    if oclock <= 0:
-                        oclock += 12
-                    if oclock > 12:
-                        oclock -= 12
-                    if not ac['was_spoken']:
-                        speaktraffic(ac['height'], oclock, round(gps_rad))
-                        ac['was_spoken'] = True
-                else:
-                    # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
-                    if gps_rad >= situation['RadarRange'] * 0.75:
-                        ac['was_spoken'] = False
-            else:
-                # do not display
+                speech_output_adsb(ac, gps_rad)
+            else: # outside of display
                 ac['x'] = -1
                 ac['y'] = -1
 
         else:
             # mode-s traffic or no valid GPS position of stratux
-            # unspecified altitude, nothing displayed for now, leave it as it is
             if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
-                return
                 # unspecified altitude, nothing displayed for now, leave it as it is
+                return
             distcirc = traffic['DistanceEstimated'] / 1852.0
-            rlog.log(AIRCRAFT_DEBUG, "RADAR: Mode-S traffic " + hex(traffic['Icao_addr'])
-                     + " in " + str(distcirc) + " nm")
-            distx = round(max_pixel / 2 * distcirc / situation['RadarRange'])
+            rlog.log(AIRCRAFT_DEBUG, f"RADAR: No position traffic {traffic['Icao_addr']:X} from source {source} "
+                                     f"in {distcirc:.1f} nm")
+            # check age of last position, if age is < POSITION_VALID_DELTA, leave position valid and do not calculate circradius
+            if 'last_position_timestamp' in ac and time.time() - ac['last_position_timestamp'] < POSITION_VALID_DELTA:
+                rlog.log(AIRCRAFT_DEBUG, f"Ignoring mode s distance estimation of "
+                    f"{traffic['Icao_addr']:X} since, position is still younger than {POSITION_VALID_DELTA}secs")
+                # this may e.g. happen if FLARM message is received and mode-s
+                return
             if is_new or 'circradius' not in ac:
                 # calc argposition if new or adsb before
                 last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
                 ac['arcposition'] = last_arcposition
             ac['gps_distance'] = distcirc
-            ac['circradius'] = distx
-
-            if ac['gps_distance'] <= situation['RadarRange'] / 2:
-                if not ac['was_spoken']:
-                    speaktraffic(ac['height'], None, round(ac['gps_distance']))
-                    ac['was_spoken'] = True
-            else:
-                # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
-                if ac['gps_distance'] > situation['RadarRange'] * 0.75:
-                    ac['was_spoken'] = False
+            ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
+            if 'x' in ac and 'y' in ac:   # remove keys for display position, traffic is now only estimated again
+                del ac['x']
+                del ac['y']
+                rlog.log(AIRCRAFT_DEBUG, f"Removing position of {traffic['Icao_addr']:X} since position "
+                                         f"was older than {POSITION_VALID_DELTA}secs")
+            speech_output_modes(ac)
     except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.log(AIRCRAFT_DEBUG, "KeyError decoding:" + json_str)
 
@@ -579,9 +649,10 @@ async def user_interface():
                 if toggle_sound:
                     radarui.sound_on = not radarui.sound_on
                     if radarui.sound_on:
-                        radarbluez.speak("Radar sound on")
+                        radarbluez.speak_sound(radar_sound_on_sound, "Radar sound on")
                     else:
-                        radarbluez.speak("Radar sound off")
+                        radarbluez.stop_sounds()  # immediately stop all sound output and thread clears queue
+                        radarbluez.speak_sound(radar_sound_off_sound, "Radar sound off")
                     Globals.refresh = True
             elif Globals.mode == Modes.TIMER:  # Timer mode
                 next_mode = timerui.user_input()
@@ -810,6 +881,8 @@ def main():
     global extsound_active
     global bluetooth_active
     global button_api_active
+    global radar_sound_on_sound
+    global radar_sound_off_sound
 
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
     if not radarui.init(url_settings_set, button_api_active):
@@ -818,6 +891,8 @@ def main():
     shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
+    radar_sound_on_sound = radarbluez.prepare_sounds_string("Radar sound on")
+    radar_sound_off_sound = radarbluez.prepare_sounds_string("Radar sound off")
     max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
     ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
@@ -865,28 +940,15 @@ def radar_excepthook(exc_type, exc_value, exc_traceback):
         print(line.strip())
 
 
-def logging_init():
-    # Add file rotation handler, with level DEBUG
-    # rotatingHandler = logging.handlers.RotatingFileHandler(filename='rotating.log', maxBytes=1000, backupCount=5)
-    # rotatingHandler.setLevel(logging.DEBUG)
-    logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
-    logging.addLevelName(SITUATION_DEBUG, 'SITUATION_DEBUG')
-    logging.addLevelName(AIRCRAFT_DEBUG, 'AIRCRAFT_DEBUG')
-
-
 if __name__ == "__main__":
     # set uncaught exception logging to /var/log/messages/user
     sys.excepthook = radar_excepthook
-    # set up radar-specific logging
-    logging_init()
-    # set up logging
     shutdownui.clear_lingering_radar()
     # parse arguments for different configurations
     ap = argparse.ArgumentParser(description='Stratux radar display')
     arguments.add(ap)
     args = vars(ap.parse_args())
     # set up logging
-    logging_init()
     if args['verbose'] == 0:
         rlog.setLevel(logging.INFO)
     elif args['verbose'] == 1:
@@ -895,7 +957,17 @@ if __name__ == "__main__":
         rlog.setLevel(AIRCRAFT_DEBUG)  # log including aircraft
     else:
         rlog.setLevel(SITUATION_DEBUG)  # log including situation messages
+    if args['logfile']:   # set a log file
+        log_dir = Path(arguments.FULL_LOG_DIR)
+        log_dir.mkdir(parents=True, exist_ok=True)  # Create directory and parents for log file if they don't exist
+        loghandler = logging.handlers.RotatingFileHandler(filename=arguments.FULL_LOG_FILE, mode='a', encoding="utf-8",
+                                                 maxBytes=10*1024*1024, backupCount=5)
+        formatter = logging.Formatter('%(asctime)-15s > %(message)s')
+        loghandler.setFormatter(formatter)
+        rlog.addHandler(loghandler)
 
+    rlog.debug("\n\n")
+    rlog.debug(f"Stratux-Radar-Display started.\nArgs: {args}")
     url_host_base = args['connect']
     try:
         display_control_module = importlib.import_module('displays.' + args['device'] + '.controller')

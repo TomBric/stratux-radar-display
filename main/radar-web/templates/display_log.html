@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form, render_field, render_form_row %}
+{% block content %}
+<style> .no-label { label{ display: None; } } </style>
+<form method="post" enctype="multipart/form-data">
+{{ display_log_form.csrf_token }}
+
+
+<h4>Display radar display log file</h4>
+<br>
+{{ render_form_row([display_log_form.exit, display_log_form.reload],
+    button_map={ 'exit': 'primary', 'reload': 'secondary'} ) }}
+<br>
+<pre>{{ content }}</pre>
+<br>
+{{ render_form_row([display_log_form.exit, display_log_form.reload],
+    button_map={ 'exit': 'primary', 'reload': 'secondary'} ) }}
+</form>
+
+{% endblock %}

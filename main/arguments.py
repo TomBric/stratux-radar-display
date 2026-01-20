@@ -40,6 +40,10 @@ FULL_CONFIG_DIR = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
 DEFAULT_MIXER = "Speaker"  # default mixer name to be used for sound output
 DEFAULT_CHECKLIST = "checklist.xml"
+LOG_DIR = "log"
+LOG_FILE = "radar-display.log"
+FULL_LOG_DIR = str(Path(__file__).resolve().parent.parent.joinpath(LOG_DIR))
+FULL_LOG_FILE = str(Path(FULL_LOG_DIR).joinpath(LOG_FILE))
 
 
 def add(ap):
@@ -93,3 +97,5 @@ def add(ap):
                     help="Select display modes that you want to see ""R=radar T=timer A=ahrs D=display-status "
                          "G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "
                          "M=distance measurement L=checklist  Example: -modes RADCM", default="RTAGKVICMDSL")
+    ap.add_argument("-log", "--logfile", required=False, help=f"Output log to logfile {FULL_LOG_FILE}",
+                    action="store_true", default=False)

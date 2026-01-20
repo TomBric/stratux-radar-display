@@ -54,7 +54,7 @@ from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRa
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
-RADAR_WEB_VERSION = "1.0"
+RADAR_WEB_VERSION = "1.1"
 START_RADAR_FILE = "../../image/stratux_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
@@ -126,14 +126,15 @@ def logging_init():
     logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
     rlog = logging.getLogger('stratux-radar-web-log')
 
-
-
 class ChecklistForm(FlaskForm):
     upload_file = FileField('Select file')
     filename = StringField(f'Store as    (in "{arguments.FULL_CONFIG_DIR}")', default=arguments.DEFAULT_CHECKLIST)
     upload = SubmitField('Upload File')
     exit = SubmitField('Back to configuration')
 
+class DisplayLogForm(FlaskForm):
+    exit = SubmitField('Back to configuration')
+    reload = SubmitField('Reload Log File')
 
 class RadarForm(FlaskForm):
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[IPAddress()])
@@ -211,6 +212,9 @@ class RadarForm(FlaskForm):
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
     darkmode = SwitchField('Enable dark mode', default=False)
     all_mixers = RadioField('Select detected devices/mixers', choices=[('other', 'Other')], default='other')
+    # logging options
+    logging=SwitchField('Enable logging of radar for debugging', default=False)
+    display_log = SubmitField('Display log')
 
 
     def __init__(self, detected_mixers, on_stratux = False):   # detected mixers is a list of (device, mixername) tuples
@@ -348,6 +352,8 @@ def read_arguments(rf):
     rf.checklist_filename.data = args['checklist']
     if args['refresh'] is not None:
         rf.autorefresh.data = str(args['refresh'])
+    if args['verbose'] is not None and args['verbose'] > 0:   # configurable is only logging with level 1
+        rf.logging.data = True
 
     rlog.debug(f'RadarForm Autorefresh: {rf.autorefresh.data}')
     rlog.debug(f'RadarForm IP: {rf.stratux_ip.data}')
@@ -437,6 +443,9 @@ def build_option_string(rf):
         out += f' -chl {secure_filename(rf.checklist_filename.data)}'
     if rf.autorefresh.data != '0':
         out += f' -ref {rf.autorefresh.data}'
+    if rf.logging.data is True:
+        out += ' -v 1'      # only level 1 supported via radar app to keep it simple
+        out += ' -log'   # send log to standard log file
     return out
 
 
@@ -471,8 +480,8 @@ def index():
         rlog.debug(f'index() in else for POST: stratux-ip is {radar_form.stratux_ip.data}')
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
-                flash(Markup('File error saving configuration'), 'fail')
-                return redirect(url_for('negative_result'))
+                flash(Markup('File error saving configuration'), 'error')
+                return redirect(url_for('index'))
             flash(Markup('Configuration saved!'), 'success')
             read_arguments(radar_form)  # reread arguments to get sequence nice
             read_app_arguments(radar_form)
@@ -481,8 +490,8 @@ def index():
             return redirect(url_for('result'))
         elif radar_form.save.data is True:
             if write_arguments(radar_form) is False:
-                flash(Markup('File error saving configuration'), 'fail')
-                return redirect(url_for('negative_result'))
+                flash(Markup('File error saving configuration'), 'error')
+                return redirect(url_for('index'))
             flash(Markup('Configuration successfully saved!'), 'success')
             read_arguments(radar_form)   # reread arguments to get sequence nice
             read_app_arguments(radar_form)
@@ -499,6 +508,8 @@ def index():
             rlog.debug(f'Sending file: {arguments.FULL_CONFIG_DIR}/{radar_form.checklist_filename.data}')
             return send_from_directory(arguments.FULL_CONFIG_DIR, radar_form.checklist_filename.data,
                                        mimetype='application/xml', as_attachment=True)
+        elif radar_form.display_log.data is True:
+            return redirect(url_for('display_log'))
     return render_template('index.html',radar_form=radar_form, on_stratux=stratux_mode)
 
 
@@ -559,17 +570,30 @@ def checklist():
             return redirect(url_for('checklist'))
     return render_template('checklist.html', checklist_form = cf)
 
-@app.route('/negative_result', methods=['GET', 'POST'])
-def negative_result():
-    watchdog.refresh()
-    return render_template('negative_result.html', status_indication=status)
-
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
     watchdog.refresh()
     return render_template('result.html', result_message=result_message, countdown=150)
 
+@app.route('/display_log', methods=['GET', 'POST'])
+def display_log():
+    watchdog.refresh()
+    dlf = DisplayLogForm()
+    if dlf.validate_on_submit() is True:  # POST request
+        # check if the post request has the file part
+        if dlf.exit.data is True:
+            return redirect(url_for('index'))
+        if dlf.reload.data is True:
+            return redirect(url_for('display_log'))
+    try:
+        with open(arguments.FULL_LOG_FILE, "r") as f:
+            content = f.read()
+    except FileNotFoundError:
+        content = f"Log file {arguments.FULL_LOG_FILE} not found."
+    except Exception as e:
+        content = f"Error reading log file: {str(e)}"
+    return render_template('display_log.html', display_log_form=dlf, content=content)
 
 if __name__ == '__main__':
     print("Stratux Radar Web Configuration Server " + RADAR_WEB_VERSION + " running ...")

@@ -35,6 +35,7 @@ from .. import dcommon
 from PIL import Image, ImageDraw
 import math
 import time
+import datetime
 from . import radar_opts
 from pathlib import Path
 
@@ -357,8 +358,13 @@ class ST7789(dcommon.GenericDisplay):
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = 5
-        if 'start_time' in values:
-            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+        # Strict type check for start_time
+        st_val = values.get('start_time')
+        if isinstance(st_val, datetime.datetime):
+            try:
+                st = st_val.strftime("%H:%M:%S,%f")[:-5]
+            except Exception:
+                st = '---'
         else:
             st = '---'
         lines = [
@@ -368,8 +374,12 @@ class ST7789(dcommon.GenericDisplay):
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         starty = self.dashboard(offset, self.SMALL, self.sizex - 2* offset, lines)
-        if 'landing_time' in values:
-            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+        lt_val = values.get('landing_time')
+        if isinstance(lt_val, datetime.datetime):
+            try:
+                lt = lt_val.strftime("%H:%M:%S,%f")[:-5]
+            except Exception:
+                lt = '---'
         else:
             lt = '---'
         lines = [
