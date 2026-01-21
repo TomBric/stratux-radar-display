@@ -38,5 +38,6 @@ The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is de
 
 Optional power supply suggestion: If you need a reliable display power supply in your airplane, I have good experiences with small step-down converters XL4015. Then you can use the aircraft power supply (up to 40V). Calibrate the XL4015 at home for a power output at 5 V e.g. using an old laptop power supply. XL4015 also work well for the stratux itself. If you encounter problems with radio noise, please ensure that the power cable to the display is twisted and if necessary use a ferrit-core at the power connection.  
 
+The wiki contains information how to build and install the display. If you need support, contact me and I am happy to help.
 
 
