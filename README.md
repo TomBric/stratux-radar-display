@@ -5,6 +5,10 @@ Implementation of a Radar display for Stratux Europe Edition. Can run on a separ
 Reads the aircraft data from Stratux and displays them on the specified display. You can connect 3 pushbuttons to the device and use them for changing the radar radius, the height difference and sound options. A clock with a stop and lap timer, an automatic flight-time measurement, a g-meter, an artificial horizon, a compass (based on GPS), a VSI display and other features are also implemented.
 
 > [!NOTE]
+> update in v2.14: The new version of the [pi imager](https://www.raspberrypi.com/software/) has the option to set a "custom url", which makes writing sd cards very convenient. 
+> Just set the url mentioned under releases and you can easily select the appropriate image for your device.
+
+> [!NOTE]
 > update in v2.06: stratux-radar-display now offers a web configuration interface. You can easily configure your settings, modes and other options with this web page. See software installation instructions.
 > Other features have not been changed. If you are happy with your version, there is no need to update.
 
