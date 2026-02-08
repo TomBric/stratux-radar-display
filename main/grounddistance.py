@@ -171,11 +171,26 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Se
     celsius = 0
 
     def init(self):
-        self.ser = serial.Serial("/dev/ttyAMA0", 115200)     # Lidar module has 115200 baud
-        self.ser.flushInput()
-        if not self.ser.isOpen():
-            return False
-        return True
+        # Check for available AMA interfaces from /dev/ttyAMA0 to /dev/ttyAMA5
+        for i in range(6):
+            device = f"/dev/ttyAMA{i}"
+            try:
+                # Try to open the serial port to check if it's available
+                test_ser = serial.Serial(device, 115200, timeout=1)
+                test_ser.close()
+                # If we can open it, use this device
+                self.ser = serial.Serial(device, 115200)     # Lidar module has 115200 baud
+                self.ser.flushInput()
+                if not self.ser.isOpen():
+                    return False
+                rlog.debug(f"LidarSensor: Using {device} for communication")
+                return True
+            except (OSError, serial.SerialException):
+                # Device not available, try next one
+                continue
+        
+        rlog.debug("LidarSensor: No available AMA interface found from /dev/ttyAMA0 to /dev/ttyAMA5")
+        return False
 
     def last_distance(self):
         return self.distance
