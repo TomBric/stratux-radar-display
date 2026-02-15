@@ -175,7 +175,7 @@ class RadarForm(FlaskForm):
     #traffic options
     registration = SwitchField('Display call sign', default=True)
     ground_mode = SwitchField('Ground mode, north always up', default=False)
-    full_circle = SwitchField('Full circle on epaper 3.7', default=False)
+    full_circle = SwitchField('Full circle on epaper 3.7 or ST7789', default=False)
 
     # sound options
     bluetooth = SwitchField('Bluetooth sound', default=False)

@@ -63,7 +63,7 @@ def add(ap):
                     default=0)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no",
                     action="store_true", default=False)
-    ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (3.7 epaper only)",
+    ap.add_argument("-e", "--fullcircle", required=False, help="Display full circle radar (only for 3.7 epaper and ST7789)",
                     action="store_true", default=False)
     ap.add_argument("-y", "--extsound", type=int, required=False, help="Ext sound on with volume [0-100]",
                     default=0)
