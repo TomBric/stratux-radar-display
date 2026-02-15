@@ -103,7 +103,7 @@ class ST7789(dcommon.GenericDisplay):
         self.cdraw = ImageDraw.Draw(self.mask)
         self.rlog.debug(f'ST7789 selected: sizex={self.sizex} sizey={self.sizey} '
                         f'zero=({self.zerox}, {self.zeroy}) refresh-time: {round(self.display_refresh, 2)} secs')
-        return self.sizex, self.zerox, self.zeroy, display_refresh
+        return self.max_pixel, self.zerox, self.zeroy, display_refresh
 
     def set_dark_mode(self, dark_mode):
         """Set dark mode and update color constants accordingly"""
