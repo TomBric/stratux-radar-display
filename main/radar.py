@@ -60,6 +60,7 @@ import radarmodes
 import simulation
 import checklist
 import logging
+import collisiondetection
 from logging.handlers import RotatingFileHandler
 
 from datetime import datetime, timezone
@@ -392,6 +393,7 @@ def new_traffic(json_str):
                 if 'nspeed' in ac:
                     nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
                     ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
+                ac['tcas_mode'] = collisiondetection.calc_tcas_state(traffic, gps_rad, gps_angle, situation)
                 speech_output_adsb(ac, gps_rad)
             else: # outside of display
                 ac['x'] = -1
