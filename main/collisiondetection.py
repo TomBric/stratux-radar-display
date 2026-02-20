@@ -80,21 +80,17 @@ def calc_tcas_state(traffic, distance, bearing, situation):
     own_course = situation['course']
 
     # Convert vectors to cartesian coordinates
-    # Own vector components
+    # vector components of traffic and own
     own_vx = own_speed * math.sin(math.radians(own_course))
     own_vy = own_speed * math.cos(math.radians(own_course))
-
-    # Traffic aircraft vector components
     traffic_vx = traffic_speed * math.sin(math.radians(traffic_course))
     traffic_vy = traffic_speed * math.cos(math.radians(traffic_course))
-
     # Relative velocity
     rel_vx = traffic_vx - own_vx
     rel_vy = traffic_vy - own_vy
     rel_speed = math.sqrt(rel_vx ** 2 + rel_vy ** 2)
 
-    # If relative speed very small, no convergence
-    if rel_speed < 0.1:  # knots
+    if rel_speed < 0.1:  # knots, if relative speed very small, no convergence
         return 'no_collision'
 
     # Position vectors (simplified for short distances)
