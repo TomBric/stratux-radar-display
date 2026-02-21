@@ -44,8 +44,16 @@ calc_tcas_state = collisiondetection.calc_tcas_state
 
 situation = {}
 
-# calc_gps_distance from radar.py
 
+# from radar.py
+def radians_rel(angle):
+    if angle > 180:
+        angle = angle - 360
+    if angle <= -180:
+        angle = angle + 360
+    return angle * math.pi / 180
+
+# calc_gps_distance from radar.py
 def calc_gps_distance(lat, lng):
     radius_earth = 6371008.8
     avglat = radians_rel((situation['latitude'] + lat) / 2)
