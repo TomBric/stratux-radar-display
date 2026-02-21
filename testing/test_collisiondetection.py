@@ -39,6 +39,9 @@ import math
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'main'))
 # Import the actual modules
 from globals import rlog, AIRCRAFT_DEBUG
+
+# Set logging to AIRCRAFT_DEBUG mode
+rlog.setLevel(AIRCRAFT_DEBUG)
 # Import the actual collisiondetection module
 import collisiondetection
 calc_tcas_state = collisiondetection.calc_tcas_state
