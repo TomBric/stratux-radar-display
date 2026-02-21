@@ -115,6 +115,8 @@ def get_yes_no_input(prompt, default=True):
             print("Invalid input. Please enter 'y' or 'n'.")
 
 def interactive_test():
+    global situation
+
     print("=" * 60)
     print("Interactive TCAS State Calculator Test")
     print("=" * 60)
