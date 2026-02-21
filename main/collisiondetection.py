@@ -108,7 +108,7 @@ def calc_tcas_state(traffic, distance, bearing, situation):
     # Calculate Tau: time to minimum distance
     dot_product = -(target_x * rel_vx + target_y * rel_vy)  # tau = -(r · v_rel) / |v_rel|²
     if dot_product <= 0:
-        rlog.log(AIRCRAFT_DEBUG, f"Dot product <= 0, targets diverging or abeam. Aircraft classified as 'no_collision'")
+        rlog.log(AIRCRAFT_DEBUG, f"Dot product={dot_product:.1f} is <=0, targets diverging or abeam. Aircraft classified as 'no_collision'")
         return 'no_collision'  # Targets are diverging or abeam
     tau_time = dot_product / (rel_speed ** 2) * 3600  # Convert to seconds
     rlog.log(AIRCRAFT_DEBUG, f"Tau time (projected time for closest approach): {tau_time:.1f} seconds")
