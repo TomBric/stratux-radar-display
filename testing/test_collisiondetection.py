@@ -42,8 +42,24 @@ from globals import rlog, AIRCRAFT_DEBUG
 import collisiondetection
 calc_tcas_state = collisiondetection.calc_tcas_state
 
-# Import calc_gps_distance from radar.py
-from radar import calc_gps_distance
+situation = {}
+
+# calc_gps_distance from radar.py
+
+def calc_gps_distance(lat, lng):
+    radius_earth = 6371008.8
+    avglat = radians_rel((situation['latitude'] + lat) / 2)
+    distlat = (radians_rel(lat - situation['latitude']) * radius_earth) / 1852
+    distlng = ((radians_rel(lng - situation['longitude']) * radius_earth) / 1852) * abs(math.cos(avglat))
+    distradius = math.sqrt((distlat * distlat) + (distlng * distlng))
+    if distlat < 0:
+        angle = math.degrees(math.pi - math.atan(distlng / (-distlat)))
+    elif distlat > 0:
+        angle = math.degrees(-math.atan(distlng / (-distlat)))
+    else:
+        angle = 0
+    return distradius, angle
+
 
 def get_float_input(prompt, default=None):
     """Helper function to get float input with validation"""
