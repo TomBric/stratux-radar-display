@@ -33,6 +33,7 @@
 
 import sys
 import os
+import math
 
 # Add the main directory to the path to import modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'main'))
