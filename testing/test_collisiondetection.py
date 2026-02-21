@@ -42,6 +42,9 @@ from globals import rlog, AIRCRAFT_DEBUG
 import collisiondetection
 calc_tcas_state = collisiondetection.calc_tcas_state
 
+# Import calc_gps_distance from radar.py
+from radar import calc_gps_distance
+
 def get_float_input(prompt, default=None):
     """Helper function to get float input with validation"""
     while True:
@@ -88,7 +91,6 @@ def get_yes_no_input(prompt, default=True):
             print("Invalid input. Please enter 'y' or 'n'.")
 
 def interactive_test():
-    """Interactive test function"""
     print("=" * 60)
     print("Interactive TCAS State Calculator Test")
     print("=" * 60)
@@ -99,6 +101,8 @@ def interactive_test():
     gps_active = get_yes_no_input("GPS active", True)
     gps_speed = get_float_input("GPS speed (knots)", 100.0)
     own_altitude = get_float_input("Own altitude (feet)", 5000.0)
+    own_lat = get_float_input("Own latitude (decimal degrees)", 48.0)
+    own_lng = get_float_input("Own longitude (decimal degrees)", 11.0)
     course = get_float_input("Course (degrees)", 0.0)
     vertical_speed = get_float_input("Vertical speed (ft/min, positive=climbing)", 0.0)
     
@@ -106,6 +110,8 @@ def interactive_test():
         'gps_active': gps_active,
         'gps_speed': gps_speed,
         'own_altitude': own_altitude,
+        'latitude': own_lat,
+        'longitude': own_lng,
         'course': course,
         'vertical_speed': vertical_speed
     }
@@ -129,9 +135,14 @@ def interactive_test():
     }
     
     print()
-    print("=== Relative Position ===")
-    distance = get_float_input("Distance to traffic (NM)", 2.0)
-    bearing = get_float_input("Bearing to traffic (degrees)", 0.0)
+    print("=== Calculating Relative Position ===")
+    print(f"Using calc_gps_distance to calculate distance and bearing from own position ({own_lat:.4f}, {own_lng:.4f}) to traffic position ({traffic_lat:.4f}, {traffic_lng:.4f})")
+    
+    # Calculate distance and bearing using the actual function from radar.py
+    distance, bearing = calc_gps_distance(traffic_lat, traffic_lng)
+    
+    print(f"Calculated distance: {distance:.3f} NM")
+    print(f"Calculated bearing: {bearing:.1f}°")
     
     print()
     print("=" * 60)
