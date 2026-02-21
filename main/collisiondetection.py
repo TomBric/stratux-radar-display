@@ -32,6 +32,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 import math
+import logging
+from globals import rlog, AIRCRAFT_DEBUG
 
 # Threshold to calculate potential collision
 COLLISION_THRESHOLD = 180 # in seconds
@@ -51,10 +53,14 @@ def calc_tcas_state(traffic, distance, bearing, situation):
 
     # first check if all data is available otherwise return unclear
     if not situation['gps_active'] or situation['gps_speed'] <= 0:
+        rlog.log(AIRCRAFT_DEBUG, f"No own gps signal: aircraft classified as 'unclear'")
         return 'unclear'
     if any(key not in situation for key in ['own_altitude', 'vertical_speed']):
+        rlog.log(AIRCRAFT_DEBUG, f"Missing situation information about 'own_altitude' and 'vertical speed': aircraft classified as 'unclear'")
         return 'unclear'
     if any(key not in traffic for key in ['Alt', 'Lat', 'Lng', 'Track', 'Speed', 'VSpeed']):
+        rlog.log(AIRCRAFT_DEBUG,
+                 f"Missing full aircraft information either: ['Alt', 'Lat', 'Lng', 'Track', 'Speed', 'VSpeed']: aircraft classified as 'unclear'")
         return 'unclear'
 
     # Extract traffic data
@@ -74,6 +80,7 @@ def calc_tcas_state(traffic, distance, bearing, situation):
     if abs(rel_vspeed) > 0.1:  # Avoid division by very small numbers
         # Time until vertical separation becomes zero
         vertical_tau = abs(height_diff / rel_vspeed) * 60  # Convert to seconds
+        rlog.log(AIRCRAFT_DEBUG, f"Vertical tau: {vertical_tau} seconds")
 
     # Own speed and course
     own_speed = situation['gps_speed']
@@ -89,8 +96,9 @@ def calc_tcas_state(traffic, distance, bearing, situation):
     rel_vx = traffic_vx - own_vx
     rel_vy = traffic_vy - own_vy
     rel_speed = math.sqrt(rel_vx ** 2 + rel_vy ** 2)
-
+    rlog.log(AIRCRAFT_DEBUG, f"Relative speed: {rel_speed:.1f} knots")
     if rel_speed < 0.1:  # knots, if relative speed very small, no convergence
+        rlog.log(AIRCRAFT_DEBUG, f"Relative speed smaller 0.1 kts. Aircraft classified as 'no_collision'")
         return 'no_collision'
 
     # Position vectors (simplified for short distances)
@@ -100,13 +108,15 @@ def calc_tcas_state(traffic, distance, bearing, situation):
     # Calculate Tau: time to minimum distance
     dot_product = -(target_x * rel_vx + target_y * rel_vy)  # tau = -(r · v_rel) / |v_rel|²
     if dot_product <= 0:
+        rlog.log(AIRCRAFT_DEBUG, f"Dot product <= 0, targets diverging or abeam. Aircraft classified as 'no_collision'")
         return 'no_collision'  # Targets are diverging or abeam
     tau_time = dot_product / (rel_speed ** 2) * 3600  # Convert to seconds
-
+    rlog.log(AIRCRAFT_DEBUG, f"Tau time (projected time for closest approach): {tau_time:.1f} seconds")
     # Calculate minimum distance at tau
     min_dist_x = target_x + rel_vx * tau_time / 3600
     min_dist_y = target_y + rel_vy * tau_time / 3600
     min_distance = math.sqrt(min_dist_x ** 2 + min_dist_y ** 2)
+    rlog.log(AIRCRAFT_DEBUG, f"Minimum distance at closest approach): {min_distance:.1f} nm")
 
     # ICAO TCAS Advisory Classification - based purely on tau and distance criteria
     if 0 < tau_time <= RA_THRESHOLD: # Check for Resolution Advisory (RA) conditions
@@ -114,11 +124,13 @@ def calc_tcas_state(traffic, distance, bearing, situation):
             # Check vertical convergence timing
             if vertical_tau != float('inf'):
                 time_diff = abs(tau_time - vertical_tau)
-                if time_diff <= 10:  # Within 10 seconds for RA
+                if time_diff <= RA_THRESHOLD:  # Within 10 seconds for RA
+                    rlog.log(AIRCRAFT_DEBUG, f"time diff of tau_time and vertical_tau: {time_diff:.1f} nm. Classified as 'RA'")
                     return 'RA'
             else:
                 # No vertical convergence, but check if already in close proximity
                 if height_diff <= RA_ALT_THRESHOLD:  # Within threshold for RA
+                    rlog.log(AIRCRAFT_DEBUG,f"Height diff {height_diff:.1f} smaller than RA_ALT_THRESHOLD. Classified as 'RA'")
                     return 'RA'
     # Check for Traffic Advisory (TA) conditions
     elif 0 < tau_time <= TA_THRESHOLD: # Check for Traffic Advisory (TA) conditions
@@ -126,15 +138,19 @@ def calc_tcas_state(traffic, distance, bearing, situation):
             # Check vertical convergence timing
             if vertical_tau != float('inf'):
                 time_diff = abs(tau_time - vertical_tau)
-                if time_diff <= 20:  # Within 20 seconds for TA
+                if time_diff <= TA_THRESHOLD:  # Within 20 seconds for TA
+                    rlog.log(AIRCRAFT_DEBUG, f"time diff of tau_time and vertical_tau: {time_diff:.1f} nm. Classified as 'TA'")
                     return 'TA'
             else:
                 # No vertical convergence, but check if already in proximity
                 if height_diff <= TA_ALT_THRESHOLD:  # Within 1500 feet for TA
+                    rlog.log(AIRCRAFT_DEBUG,f"Height diff {height_diff:.1f} smaller than TA_ALT_THRESHOLD. Classified as 'TA'")
                     return 'TA'
 
     # Check for potential collision (close but not yet at TA/RA thresholds)
     if 0 < tau_time <= COLLISION_THRESHOLD:  # collision threshold
+        rlog.log(AIRCRAFT_DEBUG, f"Tau time {tau_time:.1f} smaller than COLLISION_THRESHOLD. Classified as 'potential_collision'")
         return 'potential_collision'
     # No collision risk
+    rlog.log(AIRCRAFT_DEBUG,"Tau time {tau_time:.1f} secondes. Classified as 'no_collision'")
     return 'no_collision'
