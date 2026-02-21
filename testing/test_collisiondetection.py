@@ -121,10 +121,6 @@ def get_yes_no_input(prompt, default=True):
 def interactive_test():
     global situation
 
-    print("=" * 60)
-    print("Interactive TCAS State Calculator Test")
-    print("=" * 60)
-    print()
     
     # Get situation data
     print("=== Own Aircraft Situation ===")
@@ -189,6 +185,20 @@ def interactive_test():
     print("=" * 60)
 
 def main():
+    # Display TCAS thresholds used in collision detection
+    print("=" * 60)
+    print("Interactive TCAS State Calculator Test")
+    print("=" * 60)
+    print()
+    print("=== TCAS Thresholds ===")
+    print(f"COLLISION_THRESHOLD: {collisiondetection.COLLISION_THRESHOLD} seconds")
+    print(f"TA_THRESHOLD: {collisiondetection.TA_THRESHOLD} seconds")
+    print(f"RA_THRESHOLD: {collisiondetection.RA_THRESHOLD} seconds")
+    print(f"TA_DIST_THRESHOLD: {collisiondetection.TA_DIST_THRESHOLD} NM")
+    print(f"RA_DIST_THRESHOLD: {collisiondetection.RA_DIST_THRESHOLD} NM")
+    print(f"TA_ALT_THRESHOLD: {collisiondetection.TA_ALT_THRESHOLD} feet")
+    print(f"RA_ALT_THRESHOLD: {collisiondetection.RA_ALT_THRESHOLD} feet")
+    print()
     while True:
         interactive_test()
 
