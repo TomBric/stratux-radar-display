@@ -166,8 +166,8 @@ def file_based_test(filename):
                 'VSpeed': traffic_vspeed_ftmin  # vertical speed in kts
             }
 
-            print(f"Traffic: Lat={traffic_lat:.6f}, Lng={traffic_lng:.6f}, Alt={traffic_alt:.0f}ft, Track={traffic_track:.0f}°, HSpeed={traffic_hspeed_ftmin:.0f}ft/min, VSpeed={traffic_vspeed_kts:.0f}kts")
-            print(f"Own:    Lat={own_lat:.6f}, Lng={own_lng:.6f}, Alt={own_alt:.0f}ft, Course={own_course:.0f}°, HSpeed={own_hspeed_ftmin:.0f}ft/min, VSpeed={own_vspeed_kts:.0f}kts")
+            print(f"Traffic: Lat={traffic_lat:.6f}, Lng={traffic_lng:.6f}, Alt={traffic_alt:.0f}ft, Track={traffic_track:.0f}°, HSpeed={traffic_speed_kts:.0f}kts, VSpeed={traffic_vspeed_ftmin:.0f}ft/min")
+            print(f"Own:    Lat={own_lat:.6f}, Lng={own_lng:.6f}, Alt={own_alt:.0f}ft, Course={own_course:.0f}°, HSpeed={own_speed_kts:.0f}kts, VSpeed={own_vspeed_ftmin:.0f}ft/min")
             print(f"Expected: {expected_result}")
 
             # Calculate distance and bearing
