@@ -55,8 +55,8 @@ def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lo
     dlon = math.radians(lon_deg - lon_ref_deg)
     lat_ref_rad = math.radians(lat_ref_deg)
     nm_per_rad = 60.0 * 180.0 / math.pi # 1 rad lat ~ 60 * 180/pi NM
-    y = dlat * nm_per_rad
-    x = dlon * nm_per_rad * math.cos(lat_ref_rad)
+    x = dlat * nm_per_rad
+    y = dlon * nm_per_rad * math.cos(lat_ref_rad)
     return x, y
 
 
@@ -71,7 +71,7 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     # find a reference point in the middle
     lat_ref = (own["lat"] + intr["lat"]) / 2.0
     lon_ref = (own["lon"] + intr["lon"]) / 2.0
-    rlog.log(AIRCRAFT_DEBUG, f"Reference position: lat = {lat_ref:.1f} lon = {lon_ref:.1f}")
+    rlog.log(AIRCRAFT_DEBUG, f"Reference position: lat = {lat_ref:.3f} lon = {lon_ref:.3f}")
     # calc cartesian coordinates
     xA, yA = latlon_to_xy_nm(own["lat"], own["lon"], lat_ref, lon_ref)
     xB, yB = latlon_to_xy_nm(intr["lat"], intr["lon"], lat_ref, lon_ref)
