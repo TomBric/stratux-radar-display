@@ -92,7 +92,9 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     d_cpa_nm = float('inf')
     if v2 > 1e-6:   # do not divide by zero
         dot = rx*vx + ry*vy
+        rlog.log(AIRCRAFT_DEBUG, f"dot product = {dot:.1f}")
         tau_h = -dot / v2  # in Stunden
+        rlog.log(AIRCRAFT_DEBUG, f"tau in hours = {tau_h:.1f}")
         if tau_h > 0:
             tau_hor_sec = tau_h * 3600.0
             # Distance at CPA
