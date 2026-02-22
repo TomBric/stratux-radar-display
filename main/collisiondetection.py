@@ -136,7 +136,7 @@ def calc_tcas_state(traffic, situation):
     }
     traffic = {
         'lat': traffic['Lat'],
-        'lon': traffic['lon'],
+        'lon': traffic['Lon'],
         'alt_ft': traffic['Alt'],
         'track_deg': traffic['Track'],
         'gs_kt': traffic['Speed'],
