@@ -84,8 +84,8 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     v2 = vx*vx + vy*vy
 
     # horizontal tau and proximity
-    tau_hor_sec = None
-    d_cpa_nm = None
+    tau_hor_sec = float('inf')
+    d_cpa_nm = float('inf')
     if v2 > 1e-6:
         dot = rx*vx + ry*vy
         tau_h = -dot / v2  # in Stunden
@@ -100,7 +100,7 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     z_rel = intr["alt_ft"] - own["alt_ft"]
     v_rel_z = intr["vs_fpm"] - own["vs_fpm"]
 
-    tau_vert_sec = None
+    tau_vert_sec = float('inf')
     if abs(v_rel_z) > 1e-3:
         tau_v_min = - z_rel / v_rel_z
         if tau_v_min > 0:
@@ -150,20 +150,20 @@ def calc_tcas_state(traffic, situation):
 
     # now decide
     # horizontal proximity calculations
-    hor_threat_coll = (tau_hor_sec is not None and 0 < tau_hor_sec <= COLLISION_THRESHOLD and
-                     d_cpa_nm is not None and d_cpa_nm <= COLLISION_DIST_THRESHOLD)
-    hor_threat_ta = (tau_hor_sec is not None and 0 < tau_hor_sec <= TA_THRESHOLD and
-                     d_cpa_nm is not None and d_cpa_nm <= TA_DIST_THRESHOLD)
-    hor_threat_ra = (tau_hor_sec is not None and 0 < tau_hor_sec <= RA_THRESHOLD and
-                     d_cpa_nm is not None and d_cpa_nm <= RA_DIST_THRESHOLD)
+    hor_threat_coll = (tau_hor_sec is not float('inf') and 0 < tau_hor_sec <= COLLISION_THRESHOLD and
+                     d_cpa_nm is not float('inf') and d_cpa_nm <= COLLISION_DIST_THRESHOLD)
+    hor_threat_ta = (tau_hor_sec is not float('inf') and 0 < tau_hor_sec <= TA_THRESHOLD and
+                     d_cpa_nm is not float('inf') and d_cpa_nm <= TA_DIST_THRESHOLD)
+    hor_threat_ra = (tau_hor_sec is not float('inf') and 0 < tau_hor_sec <= RA_THRESHOLD and
+                     d_cpa_nm is not float('inf') and d_cpa_nm <= RA_DIST_THRESHOLD)
 
     # vertical checks: current height difference ok or convergence in thresholds
     vert_threat_coll = (h_diff_ft <= COLLISION_ALT_THRESHOLD or
-                      (tau_vert_sec is not None and 0 < tau_vert_sec <= COLLISION_THRESHOLD * FACTOR_MARGIN))
+                      (tau_vert_sec is not float('inf') and 0 < tau_vert_sec <= COLLISION_THRESHOLD * FACTOR_MARGIN))
     vert_threat_ta = (h_diff_ft <= TA_ALT_THRESHOLD or
-                      (tau_vert_sec is not None and 0 < tau_vert_sec <= TA_THRESHOLD * FACTOR_MARGIN))
+                      (tau_vert_sec is not float('inf') and 0 < tau_vert_sec <= TA_THRESHOLD * FACTOR_MARGIN))
     vert_threat_ra = (h_diff_ft <= RA_ALT_THRESHOLD or
-                      (tau_vert_sec is not None and 0 < tau_vert_sec <= RA_THRESHOLD * FACTOR_MARGIN))
+                      (tau_vert_sec is not float('inf') and 0 < tau_vert_sec <= RA_THRESHOLD * FACTOR_MARGIN))
 
     rlog.log(AIRCRAFT_DEBUG, f"Decision matrix, Threat (hor/vert): "
                              f"Collision ({hor_threat_coll}/{vert_threat_coll}), "
