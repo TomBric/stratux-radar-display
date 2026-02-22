@@ -4,27 +4,42 @@
 # Line 2: Own aircraft (Latitude, Longitude, Altitude, Speed, vertical Speed)  
 # Line 3: Expected result (RA, TA, potential_collision, no_collision, unclear)
 
-# Test Case 1: Close proximity - should trigger RA
-48.0000 11.0010 5000 100 0
-48.0000 11.0000 5000 100 0
-RA
-
-# Test Case 2: Medium distance - should trigger TA
-48.0000 11.0020 5000 100 0
-48.0000 11.0000 5000 100 0
-TA
-
-# Test Case 3: Far distance - no collision
-48.0000 11.0100 5000 100 0
-48.0000 11.0000 5000 100 0
+# Test Case 1: collision in 240 sec, should not trigger (collision threshold is 180 secs)
+50.0000, 7.0000, 5000, 100, 180, 0
+50.0667, 7.0000, 5000, 100, 0, 0
 no_collision
 
-# Test Case 4: Potential collision (within collision threshold but not TA/RA)
-48.0000 11.0050 5000 100 0
-48.0000 11.0000 5000 100 0
+# Test Case 2: collision in 150s sec, should trigger
+48.0000, 8.0000, 6000, 100, 180, 0
+48.0417, 8.0000, 6000, 100, 0, 0
 potential_collision
 
-# Test Case 5: Altitude separation - no collision despite close proximity
-48.0000 11.0010 6000 100 0
-48.0000 11.0000 5000 100 0
+# Test Case 3: collision in 120s
+47.5000, 9.0000, 4000, 95, 180, 0
+47.5000, 9.0000, 4000, 95, 180, 0
+potential_collision
+
+# Test Case 4: collision in 40 sec, should trigger TA
+49.0000, 6.0000, 7000, 120, 180, 0
+49.0111, 6.0000, 7000, 115, 0, 0
+TA
+
+# Test Case 5: collision in 25 sec
+46.0000, 7.5000, 4500, 100, 180, 0
+46.0069, 7.5000, 4500, 100, 0, 0
+RA
+
+# Test Case 6: collision in 10 sec
+51.0000, 7.2000, 8000, 130, 180, 0
+51.0028, 7.2000, 8000, 130, 0, 0
+RA
+
+Test Case 7: collision in 300secs, not to trigger
+45.0000, 10.0000, 3500, 90, 180, 0
+52.0139, 8.0000, 12000, 115, 0, 1000
+no_collision
+
+Test Case 8: no horizontal proximity
+44.5000, 6.5000, 3000, 105, 90, 0
+44.5200, 6.4800, 3000, 100, 270, 0
 no_collision
