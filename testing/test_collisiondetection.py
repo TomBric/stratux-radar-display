@@ -289,7 +289,7 @@ def file_based_test(filename):
             continue
 
         # Execute TCAS calculation
-        actual_result = calc_tcas_state(traffic, distance)
+        actual_result = calc_tcas_state(traffic, situation)
 
         print(f"Actual:   {actual_result}")
 
