@@ -63,8 +63,8 @@ def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lo
 
 def track_gs_to_vxy(track_deg, gs_kt):   # calc movements based on track and speed
     tr = math.radians(track_deg)
-    vy = gs_kt * math.sin(tr)
-    vx = gs_kt * math.cos(tr)
+    vx = gs_kt * math.sin(tr)
+    vy = gs_kt * math.cos(tr)
     return vx, vy
 
 
