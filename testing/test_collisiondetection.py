@@ -34,6 +34,7 @@
 import sys
 import os
 import math
+import argparse
 
 # Add the main directory to the path to import modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'main'))
@@ -184,13 +185,146 @@ def interactive_test():
     print(f"Result: {result}")
     print("=" * 60)
 
+def parse_test_file_line(line):
+    """Parse a line with 5 float values and return them as a list"""
+    parts = line.strip().split()
+    if len(parts) != 5:
+        raise ValueError(f"Line must contain exactly 5 values, got {len(parts)}: {line.strip()}")
+    return [float(part) for part in parts]
+
+def file_based_test(filename):
+    """Run test cases from a file"""
+    global situation
+    
+    if not os.path.exists(filename):
+        print(f"Error: Test file '{filename}' not found.")
+        return
+    
+    print(f"Reading test cases from: {filename}")
+    print("=" * 60)
+    
+    test_cases = []
+    current_case = []
+    line_number = 0
+    
+    try:
+        with open(filename, 'r', encoding='utf-8') as f:
+            for line in f:
+                line_number += 1
+                line = line.strip()
+                
+                # Skip empty lines and comments
+                if not line or line.startswith('#'):
+                    continue
+                
+                # Add non-empty, non-comment lines to current case
+                current_case.append((line_number, line))
+                
+                # When we have 3 lines, we have a complete test case
+                if len(current_case) == 3:
+                    test_cases.append(current_case.copy())
+                    current_case.clear()
+            
+            # Handle case where file doesn't end with complete test case
+            if current_case:
+                print(f"Warning: Incomplete test case at end of file (lines {[case[0] for case in current_case]})")
+    
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return
+    
+    if not test_cases:
+        print("No valid test cases found in file.")
+        return
+    
+    print(f"Found {len(test_cases)} test case(s)")
+    print()
+    
+    passed = 0
+    failed = 0
+    
+    for i, test_case in enumerate(test_cases, 1):
+        print(f"Test Case {i}:")
+        print("-" * 40)
+        
+        try:
+            # Parse traffic data (line 1)
+            traffic_line = test_case[0][1]
+            traffic_data = parse_test_file_line(traffic_line)
+            traffic_lat, traffic_lng, traffic_alt, traffic_speed, traffic_vspeed = traffic_data
+            
+            # Parse own data (line 2)
+            own_line = test_case[1][1]
+            own_data = parse_test_file_line(own_line)
+            own_lat, own_lng, own_alt, own_speed, own_vspeed = own_data
+            
+            # Parse expected result (line 3)
+            expected_line = test_case[2][1].strip()
+            expected_result = expected_line
+            
+            # Set up situation
+            situation = {
+                'gps_active': True,
+                'gps_speed': own_speed,
+                'own_altitude': own_alt,
+                'latitude': own_lat,
+                'longitude': own_lng,
+                'course': 0.0,  # Default course since not provided in file format
+                'vertical_speed': own_vspeed
+            }
+            
+            # Set up traffic
+            traffic = {
+                'Alt': traffic_alt,
+                'Lat': traffic_lat,
+                'Lng': traffic_lng,
+                'Track': 0.0,  # Default track since not provided in file format
+                'Speed': traffic_speed,
+                'VSpeed': traffic_vspeed
+            }
+            
+            print(f"Traffic: Lat={traffic_lat:.6f}, Lng={traffic_lng:.6f}, Alt={traffic_alt:.0f}ft, Speed={traffic_speed:.0f}kts, VSpeed={traffic_vspeed:.0f}ft/min")
+            print(f"Own:    Lat={own_lat:.6f}, Lng={own_lng:.6f}, Alt={own_alt:.0f}ft, Speed={own_speed:.0f}kts, VSpeed={own_vspeed:.0f}ft/min")
+            print(f"Expected: {expected_result}")
+            
+            # Calculate distance and bearing
+            distance, bearing = calc_gps_distance(traffic_lat, traffic_lng)
+            
+            # Execute TCAS calculation
+            actual_result = calc_tcas_state(traffic, distance, bearing, situation)
+            
+            print(f"Actual:   {actual_result}")
+            
+            # Check if result matches expectation
+            if actual_result == expected_result:
+                print("✓ PASS")
+                passed += 1
+            else:
+                print("✗ FAIL")
+                failed += 1
+            
+        except Exception as e:
+            print(f"✗ ERROR: {e}")
+            failed += 1
+        
+        print()
+    
+    print("=" * 60)
+    print(f"Test Summary: {passed} passed, {failed} failed out of {len(test_cases)} total")
+    print("=" * 60)
+
 def main():
+    parser = argparse.ArgumentParser(description='TCAS State Calculator Test')
+    parser.add_argument('-f', '--file', help='File containing test cases (format: 3 lines per test case)')
+    
+    args = parser.parse_args()
+    
     # Display TCAS thresholds used in collision detection
     print("=" * 60)
     print("Interactive TCAS State Calculator Test")
     print("=" * 60)
     print()
-    print("=== TCAS Thresholds ===")
+    print("=== Thresholds ===")
     print(f"COLLISION_THRESHOLD: {collisiondetection.COLLISION_THRESHOLD} seconds")
     print(f"TA_THRESHOLD: {collisiondetection.TA_THRESHOLD} seconds")
     print(f"RA_THRESHOLD: {collisiondetection.RA_THRESHOLD} seconds")
@@ -199,8 +333,14 @@ def main():
     print(f"TA_ALT_THRESHOLD: {collisiondetection.TA_ALT_THRESHOLD} feet")
     print(f"RA_ALT_THRESHOLD: {collisiondetection.RA_ALT_THRESHOLD} feet")
     print()
-    while True:
-        interactive_test()
+    
+    if args.file:
+        # File-based testing
+        file_based_test(args.file)
+    else:
+        # Interactive testing
+        while True:
+            interactive_test()
 
 if __name__ == "__main__":
     main()
