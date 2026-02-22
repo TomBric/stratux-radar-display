@@ -55,8 +55,8 @@ def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lo
     dlon = math.radians(lon_deg - lon_ref_deg)
     lat_ref_rad = math.radians(lat_ref_deg)
     nm_per_rad = 60.0 * 180.0 / math.pi # 1 rad lat ~ 60 * 180/pi NM
-    x = dlat * nm_per_rad
-    y = dlon * nm_per_rad * math.cos(lat_ref_rad)
+    y = dlat * nm_per_rad
+    x = dlon * nm_per_rad * math.cos(lat_ref_rad)
     return x, y
 
 
@@ -88,19 +88,15 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     vy = vBy - vAy
     rlog.log(AIRCRAFT_DEBUG, f"Distance horizontal: ({rx:.1f}/{ry:.1f}), Velocity ({vx:.1f}/{vy:.1f})")
     v2 = vx*vx + vy*vy
-    rlog.log(AIRCRAFT_DEBUG, f"v2 = {v2:.1f}")
 
     # horizontal tau and proximity
     tau_hor_sec = float('inf')
     d_cpa_nm = float('inf')
     if v2 > 1e-6:   # do not divide by zero
-        dot = rx*vx + ry*vy    # dot < 0 means both target come closer together
-        rlog.log(AIRCRAFT_DEBUG, f"dot product = {dot:.1f}")
+        dot = rx*vx + ry*vy    # dot < 0 means both targets come closer together
         tau_h = -dot / v2  # in Stunden
-        rlog.log(AIRCRAFT_DEBUG, f"tau in hours = {tau_h}")
         if tau_h > 0.0:
             tau_hor_sec = tau_h * 3600.0
-            rlog.log(AIRCRAFT_DEBUG, f"tau = {tau_hor_sec:.2f} seconds")
             # Distance at CPA
             r_cpa_x = rx + vx * tau_h
             r_cpa_y = ry + vy * tau_h
