@@ -214,37 +214,29 @@ def file_based_test(filename):
             for line in f:
                 line_number += 1
                 line = line.strip()
-                
                 # Skip empty lines and comments
                 if not line or line.startswith('#'):
                     continue
-                
                 # Add non-empty, non-comment lines to current case
                 current_case.append((line_number, line))
-                
                 # When we have 3 lines, we have a complete test case
                 if len(current_case) == 3:
                     test_cases.append(current_case.copy())
                     current_case.clear()
-            
             # Handle case where file doesn't end with complete test case
             if current_case:
                 print(f"Warning: Incomplete test case at end of file (lines {[case[0] for case in current_case]})")
-    
     except Exception as e:
         print(f"Error reading file: {e}")
         return
-    
     if not test_cases:
         print("No valid test cases found in file.")
         return
-    
     print(f"Found {len(test_cases)} test case(s)")
     print()
     
     passed = 0
     failed = 0
-    
     for i, test_case in enumerate(test_cases, 1):
         print(f"Test Case {i}:")
         print("-" * 40)
@@ -263,7 +255,7 @@ def file_based_test(filename):
             # Parse expected result (line 3)
             expected_line = test_case[2][1].strip()
             expected_result = expected_line
-            
+
             # Set up situation
             situation = {
                 'gps_active': True,
@@ -274,7 +266,7 @@ def file_based_test(filename):
                 'course': own_course,
                 'vertical_speed': own_vspeed_kts  # vertical speed in kts
             }
-            
+
             # Set up traffic
             traffic = {
                 'Alt': traffic_alt,
@@ -284,31 +276,32 @@ def file_based_test(filename):
                 'Speed': traffic_hspeed_ftmin,  # horizontal speed in ft/min
                 'VSpeed': traffic_vspeed_kts  # vertical speed in kts
             }
-            
+
             print(f"Traffic: Lat={traffic_lat:.6f}, Lng={traffic_lng:.6f}, Alt={traffic_alt:.0f}ft, Track={traffic_track:.0f}°, HSpeed={traffic_hspeed_ftmin:.0f}ft/min, VSpeed={traffic_vspeed_kts:.0f}kts")
             print(f"Own:    Lat={own_lat:.6f}, Lng={own_lng:.6f}, Alt={own_alt:.0f}ft, Course={own_course:.0f}°, HSpeed={own_hspeed_ftmin:.0f}ft/min, VSpeed={own_vspeed_kts:.0f}kts")
             print(f"Expected: {expected_result}")
-            
+
             # Calculate distance and bearing
             distance, bearing = calc_gps_distance(traffic_lat, traffic_lng)
-            
-            # Execute TCAS calculation
-            actual_result = calc_tcas_state(traffic, distance)
-            
-            print(f"Actual:   {actual_result}")
-            
-            # Check if result matches expectation
-            if actual_result == expected_result:
-                print("✓ PASS")
-                passed += 1
-            else:
-                print("✗ FAIL")
-                failed += 1
-            
         except Exception as e:
             print(f"✗ ERROR: {e}")
             failed += 1
-        
+            continue
+
+        # Execute TCAS calculation
+        actual_result = calc_tcas_state(traffic, distance)
+
+        print(f"Actual:   {actual_result}")
+
+        # Check if result matches expectation
+        if actual_result == expected_result:
+            print("✓ PASS")
+            passed += 1
+        else:
+            print("✗ FAIL")
+            failed += 1
+
+
         print()
     
     print("=" * 60)
@@ -323,16 +316,18 @@ def main():
     
     # Display TCAS thresholds used in collision detection
     print("=" * 60)
-    print("Interactive TCAS State Calculator Test")
+    print("TCAS State Calculator Test")
     print("=" * 60)
     print()
     print("=== Thresholds ===")
     print(f"COLLISION_THRESHOLD: {collisiondetection.COLLISION_THRESHOLD} seconds")
+    print(f"COLLISION_DIST_THRESHOLD: {collisiondetection.COLLISION_DIST_THRESHOLD} nm")
+    print(f"COLLISION_ALT_THRESHOLD, {collisiondetection.COLLISION_ALT_THRESHOLD} ft")
     print(f"TA_THRESHOLD: {collisiondetection.TA_THRESHOLD} seconds")
-    print(f"RA_THRESHOLD: {collisiondetection.RA_THRESHOLD} seconds")
     print(f"TA_DIST_THRESHOLD: {collisiondetection.TA_DIST_THRESHOLD} NM")
-    print(f"RA_DIST_THRESHOLD: {collisiondetection.RA_DIST_THRESHOLD} NM")
     print(f"TA_ALT_THRESHOLD: {collisiondetection.TA_ALT_THRESHOLD} feet")
+    print(f"RA_THRESHOLD: {collisiondetection.RA_THRESHOLD} seconds")
+    print(f"RA_DIST_THRESHOLD: {collisiondetection.RA_DIST_THRESHOLD} NM")
     print(f"RA_ALT_THRESHOLD: {collisiondetection.RA_ALT_THRESHOLD} feet")
     print()
     
