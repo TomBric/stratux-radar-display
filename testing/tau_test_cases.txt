@@ -8,7 +8,7 @@
 
 # Test Case 1: Tau 240s - Head-on at 100 knots
 48.0000 11.0000 5000 090 100 0
-48.0000 11.0333 5000 270 100 0
+48.0000 11.1660 5000 270 100 0
 no_collision
 
 # Test Case 2: Tau 240s - Head-on at 120 knots
