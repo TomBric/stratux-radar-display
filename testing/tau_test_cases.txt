@@ -13,5 +13,10 @@ no_collision
 
 # Test Case 2: Tau 240sec - Head-on at 120 knots north and south
 48.0000 11.0000 5000 180 120 0
-47.6000 11.0000 5000 000 120 0
+47.8670 11.0000 5000 000 120 0
+no_collision
+
+# Test Case 3: Tau 240 - Head on at 70 knots   south-east and north-west
+48.0000 11.0000 5000 145 70 0
+48.0000 11.1160 5000 315 70 0
 no_collision
