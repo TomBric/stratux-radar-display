@@ -41,12 +41,17 @@ RA
 47.5000 9.0300 5500 315 105 -200
 potential_collision
 
-# Test Case 8: TA Scenario - Constant altitude vs descending aircraft
+# Test Case 8: TA Scenario - head on, own aircraft descending, but not on same altitude at tau
 48.0000 11.0000 5000 090 120 0
 48.0000 11.0200 8000 270 120 -500
-TA
+no_collision
 
-# Test Case 9: TA Scenario - Constant altitude vs descending aircraft
+# Test Case 9: TA Scenario - other aircraft to close, below TA_ALT_THRESHOLD
 48.0000 11.0000 5000 090 120 0
 48.0000 11.0200 6000 270 120 -500
 TA
+
+# Test Case 10: Converging to same point, both climbing at 500 ft/min
+47.9800 10.9800 4000 045 100 500
+48.0200 11.0200 4500 225 100 500
+potential_collision
