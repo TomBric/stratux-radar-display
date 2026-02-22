@@ -134,12 +134,12 @@ def file_based_test(filename):
             # Parse traffic data (line 1)
             traffic_line = test_case[0][1]
             traffic_data = parse_test_file_line(traffic_line)
-            traffic_lng, traffic_lat, traffic_alt, traffic_track, traffic_vspeed_kts, traffic_hspeed_ftmin = traffic_data
+            traffic_lng, traffic_lat, traffic_alt, traffic_track, traffic_speed_kts, traffic_vspeed_ftmin = traffic_data
             
             # Parse own data (line 2)
             own_line = test_case[1][1]
             own_data = parse_test_file_line(own_line)
-            own_lng, own_lat, own_alt, own_course, own_vspeed_kts, own_hspeed_ftmin = own_data
+            own_lng, own_lat, own_alt, own_course, own_speed_kts, own_vspeed_ftmin = own_data
             
             # Parse expected result (line 3)
             expected_line = test_case[2][1].strip()
@@ -148,12 +148,12 @@ def file_based_test(filename):
             # Set up situation
             situation = {
                 'gps_active': True,
-                'gps_speed': own_hspeed_ftmin,  # horizontal speed in ft/min
+                'gps_speed': own_speed_kts,  # horizontal speed in ft/min
                 'own_altitude': own_alt,
                 'latitude': own_lat,
                 'longitude': own_lng,
                 'course': own_course,
-                'vertical_speed': own_vspeed_kts  # vertical speed in kts
+                'vertical_speed': own_vspeed_ftmin  # vertical speed in kts
             }
 
             # Set up traffic
@@ -162,8 +162,8 @@ def file_based_test(filename):
                 'Lat': traffic_lat,
                 'Lng': traffic_lng,
                 'Track': traffic_track,
-                'Speed': traffic_hspeed_ftmin,  # horizontal speed in ft/min
-                'VSpeed': traffic_vspeed_kts  # vertical speed in kts
+                'Speed': traffic_speed_kts,  # horizontal speed in ft/min
+                'VSpeed': traffic_vspeed_ftmin  # vertical speed in kts
             }
 
             print(f"Traffic: Lat={traffic_lat:.6f}, Lng={traffic_lng:.6f}, Alt={traffic_alt:.0f}ft, Track={traffic_track:.0f}°, HSpeed={traffic_hspeed_ftmin:.0f}ft/min, VSpeed={traffic_vspeed_kts:.0f}kts")

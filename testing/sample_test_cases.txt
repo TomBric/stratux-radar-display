@@ -1,7 +1,7 @@
 # Sample test cases for TCAS collision detection
 # Format: 3 lines per test case
-# Line 1: Traffic aircraft (Latitude, Longitude, Altitude, Track, vertical speed in kts, horizontal speed in ft/min)
-# Line 2: Own aircraft (Latitude, Longitude, Altitude, Track, vertical speed in kts, horizontal speed in ft/min)
+# Line 1: Traffic aircraft (Latitude, Longitude, Altitude, Track, speed in kts, vertical speed in ft/min)
+# Line 2: Own aircraft (Latitude, Longitude, Altitude, Track, speed in kts, vertical speed in ft/min)
 # Line 3: Expected result (RA, TA, potential_collision, no_collision, unclear)
 
 # Test Case 1: collision in 240 sec, should not trigger (collision threshold is 180 secs)
