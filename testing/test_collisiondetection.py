@@ -186,10 +186,12 @@ def interactive_test():
     print("=" * 60)
 
 def parse_test_file_line(line):
-    """Parse a line with 5 float values and return them as a list"""
+    """Parse a line with 6 float values and return them as a list"""
+    # Remove commas and split by whitespace or commas
+    line = line.replace(',', ' ')
     parts = line.strip().split()
-    if len(parts) != 5:
-        raise ValueError(f"Line must contain exactly 5 values, got {len(parts)}: {line.strip()}")
+    if len(parts) != 6:
+        raise ValueError(f"Line must contain exactly 6 values, got {len(parts)}: {line.strip()}")
     return [float(part) for part in parts]
 
 def file_based_test(filename):
@@ -251,12 +253,12 @@ def file_based_test(filename):
             # Parse traffic data (line 1)
             traffic_line = test_case[0][1]
             traffic_data = parse_test_file_line(traffic_line)
-            traffic_lat, traffic_lng, traffic_alt, traffic_speed, traffic_vspeed = traffic_data
+            traffic_lng, traffic_lat, traffic_alt, traffic_track, traffic_vspeed_kts, traffic_hspeed_ftmin = traffic_data
             
             # Parse own data (line 2)
             own_line = test_case[1][1]
             own_data = parse_test_file_line(own_line)
-            own_lat, own_lng, own_alt, own_speed, own_vspeed = own_data
+            own_lng, own_lat, own_alt, own_course, own_vspeed_kts, own_hspeed_ftmin = own_data
             
             # Parse expected result (line 3)
             expected_line = test_case[2][1].strip()
@@ -265,12 +267,12 @@ def file_based_test(filename):
             # Set up situation
             situation = {
                 'gps_active': True,
-                'gps_speed': own_speed,
+                'gps_speed': own_hspeed_ftmin,  # horizontal speed in ft/min
                 'own_altitude': own_alt,
                 'latitude': own_lat,
                 'longitude': own_lng,
-                'course': 0.0,  # Default course since not provided in file format
-                'vertical_speed': own_vspeed
+                'course': own_course,
+                'vertical_speed': own_vspeed_kts  # vertical speed in kts
             }
             
             # Set up traffic
@@ -278,13 +280,13 @@ def file_based_test(filename):
                 'Alt': traffic_alt,
                 'Lat': traffic_lat,
                 'Lng': traffic_lng,
-                'Track': 0.0,  # Default track since not provided in file format
-                'Speed': traffic_speed,
-                'VSpeed': traffic_vspeed
+                'Track': traffic_track,
+                'Speed': traffic_hspeed_ftmin,  # horizontal speed in ft/min
+                'VSpeed': traffic_vspeed_kts  # vertical speed in kts
             }
             
-            print(f"Traffic: Lat={traffic_lat:.6f}, Lng={traffic_lng:.6f}, Alt={traffic_alt:.0f}ft, Speed={traffic_speed:.0f}kts, VSpeed={traffic_vspeed:.0f}ft/min")
-            print(f"Own:    Lat={own_lat:.6f}, Lng={own_lng:.6f}, Alt={own_alt:.0f}ft, Speed={own_speed:.0f}kts, VSpeed={own_vspeed:.0f}ft/min")
+            print(f"Traffic: Lat={traffic_lat:.6f}, Lng={traffic_lng:.6f}, Alt={traffic_alt:.0f}ft, Track={traffic_track:.0f}°, HSpeed={traffic_hspeed_ftmin:.0f}ft/min, VSpeed={traffic_vspeed_kts:.0f}kts")
+            print(f"Own:    Lat={own_lat:.6f}, Lng={own_lng:.6f}, Alt={own_alt:.0f}ft, Course={own_course:.0f}°, HSpeed={own_hspeed_ftmin:.0f}ft/min, VSpeed={own_vspeed_kts:.0f}kts")
             print(f"Expected: {expected_result}")
             
             # Calculate distance and bearing
