@@ -40,16 +40,16 @@ COLLISION_DIST_THRESHOLD = 2.0
 COLLISION_ALT_THRESHOLD = 2000   # aircraft more alt diff than this will not be taken into consideration
 # TA thresholds, warning level ADVISORY
 TA_THRESHOLD = 40  # TA at 40 seconds
-TA_DIST_THRESHOLD = 0.3  # 0.3 mile as threshold for minimum vertical separation on current course
+TA_DIST_THRESHOLD = 0.3  # 0.3 mile as threshold for minimum separation on current course
 TA_ALT_THRESHOLD = 1500  # 1500 ft threshold for minimal vertical separation currently
 # RA_THRESHOLDS, warning level ALARM
 RA_THRESHOLD = 25  # RA at 25 seconds
 RA_ALT_THRESHOLD = 800 # 1000 ft threshold for minimal vertical currently
-RA_DIST_THRESHOLD = 0.2 # 1 nm mile as threshold for minimum vertical separation on current course
+RA_DIST_THRESHOLD = 0.2 # 0.2 nm mile as threshold for minimum  separation on current course
 # security factors margin
 FACTOR_MARGIN = 1.2
 
-# helper functions
+# helper functions to transform info into cartesian coordinates
 def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lon into cartesian coordinates
     dlat = math.radians(lat_deg - lat_ref_deg)
     dlon = math.radians(lon_deg - lon_ref_deg)
@@ -60,8 +60,7 @@ def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lo
     return x, y
 
 
-
-def track_gs_to_vxy(track_deg, gs_kt):   # calc movements based on track and speed
+def track_gs_to_vxy(track_deg, gs_kt):   # calc cartesian movements based on track and speed
     tr = math.radians(track_deg)
     vx = gs_kt * math.sin(tr)
     vy = gs_kt * math.cos(tr)
