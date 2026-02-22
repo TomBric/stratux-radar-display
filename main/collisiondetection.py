@@ -74,8 +74,8 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     xA, yA = latlon_to_xy_nm(own["lat"], own["lon"], lat_ref, lon_ref)
     xB, yB = latlon_to_xy_nm(intr["lat"], intr["lon"], lat_ref, lon_ref)
     # vertical vectors
-    vAx, vAy = track_gs_to_vxy(own["track_deg"], own["gs"])
-    vBx, vBy = track_gs_to_vxy(intr["track_deg"], intr["gs"])
+    vAx, vAy = track_gs_to_vxy(own["track_deg"], own["gs_kt"])
+    vBx, vBy = track_gs_to_vxy(intr["track_deg"], intr["gs_kt"])
     # relative horizontal
     rx = xB - xA
     ry = yB - yA
