@@ -134,12 +134,12 @@ def file_based_test(filename):
             # Parse traffic data (line 1)
             traffic_line = test_case[0][1]
             traffic_data = parse_test_file_line(traffic_line)
-            traffic_lng, traffic_lat, traffic_alt, traffic_track, traffic_speed_kts, traffic_vspeed_ftmin = traffic_data
+            traffic_lat, traffic_lon, traffic_alt, traffic_track, traffic_speed_kts, traffic_vspeed_ftmin = traffic_data
             
             # Parse own data (line 2)
             own_line = test_case[1][1]
             own_data = parse_test_file_line(own_line)
-            own_lng, own_lat, own_alt, own_course, own_speed_kts, own_vspeed_ftmin = own_data
+            own_lat, own_lng, own_alt, own_course, own_speed_kts, own_vspeed_ftmin = own_data
             
             # Parse expected result (line 3)
             expected_line = test_case[2][1].strip()
