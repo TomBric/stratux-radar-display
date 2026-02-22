@@ -71,6 +71,7 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     # find a reference point in the middle
     lat_ref = (own["lat"] + intr["lat"]) / 2.0
     lon_ref = (own["lon"] + intr["lon"]) / 2.0
+    rlog.log(AIRCRAFT_DEBUG, f"Reference position: lat = {lat_ref:.1f} lon = {lon_ref:.1f}")
     # calc cartesian coordinates
     xA, yA = latlon_to_xy_nm(own["lat"], own["lon"], lat_ref, lon_ref)
     xB, yB = latlon_to_xy_nm(intr["lat"], intr["lon"], lat_ref, lon_ref)

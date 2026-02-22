@@ -172,6 +172,7 @@ def file_based_test(filename):
 
             # Calculate distance and bearing
             distance, bearing = calc_gps_distance(traffic_lat, traffic_lng)
+            print(f"Info: distance of aircraft = {distance:.1f} nm")
         except Exception as e:
             print(f"✗ ERROR: {e}")
             failed += 1
