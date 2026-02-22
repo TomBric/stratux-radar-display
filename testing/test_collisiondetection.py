@@ -75,7 +75,6 @@ def calc_gps_distance(lat, lng):
 
 
 def parse_test_file_line(line):
-    """Parse a line with 6 float values and return them as a list"""
     # Remove commas and split by whitespace or commas
     line = line.replace(',', ' ')
     parts = line.strip().split()
@@ -83,8 +82,8 @@ def parse_test_file_line(line):
         raise ValueError(f"Line must contain exactly 6 values, got {len(parts)}: {line.strip()}")
     return [float(part) for part in parts]
 
+
 def file_based_test(filename):
-    """Run test cases from a file"""
     global situation
     
     if not os.path.exists(filename):
@@ -103,17 +102,13 @@ def file_based_test(filename):
             for line in f:
                 line_number += 1
                 line = line.strip()
-                # Skip empty lines and comments
-                if not line or line.startswith('#'):
+                if not line or line.startswith('#'): # Skip empty lines and comments
                     continue
-                # Add non-empty, non-comment lines to current case
-                current_case.append((line_number, line))
-                # When we have 3 lines, we have a complete test case
-                if len(current_case) == 3:
+                current_case.append((line_number, line))   # Add non-empty, non-comment lines to current case
+                if len(current_case) == 3: # When we have 3 lines, we have a complete test case
                     test_cases.append(current_case.copy())
                     current_case.clear()
-            # Handle case where file doesn't end with complete test case
-            if current_case:
+            if current_case: # Handle case where file doesn't end with complete test case
                 print(f"Warning: Incomplete test case at end of file (lines {[case[0] for case in current_case]})")
     except Exception as e:
         print(f"Error reading file: {e}")
@@ -135,12 +130,10 @@ def file_based_test(filename):
             traffic_line = test_case[0][1]
             traffic_data = parse_test_file_line(traffic_line)
             traffic_lat, traffic_lng, traffic_alt, traffic_track, traffic_speed_kts, traffic_vspeed_ftmin = traffic_data
-            
             # Parse own data (line 2)
             own_line = test_case[1][1]
             own_data = parse_test_file_line(own_line)
             own_lat, own_lng, own_alt, own_course, own_speed_kts, own_vspeed_ftmin = own_data
-            
             # Parse expected result (line 3)
             expected_line = test_case[2][1].strip()
             expected_result = expected_line
@@ -155,7 +148,6 @@ def file_based_test(filename):
                 'course': own_course,
                 'vertical_speed': own_vspeed_ftmin  # vertical speed in kts
             }
-
             # Set up traffic
             traffic = {
                 'Alt': traffic_alt,
@@ -169,8 +161,7 @@ def file_based_test(filename):
             print(f"Traffic: Lat={traffic_lat:.6f}, Lng={traffic_lng:.6f}, Alt={traffic_alt:.0f}ft, Track={traffic_track:.0f}°, HSpeed={traffic_speed_kts:.0f}kts, VSpeed={traffic_vspeed_ftmin:.0f}ft/min")
             print(f"Own:    Lat={own_lat:.6f}, Lng={own_lng:.6f}, Alt={own_alt:.0f}ft, Course={own_course:.0f}°, HSpeed={own_speed_kts:.0f}kts, VSpeed={own_vspeed_ftmin:.0f}ft/min")
             print(f"Expected: {expected_result}")
-
-            # Calculate distance and bearing
+            # Calculate distance
             distance, bearing = calc_gps_distance(traffic_lat, traffic_lng)
             print(f"Info: distance of aircraft = {distance:.3f} nm")
         except Exception as e:
@@ -180,9 +171,7 @@ def file_based_test(filename):
 
         # Execute TCAS calculation
         actual_result = calc_tcas_state(traffic, situation)
-
         print(f"Actual:   {actual_result}")
-
         # Check if result matches expectation
         if actual_result == expected_result:
             print("✓ PASS")
@@ -190,10 +179,7 @@ def file_based_test(filename):
         else:
             print("✗ FAIL")
             failed += 1
-
-
         print()
-    
     print("=" * 60)
     print(f"Test Summary: {passed} passed, {failed} failed out of {len(test_cases)} total")
     print("=" * 60)
@@ -201,7 +187,6 @@ def file_based_test(filename):
 def main():
     parser = argparse.ArgumentParser(description='TCAS State Calculator Test')
     parser.add_argument('-f', '--file', help='File containing test cases (format: 3 lines per test case)', required=True)
-    
     args = parser.parse_args()
     
     # Display TCAS thresholds used in collision detection
