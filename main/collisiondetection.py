@@ -185,7 +185,7 @@ def calc_tcas_state(traffic, situation):
         return 'TA'
     elif hor_threat_coll and vert_threat_coll:
         rlog.log(AIRCRAFT_DEBUG, f"Classified as potential collision situation")
-        return 'pontential_collision'
+        return 'potential_collision'
 
     rlog.log(AIRCRAFT_DEBUG, f"Classified as no collision situation")
     return 'no_collision'
