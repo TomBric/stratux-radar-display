@@ -74,117 +74,6 @@ def calc_gps_distance(lat, lng):
     return distradius, angle
 
 
-def get_float_input(prompt, default=None):
-    """Helper function to get float input with validation"""
-    while True:
-        try:
-            if default is not None:
-                value = input(f"{prompt} (default: {default}): ").strip()
-                if not value:
-                    return float(default)
-            else:
-                value = input(f"{prompt}: ").strip()
-            return float(value)
-        except ValueError:
-            print("Invalid input. Please enter a valid number.")
-
-def get_int_input(prompt, default=None):
-    """Helper function to get integer input with validation"""
-    while True:
-        try:
-            if default is not None:
-                value = input(f"{prompt} (default: {default}): ").strip()
-                if not value:
-                    return int(default)
-            else:
-                value = input(f"{prompt}: ").strip()
-            return int(value)
-        except ValueError:
-            print("Invalid input. Please enter a valid integer.")
-
-def get_yes_no_input(prompt, default=True):
-    """Helper function to get yes/no input"""
-    while True:
-        if default:
-            value = input(f"{prompt} (Y/n): ").strip().lower()
-        else:
-            value = input(f"{prompt} (y/N): ").strip().lower()
-
-        if not value:
-            return default
-        if value in ['y', 'yes', 'j', 'ja']:
-            return True
-        elif value in ['n', 'no', 'nein']:
-            return False
-        else:
-            print("Invalid input. Please enter 'y' or 'n'.")
-
-def interactive_test():
-    global situation
-
-    
-    # Get situation data
-    print("=== Own Aircraft Situation ===")
-    gps_active = get_yes_no_input("GPS active", True)
-    gps_speed = get_float_input("GPS speed (knots)", 100.0)
-    own_altitude = get_float_input("Own altitude (feet)", 5000.0)
-    own_lat = get_float_input("Own latitude (decimal degrees)", 48.0)
-    own_lng = get_float_input("Own longitude (decimal degrees)", 11.0)
-    course = get_float_input("Course (degrees)", 0.0)
-    vertical_speed = get_float_input("Vertical speed (ft/min, positive=climbing)", 0.0)
-    
-    situation = {
-        'gps_active': gps_active,
-        'gps_speed': gps_speed,
-        'own_altitude': own_altitude,
-        'latitude': own_lat,
-        'longitude': own_lng,
-        'course': course,
-        'vertical_speed': vertical_speed
-    }
-    
-    print()
-    print("=== Traffic Aircraft Data ===")
-    traffic_alt = get_float_input("Traffic altitude (feet)", 4500.0)
-    traffic_lat = get_float_input("Traffic latitude (decimal degrees)", 48.0)
-    traffic_lng = get_float_input("Traffic longitude (decimal degrees)", 11.0)
-    traffic_track = get_float_input("Traffic track (degrees)", 180.0)
-    traffic_speed = get_float_input("Traffic speed (knots)", 100.0)
-    traffic_vspeed = get_float_input("Traffic vertical speed (ft/min)", 0.0)
-    
-    traffic = {
-        'Alt': traffic_alt,
-        'Lat': traffic_lat,
-        'Lng': traffic_lng,
-        'Track': traffic_track,
-        'Speed': traffic_speed,
-        'VSpeed': traffic_vspeed
-    }
-    
-    print()
-    print("=== Calculating Relative Position ===")
-    print(f"Using calc_gps_distance to calculate distance and bearing from own position ({own_lat:.4f}, {own_lng:.4f}) to traffic position ({traffic_lat:.4f}, {traffic_lng:.4f})")
-    
-    # Calculate distance and bearing using the actual function from radar.py
-    distance, bearing = calc_gps_distance(traffic_lat, traffic_lng)
-    
-    print(f"Calculated distance: {distance:.3f} NM")
-    print(f"Calculated bearing: {bearing:.1f}°")
-    
-    print()
-    print("=" * 60)
-    print("Executing TCAS State Calculation...")
-    print("=" * 60)
-    print()
-    
-    # Execute the function
-    result = calc_tcas_state(traffic, distance, bearing, situation)
-    
-    print()
-    print("=" * 60)
-    print(f"Result: {result}")
-    print("=" * 60)
-
 def parse_test_file_line(line):
     """Parse a line with 6 float values and return them as a list"""
     # Remove commas and split by whitespace or commas
@@ -310,7 +199,7 @@ def file_based_test(filename):
 
 def main():
     parser = argparse.ArgumentParser(description='TCAS State Calculator Test')
-    parser.add_argument('-f', '--file', help='File containing test cases (format: 3 lines per test case)')
+    parser.add_argument('-f', '--file', help='File containing test cases (format: 3 lines per test case)', required=True)
     
     args = parser.parse_args()
     
@@ -331,13 +220,8 @@ def main():
     print(f"RA_ALT_THRESHOLD: {collisiondetection.RA_ALT_THRESHOLD} feet")
     print()
     
-    if args.file:
-        # File-based testing
-        file_based_test(args.file)
-    else:
-        # Interactive testing
-        while True:
-            interactive_test()
+    # File-based testing (now the only mode)
+    file_based_test(args.file)
 
 if __name__ == "__main__":
     main()
