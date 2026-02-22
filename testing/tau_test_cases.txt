@@ -6,7 +6,12 @@
 
 # === Tau = 240 seconds (4 minutes) - Should NOT trigger (collision threshold is 180s) ===
 
-# Test Case 1: Tau 240s - Head-on at 100 knots
+# Test Case 1: Tau 240s - Head-on at 100 knots south and west
 48.0000 11.0000 5000 090 100 0
 48.0000 11.3320 5000 270 100 0
+no_collision
+
+# Test Case 2: Tau 240sec - Head-on at 120 knots north and south
+48.0000 11.0000 5000 180 120 0
+47.6000 11.0000 5000 000 120 0
 no_collision
