@@ -68,6 +68,7 @@ def track_gs_to_vxy(track_deg, gs_kt):   # calc movements based on track and spe
 
 
 def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_deg, vs_fpm
+    # find a reference point in the middle
     lat_ref = (own["lat"] + intr["lat"]) / 2.0
     lon_ref = (own["lon"] + intr["lon"]) / 2.0
     # calc cartesian coordinates
