@@ -91,7 +91,7 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     tau_hor_sec = float('inf')
     d_cpa_nm = float('inf')
     if v2 > 1e-6:   # do not divide by zero
-        dot = rx*vx + ry*vy
+        dot = rx*vx + ry*vy    # dot < 0 means both target come closer together
         rlog.log(AIRCRAFT_DEBUG, f"dot product = {dot:.1f}")
         tau_h = -dot / v2  # in Stunden
         rlog.log(AIRCRAFT_DEBUG, f"tau in hours = {tau_h}")
