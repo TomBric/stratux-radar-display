@@ -32,24 +32,86 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 import math
-import logging
 from globals import rlog, AIRCRAFT_DEBUG
 
-# Threshold to calculate potential collision
+# Threshold to calculate potential collision, warning level low, INFO
 COLLISION_THRESHOLD = 180 # in seconds
-# Thresholds for TA and RA as defined by ICAO for General Aviation below 10000 ft
+COLLISION_DIST_THRESHOLD = 2.0
+COLLISION_ALT_THRESHOLD = 2000   # aircraft more alt diff than this will not be taken into consideration
+# TA thresholds, warning level ADVISORY
 TA_THRESHOLD = 40  # TA at 40 seconds
+TA_DIST_THRESHOLD = 0.3  # 0.3 mile as threshold for minimum vertical separation on current course
+TA_ALT_THRESHOLD = 1500  # 1500 ft threshold for minimal vertical separation currently
+# RA_THRESHOLDS, warning level ALARM
 RA_THRESHOLD = 25  # RA at 25 seconds
-RA_ALT_THRESHOLD = 1000 # 1000 ft threshold for minimal vertical separation on current vertical movements
-RA_DIST_THRESHOLD = 1.0 # 1 nm mile as threshold for minimum vertical separation on current course
-TA_DIST_THRESHOLD = 2.0  # 2 nm mile as threshold for minimum vertical separation on current course
-TA_ALT_THRESHOLD = 1500  # 1500 ft threshold for minimal vertical separation on current vertical movements
-# this means tau will be calculated the thresholds are underrun when calculating current
-# movements of own and other aircraft
+RA_ALT_THRESHOLD = 800 # 1000 ft threshold for minimal vertical currently
+RA_DIST_THRESHOLD = 0.2 # 1 nm mile as threshold for minimum vertical separation on current course
+# security factors margin
+FACTOR_MARGIN = 1.2
 
-def calc_tcas_state(traffic, distance, bearing, situation):
+# helper functions
+def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lon into cartesian coordinates
+    dlat = math.radians(lat_deg - lat_ref_deg)
+    dlon = math.radians(lon_deg - lon_ref_deg)
+    lat_ref_rad = math.radians(lat_ref_deg)
+    nm_per_rad = 60.0 * 180.0 / math.pi # 1 rad lat ~ 60 * 180/pi NM
+    y = dlat * nm_per_rad
+    x = dlon * nm_per_rad * math.cos(lat_ref_rad)
+    return x, y
+
+
+def track_gs_to_vxy(track_deg, gs_kt):   # calc vertical movements based on track and spped
+    tr = math.radians(track_deg)
+    vx = gs_kt * math.sin(tr)
+    vy = gs_kt * math.cos(tr)
+    return vx, vy
+
+
+def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_deg, vs_fpm
+    lat_ref = (own["lat"] + intr["lat"]) / 2.0
+    lon_ref = (own["lon"] + intr["lon"]) / 2.0
+    # calc cartesian coordinates
+    xA, yA = latlon_to_xy_nm(own["lat"], own["lon"], lat_ref, lon_ref)
+    xB, yB = latlon_to_xy_nm(intr["lat"], intr["lon"], lat_ref, lon_ref)
+    # vertical vectors
+    vAx, vAy = track_gs_to_vxy(own["track"], own["gs"])
+    vBx, vBy = track_gs_to_vxy(intr["track"], intr["gs"])
+    # relative horizontal
+    rx = xB - xA
+    ry = yB - yA
+    vx = vBx - vAx
+    vy = vBy - vAy
+    v2 = vx*vx + vy*vy
+
+    # horizontal tau and proximity
+    tau_hor_sec = None
+    d_cpa_nm = None
+    if v2 > 1e-6:
+        dot = rx*vx + ry*vy
+        tau_h = -dot / v2  # in Stunden
+        if tau_h > 0:
+            tau_hor_sec = tau_h * 3600.0
+            # Distance at CPA
+            r_cpa_x = rx + vx * tau_h
+            r_cpa_y = ry + vy * tau_h
+            d_cpa_nm = math.hypot(r_cpa_x, r_cpa_y)
+
+    # vertical tau
+    z_rel = intr["alt_ft"] - own["alt_ft"]
+    v_rel_z = intr["vs_fpm"] - own["vs_fpm"]
+
+    tau_vert_sec = None
+    if abs(v_rel_z) > 1e-3:
+        tau_v_min = - z_rel / v_rel_z
+        if tau_v_min > 0:
+            tau_vert_sec = tau_v_min * 60.0
+
+    return tau_hor_sec, d_cpa_nm, tau_vert_sec
+
+
+def calc_tcas_state(traffic, situation):
     # Returns a collision classification for the traffic
-    # returns a string either: 'RA', 'TA', 'unclear', 'potential_collision', 'no_collision'
+    # returns a string either: 'unclear', 'RA', 'TA', 'potential_collision', 'no_collision'
 
     # first check if all data is available otherwise return unclear
     if not situation['gps_active'] or situation['gps_speed'] <= 0:
@@ -63,91 +125,61 @@ def calc_tcas_state(traffic, distance, bearing, situation):
                  f"Missing full aircraft information either: ['Alt', 'Lat', 'Lng', 'Track', 'Speed', 'VSpeed']: aircraft classified as 'unclear'")
         return 'unclear'
 
-    # Extract traffic data
-    own_alt = situation['own_altitude']
-    own_vspeed = situation['vertical_speed']
+    # Extract traffic and own data and bring them into unified dict
+    own = {
+        'lat': situation['latitude'],
+        'Lon': situation['longitude'],
+        'alt_ft': situation['own_altitude'],
+        'track_deg': situation['course'],
+        'gs_kt': situation['gps_speed'],
+        'vs_fpm': situation['vertical_speed']
+    }
+    traffic = {
+        'lat': traffic['Lat'],
+        'lon': traffic['lon'],
+        'alt_ft': traffic['Alt'],
+        'track_deg': traffic['Track'],
+        'gs_kt': traffic['Speed'],
+        'vs_fpm': traffic['VSpeed']
+    }
+    h_diff_ft = abs(own['alt_ft'] - traffic['alt_ft'])
 
-    own_speed = situation['gps_speed']
-    own_course = situation['course']
-    traffic_alt = traffic['Alt']
-    traffic_course = traffic['Track']
-    traffic_speed = traffic['Speed']
-    traffic_vspeed = traffic['VSpeed']
+    tau_hor_sec, d_cpa_nm, tau_vert_sec = tcas_tau(own, traffic)
+    rlog.log(AIRCRAFT_DEBUG, f"tau_h {tau_hor_sec:.1f} secs, closest proximity {d_cpa_nm:.1f} nm, "
+                             f"tau_v {tau_vert_sec:.1f} secs, current height diff {h_diff_ft:.1f} ft")
 
-    # ----------- Calculate vertical tau (time to height convergence)
-    height_diff = abs(traffic_alt - own_alt)
-    rel_vspeed = traffic_vspeed - own_vspeed
-    vertical_tau = float('inf')
-    if abs(rel_vspeed) > 0.1:  # Avoid division by very small numbers
-        # Time until vertical separation becomes zero
-        vertical_tau = abs(height_diff / rel_vspeed) * 60  # Convert to seconds
-        rlog.log(AIRCRAFT_DEBUG, f"Vertical tau: {vertical_tau} seconds")
+    # now decide
+    # horizontal proximity calculations
+    hor_threat_coll = (tau_hor_sec is not None and 0 < tau_hor_sec <= COLLISION_THRESHOLD and
+                     d_cpa_nm is not None and d_cpa_nm <= COLLISION_DIST_THRESHOLD)
+    hor_threat_ta = (tau_hor_sec is not None and 0 < tau_hor_sec <= TA_THRESHOLD and
+                     d_cpa_nm is not None and d_cpa_nm <= TA_DIST_THRESHOLD)
+    hor_threat_ra = (tau_hor_sec is not None and 0 < tau_hor_sec <= RA_THRESHOLD and
+                     d_cpa_nm is not None and d_cpa_nm <= RA_DIST_THRESHOLD)
 
-    # ---------- Calculate horizontal tau (time to position convergence)
-    # Convert vectors to cartesian coordinates
-    # vector components of traffic and own
-    own_vx = own_speed * math.sin(math.radians(own_course))
-    own_vy = own_speed * math.cos(math.radians(own_course))
-    traffic_vx = traffic_speed * math.sin(math.radians(traffic_course))
-    traffic_vy = traffic_speed * math.cos(math.radians(traffic_course))
-    rel_vx = traffic_vx - own_vx # Relative velocity
-    rel_vy = traffic_vy - own_vy
-    rel_speed = math.sqrt(rel_vx ** 2 + rel_vy ** 2)
-    rlog.log(AIRCRAFT_DEBUG, f"Relative speed: {rel_speed:.1f} knots")
-    if rel_speed < 0.1:  # knots, if relative speed very small, no convergence
-        rlog.log(AIRCRAFT_DEBUG, f"Relative speed smaller 0.1 kts. Aircraft classified as 'no_collision'")
-        return 'no_collision'
+    # vertical checks: current height difference ok or convergence in thresholds
+    vert_threat_coll = (h_diff_ft <= COLLISION_ALT_THRESHOLD or
+                      (tau_vert_sec is not None and 0 < tau_vert_sec <= COLLISION_THRESHOLD * FACTOR_MARGIN))
+    vert_threat_ta = (h_diff_ft <= TA_ALT_THRESHOLD or
+                      (tau_vert_sec is not None and 0 < tau_vert_sec <= TA_THRESHOLD * FACTOR_MARGIN))
+    vert_threat_ra = (h_diff_ft <= RA_ALT_THRESHOLD or
+                      (tau_vert_sec is not None and 0 < tau_vert_sec <= RA_THRESHOLD * FACTOR_MARGIN))
 
-    # Position vectors (simplified for short distances)
-    # Assumption: target_x, target_y from bearing and distance
-    target_x = distance * math.sin(math.radians(bearing))
-    target_y = distance * math.cos(math.radians(bearing))
-    # Calculate Tau: time to minimum distance
-    dot_product = -(target_x * rel_vx + target_y * rel_vy)  # tau = -(r · v_rel) / |v_rel|²
-    if dot_product <= 0:
-        rlog.log(AIRCRAFT_DEBUG, f"Dot product={dot_product:.1f} is <=0, targets diverging or abeam. Aircraft classified as 'no_collision'")
-        return 'no_collision'  # Targets are diverging or abeam
-    tau_time = dot_product / (rel_speed ** 2) * 3600  # Convert to seconds
-    rlog.log(AIRCRAFT_DEBUG, f"Tau time (projected time for closest approach): {tau_time:.1f} seconds")
-    # Calculate minimum distance at tau
-    min_dist_x = target_x + rel_vx * tau_time / 3600
-    min_dist_y = target_y + rel_vy * tau_time / 3600
-    min_distance = math.sqrt(min_dist_x ** 2 + min_dist_y ** 2)
-    rlog.log(AIRCRAFT_DEBUG, f"Minimum distance at closest approach): {min_distance:.1f} nm")
+    rlog.log(AIRCRAFT_DEBUG, f"Decision matrix, Threat (hor/vert): "
+                             f"Collision ({hor_threat_coll}/{vert_threat_coll}), "
+                             f"TA ({hor_threat_ta}/{vert_threat_ta}) "
+                             f"RA ({hor_threat_ra}/{vert_threat_ra})")
 
-    # ICAO TCAS Advisory Classification - based purely on tau and distance criteria
-    if 0 < tau_time <= RA_THRESHOLD: # Check for Resolution Advisory (RA) conditions vertically
-        if min_distance < RA_DIST_THRESHOLD:  # Within minimum distance for RA
-            # Check vertical convergence timing
-            if vertical_tau != float('inf'):   # aircraft meet in height
-                time_diff = abs(tau_time - vertical_tau)     # check if v-tau and h-tau are in the same time range
-                if time_diff <= RA_THRESHOLD:  # Within 10 seconds for RA
-                    rlog.log(AIRCRAFT_DEBUG, f"time diff of tau_time and vertical_tau: {time_diff:.1f} nm. Classified as 'RA'")
-                    return 'RA'
-            else:
-                # No vertical convergence, but check if already in close proximity
-                if height_diff <= RA_ALT_THRESHOLD:  # Within threshold for RA
-                    rlog.log(AIRCRAFT_DEBUG,f"Height diff {height_diff:.1f} smaller than RA_ALT_THRESHOLD. Classified as 'RA'")
-                    return 'RA'
-    # Check for Traffic Advisory (TA) conditions
-    elif 0 < tau_time <= TA_THRESHOLD: # Check for Traffic Advisory (TA) conditions vertically
-        if min_distance < TA_DIST_THRESHOLD:  # Within 2 NM minimum distance for TA
-            # Check vertical convergence timing
-            if vertical_tau != float('inf'):
-                time_diff = abs(tau_time - vertical_tau)   # check if v-tau and h-tau are in the same time range
-                if time_diff <= TA_THRESHOLD:  # Within 20 seconds for TA
-                    rlog.log(AIRCRAFT_DEBUG, f"time diff of tau_time and vertical_tau: {time_diff:.1f} nm. Classified as 'TA'")
-                    return 'TA'
-            else:
-                # No vertical convergence, but check if already in proximity
-                if height_diff <= TA_ALT_THRESHOLD:  # Within 1500 feet for TA
-                    rlog.log(AIRCRAFT_DEBUG,f"Height diff {height_diff:.1f} smaller than TA_ALT_THRESHOLD. Classified as 'TA'")
-                    return 'TA'
+    # no decide, critical decision first
+    if hor_threat_ra and vert_threat_ra:   # collision only if horizontal and vertical convergence
+        rlog.log(AIRCRAFT_DEBUG, f"Classified as RA situation")
+        return 'RA'
+    elif hor_threat_ta and vert_threat_ta:
+        rlog.log(AIRCRAFT_DEBUG, f"Classified as TA situation")
+        return 'TA'
+    elif hor_threat_coll and vert_threat_coll:
+        rlog.log(AIRCRAFT_DEBUG, f"Classified as potential collision situation")
+        return 'pontential_collision'
 
-    # Check for potential collision (close but not yet at TA/RA thresholds)
-    if 0 < tau_time <= COLLISION_THRESHOLD:  # collision threshold
-        rlog.log(AIRCRAFT_DEBUG, f"Tau time {tau_time:.1f} smaller than COLLISION_THRESHOLD. Classified as 'potential_collision'")
-        return 'potential_collision'
-    # No collision risk
-    rlog.log(AIRCRAFT_DEBUG,"Tau time {tau_time:.1f} secondes. Classified as 'no_collision'")
+    rlog.log(AIRCRAFT_DEBUG, f"Classified as no collision situation")
     return 'no_collision'
