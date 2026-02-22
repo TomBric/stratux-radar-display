@@ -56,8 +56,8 @@ TA
 48.0200 11.0200 4500 225 100 500
 potential_collision
 
-# Test Case 11: TA Scenario - overtaking traffic from behind at double speed
-48.0000 11.0000 5000 090 60 0
-48.0000 11.0150 5000 090 120 0
+# Test Case 11: TA Scenario - I am overtaking traffic from behind at double speed
+48.0000 11.0150 5000 090 60 0
+48.0000 11.000 5000 090 120 0
 TA
 
