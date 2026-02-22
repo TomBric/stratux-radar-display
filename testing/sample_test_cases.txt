@@ -5,13 +5,13 @@
 # Line 3: Expected result (RA, TA, potential_collision, no_collision, unclear)
 
 # Test Case 1: collision in 240 sec, should not trigger (collision threshold is 180 secs)
-50.000000, 7.000000, 5000, 100, 180, 0
-50.003879, 7.000000, 5000, 100, 0, 0
+50.000000, 7.000000, 5000, 180, 100, 0
+50.003879, 7.000000, 5000, 0, 100, 0
 no_collision
 
 # Test Case 2: collision in 150s sec, should trigger
-48.000000, 8.000000, 6000, 100, 180, 0
-48.002424, 8.000000, 6000, 100, 0, 0
+48.000000, 8.000000, 6000, 180, 100, 0
+48.002424, 8.000000, 6000, 0, 100, 0
 potential_collision
 
 # Test Case 3: collision in 120s
