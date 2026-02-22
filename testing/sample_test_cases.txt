@@ -1,0 +1,30 @@
+# Sample test cases for TCAS collision detection
+# Format: 3 lines per test case
+# Line 1: Traffic aircraft (Latitude, Longitude, Altitude, Speed, vertical Speed)
+# Line 2: Own aircraft (Latitude, Longitude, Altitude, Speed, vertical Speed)  
+# Line 3: Expected result (RA, TA, potential_collision, no_collision, unclear)
+
+# Test Case 1: Close proximity - should trigger RA
+48.0000 11.0010 5000 100 0
+48.0000 11.0000 5000 100 0
+RA
+
+# Test Case 2: Medium distance - should trigger TA
+48.0000 11.0020 5000 100 0
+48.0000 11.0000 5000 100 0
+TA
+
+# Test Case 3: Far distance - no collision
+48.0000 11.0100 5000 100 0
+48.0000 11.0000 5000 100 0
+no_collision
+
+# Test Case 4: Potential collision (within collision threshold but not TA/RA)
+48.0000 11.0050 5000 100 0
+48.0000 11.0000 5000 100 0
+potential_collision
+
+# Test Case 5: Altitude separation - no collision despite close proximity
+48.0000 11.0010 6000 100 0
+48.0000 11.0000 5000 100 0
+no_collision
