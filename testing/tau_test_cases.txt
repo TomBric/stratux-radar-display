@@ -16,7 +16,28 @@ no_collision
 47.8670 11.0000 5000 000 120 0
 potential_collision
 
-# Test Case 3: Tau 240 - Head on at 70 knots   south-east and north-west
+# Test Case 3: Tau 185 - Head on at 70 knots   south-east and north-west
 48.0500 10.9500 5000 145 70 0
 47.9500 11.0500 5000 315 70 0
 no_collision
+
+
+# Test Case 4: RA Scenario - Head-on at 25 seconds tau
+48.0000 11.0000 5000 090 100 0
+48.0000 11.0167 5000 270 100 0
+RA
+
+# Test Case 5: TA Scenario - Head-on at 40 seconds tau
+48.0000 11.0000 5000 045 120 0
+48.0000 11.0267 5000 225 120 0
+TA
+
+# Test Case 6: Vertical Convergence with RA - Same altitude, climbing/descending
+48.3538 11.7861 5000 090 100 500
+48.3538 11.8167 5000 270 100 -500
+RA
+
+# Test Case 7: Complex Scenario - Converging tracks with altitude difference
+47.5000 9.0000 4500 135 95 200
+47.5000 9.0300 5500 315 105 -200
+potential_collision
