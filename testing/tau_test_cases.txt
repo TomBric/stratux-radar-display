@@ -40,3 +40,13 @@ RA
 47.5000 9.0000 4500 135 95 200
 47.5000 9.0300 5500 315 105 -200
 potential_collision
+
+# Test Case 8: TA Scenario - Constant altitude vs descending aircraft
+48.0000 11.0000 5000 090 120 0
+48.0000 11.0200 8000 270 120 -500
+TA
+
+# Test Case 9: TA Scenario - Constant altitude vs descending aircraft
+48.0000 11.0000 5000 090 120 0
+48.0000 11.0200 6000 270 120 -500
+TA
