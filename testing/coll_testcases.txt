@@ -1,10 +1,9 @@
-# Tau-specific Test Cases for European General Aviation
+# Tau-specific Test Cases for General Aviation
 # Format: 3 lines per test case
 # Line 1: Traffic aircraft (Latitude, Longitude, Altitude, Track, speed in kts, vertical speed in ft/min)
 # Line 2: Own aircraft (Latitude, Longitude, Altitude, Track, speed in kts, vertical speed in ft/min)
 # Line 3: Expected result (RA, TA, potential_collision, no_collision, unclear)
 
-# === Tau = 240 seconds (4 minutes) - Should NOT trigger (collision threshold is 180s) ===
 
 # Test Case 1: Tau 240s - Head-on at 100 knots south and west
 48.0000 11.0000 5000 090 100 0
