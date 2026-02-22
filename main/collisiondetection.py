@@ -60,7 +60,7 @@ def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lo
     return x, y
 
 
-def track_gs_to_vxy(track_deg, gs_kt):   # calc vertical movements based on track and spped
+def track_gs_to_vxy(track_deg, gs_kt):   # calc movements based on track and speed
     tr = math.radians(track_deg)
     vx = gs_kt * math.sin(tr)
     vy = gs_kt * math.cos(tr)
@@ -74,23 +74,23 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     xA, yA = latlon_to_xy_nm(own["lat"], own["lon"], lat_ref, lon_ref)
     xB, yB = latlon_to_xy_nm(intr["lat"], intr["lon"], lat_ref, lon_ref)
     rlog.log(AIRCRAFT_DEBUG, f"Cartesian positions: own ({xA:.1f}/{yA:.1f}), traffic ({xB:.1f}/{yB:.1f})")
-    # vertical vectors
+    # movement vectors horizontally
     vAx, vAy = track_gs_to_vxy(own["track_deg"], own["gs_kt"])
     vBx, vBy = track_gs_to_vxy(intr["track_deg"], intr["gs_kt"])
-    rlog.log(AIRCRAFT_DEBUG, f"Vertical vectors: own ({vAx:.1f}/{vAy:.1f}), traffic ({vBx:.1f}/{vBy:.1f})")
+    rlog.log(AIRCRAFT_DEBUG, f"Horizontal movement vectors: own ({vAx:.1f}/{vAy:.1f}), traffic ({vBx:.1f}/{vBy:.1f})")
     # relative horizontal
     rx = xB - xA
     ry = yB - yA
     vx = vBx - vAx
     vy = vBy - vAy
-    rlog.log(AIRCRAFT_DEBUG, f"Relative movements: horizontal ({rx:.1f}/{ry:.1f}), vertical ({vx:.1f}/{vy:.1f})")
+    rlog.log(AIRCRAFT_DEBUG, f"Distance horizontal: ({rx:.1f}/{ry:.1f}), Velocity ({vx:.1f}/{vy:.1f})")
     v2 = vx*vx + vy*vy
-    rlog.log(AIRCRAFT_DEBUG, f"v2 ={v2:.1f}")
+    rlog.log(AIRCRAFT_DEBUG, f"v2 = {v2:.1f}")
 
     # horizontal tau and proximity
     tau_hor_sec = float('inf')
     d_cpa_nm = float('inf')
-    if v2 > 1e-6:
+    if v2 > 1e-6:   # do not divide by zero
         dot = rx*vx + ry*vy
         tau_h = -dot / v2  # in Stunden
         if tau_h > 0:
