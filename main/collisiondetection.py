@@ -60,10 +60,11 @@ def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lo
     return x, y
 
 
+
 def track_gs_to_vxy(track_deg, gs_kt):   # calc movements based on track and speed
     tr = math.radians(track_deg)
-    vx = gs_kt * math.sin(tr)
-    vy = gs_kt * math.cos(tr)
+    vy = gs_kt * math.sin(tr)
+    vx = gs_kt * math.cos(tr)
     return vx, vy
 
 
@@ -72,7 +73,7 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     lat_ref = (own["lat"] + intr["lat"]) / 2.0
     lon_ref = (own["lon"] + intr["lon"]) / 2.0
     rlog.log(AIRCRAFT_DEBUG, f"Reference position: lat = {lat_ref:.3f} lon = {lon_ref:.3f}")
-    # calc cartesian coordinates
+    # calc cartesian coordinates, x means movement North/South, y means movement West/East
     xA, yA = latlon_to_xy_nm(own["lat"], own["lon"], lat_ref, lon_ref)
     xB, yB = latlon_to_xy_nm(intr["lat"], intr["lon"], lat_ref, lon_ref)
     rlog.log(AIRCRAFT_DEBUG, f"Cartesian positions: own ({xA:.1f}/{yA:.1f}), traffic ({xB:.1f}/{yB:.1f})")
