@@ -29,7 +29,7 @@ RA
 # Test Case 5: potential collision scenario - passing 0.8 nm on head on course
 48.0000 11.0000 5000 045 120 0
 48.0000 11.0267 5000 225 120 0
-potential collision
+potential_collision
 
 # Test Case 6: approaching vertical - currently same altitude, climbing/descending
 48.3538 11.7861 5000 090 100 500
@@ -51,7 +51,13 @@ no_collision
 48.0000 11.0200 6000 270 120 -500
 TA
 
-# Test Case 10: Converging to same point, both climbing at 500 ft/min
+# Test Case 10: Converging to same point in tau=51 secs, both climbing at 500 ft/min
 47.9800 10.9800 4000 045 100 500
 48.0200 11.0200 4500 225 100 500
 potential_collision
+
+# Test Case 11: TA Scenario - overtaking traffic from behind at double speed
+48.0000 11.0000 5000 090 60 0
+48.0000 11.0150 5000 090 120 0
+TA
+
