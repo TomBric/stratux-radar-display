@@ -293,7 +293,7 @@ def file_based_test(filename):
             distance, bearing = calc_gps_distance(traffic_lat, traffic_lng)
             
             # Execute TCAS calculation
-            actual_result = calc_tcas_state(traffic, distance, bearing, situation)
+            actual_result = calc_tcas_state(traffic, distance)
             
             print(f"Actual:   {actual_result}")
             
