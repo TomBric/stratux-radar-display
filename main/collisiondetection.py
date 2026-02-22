@@ -128,7 +128,7 @@ def calc_tcas_state(traffic, situation):
     # Extract traffic and own data and bring them into unified dict
     own = {
         'lat': situation['latitude'],
-        'Lon': situation['longitude'],
+        'lon': situation['longitude'],
         'alt_ft': situation['own_altitude'],
         'track_deg': situation['course'],
         'gs_kt': situation['gps_speed'],
