@@ -60,7 +60,7 @@ import radarmodes
 import simulation
 import checklist
 import logging
-import collisiondetection
+import collisiondetect
 from logging.handlers import RotatingFileHandler
 
 from datetime import datetime, timezone
@@ -214,7 +214,7 @@ def draw_all_ac(allac):
                 else:
                     tail = None
                 display_control.aircraft(ac['x'], ac['y'], ac['direction'], ac['height'], ac['vspeed'],
-                                         line_length, tail)
+                                         line_length, tail, ac['prio'])
 
 
 def draw_display():
@@ -393,7 +393,7 @@ def new_traffic(json_str):
                 if 'nspeed' in ac:
                     nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
                     ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
-                ac['tcas_mode'] = collisiondetection.calc_tcas_state(traffic, gps_rad, gps_angle, situation)
+                ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_tcas_state(traffic, situation))
                 speech_output_adsb(ac, gps_rad)
             else: # outside of display
                 ac['x'] = -1

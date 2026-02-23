@@ -82,14 +82,27 @@ class GenericDisplay:
     # CO warner specific constants
     GRAPH_SPACE = 3  # space between scale figures and zero line
     GRAPH_X_AXIS_LINE_LENGTH = 5  # line length for values in graph
-    # end constant definitions
+    # Priority color mapping for aircraft with TCAS priorities 0-4
+    # Format: priority -> (aircraft_color, outline_color, outline_size)
+    PRIORITY_MAPPING_LIGHT = {
+        0: ("gray", "darkgray", 1),  # unclear
+        1: ("red", "darkred", 3),  # RA (Resolution Advisory)
+        2: ("orange", "darkorange", 2),  # TA (Traffic Advisory)
+        3: ("yellow", "gold", 2),  # potential_collision
+        4: ("green", "darkgreen", 1)  # no_collision
+    }
+    PRIORITY_MAPPING_DARK = {
+        0: ("gray", "lightgray", 1),  # unclear
+        1: ("red", "pink", 3),  # RA (Resolution Advisory)
+        2: ("orange", "yellow", 2),  # TA (Traffic Advisory)
+        3: ("yellow", "lightyellow", 2),  # potential_collision
+        4: ("lightgreen", "white", 1)  # no_collision
+    }
 
     def __init__(self):
         self.rlog = logging.getLogger('stratux-radar-log')
         # Initialize color attributes with default light mode
-        self.AIRCRAFT_COLOR = "red"
         self.MODE_S_COLOR = "black"
-        self.AIRCRAFT_OUTLINE = "black"
         self.BG_COLOR = "white"
         self.TEXT_COLOR = "black"
         self.HIGHLIGHT_COLOR = self.TEXT_COLOR
@@ -129,14 +142,18 @@ class GenericDisplay:
         self.awesomefont = self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONTSIZE)
         self.top_index = 0   # checklist number
 
+    def get_color_mapping(self, priority):
+        # priority (int): TCAS priority (0=unclear, 1=RA, 2=TA, 3=collision, 4=no_collision)
+        # Returns:  tuple: (aircraft_color, outline_color, outline_size)
+        mapping = self.PRIORITY_MAPPING_DARK if self.dark_mode else self.PRIORITY_MAPPING_LIGHT
+        return mapping.get(priority, ("gray", "darkgray" if not self.dark_mode else "lightgray", 1))
+
     def set_dark_mode(self, dark_mode):
         self.dark_mode = dark_mode
         if dark_mode:
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
             self.HIGHLIGHT_COLOR = "white"
-            self.AIRCRAFT_COLOR = "white"
-            self.AIRCRAFT_OUTLINE = "white"
             self.MODE_S_COLOR = "white"
             self.AHRS_EARTH_COLOR = "black"
             self.AHRS_SKY_COLOR = "black"
@@ -146,8 +163,6 @@ class GenericDisplay:
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
             self.HIGHLIGHT_COLOR = "black"
-            self.AIRCRAFT_COLOR = "red"
-            self.AIRCRAFT_OUTLINE = "black"
             self.MODE_S_COLOR = "black"
             self.AHRS_EARTH_COLOR = "brown"
             self.AHRS_SKY_COLOR = "lightblue"
@@ -182,7 +197,9 @@ class GenericDisplay:
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail,
                            font=self.fonts[self.VERYSMALL], fill=self.MODE_S_COLOR)
 
-    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail):
+    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, prio=0):
+        # Get colors and outline size based on priority
+        aircraft_color, outline_color, outline_width = self.get_color_mapping(prio)
         velocity_width = max(2, 1 + self.AIRCRAFT_SIZE // 3)
         p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
         p2 = posn(direction + 150, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
@@ -192,8 +209,8 @@ class GenericDisplay:
 
         self.draw.polygon(
             ((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
-            fill=self.AIRCRAFT_COLOR, outline=self.AIRCRAFT_OUTLINE)
-        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=self.AIRCRAFT_OUTLINE, width=velocity_width)
+            fill=aircraft_color, outline=outline_color, width=outline_width)
+        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=outline_color, width=velocity_width)
         if height >= 0:
             t = "+" + str(abs(height))
         else:

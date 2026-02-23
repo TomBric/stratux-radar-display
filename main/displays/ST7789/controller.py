@@ -54,7 +54,20 @@ class ST7789(dcommon.GenericDisplay):
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
     UP_CHARACTER = '\u2191'  # character to show ascending aircraft
     DOWN_CHARACTER = '\u2193'  # character to show descending aircraft
-
+    PRIORITY_MAPPING_LIGHT = {
+        0: ("gray", "darkgray", 1),  # unclear
+        1: ("red", "darkred", 3),  # RA (Resolution Advisory)
+        2: ("orange", "darkorange", 2),  # TA (Traffic Advisory)
+        3: ("yellow", "gold", 2),  # potential_collision
+        4: ("green", "darkgreen", 1)  # no_collision
+    }
+    PRIORITY_MAPPING_DARK = {
+        0: ("gray", "lightgray", 1),  # unclear
+        1: ("red", "pink", 3),  # RA (Resolution Advisory)
+        2: ("orange", "yellow", 2),  # TA (Traffic Advisory)
+        3: ("yellow", "lightyellow", 2),  # potential_collision
+        4: ("lightgreen", "white", 1)  # no_collision
+    }
 
     def __init__(self):
         super().__init__()
@@ -112,8 +125,6 @@ class ST7789(dcommon.GenericDisplay):
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
             self.HIGHLIGHT_COLOR = "red"
-            self.AIRCRAFT_COLOR = "red"
-            self.AIRCRAFT_OUTLINE = "white"
             self.MODE_S_COLOR = "white"
             # AHRS colors
             self.AHRS_EARTH_COLOR = "sandybrown"
@@ -125,8 +136,6 @@ class ST7789(dcommon.GenericDisplay):
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
             self.HIGHLIGHT_COLOR = "red"
-            self.AIRCRAFT_COLOR = "red"
-            self.AIRCRAFT_OUTLINE = "black"
             self.MODE_S_COLOR = "black"
             # AHRS colors
             self.AHRS_EARTH_COLOR = "sandybrown"

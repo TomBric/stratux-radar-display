@@ -188,3 +188,16 @@ def calc_tcas_state(traffic, situation):
 
     rlog.log(AIRCRAFT_DEBUG, f"Classified as no collision situation")
     return 'no_collision'
+
+
+def tcas_to_prio(tcas_state):
+    # Mapping dictionary for efficient lookup
+    state_to_prio = {
+        'RA': 1,
+        'TA': 2,
+        'potential_collision': 3,
+        'no_collision': 4,
+        'unclear': 0
+    }
+    
+    return state_to_prio.get(tcas_state, 0)  # default to 0 for unknown states
