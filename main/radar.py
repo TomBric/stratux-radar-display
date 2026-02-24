@@ -61,6 +61,7 @@ import simulation
 import checklist
 import logging
 import collisiondetect
+import airsimulation
 from logging.handlers import RotatingFileHandler
 
 from datetime import datetime, timezone
@@ -76,7 +77,7 @@ RADAR_VERSION = "2.14"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
-RADAR_CUTOFF = 29  # time after last message received from an aircraft is is no longer displayed
+RADAR_CUTOFF = 29  # time after last message received from an aircraft is no longer displayed
 POSITION_VALID_DELTA = 10.0   # time a received position is assumed valid, e.g. if message without position is received
 # only after this POSITION_VALID_DELTA time a switch back to mode-s (circle) is done. May e.g. happen when
 # flarm is no more received, but only mode-s. Than switch back and display circle
@@ -157,6 +158,7 @@ gear_indication = False  # True if indication via GPIO Pin 19 is on for reading 
 groundbeep = False  # True if indication of ground distance via audio
 countdown = False # True if ground distance with countdown screen is shown
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
+aircraft_simulation = None   # if a string is provided read simulation data from file and simulate traffic
 
 radar_sound_off_sound = None   # prepared sound output for "sound off"
 radar_sound_on_sound = None    # prepared send output for "sound on"
@@ -865,20 +867,20 @@ async def display_and_cutoff():
 
 
 async def coroutines():
-    if aircraft_simulation is not None:
-        tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
-        sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
-    else:
-        rlog.debug("AIRCRAFT SIMULATION MODE, ONLY DEMO OR TEST!")
-        sim_handler = asyncio.create_task(airsimulaton.sim_handler(aircraft_simulation))
     dis_cutoff = asyncio.create_task(display_and_cutoff())
     sensor_reader = asyncio.create_task(cowarner.read_sensors())
     ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
     u_interface = asyncio.create_task(user_interface())
     if aircraft_simulation is not None:
+        tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
+        sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+
         await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
         # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
     else:
+        rlog.debug("AIRCRAFT SIMULATION MODE, ONLY DEMO OR TEST!")
+        sim_handler = asyncio.create_task(airsimulation.sim_handler(aircraft_simulation))
+
         await asyncio.gather(sim_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
 
 
