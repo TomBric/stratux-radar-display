@@ -591,6 +591,7 @@ def new_situation(json_str):
     except KeyError:  # to be safe when stratux changes its message-format
         rlog.log(SITUATION_DEBUG, "KeyError decoding situation:" + json_str)
 
+    rlog.log(SITUATION_DEBUG, f"Situation is now: {situation}")
 
 async def listen_forever(path, name, callback, logger):
     logger.debug(name + " waiting for " + path)
