@@ -125,9 +125,9 @@ def calc_tcas_state(traffic, situation):
     if any(key not in situation for key in ['own_altitude', 'vertical_speed']):
         rlog.log(AIRCRAFT_DEBUG, f"Missing situation information about 'own_altitude' and 'vertical speed': aircraft classified as 'unclear'")
         return 'unclear'
-    if any(key not in traffic for key in ['Alt', 'Lat', 'Lng', 'Track', 'Speed', 'VSpeed']):
+    if any(key not in traffic for key in ['Alt', 'Lat', 'Lng', 'Track', 'Speed', 'Vvel']):
         rlog.log(AIRCRAFT_DEBUG,
-                 f"Missing full aircraft information either: ['Alt', 'Lat', 'Lng', 'Track', 'Speed', 'VSpeed']: aircraft classified as 'unclear'")
+                 f"Missing full aircraft information either: ['Alt', 'Lat', 'Lng', 'Track', 'Speed', 'Vvel']: aircraft classified as 'unclear'")
         rlog.log(AIRCRAFT_DEBUG, f"Traffic was: {traffic}")
         return 'unclear'
 
