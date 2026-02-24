@@ -1012,7 +1012,7 @@ if __name__ == "__main__":
     if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
         global_config['sound_volume'] = 50  # set to a medium value if strange number used
     aircraft_simulation = args['aircraftsim']   # set to None if parameter is not set
-    rlog.debug(f"AIRCRAFT SIMULATION= {airsimulation}")
+    rlog.debug(f"AIRCRAFT SIMULATION= {aircraft_simulation}")
 
     # check config file, if existent use config from there
     saved_config = statusui.read_config(CONFIG_FILE)
