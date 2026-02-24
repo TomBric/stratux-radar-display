@@ -738,7 +738,6 @@ def refresh_display(manual = False):
 async def display_and_cutoff():
     global aircraft_changed
     global display_control
-    global situation
 
     try:
         while True:
