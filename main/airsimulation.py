@@ -81,6 +81,12 @@ async def sim_handler(aircraft_sim_file):
                 rlog.debug("Simulation file reset to beginning")
             if current_line_index < len(simulation_lines):
                 line = simulation_lines[current_line_index]
+                
+                # Skip comment lines starting with #
+                if line.strip().startswith('#'):
+                    current_line_index += 1
+                    continue
+                
                 # Parse line: delay, identifier, lat, lon, alt, track, speed, vspeed
                 parts = line.split(',')
                 if len(parts) >= 8:
