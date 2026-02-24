@@ -129,7 +129,17 @@ async def sim_handler(aircraft_sim_file):
                                 'GPSFixQuality': 1,
                                 'GPSLastFixLocalTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
                                 'GPSLastGPSTimeStratuxTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                                'GPSTime': time.strftime("%Y-%m-%dT%H:%M:%SZ")
+                                'GPSTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                'GPSAltitudeMSL': altitude,
+                                'BaroSourceType': 1,
+                                'AHRSPitch': 0,
+                                'AHRSRoll': 0,
+                                'AHRSGyroHeading': track,
+                                'AHRSSlipSkid': 0,
+                                'AHRSStatus': 0,
+                                'AHRSGLoad': 1.0,
+                                'AHRSGLoadMax': 1.0,
+                                'AHRSGLoadMin': 1.0
                             }
                             rlog.log(SITUATION_DEBUG, f"Simulation: Own ship update at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
                             # Call new_situation with JSON message
@@ -148,7 +158,9 @@ async def sim_handler(aircraft_sim_file):
                                 'Position_valid': True,
                                 'Age': 0,
                                 'AgeLastAlt': 0,
-                                'Last_source': 1  # 1090ES
+                                'Last_source': 1,  # 1090ES
+                                'Tail': identifier,
+                                'DistanceEstimated': 0
                             }
                             rlog.log(AIRCRAFT_DEBUG, f"Simulation: Traffic {identifier} at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
                             # Call new_traffic with JSON message
