@@ -6,3 +6,4 @@
 
 # Initial setup - Own aircraft starting north, moving south
 0.0,OWNSHIP,52.500000,8.200000,5000,180,120,0
+10.0,OWNSHIP,52.500000,8.200000,5000,180,120,100
