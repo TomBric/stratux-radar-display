@@ -37,7 +37,7 @@ import time
 from pathlib import Path
 from globals import rlog, AIRCRAFT_DEBUG, SITUATION_DEBUG
 # Import radar functions for callbacks
-import radar
+from radar import new_situation, new_traffic
 
 # Global variables for simulation state
 simulation_file = None
@@ -49,7 +49,6 @@ async def sim_handler(aircraft_sim_file):
     global simulation_file, simulation_lines, current_line_index, last_event_time
 
     await asyncio.sleep(1)  # first wait for the radar to be initialized
-
     if aircraft_sim_file is None:
         rlog.debug("Sim-Handler: No file provided. Stopping.")
         return
@@ -80,7 +79,7 @@ async def sim_handler(aircraft_sim_file):
         'RadarLimits': 2000
     }
     rlog.debug("Simulation: Sending initial steering message with RadarRange=5, RadarLimits=2000")
-    radar.new_traffic(json.dumps(steering_msg))
+    new_traffic(json.dumps(steering_msg))
 
     try:
         # Process simulation events
@@ -153,7 +152,7 @@ async def sim_handler(aircraft_sim_file):
                             }
                             rlog.log(SITUATION_DEBUG, f"Simulation: Own ship update at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
                             # Call new_situation with JSON message
-                            radar.new_situation(json.dumps(situation_msg))
+                            new_situation(json.dumps(situation_msg))
                         else:
                             # Generate traffic message
                             traffic_msg = {
@@ -174,7 +173,7 @@ async def sim_handler(aircraft_sim_file):
                             }
                             rlog.log(AIRCRAFT_DEBUG, f"Simulation: Traffic {identifier} at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
                             # Call new_traffic with JSON message
-                            radar.new_traffic(json.dumps(traffic_msg))
+                            new_traffic(json.dumps(traffic_msg))
                         current_line_index += 1
                         
                     except (ValueError, IndexError) as e:
