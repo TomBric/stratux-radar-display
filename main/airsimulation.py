@@ -47,7 +47,9 @@ last_event_time = 0.0
 
 async def sim_handler(aircraft_sim_file):
     global simulation_file, simulation_lines, current_line_index, last_event_time
-    
+
+    await asyncio.sleep(1)  # first wait for the radar to be initialized
+
     if aircraft_sim_file is None:
         rlog.debug("Sim-Handler: No file provided. Stopping.")
         return
@@ -71,7 +73,7 @@ async def sim_handler(aircraft_sim_file):
         except Exception as e:
             rlog.debug(f"Error loading simulation file {aircraft_sim_file}: {e}")
             return
-    
+
     # Send initial steering message to set radar parameters
     steering_msg = {
         'RadarRange': 5,
