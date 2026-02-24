@@ -1,80 +1,80 @@
 # Aircraft Simulation File
-# Format: delay(seconds),identifier,latitude,longitude,altitude(feet),track(degrees),speed(kts),vertical_speed(ft/min), comment
+# Format: event_number,delay(seconds),identifier,latitude,longitude,altitude(feet),track(degrees),speed(kts),vertical_speed(ft/min), comment
 # 
 # Scenario: OWNSHIP moves North to South, 3 aircraft on collision course, others in typical GA patterns
 # Own aircraft at 5000ft, others at various altitudes
 
-0.0,OWNSHIP,52.500000,8.200000,5000,180,120,0,Initial setup - Own aircraft starting north, moving south
+1,	0.0,OWNSHIP,52.500000,8.200000,5000,180,120,0,Initial setup - Own aircraft starting north, moving south
 
-0.5,DABC12,52.450000,8.200000,4800,0,150,500,Traffic 1: Moving South-North on collision course (same track, opposite direction)
+2,	0.5,DABC12,52.450000,8.200000,4800,0,150,500,Traffic 1: Moving South-North on collision course (same track, opposite direction)
 
-0.5,DEFG34,52.500000,8.150000,5200,270,140,200,Traffic 2: Moving East-West on collision course
+3,	0.5,DEFG34,52.500000,8.150000,5200,270,140,200,Traffic 2: Moving East-West on collision course
 
-0.5,HIJK56,52.550000,8.250000,4900,225,130,-300,Traffic 3: Moving Northeast-Southwest on collision course
+4,	0.5,HIJK56,52.550000,8.250000,4900,225,130,-300,Traffic 3: Moving Northeast-Southwest on collision course
 
-0.5,LMNOP7,52.400000,8.100000,4500,045,100,800,Traffic 4: Typical GA - climbing pattern
+5,	0.5,LMNOP7,52.400000,8.100000,4500,045,100,800,Traffic 4: Typical GA - climbing pattern
 
-0.5,QRS89,52.600000,8.300000,5500,135,110,-600,Traffic 5: Typical GA - descending pattern
+6,	0.5,QRS89,52.600000,8.300000,5500,135,110,-600,Traffic 5: Typical GA - descending pattern
 
-0.5,TUV01,52.350000,8.050000,4700,090,125,0,Traffic 6: Typical GA - level flight pattern
+7,	0.5,TUV01,52.350000,8.050000,4700,090,125,0,Traffic 6: Typical GA - level flight pattern
 
-0.5,WXYZ23,52.650000,8.350000,5100,180,145,400,Traffic 7: Typical GA - climbing turn
+8,	0.5,WXYZ23,52.650000,8.350000,5100,180,145,400,Traffic 7: Typical GA - climbing turn
 
-0.5,ABCD45,52.300000,8.000000,4600,315,95,-500,Traffic 8: Typical GA - descending turn
+9,	0.5,ABCD45,52.300000,8.000000,4600,315,95,-500,Traffic 8: Typical GA - descending turn
 
-0.5,EFGH67,52.700000,8.400000,5300,060,115,200,Traffic 9: Typical GA - crossing pattern
+10,	0.5,EFGH67,52.700000,8.400000,5300,060,115,200,Traffic 9: Typical GA - crossing pattern
 
-0.5,DABC12,52.480000,8.200000,4750,0,155,450,Continue collision course movements - getting closer
-0.5,DEFG34,52.500000,8.170000,5150,270,135,150,Continue collision course movements - getting closer
-0.5,HIJK56,52.530000,8.230000,4850,225,125,-250,Continue collision course movements - getting closer
+11,	0.5,DABC12,52.480000,8.200000,4750,0,155,450,Continue collision course movements - getting closer
+12,	0.5,DEFG34,52.500000,8.170000,5150,270,135,150,Continue collision course movements - getting closer
+13,	0.5,HIJK56,52.530000,8.230000,4850,225,125,-250,Continue collision course movements - getting closer
 
-0.5,OWNSHIP,52.480000,8.200000,5000,180,120,0,Own aircraft continuing south
+14,	0.5,OWNSHIP,52.480000,8.200000,5000,180,120,0,Own aircraft continuing south
 
-0.5,DABC12,52.500000,8.200000,4700,0,160,400,Collision course aircraft getting even closer
-0.5,DEFG34,52.500000,8.190000,5100,270,130,100,Collision course aircraft getting even closer
-0.5,HIJK56,52.510000,8.210000,4800,225,120,-200,Collision course aircraft getting even closer
+15,	0.5,DABC12,52.500000,8.200000,4700,0,160,400,Collision course aircraft getting even closer
+16,	0.5,DEFG34,52.500000,8.190000,5100,270,130,100,Collision course aircraft getting even closer
+17,	0.5,HIJK56,52.510000,8.210000,4800,225,120,-200,Collision course aircraft getting even closer
 
-0.5,OWNSHIP,52.460000,8.200000,5000,180,120,0,Own aircraft continuing south
+18,	0.5,OWNSHIP,52.460000,8.200000,5000,180,120,0,Own aircraft continuing south
 
-0.5,DABC12,52.520000,8.200000,4650,0,165,350,Near collision situation
-0.5,DEFG34,52.500000,8.200000,5050,270,125,50,Near collision situation
-0.5,HIJK56,52.490000,8.200000,4750,225,115,-150,Near collision situation
+19,	0.5,DABC12,52.520000,8.200000,4650,0,165,350,Near collision situation
+20,	0.5,DEFG34,52.500000,8.200000,5050,270,125,50,Near collision situation
+21,	0.5,HIJK56,52.490000,8.200000,4750,225,115,-150,Near collision situation
 
-0.5,OWNSHIP,52.440000,8.200000,5000,180,120,0,Own aircraft at closest point
+22,	0.5,OWNSHIP,52.440000,8.200000,5000,180,120,0,Own aircraft at closest point
 
-0.5,DABC12,52.540000,8.200000,4600,0,170,300,Collision aircraft passing closest point
-0.5,DEFG34,52.500000,8.210000,5000,270,120,0,Collision aircraft passing closest point
-0.5,HIJK56,52.470000,8.200000,4700,225,110,-100,Collision aircraft passing closest point
+23,	0.5,DABC12,52.540000,8.200000,4600,0,170,300,Collision aircraft passing closest point
+24,	0.5,DEFG34,52.500000,8.210000,5000,270,120,0,Collision aircraft passing closest point
+25,	0.5,HIJK56,52.470000,8.200000,4700,225,110,-100,Collision aircraft passing closest point
 
-0.5,OWNSHIP,52.420000,8.200000,5000,180,120,0,Own aircraft continuing south
+26,	0.5,OWNSHIP,52.420000,8.200000,5000,180,120,0,Own aircraft continuing south
 
-0.5,LMNOP7,52.420000,8.120000,4700,050,105,600,Continue typical GA movements
-0.5,QRS89,52.580000,8.320000,5400,140,105,-400,Continue typical GA movements
-0.5,TUV01,52.330000,8.080000,4800,095,120,100,Continue typical GA movements
-0.5,WXYZ23,52.630000,8.380000,5200,185,140,300,Continue typical GA movements
-0.5,ABCD45,52.280000,8.030000,4900,330,90,-300,Continue typical GA movements
-0.5,EFGH67,52.680000,8.430000,5400,065,110,150,Continue typical GA movements
+27,	0.5,LMNOP7,52.420000,8.120000,4700,050,105,600,Continue typical GA movements
+28,	0.5,QRS89,52.580000,8.320000,5400,140,105,-400,Continue typical GA movements
+29,	0.5,TUV01,52.330000,8.080000,4800,095,120,100,Continue typical GA movements
+30,	0.5,WXYZ23,52.630000,8.380000,5200,185,140,300,Continue typical GA movements
+31,	0.5,ABCD45,52.280000,8.030000,4900,330,90,-300,Continue typical GA movements
+32,	0.5,EFGH67,52.680000,8.430000,5400,065,110,150,Continue typical GA movements
 
-0.5,DABC12,52.560000,8.200000,4550,0,175,250,Collision course aircraft continuing
-0.5,DEFG34,52.500000,8.230000,4950,270,115,-50,Collision course aircraft continuing
-0.5,HIJK56,52.450000,8.200000,4650,225,105,-50,Collision course aircraft continuing
+33,	0.5,DABC12,52.560000,8.200000,4550,0,175,250,Collision course aircraft continuing
+34,	0.5,DEFG34,52.500000,8.230000,4950,270,115,-50,Collision course aircraft continuing
+35,	0.5,HIJK56,52.450000,8.200000,4650,225,105,-50,Collision course aircraft continuing
 
-0.5,OWNSHIP,52.400000,8.200000,5000,180,120,0,Own aircraft continuing south
+36,	0.5,OWNSHIP,52.400000,8.200000,5000,180,120,0,Own aircraft continuing south
 
-0.5,DABC12,52.580000,8.200000,4500,0,180,200,Final positions - collision aircraft moving away
-0.5,DEFG34,52.500000,8.250000,4900,270,110,-100,Final positions - collision aircraft moving away
-0.5,HIJK56,52.430000,8.200000,4600,225,100,0,Final positions - collision aircraft moving away
+37,	0.5,DABC12,52.580000,8.200000,4500,0,180,200,Final positions - collision aircraft moving away
+38,	0.5,DEFG34,52.500000,8.250000,4900,270,110,-100,Final positions - collision aircraft moving away
+39,	0.5,HIJK56,52.430000,8.200000,4600,225,100,0,Final positions - collision aircraft moving away
 
-0.5,OWNSHIP,52.380000,8.200000,5000,180,120,0,Own aircraft final position
+40,	0.5,OWNSHIP,52.380000,8.200000,5000,180,120,0,Own aircraft final position
 
-0.5,LMNOP7,52.440000,8.140000,4900,055,110,400,Continue with typical GA patterns for demonstration
-0.5,QRS89,52.560000,8.340000,5300,145,100,-200,Continue with typical GA patterns for demonstration
-0.5,TUV01,52.310000,8.110000,5000,100,115,50,Continue with typical GA patterns for demonstration
-0.5,WXYZ23,52.610000,8.410000,5300,190,135,200,Continue with typical GA patterns for demonstration
-0.5,ABCD45,52.260000,8.060000,5200,345,85,-100,Continue with typical GA patterns for demonstration
-0.5,EFGH67,52.660000,8.460000,5500,070,105,100,Continue with typical GA patterns for demonstration
+41,	0.5,LMNOP7,52.440000,8.140000,4900,055,110,400,Continue with typical GA patterns for demonstration
+42,	0.5,QRS89,52.560000,8.340000,5300,145,100,-200,Continue with typical GA patterns for demonstration
+43,	0.5,TUV01,52.310000,8.110000,5000,100,115,50,Continue with typical GA patterns for demonstration
+44,	0.5,WXYZ23,52.610000,8.410000,5300,190,135,200,Continue with typical GA patterns for demonstration
+45,	0.5,ABCD45,52.260000,8.060000,5200,345,85,-100,Continue with typical GA patterns for demonstration
+46,	0.5,EFGH67,52.660000,8.460000,5500,070,105,100,Continue with typical GA patterns for demonstration
 
-2.5,OWNSHIP,52.500000,8.200000,5000,180,120,0,Reset cycle - back to initial positions for continuous loop
-0.5,DABC12,52.450000,8.200000,4800,0,150,500,Reset cycle - back to initial positions for continuous loop
-0.5,DEFG34,52.500000,8.150000,5200,270,140,200,Reset cycle - back to initial positions for continuous loop
-0.5,HIJK56,52.550000,8.250000,4900,225,130,-300,Reset cycle - back to initial positions for continuous loop
+47,	2.5,OWNSHIP,52.500000,8.200000,5000,180,120,0,Reset cycle - back to initial positions for continuous loop
+48,	0.5,DABC12,52.450000,8.200000,4800,0,150,500,Reset cycle - back to initial positions for continuous loop
+49,	0.5,DEFG34,52.500000,8.150000,5200,270,140,200,Reset cycle - back to initial positions for continuous loop
+50,	0.5,HIJK56,52.550000,8.250000,4900,225,130,-300,Reset cycle - back to initial positions for continuous loop

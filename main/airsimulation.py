@@ -99,26 +99,31 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                 if line.strip().startswith('#'):
                     current_line_index += 1
                     continue
-                # Parse line: delay, identifier, lat, lon, alt, track, speed, vspeed, comment
+                # Parse line: event_number, delay, identifier, lat, lon, alt, track, speed, vspeed, comment
                 parts = line.split(',')
-                if len(parts) < 8:
+                if len(parts) < 9:
                     rlog.debug(f"Invalid simulation line format: {line}")
                     current_line_index += 1
                     continue
                 try:
-                    delay = float(parts[0].strip())
-                    identifier = parts[1].strip()
-                    latitude = float(parts[2].strip())
-                    longitude = float(parts[3].strip())
-                    altitude = float(parts[4].strip())
-                    track = float(parts[5].strip())
-                    speed = float(parts[6].strip())
-                    vspeed = float(parts[7].strip())
-                    # Extract comment from the rest of the line after the 8th value
-                    if len(parts) > 8:
-                        comment = ",".join(parts[8:]).strip()
+                    event_number = int(parts[0].strip())
+                    delay = float(parts[1].strip())
+                    identifier = parts[2].strip()
+                    latitude = float(parts[3].strip())
+                    longitude = float(parts[4].strip())
+                    altitude = float(parts[5].strip())
+                    track = float(parts[6].strip())
+                    speed = float(parts[7].strip())
+                    vspeed = float(parts[8].strip())
+                    # Extract comment from the rest of the line after the 9th value
+                    if len(parts) > 9:
+                        comment = ",".join(parts[9:]).strip()
                         if comment:
-                            rlog.debug(f"Simulation: Line {current_line_index + 1}: {identifier} (delay {delay}s): {comment}")
+                            rlog.debug(f"Simulation event #{event_number}: {identifier} (delay {delay}s): {comment}")
+                        else:
+                            rlog.debug(f"Simulation event #{event_number}: {identifier} (delay {delay}s)")
+                    else:
+                        rlog.debug(f"Simulation event #{event_number}: {identifier} (delay {delay}s)")
                     actual_time = time.time()
                     next_event_time = actual_time + delay
                     await asyncio.sleep(min(next_event_time-actual_time, next_situation_time-actual_time))
@@ -157,6 +162,7 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                             next_situation_time = time.time() + REPEAT_SITUATION_TIME
                             # Call new_situation with JSON message
                             new_situation_func(json.dumps(situation_msg))
+                            current_line_index += 1
                         else:
                             # Generate traffic message
                             traffic_msg = {
@@ -178,8 +184,9 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                             rlog.log(AIRCRAFT_DEBUG, f"Simulation: Traffic {identifier} at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
                             # Call new_traffic with JSON message
                             new_traffic_func(json.dumps(traffic_msg))
-                        current_line_index += 1
+                            current_line_index += 1
                     else:   # next simulation time reached, resend last situation message
+                        rlog.debug(f"Simulation: next simulation time reached")
                         if last_situation_msg is not None:
                             rlog.log(SITUATION_DEBUG, "Simulation: Resending last situation message")
                             new_situation_func(json.dumps(last_situation_msg))
