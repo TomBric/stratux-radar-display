@@ -127,9 +127,9 @@ async def sim_handler(aircraft_sim_file):
                                 'GPSHorizontalAccuracy': 10,
                                 'GPSVerticalAccuracy': 10,
                                 'GPSFixQuality': 1,
-                                'GPSLastFixLocalTime': time.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
-                                'GPSLastGPSTimeStratuxTime': time.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
-                                'GPSTime': time.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+                                'GPSLastFixLocalTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                'GPSLastGPSTimeStratuxTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                'GPSTime': time.strftime("%Y-%m-%dT%H:%M:%SZ")
                             }
                             rlog.log(SITUATION_DEBUG, f"Simulation: Own ship update at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
                             # Call new_situation with JSON message
