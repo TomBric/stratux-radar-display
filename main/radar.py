@@ -884,7 +884,8 @@ async def coroutines():
         # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
     else:
         rlog.debug("AIRCRAFT SIMULATION MODE, ONLY DEMO OR TEST!")
-        sim_handler = asyncio.create_task(airsimulation.sim_handler(aircraft_simulation))
+        sim_handler = asyncio.create_task(airsimulation.sim_handler(aircraft_simulation, new_traffic, new_situation))
+        # sim handler needs callbacks to new_traffic and new_situation
 
         await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, sim_handler)
 
