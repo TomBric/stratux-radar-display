@@ -377,6 +377,7 @@ def new_traffic(json_str):
         if traffic['Position_valid'] and situation['gps_active']:
             # adsb traffic and stratux has valid gps signal
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at height {ac['height']}")
+            rlog.log(AIRCRAFT_DEBUG, f"Traffic was: {traffic}")
             if 'circradius' in ac:
                 del ac['circradius']
                 # was mode-s target before, now invalidate mode-s info
