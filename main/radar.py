@@ -871,7 +871,7 @@ async def coroutines():
     sensor_reader = asyncio.create_task(cowarner.read_sensors())
     ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
     u_interface = asyncio.create_task(user_interface())
-    if aircraft_simulation is not None:
+    if aircraft_simulation is None:
         tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
         sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
 
