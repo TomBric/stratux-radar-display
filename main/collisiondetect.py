@@ -128,6 +128,7 @@ def calc_tcas_state(traffic, situation):
     if any(key not in traffic for key in ['Alt', 'Lat', 'Lng', 'Track', 'Speed', 'VSpeed']):
         rlog.log(AIRCRAFT_DEBUG,
                  f"Missing full aircraft information either: ['Alt', 'Lat', 'Lng', 'Track', 'Speed', 'VSpeed']: aircraft classified as 'unclear'")
+        rlog.log(AIRCRAFT_DEBUG, f"Traffic was: {traffic}")
         return 'unclear'
 
     # Extract traffic and own data and bring them into unified dict
