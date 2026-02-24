@@ -460,6 +460,7 @@ def new_situation(json_str):
     global vertical_max
     global vertical_min
 
+    rlog.log(SITUATION_DEBUG, f"Situation before new_situation: {situation}")
     rlog.log(SITUATION_DEBUG, "New Situation" + json_str)
     sit = json.loads(json_str)
     try:
