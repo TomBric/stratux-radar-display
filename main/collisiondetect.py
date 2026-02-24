@@ -146,7 +146,7 @@ def calc_tcas_state(traffic, situation):
         'alt_ft': traffic['Alt'],
         'track_deg': traffic['Track'],
         'gs_kt': traffic['Speed'],
-        'vs_fpm': traffic['VSpeed']
+        'vs_fpm': traffic['Vvel']
     }
     h_diff_ft = abs(own['alt_ft'] - traffic['alt_ft'])
 
