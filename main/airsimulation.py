@@ -72,6 +72,14 @@ async def sim_handler(aircraft_sim_file):
             rlog.debug(f"Error loading simulation file {aircraft_sim_file}: {e}")
             return
     
+    # Send initial steering message to set radar parameters
+    steering_msg = {
+        'RadarRange': 5,
+        'RadarLimits': 2000
+    }
+    rlog.debug("Simulation: Sending initial steering message with RadarRange=5, RadarLimits=2000")
+    radar.new_traffic(json.dumps(steering_msg))
+
     try:
         # Process simulation events
         while True:
