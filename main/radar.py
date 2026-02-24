@@ -739,6 +739,7 @@ async def display_and_cutoff():
     global aircraft_changed
     global display_control
 
+    rlog.log(SITUATION_DEBUG, f"Situation at start of display_and_cutoff: {situation}")
     try:
         while True:
             await asyncio.sleep(MIN_DISPLAY_REFRESH_TIME)
