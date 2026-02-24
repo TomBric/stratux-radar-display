@@ -83,6 +83,8 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
     }
     rlog.debug("Simulation: Sending initial steering message with RadarRange=5, RadarLimits=2000")
     new_traffic_func(json.dumps(steering_msg))
+    next_situation_time = time.time() + REPEAT_SITUATION_TIME
+    last_situation_msg = None
 
     try:
         # Process simulation events
@@ -93,39 +95,31 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                 rlog.debug("Simulation file reset to beginning")
             if current_line_index < len(simulation_lines):
                 line = simulation_lines[current_line_index]
-                
                 # Skip comment lines starting with #
                 if line.strip().startswith('#'):
                     current_line_index += 1
                     continue
-                
                 # Parse line: delay, identifier, lat, lon, alt, track, speed, vspeed
                 parts = line.split(',')
-                if len(parts) >= 8:
-                    try:
-                        delay = float(parts[0].strip())
-                        identifier = parts[1].strip()
-                        latitude = float(parts[2].strip())
-                        longitude = float(parts[3].strip())
-                        altitude = float(parts[4].strip())
-                        track = float(parts[5].strip())
-                        speed = float(parts[6].strip())
-                        vspeed = float(parts[7].strip())
-                        
-                        # Wait for the specified delay
-                        await asyncio.sleep(delay)
-                        # Create simulation data
-                        sim_data = {
-                            'delay': delay,
-                            'identifier': identifier,
-                            'latitude': latitude,
-                            'longitude': longitude,
-                            'altitude': altitude,
-                            'track': track,
-                            'speed': speed,
-                            'vertical_speed': vspeed,
-                            'timestamp': time.time()
-                        }
+                if len(parts) < 8:
+                    rlog.debug(f"Invalid simulation line format: {line}")
+                    current_line_index += 1
+                    continue
+                try:
+                    delay = float(parts[0].strip())
+                    identifier = parts[1].strip()
+                    latitude = float(parts[2].strip())
+                    longitude = float(parts[3].strip())
+                    altitude = float(parts[4].strip())
+                    track = float(parts[5].strip())
+                    speed = float(parts[6].strip())
+                    vspeed = float(parts[7].strip())
+
+                    actual_time = time.time()
+                    next_event_time = actual_time + delay
+                    await asyncio.sleep(min(next_event_time-actual_time, next_situation_time-actual_time))
+
+                    if time.time() >= next_event_time:   # event is to be triggered
                         # Generate appropriate message based on identifier
                         if identifier == "OWNSHIP":
                             # Generate situation message
@@ -156,7 +150,7 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                             rlog.log(SITUATION_DEBUG, f"Simulation: Own ship update at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
                             # Store last situation message and time
                             last_situation_msg = situation_msg
-                            last_situation_time = time.time()
+                            next_situation_time = time.time() + REPEAT_SITUATION_TIME
                             # Call new_situation with JSON message
                             new_situation_func(json.dumps(situation_msg))
                         else:
@@ -181,24 +175,15 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                             # Call new_traffic with JSON message
                             new_traffic_func(json.dumps(traffic_msg))
                         current_line_index += 1
-                        
-                    except (ValueError, IndexError) as e:
-                        rlog.debug(f"Error parsing simulation line {current_line_index + 1}: {line} - {e}")
-                        current_line_index += 1
-                        continue
-                else:
-                    rlog.debug(f"Invalid simulation line format: {line}")
+                    else:   # next simulation time reached, resend last situation message
+                        if last_situation_msg is not None:
+                            rlog.log(SITUATION_DEBUG, "Simulation: Resending last situation message")
+                            new_situation_func(json.dumps(last_situation_msg))
+                        next_situation_time = time.time() + REPEAT_SITUATION_TIME
+                except (ValueError, IndexError) as e:
+                    rlog.debug(f"Error parsing simulation line {current_line_index + 1}: {line} - {e}")
                     current_line_index += 1
-            else:
-                # Check if we need to resend last situation message (2-second watchdog)
-                current_time = time.time()
-                if (last_situation_msg is not None and 
-                    current_time - last_situation_time >= REPEAT_SITUATION_TIME):
-                    rlog.log(SITUATION_DEBUG, "Simulation: Resending last situation message (2-second watchdog)")
-                    new_situation_func(json.dumps(last_situation_msg))
-                    last_situation_time = current_time  # Reset timer
-                
-                await asyncio.sleep(0.2)  # Short sleep to prevent busy waiting
+                    continue
                 
     except asyncio.CancelledError:
         rlog.debug("Simulation handler cancelled")
