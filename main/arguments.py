@@ -99,3 +99,4 @@ def add(ap):
                          "M=distance measurement L=checklist  Example: -modes RADCM", default="RTAGKVICMDSL")
     ap.add_argument("-log", "--logfile", required=False, help=f"Output log to logfile {FULL_LOG_FILE}",
                     action="store_true", default=False)
+    ap.add_argument("-airsim", "--aircraftsim", required=False, help="Read simulation data from file", default=None)

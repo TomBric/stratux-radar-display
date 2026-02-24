@@ -865,14 +865,21 @@ async def display_and_cutoff():
 
 
 async def coroutines():
-    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
-    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+    if aircraft_simulation is not None:
+        tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
+        sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+    else:
+        rlog.debug("AIRCRAFT SIMULATION MODE, ONLY DEMO OR TEST!")
+        sim_handler = asyncio.create_task(airsimulaton.sim_handler(aircraft_simulation))
     dis_cutoff = asyncio.create_task(display_and_cutoff())
     sensor_reader = asyncio.create_task(cowarner.read_sensors())
     ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
     u_interface = asyncio.create_task(user_interface())
-    await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
-    # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
+    if aircraft_simulation is not None:
+        await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
+        # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
+    else:
+        await asyncio.gather(sim_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
 
 
 def main():
@@ -1002,6 +1009,7 @@ if __name__ == "__main__":
     global_config['sound_volume'] = args['extsound']  # 0 if not enabled
     if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
         global_config['sound_volume'] = 50  # set to a medium value if strange number used
+    aircraft_simulation = args['aircraftsim']   # set to None if parameter is not set
 
     # check config file, if existent use config from there
     saved_config = statusui.read_config(CONFIG_FILE)
