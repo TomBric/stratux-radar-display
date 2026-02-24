@@ -114,7 +114,12 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                     track = float(parts[5].strip())
                     speed = float(parts[6].strip())
                     vspeed = float(parts[7].strip())
-
+                    # Extract comment from the rest of the line after the 8th value
+                    comment = ""
+                    if len(parts) > 8:
+                        comment = ",".join(parts[8:]).strip()
+                        if comment:
+                            rlog.debug(f"Simulation: {identifier} (delay {delay}s): {comment}")
                     actual_time = time.time()
                     next_event_time = actual_time + delay
                     await asyncio.sleep(min(next_event_time-actual_time, next_situation_time-actual_time))
