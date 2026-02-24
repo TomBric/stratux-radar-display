@@ -126,71 +126,72 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                         rlog.debug(f"Simulation event #{event_number}: {identifier} (delay {delay}s)")
                     actual_time = time.time()
                     next_event_time = actual_time + delay
-                    await asyncio.sleep(min(next_event_time-actual_time, next_situation_time-actual_time))
 
-                    if time.time() >= next_event_time:   # event is to be triggered
-                        # Generate appropriate message based on identifier
-                        if identifier == "OWNSHIP":
-                            # Generate situation message
-                            situation_msg = {
-                                'GPSLatitude': latitude,
-                                'GPSLongitude': longitude,
-                                'BaroPressureAltitude': altitude,
-                                'GPSTrueCourse': track,
-                                'GPSGroundSpeed': speed,
-                                'BaroVerticalSpeed': vspeed,
-                                'GPSHorizontalAccuracy': 10,
-                                'GPSVerticalAccuracy': 10,
-                                'GPSFixQuality': 1,
-                                'GPSLastFixLocalTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                                'GPSLastGPSTimeStratuxTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                                'GPSTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                                'GPSAltitudeMSL': altitude,
-                                'BaroSourceType': 1,
-                                'AHRSPitch': 0,
-                                'AHRSRoll': 0,
-                                'AHRSGyroHeading': track,
-                                'AHRSSlipSkid': 0,
-                                'AHRSStatus': 0,
-                                'AHRSGLoad': 1.0,
-                                'AHRSGLoadMax': 1.0,
-                                'AHRSGLoadMin': 1.0
-                            }
-                            rlog.log(SITUATION_DEBUG, f"Simulation: Own ship update at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
-                            # Store last situation message and time
-                            last_situation_msg = situation_msg
+                    while time.time() < next_event_time:
+                        await asyncio.sleep(min(next_event_time-actual_time, next_situation_time-actual_time))
+                        if time.time() >= next_situation_time:
+                            if last_situation_msg is not None:
+                                rlog.log(SITUATION_DEBUG, "Simulation: Resending last situation message")
+                                new_situation_func(json.dumps(last_situation_msg))
                             next_situation_time = time.time() + REPEAT_SITUATION_TIME
-                            # Call new_situation with JSON message
-                            new_situation_func(json.dumps(situation_msg))
-                            current_line_index += 1
-                        else:
-                            # Generate traffic message
-                            traffic_msg = {
-                                'Icao_addr': int(identifier, 16) if identifier.startswith("0x") else hash(identifier) & 0xFFFFFF,
-                                'Lat': latitude,
-                                'Lng': longitude,
-                                'Alt': altitude,
-                                'Track': track,
-                                'Speed': speed,
-                                'Vvel': vspeed,
-                                'Speed_valid': True,
-                                'Position_valid': True,
-                                'Age': 0,
-                                'AgeLastAlt': 0,
-                                'Last_source': 1,  # 1090ES
-                                'Tail': identifier,
-                                'DistanceEstimated': 0
-                            }
-                            rlog.log(AIRCRAFT_DEBUG, f"Simulation: Traffic {identifier} at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
-                            # Call new_traffic with JSON message
-                            new_traffic_func(json.dumps(traffic_msg))
-                            current_line_index += 1
-                    else:   # next simulation time reached, resend last situation message
-                        rlog.debug(f"Simulation: next simulation time reached")
-                        if last_situation_msg is not None:
-                            rlog.log(SITUATION_DEBUG, "Simulation: Resending last situation message")
-                            new_situation_func(json.dumps(last_situation_msg))
+
+                    # event is to be triggered
+                    # Generate appropriate message based on identifier
+                    if identifier == "OWNSHIP":
+                        # Generate situation message
+                        situation_msg = {
+                            'GPSLatitude': latitude,
+                            'GPSLongitude': longitude,
+                            'BaroPressureAltitude': altitude,
+                            'GPSTrueCourse': track,
+                            'GPSGroundSpeed': speed,
+                            'BaroVerticalSpeed': vspeed,
+                            'GPSHorizontalAccuracy': 10,
+                            'GPSVerticalAccuracy': 10,
+                            'GPSFixQuality': 1,
+                            'GPSLastFixLocalTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                            'GPSLastGPSTimeStratuxTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                            'GPSTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                            'GPSAltitudeMSL': altitude,
+                            'BaroSourceType': 1,
+                            'AHRSPitch': 0,
+                            'AHRSRoll': 0,
+                            'AHRSGyroHeading': track,
+                            'AHRSSlipSkid': 0,
+                            'AHRSStatus': 0,
+                            'AHRSGLoad': 1.0,
+                            'AHRSGLoadMax': 1.0,
+                            'AHRSGLoadMin': 1.0
+                        }
+                        rlog.log(SITUATION_DEBUG, f"Simulation: Own ship update at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
+                        # Store last situation message and time
+                        last_situation_msg = situation_msg
                         next_situation_time = time.time() + REPEAT_SITUATION_TIME
+                        # Call new_situation with JSON message
+                        new_situation_func(json.dumps(situation_msg))
+                        current_line_index += 1
+                    else:
+                        # Generate traffic message
+                        traffic_msg = {
+                            'Icao_addr': int(identifier, 16) if identifier.startswith("0x") else hash(identifier) & 0xFFFFFF,
+                            'Lat': latitude,
+                            'Lng': longitude,
+                            'Alt': altitude,
+                            'Track': track,
+                            'Speed': speed,
+                            'Vvel': vspeed,
+                            'Speed_valid': True,
+                            'Position_valid': True,
+                            'Age': 0,
+                            'AgeLastAlt': 0,
+                            'Last_source': 1,  # 1090ES
+                            'Tail': identifier,
+                            'DistanceEstimated': 0
+                        }
+                        rlog.log(AIRCRAFT_DEBUG, f"Simulation: Traffic {identifier} at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
+                        # Call new_traffic with JSON message
+                        new_traffic_func(json.dumps(traffic_msg))
+                        current_line_index += 1
                 except (ValueError, IndexError) as e:
                     rlog.debug(f"Error parsing simulation line {current_line_index + 1}: {line} - {e}")
                     current_line_index += 1
