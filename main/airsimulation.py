@@ -43,9 +43,13 @@ simulation_file = None
 simulation_lines = []
 current_line_index = 0
 last_event_time = 0.0
+last_situation_time = 0.0
+last_situation_msg = None
+
+REPEAT_SITUATION_TIME = 2.0     # time in seconds after which the last situation message is repeated
 
 async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
-    global simulation_file, simulation_lines, current_line_index, last_event_time
+    global simulation_file, simulation_lines, current_line_index, last_event_time, last_situation_time, last_situation_msg
 
     await asyncio.sleep(1)  # first wait for the radar to be initialized
     if aircraft_sim_file is None:
@@ -150,6 +154,9 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                                 'AHRSGLoadMin': 1.0
                             }
                             rlog.log(SITUATION_DEBUG, f"Simulation: Own ship update at {latitude:.6f}, {longitude:.6f}, alt {altitude}ft")
+                            # Store last situation message and time
+                            last_situation_msg = situation_msg
+                            last_situation_time = time.time()
                             # Call new_situation with JSON message
                             new_situation_func(json.dumps(situation_msg))
                         else:
@@ -183,7 +190,15 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                     rlog.debug(f"Invalid simulation line format: {line}")
                     current_line_index += 1
             else:
-                await asyncio.sleep(1)  # Wait if no lines available
+                # Check if we need to resend last situation message (2-second watchdog)
+                current_time = time.time()
+                if (last_situation_msg is not None and 
+                    current_time - last_situation_time >= REPEAT_SITUATION_TIME):
+                    rlog.log(SITUATION_DEBUG, "Simulation: Resending last situation message (2-second watchdog)")
+                    new_situation_func(json.dumps(last_situation_msg))
+                    last_situation_time = current_time  # Reset timer
+                
+                await asyncio.sleep(0.2)  # Short sleep to prevent busy waiting
                 
     except asyncio.CancelledError:
         rlog.debug("Simulation handler cancelled")
