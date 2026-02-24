@@ -1,0 +1,8 @@
+# Aircraft Simulation File
+# Format: delay(seconds),identifier,latitude,longitude,altitude(feet),track(degrees),speed(kts),vertical_speed(ft/min)
+#
+# Scenario: OWNSHIP moves North to South, 3 aircraft on collision course, others in typical GA patterns
+# Own aircraft at 5000ft, others at various altitudes
+
+# Initial setup - Own aircraft starting north, moving south
+0.0,OWNSHIP,52.500000,8.200000,5000,180,120,0

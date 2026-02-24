@@ -224,7 +224,7 @@ def draw_display():
     global optical_alive
 
     rlog.log(AIRCRAFT_DEBUG, "List of all aircraft > " + dump_all(all_ac))
-    rlog.log(SITUATION_DEBUG, f"Situation is now: {situation}")
+    rlog.log(SITUATION_DEBUG, f"Situation in draw_display: {situation}")
     new_alive = int((int(time.time()) % (OPTICAL_ALIVE_BARS * OPTICAL_ALIVE_TIME)) / OPTICAL_ALIVE_TIME)
     if situation['was_changed'] or aircraft_changed or Globals.refresh or new_alive != optical_alive:
         # display is only triggered if there was a change
@@ -592,7 +592,7 @@ def new_situation(json_str):
     except KeyError:  # to be safe when stratux changes its message-format
         rlog.log(SITUATION_DEBUG, "KeyError decoding situation:" + json_str)
 
-    rlog.log(SITUATION_DEBUG, f"Situation is now: {situation}")
+    rlog.log(SITUATION_DEBUG, f"Situation afer new_situation: {situation}")
 
 
 async def listen_forever(path, name, callback, logger):
