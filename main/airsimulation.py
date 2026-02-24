@@ -153,7 +153,7 @@ async def sim_handler(aircraft_sim_file):
                                 'Alt': altitude,
                                 'Track': track,
                                 'Speed': speed,
-                                'Vvel': vspeed,
+                                'VSpeed': vspeed,
                                 'Speed_valid': True,
                                 'Position_valid': True,
                                 'Age': 0,
