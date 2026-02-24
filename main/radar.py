@@ -884,7 +884,7 @@ async def coroutines():
         rlog.debug("AIRCRAFT SIMULATION MODE, ONLY DEMO OR TEST!")
         sim_handler = asyncio.create_task(airsimulation.sim_handler(aircraft_simulation))
 
-        await asyncio.gather(sim_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
+        await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, sim_handler)
 
 
 def main():
