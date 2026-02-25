@@ -180,6 +180,7 @@ def dump_ac(ac):    # debug function, produces one line for aircraft in a readab
     ret += f" last_speak_time:{time.strftime('%H:%M:%S', time.gmtime(ac['last_speak_time']))}" if 'last_speak_time' in ac else ""
     ret += f" arcposition:{ac['arcposition']}" if 'arcposition' in ac else ""
     ret += f" circradius:{ac['circradius']}" if 'circradius' in ac else ""
+    ret += f" prio:{ac['prio']}" if 'prio' in ac else ""
     return ret
 
 
@@ -377,7 +378,7 @@ def new_traffic(json_str):
         if traffic['Position_valid'] and situation['gps_active']:
             # adsb traffic and stratux has valid gps signal
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at height {ac['height']}")
-            rlog.log(AIRCRAFT_DEBUG, f"Traffic was: {traffic}")
+            rlog.log(AIRCRAFT_DEBUG, f"Traffic is: {traffic}")
             if 'circradius' in ac:
                 del ac['circradius']
                 # was mode-s target before, now invalidate mode-s info
