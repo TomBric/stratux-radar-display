@@ -57,7 +57,7 @@ class ST7789(dcommon.GenericDisplay):
     PRIORITY_MAPPING_LIGHT = {
         0: ("gray", "darkgray", 1),  # unclear
         1: ("red", "darkred", 3),  # RA (Resolution Advisory)
-        2: ("orange", "darkorange", 2),  # TA (Traffic Advisory)
+        2: ("orange", "orange", 2),  # TA (Traffic Advisory)
         3: ("yellow", "gold", 2),  # potential_collision
         4: ("green", "darkgreen", 1)  # no_collision
     }
