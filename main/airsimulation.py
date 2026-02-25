@@ -78,7 +78,7 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
 
     # Send initial steering message to set radar parameters
     steering_msg = {
-        'RadarRange': 5,
+        'RadarRange': 10,
         'RadarLimits': 2000
     }
     rlog.debug("Simulation: Sending initial steering message with RadarRange=5, RadarLimits=2000")
