@@ -81,7 +81,7 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
         'RadarRange': 10,
         'RadarLimits': 2000
     }
-    rlog.debug("Simulation: Sending initial steering message with RadarRange=5, RadarLimits=2000")
+    rlog.debug(f"Simulation: Sending initial steering message: RadarRange={steering_msg['RadarRange']}, RadarLimits={steering_msg['RadarLimits']}")
     new_traffic_func(json.dumps(steering_msg))
     next_situation_time = time.time() + REPEAT_SITUATION_TIME
     last_situation_msg = None
@@ -124,11 +124,10 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                             rlog.debug(f"Simulation event #{event_number}: {identifier} (delay {delay}s)")
                     else:
                         rlog.debug(f"Simulation event #{event_number}: {identifier} (delay {delay}s)")
-                    actual_time = time.time()
-                    next_event_time = actual_time + delay
+                    next_event_time = time.time() + delay
 
                     while time.time() < next_event_time:
-                        await asyncio.sleep(min(next_event_time-actual_time, next_situation_time-actual_time))
+                        await asyncio.sleep(min(next_event_time-time.time(), next_situation_time-time.time()))
                         if time.time() >= next_situation_time:
                             if last_situation_msg is not None:
                                 rlog.log(SITUATION_DEBUG, "Simulation: Resending last situation message")
