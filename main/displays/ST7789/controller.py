@@ -54,19 +54,21 @@ class ST7789(dcommon.GenericDisplay):
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
     UP_CHARACTER = '\u2191'  # character to show ascending aircraft
     DOWN_CHARACTER = '\u2193'  # character to show descending aircraft
+
+    # color and size scheme for prios (fillcolor, outline-color, outline-size, size-factor)
     PRIORITY_MAPPING_LIGHT = {
-        0: ("white", "darkgray", 1),  # unclear
-        1: ("red", "red", 2),  # RA (Resolution Advisory)
-        2: ("yellow", "black", 2),  # TA (Traffic Advisory)
-        3: ("black", "black", 1),  # potential_collision
-        4: ("lightgreen", "lightgreen", 1)  # no_collision
+        0: ("white", "darkgray", 1, 1),  # unclear
+        1: ("red", "red", 2, 1.5),  # RA (Resolution Advisory)
+        2: ("yellow", "black", 2, 1),  # TA (Traffic Advisory)
+        3: ("black", "black", 1, 1),  # potential_collision
+        4: ("lightgreen", "lightgreen", 1, 0.5)  # no_collision
     }
     PRIORITY_MAPPING_DARK = {
-        0: ("gray", "lightgray", 1),  # unclear
-        1: ("red", "red", 3),  # RA (Resolution Advisory)
-        2: ("yellow", "yellow", 2),  # TA (Traffic Advisory)
-        3: ("white", "white", 2),  # potential_collision
-        4: ("lightgreen", "lightgreen", 1)  # no_collision
+        0: ("gray", "lightgray", 1, 1),  # unclear
+        1: ("red", "red", 3, 1.5),  # RA (Resolution Advisory)
+        2: ("yellow", "yellow", 2, 1),  # TA (Traffic Advisory)
+        3: ("white", "white", 2, 1),  # potential_collision
+        4: ("lightgreen", "lightgreen", 1, 0.5)  # no_collision
     }
 
     def __init__(self):
