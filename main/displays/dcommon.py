@@ -222,10 +222,10 @@ class GenericDisplay:
             t = t + self.DOWN_CHARACTER
         w = self.draw.textlength(t, self.fonts[self.LARGE])
         if w + x + 4 * ac_size - 2 > self.sizex:
-            # would draw text outside, move to the left
-            tposition = (x - 4 * ac_size - w, int(y - self.LARGE / 2))
+            # would draw text outside, move to the left and do not take size factor into consideration
+            tposition = (x - 4 * self.AIRCRAFT_SIZE - w, int(y - self.LARGE / 2))
         else:
-            tposition = (x + 4 * ac_size + 1, int(y - self.LARGE / 2))
+            tposition = (x + 4 * self.AIRCRAFT_SIZE + 1, int(y - self.LARGE / 2))
         self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.TEXT_COLOR)
         if tail is not None:
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.fonts[self.VERYSMALL],
