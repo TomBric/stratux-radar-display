@@ -200,7 +200,7 @@ class GenericDisplay:
     def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, prio=0):
         # Get colors and outline size based on priority
         aircraft_color, outline_color, outline_width, size_factor = self.get_color_mapping(prio)
-        ac_size = self.AIRCRAFT_SIZE * size_factor
+        ac_size = int(self.AIRCRAFT_SIZE * size_factor)
         velocity_width = max(2, 1 + ac_size // 3)
         p1 = posn(direction, 2 * ac_size, self.ANGLE_OFFSET)
         p2 = posn(direction + 150, 4 * ac_size, self.ANGLE_OFFSET)

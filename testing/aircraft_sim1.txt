@@ -53,8 +53,7 @@
 42,	0.5,AC2,53.530000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.8 NM)
 43,	0.5,AC3,53.530000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.8 NM)
 
-# new aircraft crossing
-44,	0.0,AC4,52.460000,8.240000,4000,315,70,0,AC4 starts SE at 4000ft, 3 NM from OWNSHIP
+# new aircraft crossing44,	0.0,AC4,52.460000,8.240000,4000,315,70,0,AC4 starts SE at 4000ft, 3 NM from OWNSHIP
 44,	0.0,AC4,52.462000,8.238000,4000,315,70,0,AC4 starts SE at 4000ft, 3 NM from OWNSHIP
 44,	0.0,AC4,52.465000,8.235000,4000,315,70,0,AC4 starts SE at 4000ft, 3 NM from OWNSHIP
 44,	0.0,AC4,52.468000,8.232500,4000,315,70,0,AC4 starts SE at 4000ft, 3 NM from OWNSHIP
