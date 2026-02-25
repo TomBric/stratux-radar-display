@@ -58,6 +58,7 @@ class Epaper3in7(dcommon.GenericDisplay):
     ARCPOSITION_EXCLUDE_TO = 250
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
 
+    # color and size scheme for prios (fillcolor, outline-color, outline-size, size-factor)
     PRIORITY_MAPPING_LIGHT = {
         0: ("white", "black", 3, 1),  # unclear
         1: ("black", "black", 1, 1.5),  # RA (Resolution Advisory)
