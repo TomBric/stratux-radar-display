@@ -48,6 +48,12 @@
 42,	0.5,AC2,52.530000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.8 NM)
 43,	0.5,AC3,52.530000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.8 NM)
 
+# moving these ac out
+41,	0.5,AC1,53.530000,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 1.8 NM)
+42,	0.5,AC2,53.530000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.8 NM)
+43,	0.5,AC3,53.530000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.8 NM)
+
+# new aircraft crossing
 44,	0.0,D-AC1,52.470000,8.230000,4000,315,70,0,D-AC1 starts SE at 4000ft, 3 NM from OWNSHIP
 45,	0.5,D-AC1,52.472500,8.227500,4000,315,70,0,D-AC1 climbing to 6000ft
 46,	0.5,D-AC1,52.475000,8.225000,4250,315,70,250,D-AC1 climbing to 6000ft
@@ -73,6 +79,8 @@
 66,	0.5,D-AC1,52.525000,8.175000,4000,315,70,-250,D-AC1 reaches 4000ft
 67,	0.5,D-AC1,52.527500,8.172500,4000,315,70,0,D-AC1 at 4000ft continuing NW
 68,	0.5,D-AC1,52.530000,8.170000,4000,315,70,0,D-AC1 ends NW at 4000ft, 3 NM from OWNSHIP
+
+#
 
 
 
