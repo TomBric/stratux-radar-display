@@ -58,6 +58,20 @@ class Epaper3in7(dcommon.GenericDisplay):
     ARCPOSITION_EXCLUDE_TO = 250
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
 
+    PRIORITY_MAPPING_LIGHT = {
+        0: ("white", "black", 3),  # unclear
+        1: ("black", "black", 2),  # RA (Resolution Advisory)
+        2: ("white", "black", 4),  # TA (Traffic Advisory)
+        3: ("white", "black", 2),  # potential_collision
+        4: ("white", "black", 1)  # no_collision
+    }
+    PRIORITY_MAPPING_DARK = {
+        0: ("white", "black", 3),  # unclear
+        1: ("white", "white", 2),  # RA (Resolution Advisory)
+        2: ("black", "white", 4),  # TA (Traffic Advisory)
+        3: ("white", "black", 2),  # potential_collision
+        4: ("white", "black", 1)  # no_collision
+    }
 
     def __init__(self):
         super().__init__()
