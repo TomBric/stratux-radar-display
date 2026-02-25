@@ -116,14 +116,7 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                     speed = float(parts[7].strip())
                     vspeed = float(parts[8].strip())
                     # Extract comment from the rest of the line after the 9th value
-                    if len(parts) > 9:
-                        comment = ",".join(parts[9:]).strip()
-                        if comment:
-                            rlog.debug(f"Simulation event #{event_number}: {identifier} (delay {delay}s): {comment}")
-                        else:
-                            rlog.debug(f"Simulation event #{event_number}: {identifier} (delay {delay}s)")
-                    else:
-                        rlog.debug(f"Simulation event #{event_number}: {identifier} (delay {delay}s)")
+                    rlog.debug(f"Delay: {delay}s)")
                     next_event_time = time.time() + delay
 
                     while time.time() < next_event_time:
@@ -134,6 +127,14 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                                 new_situation_func(json.dumps(last_situation_msg))
                             next_situation_time = time.time() + REPEAT_SITUATION_TIME
 
+                    if len(parts) > 9:
+                        comment = ",".join(parts[9:]).strip()
+                        if comment:
+                            rlog.debug(f"Simulation event #{event_number}: {identifier}: {comment}")
+                        else:
+                            rlog.debug(f"Simulation event #{event_number}: {identifier}")
+                    else:
+                        rlog.debug(f"Simulation event #{event_number}: {identifier}")
                     # event is to be triggered
                     # Generate appropriate message based on identifier
                     if identifier == "OWNSHIP":
