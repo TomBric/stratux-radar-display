@@ -200,11 +200,15 @@ class GenericDisplay:
     def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, prio=0):
         # Get colors and outline size based on priority
         aircraft_color, outline_color, outline_width = self.get_color_mapping(prio)
-        velocity_width = max(2, 1 + self.AIRCRAFT_SIZE // 3)
-        p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
-        p2 = posn(direction + 150, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
-        p3 = posn(direction + 180, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
-        p4 = posn(direction + 210, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
+        if prio == 1:  # draw RA aircraft double size
+            ac_size = self.AIRCRAFT_SIZE * 2
+        else:
+            ac_size = self.AIRCRAFT_SIZE
+        velocity_width = max(2, 1 + ac_size // 3)
+        p1 = posn(direction, 2 * ac_size, self.ANGLE_OFFSET)
+        p2 = posn(direction + 150, 4 * ac_size, self.ANGLE_OFFSET)
+        p3 = posn(direction + 180, 2 * ac_size, self.ANGLE_OFFSET)
+        p4 = posn(direction + 210, 4 * ac_size, self.ANGLE_OFFSET)
         p5 = posn(direction, nspeed_length, self.ANGLE_OFFSET)  # line for speed
 
         self.draw.polygon(
@@ -220,11 +224,11 @@ class GenericDisplay:
         if vspeed < 0:
             t = t + self.DOWN_CHARACTER
         w = self.draw.textlength(t, self.fonts[self.LARGE])
-        if w + x + 4 * self.AIRCRAFT_SIZE - 2 > self.sizex:
+        if w + x + 4 * ac_size - 2 > self.sizex:
             # would draw text outside, move to the left
-            tposition = (x - 4 * self.AIRCRAFT_SIZE - w, int(y - self.LARGE / 2))
+            tposition = (x - 4 * ac_size - w, int(y - self.LARGE / 2))
         else:
-            tposition = (x + 4 * self.AIRCRAFT_SIZE + 1, int(y - self.LARGE / 2))
+            tposition = (x + 4 * ac_size + 1, int(y - self.LARGE / 2))
         self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.TEXT_COLOR)
         if tail is not None:
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.fonts[self.VERYSMALL],
