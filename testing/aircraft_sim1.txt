@@ -6,14 +6,14 @@
 
 1,	0.0,OWNSHIP,52.500000,8.200000,5000,180,120,0,Initial setup - Own aircraft starting north, moving south
 2,	0.0,AC1,52.340000,8.200000,5000,000,120,0,Head-on collision course - CPA 144 seconds (Distance: 9.6 NM)
-3,	0.0,AC2,52.340000,8.250000,5000,000,120,0,Parallel to AC1 - eastern offset 3 NM (Distance: 9.6 NM)
+3,	0.0,AC2,52.340000,8.270000,5000,000,120,0,Parallel to AC1 - eastern offset 3 NM (Distance: 9.6 NM)
 4,	3.0,AC1,52.485417,8.200000,5000,000,120,0,TA situation - CPA 35 seconds (Distance: 2.33 NM)
-5,	3.0,AC2,52.485417,8.250000,5000,000,120,0,Parallel to AC1 - eastern offset 3 NM (Distance: 2.33 NM)
+5,	3.0,AC2,52.485417,8.270000,5000,000,120,0,Parallel to AC1 - eastern offset 3 NM (Distance: 2.33 NM)
 6,	3.0,AC1,52.491667,8.200000,5000,000,120,0,RA situation - CPA 20 seconds (Distance: 1.33 NM)
-7,	3.0,AC2,52.491667,8.250000,5000,000,120,0,Parallel to AC1 - eastern offset 3 NM (Distance: 1.33 NM)
+7,	3.0,AC2,52.491667,8.270000,5000,000,120,0,Parallel to AC1 - eastern offset 3 NM (Distance: 1.33 NM)
 8,	3.0,AC1,52.510,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 0.67 NM)
-9,	3.0,AC2,52.510,8.250000,5000,000,120,0,Parallel to AC1 - eastern offset 3 NM (Distance: 0.67 NM)
+9,	3.0,AC2,52.510,8.270000,5000,000,120,0,Parallel to AC1 - eastern offset 3 NM (Distance: 0.67 NM)
 10,	10.0,AC1,52.53,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 0.67 NM)
-11,	10.0,AC2,52.53,8.250000,5000,000,120,0,Parallel to AC1 - eastern offset 3 NM (Distance: 0.67 NM)
+11,	10.0,AC2,52.53,8.270000,5000,000,120,0,Parallel to AC1 - eastern offset 3 NM (Distance: 0.67 NM)
 
 
