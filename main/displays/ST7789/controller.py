@@ -59,7 +59,7 @@ class ST7789(dcommon.GenericDisplay):
         1: ("red", "darkred", 3),  # RA (Resolution Advisory)
         2: ("orange", "orange", 2),  # TA (Traffic Advisory)
         3: ("yellow", "gold", 2),  # potential_collision
-        4: ("white", "black", 1)  # no_collision
+        4: ("lightgreen", "black", 1)  # no_collision
     }
     PRIORITY_MAPPING_DARK = {
         0: ("gray", "lightgray", 1),  # unclear
