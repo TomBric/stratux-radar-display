@@ -36,7 +36,7 @@ from globals import rlog, AIRCRAFT_DEBUG
 
 # Threshold to calculate potential collision, warning level low, INFO
 COLLISION_THRESHOLD = 180 # in seconds
-COLLISION_DIST_THRESHOLD = 2.0
+COLLISION_DIST_THRESHOLD = 1.5
 COLLISION_ALT_THRESHOLD = 2000   # aircraft more alt diff than this will not be taken into consideration
 # TA thresholds, warning level ADVISORY
 TA_THRESHOLD = 40  # TA at 40 seconds
