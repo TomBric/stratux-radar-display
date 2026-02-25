@@ -63,10 +63,10 @@ class ST7789(dcommon.GenericDisplay):
     }
     PRIORITY_MAPPING_DARK = {
         0: ("gray", "lightgray", 1),  # unclear
-        1: ("red", "pink", 3),  # RA (Resolution Advisory)
-        2: ("orange", "yellow", 2),  # TA (Traffic Advisory)
-        3: ("yellow", "lightyellow", 2),  # potential_collision
-        4: ("lightgreen", "white", 1)  # no_collision
+        1: ("red", "red", 3),  # RA (Resolution Advisory)
+        2: ("yellow", "yellow", 2),  # TA (Traffic Advisory)
+        3: ("white", "white", 2),  # potential_collision
+        4: ("lightgreen", "lightgreen", 1)  # no_collision
     }
 
     def __init__(self):
