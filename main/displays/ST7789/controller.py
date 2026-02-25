@@ -56,8 +56,8 @@ class ST7789(dcommon.GenericDisplay):
     DOWN_CHARACTER = '\u2193'  # character to show descending aircraft
     PRIORITY_MAPPING_LIGHT = {
         0: ("white", "darkgray", 1),  # unclear
-        1: ("red", "black", 2),  # RA (Resolution Advisory)
-        2: ("yellow", "black", 2),  # TA (Traffic Advisory)
+        1: ("red", "red", 2),  # RA (Resolution Advisory)
+        2: ("yellow", "red", 2),  # TA (Traffic Advisory)
         3: ("black", "black", 1),  # potential_collision
         4: ("lightgreen", "lightgreen", 1)  # no_collision
     }
