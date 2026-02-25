@@ -63,14 +63,14 @@ class Epaper3in7(dcommon.GenericDisplay):
         1: ("black", "black", 1, 1.5),  # RA (Resolution Advisory)
         2: ("black", "black", 1, 1),  # TA (Traffic Advisory)
         3: ("white", "black", 2, 1),  # potential_collision
-        4: ("white", "black", 1, 0.5)  # no_collision
+        4: ("white", "black", 1, 1)  # no_collision
     }
     PRIORITY_MAPPING_DARK = {
         0: ("white", "black", 3, 1),  # unclear
         1: ("white", "white", 1, 1.5),  # RA (Resolution Advisory)
         2: ("white", "white", 4, 1),  # TA (Traffic Advisory)
         3: ("white", "black", 2, 1),  # potential_collision
-        4: ("white", "black", 1, 0.5)  # no_collision
+        4: ("white", "black", 1, 1)  # no_collision
     }
 
     def __init__(self):
