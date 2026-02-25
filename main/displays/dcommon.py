@@ -89,7 +89,7 @@ class GenericDisplay:
         1: ("red", "darkred", 3),  # RA (Resolution Advisory)
         2: ("orange", "darkorange", 2),  # TA (Traffic Advisory)
         3: ("yellow", "gold", 2),  # potential_collision
-        4: ("green", "darkgreen", 1)  # no_collision
+        4: ("lightgreen", "lightgreen", 1)  # no_collision
     }
     PRIORITY_MAPPING_DARK = {
         0: ("gray", "lightgray", 1),  # unclear
@@ -200,7 +200,6 @@ class GenericDisplay:
     def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, prio=0):
         # Get colors and outline size based on priority
         aircraft_color, outline_color, outline_width = self.get_color_mapping(prio)
-        print(f"Color Mapping: Aircraft {aircraft_color} Outline {outline_color} outline_widht {outline_width}")
         velocity_width = max(2, 1 + self.AIRCRAFT_SIZE // 3)
         p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
         p2 = posn(direction + 150, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
