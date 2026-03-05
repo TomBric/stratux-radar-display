@@ -434,7 +434,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = LEFT
         if 'start_time' in values and isinstance(values['start_time'], datetime.datetime):
-            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+            st = values['start_time'].strftime("%d.%m %H:%M")
         else:
             st = '---'
         lines = [
@@ -445,7 +445,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         ]
         self.dashboard(offset, 35, self.zerox-offset, lines, headline="Takeoff", rounding=True)
         if 'landing_time' in values and isinstance(values['landing_time'], datetime.datetime):
-            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+            lt = values['landing_time'].strftime("%d.%m %H:%M")
         else:
             lt = '---'
         lines = [

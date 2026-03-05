@@ -613,7 +613,7 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                     runup_situation = stat
                     break
     elif fly_status == 1:  # start was detected
-        if obstacle_up_clear:  # do not search for if already set
+        if not obstacle_up_clear:  # do not search for if already set
             if latest_stat['baro_valid'] and start_situation['baro_valid'] and \
                     obstacle_is_clear(latest_stat['own_altitude'], start_situation['own_altitude'] + OBSTACLE_HEIGHT):
                 obstacle_up_clear = latest_stat
