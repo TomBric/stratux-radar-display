@@ -32,7 +32,7 @@ die() {
 # set defaults
 BRANCH=main
 USB_NAME=""
-DISPLAY_NAME="Epaper_3in7"
+DISPLAY_NAME="NoDisplay"
 UART=false
 
 # pi imager settings
@@ -115,7 +115,7 @@ if [ -n "$FLASH" ]; then
   sed -i "/\/bin\/bash/a\/bin\/bash \/$DISPLAY_SRC\/stratux-radar-display\/image\/flash-once.sh \/$DISPLAY_SRC\/stratux-radar-display\/to_flash" stratux-radar-display/image/stratux_radar.sh
 fi
 # set display
-sed -i "s/Oled_1in5/${DISPLAY_NAME}/g" stratux-radar-display/image/stratux_radar.sh
+sed -i "s/NoDisplay/${DISPLAY_NAME}/g" stratux-radar-display/image/stratux_radar.sh
 # back to root directory of stratux image
 cd ../../../
 # run stratux configuration skript
