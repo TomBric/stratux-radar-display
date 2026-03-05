@@ -421,18 +421,18 @@ class Epaper3in7(dcommon.GenericDisplay):
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = 5
         if 'start_time' in values:
-            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+            st = values['start_time'].strftime("%d.%m %H:%M")
         else:
             st = '---'
         lines = [
-            ("t-off time", st),
+            ("t-off", st),
             ("t-off alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         self.dashboard(offset, 35, self.zerox - offset, lines, headline="Takeoff", rounding=True)
         if 'landing_time' in values:
-            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+            lt = values['landing_time'].strftime("%d.%m %H:%M")
         else:
             lt = '---'
         lines = [
