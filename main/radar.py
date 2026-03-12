@@ -162,7 +162,7 @@ aircraft_simulation = None   # if a string is provided read simulation data from
 radar_sound_off_sound = None   # prepared sound output for "sound off"
 radar_sound_on_sound = None    # prepared send output for "sound on"
 
-AUDIO_TIMEOUTS ={0: 30, 1: 10, 2:30, 3:0, 4:0}   # time in seconds to repeat audio of prio x traffic, if zero do not repeat
+AUDIO_TIMEOUTS ={0: 30, 1: 10, 2:30, 3:60, 4:0}   # time in seconds to repeat audio of prio x traffic, if zero do not repeat
 # E.g. Prio 1 (RA) traffic will be repeated after 10 secondes, Prio 2 (TA) after 30 secs
 # Unclear traffic (prio 0) will also be repeated after 30 seconds
 # prio0=unclear, prio1=RA, prio2=TA, prio3=collision, prio4=no collision
@@ -337,12 +337,19 @@ def audio_output_adsb(ac):
                     message = gen_traffic_message(ac)     # if it was RA before, repeat only after TA time now
             else:    # was in lower prio state before, speak
                 message = gen_traffic_message(ac)
-    elif ac['prio'] == 3:    # collision traffic, it is only announced once
+    elif ac['prio'] == 3:    # collision traffic
         if not audio_info or audio_info['speak_time'] != 0:   # not yet spoken, do it
             message = gen_traffic_message(ac)
+        else:
+            # repeat collision traffic after timeout, whatever it was before
+            if audio_info['speak_time'] + timeout <= time.time():    # its time to repeat
+                message = gen_traffic_message(ac)     # if it was RA before, repeat only after TA time now
     elif ac['prio'] == 0:    # unclear traffic, it is only announced once
         if not audio_info or audio_info['speak_time'] != 0:   # not yet spoken, do it
             message = gen_traffic_message(ac)
+        else:   # repeat unclear traffic after timeout, whatever it was before
+            if audio_info['speak_time'] + timeout <= time.time():  # its time to repeat
+                message = gen_traffic_message(ac)  # if it was RA before, repeat only after TA time now
     if message:
         ac['audio'] = {'speak_time': time.time(), 'was_prio': ac['prio']}
         if ac['prio'] == 1:    # RA

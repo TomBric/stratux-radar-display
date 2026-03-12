@@ -8,82 +8,82 @@
 2,	0.0,AC1,52.460000,8.200000,5000,000,120,0,Head-on collision course - CPA 144 seconds (Distance: 2.4 NM)
 3,	0.0,AC2,52.460000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 2.4 NM)
 4,	0.0,AC3,52.460000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 2.4 NM)
-5,	0.5,AC1,52.465000,8.200000,5000,000,120,0,Head-on collision course - CPA 144 seconds (Distance: 2.1 NM)
-6,	0.5,AC2,52.465000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 2.1 NM)
-7,	0.5,AC3,52.465000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 2.1 NM)
-8,	0.5,AC1,52.472500,8.200000,5000,000,120,0,Head-on collision course - CPA 144 seconds (Distance: 1.65 NM)
-9,	0.5,AC2,52.472500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.65 NM)
-10,	0.5,AC3,52.472500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.65 NM)
-11,	0.5,AC1,52.480000,8.200000,5000,000,120,0,Head-on collision course - CPA 144 seconds (Distance: 1.2 NM)
-12,	0.5,AC2,52.480000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.2 NM)
-13,	0.5,AC3,52.480000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.2 NM)
-14,	0.5,AC1,52.485000,8.200000,5000,000,120,0,Head-on collision course - CPA 144 seconds (Distance: 0.9 NM)
-15,	0.5,AC2,52.485000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.9 NM)
-16,	0.5,AC3,52.485000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.9 NM)
-17,	0.5,AC1,52.490292,8.200000,5000,000,120,0,TA situation - CPA 35 seconds (Distance: 0.6 NM)
-18,	0.5,AC2,52.490292,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.6 NM)
-19,	0.5,AC3,52.490292,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.6 NM)
-20,	0.5,AC1,52.497917,8.200000,5000,000,120,0,RA situation - CPA 20 seconds (Distance: 0.125 NM)
-21,	0.5,AC2,52.497917,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.125 NM)
-22,	0.5,AC3,52.497917,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.125 NM)
-23,	0.5,AC1,52.499306,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 0.04 NM)
-24,	0.5,AC2,52.499306,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.04 NM)
-25,	0.5,AC3,52.499306,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.04 NM)
-26,	0.5,AC1,52.502500,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 0.15 NM)
-27,	0.5,AC2,52.502500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.15 NM)
-28,	0.5,AC3,52.502500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.15 NM)
-29,	0.5,AC1,52.507500,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 0.45 NM)
-30,	0.5,AC2,52.507500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.45 NM)
-31,	0.5,AC3,52.507500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.45 NM)
-32,	0.5,AC1,52.512500,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 0.75 NM)
-33,	0.5,AC2,52.512500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.75 NM)
-34,	0.5,AC3,52.512500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.75 NM)
-35,	0.5,AC1,52.517500,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 1.05 NM)
-36,	0.5,AC2,52.517500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.05 NM)
-37,	0.5,AC3,52.517500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.05 NM)
-38,	0.5,AC1,52.522500,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 1.35 NM)
-39,	0.5,AC2,52.522500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.35 NM)
-40,	0.5,AC3,52.522500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.35 NM)
-41,	0.5,AC1,52.530000,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 1.8 NM)
-42,	0.5,AC2,52.530000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.8 NM)
-43,	0.5,AC3,52.530000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.8 NM)
+5,	1.0,AC1,52.465000,8.200000,5000,000,120,0,Head-on collision course - CPA 144 seconds (Distance: 2.1 NM)
+6,	1.0,AC2,52.465000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 2.1 NM)
+7,	1.0,AC3,52.465000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 2.1 NM)
+8,	1.0,AC1,52.472500,8.200000,5000,000,120,0,Head-on collision course - CPA 144 seconds (Distance: 1.65 NM)
+9,	1.0,AC2,52.472500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.65 NM)
+10,	1.0,AC3,52.472500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.65 NM)
+11,	1.0,AC1,52.480000,8.200000,5000,000,120,0,Head-on collision course - CPA 144 seconds (Distance: 1.2 NM)
+12,	1.0,AC2,52.480000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.2 NM)
+13,	1.0,AC3,52.480000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.2 NM)
+14,	1.0,AC1,52.485000,8.200000,5000,000,120,0,Head-on collision course - CPA 144 seconds (Distance: 0.9 NM)
+15,	1.0,AC2,52.485000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.9 NM)
+16,	1.0,AC3,52.485000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.9 NM)
+17,	1.0,AC1,52.490292,8.200000,5000,000,120,0,TA situation - CPA 35 seconds (Distance: 0.6 NM)
+18,	1.0,AC2,52.490292,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.6 NM)
+19,	1.0,AC3,52.490292,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.6 NM)
+20,	1.0,AC1,52.497917,8.200000,5000,000,120,0,RA situation - CPA 20 seconds (Distance: 0.125 NM)
+21,	1.0,AC2,52.497917,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.125 NM)
+22,	1.0,AC3,52.497917,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.125 NM)
+23,	1.0,AC1,52.499306,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 0.04 NM)
+24,	1.0,AC2,52.499306,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.04 NM)
+25,	1.0,AC3,52.499306,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.04 NM)
+26,	1.0,AC1,52.502500,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 0.15 NM)
+27,	1.0,AC2,52.502500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.15 NM)
+28,	1.0,AC3,52.502500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.15 NM)
+29,	1.0,AC1,52.507500,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 0.45 NM)
+30,	1.0,AC2,52.507500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.45 NM)
+31,	1.0,AC3,52.507500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.45 NM)
+32,	1.0,AC1,52.512500,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 0.75 NM)
+33,	1.0,AC2,52.512500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 0.75 NM)
+34,	1.0,AC3,52.512500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 0.75 NM)
+35,	1.0,AC1,52.517500,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 1.05 NM)
+36,	1.0,AC2,52.517500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.05 NM)
+37,	1.0,AC3,52.517500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.05 NM)
+38,	1.0,AC1,52.522500,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 1.35 NM)
+39,	1.0,AC2,52.522500,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.35 NM)
+40,	1.0,AC3,52.522500,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.35 NM)
+41,	1.0,AC1,52.530000,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 1.8 NM)
+42,	1.0,AC2,52.530000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.8 NM)
+43,	1.0,AC3,52.530000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.8 NM)
 
 # moving these ac out
-41,	0.5,AC1,53.530000,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 1.8 NM)
-42,	0.5,AC2,53.530000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.8 NM)
-43,	0.5,AC3,53.530000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.8 NM)
+41,	1.0,AC1,53.530000,8.200000,5000,000,120,0,No collision - aircraft continues on course (Distance: 1.8 NM)
+42,	1.0,AC2,53.530000,8.246700,5000,000,120,0,Parallel to AC1 - eastern offset 2.8 NM (Distance: 1.8 NM)
+43,	1.0,AC3,53.530000,8.175000,5000,000,120,0,Parallel to AC1 - western offset 1.5 NM (Distance: 1.8 NM)
 
 # new aircraft crossing44,	0.0,AC4,52.460000,8.240000,4000,315,70,0,AC4 starts SE at 4000ft, 3 NM from OWNSHIP
 44,	0.0,AC4,52.462000,8.238000,4000,315,70,0,AC4 starts SE at 4000ft, 3 NM from OWNSHIP
 44,	0.0,AC4,52.465000,8.235000,4000,315,70,0,AC4 starts SE at 4000ft, 3 NM from OWNSHIP
 44,	0.0,AC4,52.468000,8.232500,4000,315,70,0,AC4 starts SE at 4000ft, 3 NM from OWNSHIP
 44,	0.0,AC4,52.470000,8.230000,4000,315,70,0,AC4 starts SE at 4000ft, 3 NM from OWNSHIP
-45,	0.5,AC4,52.472500,8.227500,4000,315,70,0,AC4 climbing to 6000ft
-46,	0.5,AC4,52.475000,8.225000,4250,315,70,250,AC4 climbing to 6000ft
-47,	0.5,AC4,52.477500,8.222500,4500,315,70,250,AC4 climbing to 6000ft
-48,	0.5,AC4,52.480000,8.220000,4750,315,70,250,AC4 climbing to 6000ft
-49,	0.5,AC4,52.482500,8.217500,5000,315,70,250,AC4 climbing to 6000ft
-50,	0.5,AC4,52.485000,8.215000,5250,315,70,250,AC4 climbing to 6000ft
-51,	0.5,AC4,52.487500,8.212500,5500,315,70,250,AC4 climbing to 6000ft
-52,	0.5,AC4,52.490000,8.210000,5750,315,70,250,AC4 climbing to 6000ft
-53,	0.5,AC4,52.492500,8.207500,6000,315,70,250,AC4 reaches 6000ft
-54,	0.5,AC4,52.495000,8.205000,6000,315,70,0,AC4 at cruise 6000ft
-55,	0.5,AC4,52.497500,8.202500,6000,315,70,0,AC4 at cruise 6000ft
-56,	0.5,AC4,52.500000,8.200000,6000,315,70,0,AC4 closest approach at 6000ft
-57,	0.5,AC4,52.502500,8.197500,6000,315,70,0,AC4 at cruise 6000ft
-58,	0.5,AC4,52.505000,8.195000,6000,315,70,0,AC4 at cruise 6000ft
-59,	0.5,AC4,52.507500,8.192500,5750,315,70,-250,AC4 descending to 4000ft
-60,	0.5,AC4,52.510000,8.190000,5500,315,70,-250,AC4 descending to 4000ft
-61,	0.5,AC4,52.512500,8.187500,5250,315,70,-250,AC4 descending to 4000ft
-62,	0.5,AC4,52.515000,8.185000,5000,315,70,-250,AC4 descending to 4000ft
-63,	0.5,AC4,52.517500,8.182500,4750,315,70,-250,AC4 descending to 4000ft
-64,	0.5,AC4,52.520000,8.180000,4500,315,70,-250,AC4 descending to 4000ft
-65,	0.5,AC4,52.522500,8.177500,4250,315,70,-250,AC4 descending to 4000ft
-66,	0.5,AC4,52.525000,8.175000,4000,315,70,-250,AC4 reaches 4000ft
-67,	0.5,AC4,52.527500,8.172500,4000,315,70,0,AC4 at 4000ft continuing NW
-68,	0.5,AC4,52.530000,8.170000,4000,315,70,0,AC4 ends NW at 4000ft, 3 NM from OWNSHIP
-68,	0.5,AC4,52.532500,8.167500,4000,315,70,0,AC4 ends NW at 4000ft, 3 NM from OWNSHIP
-68,	0.5,AC4,52.535000,8.165000,4000,315,70,0,AC4 ends NW at 4000ft, 3 NM from OWNSHIP
+45,	1.0,AC4,52.472500,8.227500,4000,315,70,0,AC4 climbing to 6000ft
+46,	1.0,AC4,52.475000,8.225000,4250,315,70,250,AC4 climbing to 6000ft
+47,	1.0,AC4,52.477500,8.222500,4500,315,70,250,AC4 climbing to 6000ft
+48,	1.0,AC4,52.480000,8.220000,4750,315,70,250,AC4 climbing to 6000ft
+49,	1.0,AC4,52.482500,8.217500,5000,315,70,250,AC4 climbing to 6000ft
+50,	1.0,AC4,52.485000,8.215000,5250,315,70,250,AC4 climbing to 6000ft
+51,	1.0,AC4,52.487500,8.212500,5500,315,70,250,AC4 climbing to 6000ft
+52,	1.0,AC4,52.490000,8.210000,5750,315,70,250,AC4 climbing to 6000ft
+53,	1.0,AC4,52.492500,8.207500,6000,315,70,250,AC4 reaches 6000ft
+54,	1.0,AC4,52.495000,8.205000,6000,315,70,0,AC4 at cruise 6000ft
+55,	1.0,AC4,52.497500,8.202500,6000,315,70,0,AC4 at cruise 6000ft
+56,	1.0,AC4,52.500000,8.200000,6000,315,70,0,AC4 closest approach at 6000ft
+57,	1.0,AC4,52.502500,8.197500,6000,315,70,0,AC4 at cruise 6000ft
+58,	1.0,AC4,52.505000,8.195000,6000,315,70,0,AC4 at cruise 6000ft
+59,	1.0,AC4,52.507500,8.192500,5750,315,70,-250,AC4 descending to 4000ft
+60,	1.0,AC4,52.510000,8.190000,5500,315,70,-250,AC4 descending to 4000ft
+61,	1.0,AC4,52.512500,8.187500,5250,315,70,-250,AC4 descending to 4000ft
+62,	1.0,AC4,52.515000,8.185000,5000,315,70,-250,AC4 descending to 4000ft
+63,	1.0,AC4,52.517500,8.182500,4750,315,70,-250,AC4 descending to 4000ft
+64,	1.0,AC4,52.520000,8.180000,4500,315,70,-250,AC4 descending to 4000ft
+65,	1.0,AC4,52.522500,8.177500,4250,315,70,-250,AC4 descending to 4000ft
+66,	1.0,AC4,52.525000,8.175000,4000,315,70,-250,AC4 reaches 4000ft
+67,	1.0,AC4,52.527500,8.172500,4000,315,70,0,AC4 at 4000ft continuing NW
+68,	1.0,AC4,52.530000,8.170000,4000,315,70,0,AC4 ends NW at 4000ft, 3 NM from OWNSHIP
+68,	1.0,AC4,52.532500,8.167500,4000,315,70,0,AC4 ends NW at 4000ft, 3 NM from OWNSHIP
+68,	1.0,AC4,52.535000,8.165000,4000,315,70,0,AC4 ends NW at 4000ft, 3 NM from OWNSHIP
 
 
 #

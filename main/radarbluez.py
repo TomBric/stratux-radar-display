@@ -172,7 +172,7 @@ def stop_sounds():      # if mute button is pressed, stop immediately sound outp
         pygame.mixer.stop()
 
 
-def speak(text, speed_percent = 100):
+def speak(text, speed_percent = 130):
     if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
         output_text = f"<speed level='{speed_percent}'> {text} </speed>"    # include string for setting speed
         sound_queue.put((2, output_text))
