@@ -402,7 +402,7 @@ def new_traffic(json_str):
         is_new = False
         if traffic['Icao_addr'] not in all_ac.keys():
             # new traffic, insert
-            all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'was_spoken': False}
+            all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'was_spoken': False, 'prio':0}
             is_new = True
         ac = all_ac[traffic['Icao_addr']]
         if traffic['Age'] <= traffic['AgeLastAlt']:
@@ -437,6 +437,15 @@ def new_traffic(json_str):
             if 'Track' in traffic:
                 ac['direction'] = traffic['Track'] - situation['course']
                 # sometimes track is missing, then leave it as it is
+            old_prio = 0
+            if ac['prio']:
+                old_prio = ac['prio']
+            ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_tcas_state(traffic, situation))
+            audio_output_adsb(ac)
+            if old_prio == 1 and ac['prio'] != 1:  # there was a RA situation on this aircraft, now its clear
+                # check if there is still a RA situation
+                if check_clear_of_traffic():
+                    radarbluez.speak("Clear of conflict")  # Clear RA alerts if no aircraft is in RA state anymore
             if ac['gps_distance'] <= situation['RadarRange'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
                 res_angle = (ac['gps_angle'] - situation['course']) % 360
                 gpsx = math.sin(math.radians(res_angle)) * ac['gps_distance']
@@ -446,15 +455,6 @@ def new_traffic(json_str):
                 if 'nspeed' in ac:
                     nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
                     ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
-                old_prio = 0
-                if ac['prio']:
-                    old_prio = ac['prio']
-                ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_tcas_state(traffic, situation))
-                audio_output_adsb(ac)
-                if old_prio == 1 and ac['prio'] != 1 : # there was a RA situation on this aircraft, now its clear
-                    # check if there is still a RA situation
-                    if check_clear_of_traffic():
-                        radarbluez.speak("Clear of conflict")  # Clear RA alerts if no aircraft is in RA state anymore
             else: # outside of display
                 ac['x'] = -1
                 ac['y'] = -1
