@@ -486,7 +486,7 @@ def new_traffic(json_str):
                                          f"was older than {POSITION_VALID_DELTA}secs")
             speech_output_modes(ac)
     except KeyError:  # to be safe in case keys are changed in Stratux
-        rlog.log(AIRCRAFT_DEBUG, "KeyError decoding:" + json_str)
+        rlog.log(AIRCRAFT_DEBUG, f"KeyError decoding {json_str} \n with ac: {ac}")
 
 
 def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
