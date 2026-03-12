@@ -316,9 +316,6 @@ def audio_output_adsb(ac):
     message = None
     # ac['audio'] = {'speak_time': timestamp of last announce for this aircraft, 'was_prio': gesprochene Prio, }
     audio_info = ac.get('audio')
-    if audio_info:
-        rlog.log(AIRCRAFT_DEBUG,
-             f"Audio output: Prio {ac.get('prio', 0)} Audio {ac.get('audio', "")} time-diff {time.time() - audio_info['speak_time']}")
     timeout = AUDIO_TIMEOUTS[ac['prio']]    # timeout for this current prio
     rlog.log(AIRCRAFT_DEBUG,f"Timeout for prio is {timeout} sec")
     if ac['prio'] == 0 or ac['prio'] == 3:  # unclear traffic, or potential collision traffic, speak once
@@ -328,7 +325,7 @@ def audio_output_adsb(ac):
         if not audio_info or audio_info['speak_time'] == 0 or audio_info['was_prio'] != 1:   # was not spoken as RA before
             message = gen_traffic_message(ac)
         else:   # was already spoken as RA, check whether it is time to repeat
-            if audio_info['speak_time'] + timeout >= time.time():    # its time to repeat
+            if audio_info['speak_time'] + timeout <= time.time():    # its time to repeat
                 message = gen_traffic_message(ac)
     elif ac['prio'] == 2:   # TA
         if not audio_info or audio_info['speak_time'] == 0:   # never spoken
@@ -336,7 +333,7 @@ def audio_output_adsb(ac):
         else:
             if audio_info['was_prio'] == 1 or audio_info['was_prio'] == 2:
                 # was already spoken as TA or RA, check whether it is time to repeat
-                if audio_info['speak_time'] + timeout >= time.time():    # its time to repeat
+                if audio_info['speak_time'] + timeout <= time.time():    # its time to repeat
                     message = gen_traffic_message(ac)     # if it was RA before, repeat only after TA time now
             else:    # was in lower prio state before, speak
                 message = gen_traffic_message(ac)
@@ -374,7 +371,7 @@ def speech_output_modes(ac):   # checks if modes aircraft has to be spoken
             ac['audio'] = {'speak_time': time.time(), 'was_prio': 0}    # mode S traffic is always unclear
             speak_mode_s(ac)
         else: # already spoken
-            if audio_info['speak_time'] + timeout >= time.time():    # its time to speak it now again
+            if audio_info['speak_time'] + timeout <= time.time():    # its time to speak it now again
                 ac['audio'] = {'speak_time': time.time(), 'was_prio': 0}
                 speak_mode_s(ac)
 
