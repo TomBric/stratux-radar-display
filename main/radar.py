@@ -353,9 +353,9 @@ def audio_output_adsb(ac):
     if message:
         ac['audio'] = {'speak_time': time.time(), 'was_prio': ac['prio']}
         if ac['prio'] == 1:    # RA
-            radarbluez.priority_speak(message)
+            radarbluez.priority_speak(message, 130)
         else:
-            radarbluez.speak(message)
+            radarbluez.speak(message, 130)
 
 
 def speak_mode_s(ac):
@@ -366,7 +366,7 @@ def speak_mode_s(ac):
     txt = f"Traffic {sign} {abs(feet)} feet"
     if global_config['distance_warnings'] and ac['gps_distance']:
         txt += f" {round(ac['gps_distance'])} miles"
-    radarbluez.speak(txt)
+    radarbluez.speak(txt, 130)
 
 
 def speech_output_modes(ac):   # checks if modes aircraft has to be spoken
@@ -452,7 +452,7 @@ def new_traffic(json_str):
             if old_prio == 1 and ac['prio'] != 1:  # there was a RA situation on this aircraft, now its clear
                 # check if there is still a RA situation
                 if check_clear_of_traffic():
-                    radarbluez.speak("Clear of conflict")  # Clear RA alerts if no aircraft is in RA state anymore
+                    radarbluez.priority_speak("Clear of conflict", 130)  # Clear RA alerts if no aircraft is in RA state anymore
             if ac['gps_distance'] <= situation['RadarRange'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
                 res_angle = (ac['gps_angle'] - situation['course']) % 360
                 gpsx = math.sin(math.radians(res_angle)) * ac['gps_distance']
