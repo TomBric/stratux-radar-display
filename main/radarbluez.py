@@ -38,7 +38,7 @@ import alsaaudio
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'  # disable pygame hello message
 import pygame
-from queue import Queue
+from queue import PriorityQueue
 import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
 import time
 from globals import rlog
@@ -56,7 +56,7 @@ extsound_active = False
 bt_devices = 0          # no of active bluetooth devices last time checked via connected devices
 mixer = None
 global_config = None
-sound_queue = None    # external sound queue
+sound_queue = None    # external sound queue with priorities, Priority 1 is for RA messages with priority_speak
 sound_thread = None
 sound_card = None     # number of sound card, is initialized if external_sound_output is True
 audio_device = None   # name of audio device selected by mixer name
@@ -124,7 +124,7 @@ def sound_init(config, bluetooth, mixer_name):
         except pygame.error as error:
             rlog.debug(f"SoundInit: Error pygame.init - {error} ")
         # rlog.debug(f"SoundInit: Mixer initialized with device '{audio_device}'")
-        sound_queue = Queue()
+        sound_queue = PriorityQueue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
         speak("Stratux Radar connected")
@@ -135,7 +135,7 @@ def sound_init(config, bluetooth, mixer_name):
 
 def sound_terminate():
     if sound_queue:
-        sound_queue.put('STOP')
+        sound_queue.put((2, 'STOP'))    # no prio
     if sound_thread:
         sound_thread.join()    # wait for termination
 
@@ -175,8 +175,15 @@ def stop_sounds():      # if mute button is pressed, stop immediately sound outp
 def speak(text, speed_percent = 100):
     if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
         output_text = f"<speed level='{speed_percent}'> {text} </speed>"    # include string for setting speed
-        sound_queue.put(output_text)
+        sound_queue.put((2, output_text))
     rlog.debug("Speak: "+text)
+
+
+def priority_speak(text, speed_percent = 130, pitch_level = 130):
+    if (extsound_active and global_config['sound_volume'] > 0) or (bluetooth_active and bt_devices > 0):
+        output_text = f"<speed level='{speed_percent}'> <pitch level = '{pitch_level}'> {text} </pitch></speed>"    # include string for setting speed
+        sound_queue.put((1, output_text))
+    rlog.debug("PrioritySpeak: "+text)
 
 
 def prepare_sounds_tuple(int_tuple):  # done during init without parallel coroutines
@@ -210,7 +217,7 @@ def speak_sound(sound, text=""):    # used to instantly speak sounds which are a
 def audio_speaker(queue):
     rlog.debug("Radarbluez: Audio-Speaker thread active.")
     while True:
-        msg = queue.get()
+        priority, msg = queue.get()
         if msg == 'STOP':
             break
         if radarui.sound_on:    # if not ignore sound, clears queue

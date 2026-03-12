@@ -163,12 +163,17 @@ aircraft_simulation = None   # if a string is provided read simulation data from
 radar_sound_off_sound = None   # prepared sound output for "sound off"
 radar_sound_on_sound = None    # prepared send output for "sound on"
 
+AUDIO_TIMEOUTS ={0: 30, 1: 10, 2:30, 3:0, 4:0}   # time in seconds to repeat audio of prio x traffic, if zero do not repeat
+# E.g. Prio 1 (RA) traffic will be repeated after 10 secondes, Prio 2 (TA) after 30 secs
+# Unclear traffic (prio 0) will also be repeated after 30 seconds
+# prio0=unclear, prio1=RA, prio2=TA, prio3=collision, prio4=no collision
+
 def dump_ac(ac):    # debug function, produces one line for aircraft in a readable manner
     ret=""
     ret += f" tail:{ac['tail']}" if 'tail' in ac else ""
     ret += f" gps_distance:{ac['gps_distance']:.1f}" if 'gps_distance' in ac else ""
     ret += f" last_contact_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_contact_timestamp']))}" if 'last_contact_timestamp' in ac else ""
-    ret += f" height:{ac['height']}" if 'height' in ac else ""
+    ret += f" hdiff:{ac['hdiff']}" if 'hdiff' in ac else ""
     ret += f" nspeed:{ac['nspeed']}" if 'nspeed' in ac else ""
     ret += f" vspeed:{ac['vspeed']}" if 'vspeed' in ac else ""
     ret += f" direction:{ac['direction']}" if 'direction' in ac else ""
@@ -202,7 +207,7 @@ def draw_all_ac(allac):
             else:
                 tail = None
             if ac['circradius'] <= max_pixel / 2:
-                display_control.modesaircraft(ac['circradius'], ac['height'], ac['arcposition'], ac['vspeed'],
+                display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac['vspeed'],
                                               tail)
     for icao, ac in dist_sorted:
         # then draw adsb
@@ -216,7 +221,7 @@ def draw_all_ac(allac):
                     tail = ac['tail']
                 else:
                     tail = None
-                display_control.aircraft(ac['x'], ac['y'], ac['direction'], ac['height'], ac['vspeed'],
+                display_control.aircraft(ac['x'], ac['y'], ac['direction'], ac['hdiff'], ac['vspeed'],
                                          line_length, tail, ac['prio'])
 
 
@@ -264,19 +269,28 @@ def calc_gps_distance(lat, lng):
     return distradius, angle
 
 
-def speaktraffic(hdiff, direction=None, dist=None):
-    if radarui.sound_on:
-        feet = hdiff * 100
-        sign = 'plus'
-        if hdiff < 0:
-            sign = 'minus'
-        txt = 'Traffic '
-        if direction:
-            txt += str(direction) + ' o\'clock '
-        txt += sign + ' ' + str(abs(feet)) + ' feet'
-        if global_config['distance_warnings'] and dist:
-            txt += f" {dist} miles "
-        radarbluez.speak(txt)
+def gen_traffic_message(ac):
+    res_angle = (ac['gps_angle'] - situation['course']) % 360
+    oclock = round(res_angle / 30) % 12
+    if oclock == 0:
+        oclock = 12
+    feet = ac['hdiff'] * 100
+    sign = '+'
+    if feet < 0:
+        sign = '-'
+    # Priority-based message templates
+    priority_messages = {
+        1: f"Alarm: traffic {oclock} o'clock, {sign}{abs(feet)} feet",      # RA
+        2: f"Advisory: traffic {oclock} o'clock, {sign}{abs(feet)} feet",  # TA
+        3: f"Info: traffic {oclock} o'clock, {sign}{abs(feet)} feet",      # Collision
+        4: None,                                                          # No Collision
+        0: f"traffic {oclock} o'clock, {sign}{abs(feet)} feet"           # Unclear
+    }
+    txt = priority_messages.get(ac['prio'], None)
+    if txt and global_config['distance_warnings']:
+        txt += f" {ac['gps_distance']} miles "
+    return txt
+
 
 def is_steering_message(traffic):  # checks if traffic is a steering message and returns true if yes
     changed = False
@@ -299,38 +313,74 @@ def is_steering_message(traffic):  # checks if traffic is a steering message and
     return False
 
 
-def speech_output_adsb(ac, res_angle):   # checks if aircraft with position has to be spoken and triggers speech
-    if ac['gps_distance'] <= situation['RadarRange'] / 2:
-        oclock = round(res_angle / 30)
-        if oclock <= 0:
-            oclock += 12
-        if oclock > 12:
-            oclock -= 12
-        if not ac['was_spoken']:  # only speak again, if never spoken or hysteresis reached
-            if 'last_speak_time' not in ac or time.time() - ac['last_speak_time'] > SPEAK_SAME_TRAFFIC_DELTA:
-                # has been spoken before, now check timeout, against "flickering position"
-                # so is only spoken if never spoken, hysteresis met and last speak is long enough ago
-                speaktraffic(ac['height'], oclock, round(ac['gps_distance']))
-                ac['was_spoken'] = True
-                ac['last_speak_time'] = time.time()
-    else:
-        # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
-        if ac['gps_distance'] >= situation['RadarRange'] * 0.75:
-            ac['was_spoken'] = False
+def audio_output_adsb(ac):
+    message = None
+    # ac['audio'] = {'speak_time': timestamp of last announce for this aircraft, 'was_prio': gesprochene Prio, }
+    audio_info = ac.get('audio')
+    timeout = AUDIO_TIMEOUTS[ac['prio']]    # timeout for this current prio
+    if ac['prio'] == 0 or ac['prio'] == 3:  # unclear traffic, or potential collision traffic, speak once
+        if not audio_info or audio_info['speak_time'] == 0:   # traffic not yet spoken, speak
+            message = gen_traffic_message(ac)
+    elif ac['prio'] == 1:   # RA
+        if not audio_info or audio_info['speak_time'] == 0 or audio_info['was_prio'] != 1:   # was not spoken as RA before
+            message = gen_traffic_message(ac)
+        else:   # was already spoken as RA, check whether it is time to repeat
+            if audio_info['speak_time'] + timeout >= time.time():    # its time to repeat
+                message = gen_traffic_message(ac)
+    elif ac['prio'] == 2:   # TA
+        if not audio_info or audio_info['speak_time'] == 0:   # never spoken
+            message = gen_traffic_message(ac)
+        else:
+            if audio_info['was_prio'] == 1 or audio_info['was_prio'] == 2:
+                # was already spoken as TA or RA, check whether it is time to repeat
+                if audio_info['speak_time'] + timeout >= time.time():    # its time to repeat
+                    message = gen_traffic_message(ac)     # if it was RA before, repeat only after TA time now
+            else:    # was in lower prio state before, speak
+                message = gen_traffic_message(ac)
+    elif ac['prio'] == 3:    # collision traffic, it is only announced once
+        if not audio_info or audio_info['speak_time'] != 0:   # not yet spoken, do it
+            message = gen_traffic_message(ac)
+    elif ac['prio'] == 0:    # unclear traffic, it is only announced once
+        if not audio_info or audio_info['speak_time'] != 0:   # not yet spoken, do it
+            message = gen_traffic_message(ac)
+    if message:
+        ac['audio'] = {'speak_time': time.time(), 'was_prio': ac['prio']}
+        if ac['prio'] == 1:    # RA
+            radarbluez.priority_speak(message)
+        else:
+            radarbluez.speak(message)
+
+
+def speak_mode_s(ac):
+    feet = ac['hdiff'] * 100
+    sign = 'plus'
+    if feet < 0:
+        sign = 'minus'
+    txt = f"Traffic {sign} {abs(feet)} feet"
+    if global_config['distance_warnings'] and ac['gps_distance']:
+        txt += f" {round(ac['gps_distance'])} miles"
+    radarbluez.speak(txt)
 
 
 def speech_output_modes(ac):   # checks if modes aircraft has to be spoken
-    if ac['gps_distance'] <= situation['RadarRange'] / 2:
-        if not ac['was_spoken']:  # check hysteresis
-            if 'last_speak_time' not in ac or time.time() - ac['last_speak_time'] > SPEAK_SAME_TRAFFIC_DELTA:
-                # only speak after a minimal time again, necessary if traffic esp. Mode S "flickers"
-                speaktraffic(ac['height'], None, round(ac['gps_distance']))
-                ac['was_spoken'] = True
-                ac['last_speak_time'] = time.time()
-    else:
-        # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
-        if ac['gps_distance'] > situation['RadarRange'] * 0.75:
-            ac['was_spoken'] = False
+    timeout = AUDIO_TIMEOUTS[0]  # mode s traffic is always prio0=unclear
+    if ac['gps_distance'] <= situation['RadarRange'] / 2:    # inside inner circle
+        # ac['audio'] = {'speak_time': timestamp of last announce for this aircraft, 'was_prio': gesprochene Prio, }
+        audio_info = ac.get('audio')
+        if not audio_info: # not yet spoken
+            ac['audio'] = {'speak_time': time.time(), 'was_prio': 0}    # mode S traffic is always unclear
+            speak_mode_s(ac)
+        else: # already spoken
+            if audio_info['speak_time'] + timeout >= time.time():    # its time to speak it now again
+                ac['audio'] = {'speak_time': time.time(), 'was_prio': 0}
+                speak_mode_s(ac)
+
+
+def check_clear_of_traffic():   # check if there is still a RA situation in any aircraft
+    for icao, ac in all_ac.items():
+        if 'prio' in ac and ac['prio'] == 1:
+            return False
+    return True
 
 
 def new_traffic(json_str):
@@ -359,7 +409,7 @@ def new_traffic(json_str):
             ac['last_contact_timestamp'] = time.time() - traffic['Age']
         else:
             ac['last_contact_timestamp'] = time.time() - traffic['AgeLastAlt']
-        ac['height'] = round((traffic['Alt'] - situation['own_altitude']) / 100)
+        ac['hdiff'] = round((traffic['Alt'] - situation['own_altitude']) / 100)
 
         if traffic['Speed_valid']:
             ac['nspeed'] = traffic['Speed']
@@ -377,32 +427,37 @@ def new_traffic(json_str):
 
         if traffic['Position_valid'] and situation['gps_active']:
             # adsb traffic and stratux has valid gps signal
-            rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at height {ac['height']}")
+            rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at hdiff {ac['hdiff']}")
             rlog.log(AIRCRAFT_DEBUG, f"Traffic is: {traffic}")
             if 'circradius' in ac:
                 del ac['circradius']
                 # was mode-s target before, now invalidate mode-s info
-            gps_rad, gps_angle = calc_gps_distance(traffic['Lat'], traffic['Lng'])
-            ac['gps_distance'] = gps_rad
+            ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             ac['last_position_timestamp'] = time.time()
             if 'Track' in traffic:
                 ac['direction'] = traffic['Track'] - situation['course']
                 # sometimes track is missing, then leave it as it is
-            if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= round(situation['RadarLimits'] / 100):
-                res_angle = (gps_angle - situation['course']) % 360
-                gpsx = math.sin(math.radians(res_angle)) * gps_rad
-                gpsy = - math.cos(math.radians(res_angle)) * gps_rad
+            if ac['gps_rad'] <= situation['RadarRange'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
+                res_angle = (ac['gps_angle'] - situation['course']) % 360
+                gpsx = math.sin(math.radians(res_angle)) * ac['gps_rad']
+                gpsy = - math.cos(math.radians(res_angle)) * ac['gps_rad']
                 ac['x'] = round(max_pixel / 2 * gpsx / situation['RadarRange'] + zerox)
                 ac['y'] = round(max_pixel / 2 * gpsy / situation['RadarRange'] + zeroy)
                 if 'nspeed' in ac:
                     nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
                     ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
+                old_prio = 0
+                if ac['prio']:
+                    old_prio = ac['prio']
                 ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_tcas_state(traffic, situation))
-                speech_output_adsb(ac, gps_rad)
+                audio_output_adsb(ac)
+                if old_prio == 1 and ac['prio'] != 1 : # there was a RA situation on this aircraft, now its clear
+                    # check if there is still a RA situation
+                    if check_clear_of_traffic():
+                        radarbluez.speak("Clear of conflict")  # Clear RA alerts if no aircraft is in RA state anymore
             else: # outside of display
                 ac['x'] = -1
                 ac['y'] = -1
-
         else:
             # mode-s traffic or no valid GPS position of stratux
             if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
