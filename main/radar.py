@@ -181,7 +181,7 @@ def dump_ac(ac):    # debug function, produces one line for aircraft in a readab
     ret += f" y:{ac['y']}" if 'y' in ac else ""
     ret += f" last_position_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_position_timestamp']))}" if 'last_position_timestamp' in ac else ""
     ret += f" nspeed_length:{ac['nspeed_length']}" if 'nspeed_length' in ac else ""
-    ret += f" was_spoken:{ac['was_spoken']}" if 'was_spoken' in ac else ""
+    ret += f" audio_info: speak_time {ac['audio_info']['speak_time']} was_prio {ac['audio_info']['was_prio']}" if 'audio_info' in ac else ""
     ret += f" last_speak_time:{time.strftime('%H:%M:%S', time.gmtime(ac['last_speak_time']))}" if 'last_speak_time' in ac else ""
     ret += f" arcposition:{ac['arcposition']}" if 'arcposition' in ac else ""
     ret += f" circradius:{ac['circradius']}" if 'circradius' in ac else ""
