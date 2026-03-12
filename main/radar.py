@@ -280,8 +280,8 @@ def gen_traffic_message(ac):
     # Priority-based message templates
     priority_messages = {
         1: f"Alarm: traffic {oclock} o'clock, {sign}{abs(feet)} feet",      # RA
-        2: f"Advisory: traffic {oclock} o'clock, {sign}{abs(feet)} feet",  # TA
-        3: f"Info: traffic {oclock} o'clock, {sign}{abs(feet)} feet",      # Collision
+        2: f"Advise: traffic {oclock} o'clock, {sign}{abs(feet)} feet",  # TA
+        3: f"traffic {oclock} o'clock, {sign}{abs(feet)} feet",      # Collision
         4: None,                                                          # No Collision
         0: f"traffic {oclock} o'clock, {sign}{abs(feet)} feet"           # Unclear
     }
