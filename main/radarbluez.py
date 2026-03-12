@@ -135,7 +135,7 @@ def sound_init(config, bluetooth, mixer_name):
 
 def sound_terminate():
     if sound_queue:
-        sound_queue.put((2, 'STOP'))    # no prio
+        sound_queue.put((0, 'STOP'))    # top prio
     if sound_thread:
         sound_thread.join()    # wait for termination
 

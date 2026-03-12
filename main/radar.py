@@ -96,7 +96,6 @@ OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
-SPEAK_SAME_TRAFFIC_DELTA = 2.0   # time in seconds after the same traffic is spoken again (if also hysteresis was true)
 SOURCE_1090 = 1    # source identifier from stratux
 SOURCE_FLARM = 4   # source identifier from stratux
 
@@ -181,7 +180,7 @@ def dump_ac(ac):    # debug function, produces one line for aircraft in a readab
     ret += f" y:{ac['y']}" if 'y' in ac else ""
     ret += f" last_position_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_position_timestamp']))}" if 'last_position_timestamp' in ac else ""
     ret += f" nspeed_length:{ac['nspeed_length']}" if 'nspeed_length' in ac else ""
-    ret += f" audio_info: speak_time {ac['audio_info']['speak_time']} was_prio {ac['audio_info']['was_prio']}" if 'audio_info' in ac else ""
+    ret += f" audio: speak_time {ac['audio']['speak_time']} was_prio {ac['audio']['was_prio']}" if 'audio' in ac else ""
     ret += f" last_speak_time:{time.strftime('%H:%M:%S', time.gmtime(ac['last_speak_time']))}" if 'last_speak_time' in ac else ""
     ret += f" arcposition:{ac['arcposition']}" if 'arcposition' in ac else ""
     ret += f" circradius:{ac['circradius']}" if 'circradius' in ac else ""
@@ -315,6 +314,7 @@ def is_steering_message(traffic):  # checks if traffic is a steering message and
 
 def audio_output_adsb(ac):
     message = None
+    rlog.log(AIRCRAFT_DEBUG, f"Audio output: {ac['Icao_addr']} {ac['prio']} {ac.get('audio', "")}")
     # ac['audio'] = {'speak_time': timestamp of last announce for this aircraft, 'was_prio': gesprochene Prio, }
     audio_info = ac.get('audio')
     timeout = AUDIO_TIMEOUTS[ac['prio']]    # timeout for this current prio
