@@ -65,18 +65,19 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     # color and size scheme for prios (fillcolor, outline-color, outline-size, size-factor)
     PRIORITY_MAPPING_LIGHT = {
         0: ("white", "black", 3, 1),  # unclear
-        1: ("black", "black", 2, 1.5),  # RA (Resolution Advisory)
-        2: ("white", "black", 4, 1),  # TA (Traffic Advisory)
-        3: ("white", "black", 2, 1),  # potential_collision
-        4: ("white", "black", 1, 1)  # no_collision
+        1: ("black", "black", 1, 1.5),  # RA (Resolution Advisory)
+        2: ("black", "black", 1, 1),  # TA (Traffic Advisory)
+        3: ("white", "black", 4, 1),  # potential_collision
+        4: ("white", "black", 2, 1)  # no_collision
     }
     PRIORITY_MAPPING_DARK = {
-        0: ("white", "black", 3, 1),  # unclear
-        1: ("white", "white", 2, 1.5),  # RA (Resolution Advisory)
-        2: ("black", "white", 4, 1),  # TA (Traffic Advisory)
-        3: ("white", "black", 2, 1),  # potential_collision
-        4: ("white", "black", 1, 1)  # no_collision
+        0: ("black", "white", 3, 1),  # unclear
+        1: ("white", "white", 1, 1.5),  # RA (Resolution Advisory)
+        2: ("white", "white", 1, 1),  # TA (Traffic Advisory)
+        3: ("black", "white", 4, 1),  # potential_collision
+        4: ("black", "white", 2, 1)  # no_collision
     }
+
     
     def __init__(self):
         super().__init__()
