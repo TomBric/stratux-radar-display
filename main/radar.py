@@ -438,7 +438,7 @@ def new_traffic(json_str):
                 ac['direction'] = traffic['Track'] - situation['course']
                 # sometimes track is missing, then leave it as it is
             old_prio = 0
-            if ac['prio']:
+            if 'prio' in ac:
                 old_prio = ac['prio']
             ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_tcas_state(traffic, situation))
             audio_output_adsb(ac)
