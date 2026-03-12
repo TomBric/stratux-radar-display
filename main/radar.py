@@ -403,7 +403,7 @@ def new_traffic(json_str):
         is_new = False
         if traffic['Icao_addr'] not in all_ac.keys():
             # new traffic, insert
-            all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'was_spoken': False, 'prio':0}
+            all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'prio':0}
             is_new = True
         ac = all_ac[traffic['Icao_addr']]
         if traffic['Age'] <= traffic['AgeLastAlt']:
