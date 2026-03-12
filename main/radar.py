@@ -314,10 +314,11 @@ def is_steering_message(traffic):  # checks if traffic is a steering message and
 
 def audio_output_adsb(ac):
     message = None
-    rlog.log(AIRCRAFT_DEBUG, f"Audio output: {ac['Icao_addr']} {ac['prio']} {ac.get('audio', "")}")
+    rlog.log(AIRCRAFT_DEBUG, f"Audio output: {ac['Icao_addr']} Prio {ac.get('prio',0)} Audio {ac.get('audio', "")}")
     # ac['audio'] = {'speak_time': timestamp of last announce for this aircraft, 'was_prio': gesprochene Prio, }
     audio_info = ac.get('audio')
     timeout = AUDIO_TIMEOUTS[ac['prio']]    # timeout for this current prio
+    rlog.log(AIRCRAFT_DEBUG,f"Timeout for prio is {timeout} sec")
     if ac['prio'] == 0 or ac['prio'] == 3:  # unclear traffic, or potential collision traffic, speak once
         if not audio_info or audio_info['speak_time'] == 0:   # traffic not yet spoken, speak
             message = gen_traffic_message(ac)
