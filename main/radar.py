@@ -439,8 +439,8 @@ def new_traffic(json_str):
                 # sometimes track is missing, then leave it as it is
             if ac['gps_distance'] <= situation['RadarRange'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
                 res_angle = (ac['gps_angle'] - situation['course']) % 360
-                gpsx = math.sin(math.radians(res_angle)) * ac['gps_rad']
-                gpsy = - math.cos(math.radians(res_angle)) * ac['gps_rad']
+                gpsx = math.sin(math.radians(res_angle)) * ac['gps_distance']
+                gpsy = - math.cos(math.radians(res_angle)) * ac['gps_distance']
                 ac['x'] = round(max_pixel / 2 * gpsx / situation['RadarRange'] + zerox)
                 ac['y'] = round(max_pixel / 2 * gpsy / situation['RadarRange'] + zeroy)
                 if 'nspeed' in ac:
