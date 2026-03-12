@@ -314,7 +314,7 @@ def is_steering_message(traffic):  # checks if traffic is a steering message and
 
 def audio_output_adsb(ac):
     message = None
-    rlog.log(AIRCRAFT_DEBUG, f"Audio output: {ac['Icao_addr']} Prio {ac.get('prio',0)} Audio {ac.get('audio', "")}")
+    rlog.log(AIRCRAFT_DEBUG, f"Audio output: Prio {ac.get('prio',0)} Audio {ac.get('audio', "")}")
     # ac['audio'] = {'speak_time': timestamp of last announce for this aircraft, 'was_prio': gesprochene Prio, }
     audio_info = ac.get('audio')
     timeout = AUDIO_TIMEOUTS[ac['prio']]    # timeout for this current prio
@@ -442,6 +442,7 @@ def new_traffic(json_str):
             if 'prio' in ac:
                 old_prio = ac['prio']
             ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_tcas_state(traffic, situation))
+            rlog.log(AIRCRAFT_DEBUG, f"Traffic priority is: {ac['prio']}")
             audio_output_adsb(ac)
             if old_prio == 1 and ac['prio'] != 1:  # there was a RA situation on this aircraft, now its clear
                 # check if there is still a RA situation
