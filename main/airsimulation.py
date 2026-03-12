@@ -116,7 +116,6 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                     speed = float(parts[7].strip())
                     vspeed = float(parts[8].strip())
                     # Extract comment from the rest of the line after the 9th value
-                    rlog.debug(f"Delay: {delay}s")
                     next_event_time = time.time() + delay
 
                     while time.time() < next_event_time:
