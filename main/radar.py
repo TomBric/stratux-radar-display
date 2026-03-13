@@ -196,15 +196,17 @@ def dump_all(all_aircraft):    # return string of all aircraft currently monitor
     return ret
 
 
+def get_tail_display(ac):
+    """Get tail display for aircraft if enabled and available."""
+    return ac['tail'] if global_config['display_tail'] and 'tail' in ac else None
+
+
 def draw_all_ac(allac):
     dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
     for icao, ac in dist_sorted:
         # first draw mode-s
         if 'circradius' in ac:
-            if global_config['display_tail'] and 'tail' in ac:
-                tail = ac['tail']
-            else:
-                tail = None
+            tail = get_tail_display(ac)
             if ac['circradius'] <= max_pixel / 2:
                 display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac['vspeed'],
                                               tail)
@@ -212,14 +214,8 @@ def draw_all_ac(allac):
         # then draw adsb
         if 'x' in ac:
             if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
-                if 'nspeed_length' in ac:
-                    line_length = ac['nspeed_length']
-                else:
-                    line_length = 0
-                if global_config['display_tail'] and 'tail' in ac:
-                    tail = ac['tail']
-                else:
-                    tail = None
+                line_length = ac.get('nspeed_length', 0)
+                tail = get_tail_display(ac)
                 display_control.aircraft(ac['x'], ac['y'], ac['direction'], ac['hdiff'], ac['vspeed'],
                                          line_length, tail, ac['prio'])
 
@@ -473,7 +469,7 @@ def new_traffic(json_str):
                                          f"was older than {POSITION_VALID_DELTA}secs")
             speech_output_modes(ac)
     except KeyError:  # to be safe in case keys are changed in Stratux
-        rlog.debug(f"KeyError decoding {json_str} \n with ac: {ac}")
+        rlog.debug(f"KeyError decoding {json_str}")
 
 
 def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
@@ -947,22 +943,16 @@ def initialize_sensors_and_simulation():
 
 def main():
     global max_pixel, zerox, zeroy, display_refresh_time
-
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
-    
     # Initialize UI components
     if not initialize_ui_components():
         return 1
-    
     # Initialize audio system
     initialize_audio_system()
-    
     # Initialize display
     max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
-    
     # Initialize sensors and simulation
     initialize_sensors_and_simulation()
-    
     rlog.debug(f"Initialization finished. Global config {global_config}")
     display_control.startup(RADAR_VERSION, url_host_base, 4)
     
