@@ -313,49 +313,30 @@ def is_steering_message(traffic):  # checks if traffic is a steering message and
 
 
 def audio_output_adsb(ac):
-    message = None
-    # ac['audio'] = {'speak_time': timestamp of last announce for this aircraft, 'was_prio': gesprochene Prio, }
     audio_info = ac.get('audio')
-    timeout = AUDIO_TIMEOUTS[ac['prio']]    # timeout for this current prio
+    timeout = AUDIO_TIMEOUTS[ac['prio']]
     rlog.log(AIRCRAFT_DEBUG,f"Timeout for prio is {timeout} sec")
-    if ac['prio'] == 0 or ac['prio'] == 3:  # unclear traffic, or potential collision traffic, speak once
-        if not audio_info or audio_info['speak_time'] == 0:   # traffic not yet spoken, speak
-            message = gen_traffic_message(ac)
-    elif ac['prio'] == 1:   # RA
-        if not audio_info or audio_info['speak_time'] == 0 or audio_info['was_prio'] != 1:   # was not spoken as RA before
-            message = gen_traffic_message(ac)
-        else:   # was already spoken as RA, check whether it is time to repeat
-            if audio_info['speak_time'] + timeout <= time.time():    # its time to repeat
-                message = gen_traffic_message(ac)
-    elif ac['prio'] == 2:   # TA
-        if not audio_info or audio_info['speak_time'] == 0:   # never spoken
-            message = gen_traffic_message(ac)
+    
+    should_speak = False
+    
+    if ac['prio'] in [0, 3]:  # unclear or collision traffic
+        should_speak = not audio_info or audio_info['speak_time'] == 0
+    elif ac['prio'] == 1:  # RA
+        should_speak = (not audio_info or audio_info['speak_time'] == 0 or 
+                       audio_info['was_prio'] != 1 or 
+                       (audio_info['speak_time'] + timeout <= time.time()))
+    elif ac['prio'] == 2:  # TA
+        if not audio_info or audio_info['speak_time'] == 0:
+            should_speak = True
         else:
-            if audio_info['was_prio'] == 1 or audio_info['was_prio'] == 2:
-                # was already spoken as TA or RA, check whether it is time to repeat
-                if audio_info['speak_time'] + timeout <= time.time():    # its time to repeat
-                    message = gen_traffic_message(ac)     # if it was RA before, repeat only after TA time now
-            else:    # was in lower prio state before, speak
-                message = gen_traffic_message(ac)
-    elif ac['prio'] == 3:    # collision traffic
-        if not audio_info or audio_info['speak_time'] != 0:   # not yet spoken, do it
-            message = gen_traffic_message(ac)
-        else:
-            # repeat collision traffic after timeout, whatever it was before
-            if audio_info['speak_time'] + timeout <= time.time():    # its time to repeat
-                message = gen_traffic_message(ac)     # if it was RA before, repeat only after TA time now
-    elif ac['prio'] == 0:    # unclear traffic, it is only announced once
-        if not audio_info or audio_info['speak_time'] != 0:   # not yet spoken, do it
-            message = gen_traffic_message(ac)
-        else:   # repeat unclear traffic after timeout, whatever it was before
-            if audio_info['speak_time'] + timeout <= time.time():  # its time to repeat
-                message = gen_traffic_message(ac)  # if it was RA before, repeat only after TA time now
-    if message:
+            was_high_prio = audio_info['was_prio'] in [1, 2]
+            should_speak = (was_high_prio and audio_info['speak_time'] + timeout <= time.time()) or not was_high_prio
+    
+    if should_speak:
+        message = gen_traffic_message(ac)
         ac['audio'] = {'speak_time': time.time(), 'was_prio': ac['prio']}
-        if ac['prio'] == 1:    # RA
-            radarbluez.priority_speak(message, 130)
-        else:
-            radarbluez.speak(message, 130)
+        speak_func = radarbluez.priority_speak if ac['prio'] == 1 else radarbluez.speak
+        speak_func(message, 130)
 
 
 def speak_mode_s(ac):
@@ -518,6 +499,16 @@ def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
             last_bt_checktime = 0.0  # reset timer
 
 
+def update_field_if_changed(target_dict, field_name, new_value, changed_flag_dict=None):
+    """Update a field if the value changed and mark as changed."""
+    if target_dict[field_name] != new_value:
+        target_dict[field_name] = new_value
+        if changed_flag_dict:
+            changed_flag_dict['was_changed'] = True
+        return True
+    return False
+
+
 def new_situation(json_str):
     global vertical_max
     global vertical_min
@@ -536,33 +527,22 @@ def new_situation(json_str):
             situation['gps_active'] = gps_active
             situation['was_changed'] = True
         if not basemode:
-            if situation['course'] != round(sit['GPSTrueCourse']):
-                situation['course'] = round(sit['GPSTrueCourse'])
-                situation['was_changed'] = True
-        if situation['own_altitude'] != sit['BaroPressureAltitude']:
-            situation['own_altitude'] = sit['BaroPressureAltitude']
-            situation['was_changed'] = True
-        if situation['latitude'] != sit['GPSLatitude']:
-            situation['latitude'] = sit['GPSLatitude']
-            situation['was_changed'] = True
-        if situation['longitude'] != sit['GPSLongitude']:
-            situation['longitude'] = sit['GPSLongitude']
-            situation['was_changed'] = True
-        if situation['gps_quality'] != sit['GPSFixQuality']:
-            situation['gps_quality'] = sit['GPSFixQuality']
-            situation['was_changed'] = True
-        if situation['gps_h_accuracy'] != sit['GPSHorizontalAccuracy']:
-            situation['gps_h_accuracy'] = sit['GPSHorizontalAccuracy']
-            situation['was_changed'] = True
-        if situation['gps_v_accuracy'] != sit['GPSVerticalAccuracy']:
-            situation['gps_v_accuracy'] = sit['GPSVerticalAccuracy']
-            situation['was_changed'] = True
-        if situation['gps_speed'] != sit['GPSGroundSpeed']:
-            situation['gps_speed'] = sit['GPSGroundSpeed']
-            situation['was_changed'] = True
-        if situation['gps_altitude'] != sit['GPSAltitudeMSL']:
-            situation['gps_altitude'] = sit['GPSAltitudeMSL']
-            situation['was_changed'] = True
+            update_field_if_changed(situation, 'course', round(sit['GPSTrueCourse']), situation)
+        
+        # Update situation fields
+        fields_to_update = [
+            ('own_altitude', sit['BaroPressureAltitude']),
+            ('latitude', sit['GPSLatitude']),
+            ('longitude', sit['GPSLongitude']),
+            ('gps_quality', sit['GPSFixQuality']),
+            ('gps_h_accuracy', sit['GPSHorizontalAccuracy']),
+            ('gps_v_accuracy', sit['GPSVerticalAccuracy']),
+            ('gps_speed', sit['GPSGroundSpeed']),
+            ('gps_altitude', sit['GPSAltitudeMSL'])
+        ]
+        
+        for field_name, new_value in fields_to_update:
+            update_field_if_changed(situation, field_name, new_value, situation)
 
         if sit['BaroSourceType'] == 1 or sit['BaroSourceType'] == 2 or sit['BaroSourceType'] == 3:
             # 1 = BMP280, 2 = OGN device, 3 = NMEA device
@@ -593,48 +573,31 @@ def new_situation(json_str):
                 # not yet an update time value from GPS, but the old one is transmitted by stratux
                 update_time(sit['GPSTime'])
         # ahrs
-        if ahrs['pitch'] != round(sit['AHRSPitch']):
-            ahrs['pitch'] = round(sit['AHRSPitch'])
-            ahrs['was_changed'] = True
-        if ahrs['roll'] != round(sit['AHRSRoll']):
-            ahrs['roll'] = round(sit['AHRSRoll'])
-            ahrs['was_changed'] = True
-        if ahrs['heading'] != round(sit['AHRSGyroHeading']):
-            ahrs['heading'] = round(sit['AHRSGyroHeading'])
-            ahrs['was_changed'] = True
-        if ahrs['slipskid'] != round(sit['AHRSSlipSkid']):
-            ahrs['slipskid'] = round(sit['AHRSSlipSkid'])
-            ahrs['was_changed'] = True
-        if ahrs['gps_hor_accuracy'] != round(sit['GPSHorizontalAccuracy']):
-            ahrs['gps_hor_accuracy'] = round(sit['GPSHorizontalAccuracy'])
-            ahrs['was_changed'] = True
-        if sit['AHRSStatus'] & 0x02:
-            ahrs_flag = True
-        else:
-            ahrs_flag = False
-        if sit['AHRSStatus'] & 0x08:
-            ahrs_caging = True
-        else:
-            ahrs_caging = False
-        if ahrs['is_caging'] != ahrs_caging:
-            ahrs['is_caging'] = ahrs_caging
-            ahrs['was_changed'] = True
-        if ahrs['ahrs_sensor'] != ahrs_flag:
-            ahrs['ahrs_sensor'] = ahrs_flag
-            ahrs['was_changed'] = True
+        ahrs_fields_to_update = [
+            ('pitch', round(sit['AHRSPitch'])),
+            ('roll', round(sit['AHRSRoll'])),
+            ('heading', round(sit['AHRSGyroHeading'])),
+            ('slipskid', round(sit['AHRSSlipSkid'])),
+            ('gps_hor_accuracy', round(sit['GPSHorizontalAccuracy']))
+        ]
+        
+        for field_name, new_value in ahrs_fields_to_update:
+            update_field_if_changed(ahrs, field_name, new_value, ahrs)
+        
+        ahrs_flag = bool(sit['AHRSStatus'] & 0x02)
+        ahrs_caging = bool(sit['AHRSStatus'] & 0x08)
+        update_field_if_changed(ahrs, 'is_caging', ahrs_caging, ahrs)
+        update_field_if_changed(ahrs, 'ahrs_sensor', ahrs_flag, ahrs)
 
-        current = round(sit['AHRSGLoad'], 2)
-        if gmeter['current'] != current:
-            gmeter['current'] = current
-            gmeter['was_changed'] = True
-        maxv = round(sit['AHRSGLoadMax'], 2)
-        if gmeter['max'] != maxv:
-            gmeter['max'] = maxv
-            gmeter['was_changed'] = True
-        minv = round(sit['AHRSGLoadMin'], 2)
-        if gmeter['min'] != minv:
-            gmeter['min'] = minv
-            gmeter['was_changed'] = True
+        # gmeter updates
+        gmeter_fields_to_update = [
+            ('current', round(sit['AHRSGLoad'], 2)),
+            ('max', round(sit['AHRSGLoadMax'], 2)),
+            ('min', round(sit['AHRSGLoadMin'], 2))
+        ]
+        
+        for field_name, new_value in gmeter_fields_to_update:
+            update_field_if_changed(gmeter, field_name, new_value, gmeter)
 
         if simulation_mode:
             sim_data = simulation.read_simulation_data()
@@ -948,39 +911,61 @@ async def coroutines():
         await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, sim_handler)
 
 
-def main():
-    global max_pixel
-    global zerox
-    global zeroy
-    global display_refresh_time
-    global extsound_active
-    global bluetooth_active
-    global button_api_active
-    global radar_sound_on_sound
-    global radar_sound_off_sound
-
-    print("Stratux Radar Display " + RADAR_VERSION + " running ...")
+def initialize_ui_components():
+    """Initialize UI components and related services."""
     if not radarui.init(url_settings_set, button_api_active):
         print("GPIO Error, is  another radar process running? Terminating.")
-        return 1
+        return False
+    
     shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
-    extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
-    radar_sound_on_sound = radarbluez.prepare_sounds_string("Radar sound on")
-    radar_sound_off_sound = radarbluez.prepare_sounds_string("Radar sound off")
-    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
     ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
+    checklist.init(xml_checklist)
+    return True
+
+
+def initialize_audio_system():
+    """Initialize audio system and prepare sounds."""
+    global extsound_active, bluetooth_active, radar_sound_on_sound, radar_sound_off_sound
+    
+    extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
+    radar_sound_on_sound = radarbluez.prepare_sounds_string("Radar sound on")
+    radar_sound_off_sound = radarbluez.prepare_sounds_string("Radar sound off")
+
+
+def initialize_sensors_and_simulation():
+    """Initialize sensor systems and simulation."""
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication, co_simulation_mode, co_i2c_0)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
                         groundbeep, countdown, gear_indication, situation, simulation_mode)
     simulation.init(simulation_mode)
-    checklist.init(xml_checklist)
+
+
+def main():
+    global max_pixel, zerox, zeroy, display_refresh_time
+
+    print("Stratux Radar Display " + RADAR_VERSION + " running ...")
+    
+    # Initialize UI components
+    if not initialize_ui_components():
+        return 1
+    
+    # Initialize audio system
+    initialize_audio_system()
+    
+    # Initialize display
+    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
+    
+    # Initialize sensors and simulation
+    initialize_sensors_and_simulation()
+    
     rlog.debug(f"Initialization finished. Global config {global_config}")
     display_control.startup(RADAR_VERSION, url_host_base, 4)
+    
     try:
         asyncio.run(coroutines())
     except asyncio.CancelledError:
