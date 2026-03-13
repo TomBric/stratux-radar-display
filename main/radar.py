@@ -360,9 +360,9 @@ def speech_output_modes(ac):   # checks if modes aircraft has to be spoken
                 speak_mode_s(ac)
 
 
-def check_clear_of_traffic():   # check if there is still a RA situation in any aircraft
+def check_clear_of_traffic():   # check if there is still a RA or TA situation in any aircraft
     for icao, ac in all_ac.items():
-        if 'prio' in ac and ac['prio'] == 1:
+        if 'prio' in ac and ac['prio'] in [1, 2]:
             return False
     return True
 
