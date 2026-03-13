@@ -426,7 +426,7 @@ def new_traffic(json_str):
                 old_prio = ac['prio']
             ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_tcas_state(traffic, situation))
             audio_output_adsb(ac)
-            if old_prio == 1 and ac['prio'] != 1:  # there was a RA situation on this aircraft, now its clear
+            if old_prio in [1,2] and not ac['prio'] in [1, 2]:  # there was a RA or TA situation on this aircraft, now its clear
                 # check if there is still a RA situation
                 if check_clear_of_traffic():
                     radarbluez.priority_speak("Clear of conflict", 130)  # Clear RA alerts if no aircraft is in RA state anymore
