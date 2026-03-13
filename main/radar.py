@@ -355,7 +355,7 @@ def speech_output_modes(ac):   # checks if modes aircraft has to be spoken
             ac['audio'] = {'speak_time': time.time(), 'was_prio': 0}    # mode S traffic is always unclear
             speak_mode_s(ac)
         else: # already spoken
-            if audio_info['speak_time'] + timeout <= time.time():    # its time to speak it now again
+            if audio_info['speak_time'] + timeout <= time.time():    # it is time to speak it now again
                 ac['audio'] = {'speak_time': time.time(), 'was_prio': 0}
                 speak_mode_s(ac)
 
