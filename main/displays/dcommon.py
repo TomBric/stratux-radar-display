@@ -85,18 +85,18 @@ class GenericDisplay:
     # Priority color mapping for aircraft with TCAS priorities 0-4
     # Format: priority -> (aircraft_color, outline_color, outline_size)
     PRIORITY_MAPPING_LIGHT = {
-        0: ("gray", "darkgray", 1),  # unclear
-        1: ("red", "darkred", 3),  # RA (Resolution Advisory)
-        2: ("orange", "darkorange", 2),  # TA (Traffic Advisory)
-        3: ("yellow", "gold", 2),  # potential_collision
-        4: ("white", "black", 1)  # no_collision
+        0: ("gray", "darkgray", 1, 1),  # unclear
+        1: ("red", "darkred", 3, 1.5),  # RA (Resolution Advisory)
+        2: ("orange", "darkorange", 2, 2),  # TA (Traffic Advisory)
+        3: ("yellow", "gold", 2, 1),  # potential_collision
+        4: ("white", "black", 1, 1)  # no_collision
     }
     PRIORITY_MAPPING_DARK = {
-        0: ("gray", "lightgray", 1),  # unclear
-        1: ("red", "pink", 3),  # RA (Resolution Advisory)
-        2: ("orange", "yellow", 2),  # TA (Traffic Advisory)
-        3: ("yellow", "lightyellow", 2),  # potential_collision
-        4: ("lightgreen", "white", 1)  # no_collision
+        0: ("gray", "lightgray", 1, 1),  # unclear
+        1: ("red", "pink", 3, 1.5),  # RA (Resolution Advisory)
+        2: ("orange", "yellow", 2, 2),  # TA (Traffic Advisory)
+        3: ("yellow", "lightyellow", 2, 1),  # potential_collision
+        4: ("lightgreen", "white", 1, 1)  # no_collision
     }
 
     def __init__(self):
