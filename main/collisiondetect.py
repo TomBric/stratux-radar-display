@@ -129,14 +129,31 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
 
 
 def assess_threat(tau_h, d_cpa, tau_v, h_diff):
-    """
-    Unified threat assessment based on horizontal/vertical tau and distance/altitude.
-    Returns: 'RA', 'TA', 'potential_collision', or 'no_collision'
-    """
+    # threat classification for aircraft with position and velocity
     # Horizontal threats
     h_ra = (0 < tau_h <= RA_THRESHOLD and d_cpa <= RA_DIST_THRESHOLD)
     h_ta = (0 < tau_h <= TA_THRESHOLD and d_cpa <= TA_DIST_THRESHOLD)
     h_coll = (0 < tau_h <= COLLISION_THRESHOLD and d_cpa <= COLLISION_DIST_THRESHOLD)
+
+    # Vertical threats
+    v_ra = (abs(h_diff) <= RA_ALT_THRESHOLD or (0 < tau_v <= RA_THRESHOLD * FACTOR_MARGIN))
+    v_ta = (abs(h_diff) <= TA_ALT_THRESHOLD or (0 < tau_v <= TA_THRESHOLD * FACTOR_MARGIN))
+    v_coll = (abs(h_diff) <= COLLISION_ALT_THRESHOLD or (0 < tau_v <= COLLISION_THRESHOLD * FACTOR_MARGIN))
+
+    if h_ra and v_ra:
+        return 'RA'
+    if h_ta and v_ta:
+        return 'TA'
+    if h_coll and v_coll:
+        return 'potential_collision'
+    return 'no_collision'
+
+def assess_threat_modes(tau_h, tau_v, h_diff):
+    # threat classification for aircraft with modes signal only (distance estimated and vertical velocity)
+    # Horizontal threats
+    h_ra = (0 < tau_h <= RA_THRESHOLD)
+    h_ta = (0 < tau_h <= TA_THRESHOLD)
+    h_coll = (0 < tau_h <= COLLISION_THRESHOLD)
 
     # Vertical threats
     v_ra = (abs(h_diff) <= RA_ALT_THRESHOLD or (0 < tau_v <= RA_THRESHOLD * FACTOR_MARGIN))
@@ -294,4 +311,4 @@ def calc_modes_tcas_state(ac, situation):
     tau_v = vertical_tau(situation['own_altitude'], situation['vertical_speed'], ac['alt'], v_fpm)
     h_diff = ac['hdiff'] * 100.0
     rlog.log(AIRCRAFT_DEBUG, f"MODES: dist {dist:.2f}nm, v_close {v_close:.2f}nm/s, tau_h {tau_h:.1f}s, tau_v {tau_v:.1f}s, vspeed {v_fpm:.0f}fpm, h_diff {h_diff:.0f}ft")
-    return assess_threat(tau_h, dist, tau_v, h_diff)
+    return assess_threat_modes(tau_h, dist, tau_v, h_diff)
