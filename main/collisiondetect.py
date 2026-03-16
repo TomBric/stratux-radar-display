@@ -246,6 +246,7 @@ def update_traffic_adaptive(ac):
     ac['kf'].Q = np.array([[(dt ** 4) / 4, (dt ** 3) / 2], [(dt ** 3) / 2, (dt ** 2)]]) * q_var
     ac['kf'].predict()
     ac['kf'].update(ac['DistanceEstimated'])
+    rlog.debug(AIRCRAFT_DEBUG, f"horizontal kalman filter: {ac['kf'].x}")
 
     # Update vertical filter
     if 'kf_v' not in ac:
@@ -266,6 +267,8 @@ def update_traffic_adaptive(ac):
 
     # kf_v.x[1][0] is vertical velocity (ft/s), convert to fpm
     v_fpm = ac['kf_v'].x[1][0] * 60.0
+
+    # distance, velocity, vertical velocity
     return ac['kf'].x[0][0], ac['kf'].x[1][0], v_fpm
 
 
@@ -277,6 +280,7 @@ def calc_modes_tcas_state(ac, situation):
 
     try:
         dist, v_close, v_fpm = update_traffic_adaptive(ac)
+        rlog.log(AIRCRAFT_DEBUG, f"Mode-S: result of kalman filters: dist {dist} h_vel {v_close} v_fpm {v_fpm}")
     except Exception as e:
         rlog.log(AIRCRAFT_DEBUG, f"Mode-S filter error: {e}")
         return 'unclear'
