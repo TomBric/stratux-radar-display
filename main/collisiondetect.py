@@ -272,7 +272,7 @@ def update_traffic_adaptive(ac):
         ac['last_used_alt_time'] = ac['last_alt_timestamp']
     # do not update kalman filter if no new altitude is available
     if ac['last_used_alt_time'] == ac['last_alt_timestamp']:
-        return ac['kf_v'].x[0][0], ac['kf_v'].x[1][0], ac['kf_v'].x[1][0] * 60.0
+        return ac['kf'].x[0][0], ac['kf'].x[1][0], ac['kf_v'].x[1][0] * 60.0   # dist, velocity, vertical velocity
     # new altitude is available
     dt_v = max(0.001, ac['last_alt_timestamp'] - ac.get('last_used_alt_time', now - 0.5))
     rlog.log(AIRCRAFT_DEBUG, f"dt vertical {dt_v}")
