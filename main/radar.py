@@ -185,6 +185,8 @@ def dump_ac(ac):    # debug function, produces one line for aircraft in a readab
     ret += f" arcposition:{ac['arcposition']}" if 'arcposition' in ac else ""
     ret += f" circradius:{ac['circradius']}" if 'circradius' in ac else ""
     ret += f" prio:{ac['prio']}" if 'prio' in ac else ""
+    ret += f" age_last_alt:{ac['age_last_alt']}" if 'age_last_alt' in ac else ""
+    ret += f" alt:{ac['alt']}" if 'alt' in ac else ""
     return ret
 
 
@@ -287,6 +289,23 @@ def gen_traffic_message(ac):
     return txt
 
 
+def gen_modes_traffic_message(ac):
+    feet = ac['hdiff'] * 100
+    sign = '+'
+    if feet < 0:
+        sign = '-'
+    # Priority-based message templates
+    priority_messages = {
+        1: f"Alarm: traffic {sign}{abs(feet)} feet",  # RA
+        2: f"Advise: traffic {sign}{abs(feet)} feet",  # TA
+        3: f"traffic {sign}{abs(feet)} feet",  # Collision
+        4: None,  # No Collision
+        0: f"traffic {sign}{abs(feet)} feet"  # Unclear
+    }
+    txt = priority_messages.get(ac['prio'], None)
+    return txt
+
+
 def is_steering_message(traffic):  # checks if traffic is a steering message and returns true if yes
     changed = False
     if 'RadarRange' in traffic or 'RadarLimits' in traffic:
@@ -308,13 +327,10 @@ def is_steering_message(traffic):  # checks if traffic is a steering message and
     return False
 
 
-def audio_output_adsb(ac):
+def audio_output(ac, mode_s=False):
     audio_info = ac.get('audio')
     timeout = AUDIO_TIMEOUTS[ac['prio']]
-    rlog.log(AIRCRAFT_DEBUG,f"Timeout for prio is {timeout} sec")
-    
     should_speak = False
-    
     if ac['prio'] in [0, 3]:  # unclear or collision traffic
         should_speak = not audio_info or audio_info['speak_time'] == 0
     elif ac['prio'] == 1:  # RA
@@ -329,7 +345,10 @@ def audio_output_adsb(ac):
             should_speak = (was_high_prio and audio_info['speak_time'] + timeout <= time.time()) or not was_high_prio
     
     if should_speak:
-        message = gen_traffic_message(ac)
+        if not mode_s:
+            message = gen_traffic_message(ac)
+        else:
+            message = gen_modes_traffic_message(ac)
         ac['audio'] = {'speak_time': time.time(), 'was_prio': ac['prio']}
         speak_func = radarbluez.priority_speak if ac['prio'] == 1 else radarbluez.speak
         speak_func(message, 130)
@@ -389,11 +408,14 @@ def new_traffic(json_str):
             all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'prio':0}
             is_new = True
         ac = all_ac[traffic['Icao_addr']]
+        now = time.time()
         if traffic['Age'] <= traffic['AgeLastAlt']:
-            ac['last_contact_timestamp'] = time.time() - traffic['Age']
+            ac['last_contact_timestamp'] = now - traffic['Age']
         else:
-            ac['last_contact_timestamp'] = time.time() - traffic['AgeLastAlt']
+            ac['last_contact_timestamp'] = now - traffic['AgeLastAlt']
         ac['hdiff'] = round((traffic['Alt'] - situation['own_altitude']) / 100)
+        ac['alt'] = traffic['Alt']
+        ac['last_alt_timestamp'] = now - traffic['AgeLastAlt']
 
         if traffic['Speed_valid']:
             ac['nspeed'] = traffic['Speed']
@@ -414,8 +436,9 @@ def new_traffic(json_str):
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at hdiff {ac['hdiff']}")
             rlog.log(AIRCRAFT_DEBUG, f"Traffic is: {traffic}")
             if 'circradius' in ac:
-                del ac['circradius']
-                # was mode-s target before, now invalidate mode-s info
+                del ac['circradius']   # was mode-s target before, now invalidate mode-s info on radius
+            if 'kf' in ac:
+                del ac['kf'] # was mode-s target before, now invalidate mode-s info on kalman filter
             ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             ac['last_position_timestamp'] = time.time()
             if 'Track' in traffic:
@@ -425,7 +448,7 @@ def new_traffic(json_str):
             if 'prio' in ac:
                 old_prio = ac['prio']
             ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_tcas_state(traffic, situation))
-            audio_output_adsb(ac)
+            audio_output(ac, False)
             if old_prio in [1,2] and not ac['prio'] in [1, 2]:  # there was a RA or TA situation on this aircraft, now its clear
                 # check if there is still a RA situation
                 if check_clear_of_traffic():
@@ -467,7 +490,17 @@ def new_traffic(json_str):
                 del ac['y']
                 rlog.log(AIRCRAFT_DEBUG, f"Removing position of {traffic['Icao_addr']:X} since position "
                                          f"was older than {POSITION_VALID_DELTA}secs")
-            speech_output_modes(ac)
+            # calculate priority
+            old_prio = 0
+            if 'prio' in ac:
+                old_prio = ac['prio']
+            ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_modes_tcas_state(traffic, situation))
+            audio_output(ac, True)
+            if old_prio in [1, 2] and not ac['prio'] in [1, 2]:  # there was a RA or TA situation on this aircraft, now its clear
+                # check if there is still a RA situation
+                if check_clear_of_traffic():
+                    radarbluez.priority_speak("Clear of conflict",
+                                              130)  # Clear RA alerts if no aircraft is in RA state anymore
     except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.debug(f"KeyError decoding {json_str}")
 
