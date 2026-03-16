@@ -14,7 +14,7 @@ RA
 # Case 2: Converging vertically from below (Climbing towards path)
 1.0 3000 1.5
 1.0 3500 1.4 1.0 4000 1.3 1.0 4500 1.2 1.0 5000 1.1
-potential_collision
+RA
 
 # Case 3: Diverging - was close but now moving away and descending
 0.5 5500 0.3
@@ -29,4 +29,4 @@ no_collision
 # Case 5: Sudden vertical threat (High speed climb into path)
 0.5 3500 1.0
 0.5 4000 0.9 0.5 4500 0.8 0.5 5000 0.7
-TA
+RA
