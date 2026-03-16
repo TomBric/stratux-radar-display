@@ -280,7 +280,10 @@ def calc_modes_tcas_state(ac, situation):
 
     try:
         dist, v_close, v_fpm = update_traffic_adaptive(ac)
-        rlog.log(AIRCRAFT_DEBUG, f"Mode-S: result of kalman filters: dist {dist} h_vel {v_close} v_fpm {v_fpm}")
+        rlog.log(AIRCRAFT_DEBUG, f"Mode-S: result of kalman filters: ")
+        rlog.log(AIRCRAFT_DEBUG, f"  dist {dist} ")
+        rlog.log(AIRCRAFT_DEBUG, f"  h_vel {v_close} ")
+        rlog.log(AIRCRAFT_DEBUG, f"  v_fpm {v_fpm}")
     except Exception as e:
         rlog.log(AIRCRAFT_DEBUG, f"Mode-S filter error: {e}")
         return 'unclear'
