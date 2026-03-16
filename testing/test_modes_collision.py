@@ -70,20 +70,20 @@ def file_based_test(filename):
         print("-" * 40)
         
         try:
-            # Line 1: initial_dist_nm, initial_alt, initial_age_last_alt
+            # Line 1: initial_timeout, initial_alt, initial_dist_nm
             traffic_init = parse_test_file_line(test_case[0][1])
-            init_dist_nm = float(traffic_init[0])
+            init_timeout = float(traffic_init[0])
             init_alt = float(traffic_init[1])
-            init_age_last_alt = float(traffic_init[2])
+            init_dist_nm = float(traffic_init[2])
             
-            # Line 2: updates (dist_nm, alt, age_last_alt)
+            # Line 2: updates (timeout, alt, dist_nm)
             updates = []
             update_parts = parse_test_file_line(test_case[1][1])
             for j in range(0, len(update_parts), 3):
                 updates.append({
-                    'dist': float(update_parts[j]),
+                    'timeout': float(update_parts[j]),
                     'alt': float(update_parts[j+1]),
-                    'age_last_alt': float(update_parts[j+2])
+                    'dist': float(update_parts[j+2])
                 })
             
             # Line 3: Expected result
@@ -96,32 +96,28 @@ def file_based_test(filename):
                 'DistanceEstimated': init_dist_nm,
                 'alt': init_alt,
                 'hdiff': round((init_alt - situation['own_altitude']) / 100),
-                'last_contact_timestamp': now - init_age_last_alt,
-                'last_alt_timestamp': now - init_age_last_alt
+                'last_alt_timestamp': now - init_timeout
             }
 
-            print(f"Initial: Dist={init_dist_nm}nm, Alt={init_alt}ft, AgeLastAlt={init_age_last_alt}s")
+            print(f"Initial: Timeout={init_timeout}s, Alt={init_alt}ft, Dist={init_dist_nm}nm")
             
-            # Simulate updates
+            # Initial classification to start filters
+            actual_result = collisiondetect.calc_modes_tcas_state(ac, situation)
+            print(f"  Initial State: {actual_result}")
+
+            # Simulate updates with real sleeps
             for up in updates:
-                # In real life, now is moving forward.
-                # Here we simulate time based on age_last_alt relative to a starting 'now'
-                # but to keep it simple and consistent with how radar.py handles it:
-                # ac['last_alt_timestamp'] = now - traffic['AgeLastAlt']
-                # ac['last_contact_timestamp'] = now - min(Age, AgeLastAlt)
-                
-                # Let's assume 'now' for this update is slightly after the previous simulated time
-                # but we use the age_last_alt to determine the actual timestamp
-                sim_now = now + (updates.index(up) + 1) * 1.0 # 1 second increments for simulation time
+                time.sleep(up['timeout'])
+                now = time.time()
                 
                 ac['DistanceEstimated'] = up['dist']
                 ac['alt'] = up['alt']
                 ac['hdiff'] = round((up['alt'] - situation['own_altitude']) / 100)
-                ac['last_alt_timestamp'] = sim_now - up['age_last_alt']
-
+                ac['last_alt_timestamp'] = now
+                
                 # We call the classification which triggers the filter update
                 actual_result = collisiondetect.calc_modes_tcas_state(ac, situation)
-                print(f"  Update: dist={up['dist']}nm, alt={up['alt']}ft, age={up['age_last_alt']}s -> {actual_result}")
+                print(f"  Update: timeout={up['timeout']}s, alt={up['alt']}ft, dist={up['dist']}nm -> {actual_result}")
 
             print(f"Expected: {expected_result}")
             print(f"Actual:   {actual_result}")

@@ -246,7 +246,7 @@ def update_traffic_adaptive(ac):
     ac['kf'].Q = np.array([[(dt ** 4) / 4, (dt ** 3) / 2], [(dt ** 3) / 2, (dt ** 2)]]) * q_var
     ac['kf'].predict()
     ac['kf'].update(ac['DistanceEstimated'])
-    rlog.log(AIRCRAFT_DEBUG, f"horizontal kalman filter: dist {ac['kf'].x[0][0]} velocity {ac['kf'].x[1][0]}")
+    rlog.log(AIRCRAFT_DEBUG, f"horizontal kalman filter: dist {ac['kf'].x[0][0]} vert-velocity {ac['kf'].x[1][0]}")
 
     # Update vertical filter
     if 'kf_v' not in ac:
