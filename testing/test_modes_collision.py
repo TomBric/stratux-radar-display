@@ -16,6 +16,7 @@ rlog.setLevel(AIRCRAFT_DEBUG)
 # Import the actual collisiondetect module
 import collisiondetect
 
+rlog.setLevel(AIRCRAFT_DEBUG)
 def parse_test_file_line(line):
     # Remove commas and split by whitespace or commas
     line = line.replace(',', ' ')
