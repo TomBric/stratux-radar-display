@@ -311,4 +311,4 @@ def calc_modes_tcas_state(ac, situation):
     tau_v = vertical_tau(situation['own_altitude'], situation['vertical_speed'], ac['alt'], v_fpm)
     h_diff = ac['hdiff'] * 100.0
     rlog.log(AIRCRAFT_DEBUG, f"MODES: dist {dist:.2f}nm, v_close {v_close:.2f}nm/s, tau_h {tau_h:.1f}s, tau_v {tau_v:.1f}s, vspeed {v_fpm:.0f}fpm, h_diff {h_diff:.0f}ft")
-    return assess_threat_modes(tau_h, dist, tau_v, h_diff)
+    return assess_threat_modes(tau_h, tau_v, h_diff)
