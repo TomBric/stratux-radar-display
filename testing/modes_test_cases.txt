@@ -16,7 +16,7 @@ RA
 1.0 3500 1.4 1.0 4000 1.3 1.0 4500 1.2 1.0 5000 1.1
 RA
 
-# Case 3: Diverging - was close but now moving away and descending
+# Case 3: Diverging - was close but now moving away and climbing
 0.5 5500 0.3
 0.5 5600 0.4 0.5 5700 0.5 0.5 5800 0.6
 no_collision
@@ -30,3 +30,8 @@ no_collision
 0.5 3500 1.0
 0.5 4000 0.9 0.5 4500 0.8 0.5 5000 0.7
 RA
+
+# Case 6: Traffic Advisory (TA) situation (Medium closing speed, medium altitude difference)
+1.0 4000 1.5
+1.0 4000 1.3 1.0 4000 1.1 1.0 4000 0.9 1.0 4000 0.7 1.0 4000 0.5
+TA
