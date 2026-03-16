@@ -235,10 +235,11 @@ def update_traffic_adaptive(ac):
     # used for mode-s only targets, returns distance, velocity, vertical velocity  by using kalman filters for distance and altitude
     # first horizontal distance estimation
     now = time.time()
-    last_time = ac.get("last_alt_timestamp", now - 0.5)  # fallback if no last contact timestamp available
+    last_time = ac.get("last_contact_timestamp", now - 0.5)  # fallback if no last contact timestamp available
     if 'kf' not in ac:   # filter not initialized
         ac['kf'] = setup_distance_filter(ac['DistanceEstimated'])
     dt = max(0.001, now - last_time)  # do not get dt = 0
+    rlog.log(AIRCRAFT_DEBUG, f"dt horizontal {dt}")
     # update dynamic matrix F mit real dt
     ac['kf'].F = np.array([[1., dt], [0., 1.]])    # new_dist = old_dist + velocity * dt
     # update noiselevel Q according to dt, increase noise with dt
@@ -246,7 +247,7 @@ def update_traffic_adaptive(ac):
     ac['kf'].Q = np.array([[(dt ** 4) / 4, (dt ** 3) / 2], [(dt ** 3) / 2, (dt ** 2)]]) * q_var
     ac['kf'].predict()
     ac['kf'].update(ac['DistanceEstimated'])
-    rlog.log(AIRCRAFT_DEBUG, f"horizontal kalman filter: dist {ac['kf'].x[0][0]} vert-velocity {ac['kf'].x[1][0]}")
+    rlog.log(AIRCRAFT_DEBUG, f"horizontal kalman filter: dist {ac['kf'].x[0][0]} hor-velocity {ac['kf'].x[1][0]}")
 
     # Update vertical filter
     if 'kf_v' not in ac:
@@ -257,6 +258,7 @@ def update_traffic_adaptive(ac):
         return ac['kf_v'].x[0][0], ac['kf_v'].x[1][0], ac['kf_v'].x[1][0] * 60.0
     # new altitude is available
     dt_v = max(0.001, ac['last_alt_timestamp'] - ac.get('last_used_alt_time', now - 0.5))
+    rlog.log(AIRCRAFT_DEBUG, f"dt vertical {dt_v}")
     ac['kf_v'].F = np.array([[1., dt_v], [0., 1.]])
     q_var_v = 10.0  # vertical noise variance
     # update noiselevel Q according to dt, increase noise with dt
