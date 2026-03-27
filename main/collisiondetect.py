@@ -260,7 +260,7 @@ def update_traffic_adaptive(ac):
     # update dynamic matrix F mit real dt
     ac['kf'].F = np.array([[1., dt], [0., 1.]])    # new_dist = old_dist + velocity * dt
     # update noiselevel Q according to dt, increase noise with dt
-    q_var = 0.3
+    q_var = 0.5
     ac['kf'].Q = np.array([[(dt ** 4) / 4, (dt ** 3) / 2], [(dt ** 3) / 2, (dt ** 2)]]) * q_var
     ac['kf'].predict()
     ac['kf'].update(ac['DistanceEstimated'])
