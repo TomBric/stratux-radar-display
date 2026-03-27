@@ -229,7 +229,7 @@ def tcas_to_prio(tcas_state):
 # horizontal distance estimation uses a time based kalman filter. Additionally it is "gated" to ignore outliers
 
 def setup_distance_filter(initial_dist):
-    # kalman filter state x is: [distance, velocity], measurements z are: [distance]
+    # kalman filter state x is: [distance, velocity], measurements z are: [distance], all values in nm
     f = KalmanFilter(dim_x=2, dim_z=1)
     f.x = np.array([[initial_dist], [0.]])
     f.H = np.array([[1., 0.]])    # H is constant, we are only getting distance measurements
@@ -239,12 +239,12 @@ def setup_distance_filter(initial_dist):
 
 
 def setup_vertical_filter(initial_alt):
-    # kalman filter state x is: [altitude, vertical_velocity], measurements z are: [altitude]
+    # kalman filter state x is: [altitude, vertical_velocity], measurements z are: [altitude], all values in ft
     f = KalmanFilter(dim_x=2, dim_z=1)
     f.x = np.array([[initial_alt], [0.]])
     f.H = np.array([[1., 0.]])    # H is altitude
-    f.R = 50.0   # altitude measurement noise (ft)
-    f.P *= 100.0
+    f.R = 50.0   # altitude measurement noise (ft) is minimal, we assume 50 ft here
+    f.P *= 100.0  # noise level if aircraft is first detected is high, quick adaption
     return f
 
 
@@ -260,7 +260,7 @@ def update_traffic_adaptive(ac):
     # update dynamic matrix F mit real dt
     ac['kf'].F = np.array([[1., dt], [0., 1.]])    # new_dist = old_dist + velocity * dt
     # update noiselevel Q according to dt, increase noise with dt
-    q_var = 0.1
+    q_var = 0.3
     ac['kf'].Q = np.array([[(dt ** 4) / 4, (dt ** 3) / 2], [(dt ** 3) / 2, (dt ** 2)]]) * q_var
     ac['kf'].predict()
     ac['kf'].update(ac['DistanceEstimated'])
