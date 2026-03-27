@@ -233,7 +233,7 @@ def setup_distance_filter(initial_dist):
     f = KalmanFilter(dim_x=2, dim_z=1)
     f.x = np.array([[initial_dist], [0.]])
     f.H = np.array([[1., 0.]])    # H is constant, we are only getting distance measurements
-    f.R = 3.0    # noise level
+    f.R = 2.0    # noise level
     f.P *= 10.0   # noise level
     return f
 
