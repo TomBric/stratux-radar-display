@@ -233,7 +233,7 @@ def setup_distance_filter(initial_dist):
     f = KalmanFilter(dim_x=2, dim_z=1)
     f.x = np.array([[initial_dist], [0.]])
     f.H = np.array([[1., 0.]])    # H is constant, we are only getting distance measurements
-    f.R = 2.0    # noise level
+    f.R = 1.0    # noise level (was 2.0)
     f.P *= 10.0   # noise level
     return f
 
@@ -257,10 +257,19 @@ def update_traffic_adaptive(ac):
         ac['kf'] = setup_distance_filter(ac['DistanceEstimated'])
     dt = max(0.001, now - last_time)  # do not get dt = 0
     rlog.log(AIRCRAFT_DEBUG, f"dt horizontal {dt}")
+    
+    # Check for potential sign change in velocity to adapt q_var
+    # if measurement suggests a different direction than current estimate, increase q_var
+    q_var = 1.0
+    current_v = ac['kf'].x[1][0]
+    innovation = ac['DistanceEstimated'] - ac['kf'].x[0][0]
+    if (current_v < -0.1 and innovation > 0.2) or (current_v > 0.1 and innovation < -0.2):
+        q_var = 5.0  # boost adaptation for sign change
+        rlog.log(AIRCRAFT_DEBUG, "Velocity sign change detected, boosting q_var")
+
     # update dynamic matrix F mit real dt
     ac['kf'].F = np.array([[1., dt], [0., 1.]])    # new_dist = old_dist + velocity * dt
     # update noiselevel Q according to dt, increase noise with dt
-    q_var = 0.5
     ac['kf'].Q = np.array([[(dt ** 4) / 4, (dt ** 3) / 2], [(dt ** 3) / 2, (dt ** 2)]]) * q_var
     ac['kf'].predict()
     ac['kf'].update(ac['DistanceEstimated'])
