@@ -100,7 +100,64 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                     current_line_index += 1
                     continue
                 # Parse line: event_number, delay, identifier, lat, lon, alt, track, speed, vspeed, comment
+                # OR for Mode-S: event_number, delay, identifier, alt, distance, expected_result-comment
                 parts = line.split(',')
+                
+                # Check for Mode-S format (5-6 parts) vs regular aircraft format (9+ parts)
+                if len(parts) >= 5 and len(parts) < 9:
+                    # Mode-S format: event_number, delay, identifier, alt, distance, comment
+                    try:
+                        event_number = int(parts[0].strip())
+                        delay = float(parts[1].strip())
+                        identifier = parts[2].strip()
+                        altitude = float(parts[3].strip())
+                        distance_nm = float(parts[4].strip())
+                        # Convert NM to meters for DistanceEstimated
+                        distance_meters = distance_nm * 1852.0
+                        
+                        next_event_time = time.time() + delay
+                        while time.time() < next_event_time:
+                            await asyncio.sleep(min(next_event_time-time.time(), next_situation_time-time.time()))
+                            if time.time() >= next_situation_time:
+                                if last_situation_msg is not None:
+                                    rlog.log(SITUATION_DEBUG, "Simulation: Resending last situation message")
+                                    new_situation_func(json.dumps(last_situation_msg))
+                                next_situation_time = time.time() + REPEAT_SITUATION_TIME
+                        
+                        # Extract expected result from comment if present
+                        if len(parts) > 5:
+                            comment = ",".join(parts[5:]).strip()
+                            rlog.debug(f"Simulation Mode-S event #{event_number}: {identifier}: alt={altitude}ft, dist={distance_nm}nm, {comment}")
+                        else:
+                            rlog.debug(f"Simulation Mode-S event #{event_number}: {identifier}: alt={altitude}ft, dist={distance_nm}nm")
+                        
+                        # Generate Mode-S traffic message (no position, only distance estimation)
+                        traffic_msg = {
+                            'Icao_addr': int(identifier, 16) if identifier.startswith("0x") else hash(identifier) & 0xFFFFFF,
+                            'Lat': 0.0,
+                            'Lng': 0.0,
+                            'Alt': altitude,
+                            'Track': 0,
+                            'Speed': 0,
+                            'Vvel': 0,
+                            'Speed_valid': False,
+                            'Position_valid': False,
+                            'Age': 0,
+                            'AgeLastAlt': 0,
+                            'Last_source': 1,  # 1090ES
+                            'Tail': identifier,
+                            'DistanceEstimated': distance_meters
+                        }
+                        rlog.log(AIRCRAFT_DEBUG, f"Simulation: Mode-S Traffic {identifier} at {distance_nm}nm, alt {altitude}ft")
+                        # Call new_traffic with JSON message
+                        new_traffic_func(json.dumps(traffic_msg))
+                        current_line_index += 1
+                        continue
+                    except (ValueError, IndexError) as e:
+                        rlog.debug(f"Error parsing Mode-S simulation line {current_line_index + 1}: {line} - {e}")
+                        current_line_index += 1
+                        continue
+                
                 if len(parts) < 9:
                     rlog.debug(f"Invalid simulation line format: {line}")
                     current_line_index += 1

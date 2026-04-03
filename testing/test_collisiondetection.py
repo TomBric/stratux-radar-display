@@ -31,6 +31,11 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
+
+# testmodule to test collision detection for adsb targets
+# usage:   python3 test_collisiondetection.py -f <test_file>
+
+
 import sys
 import os
 import math

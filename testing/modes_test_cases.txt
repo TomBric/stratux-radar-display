@@ -4,6 +4,10 @@
 # Line 2: space-separated updates (timeout alt dist_nm) [can be multiple triplets]
 # Line 3: expected_result (RA, TA, potential_collision, no_collision)
 
+# usage:   python3 test_modes_collision.py -f modes_test_cases.txt
+
+
+
 # Note: Own altitude in test script is fixed at 5000ft
 
 # Case 1: Fast approaching RA situation (Closing distance, level altitude)

@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+
+# testmodule to test collision detection for mode s targets
+# usage:   python3 test_modes_collision.py -f <test_file>
+
 import sys
 import os
 import time
