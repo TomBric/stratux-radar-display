@@ -114,7 +114,7 @@ def file_based_test(filename):
                 time.sleep(up['timeout'])
                 now = time.time()
                 
-                ac['DistanceEstimated'] = up['dist']
+                ac['gps_distance'] = up['dist']
                 ac['alt'] = up['alt']
                 ac['hdiff'] = round((up['alt'] - situation['own_altitude']) / 100)
                 ac['last_alt_timestamp'] = now

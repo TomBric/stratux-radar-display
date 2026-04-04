@@ -254,7 +254,7 @@ def update_traffic_adaptive(ac):
     now = time.time()
     last_time = ac.get("last_contact_timestamp", now - 0.5)  # fallback if no last contact timestamp available
     if 'kf' not in ac:   # filter not initialized
-        ac['kf'] = setup_distance_filter(ac['DistanceEstimated'])
+        ac['kf'] = setup_distance_filter(ac['gps_distance'])
     dt = max(0.001, now - last_time)  # do not get dt = 0
     rlog.log(AIRCRAFT_DEBUG, f"dt horizontal {dt}")
     
@@ -262,7 +262,7 @@ def update_traffic_adaptive(ac):
     # if measurement suggests a different direction than current estimate, increase q_var
     q_var = 1.0
     current_v = ac['kf'].x[1][0]
-    innovation = ac['DistanceEstimated'] - ac['kf'].x[0][0]
+    innovation = ac['gps_distance'] - ac['kf'].x[0][0]
     if (current_v < -0.1 and innovation > 0.2) or (current_v > 0.1 and innovation < -0.2):
         q_var = 5.0  # boost adaptation for sign change
         rlog.log(AIRCRAFT_DEBUG, "Velocity sign change detected, boosting q_var")
@@ -272,7 +272,7 @@ def update_traffic_adaptive(ac):
     # update noiselevel Q according to dt, increase noise with dt
     ac['kf'].Q = np.array([[(dt ** 4) / 4, (dt ** 3) / 2], [(dt ** 3) / 2, (dt ** 2)]]) * q_var
     ac['kf'].predict()
-    ac['kf'].update(ac['DistanceEstimated'])
+    ac['kf'].update(ac['gps_distance'])
     rlog.log(AIRCRAFT_DEBUG, f"horizontal kalman filter: dist {ac['kf'].x[0][0]} hor-velocity {ac['kf'].x[1][0]}")
 
     # Update vertical filter
@@ -301,9 +301,9 @@ def update_traffic_adaptive(ac):
 
 
 def calc_modes_tcas_state(ac, situation):
-    if 'own_altitude' not in situation or 'alt' not in ac or 'DistanceEstimated' not in ac:
+    if 'own_altitude' not in situation or 'alt' not in ac or 'gps_distance' not in ac:
         return 'unclear'
-    if ac['alt'] == 0 or ac['DistanceEstimated'] == 0:
+    if ac['alt'] == 0 or ac['gps_distance'] == 0:
         return 'unclear'
 
     try:
