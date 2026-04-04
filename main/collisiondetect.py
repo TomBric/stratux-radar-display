@@ -301,6 +301,7 @@ def update_traffic_adaptive(ac):
 
 
 def calc_modes_tcas_state(ac, situation):
+    rlog.log(AIRCRAFT_DEBUG, f"Mode-S: calc_modes_tcas_state: ac: {ac}     situation {situation}")
     if 'own_altitude' not in situation or 'alt' not in ac or 'gps_distance' not in ac:
         return 'unclear'
     if ac['alt'] == 0 or ac['gps_distance'] == 0:
