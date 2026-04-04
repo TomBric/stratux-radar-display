@@ -199,7 +199,7 @@ class GenericDisplay:
 
     def modesaircraft(self, radius, height, arcposition, vspeed, tail, prio=0):
         circle_color, circle_width_multiplier = self.get_modes_color_mapping(prio)
-        circle_width = max(2, 1 + (self.max_pixel * circle_width_multiplier) // 128)
+        circle_width = int(max(2, 1 + self.max_pixel * circle_width_multiplier // 128))
         if radius < self.MINIMAL_CIRCLE:
             radius = self.MINIMAL_CIRCLE
         self.draw.ellipse((self.zerox-radius, self.zeroy-radius, self.zerox+radius, self.zeroy+radius),
