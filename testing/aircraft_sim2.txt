@@ -84,12 +84,44 @@
 68,	2.0,AC4,52.530000,8.170000,4000,315,70,0,AC4 ends NW at 4000ft, 3 NM from OWNSHIP
 68,	2.0,AC4,52.532500,8.167500,4000,315,70,0,AC4 ends NW at 4000ft, 3 NM from OWNSHIP
 68,	2.0,AC4,52.535000,8.165000,4000,315,70,0,AC4 ends NW at 4000ft, 3 NM from OWNSHIP
-69,	1.0,MS1,5000,0.5,RA - Mode-S direct collision at same altitude
-70,	1.0,MS2,4200,1.2,TA - Mode-S approaching at safe altitude difference
-71,	1.0,MS3,6000,3.5,no_collision - Mode-S far away and above
-72,	1.0,MS1,5000,0.2,RA - Mode-S getting closer
-73,	1.0,MS2,4200,0.8,TA - Mode-S closer but still altitude separation
-74,	1.0,MS3,6000,3.2,no_collision - Mode-S still far away
+
+# mode s only aircraft simulation
+69, 1.0, MS1, 5000, 3, Mode-S same altitude coming closer
+70, 1.0, MS1, 5000, 2, Mode-S same altitude coming closer
+71, 1.0, MS1, 5000, 1, Mode-S same altitude coming closer
+72, 1.0, MS1, 5000, 1.2, Mode-S same altitude coming closer
+73, 1.0, MS1, 5000, 1.4, Mode-S same altitude coming closer
+74, 1.0, MS1, 5000, 1.0, Mode-S same altitude coming closer
+75, 1.0, MS1, 5000, 0.8, Mode-S same altitude coming closer
+76, 1.0, MS1, 5000, 0.9, Mode-S same altitude coming closer
+77, 1.0, MS1, 5000, 0.7, Mode-S same altitude coming closer
+78, 1.0, MS1, 5000, 0.9, Mode-S same altitude coming closer
+79, 1.0, MS1, 5000, 0.6, Mode-S same altitude coming closer
+80, 1.0, MS1, 5000, 0.5, Mode-S same altitude coming closer
+81,	1.0,MS1,5000,0.5,RA - Mode-S direct collision at same altitude
+82,	1.0,MS1,5000,0.2,RA - Mode-S direct collision at same altitude
+# no moving out
+83,	1.0,MS1,5000,0.5, Mode-S moving away
+84,	1.0,MS1,5000,0.3,Mode-S moving away
+85,	1.0,MS1,5000,0.6,Mode-S moving away
+86,	1.0,MS1,5000,0.3,Mode-S moving away
+87,	1.0,MS1,5000,0.4,Mode-S moving away
+88,	1.0,MS1,5000,0.7,Mode-S moving away
+89,	1.0,MS1,5000,1.0,RMode-S moving away
+90,	1.0,MS1,5000,1.2,Mode-S moving away
+91,	1.0,MS1,5000,1.0,Mode-S moving away
+92,	1.0,MS1,5000,1.5,Mode-S moving away
+93,	1.0,MS1,5000,2.0,Mode-S moving away
+94,	1.0,MS1,5000,2.5,Mode-S moving away
+95,	1.0,MS1,5000,3.0,Mode-S moving away
+96,	1.0,MS1,5000,3.5,Mode-S moving away
+
+
+97,	1.0,MS2,4200,1.2,TA - Mode-S approaching at safe altitude difference
+98,	1.0,MS3,6000,3.5,no_collision - Mode-S far away and above
+99,	1.0,MS1,5000,0.2,RA - Mode-S getting closer
+100,	1.0,MS2,4200,0.8,TA - Mode-S closer but still altitude separation
+101,	1.0,MS3,6000,3.2,no_collision - Mode-S still far away
 
 
 #
