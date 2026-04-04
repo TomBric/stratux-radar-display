@@ -391,7 +391,7 @@ def collision_detection(ac, traffic, mode_s=False):
     if 'prio' in ac:
         old_prio = ac['prio']
     if mode_s:
-        tcas_state = collisiondetect.calc_modes_tcas_state(traffic, situation)
+        tcas_state = collisiondetect.calc_modes_tcas_state(ac, situation)
     else:
         tcas_state = collisiondetect.calc_tcas_state(traffic, situation)
     rlog.log(AIRCRAFT_DEBUG, f"TCAS state classified as: {tcas_state}")
