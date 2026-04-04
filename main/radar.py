@@ -394,7 +394,7 @@ def collision_detection(ac, traffic, mode_s=False):
         tcas_state = collisiondetect.calc_modes_tcas_state(traffic, situation)
     else:
         tcas_state = collisiondetect.calc_tcas_state(traffic, situation)
-
+    rlog.log(AIRCRAFT_DEBUG, f"TCAS state classified as: {tcas_state}")
     ac['prio'] = collisiondetect.tcas_to_prio(tcas_state)
     audio_output(ac, mode_s)
     if old_prio in [1, 2] and not ac['prio'] in [1, 2]:  # there was a RA or TA on this aircraft, now it's clear
