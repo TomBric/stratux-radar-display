@@ -82,6 +82,7 @@ class GenericDisplay:
     # CO warner specific constants
     GRAPH_SPACE = 3  # space between scale figures and zero line
     GRAPH_X_AXIS_LINE_LENGTH = 5  # line length for values in graph
+
     # Priority color mapping for aircraft with TCAS priorities 0-4
     # Format: priority -> (aircraft_color, outline_color, outline_size)
     PRIORITY_MAPPING_LIGHT = {
@@ -99,10 +100,26 @@ class GenericDisplay:
         4: ("lightgreen", "white", 1, 1)  # no_collision
     }
 
+    # Priority color mapping for mode-s aircraft with TCAS priorities 0-4
+    # Format: priority -> (circle_color, width_multiplier)
+    MODES_PRIORITY_MAPPING_LIGHT = {
+        0: ("gray", 0.8),  # unclear
+        1: ("red", 3),     # RA (Resolution Advisory)
+        2: ("orange", 2),  # TA (Traffic Advisory)
+        3: ("yellow", 1),  # potential_collision
+        4: ("gray",  0.5)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_DARK  = {
+        0: ("white", 0.8),  # unclear
+        1: ("red", 3),  # RA (Resolution Advisory)
+        2: ("orange", 2),  # TA (Traffic Advisory)
+        3: ("yellow", 1),  # potential_collision
+        4: ("white", 0.5)  # no_collision
+    }
+
     def __init__(self):
         self.rlog = logging.getLogger('stratux-radar-log')
         # Initialize color attributes with default light mode
-        self.MODE_S_COLOR = "black"
         self.BG_COLOR = "white"
         self.TEXT_COLOR = "black"
         self.HIGHLIGHT_COLOR = self.TEXT_COLOR
@@ -148,13 +165,18 @@ class GenericDisplay:
         mapping = self.PRIORITY_MAPPING_DARK if self.dark_mode else self.PRIORITY_MAPPING_LIGHT
         return mapping.get(priority, ("gray", "darkgray" if not self.dark_mode else "lightgray", 1))
 
+    def get_modes_color_mapping(self, priority):
+        # priority (int): TCAS priority (0=unclear, 1=RA, 2=TA, 3=collision, 4=no_collision)
+        # Returns:  tuple: (circle_color, circle_width_multiplier)
+        mapping = self.MODES_PRIORITY_MAPPING_DARK if self.dark_mode else self.MODES_PRIORITY_MAPPING_LIGHT
+        return mapping.get(priority, ("gray" if not self.dark_mode else "lightgray", 1))
+
     def set_dark_mode(self, dark_mode):
         self.dark_mode = dark_mode
         if dark_mode:
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
             self.HIGHLIGHT_COLOR = "white"
-            self.MODE_S_COLOR = "white"
             self.AHRS_EARTH_COLOR = "black"
             self.AHRS_SKY_COLOR = "black"
             self.AHRS_HORIZON_COLOR = "white"
@@ -163,7 +185,6 @@ class GenericDisplay:
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
             self.HIGHLIGHT_COLOR = "black"
-            self.MODE_S_COLOR = "black"
             self.AHRS_EARTH_COLOR = "brown"
             self.AHRS_SKY_COLOR = "lightblue"
             self.AHRS_HORIZON_COLOR = "black"
@@ -176,12 +197,13 @@ class GenericDisplay:
         self.rlog.debug("Running Radar with NoDisplay! ")
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
-    def modesaircraft(self, radius, height, arcposition, vspeed, tail):
-        circle_width = max(2, 1 + self.max_pixel // 128)
+    def modesaircraft(self, radius, height, arcposition, vspeed, tail, prio=0):
+        circle_color, circle_width_multiplier = self.get_modes_color_mapping(prio)
+        circle_width = max(2, 1 + (self.max_pixel * circle_width_multiplier) // 128)
         if radius < self.MINIMAL_CIRCLE:
             radius = self.MINIMAL_CIRCLE
         self.draw.ellipse((self.zerox-radius, self.zeroy-radius, self.zerox+radius, self.zeroy+radius),
-                          width=circle_width, outline=self.MODE_S_COLOR)
+                          width=circle_width, outline=circle_color)
         arctext = posn(arcposition, radius, angle_offset=self.ANGLE_OFFSET)
         signchar = "+" if height > 0 else "-"
         t = signchar + str(abs(height))
@@ -189,13 +211,13 @@ class GenericDisplay:
         w = self.draw.textlength(t, self.fonts[self.LARGE])
         tposition = (int(self.zerox+arctext[0]-w//2), int(self.zeroy+arctext[1]-self.LARGE//2))
         self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.LARGE)), fill=self.BG_COLOR)
-        self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.MODE_S_COLOR)
+        self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=circle_color)
         if tail is not None:
             tl = self.draw.textlength(tail, self.fonts[self.VERYSMALL])
             self.draw.rectangle((tposition[0], tposition[1] + self.LARGE, tposition[0] + tl,
                             tposition[1] + self.LARGE + self.VERYSMALL), fill=self.BG_COLOR)
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail,
-                           font=self.fonts[self.VERYSMALL], fill=self.MODE_S_COLOR)
+                           font=self.fonts[self.VERYSMALL], fill=circle_color)
 
     def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, prio=0):
         # Get colors and outline size based on priority

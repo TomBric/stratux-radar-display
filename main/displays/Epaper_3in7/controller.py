@@ -73,6 +73,20 @@ class Epaper3in7(dcommon.GenericDisplay):
         3: ("black", "white", 4, 1),  # potential_collision
         4: ("black", "white", 2, 1)  # no_collision
     }
+    MODES_PRIORITY_MAPPING_LIGHT = {
+        0: ("black", 0.8),  # unclear
+        1: ("black", 3),  # RA (Resolution Advisory)
+        2: ("black", 2),  # TA (Traffic Advisory)
+        3: ("black", 1),  # potential_collision
+        4: ("black", 0.5)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_DARK = {
+        0: ("white", 0.8),  # unclear
+        1: ("white", 3),  # RA (Resolution Advisory)
+        2: ("white", 2),  # TA (Traffic Advisory)
+        3: ("white", 1),  # potential_collision
+        4: ("white", 0.5)  # no_collision
+    }
 
     def __init__(self):
         super().__init__()
@@ -82,7 +96,6 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.HIGHLIGHT_COLOR = "black"
         self.AIRCRAFT_COLOR = "black"
         self.AIRCRAFT_OUTLINE = "black"
-        self.MODE_S_COLOR = "black"
         # AHRS colors
         self.AHRS_EARTH_COLOR = "white"
         self.AHRS_SKY_COLOR = "white"
@@ -104,7 +117,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.HIGHLIGHT_COLOR = "white"
             self.AIRCRAFT_COLOR = "white"
             self.AIRCRAFT_OUTLINE = "white"
-            self.MODE_S_COLOR = "white"
             self.AHRS_EARTH_COLOR = "black"
             self.AHRS_SKY_COLOR = "black"
             self.AHRS_HORIZON_COLOR = "white"
@@ -115,7 +127,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.HIGHLIGHT_COLOR = "black"
             self.AIRCRAFT_COLOR = "black"
             self.AIRCRAFT_OUTLINE = "black"
-            self.MODE_S_COLOR = "black"
             self.AHRS_EARTH_COLOR = "white"
             self.AHRS_SKY_COLOR = "white"
             self.AHRS_HORIZON_COLOR = "black"
