@@ -4,6 +4,7 @@
 # Scenario: OWNSHIP moves North to South, 3 aircraft on collision course, others in typical GA patterns
 # Own aircraft at 5000ft, others at various altitudes
 
+1,	0.0,OWNSHIP,52.500000,8.200000,5000,180,100,0,Initial setup - Own aircraft starting north, moving south
 
 # mode s only aircraft simulation
 69, 1.0, MS1, 5000, 3, Mode-S same altitude coming closer
