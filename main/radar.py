@@ -385,6 +385,23 @@ def check_clear_of_traffic():   # check if there is still a RA or TA situation i
             return False
     return True
 
+def collision_detection(ac, traffic, mode_s=False):
+    # check collisiondetection for adsb and mode s, update priority and audio
+    old_prio = 0
+    if 'prio' in ac:
+        old_prio = ac['prio']
+    if mode_s:
+        tcas_state = collisiondetect.calc_modes_tcas_state(traffic, situation)
+    else:
+        tcas_state = collisiondetect.calc_tcas_state(traffic, situation)
+
+    ac['prio'] = collisiondetect.tcas_to_prio(tcas_state)
+    audio_output(ac, mode_s)
+    if old_prio in [1, 2] and not ac['prio'] in [1, 2]:  # there was a RA or TA on this aircraft, now it's clear
+        # check if there is still another RA situation
+        if check_clear_of_traffic():
+            radarbluez.priority_speak("Clear of conflict", 130)
+
 
 def new_traffic(json_str):
     global last_arcposition
@@ -444,15 +461,7 @@ def new_traffic(json_str):
             if 'Track' in traffic:
                 ac['direction'] = traffic['Track'] - situation['course']
                 # sometimes track is missing, then leave it as it is
-            old_prio = 0
-            if 'prio' in ac:
-                old_prio = ac['prio']
-            ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_tcas_state(traffic, situation))
-            audio_output(ac, False)
-            if old_prio in [1,2] and not ac['prio'] in [1, 2]:  # there was a RA or TA situation on this aircraft, now its clear
-                # check if there is still a RA situation
-                if check_clear_of_traffic():
-                    radarbluez.priority_speak("Clear of conflict", 130)  # Clear RA alerts if no aircraft is in RA state anymore
+            collision_detection(ac, traffic, False)
             if ac['gps_distance'] <= situation['RadarRange'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
                 res_angle = (ac['gps_angle'] - situation['course']) % 360
                 gpsx = math.sin(math.radians(res_angle)) * ac['gps_distance']
@@ -490,17 +499,8 @@ def new_traffic(json_str):
                 del ac['y']
                 rlog.log(AIRCRAFT_DEBUG, f"Removing position of {traffic['Icao_addr']:X} since position "
                                          f"was older than {POSITION_VALID_DELTA}secs")
-            # calculate priority
-            old_prio = 0
-            if 'prio' in ac:
-                old_prio = ac['prio']
-            ac['prio'] = collisiondetect.tcas_to_prio(collisiondetect.calc_modes_tcas_state(traffic, situation))
-            audio_output(ac, True)
-            if old_prio in [1, 2] and not ac['prio'] in [1, 2]:  # there was a RA or TA situation on this aircraft, now its clear
-                # check if there is still a RA situation
-                if check_clear_of_traffic():
-                    radarbluez.priority_speak("Clear of conflict",
-                                              130)  # Clear RA alerts if no aircraft is in RA state anymore
+            collision_detection(ac, traffic, True)
+
     except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.debug(f"KeyError decoding {json_str}")
 
