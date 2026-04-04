@@ -211,7 +211,7 @@ def draw_all_ac(allac):
             tail = get_tail_display(ac)
             if ac['circradius'] <= max_pixel / 2:
                 display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac['vspeed'],
-                                              tail)
+                                              tail, ac['prio'])
     for icao, ac in dist_sorted:
         # then draw adsb
         if 'x' in ac:
