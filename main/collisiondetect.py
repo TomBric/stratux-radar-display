@@ -45,10 +45,10 @@ COLLISION_ALT_THRESHOLD = 2000   # aircraft more alt diff than this will not be 
 # TA thresholds, warning level ADVISORY
 TA_THRESHOLD = 40  # TA at 40 seconds
 TA_DIST_THRESHOLD = 0.3  # 0.3 mile as threshold for minimum separation on current course
-TA_ALT_THRESHOLD = 1500  # 1500 ft threshold for minimal vertical separation currently
+TA_ALT_THRESHOLD = 1000  # 1000 ft threshold for minimal vertical separation currently
 # RA_THRESHOLDS, warning level ALARM
 RA_THRESHOLD = 25  # RA at 25 seconds
-RA_ALT_THRESHOLD = 800 # 1000 ft threshold for minimal vertical currently
+RA_ALT_THRESHOLD = 600 # 800 ft threshold for minimal vertical currently
 RA_DIST_THRESHOLD = 0.2 # 0.2 nm mile as threshold for minimum  separation on current course
 # security factors margin
 FACTOR_MARGIN = 1.2
@@ -225,7 +225,6 @@ def tcas_to_prio(tcas_state):
 
 
 # mode-s only targets, distance estimation and tau calculation
-#
 # horizontal distance estimation uses a time based kalman filter. Additionally it is "gated" to ignore outliers
 
 def setup_distance_filter(initial_dist):
