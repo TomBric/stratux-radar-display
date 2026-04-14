@@ -33,6 +33,7 @@
 
 
 import logging
+import sys
 from enum import Enum
 
 class Modes(Enum):
@@ -75,6 +76,15 @@ logging.addLevelName(SITUATION_DEBUG, 'SITUATION_DEBUG')
 logging.addLevelName(AIRCRAFT_DEBUG, 'AIRCRAFT_DEBUG')
 logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
 rlog = logging.getLogger('stratux-radar-log')
+
+# Hook to log uncaught exceptions that cause program termination
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    rlog.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+
+sys.excepthook = handle_exception
 
 # Global configuration dictionary
 global_config = {}
