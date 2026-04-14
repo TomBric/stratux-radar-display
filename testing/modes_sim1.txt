@@ -53,6 +53,9 @@
 43,	1.0,MS2,4200,1.5,clear - Mode-S approaching at safe altitude difference
 44,	1.0,MS2,4200,2.0,clear - Mode-S approaching at safe altitude difference
 45,	1.0,MS2,4200,2.0,clear - Mode-S approaching at safe altitude difference
+46,	1.0,MS2,4200,2.5,clear - Mode-S approaching at safe altitude difference
+47,	1.0,MS2,4200,3.0,clear - Mode-S approaching at safe altitude difference
+48,	1.0,MS2,4200,5.0,clear - Mode-S approaching at safe altitude difference
 
 
 
