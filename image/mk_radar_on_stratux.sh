@@ -8,10 +8,12 @@
 #  sudo /bin/bash mk_radar_on_stratux.sh [-b <branch>][-u <USB-stick-name>]
 # Run with argument "-b dev" to get the dev branch from github, otherwise with main
 # Run with argument "-d <display>" to create an image for <display>, otherwise default is 'Epaper_3in7'
+# Run with argument "-v 20" to create an image based on stratux 2.0
 # Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
 # call examples:
 #   sudo /bin/bash mk_radar_on_stratux.sh
 #   sudo /bin/bash mk_radar_on_stratux.sh -b dev
+#   sudo /bin/bash mk_radar_on_stratux.sh -v 20
 #   sudo /bin/bash mk_radar_on_stratux.sh -d Epaper_1in54
 # install a first time flashing of the t-beam, copies the content of the specified directory to /home/pi/stratux-radar-display/to_flash
 #   sudo /bin/bash mk_radar_on_stratux.sh -flash /home/pi/GxAirCom81
@@ -34,17 +36,18 @@ BRANCH=main
 USB_NAME=""
 DISPLAY_NAME="NoDisplay"
 UART=false
+VERSION="1.6r1"
 
 # pi imager settings
 GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
-REPONAME="Stratux EU032 with Radar Display preinstalled(64-bit)"
 ICON_URL="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
 DEVICE_LIST="pi3-64bit, pi4-64bit"
 
 # check parameters
-while getopts ":b:d:u:f:s" opt; do
+while getopts ":b:v:d:u:f:s" opt; do
       case $opt in
         b) BRANCH="$OPTARG" ;;
+        v) VERSION="$OPTARG" ;;
         u) USB_NAME="$OPTARG" ;;
         d) DISPLAY_NAME="$OPTARG" ;;
         f) FLASH="$OPTARG" ;;
@@ -54,15 +57,24 @@ while getopts ":b:d:u:f:s" opt; do
       esac
     done
 
-echo "Building stratux image for branch '$BRANCH' and display '$DISPLAY_NAME'"
+REPONAME="Stratux $VERSION with Radar Display preinstalled(64-bit)"
+
+echo "Building stratux image $VERSION for branch '$BRANCH' and display '$DISPLAY_NAME'"
 if [ "$UART" = true ]; then
   echo "Enabling UART Ground Sensor support"
 fi
 
-ZIPNAME="stratux-v1.6r1-eu032-ff1f01dc.img.zip"
-BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu032/${ZIPNAME}"
-outprefix="stratux-eu32-radar"
-IMGNAME="${ZIPNAME%.*}"
+if [ "$VERSION" = "1.6r1" ]; then
+  ZIPNAME="stratux-v1.6r1-eu032-ff1f01dc.img.zip"
+  BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu032/${ZIPNAME}"
+  outprefix="stratux-eu32-radar"
+  IMGNAME="${ZIPNAME%.*}"
+else
+  ZIPNAME="image_2026-03-02-stratux-lite.zip"
+  BASE_IMAGE_URL=https://github.com/stratux/stratux/releases/download/v2.0-pre5/${ZIPNAME}"
+  outprefix="stratux-2.0pre-radar"
+  IMGNAME="${ZIPNAME%.*}"
+fi
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"

@@ -398,8 +398,8 @@ class GenericDisplay:
         for m in range(0, 360, 10):
             s = math.sin(math.radians(m - heading + 90))
             c = math.cos(math.radians(m - heading + 90))
-            x1, y1 = self.czerox - (csize - 1) * c, self.czeroy - (csize - 1) * s
-            x2, y2 = self.czerox - (csize - cmsize) * c, self.czeroy - (csize - cmsize) * s
+            x1, y1 = int(self.czerox - (csize - 1) * c), int(self.czeroy - (csize - 1) * s)
+            x2, y2 = int(self.czerox - (csize - cmsize) * c), int(self.czeroy - (csize - cmsize) * s)
             width = line_width if m % 30 == 0 else line_width//2
             self.draw.line((x1, y1, x2, y2), fill=self.TEXT_COLOR, width=width)
 
@@ -433,10 +433,10 @@ class GenericDisplay:
         move = (dist * s, dist * c)
         s1 = math.sin(math.radians(-90 - roll))
         c1 = math.cos(math.radians(-90 - roll))
-        p1 = (self.ah_zerox - length * s1, self.ah_zeroy + length * c1)
-        p2 = (self.ah_zerox + length * s1, self.ah_zeroy - length * c1)
-        ps = (p1[0] + move[0], p1[1] + move[1])
-        pe = (p2[0] + move[0], p2[1] + move[1])
+        p1 = (int(self.ah_zerox - length * s1), int(self.ah_zeroy + length * c1))
+        p2 = (int(self.ah_zerox + length * s1), int(self.ah_zeroy - length * c1))
+        ps = (int(p1[0] + move[0]), int(p1[1] + move[1]))
+        pe = (int(p2[0] + move[0]), int(p2[1] + move[1]))
         return ps, pe
 
     def rollmarks(self, roll, marks_width, marks_length):
@@ -468,8 +468,8 @@ class GenericDisplay:
         self.draw.rectangle((self.ah_zerox - slipsize_x, self.sizey-1 - slipsize_y*2,
                              self.ah_zerox + slipsize_x, self.sizey-1), fill="black")
         # now draw ball
-        self.draw.ellipse((self.ah_zerox - slipskid * slipscale - slipsize_y, self.sizey-1 - slipsize_y*2,
-                      self.ah_zerox - slipskid * slipscale + slipsize_y, self.sizey-1), fill="white")
+        self.draw.ellipse((int(self.ah_zerox - slipskid * slipscale - slipsize_y), self.sizey-1 - slipsize_y*2,
+                      int(self.ah_zerox - slipskid * slipscale + slipsize_y), self.sizey-1), fill="white")
         # middle line with background
         self.draw.line((self.ah_zerox, self.sizey-1 - slipsize_y * 2, self.ah_zerox, self.sizey-1),
                        fill="black", width=centerline_width*3)
@@ -659,13 +659,12 @@ class GenericDisplay:
         text = f"{int(feet)}"  # round down
         arcw = self.sizex//32  # width of the arc outline
         radx = self.EXTREMELARGE  # x size of ellipse
-        rady = self.EXTREMELARGE * 0.8  # y size of ellipse
+        rady = int(self.EXTREMELARGE * 0.8)  # y size of ellipse
         if feet > 0:
             arc_angle = 360 if feet >= 10.0 else 360/10 * feet
         else:
             arc_angle = 0
-        self.draw.arc(
-            (self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady),
+        self.draw.arc((self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady),
             -90, arc_angle-90, fill=self.TEXT_COLOR, width=arcw)
         self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.EXTREMELARGE],
                        fill=self.TEXT_COLOR,
