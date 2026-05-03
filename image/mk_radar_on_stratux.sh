@@ -59,7 +59,7 @@ while getopts ":b:v:d:u:f:s" opt; do
 
 REPONAME="Stratux $VERSION with Radar Display preinstalled(64-bit)"
 
-echo "Building stratux image $VERSION for branch '$BRANCH' and display '$DISPLAY_NAME'"
+echo "Building stratux image '$VERSION' for branch '$BRANCH' and display '$DISPLAY_NAME'"
 if [ "$UART" = true ]; then
   echo "Enabling UART Ground Sensor support"
 fi
@@ -71,7 +71,7 @@ if [ "$VERSION" = "1.6r1" ]; then
   IMGNAME="${ZIPNAME%.*}"
 else
   ZIPNAME="image_2026-03-02-stratux-lite.zip"
-  BASE_IMAGE_URL=https://github.com/stratux/stratux/releases/download/v2.0-pre5/${ZIPNAME}"
+  BASE_IMAGE_URL="https://github.com/stratux/stratux/releases/download/v2.0-pre5/${ZIPNAME}"
   outprefix="stratux-2.0pre-radar"
   IMGNAME="${ZIPNAME%.*}"
 fi
