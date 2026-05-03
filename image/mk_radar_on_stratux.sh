@@ -21,7 +21,7 @@
 #   sudo /bin/bash mk_radar_on_stratux.sh -s
 
 
-# set -x
+set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -73,7 +73,7 @@ else
   ZIPNAME="image_2026-03-02-stratux-lite.zip"
   BASE_IMAGE_URL="https://github.com/stratux/stratux/releases/download/v2.0-pre5/${ZIPNAME}"
   outprefix="stratux-2.0pre-radar"
-  IMGNAME="${ZIPNAME%.*}"
+  IMGNAME="2026-03-02-stratux-lite.img"
 fi
 
 # cd to script directory
