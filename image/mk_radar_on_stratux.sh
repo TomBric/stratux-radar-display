@@ -92,8 +92,8 @@ bootoffset=${bootoffset::-1}
 partoffset=$(parted $IMGNAME unit B p | grep ext4 | awk -F ' ' '{print $2}')
 partoffset=${partoffset::-1}
 
-# Original image partition is too small to hold our stuff.. resize it to 4gb
-truncate -s 4096M $IMGNAME || die "Image resize failed"
+# Original image partition is too small to hold our stuff.. resize it to 6gb
+truncate -s 6144M $IMGNAME || die "Image resize failed"
 lo=$(losetup -f)
 losetup $lo $IMGNAME
 partprobe $lo
