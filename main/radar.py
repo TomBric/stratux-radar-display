@@ -437,7 +437,9 @@ def new_traffic(json_str):
         if traffic['Speed_valid']:
             ac['nspeed'] = traffic['Speed']
         ac['vspeed'] = traffic['Vvel']
-        if traffic['Tail']:
+        if traffic['Tail'] and traffic['Tail'] != '':
+            # do not give up registration, if it is once received and now is empty,
+            # happens e.g. when same ICAO hex comes from FLARM without ddb entry
             ac['tail'] = traffic['Tail']
 
         # Traffic in all_ac list is
