@@ -121,10 +121,8 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
             r_cpa_x = rx + vx * tau_h
             r_cpa_y = ry + vy * tau_h
             d_cpa_nm = math.hypot(r_cpa_x, r_cpa_y)
-
     # vertical tau
     tau_vert_sec = vertical_tau(own["alt_ft"], own["vs_fpm"], intr["alt_ft"], intr["vs_fpm"])
-
     return tau_hor_sec, d_cpa_nm, tau_vert_sec
 
 
@@ -220,7 +218,6 @@ def tcas_to_prio(tcas_state):
         'no_collision': 4,
         'unclear': 0
     }
-    
     return state_to_prio.get(tcas_state, 0)  # default to 0 for unknown states
 
 

@@ -212,7 +212,7 @@ class GenericDisplay:
         tposition = (int(self.zerox+arctext[0]-w//2), int(self.zeroy+arctext[1]-self.LARGE//2))
         self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.MORELARGE)), fill=self.BG_COLOR)
         self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=circle_color)
-        if tail is not None:
+        if tail is not None and tail != "":
             tl = self.draw.textlength(tail, self.fonts[self.VERYSMALL])
             self.draw.rectangle((tposition[0], tposition[1] + self.LARGE, tposition[0] + tl,
                             tposition[1] + self.LARGE + self.SMALL), fill=self.BG_COLOR)  # SMALL to have more space
@@ -249,7 +249,7 @@ class GenericDisplay:
         else:
             tposition = (x + 4 * self.AIRCRAFT_SIZE + 1, int(y - self.LARGE / 2))
         self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.TEXT_COLOR)
-        if tail is not None:
+        if tail is not None and tail != "":
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.fonts[self.VERYSMALL],
                            fill=self.TEXT_COLOR)
 
