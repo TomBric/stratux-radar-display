@@ -345,7 +345,7 @@ def audio_output(ac, mode_s=False):
             should_speak = (was_high_prio and audio_info['speak_time'] + timeout <= time.time()) or not was_high_prio
     
     if should_speak:
-        logging.COLLISION_DEBUG(f"Speaking: {ac['Icao_addr']} {ac['prio']} {ac['hdiff']} {ac['gps_distance']} {ac['gps_angle']} {ac['course']} {ac['prio']}")
+        rlog.log(COLLISION_DEBUG, f"Speaking: {ac['Icao_addr']} {ac['prio']} {ac['hdiff']} {ac['gps_distance']} {ac['gps_angle']} {ac['course']} {ac['prio']}")
         if not mode_s:
             message = gen_traffic_message(ac)
         else:
@@ -401,7 +401,7 @@ def collision_detection(ac, traffic, mode_s=False):
     if old_prio in [1, 2] and not ac['prio'] in [1, 2]:  # there was a RA or TA on this aircraft, now it's clear
         # check if there is still another RA situation
         if check_clear_of_traffic():
-            logging.COLLISION_DEBUG(f"Clear of conflict: {ac['Icao_addr']} {ac['prio']} {ac['hdiff']} {ac['gps_distance']} {ac['gps_angle']} {ac['course']} {ac['prio']}")
+            rlog.log(COLLISION_DEBUG, f"Clear of conflict: {ac['Icao_addr']} {ac['prio']} {ac['hdiff']} {ac['gps_distance']} {ac['gps_angle']} {ac['course']} {ac['prio']}")
             radarbluez.priority_speak("Clear of conflict", 130)
 
 
