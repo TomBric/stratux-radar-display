@@ -345,6 +345,7 @@ def audio_output(ac, mode_s=False):
             should_speak = (was_high_prio and audio_info['speak_time'] + timeout <= time.time()) or not was_high_prio
     
     if should_speak:
+        logging.COLLISION_DEBUG(f"Speaking: {ac['Icao_addr']} {ac['prio']} {ac['hdiff']} {ac['gps_distance']} {ac['gps_angle']} {ac['course']} {ac['prio']}")
         if not mode_s:
             message = gen_traffic_message(ac)
         else:
@@ -400,6 +401,7 @@ def collision_detection(ac, traffic, mode_s=False):
     if old_prio in [1, 2] and not ac['prio'] in [1, 2]:  # there was a RA or TA on this aircraft, now it's clear
         # check if there is still another RA situation
         if check_clear_of_traffic():
+            logging.COLLISION_DEBUG(f"Clear of conflict: {ac['Icao_addr']} {ac['prio']} {ac['hdiff']} {ac['gps_distance']} {ac['gps_angle']} {ac['course']} {ac['prio']}")
             radarbluez.priority_speak("Clear of conflict", 130)
 
 
@@ -1039,7 +1041,9 @@ if __name__ == "__main__":
     elif args['verbose'] == 1:
         rlog.setLevel(logging.DEBUG)  # log events without situation and aircraft
     elif args['verbose'] == 2:
-        rlog.setLevel(AIRCRAFT_DEBUG)  # log including aircraft
+        rlog.setLevel(COLLISION_DEBUG)  # log collision detection
+    elif args['verbose'] == 3:
+        rlog.setLevel(AIRCRAFT_DEBUG)  # log including situation messages
     else:
         rlog.setLevel(SITUATION_DEBUG)  # log including situation messages
     if args['logfile']:   # set a log file

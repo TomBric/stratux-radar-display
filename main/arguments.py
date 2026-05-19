@@ -59,7 +59,7 @@ def add(ap):
     ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use",
                     default=DEFAULT_CHECKLIST)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP (deprecated, use --url instead)", default=DEFAULT_URL_HOST_BASE)
-    ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
+    ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-NoDebug 1-Debug 2-Collision 3-Aircraft 4-Situation]",
                     default=0)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no",
                     action="store_true", default=False)
