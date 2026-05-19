@@ -1041,7 +1041,7 @@ if __name__ == "__main__":
     elif args['verbose'] == 1:
         rlog.setLevel(logging.DEBUG)  # log events without situation and aircraft
     elif args['verbose'] == 2:
-        rlog.setLevel(COLLISION_DEBUG)  # log collision detection
+        rlog.setLevel(logging.COLLISION_DEBUG)  # log collision detection
     elif args['verbose'] == 3:
         rlog.setLevel(AIRCRAFT_DEBUG)  # log including situation messages
     else:
