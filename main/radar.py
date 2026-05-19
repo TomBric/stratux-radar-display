@@ -70,7 +70,7 @@ import sys
 import traceback
 import syslog
 
-from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG
+from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG, COLLISION_DEBUG
 
 # constants
 RADAR_VERSION = "3.00"
