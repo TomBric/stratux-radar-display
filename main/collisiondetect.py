@@ -259,7 +259,7 @@ def update_traffic_adaptive(ac):
     ac['kf'].F[0, 1] = dt
     ac['kf'].predict()
 
-    # 2. calc residual (Differece:  meaurement - prediction)
+    # 2. calc residual (Difference:  meaurement - prediction)
     prediction = ac['kf'].x[0][0]
     residual = abs(ac['gps_distance']- prediction)
 
@@ -267,6 +267,7 @@ def update_traffic_adaptive(ac):
     max_possible_change = 0.2 * dt + 0.5  # 0.5 NM buffer
 
     if residual >= max_possible_change:
+        rlog.log(AIRCRAFT_DEBUG, f"Residual change to high, ignoring. Residual {residual:.2f}NM max_change {max_possible_change:.2f}NM")
         # value is not realistic, but count it
         ac['outlier_count'] = ac.get('outlier_count', 0) + 1
 
