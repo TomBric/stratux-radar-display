@@ -253,7 +253,34 @@ def update_traffic_adaptive(ac):
         ac['kf'] = setup_distance_filter(ac['gps_distance'])
     dt = max(0.001, now - last_time)  # do not get dt = 0
     rlog.log(AIRCRAFT_DEBUG, f"dt horizontal {dt}")
-    
+
+    # Implement gating for SDR bursts or
+    # 1. prediction: where do we expect the aircraft
+    ac['kf'].F[0, 1] = dt
+    ac['kf'].predict()
+
+    # 2. calc residual (Differece:  meaurement - prediction)
+    prediction = ac['kf'].x[0][0]
+    residual = abs(ac['gps_distance']- prediction)
+
+    # 3. Gating: is the measure realistic? Assumption: aircraft max 600kts = 0.16 NM/s
+    max_possible_change = 0.2 * dt + 0.5  # 0.5 NM buffer
+
+    if residual >= max_possible_change:
+        # value is not realistic, but count it
+        ac['outlier_count'] = ac.get('outlier_count', 0) + 1
+
+        # more than 10 outliers, reset filter
+        if ac['outlier_count'] > 10:
+            ac['kf'].x[0][0] = ac['gps_distance']
+            ac['outlier_count'] = 0
+        return ac['kf'].x[0][0], ac['kf'].x[1][0], ac['kf_v'].x[1][0] * 60.0    # leave it as it was
+
+    # value is plausible
+    ac['kf'].update(ac['gps_distance'])
+    ac['last_contact_timestamp'] = now
+    ac['outlier_count'] = 0
+
     # Check for potential sign change in velocity to adapt q_var
     # if measurement suggests a different direction than current estimate, increase q_var
     q_var = 1.0
@@ -264,20 +291,17 @@ def update_traffic_adaptive(ac):
         rlog.log(AIRCRAFT_DEBUG, "Velocity sign change detected, boosting q_var")
 
     # update dynamic matrix F mit real dt
-    ac['kf'].F = np.array([[1., dt], [0., 1.]])    # new_dist = old_dist + velocity * dt
+    ac['kf'].F = np.array([[1., dt], [0., 1.]])  # new_dist = old_dist + velocity * dt
     # update noiselevel Q according to dt, increase noise with dt
     ac['kf'].Q = np.array([[(dt ** 4) / 4, (dt ** 3) / 2], [(dt ** 3) / 2, (dt ** 2)]]) * q_var
-    ac['kf'].predict()
-    ac['kf'].update(ac['gps_distance'])
     rlog.log(AIRCRAFT_DEBUG, f"horizontal kalman filter: dist {ac['kf'].x[0][0]} hor-velocity {ac['kf'].x[1][0]}")
-
     # Update vertical filter
     if 'kf_v' not in ac:
         ac['kf_v'] = setup_vertical_filter(ac['alt'])
         ac['last_used_alt_time'] = ac['last_alt_timestamp']
     # do not update kalman filter if no new altitude is available
     if ac['last_used_alt_time'] == ac['last_alt_timestamp']:
-        return ac['kf'].x[0][0], ac['kf'].x[1][0], ac['kf_v'].x[1][0] * 60.0   # dist, velocity, vertical velocity
+        return ac['kf'].x[0][0], ac['kf'].x[1][0], ac['kf_v'].x[1][0] * 60.0  # dist, velocity, vertical velocity
     # new altitude is available
     dt_v = max(0.001, ac['last_alt_timestamp'] - ac.get('last_used_alt_time', now - 0.5))
     rlog.log(AIRCRAFT_DEBUG, f"dt vertical {dt_v}")
