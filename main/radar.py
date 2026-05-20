@@ -403,7 +403,7 @@ def collision_detection(ac, traffic, mode_s=False):
     if old_prio in [1, 2] and not ac['prio'] in [1, 2]:  # there was a RA or TA on this aircraft, now it's clear
         # check if there is still another RA situation
         if check_clear_of_traffic():
-            rlog.log(COLLISION_DEBUG, f"Clear of conflict: {ac['Icao_addr']} {ac['prio']} {ac['hdiff']} {ac['gps_distance']} {ac['gps_angle']} {ac['course']} {ac['prio']}")
+            rlog.log(COLLISION_DEBUG, f"Clear of conflict: {ac.get('tail',"unknown")} ")
             radarbluez.priority_speak("Clear of conflict", 130)
 
 
