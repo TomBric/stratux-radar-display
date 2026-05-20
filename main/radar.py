@@ -39,6 +39,8 @@ import socket
 import websockets
 import math
 import time
+import traceback
+
 import arguments
 import radarbluez
 import radarui
@@ -508,6 +510,7 @@ def new_traffic(json_str):
     except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.debug(f"KeyError decoding {json_str}")
         rlog.debug(f"Own situation was: {situation}")
+        rlog.debug(f"traceback: {traceback.format_exc()}")
 
 
 def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
