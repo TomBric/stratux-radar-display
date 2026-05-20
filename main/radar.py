@@ -348,7 +348,7 @@ def audio_output(ac, mode_s=False):
     
     if should_speak:
         rlog.log(COLLISION_DEBUG, f"Speaking: {ac.get('tail','')} prio: {ac['prio']} hdiff: {ac['hdiff']} gps_angle {ac.get('gps_angle','unknown')} "
-                                  f"audio_info: {ac.get('audio_info')}")
+                                  f"audio: {ac.get('audio')}")
         if not mode_s:
             message = gen_traffic_message(ac)
         else:
