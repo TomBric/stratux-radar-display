@@ -507,6 +507,7 @@ def new_traffic(json_str):
 
     except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.debug(f"KeyError decoding {json_str}")
+        rlog.debug(f"Own situation was: {situation}")
 
 
 def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
