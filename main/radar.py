@@ -347,7 +347,7 @@ def audio_output(ac, mode_s=False):
             should_speak = (was_high_prio and audio_info['speak_time'] + timeout <= time.time()) or not was_high_prio
     
     if should_speak:
-        rlog.log(COLLISION_DEBUG, f"Speaking: {ac.get('tail',"")} {ac['prio']} {ac['hdiff']} {ac['gps_distance']} {ac['gps_angle']} {ac['course']} {ac['prio']}")
+        rlog.log(COLLISION_DEBUG, f"Speaking: {ac.get('tail',"")} prio: {ac['prio']} hdiff: {ac['hdiff']} gps_angle {ac.get('gps_angle',"unknown")} ")
         if not mode_s:
             message = gen_traffic_message(ac)
         else:
