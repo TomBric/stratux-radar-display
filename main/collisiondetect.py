@@ -271,8 +271,8 @@ def update_traffic_adaptive(ac):
         # value is not realistic, but count it
         ac['outlier_count'] = ac.get('outlier_count', 0) + 1
 
-        # more than 10 outliers, reset filter
-        if ac['outlier_count'] > 10:
+        # more than 5 outliers, reset filter
+        if ac['outlier_count'] > 5:
             rlog.log(AIRCRAFT_DEBUG, f"Mode-S: Resetting filter after {ac['outlier_count']} outliers")
             ac['kf'].x[0][0] = ac['gps_distance']
             ac['outlier_count'] = 0
@@ -306,7 +306,7 @@ def update_traffic_adaptive(ac):
         return ac['kf'].x[0][0], ac['kf'].x[1][0], ac['kf_v'].x[1][0] * 60.0  # dist, velocity, vertical velocity
     # new altitude is available
     dt_v = max(0.001, ac['last_alt_timestamp'] - ac.get('last_used_alt_time', now - 0.5))
-    rlog.log(AIRCRAFT_DEBUG, f"dt vertical {dt_v}")
+    rlog.log(AIRCRAFT_DEBUG, f"Mode-S: dt vertical {dt_v}")
     ac['kf_v'].F = np.array([[1., dt_v], [0., 1.]])
     q_var_v = 10.0  # vertical noise variance
     # update noiselevel Q according to dt, increase noise with dt
