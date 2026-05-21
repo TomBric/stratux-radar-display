@@ -271,8 +271,8 @@ def update_traffic_adaptive(ac):
         # value is not realistic, but count it
         ac['outlier_count'] = ac.get('outlier_count', 0) + 1
 
-        # more than 5 outliers, reset filter
-        if ac['outlier_count'] > 5:
+        # more than 10 outliers, reset filter
+        if ac['outlier_count'] > 10:
             rlog.log(AIRCRAFT_DEBUG, f"Mode-S: Resetting filter after {ac['outlier_count']} outliers")
             ac['kf'].x[0][0] = ac['gps_distance']
             ac['outlier_count'] = 0
