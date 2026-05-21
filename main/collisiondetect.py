@@ -273,6 +273,7 @@ def update_traffic_adaptive(ac):
 
         # more than 10 outliers, reset filter
         if ac['outlier_count'] > 10:
+            rlog.log(AIRCRAFT_DEBUG, f"Mode-S: Resetting filter after {ac['outlier_count']} outliers")
             ac['kf'].x[0][0] = ac['gps_distance']
             ac['outlier_count'] = 0
         return ac['kf'].x[0][0], ac['kf'].x[1][0], ac['kf_v'].x[1][0] * 60.0    # leave it as it was
@@ -289,13 +290,13 @@ def update_traffic_adaptive(ac):
     innovation = ac['gps_distance'] - ac['kf'].x[0][0]
     if (current_v < -0.1 and innovation > 0.2) or (current_v > 0.1 and innovation < -0.2):
         q_var = 5.0  # boost adaptation for sign change
-        rlog.log(AIRCRAFT_DEBUG, "Velocity sign change detected, boosting q_var")
+        rlog.log(AIRCRAFT_DEBUG, "Mode-S: Velocity sign change detected, boosting q_var")
 
     # update dynamic matrix F mit real dt
     ac['kf'].F = np.array([[1., dt], [0., 1.]])  # new_dist = old_dist + velocity * dt
     # update noiselevel Q according to dt, increase noise with dt
     ac['kf'].Q = np.array([[(dt ** 4) / 4, (dt ** 3) / 2], [(dt ** 3) / 2, (dt ** 2)]]) * q_var
-    rlog.log(AIRCRAFT_DEBUG, f"horizontal kalman filter: dist {ac['kf'].x[0][0]} hor-velocity {ac['kf'].x[1][0]}")
+    rlog.log(AIRCRAFT_DEBUG, f"Mode-S: horizontal kalman filter: dist {ac['kf'].x[0][0]} hor-velocity {ac['kf'].x[1][0]}")
     # Update vertical filter
     if 'kf_v' not in ac:
         ac['kf_v'] = setup_vertical_filter(ac['alt'])
