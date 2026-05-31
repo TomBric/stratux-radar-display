@@ -39,7 +39,6 @@ import socket
 import websockets
 import math
 import time
-import traceback
 
 import arguments
 import radarbluez
@@ -358,31 +357,6 @@ def audio_output(ac, mode_s=False):
         speak_func(message, 130)
 
 
-def speak_mode_s(ac):
-    feet = ac['hdiff'] * 100
-    sign = 'plus'
-    if feet < 0:
-        sign = 'minus'
-    txt = f"Traffic {sign} {abs(feet)} feet"
-    if global_config['distance_warnings'] and ac['gps_distance']:
-        txt += f" {round(ac['gps_distance'])} miles"
-    radarbluez.speak(txt, 130)
-
-
-def speech_output_modes(ac):   # checks if modes aircraft has to be spoken
-    timeout = AUDIO_TIMEOUTS[0]  # mode s traffic is always prio0=unclear
-    if ac['gps_distance'] <= situation['RadarRange'] / 2:    # inside inner circle
-        # ac['audio'] = {'speak_time': timestamp of last announce for this aircraft, 'was_prio': gesprochene Prio, }
-        audio_info = ac.get('audio')
-        if not audio_info: # not yet spoken
-            ac['audio'] = {'speak_time': time.time(), 'was_prio': 0}    # mode S traffic is always unclear
-            speak_mode_s(ac)
-        else: # already spoken
-            if audio_info['speak_time'] + timeout <= time.time():    # it is time to speak it now again
-                ac['audio'] = {'speak_time': time.time(), 'was_prio': 0}
-                speak_mode_s(ac)
-
-
 def check_clear_of_traffic():   # check if there is still a RA or TA situation in any aircraft
     for icao, ac in all_ac.items():
         if 'prio' in ac and ac['prio'] in [1, 2]:
@@ -404,7 +378,8 @@ def collision_detection(ac, traffic, mode_s=False):
     if old_prio in [1, 2] and not ac['prio'] in [1, 2]:  # there was a RA or TA on this aircraft, now it's clear
         # check if there is still another RA situation
         if check_clear_of_traffic():
-            rlog.log(COLLISION_DEBUG, f"Clear of conflict: {ac.get('tail','unknown')} ")
+            rlog.log(COLLISION_DEBUG, f"Clear of conflict: {ac.get('tail','unknown')} oldprio {old_prio} newprio {ac['prio']} ")
+            ac.pop("audio", None)   # remove audio info, if aircraft comes back, speak it again
             radarbluez.priority_speak("Clear of conflict", 130)
 
 
