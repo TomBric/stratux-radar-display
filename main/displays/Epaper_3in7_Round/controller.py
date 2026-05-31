@@ -212,8 +212,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
 
         if gps_speed_length > 0:    # draw own speed vector
             velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
-            self.draw.line((self.zerox - velocity_width, self.zeroy, self.zerox - velocity_width,
-                            self.zeroy - gps_speed_length), fill=self.TEXT_COLOR, width=velocity_width*2)
+            self.draw.rectangle((self.zerox - velocity_width, self.zeroy, self.zerox + velocity_width,
+                            self.zeroy - gps_speed_length), fill=self.TEXT_COLOR)
         # range
         self.draw.text((LEFT, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
@@ -387,6 +387,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         if simulation_mode:
             self.round_text(self.sizex//4, self.sizey//3, "simulation mode", out_color=self.TEXT_COLOR)
         self.bottom_line("Calibrate", "Mode", "Reset")
+
+
     def distance(self, now, gps_valid, gps_quality, gps_h_accuracy, distance_valid, gps_distance, gps_speed, baro_valid,
                          own_altitude, alt_diff, alt_diff_takeoff, vert_speed, ahrs_valid, ahrs_pitch, ahrs_roll,
                          ground_distance_valid, grounddistance, error_message):
