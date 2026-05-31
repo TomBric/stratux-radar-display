@@ -237,6 +237,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
         self.draw.text((RIGHT - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
+        tl = self.draw.textlength(f"{course}°", self.fonts[self.SMALL])
+        self.draw.rectangle((self.zerox - tl//2, 2,  self.zerox + tl//2, 2 + self.SMALL), fill=self.BG_COLOR)  # SMALL to have more space
         self.centered_text(2, f"{course}°", self.SMALL)
 
         if not gpsconnected:
