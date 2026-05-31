@@ -215,7 +215,9 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             nspeed_rad = gps_speed * globals.SPEED_ARROW_TIME / 3600  # distance in nm in that time
             nspeed_length = round(self.max_pixel / 2 * nspeed_rad / rrange)
             velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
-            self.draw.line((self.zerox, self.zeroy, self.zerox - nspeed_length, self.zeroy), fill=self.TEXT_COLOR, width=velocity_width)
+            self.rlog.debug(
+                f'Epaper_3in7_Round: gps_speed={gps_speed} rrange={rrange} nspeed_length={nspeed_length} velocity_width={velocity_width}')
+            self.draw.line((self.zerox, self.zeroy, self.zerox, self.zeroy - nspeed_length), fill=self.TEXT_COLOR, width=velocity_width)
         # range
         self.draw.text((LEFT, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
