@@ -204,6 +204,12 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
                            self.zerox + self.max_pixel // 4, self.zeroy + self.max_pixel // 4), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
+        #cross in the middle
+        self.draw.line((self.zerox - self.max_pixel // 2, self.zeroy, self.zerox + self.max_pixel // 2, self.zeroy),
+                       fill=self.TEXT_COLOR)
+        self.draw.line((self.zerox, self.zeroy - self.max_pixel // 2, self.zerox, self.zeroy + self.max_pixel // 2),
+                       fill=self.TEXT_COLOR)
+        # range
         self.draw.text((LEFT, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
         if gps_quality == 0:
