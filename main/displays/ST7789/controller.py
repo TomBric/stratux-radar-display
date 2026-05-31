@@ -181,12 +181,23 @@ class ST7789(dcommon.GenericDisplay):
 
 
     def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
-                  gps_quality, gps_h_accuracy, optical_alive, basemode, extsound, co_alarmlevel, co_alarmstring):
+                  gps_quality, gps_h_accuracy, optical_alive, basemode, extsound, co_alarmlevel, co_alarmstring, gps_speed_length):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
                            self.zerox + self.max_pixel // 2, self.zeroy + self.max_pixel // 2), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
                            self.zerox + self.max_pixel // 4, self.zeroy + self.max_pixel // 4), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
+        # cross in the middle
+        self.draw.line((self.zerox - self.max_pixel // 2, self.zeroy, self.zerox + self.max_pixel // 2, self.zeroy),
+                       fill=self.TEXT_COLOR)
+        self.draw.line((self.zerox, self.zeroy - self.max_pixel // 2, self.zerox, self.zeroy + self.max_pixel // 2),
+                       fill=self.TEXT_COLOR)
+
+        if gps_speed_length > 0:  # draw own speed vector
+            velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
+            self.draw.line((self.zerox, self.zeroy - gps_speed_length, self.zerox,
+                            self.zeroy), fill=self.TEXT_COLOR, width=velocity_width * 2)
+
 
         self.draw.text((5, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
@@ -210,6 +221,9 @@ class ST7789(dcommon.GenericDisplay):
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
         self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
+        tl = self.draw.textlength(f"{course}°", self.fonts[self.SMALL])
+        self.draw.rectangle((self.zerox - tl // 2, 2, self.zerox + tl // 2, 2 + self.LARGE),
+                            fill=self.BG_COLOR)  # LARGE to have more space
         self.centered_text(5, f"{course}°", self.SMALL)
 
         if not gpsconnected:
