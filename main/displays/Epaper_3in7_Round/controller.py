@@ -212,8 +212,8 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
 
         if gps_speed_length > 0:    # draw own speed vector
             velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
-            self.draw.rectangle((self.zerox - velocity_width, self.zeroy - gps_speed_length, self.zerox + velocity_width,
-                            self.zeroy), fill=self.TEXT_COLOR)
+            self.draw.line((self.zerox, self.zeroy - gps_speed_length, self.zerox,
+                            self.zeroy), fill=self.TEXT_COLOR, width=velocity_width)
         # range
         self.draw.text((LEFT, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
