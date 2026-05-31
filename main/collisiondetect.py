@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 import math
-from globals import rlog, AIRCRAFT_DEBUG
+from globals import rlog, AIRCRAFT_DEBUG, COLLISION_DEBUG
 import numpy as np
 import time
 from bayesian_filters.kalman import KalmanFilter
@@ -52,6 +52,7 @@ RA_ALT_THRESHOLD = 600 # 800 ft threshold for minimal vertical currently
 RA_DIST_THRESHOLD = 0.2 # 0.2 nm mile as threshold for minimum  separation on current course
 # security factors margin
 FACTOR_MARGIN = 1.2
+MODE_S_OUTLIER_ALT_THRESHOLD = 5000  # ft alt difference to be considered an outlier, mode-s tau is not reliable
 
 # helper functions to transform info into cartesian coordinates
 def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lon into cartesian coordinates
@@ -157,6 +158,10 @@ def assess_threat_modes(tau_h, tau_v, h_diff):
     v_ra = (abs(h_diff) <= RA_ALT_THRESHOLD or (0 < tau_v <= RA_THRESHOLD * FACTOR_MARGIN))
     v_ta = (abs(h_diff) <= TA_ALT_THRESHOLD or (0 < tau_v <= TA_THRESHOLD * FACTOR_MARGIN))
     v_coll = (abs(h_diff) <= COLLISION_ALT_THRESHOLD or (0 < tau_v <= COLLISION_THRESHOLD * FACTOR_MARGIN))
+
+    if abs(h_diff) > MODE_S_OUTLIER_ALT_THRESHOLD:
+        rlog.log(COLLISION_DEBUG, f"Mode-S: Outlier detected, alt_diff = {h_diff:.1f} ft tau_h {tau_h:.1f} tau_v {tau_v:.1f}")
+        return 'no_collision'
 
     if h_ra and v_ra:
         return 'RA'
