@@ -71,7 +71,7 @@ import sys
 import traceback
 import syslog
 
-from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG, COLLISION_DEBUG
+from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG, COLLISION_DEBUG, SPEED_ARROW_TIME
 
 # constants
 RADAR_VERSION = "3.00"
@@ -85,7 +85,6 @@ POSITION_VALID_DELTA = 10.0   # time a received position is assumed valid, e.g. 
 UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01  # give other coroutines some time to do their jobs
 BLUEZ_CHECK_TIME = 3.0
-SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 WATCHDOG_TIMER = 3.0  # time after "no connection" is assumed, if no new situation is received
 CHECK_CONNECTION_TIMEOUT = 5.0
 # timeout used for regular status request, necessary towards stratux to keep the websockets open
@@ -236,7 +235,8 @@ def draw_display():
         display_control.situation(situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
                                   radarui.sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
-                                  basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1]) 
+                                  basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1],
+                                  situation['gps_speed'])
         draw_all_ac(all_ac)
         display_control.display()
         situation['was_changed'] = False

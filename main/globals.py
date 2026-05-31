@@ -69,6 +69,7 @@ class Globals:     # global variables which need to be changed somehow from othe
     mode = Modes.RADAR     # Global mode for radar display
     update = True   # flag whether to update display
 
+SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 # Initialize logger
 SITUATION_DEBUG = logging.DEBUG - 3  # another low level for debugging, DEBUG is 10
 AIRCRAFT_DEBUG = logging.DEBUG - 2  # another low level for debugging below DEBUG
