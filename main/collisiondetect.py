@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 import math
-from globals import rlog, AIRCRAFT_DEBUG, COLLISION_DEBUG
+from globals import rlog, AIRCRAFT_DEBUG
 import numpy as np
 import time
 from bayesian_filters.kalman import KalmanFilter
@@ -53,6 +53,7 @@ RA_DIST_THRESHOLD = 0.2 # 0.2 nm mile as threshold for minimum  separation on cu
 # security factors margin
 FACTOR_MARGIN = 1.2
 MODE_S_OUTLIER_ALT_THRESHOLD = 5000  # ft alt difference to be considered an outlier, mode-s tau is not reliable
+MODE_S_OUTLIER_DIST_THRESHOLD = 10.0 # nm distance to be considered an outlier, mode-s tau is not reliable
 
 # helper functions to transform info into cartesian coordinates
 def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lon into cartesian coordinates
@@ -147,9 +148,13 @@ def assess_threat(tau_h, d_cpa, tau_v, h_diff):
         return 'potential_collision'
     return 'no_collision'
 
-def assess_threat_modes(tau_h, tau_v, h_diff):
+def assess_threat_modes(tau_h, tau_v, h_diff, dist):
     # threat classification for aircraft with modes signal only (distance estimated and vertical velocity)
     # Horizontal threats
+    if abs(h_diff) > MODE_S_OUTLIER_ALT_THRESHOLD or dist > MODE_S_OUTLIER_DIST_THRESHOLD:
+        rlog.log(AIRCRAFT_DEBUG, f"Mode-S: Outside outlier thresholds = {h_diff:.1f} ft dist = {dist:.1f} nm")
+        return 'no_collision'
+
     h_ra = (0 < tau_h <= RA_THRESHOLD)
     h_ta = (0 < tau_h <= TA_THRESHOLD)
     h_coll = (0 < tau_h <= COLLISION_THRESHOLD)
@@ -158,10 +163,6 @@ def assess_threat_modes(tau_h, tau_v, h_diff):
     v_ra = (abs(h_diff) <= RA_ALT_THRESHOLD or (0 < tau_v <= RA_THRESHOLD * FACTOR_MARGIN))
     v_ta = (abs(h_diff) <= TA_ALT_THRESHOLD or (0 < tau_v <= TA_THRESHOLD * FACTOR_MARGIN))
     v_coll = (abs(h_diff) <= COLLISION_ALT_THRESHOLD or (0 < tau_v <= COLLISION_THRESHOLD * FACTOR_MARGIN))
-
-    if abs(h_diff) > MODE_S_OUTLIER_ALT_THRESHOLD:
-        rlog.log(COLLISION_DEBUG, f"Mode-S: Outlier detected, alt_diff = {h_diff:.1f} ft tau_h {tau_h:.1f} tau_v {tau_v:.1f}")
-        return 'no_collision'
 
     if h_ra and v_ra:
         return 'RA'
@@ -347,4 +348,4 @@ def calc_modes_tcas_state(ac, situation):
     tau_v = vertical_tau(situation['own_altitude'], situation['vertical_speed'], ac['alt'], v_fpm)
     h_diff = ac['hdiff'] * 100.0
     rlog.log(AIRCRAFT_DEBUG, f"MODES: dist {dist:.2f}nm, v_close {v_close:.2f}nm/s, tau_h {tau_h:.1f}s, tau_v {tau_v:.1f}s, vspeed {v_fpm:.0f}fpm, h_diff {h_diff:.0f}ft")
-    return assess_threat_modes(tau_h, tau_v, h_diff)
+    return assess_threat_modes(tau_h, tau_v, h_diff, dist)
