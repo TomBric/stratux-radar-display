@@ -87,6 +87,7 @@ MINIMAL_WAIT_TIME = 0.01  # give other coroutines some time to do their jobs
 BLUEZ_CHECK_TIME = 3.0
 WATCHDOG_TIMER = 3.0  # time after "no connection" is assumed, if no new situation is received
 CHECK_CONNECTION_TIMEOUT = 5.0
+SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 # timeout used for regular status request, necessary towards stratux to keep the websockets open
 MIN_DISPLAY_REFRESH_TIME = 0.1
 # minimal time to wait for a display refresh, to give time for situation and traffic
@@ -232,11 +233,13 @@ def draw_display():
         # display is only triggered if there was a change
         optical_alive = new_alive
         display_control.clear()
+        nspeed_rad = situation['gps_speed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
+        gps_speed_length = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])   # length for own speed arrow
         display_control.situation(situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
                                   radarui.sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
                                   basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1],
-                                  situation['gps_speed'])
+                                  gps_speed_length)
         draw_all_ac(all_ac)
         display_control.display()
         situation['was_changed'] = False

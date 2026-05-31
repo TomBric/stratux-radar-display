@@ -39,7 +39,6 @@ from PIL import Image, ImageDraw
 import time
 import datetime
 from pathlib import Path
-from ... import globals
 
 top_index = 0    # top index being displayed in checklist
 
@@ -199,7 +198,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         time.sleep(seconds)
 
     def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
-                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring, gps_speed):
+                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring, gps_speed_length):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
                            self.zerox + self.max_pixel // 2, self.zeroy + self.max_pixel // 2), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
@@ -211,13 +210,9 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.draw.line((self.zerox, self.zeroy - self.max_pixel // 2, self.zerox, self.zeroy + self.max_pixel // 2),
                        fill=self.TEXT_COLOR)
 
-        if gps_speed > 0:    # draw own speed vector
-            nspeed_rad = gps_speed * globals.SPEED_ARROW_TIME / 3600  # distance in nm in that time
-            nspeed_length = round(self.max_pixel / 2 * nspeed_rad / rrange)
+        if gps_speed_length > 0:    # draw own speed vector
             velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
-            self.rlog.debug(
-                f'Epaper_3in7_Round: gps_speed={gps_speed} rrange={rrange} nspeed_length={nspeed_length} velocity_width={velocity_width}')
-            self.draw.line((self.zerox, self.zeroy, self.zerox, self.zeroy - nspeed_length), fill=self.TEXT_COLOR, width=velocity_width)
+            self.draw.line((self.zerox, self.zeroy, self.zerox, self.zeroy - gps_speed_length), fill=self.TEXT_COLOR, width=velocity_width)
         # range
         self.draw.text((LEFT, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
