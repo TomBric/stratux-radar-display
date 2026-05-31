@@ -183,11 +183,23 @@ class Epaper1in54(dcommon.GenericDisplay):
         time.sleep(seconds)
 
     def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
-                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
+                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound,
+                  co_alarmlevel, co_alarmstring, gps_speed_length):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
                            self.zerox + self.max_pixel // 2 - 1, self.zeroy + self.max_pixel // 2 - 1), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
                            self.zerox + self.max_pixel // 4 - 1, self.zeroy + self.max_pixel // 4 - 1), outline=self.TEXT_COLOR)
+        # cross in the middle
+        self.draw.line((self.zerox - self.max_pixel // 2, self.zeroy, self.zerox + self.max_pixel // 2, self.zeroy),
+                       fill=self.TEXT_COLOR)
+        self.draw.line((self.zerox, self.zeroy - self.max_pixel // 2, self.zerox, self.zeroy + self.max_pixel // 2),
+                       fill=self.TEXT_COLOR)
+
+        if gps_speed_length > 0:  # draw own speed vector
+            velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
+            self.draw.line((self.zerox, self.zeroy - gps_speed_length, self.zerox,
+                            self.zeroy), fill=self.TEXT_COLOR, width=velocity_width * 2)
+
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
         self.draw.text((0, 0), f"{rrange}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.draw.text((0, self.SMALL), "nm", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
