@@ -90,23 +90,6 @@ class Epaper3in7(dcommon.GenericDisplay):
 
     def __init__(self):
         super().__init__()
-        # Initialize color attributes
-        self.BG_COLOR = "white"
-        self.TEXT_COLOR = "black"
-        self.HIGHLIGHT_COLOR = "black"
-        self.AIRCRAFT_COLOR = "black"
-        self.AIRCRAFT_OUTLINE = "black"
-        # AHRS colors
-        self.AHRS_EARTH_COLOR = "white"
-        self.AHRS_SKY_COLOR = "white"
-        self.AHRS_HORIZON_COLOR = "black"
-        self.AHRS_MARKS_COLOR = "black"
-        # Other attributes
-        self.device = None
-        self.image = None
-        self.draw = None
-        self.mask = None
-        self.dark_mode = False
     
     def set_dark_mode(self, dark_mode):
         """Set dark mode and update color constants accordingly"""
@@ -115,8 +98,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
             self.HIGHLIGHT_COLOR = "white"
-            self.AIRCRAFT_COLOR = "white"
-            self.AIRCRAFT_OUTLINE = "white"
             self.AHRS_EARTH_COLOR = "black"
             self.AHRS_SKY_COLOR = "black"
             self.AHRS_HORIZON_COLOR = "white"
@@ -125,8 +106,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
             self.HIGHLIGHT_COLOR = "black"
-            self.AIRCRAFT_COLOR = "black"
-            self.AIRCRAFT_OUTLINE = "black"
             self.AHRS_EARTH_COLOR = "white"
             self.AHRS_SKY_COLOR = "white"
             self.AHRS_HORIZON_COLOR = "black"
@@ -145,12 +124,12 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.set_dark_mode(dark_mode)
         self.sizex = self.device.height
         self.sizey = self.device.width
-        self.zerox = self.sizex / 2
+        self.zerox = self.sizex // 2
         if not fullcircle:
             self.zeroy = 200  # not centered
             self.max_pixel = 400
         else:
-            self.zeroy = self.sizey / 2
+            self.zeroy = self.sizey // 2
             self.max_pixel = self.sizey
         self.ah_zeroy = self.sizey // 2 # zero line for ahrs
         self.ah_zerox = self.sizex // 2

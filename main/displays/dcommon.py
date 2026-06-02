@@ -119,17 +119,14 @@ class GenericDisplay:
 
     def __init__(self):
         self.rlog = logging.getLogger('stratux-radar-log')
-        # Initialize color attributes with default light mode
-        self.BG_COLOR = "white"
-        self.TEXT_COLOR = "black"
-        self.HIGHLIGHT_COLOR = self.TEXT_COLOR
-        # AHRS colors
-        self.AHRS_EARTH_COLOR = "brown"
-        self.AHRS_SKY_COLOR = "lightblue"
-        self.AHRS_HORIZON_COLOR = "black"
-        self.AHRS_MARKS_COLOR = "black"
-        
         # these variables below need to be set for every display!
+        self.BG_COLOR = "black"
+        self.TEXT_COLOR = "white"
+        self.HIGHLIGHT_COLOR = "white"
+        self.AHRS_EARTH_COLOR = "black"
+        self.AHRS_SKY_COLOR = "black"
+        self.AHRS_HORIZON_COLOR = "white"
+        self.AHRS_MARKS_COLOR = "white"
         self.sizex = 0  # display size x axis in pixel
         self.sizey = 0  # display size y axis in pixel
         self.dark_mode = False
@@ -146,6 +143,7 @@ class GenericDisplay:
         self.cdraw = None  # pixel array to be used in compass to delete text
         self.image = None # pixel array to be used in compass to rotate text
         self.mask = None
+        self.device = None
         self.compass_aircraft = None    # image of the compass aircraft
         # fonts
         self.fonts= {

@@ -70,16 +70,26 @@ class Oled1in5(dcommon.GenericDisplay):
         3: ("white", "white", 2, 1),  # potential_collision
         4: ("lightgreen", "lightgreen", 1, 1)  # no_collision
     }
+    MODES_PRIORITY_MAPPING_LIGHT = {
+        0: ("white", 0.8),  # unclear
+        1: ("red", 3),  # RA (Resolution Advisory)
+        2: ("yellow", 2),  # TA (Traffic Advisory)
+        3: ("black", 1),  # potential_collision
+        4: ("lightgreen", 1)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_DARK = {
+        0: ("gray", 0.8),  # unclear
+        1: ("red", 3),  # RA (Resolution Advisory)
+        2: ("yellow", 2),  # TA (Traffic Advisory)
+        3: ("white", 1),  # potential_collision
+        4: ("lightgreen", 1)  # no_collision
+    }
 
     def __init__(self):
         super().__init__()
-        # color attributes are later set in set_dark_mode
-        # Other attributes
-        self.device = None
-        self.image = None
-        self.draw = None
-        self.mask = None
-        self.dark_mode = False
+        # other color attributes are later set in set_dark_mode
+        self.WARNING_COLOR = "red"
+
 
     def init(self, fullcircle=False, dark_mode=False):   # dark mode without effect in Oled display
         config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
@@ -119,10 +129,6 @@ class Oled1in5(dcommon.GenericDisplay):
         if dark_mode:
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
-            self.HIGHLIGHT_COLOR = "red"
-            self.AIRCRAFT_COLOR = "red"
-            self.AIRCRAFT_OUTLINE = "white"
-            self.MODE_S_COLOR = "white"
             # AHRS colors
             self.AHRS_EARTH_COLOR = "sandybrown"
             self.AHRS_SKY_COLOR = "skyblue"
@@ -132,10 +138,6 @@ class Oled1in5(dcommon.GenericDisplay):
         else:
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
-            self.HIGHLIGHT_COLOR = "red"
-            self.AIRCRAFT_COLOR = "red"
-            self.AIRCRAFT_OUTLINE = "black"
-            self.MODE_S_COLOR = "black"
             # AHRS colors
             self.AHRS_EARTH_COLOR = "sandybrown"
             self.AHRS_SKY_COLOR = "skyblue"

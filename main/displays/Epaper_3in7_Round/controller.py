@@ -94,24 +94,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
     
     def __init__(self):
         super().__init__()
-        # Initialize color attributes
-        self.BG_COLOR = "white"
-        self.TEXT_COLOR = "black"
-        self.HIGHLIGHT_COLOR = "black"
-        self.AIRCRAFT_COLOR = "black"
-        self.AIRCRAFT_OUTLINE = "black"
-        self.MODE_S_COLOR = "black"
-        # AHRS colors
-        self.AHRS_EARTH_COLOR = "white"
-        self.AHRS_SKY_COLOR = "white"
-        self.AHRS_HORIZON_COLOR = "black"
-        self.AHRS_MARKS_COLOR = "black"
-        # Other attributes
-        self.device = None
-        self.image = None
-        self.draw = None
-        self.mask = None
-        self.dark_mode = False
+        # Initialize attributes
     
     def set_dark_mode(self, dark_mode):
         """Set dark mode and update color constants accordingly"""
@@ -120,9 +103,6 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
             self.HIGHLIGHT_COLOR = "white"
-            self.AIRCRAFT_COLOR = "white"
-            self.AIRCRAFT_OUTLINE = "white"
-            self.MODE_S_COLOR = "white"
             self.AHRS_EARTH_COLOR = "black"
             self.AHRS_SKY_COLOR = "black"
             self.AHRS_HORIZON_COLOR = "white"
@@ -131,9 +111,6 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
             self.HIGHLIGHT_COLOR = "black"
-            self.AIRCRAFT_COLOR = "black"
-            self.AIRCRAFT_OUTLINE = "black"
-            self.MODE_S_COLOR = "black"
             self.AHRS_EARTH_COLOR = "white"
             self.AHRS_SKY_COLOR = "white"
             self.AHRS_HORIZON_COLOR = "black"
@@ -144,22 +121,20 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         self.device.init(0)
         self.device.Clear(0xFF, 0)  # necessary to overwrite everything
         # Initialize dark mode before creating the image
-        self.dark_mode = dark_mode
-        self.set_dark_mode(dark_mode)
-        # Create image with correct background color based on dark mode
-        bg_color = 0x00 if dark_mode else 0xFF
-        self.image = Image.new('1', (self.device.height, self.device.width), bg_color)
+        self.image = Image.new('1', (self.device.height, self.device.width), 0xFF)
         self.draw = ImageDraw.Draw(self.image)
         self.device.init(1)
         self.device.Clear(0xFF, 1)
+        self.dark_mode = dark_mode
+        self.set_dark_mode(dark_mode)
         self.sizex = self.device.height
         self.sizey = self.device.width
-        self.zerox = self.sizex / 2 + DISPLAY_OFFSET
+        self.zerox = self.sizex // 2 + DISPLAY_OFFSET
         if not fullcircle:
             self.zeroy = 185  # not centered
             self.max_pixel = 370
         else:
-            self.zeroy = self.sizey / 2
+            self.zeroy = self.sizey // 2
             self.max_pixel = self.sizey
         self.ah_zeroy = int(self.sizey / 2) # zero line for ahrs
         self.ah_zerox = int(self.sizex / 2) + DISPLAY_OFFSET
