@@ -67,7 +67,7 @@ class Modes(Enum):
 
 class Globals:     # global variables which need to be changed somehow from other modules
     mode = Modes.RADAR     # Global mode for radar display
-    update = True   # flag whether to update display
+    refresh = True   # flag whether to update display
 
 # Initialize logger
 SITUATION_DEBUG = logging.DEBUG - 3  # another low level for debugging, DEBUG is 10
