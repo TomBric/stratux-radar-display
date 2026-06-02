@@ -69,6 +69,20 @@ class Epaper1in54(dcommon.GenericDisplay):
         3: ("black", "white", 2, 1),  # potential_collision
         4: ("black", "white", 1, 1)  # no_collision
     }
+    MODES_PRIORITY_MAPPING_LIGHT = {
+        0: ("black", 0.8),  # unclear
+        1: ("black", 3),  # RA (Resolution Advisory)
+        2: ("black", 2),  # TA (Traffic Advisory)
+        3: ("black", 1),  # potential_collision
+        4: ("black", 0.5)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_DARK = {
+        0: ("white", 0.8),  # unclear
+        1: ("white", 3),  # RA (Resolution Advisory)
+        2: ("white", 2),  # TA (Traffic Advisory)
+        3: ("white", 1),  # potential_collision
+        4: ("white", 0.5)  # no_collision
+    }
 
 
     def __init__(self):
