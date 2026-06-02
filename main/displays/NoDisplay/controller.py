@@ -45,7 +45,7 @@ class NoDisplay(dcommon.GenericDisplay):
     def modesaircraft(self, radius, height, arcposition, vspeed, tail, width=3):
         pass
 
-    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail):
+    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, prio = 0):
         pass
 
 
@@ -59,7 +59,7 @@ class NoDisplay(dcommon.GenericDisplay):
     def ahrs(self, pitch, roll, heading, slipskid, error_message):
         pass
 
-    def screen_input(self, headline, subline, text, left, middle, right, prefix, inp, suffix):
+    def screen_input(self, headline, subline, text, left, middle, right, prefix, inp, suffix, offset=0):
         pass
 
     def flighttime(self, last_flights, side_offset=0, long_version=False):
