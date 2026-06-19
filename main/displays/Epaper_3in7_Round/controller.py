@@ -217,10 +217,12 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
         else:
             t1 = ""
             t2 = ""
-        if basemode:
-            t2 += "\nGround\nmode"
+
         self.draw.text((LEFT-18, self.SMALL + 10), t1, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.draw.text((LEFT-28, self.SMALL+self.VERYSMALL+15), t2, font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
+        if basemode:
+            self.draw.text((LEFT - 37, self.SMALL + 2 * self.VERYSMALL + 10), "GrMode", font=self.fonts[self.VERYSMALL],
+                       fill=self.TEXT_COLOR)
 
         t = f"FL{round(ownalt / 100)}"
         textlength = self.draw.textlength(t, self.fonts[self.VERYSMALL])
