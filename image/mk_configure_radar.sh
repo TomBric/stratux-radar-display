@@ -43,6 +43,8 @@ raspi-config nonint do_ssh 0
 # enable spi and i2c (for cowarner)
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
+# disable password request for sudo in Trixie
+raspi-config nonint do_sudo_pass 1
 
 # Disable swap, for Trixie modify /etc/rpi/swap.conf ...
 if grep -q '^\[Main\]' /etc/rpi/swap.conf; then
