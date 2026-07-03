@@ -39,7 +39,7 @@ from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'  # disable pygame hello message
 import pygame
 from queue import PriorityQueue
-import threading    # for pico2wave so that there is no blocking of other sensor functions during that time
+import threading    # for text to speech so that there is no blocking of other sensor functions during that time
 import time
 from globals import rlog
 import radarui    # to check if radarui.sound_on
