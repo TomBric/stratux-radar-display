@@ -190,8 +190,8 @@ def prepare_sounds_tuple(int_tuple):  # done during init without parallel corout
     out = []
     if bluetooth_active or extsound_active:
         for i in int_tuple:
-            pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", str(i)])  # generate wave
-            if pico_result.returncode == 0:
+            piper_result = subprocess.run(["piper", "--model", "en-us-ryan", "--output_file", "/tmp/radar.wav", "--text", str(i)])  # generate wave
+            if piper_result.returncode == 0:
                 out.append(pygame.mixer.Sound("/tmp/radar.wav"))
             else:
                 rlog.debug("Radarbluez: Error creating sound for tuple.")
@@ -199,8 +199,8 @@ def prepare_sounds_tuple(int_tuple):  # done during init without parallel corout
 
 def prepare_sounds_string(tospeak):   # done during init without parallel coroutines
     if bluetooth_active or extsound_active:
-        pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar_prepared.wav", tospeak])  # generate wave
-        if pico_result.returncode == 0:
+        piper_result = subprocess.run(["piper", "--model", "en-us-ryan", "--output_file", "/tmp/radar_prepared.wav", "--text", tospeak])  # generate wave
+        if piper_result.returncode == 0:
             # rlog.debug(f"Sound prepared: {tospeak}")
             return pygame.mixer.Sound("/tmp/radar_prepared.wav")
         else:
@@ -221,14 +221,14 @@ def audio_speaker(queue):
         if msg == 'STOP':
             break
         if radarui.sound_on:    # if not ignore sound, clears queue
-            pico_result = subprocess.run(["pico2wave", "-w", "/tmp/radar.wav", msg])  # generate wave
-            if pico_result.returncode == 0:
+            piper_result = subprocess.run(["piper", "--model", "en-us-ryan", "--output_file", "/tmp/radar.wav", "--text", msg])  # generate wave
+            if piper_result.returncode == 0:
                 if (bluetooth_active and bt_devices > 0) or (extsound_active and global_config['sound_volume'] > 0):
                     while pygame.mixer.get_busy():
                         time.sleep(0.05)    # is a different thread, other threads continue, just audio speaker waits
                     pygame.mixer.Sound("/tmp/radar.wav").play()   # serialized via this thread
             else:
-                rlog.debug("Radarbluez: Error using pico2wave TTS")
+                rlog.debug("Radarbluez: Error using piper TTS")
     rlog.debug("Radarbluez: Audio-Speaker thread terminated.")
 
 
