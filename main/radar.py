@@ -79,9 +79,14 @@ RADAR_VERSION = "3.00"
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
 RADAR_CUTOFF = 29  # time after last message received from an aircraft is no longer displayed
-POSITION_VALID_DELTA = 10.0   # time a received position is assumed valid, e.g. if message without position is received
+POSITION_VALID_DELTA = 15.0   # time a received position is assumed valid, e.g. if message without position is received
 # only after this POSITION_VALID_DELTA time a switch back to mode-s (circle) is done. May e.g. happen when
 # flarm is no more received, but only mode-s. Than switch back and display circle
+FLARM_POSITION_OVER_ADSB_TIMEOUT = 10  # time in seconds, FLARM position is only taken into account after this timeout
+# otherwise adsb_out position is taken, this prevents FLARM/OGN position taken into account when valid adsb-out signal
+# is received
+
+
 UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01  # give other coroutines some time to do their jobs
 BLUEZ_CHECK_TIME = 3.0
@@ -180,6 +185,7 @@ def dump_ac(ac):    # debug function, produces one line for aircraft in a readab
     ret += f" x:{ac['x']}" if 'x' in ac else ""
     ret += f" y:{ac['y']}" if 'y' in ac else ""
     ret += f" last_position_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_position_timestamp']))}" if 'last_position_timestamp' in ac else ""
+    ret += f" last_position_source:{ac['last_position_source']}" if 'last_position_source' in ac else ""
     ret += f" nspeed_length:{ac['nspeed_length']}" if 'nspeed_length' in ac else ""
     ret += f" audio: speak_time {ac['audio']['speak_time']} was_prio {ac['audio']['was_prio']}" if 'audio' in ac else ""
     ret += f" last_speak_time:{time.strftime('%H:%M:%S', time.gmtime(ac['last_speak_time']))}" if 'last_speak_time' in ac else ""
@@ -441,8 +447,16 @@ def new_traffic(json_str):
                 del ac['circradius']   # was mode-s target before, now invalidate mode-s info on radius
             if 'kf' in ac:
                 del ac['kf'] # was mode-s target before, now invalidate mode-s info on kalman filter
+            if 'last_position_timestamp' in ac and 'last_position_source' in ac:
+                if source == "FLARM" and ac['last_position_source'] == "1090" and \
+                        time.time() - ac['last_position_timestamp'] < FLARM_POSITION_OVER_ADSB_TIMEOUT:
+                        # ADSB-out timestamp is still fresh, ignore FLARM/OGN position update, this gives
+                        # priority to adsb-out positions
+                    rlog.log(AIRCRAFT_DEBUG, f"FLARM position message ignored since ADSB position is still fresh")
+                    return
             ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             ac['last_position_timestamp'] = time.time()
+            ac['last_position_source'] = source    # we need to know where the last position was recorded from
             if 'Track' in traffic:
                 ac['direction'] = traffic['Track'] - situation['course']
                 # sometimes track is missing, then leave it as it is
