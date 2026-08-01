@@ -452,7 +452,7 @@ def new_traffic(json_str):
                         time.time() - ac['last_position_timestamp'] < FLARM_POSITION_OVER_ADSB_TIMEOUT:
                         # ADSB-out timestamp is still fresh, ignore FLARM/OGN position update, this gives
                         # priority to adsb-out positions
-                    rlog.log(AIRCRAFT_DEBUG, f"FLARM position message ignored since ADSB position is still fresh")
+                    rlog.log(AIRCRAFT_DEBUG, f"FLARM position message of {traffic['Icao_addr']:X} ignored since ADSB position is still fresh")
                     return
             ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             ac['last_position_timestamp'] = time.time()
