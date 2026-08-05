@@ -269,13 +269,14 @@ def modify_line_in_file(file_path, word, new_text):    # search word in file and
                     file.write(new_line)
                 else:
                     file.write(line)
+            file.flush()  # Ensure data is written to disk immediately
+        return True
     except FileNotFoundError:
-        rlog.debug(f'Radar-app: {START_RADAR_FILE} not found!')
+        rlog.debug(f'Radar-app: {file_path} not found!')
         return False
     except Exception as e:
-        rlog.debug(f'Radar-app: Error {e} modifying {START_RADAR_FILE}')
+        rlog.debug(f'Radar-app: Error {e} modifying {file_path}')
         return False
-    return True
 
 
 def find_line_in_file(file_path, word):
@@ -283,9 +284,9 @@ def find_line_in_file(file_path, word):
         with open(file_path, 'r') as file:
             lines = file.readlines()
     except FileNotFoundError:
-        rlog.debug(f'Radar-app: {START_RADAR_FILE} not found!')
+        rlog.debug(f'Radar-app: {file_path} not found!')
     except Exception as e:
-        rlog.debug(f'Radar-app: Error {e} modifying {START_RADAR_FILE}')
+        rlog.debug(f'Radar-app: Error {e} modifying {file_path}')
     for line in lines:
         if word in line:
             return line

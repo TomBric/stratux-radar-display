@@ -344,9 +344,14 @@ def _from_serializable(obj: Any) -> Any: # necessary to load datetime in json
 
 def delete_stats():
     try:
-        os.remove(saved_statistics)
-        rlog.debug("Grounddistance: Statistics deleted")
-    except (OSError, IOError, ValueError) as e:
+        if os.path.exists(saved_statistics):
+            os.remove(saved_statistics)
+            rlog.debug("Grounddistance: Statistics deleted")
+        else:
+            rlog.debug(f"Grounddistance: Statistics file {saved_statistics} does not exist")
+    except FileNotFoundError:
+        rlog.debug(f"Grounddistance: Statistics file {saved_statistics} not found")
+    except (OSError, IOError) as e:
         rlog.debug(f"Grounddistance: Error {e} deleting {saved_statistics}")
 
 
@@ -357,8 +362,14 @@ def write_stats():
         with open(saved_statistics, 'at') as out:
             rlog.debug("Grounddistance: Writing statistics " + outstr)
             out.write(outstr + '\n')  # Add newline after each JSON object
+            out.flush()  # Ensure data is written to disk immediately
+            # File is automatically closed when exiting the with block
+        rlog.debug(f"Grounddistance: Statistics successfully written to {saved_statistics}")
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + saved_statistics)
+    except Exception as e:
+        # Catch any other unexpected exceptions to prevent silent failures
+        rlog.debug(f"Grounddistance: Unexpected error writing statistics: {type(e).__name__}: {str(e)}")
 
 
 def read_stats(stats_file=None):   # returns a list of all written stats

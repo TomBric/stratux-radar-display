@@ -102,10 +102,13 @@ def write_config(config):
     try:
         with open(g_config_file, 'wt') as out:
             json.dump(config, out, sort_keys=True, indent=4, default=default)
+            out.flush()  # Ensure data is written to disk immediately
+        rlog.debug("StatusUI: Configuration saved to " + g_config_file + ": " + json.dumps(config, sort_keys=True, indent=4,
+                                                                                            default=default))
     except (OSError, IOError, ValueError) as e:
         rlog.debug("StatusUI: Error " + str(e) + " writing " + g_config_file)
-    rlog.debug("StatusUI: Configuration saved to " + g_config_file + ": " + json.dumps(config, sort_keys=True, indent=4,
-                                                                                       default=default))
+    except Exception as e:
+        rlog.debug(f"StatusUI: Unexpected error writing config: {type(e).__name__}: {str(e)}")
 
 
 def init(config_file, url, target_ip, refresh, config):   # prepare everything
