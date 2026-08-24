@@ -222,7 +222,8 @@ def calc_tcas_state(traffic, situation):
     gps_dist_nm = traffic['gps_distance']
     tau_hor_sec, d_cpa_nm, tau_vert_sec = tcas_tau(own, traffic)
 
-    rlog.log(AIRCRAFT_DEBUG, f"tau_h {tau_hor_sec:.1f}s, d_cpa {d_cpa_nm:.2f}nm, tau_v {tau_vert_sec:.1f}s, h_diff {h_diff_ft:.0f}ft")
+    rlog.log(AIRCRAFT_DEBUG, f"tau_h {tau_hor_sec:.1f}s, d_cpa {d_cpa_nm:.2f}nm, "
+                             f"tau_v {tau_vert_sec:.1f}s, h_diff {h_diff_ft:.0f}ft gps_dist {gps_dist_nm:.2f}nm")
 
     return assess_threat(tau_hor_sec, d_cpa_nm, tau_vert_sec, h_diff_ft, gps_dist_nm)
 
