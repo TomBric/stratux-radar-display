@@ -184,7 +184,7 @@ def assess_threat_modes(tau_h, tau_v, h_diff, dist):
     return 'no_collision'
 
 
-def calc_tcas_state(traffic, situation):
+def calc_tcas_state(traffic, situation, gps_distance):
     # Returns a collision classification for the traffic
     # returns a string either: 'unclear', 'RA', 'TA', 'potential_collision', 'no_collision'
 
@@ -219,13 +219,12 @@ def calc_tcas_state(traffic, situation):
         'vs_fpm': traffic['Vvel']
     }
     h_diff_ft = abs(own['alt_ft'] - traffic['alt_ft'])
-    gps_dist_nm = traffic['gps_distance']
     tau_hor_sec, d_cpa_nm, tau_vert_sec = tcas_tau(own, traffic)
 
     rlog.log(AIRCRAFT_DEBUG, f"tau_h {tau_hor_sec:.1f}s, d_cpa {d_cpa_nm:.2f}nm, "
-                             f"tau_v {tau_vert_sec:.1f}s, h_diff {h_diff_ft:.0f}ft gps_dist {gps_dist_nm:.2f}nm")
+                             f"tau_v {tau_vert_sec:.1f}s, h_diff {h_diff_ft:.0f}ft gps_distance {gps_distance:.2f}nm")
 
-    return assess_threat(tau_hor_sec, d_cpa_nm, tau_vert_sec, h_diff_ft, gps_dist_nm)
+    return assess_threat(tau_hor_sec, d_cpa_nm, tau_vert_sec, h_diff_ft, gps_distance)
 
 
 def tcas_to_prio(tcas_state):
