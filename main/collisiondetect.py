@@ -134,12 +134,19 @@ def assess_threat(tau_h, d_cpa, tau_v, h_diff):
     h_ra = (0 < tau_h <= RA_THRESHOLD and d_cpa <= RA_DIST_THRESHOLD)
     h_ta = (0 < tau_h <= TA_THRESHOLD and d_cpa <= TA_DIST_THRESHOLD)
     h_coll = (0 < tau_h <= COLLISION_THRESHOLD and d_cpa <= COLLISION_DIST_THRESHOLD)
+    # Classify very close aircraft as RA even if tau doesn't indicate closing
+    h_ra_proximity = (d_cpa <= RA_DIST_THRESHOLD)
 
     # Vertical threats
     v_ra = (abs(h_diff) <= RA_ALT_THRESHOLD or (0 < tau_v <= RA_THRESHOLD * FACTOR_MARGIN))
     v_ta = (abs(h_diff) <= TA_ALT_THRESHOLD or (0 < tau_v <= TA_THRESHOLD * FACTOR_MARGIN))
     v_coll = (abs(h_diff) <= COLLISION_ALT_THRESHOLD or (0 < tau_v <= COLLISION_THRESHOLD * FACTOR_MARGIN))
+    # Classify very close aircraft as RA even if tau doesn't indicate closing
+    v_ra_proximity = (abs(h_diff) <= RA_ALT_THRESHOLD)
 
+    # RA if aircraft is within RA thresholds regardless of tau values
+    if h_ra_proximity and v_ra_proximity:
+        return 'RA'
     if h_ra and v_ra:
         return 'RA'
     if h_ta and v_ta:
@@ -158,12 +165,19 @@ def assess_threat_modes(tau_h, tau_v, h_diff, dist):
     h_ra = (0 < tau_h <= RA_THRESHOLD)
     h_ta = (0 < tau_h <= TA_THRESHOLD)
     h_coll = (0 < tau_h <= COLLISION_THRESHOLD)
+    # Classify very close aircraft as RA even if tau doesn't indicate closing
+    h_ra_proximity = (dist <= RA_DIST_THRESHOLD)
 
     # Vertical threats
     v_ra = (abs(h_diff) <= RA_ALT_THRESHOLD or (0 < tau_v <= RA_THRESHOLD * FACTOR_MARGIN))
     v_ta = (abs(h_diff) <= TA_ALT_THRESHOLD or (0 < tau_v <= TA_THRESHOLD * FACTOR_MARGIN))
     v_coll = (abs(h_diff) <= COLLISION_ALT_THRESHOLD or (0 < tau_v <= COLLISION_THRESHOLD * FACTOR_MARGIN))
+    # Classify very close aircraft as RA even if tau doesn't indicate closing
+    v_ra_proximity = (abs(h_diff) <= RA_ALT_THRESHOLD)
 
+    # RA if aircraft is within RA thresholds regardless of tau values
+    if h_ra_proximity and v_ra_proximity:
+        return 'RA'
     if h_ra and v_ra:
         return 'RA'
     if h_ta and v_ta:
