@@ -128,25 +128,22 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     return tau_hor_sec, d_cpa_nm, tau_vert_sec
 
 
-def assess_threat(tau_h, d_cpa, tau_v, h_diff):
+def assess_threat(tau_h, d_cpa, tau_v, h_diff, gps_distance_nm):
     # threat classification for aircraft with position and velocity
     # Horizontal threats
-    h_ra = (0 < tau_h <= RA_THRESHOLD and d_cpa <= RA_DIST_THRESHOLD)
-    h_ta = (0 < tau_h <= TA_THRESHOLD and d_cpa <= TA_DIST_THRESHOLD)
-    h_coll = (0 < tau_h <= COLLISION_THRESHOLD and d_cpa <= COLLISION_DIST_THRESHOLD)
-    # Classify very close aircraft as RA even if tau doesn't indicate closing
-    h_ra_proximity = (d_cpa <= RA_DIST_THRESHOLD)
+    h_ra = (0 < tau_h <= RA_THRESHOLD and d_cpa <= RA_DIST_THRESHOLD) or (gps_distance_nm <= RA_DIST_THRESHOLD)
+    h_ta = (0 < tau_h <= TA_THRESHOLD and d_cpa <= TA_DIST_THRESHOLD) or (gps_distance_nm <= TA_DIST_THRESHOLD)
+    h_coll = (0 < tau_h <= COLLISION_THRESHOLD and d_cpa <= COLLISION_DIST_THRESHOLD) or (gps_distance_nm <= COLLISION_DIST_THRESHOLD)
 
     # Vertical threats
-    v_ra = (abs(h_diff) <= RA_ALT_THRESHOLD or (0 < tau_v <= RA_THRESHOLD * FACTOR_MARGIN))
-    v_ta = (abs(h_diff) <= TA_ALT_THRESHOLD or (0 < tau_v <= TA_THRESHOLD * FACTOR_MARGIN))
-    v_coll = (abs(h_diff) <= COLLISION_ALT_THRESHOLD or (0 < tau_v <= COLLISION_THRESHOLD * FACTOR_MARGIN))
-    # Classify very close aircraft as RA even if tau doesn't indicate closing
-    v_ra_proximity = (abs(h_diff) <= RA_ALT_THRESHOLD)
+    v_ra = ((abs(h_diff) <= RA_ALT_THRESHOLD or (0 < tau_v <= RA_THRESHOLD * FACTOR_MARGIN))
+            or (h_diff <= RA_ALT_THRESHOLD))
+    v_ta = ((abs(h_diff) <= TA_ALT_THRESHOLD or (0 < tau_v <= TA_THRESHOLD * FACTOR_MARGIN))
+            or (h_diff <= TA_ALT_THRESHOLD))
+    v_coll = ((abs(h_diff) <= COLLISION_ALT_THRESHOLD or (0 < tau_v <= COLLISION_THRESHOLD * FACTOR_MARGIN))
+              or (h_diff <= COLLISION_ALT_THRESHOLD))
 
     # RA if aircraft is within RA thresholds regardless of tau values
-    if h_ra_proximity and v_ra_proximity:
-        return 'RA'
     if h_ra and v_ra:
         return 'RA'
     if h_ta and v_ta:
@@ -222,11 +219,12 @@ def calc_tcas_state(traffic, situation):
         'vs_fpm': traffic['Vvel']
     }
     h_diff_ft = abs(own['alt_ft'] - traffic['alt_ft'])
-
+    gps_dist_nm = traffic['gps_distance']
     tau_hor_sec, d_cpa_nm, tau_vert_sec = tcas_tau(own, traffic)
+
     rlog.log(AIRCRAFT_DEBUG, f"tau_h {tau_hor_sec:.1f}s, d_cpa {d_cpa_nm:.2f}nm, tau_v {tau_vert_sec:.1f}s, h_diff {h_diff_ft:.0f}ft")
 
-    return assess_threat(tau_hor_sec, d_cpa_nm, tau_vert_sec, h_diff_ft)
+    return assess_threat(tau_hor_sec, d_cpa_nm, tau_vert_sec, h_diff_ft, gps_dist_nm)
 
 
 def tcas_to_prio(tcas_state):
