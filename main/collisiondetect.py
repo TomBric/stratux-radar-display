@@ -42,14 +42,20 @@ from bayesian_filters.kalman import KalmanFilter
 COLLISION_THRESHOLD = 180 # in seconds
 COLLISION_DIST_THRESHOLD = 1.5
 COLLISION_ALT_THRESHOLD = 2000   # aircraft more alt diff than this will not be taken into consideration
+COLLISION_DIST_CURRENT_THRESHOLD = 0.3  # 0.3 nm  (500 meters) as threshold for minimum separation on current position without projection
+COLLISION_ALT_CURRENT_THRESHOLD = 200  # 200 ft as threshold for minimum separation on current position without projection
 # TA thresholds, warning level ADVISORY
 TA_THRESHOLD = 40  # TA at 40 seconds
 TA_DIST_THRESHOLD = 0.3  # 0.3 mile as threshold for minimum separation on current course
-TA_ALT_THRESHOLD = 1000  # 1000 ft threshold for minimal vertical separation currently
+TA_ALT_THRESHOLD = 500  # 1000 ft threshold for minimal vertical separation currently
+TA_DIST_CURRENT_THRESHOLD = 0.1  # 0.1 nm (180 meters) as threshold for minimum separation on current position without projection
+TA_ALT_CURRENT_THRESHOLD = 100  # 100 ft as threshold for minimum separation on current position without projection
 # RA_THRESHOLDS, warning level ALARM
 RA_THRESHOLD = 25  # RA at 25 seconds
-RA_ALT_THRESHOLD = 600 # 800 ft threshold for minimal vertical currently
-RA_DIST_THRESHOLD = 0.2 # 0.2 nm mile as threshold for minimum  separation on current course
+RA_ALT_THRESHOLD = 300 # 800 ft threshold for minimal vertical currently
+RA_DIST_THRESHOLD = 0.05 # 0.05 nm (90 meters)as threshold for minimum  separation on current course
+RA_DIST_CURRENT_THRESHOLD = 0.05 # 0.05 nm (90 meters) as threshold for minimum separation on current position without projection
+RA_ALT_CURRENT_THRESHOLD = 50  # 100 ft as threshold for minimum separation on current position without projection
 # security factors margin
 FACTOR_MARGIN = 1.2
 MODE_S_OUTLIER_ALT_THRESHOLD = 5000  # ft alt difference to be considered an outlier, mode-s tau is not reliable
@@ -131,17 +137,17 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
 def assess_threat(tau_h, d_cpa, tau_v, h_diff, gps_distance_nm):
     # threat classification for aircraft with position and velocity
     # Horizontal threats
-    h_ra = (0 < tau_h <= RA_THRESHOLD and d_cpa <= RA_DIST_THRESHOLD) or (gps_distance_nm <= RA_DIST_THRESHOLD)
-    h_ta = (0 < tau_h <= TA_THRESHOLD and d_cpa <= TA_DIST_THRESHOLD) or (gps_distance_nm <= TA_DIST_THRESHOLD)
-    h_coll = (0 < tau_h <= COLLISION_THRESHOLD and d_cpa <= COLLISION_DIST_THRESHOLD) or (gps_distance_nm <= COLLISION_DIST_THRESHOLD)
+    h_ra = (0 < tau_h <= RA_THRESHOLD and d_cpa <= RA_DIST_THRESHOLD) or (gps_distance_nm <= RA_DIST_CURRENT_THRESHOLD)
+    h_ta = (0 < tau_h <= TA_THRESHOLD and d_cpa <= TA_DIST_THRESHOLD) or (gps_distance_nm <= TA_DIST_CURRENT_THRESHOLD)
+    h_coll = (0 < tau_h <= COLLISION_THRESHOLD and d_cpa <= COLLISION_DIST_THRESHOLD) or (gps_distance_nm <= COLLISION_DIST_CURRENT_THRESHOLD)
 
     # Vertical threats
     v_ra = ((abs(h_diff) <= RA_ALT_THRESHOLD or (0 < tau_v <= RA_THRESHOLD * FACTOR_MARGIN))
-            or (h_diff <= RA_ALT_THRESHOLD))
+            or (h_diff <= RA_ALT_CURRENT_THRESHOLD))
     v_ta = ((abs(h_diff) <= TA_ALT_THRESHOLD or (0 < tau_v <= TA_THRESHOLD * FACTOR_MARGIN))
-            or (h_diff <= TA_ALT_THRESHOLD))
+            or (h_diff <= TA_ALT_CURRENT_THRESHOLD))
     v_coll = ((abs(h_diff) <= COLLISION_ALT_THRESHOLD or (0 < tau_v <= COLLISION_THRESHOLD * FACTOR_MARGIN))
-              or (h_diff <= COLLISION_ALT_THRESHOLD))
+              or (h_diff <= COLLISION_ALT_CURRENT_THRESHOLD))
 
     # RA if aircraft is within RA thresholds regardless of tau values
     if h_ra and v_ra:
