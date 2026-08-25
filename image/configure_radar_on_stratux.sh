@@ -73,6 +73,10 @@ su pi -c "cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.serv
 # create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
 su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
 su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
+# configure pipewire with a increased buffer
+su pi -c "mkdir -p /home/pi/.config/pipewire/pipewire.conf.d/"
+cp "$(dirname "$0")"/stratux-pipewire.conf /home/pi/.config/pipewire/pipewire.conf.d/10-buffer.conf
+
 
 # change log level of rtkit, otherwise this fills journal with tons of useless info
 sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
