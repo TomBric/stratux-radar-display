@@ -188,6 +188,7 @@ def parse_PFLAA(fields):
 
     except (ValueError, KeyError) as e:
         rlog.debug(f"NMEA: Error parsing PFLAA fields: {fields} - {e}")
+        traceback.print_exc()
         return None
 
 
