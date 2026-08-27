@@ -120,7 +120,10 @@ def coordinates_from_relative(rel_north, rel_east, lat_own, lon_own):
      lat_rad = lat_own * (3.14159265359 / 180)
      dlat = (rel_north / EARTH_RADIUS) * (180 / 3.14159265359)
      # Calculate change in longitude (accounting for latitude)
-     dlon = (rel_east / (EARTH_RADIUS * abs(3.14159265359 * lat_rad / 180))) * (180 / 3.14159265359)
+     if lat_rad == 0:
+         dlon = 0
+     else:
+        dlon = (rel_east / (EARTH_RADIUS * abs(3.14159265359 * lat_rad / 180))) * (180 / 3.14159265359)
      return lat_own + dlat, lon_own + dlon
 
 def parse_PFLAA(fields):
