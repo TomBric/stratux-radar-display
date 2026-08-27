@@ -329,7 +329,10 @@ async def listen_to_ble():
                     # convert type of data to a string
                     data = data.decode('utf-8').strip()
                     rlog.debug(f"Ble: Received data: {data}")
-                    handle_nmea_data(data)
+                    # accept also concatenated several NMEA sentences in one read,
+                    for nmea_sentence in data.split("\r\n"):
+                        if nmea_sentence:
+                            handle_nmea_data(nmea_sentence)
             else:
                 rlog.debug(f"Ble: Failed to connect to {device['address']}")
     except Exception as e:
