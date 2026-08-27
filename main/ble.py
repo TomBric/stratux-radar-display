@@ -36,6 +36,7 @@ from globals import rlog
 import re
 import time
 import traceback
+import json
 
 
 SERVICE = "ffe0"
@@ -300,17 +301,17 @@ def handle_nmea_data(nmea_sentence):
         return
     if fields[0] == "GNGLL":
         if parse_GNGLL(fields):
-            situation_func(situation_msg)
+            situation_func(json.dumps(situation_msg))
     elif fields[0] == "GPRMC":
         if parse_GPRMC(fields):
-            situation_func(situation_msg)
+            situation_func(json.dumps(situation_msg))
     elif fields[0] == "PFLAU":
         # ignore PFLAU for now, as it is not used in the current implementation
         pass
     elif fields[0] == "PFLAA":
         traffic_msg_parsed = parse_PFLAA(fields)
         if traffic_msg_parsed:
-            traffic_func(traffic_msg_parsed)
+            traffic_func(json.dumps(traffic_msg_parsed))
     else:
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
