@@ -365,4 +365,4 @@ def init(new_ble_address, new_traffic_func, new_situation_func, situation):
     traffic_func = new_traffic_func
     situation_func = new_situation_func
     ble_address = new_ble_address
-    rlog.log("BLE initialized with address: {0}".format(ble_address))
+    rlog.debug("BLE initialized with address: {0}".format(ble_address))
