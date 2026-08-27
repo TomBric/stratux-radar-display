@@ -179,13 +179,13 @@ def parse_PFLAA(fields):
             identifier = icao_addr_str
         )
         msg['Last_source'] = 4   # SOURCE_FLARM (as defined in radar.py)
-        rlog.log(f"NMEA: PFLAA parsed - ID: {icao_addr_str}, Lat: {lat:.5f}, Lon: {lon:.5f}, "
+        rlog.debug(f"NMEA: PFLAA parsed - ID: {icao_addr_str}, Lat: {lat:.5f}, Lon: {lon:.5f}, "
                  f"Alt: {altitude_ft:.0f}ft, Track: {track}°, Speed: {speed_knots:.1f}kt, "
                  f"Vspeed: {vspeed_ftmin:.0f}fpm")
         return msg
 
     except (ValueError, KeyError) as e:
-        rlog.log(f"NMEA: Error parsing PFLAA fields: {fields} - {e}")
+        rlog.debug(f"NMEA: Error parsing PFLAA fields: {fields} - {e}")
         return None
 
 
@@ -194,7 +194,7 @@ def parse_GNGLL(fields):
     # Format: $GNGLL,lat,N/S,lon,E/W,hhmmss.ss,A/V*hh
     global situation_msg
     if len(fields) < 7:
-        rlog.log(f"NMEA: Incomplete GNGLL sentence: {fields}")
+        rlog.debug(f"NMEA: Incomplete GNGLL sentence: {fields}")
         return False
 
     try:
