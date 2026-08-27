@@ -143,7 +143,7 @@ def parse_PFLAA(fields):
     #  [11] AcftType     : aircraft type code (not used)
     global situation_msg
     if len(fields) < 11:
-        rlog.log(f"NMEA: Incomplete PFLAA sentence: {fields}")
+        rlog.debug(f"NMEA: Incomplete PFLAA sentence: {fields}")
         return None
     try:
         rel_north = float(fields[2])                          # meters, north positive
