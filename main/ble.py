@@ -360,6 +360,7 @@ def init(new_ble_address, new_traffic_func, new_situation_func, situation):
     global global_situation
     global traffic_func
     global situation_func
+    global ble_address
 
     global_situation = situation
     traffic_func = new_traffic_func

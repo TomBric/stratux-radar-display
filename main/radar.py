@@ -934,7 +934,7 @@ async def coroutines():
         # sim handler needs callbacks to new_traffic and new_situation
         await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, sim_handler)
     elif ble_address is not None:
-        rlog.debug("BLE mode, listening to GDL via BLE")
+        rlog.debug("BLE mode, listening to FLARM/OGN via BLE")
         ble_handler = asyncio.create_task(ble.listen_to_ble())
         await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, ble_handler)
     else:   # normal operation, listen to stratux websocket
