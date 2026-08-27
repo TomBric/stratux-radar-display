@@ -958,7 +958,7 @@ def initialize_ui_components():
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     checklist.init(xml_checklist)
-    ble.init(ble_address, new_traffic(), new_situation())
+    ble.init(ble_address, new_traffic, new_situation, global_situation)
     return True
 
 
