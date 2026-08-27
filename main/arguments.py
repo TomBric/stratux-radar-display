@@ -100,3 +100,4 @@ def add(ap):
     ap.add_argument("-log", "--logfile", required=False, help=f"Output log to logfile {FULL_LOG_FILE}",
                     action="store_true", default=False)
     ap.add_argument("-airsim", "--aircraftsim", required=False, help="Read simulation data from file", default=None)
+    ap.add_argument("-ble", "--ble", required=False, help="Connect to BLE device with specified address (e.g., 00:11:22:33:44:55)   ", default=None)

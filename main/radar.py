@@ -63,6 +63,7 @@ import checklist
 import logging
 import collisiondetect
 import airsimulation
+import ble
 from logging.handlers import RotatingFileHandler
 
 from datetime import datetime, timezone
@@ -927,19 +928,21 @@ async def coroutines():
     sensor_reader = asyncio.create_task(cowarner.read_sensors())
     ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
     u_interface = asyncio.create_task(user_interface())
-    if aircraft_simulation is None:
+    if aircraft_simulation is not None:
+        rlog.debug("AIRCRAFT SIMULATION MODE, ONLY DEMO OR TEST!")
+        sim_handler = asyncio.create_task(airsimulation.sim_handler(aircraft_simulation, new_traffic, new_situation))
+        # sim handler needs callbacks to new_traffic and new_situation
+        await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, sim_handler)
+    elif ble_address is not None:
+        rlog.debug("BLE mode, listening to GDL via BLE")
+        ble_handler = asyncio.create_task(ble.listen_to_ble())
+        await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, ble_handler)
+    else:   # normal operation, listen to stratux websocket
         tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
         sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
 
         await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
         # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
-    else:
-        rlog.debug("AIRCRAFT SIMULATION MODE, ONLY DEMO OR TEST!")
-        sim_handler = asyncio.create_task(airsimulation.sim_handler(aircraft_simulation, new_traffic, new_situation))
-        # sim handler needs callbacks to new_traffic and new_situation
-
-        await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, sim_handler)
-
 
 def initialize_ui_components():
     """Initialize UI components and related services."""
@@ -955,6 +958,7 @@ def initialize_ui_components():
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     checklist.init(xml_checklist)
+    ble.init(ble_address, new_traffic(), new_situation())
     return True
 
 
@@ -1087,6 +1091,7 @@ if __name__ == "__main__":
     if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
         global_config['sound_volume'] = 50  # set to a medium value if strange number used
     aircraft_simulation = args['aircraftsim']   # set to None if parameter is not set
+    ble_address = args['ble']
 
     # check config file, if existent use config from there
     saved_config = statusui.read_config(CONFIG_FILE)
@@ -1102,7 +1107,6 @@ if __name__ == "__main__":
             global_config['sound_volume'] = saved_config['sound_volume']
         if 'CO_warner_R0' in saved_config:
             global_config['CO_warner_R0'] = saved_config['CO_warner_R0']
-
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_status_ws = "ws://" + url_host_base + "/status"
