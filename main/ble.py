@@ -35,6 +35,7 @@ from bleak import BleakClient, BleakScanner
 from globals import rlog
 import re
 import time
+import traceback
 
 
 SERVICE = "ffe0"
@@ -333,6 +334,7 @@ async def listen_to_ble():
                 rlog.debug(f"Ble: Failed to connect to {device['address']}")
     except Exception as e:
         rlog.debug(f"Ble: Exception while listening to BLE device {ble_address}: {e}")
+        traceback.print_exc()
 
 
 async def search_ble():
