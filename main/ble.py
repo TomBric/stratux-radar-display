@@ -278,7 +278,7 @@ def parse_GPRMC(fields):
         return False
 
 
-def handle_nmea_data(nmea_sentence, new_traffic_func, new_situation_func):
+def handle_nmea_data(nmea_sentence):
     # Verify checksum before parsing
     if "*" not in nmea_sentence:
         rlog.debug(f"NMEA: Invalid NMEA sentence: Missing checksum")
@@ -296,17 +296,17 @@ def handle_nmea_data(nmea_sentence, new_traffic_func, new_situation_func):
         return
     if fields[0] == "GNGLL":
         if parse_GNGLL(fields):
-            new_situation_func(situation_msg)
+            situation_func(situation_msg)
     elif fields[0] == "GPRMC":
         if parse_GPRMC(fields):
-            new_situation_func(situation_msg)
+            situation_func(situation_msg)
     elif fields[0] == "PFLAU":
         # ignore PFLAU for now, as it is not used in the current implementation
         pass
     elif fields[0] == "PFLAA":
         traffic_msg_parsed = parse_PFLAA(fields)
         if traffic_msg_parsed:
-            new_traffic_func(traffic_msg_parsed)
+            traffic_func(traffic_msg_parsed)
     else:
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
@@ -322,8 +322,10 @@ async def listen_to_ble():
                 rlog.debug(f"Ble: Connected to {device['address']}")
                 while True:
                     data = await client.read_gatt_char(device['uuid'])
+                    # convert type of data to a string
+                    data = data.decode('utf-8').strip()
                     rlog.debug(f"Ble: Received data: {data}")
-                    handle_nmea_data(data, traffic_func, situation_func)
+                    handle_nmea_data(data)
             else:
                 rlog.debug(f"Ble: Failed to connect to {device['address']}")
     except Exception as e:
