@@ -234,6 +234,35 @@ def parse_GNGLL(fields):
         rlog.debug(f"NMEA: Error parsing GNGLL fields: {fields} - {e}")
         return False
 
+
+def parse_GNGGA(fields):
+    # Parse GNGGA NMEA sentence and update situation_msg
+    # Format: $GNGGA,hhmmss.ss,lat,N/S,lon,E/W,fix_quality,num_satellites,hdop,altitude,M,geoid_sep,M,dgps_age,dgps_station_id*hh
+    global situation_msg
+    if len(fields) < 15:
+        rlog.debug(f"NMEA: Incomplete GNGGA sentence: {fields}")
+        return False
+    try:
+        # Parse fix quality (0=invalid, 1=GPS fix, 2=DGPS fix)
+        if fields[6]:
+            situation_msg['GPSFixQuality'] = int(fields[6])
+        # Parse number of satellites
+        if fields[7]:
+            situation_msg['NumSatellites'] = int(fields[7])
+        # Parse horizontal dilution of precision (HDOP)
+        if fields[8]:
+            situation_msg['GPSHorizontalAccuracy'] = float(fields[8])
+        # Parse altitude above mean sea level (in meters)
+        if fields[9]:
+            situation_msg['GPSAltitudeMSL'] = float(fields[9])
+        rlog.debug(f"NMEA: GNGGA parsed - Fix Quality: {situation_msg['GPSFixQuality']}, Num Satellites: {situation_msg['NumSatellites']}, Altitude MSL: {situation_msg['GPSAltitudeMSL']}")
+        return True
+    except ValueError as e:
+        rlog.debug(f"NMEA: Error parsing GNGGA fields: {fields} - {e}")
+        traceback.print_exc()
+        return False
+
+
 def parse_GPRMC(fields):
     # Parse GPRMC NMEA sentence and update situation_msg
     # Format: $GPRMC,hhmmss.ss,A,lat,N,lon,E,speed,track,date,magvar,E/W*hh
@@ -313,6 +342,9 @@ def handle_nmea_data(nmea_sentence):
         traffic_msg_parsed = parse_PFLAA(fields)
         if traffic_msg_parsed:
             traffic_func(json.dumps(traffic_msg_parsed))
+    elif fields[0] == "GNGGA":
+        if parse_GNGGA(fields):
+            situation_func(json.dumps(situation_msg))
     else:
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
