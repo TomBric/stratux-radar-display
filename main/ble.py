@@ -222,10 +222,10 @@ def parse_GNGLL(fields):
         if fields[6]:
             is_valid = fields[6].upper() == 'A'
             situation_msg['GPSFixQuality'] = 1 if is_valid else 0
-        rlog.log(f"NMEA: GNGLL parsed - Lat: {situation_msg['GPSLatitude']}, Lon: {situation_msg['GPSLongitude']}, Status: {situation_msg['GPSFixQuality']}")
+        rlog.debug(f"NMEA: GNGLL parsed - Lat: {situation_msg['GPSLatitude']}, Lon: {situation_msg['GPSLongitude']}, Status: {situation_msg['GPSFixQuality']}")
         return True
     except ValueError as e:
-        rlog.log(f"NMEA: Error parsing GNGLL fields: {fields} - {e}")
+        rlog.debug(f"NMEA: Error parsing GNGLL fields: {fields} - {e}")
         return False
 
 def parse_GPRMC(fields):
@@ -233,7 +233,7 @@ def parse_GPRMC(fields):
     # Format: $GPRMC,hhmmss.ss,A,lat,N,lon,E,speed,track,date,magvar,E/W*hh
     global situation_msg
     if len(fields) < 12:
-        rlog.log(f"NMEA: Incomplete GPRMC sentence: {fields}")
+        rlog.debug(f"NMEA: Incomplete GPRMC sentence: {fields}")
         return False
     try:
         # Parse UTC time (hhmmss.ss format)
@@ -271,28 +271,28 @@ def parse_GPRMC(fields):
         # Parse track angle in degrees
         if fields[8]:
             situation_msg['GPSTrueCourse'] = float(fields[8])
-        rlog.log(f"NMEA: GPRMC parsed - Lat: {situation_msg['GPSLatitude']}, Lon: {situation_msg['GPSLongitude']}, Speed: {situation_msg['GPSGroundSpeed']}, Course: {situation_msg['GPSTrueCourse']}")
+        rlog.debug(f"NMEA: GPRMC parsed - Lat: {situation_msg['GPSLatitude']}, Lon: {situation_msg['GPSLongitude']}, Speed: {situation_msg['GPSGroundSpeed']}, Course: {situation_msg['GPSTrueCourse']}")
         return True
     except ValueError as e:
-        rlog.log(f"NMEA: Error parsing GPRMC fields: {fields} - {e}")
+        rlog.debug(f"NMEA: Error parsing GPRMC fields: {fields} - {e}")
         return False
 
 
 def handle_nmea_data(nmea_sentence, new_traffic_func, new_situation_func):
     # Verify checksum before parsing
     if "*" not in nmea_sentence:
-        rlog.log(f"NMEA: Invalid NMEA sentence: Missing checksum")
+        rlog.debug(f"NMEA: Invalid NMEA sentence: Missing checksum")
         return
     data, checksum = nmea_sentence.strip().split("*")
     # Remove leading '$' if present
     if data.startswith("$"):
         data = data[1:]
     if not check_nmea_checksum(data, checksum):
-        rlog.log(f"NMEA: Invalid checksum for sentence: {nmea_sentence}")
+        rlog.debug(f"NMEA: Invalid checksum for sentence: {nmea_sentence}")
         return
     fields = data.split(",")  # Split the fields
     if not fields:
-        rlog.log(f"NMEA: Empty fields in sentence: {nmea_sentence}")
+        rlog.debug(f"NMEA: Empty fields in sentence: {nmea_sentence}")
         return
     if fields[0] == "GNGLL":
         if parse_GNGLL(fields):
@@ -308,26 +308,26 @@ def handle_nmea_data(nmea_sentence, new_traffic_func, new_situation_func):
         if traffic_msg_parsed:
             new_traffic_func(traffic_msg_parsed)
     else:
-        rlog.log(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
+        rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
 
 async def listen_to_ble():
     if not is_valid_ble_address(ble_address):
-        rlog.log(f"Ble: Invalid BLE address format: {ble_address}")
+        rlog.debug(f"Ble: Invalid BLE address format: {ble_address}")
         return
     device= {'name': f"Unknown ({ble_address})", 'address': ble_address,'uuid': characteristic_uuid}
     try:
         async with BleakClient(device['address']) as client:
             if client.is_connected:
-                rlog.log(f"Ble: Connected to {device['address']}")
+                rlog.debug(f"Ble: Connected to {device['address']}")
                 while True:
                     data = await client.read_gatt_char(device['uuid'])
-                    rlog.log(f"Ble: Received data: {data}")
+                    rlog.debug(f"Ble: Received data: {data}")
                     handle_nmea_data(data, traffic_func, situation_func)
             else:
-                rlog.log(f"Ble: Failed to connect to {device['address']}")
+                rlog.debug(f"Ble: Failed to connect to {device['address']}")
     except Exception as e:
-        rlog.log(f"Ble: Exception while listening to BLE device {ble_address}: {e}")
+        rlog.debug(f"Ble: Exception while listening to BLE device {ble_address}: {e}")
 
 
 async def search_ble():
@@ -337,13 +337,13 @@ async def search_ble():
         scanner = BleakScanner()
         devices = await scanner.discover(timeout=10)
     except Exception as e:
-        rlog.log(f"Ble: Exception performing BLE-Scan: {e}")
+        rlog.debug(f"Ble: Exception performing BLE-Scan: {e}")
         return []
     # accept only devices with device id FFE0
-    rlog.log(f"Identified devices: {devices}")
+    rlog.debug(f"Identified devices: {devices}")
     for device in devices:
         uuids = device.details.get("props").get("UUIDs")
-        rlog.log(f"Ble: Found device {device.name} ({device.address}) with UUIDs: {uuids}")
+        rlog.debug(f"Ble: Found device {device.name} ({device.address}) with UUIDs: {uuids}")
         for uuid in uuids:
             if  uuid == service_uuid:
                 device_info = {
@@ -352,7 +352,7 @@ async def search_ble():
                     'uuid': characteristic_uuid
                 }
                 found_devices.append(device_info)
-        rlog.log(f"Ble: Following BLE devices with service FFE0 found: {found_devices}")
+        rlog.debug(f"Ble: Following BLE devices with service FFE0 found: {found_devices}")
     return found_devices
 
 
