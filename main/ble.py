@@ -502,7 +502,7 @@ async def listen_to_ble():
                     data = await client.read_gatt_char(device_uuid)
                     # convert type of data to a string
                     data = data.decode('utf-8').strip()
-                    rlog.debug(f"Ble: Received data: {data}")
+                    # rlog.debug(f"Ble: Received data: {data}")
                     # accept also concatenated several NMEA sentences in one read,
                     for nmea_sentence in data.split("\r\n"):
                         if nmea_sentence:
