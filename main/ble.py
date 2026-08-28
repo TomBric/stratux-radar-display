@@ -378,8 +378,12 @@ def parse_GNRMC(fields):
         # Parse track angle in degrees
         if fields[8]:
             situation_msg['GPSTrueCourse'] = float(fields[8])
-        rlog.debug(f"NMEA: GNRMC parsed - Lat: {situation_msg['GPSLatitude']}, Lon: {
-
+        rlog.debug(f"NMEA: GNRMC parsed - Lat: {situation_msg['GPSLatitude']}, Lon: {situation_msg['GPSLongitude']}, Speed: {situation_msg['GPSGroundSpeed']}, Course: {situation_msg['GPSTrueCourse']}")
+        return True
+    except ValueError as e:
+        rlog.debug(f"NMEA: Error parsing GNRMC fields: {fields} - {e}")
+        traceback.print_exc()
+        return False
 
 def handle_nmea_data(nmea_sentence):
     # Verify checksum before parsing
