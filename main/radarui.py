@@ -36,6 +36,7 @@ import requests
 import radarbuttons
 import radarmodes
 from flask_bootstrap import Bootstrap5, SwitchField
+import json
 
 # status variables for state machine
 display_radius = (2, 3, 5, 10, 20, 40)
@@ -44,23 +45,33 @@ sound_on = True
 button_api_active = False
 
 url_settings_set = ""
+ble_address = None
+traffic_func = None
 
 
-def init(url, button_api):
-    global url_settings_set
+def init(url, button_api, ble_address_param, traffic_func_param):
+    global url_settings_set, ble_address, traffic_func
 
     if not radarbuttons.init(button_api):   # error occured, e.g. gpio pins are buse
         return False
     url_settings_set = url
+    ble_address = ble_address_param
+    traffic_func = traffic_func_param
+    ble_address_set = ble_address
     rlog.debug("Radar UI: Initialized POST settings to " + url_settings_set)
     return True
 
 def communicate_limits(radarrange, threshold):
-    rlog.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
-    try:
-        requests.post(url_settings_set, json={'RadarLimits': threshold, 'RadarRange': radarrange})
-    except requests.exceptions.RequestException as e:
-        rlog.debug("Posting limits exception", e)
+    if ble_address is not None:
+        rlog.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
+        try:
+            requests.post(url_settings_set, json={'RadarLimits': threshold, 'RadarRange': radarrange})
+        except requests.exceptions.RequestException as e:
+            rlog.debug("Posting limits exception", e)
+    else:  # ble mode communicate via traffic msg
+        rlog.debug("BLE COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
+        traffic_msg = { 'RadarLimits': threshold, 'RadarRange': radarrange }
+        traffic_func(json.dumps(traffic_msg))
 
 
 def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)

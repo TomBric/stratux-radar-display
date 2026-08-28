@@ -946,7 +946,7 @@ async def coroutines():
 
 def initialize_ui_components():
     """Initialize UI components and related services."""
-    if not radarui.init(url_settings_set, button_api_active):
+    if not radarui.init(url_settings_set, button_api_active, ble_address, new_traffic):
         print("GPIO Error, is  another radar process running? Terminating.")
         return False
     
