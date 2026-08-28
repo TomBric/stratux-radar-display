@@ -61,7 +61,7 @@ situation_msg = {
     'GPSLongitude': 0,
     'BaroPressureAltitude': 0,
     'GPSTrueCourse': 0,
-    'GPSGroundSpeed': 0,
+    'GPSGroundSpeed': 0,     # in knots
     'BaroVerticalSpeed': 0,
     'GPSHorizontalAccuracy': 0,
     'GPSVerticalAccuracy': 0,
@@ -69,7 +69,7 @@ situation_msg = {
     'GPSLastFixLocalTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
     'GPSLastGPSTimeStratuxTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
     'GPSTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
-    'GPSAltitudeMSL': 0,
+    'GPSAltitudeMSL': 0,   # in feet
     'BaroSourceType': 1,
     'AHRSPitch': 0,
     'AHRSRoll': 0,
@@ -254,8 +254,8 @@ def parse_GNGGA(fields):
             situation_msg['GPSHorizontalAccuracy'] = float(fields[8])
         # Parse altitude above mean sea level (in meters)
         if fields[9]:
-            situation_msg['GPSAltitudeMSL'] = float(fields[9])
-        rlog.debug(f"NMEA: GNGGA parsed - Fix Quality: {situation_msg['GPSFixQuality']}, Num Satellites: {situation_msg['NumSatellites']}, Altitude MSL: {situation_msg['GPSAltitudeMSL']}")
+            situation_msg['GPSAltitudeMSL'] = float(fields[9]) * 3.28084  # Convert meters to feet
+        rlog.debug(f"NMEA: GNGGA parsed - Fix Quality: {situation_msg['GPSFixQuality']}, Num Satellites: {situation_msg['NumSatellites']}, Altitude MSL/ft: {situation_msg['GPSAltitudeMSL']}")
         return True
     except ValueError as e:
         rlog.debug(f"NMEA: Error parsing GNGGA fields: {fields} - {e}")
@@ -370,11 +370,10 @@ def parse_GNRMC(fields):
             if fields[6].upper() == 'W':
                 longitude = -longitude
             situation_msg['GPSLongitude'] = longitude
-        # Parse speed over ground in knots and convert to m/s
+        # Parse speed over ground in knots
         if fields[7]:
             speed_knots = float(fields[7])
-            speed_mps = speed_knots * 0.514444  # Convert knots to m/s
-            situation_msg['GPSGroundSpeed'] = speed_mps
+            situation_msg['GPSGroundSpeed'] = speed_knots
         # Parse track angle in degrees
         if fields[8]:
             situation_msg['GPSTrueCourse'] = float(fields[8])
@@ -382,6 +381,28 @@ def parse_GNRMC(fields):
         return True
     except ValueError as e:
         rlog.debug(f"NMEA: Error parsing GNRMC fields: {fields} - {e}")
+        traceback.print_exc()
+        return False
+
+def parse_GNVTG(fields):
+    # Parse GNVTG NMEA sentence and update situation_msg
+    # Format: $GNVTG,<TrackTrue>,T,<TrackMagnetic>,M,<SpeedKnots>,N,<SpeedKmh>,K*hh
+    global situation_msg
+    if len(fields) < 9:
+        rlog.debug(f"NMEA: Incomplete GNVTG sentence: {fields}")
+        return False
+    try:
+        # Parse track over ground in degrees (true)
+        if fields[1]:
+            situation_msg['GPSTrueCourse'] = float(fields[1])
+        # Parse speed over ground in knots
+        if fields[5]:
+            speed_knots = float(fields[5])
+            situation_msg['GPSGroundSpeed'] = speed_knots
+        rlog.debug(f"NMEA: GNVTG parsed - Course: {situation_msg['GPSTrueCourse']}, Speed: {situation_msg['GPSGroundSpeed']}")
+        return True
+    except ValueError as e:
+        rlog.debug(f"NMEA: Error parsing GNVTG fields: {fields} - {e}")
         traceback.print_exc()
         return False
 
@@ -422,6 +443,9 @@ def handle_nmea_data(nmea_sentence):
             situation_func(json.dumps(situation_msg))
     elif fields[0] == "GNRMC":
         if parse_GNRMC(fields):
+            situation_func(json.dumps(situation_msg))
+    elif fields[0] == "GNVTG":
+        if parse_GNVTG(fields):
             situation_func(json.dumps(situation_msg))
     else:
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")

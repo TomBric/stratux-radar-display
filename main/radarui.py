@@ -57,7 +57,6 @@ def init(url, button_api, ble_address_param, traffic_func_param):
     url_settings_set = url
     ble_address = ble_address_param
     traffic_func = traffic_func_param
-    ble_address_set = ble_address
     rlog.debug("Radar UI: Initialized POST settings to " + url_settings_set)
     return True
 
@@ -69,9 +68,9 @@ def communicate_limits(radarrange, threshold):
         except requests.exceptions.RequestException as e:
             rlog.debug("Posting limits exception", e)
     else:  # ble mode communicate via traffic msg
-        rlog.debug("BLE COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
-        traffic_msg = { 'RadarLimits': threshold, 'RadarRange': radarrange }
-        traffic_func(json.dumps(traffic_msg))
+        traffic_msg = json.dumps({ 'RadarLimits': threshold, 'RadarRange': radarrange })
+        rlog.debug(f"BLE COMMUNICATE LIMITS: {traffic_msg}")
+        traffic_func(traffic_msg)
 
 
 def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
