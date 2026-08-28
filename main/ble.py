@@ -487,6 +487,10 @@ def handle_nmea_data(nmea_sentence):
     elif fields[0] == "POGNB":
         if parse_POGNB(fields):
             _emit_situation_update(situation_callback)
+    elif fields[0] == "PGRMZ":
+        pass  # ignore PGRMZ for now, we have GNGLL and GNGGA for altitude
+    elif fields[0] == "LK8EX1":
+        pass  # do nothing for LK8EX1 sentences
     else:
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
