@@ -34,7 +34,6 @@
 from bleak import BleakClient, BleakScanner
 from globals import rlog
 from pathlib import Path
-import os
 import re
 import time
 import traceback
@@ -132,7 +131,7 @@ def check_nmea_checksum(data, provided_checksum):
     # Compare with the provided checksum (case-insensitive)
     return calculated_hex == provided_checksum.upper()
 
-def parse_traffic_msg(icao_addr, latitude, longitude, altitude, track, speed, vspeed, identifier):
+def parse_traffic_msg(icao_addr, latitude, longitude, altitude, track, speed, vspeed, tail):
      """Create a traffic_msg dictionary with parsed aircraft data"""
      return {
          'Icao_addr': icao_addr,
@@ -147,7 +146,7 @@ def parse_traffic_msg(icao_addr, latitude, longitude, altitude, track, speed, vs
          'Age': 0,
          'AgeLastAlt': 0,
          'Last_source': 1,  # 1090ES
-         'Tail': identifier,
+         'Tail': tail,
          'DistanceEstimated': 0
      }
 
@@ -198,8 +197,8 @@ def parse_PFLAA(fields):
         track       = float(fields[7]) if fields[7] else 0.0
         speed_mps   = float(fields[9])  if fields[9]  else 0.0
         climb_mps   = float(fields[10]) if fields[10] else 0.0
-        speed_knots  = speed_mps  * 1.94384   # m/s  → knots
-        vspeed_ftmin = climb_mps  * 196.85    # m/s  → ft/min
+        speed_knots  = float(speed_mps  * 1.94384)   # m/s  → knots
+        vspeed_ftmin = float(climb_mps  * 196.85)    # m/s  → ft/min
 
         # Convert relative offsets to absolute WGS-84 coordinates
         own_lat = float(own_situation['latitude'])
@@ -212,22 +211,10 @@ def parse_PFLAA(fields):
         own_alt_ft = float(own_situation['own_altitude'])
         altitude_ft  = own_alt_ft + (rel_vertical * 3.28084)
 
-        identifier = lookup_ogn_tail_number(icao_addr_str) or icao_addr_str
-
-        msg = parse_traffic_msg(
-            icao_addr  = icao_addr,
-            latitude   = lat,
-            longitude  = lon,
-            altitude   = altitude_ft,
-            track      = track,
-            speed      = speed_knots,
-            vspeed     = vspeed_ftmin,
-            identifier = identifier
-        )
+        tail = lookup_ogn_tail_number(icao_addr_str) or icao_addr_str
+        msg = parse_traffic_msg(icao_addr= icao_addr, latitude=lat, longitude=lon, altitude=altitude_ft,
+            track=track, speed=speed_knots, vspeed=vspeed_ftmin,tail=tail)
         msg['Last_source'] = 4   # SOURCE_FLARM (as defined in radar.py)
-        altitude_ft = float(altitude_ft)
-        speed_knots = float(speed_knots)
-        vspeed_ftmin = float(vspeed_ftmin)
         rlog.debug(f"NMEA: PFLAA parsed - ID: {icao_addr_str}, Lat: {lat:.5f}, Lon: {lon:.5f}, "
                  f"Alt: {altitude_ft:.0f}ft, Track: {track}°, Speed: {speed_knots:.1f}kt, "
                  f"Vspeed: {vspeed_ftmin:.0f}fpm")
