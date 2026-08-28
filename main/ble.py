@@ -374,6 +374,41 @@ def parse_GNRMC(fields):
     return _parse_rmc(fields, "GNRMC")
 
 
+def parse_POGNB(fields):
+    # Parse POGNB NMEA sentence and update situation_msg
+    # Format: $POGNB,<BaroAltitude>,<BaroVerticalSpeed>,<AHRSPitch>,<AHRSRoll>,<AHRSGyroHeading>,<AHRSSlipSkid>,<AHRSStatus>,<AHRSGLoad>,<AHRSGLoadMax>,<AHRSGLoadMin>*hh
+    global situation_msg
+    if len(fields) < 11:
+        rlog.debug(f"NMEA: Incomplete POGNB sentence: {fields}")
+        return False
+    try:
+        if fields[1]:
+            situation_msg['BaroPressureAltitude'] = float(fields[1])
+        if fields[2]:
+            situation_msg['BaroVerticalSpeed'] = float(fields[2])
+        if fields[3]:
+            situation_msg['AHRSPitch'] = float(fields[3])
+        if fields[4]:
+            situation_msg['AHRSRoll'] = float(fields[4])
+        if fields[5]:
+            situation_msg['AHRSGyroHeading'] = float(fields[5])
+        if fields[6]:
+            situation_msg['AHRSSlipSkid'] = float(fields[6])
+        if fields[7]:
+            situation_msg['AHRSStatus'] = int(fields[7])
+        if fields[8]:
+            situation_msg['AHRSGLoad'] = float(fields[8])
+        if fields[9]:
+            situation_msg['AHRSGLoadMax'] = float(fields[9])
+        if fields[10]:
+            situation_msg['AHRSGLoadMin'] = float(fields[10])
+        rlog.debug(f"NMEA: POGNB parsed - Baro Altitude: {situation_msg['BaroPressureAltitude']}, Vertical Speed: {situation_msg['BaroVerticalSpeed']}, Pitch: {situation_msg['AHRSPitch']}, Roll: {situation_msg['AHRSRoll']}, Gyro Heading: {situation_msg['AHRSGyroHeading']}")
+        return True
+    except ValueError as e:
+        rlog.debug(f"NMEA: Error parsing POGNB fields: {fields} - {e}")
+        traceback.print_exc()
+        return False
+
 def parse_GNMRC(fields):
     # Some BLE/NMEA sources appear to emit the non-standard talker/type GNMRC.
     # Parse it like a regular RMC sentence for compatibility.
@@ -457,6 +492,9 @@ def handle_nmea_data(nmea_sentence):
             _emit_situation_update(situation_callback)
     elif fields[0] == "GNVTG":
         if parse_GNVTG(fields):
+            _emit_situation_update(situation_callback)
+    elif fields[0] == "POGNB":
+        if parse_POGNB(fields):
             _emit_situation_update(situation_callback)
     else:
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
