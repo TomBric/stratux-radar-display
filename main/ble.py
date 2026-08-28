@@ -39,6 +39,7 @@ import time
 import traceback
 import json
 import arguments
+import asyncio
 
 
 SERVICE = "ffe0"
@@ -47,6 +48,7 @@ BLE_BASE_UUID = "0000{0}-0000-1000-8000-00805f9b34fb"
 service_uuid = BLE_BASE_UUID.format(SERVICE.lower())
 characteristic_uuid = BLE_BASE_UUID.format(CHARACTERISTIC.lower())
 OGN_DDB_FILENAME = str(Path(arguments.FULL_CONFIG_DIR).joinpath("ddb.json"))
+BLE_RETRY_TIMEOUT = 1 # seconds to wait before retrying BLE connection after failure
 
 global_situation = None    # global situation dictionary to hold the latest situation data
 traffic_func = None         # global function to handle new traffic messages
@@ -494,24 +496,33 @@ async def listen_to_ble():
     device_address = valid_address
     device_uuid = characteristic_uuid
     device= {'name': f"Unknown ({device_address})", 'address': device_address, 'uuid': device_uuid}
-    try:
-        async with BleakClient(device_address) as client:
-            if client.is_connected:
-                rlog.debug(f"Ble: Connected to {device['address']}")
-                while True:
-                    data = await client.read_gatt_char(device_uuid)
-                    # convert type of data to a string
-                    data = data.decode('utf-8').strip()
-                    # rlog.debug(f"Ble: Received data: {data}")
-                    # accept also concatenated several NMEA sentences in one read,
-                    for nmea_sentence in data.split("\r\n"):
-                        if nmea_sentence:
-                            handle_nmea_data(nmea_sentence)
-            else:
-                rlog.debug(f"Ble: Failed to connect to {device['address']}")
-    except Exception as e:
-        rlog.debug(f"Ble: Exception while listening to BLE device {ble_address}: {e}")
-        traceback.print_exc()
+    while True:
+        # outer loop restarted every time the connection fails
+        rlog.debug("BLE listener active ...")
+        try:
+            async with BleakClient(device_address) as client:
+                if client.is_connected:
+                    rlog.debug(f"Ble: Connected to {device['address']}")
+                    while True:
+                        data = await client.read_gatt_char(device_uuid)
+                        # convert type of data to a string
+                        data = data.decode('utf-8').strip()
+                        # rlog.debug(f"Ble: Received data: {data}")
+                        # accept also concatenated several NMEA sentences in one read,
+                        for nmea_sentence in data.split("\r\n"):
+                            if nmea_sentence:
+                                handle_nmea_data(nmea_sentence)
+                else:
+                    rlog.debug(f"Ble: Failed to connect to {device['address']}")
+        except asyncio.CancelledError:
+            rlog.debug("Ble: Shutting down in connect ... ")
+            return
+        except Exception as e:
+            rlog.debug(f"Ble: Exception while listening to BLE device {ble_address}: {e}")
+            traceback.print_exc()
+            global_situation['connected'] = False
+            await asyncio.sleep(BLE_RETRY_TIMEOUT)
+            continue
 
 
 async def search_ble():
