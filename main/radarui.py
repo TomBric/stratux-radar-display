@@ -61,7 +61,7 @@ def init(url, button_api, ble_address_param, traffic_func_param):
     return True
 
 def communicate_limits(radarrange, threshold):
-    if ble_address is not None:
+    if ble_address is None:
         rlog.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
         try:
             requests.post(url_settings_set, json={'RadarLimits': threshold, 'RadarRange': radarrange})
