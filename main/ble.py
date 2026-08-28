@@ -167,7 +167,7 @@ def parse_PFLAA(fields):
         lon = float(lon)
 
         # Absolute altitude in feet (own baro altitude + relative vertical converted to feet)
-        own_alt_ft   = float(global_situation['altitude'])
+        own_alt_ft   = float(global_situation['own_altitude'])
         altitude_ft  = own_alt_ft + (rel_vertical * 3.28084)
 
         msg = parse_traffic_msg(
