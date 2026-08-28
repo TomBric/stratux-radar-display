@@ -215,9 +215,6 @@ def parse_PFLAA(fields):
         msg = parse_traffic_msg(icao_addr= icao_addr, latitude=lat, longitude=lon, altitude=altitude_ft,
             track=track, speed=speed_knots, vspeed=vspeed_ftmin,tail=tail)
         msg['Last_source'] = 4   # SOURCE_FLARM (as defined in radar.py)
-        rlog.debug(f"NMEA: PFLAA parsed - ID: {icao_addr_str}, Lat: {lat:.5f}, Lon: {lon:.5f}, "
-                 f"Alt: {altitude_ft:.0f}ft, Track: {track}°, Speed: {speed_knots:.1f}kt, "
-                 f"Vspeed: {vspeed_ftmin:.0f}fpm")
         return msg
 
     except (ValueError, KeyError) as e:
@@ -262,7 +259,6 @@ def parse_GNGLL(fields):
         if fields[6]:
             is_valid = fields[6].upper() == 'A'
             situation_msg['GPSFixQuality'] = 1 if is_valid else 0
-        rlog.debug(f"NMEA: GNGLL parsed - Lat: {situation_msg['GPSLatitude']}, Lon: {situation_msg['GPSLongitude']}, Status: {situation_msg['GPSFixQuality']}")
         return True
     except ValueError as e:
         rlog.debug(f"NMEA: Error parsing GNGLL fields: {fields} - {e}")
@@ -289,7 +285,6 @@ def parse_GNGGA(fields):
         # Parse altitude above mean sea level (in meters)
         if fields[9]:
             situation_msg['GPSAltitudeMSL'] = float(fields[9]) * 3.28084  # Convert meters to feet
-        rlog.debug(f"NMEA: GNGGA parsed - Fix Quality: {situation_msg['GPSFixQuality']}, Num Satellites: {situation_msg['NumSatellites']}, Altitude MSL/ft: {situation_msg['GPSAltitudeMSL']}")
         return True
     except ValueError as e:
         rlog.debug(f"NMEA: Error parsing GNGGA fields: {fields} - {e}")
@@ -328,11 +323,6 @@ def _parse_rmc(fields, sentence_type):
             situation_msg['GPSGroundSpeed'] = float(fields[7])
         if fields[8]:
             situation_msg['GPSTrueCourse'] = float(fields[8])
-        rlog.debug(
-            f"NMEA: {sentence_type} parsed - Lat: {situation_msg['GPSLatitude']}, "
-            f"Lon: {situation_msg['GPSLongitude']}, Speed: {situation_msg['GPSGroundSpeed']}, "
-            f"Course: {situation_msg['GPSTrueCourse']}"
-        )
         return True
     except (ValueError, IndexError) as e:
         rlog.debug(f"NMEA: Error parsing {sentence_type} fields: {fields} - {e}")
@@ -361,7 +351,6 @@ def parse_GNGSA(fields):
             situation_msg['GPSHorizontalAccuracy'] = float(fields[16])
         if len(fields) > 17 and fields[17]:
             situation_msg['GPSVerticalAccuracy'] = float(fields[17])
-        rlog.debug(f"NMEA: GNGSA parsed - Fix Quality: {situation_msg['GPSFixQuality']}, PDOP: {situation_msg.get('PDOP', 'N/A')}, HDOP: {situation_msg.get('GPSHorizontalAccuracy', 'N/A')}, VDOP: {situation_msg.get('GPSVerticalAccuracy', 'N/A')}")
         return True
     except ValueError as e:
         rlog.debug(f"NMEA: Error parsing GNGSA fields: {fields} - {e}")
@@ -393,7 +382,6 @@ def parse_POGNB(fields):
         if fields[6]:
             situation_msg['BaroVerticalSpeed'] = float(fields[4]) * 196.85      # m/s -> ft/min
         situation_msg['BaroSourceType'] = 2  # Mark baro source as OGN device (see radar.py: 2 = OGN device)
-        rlog.debug(f"NMEA: POGNB parsed - Baro Altitude: {situation_msg['BaroPressureAltitude']}, Vertical Speed: {situation_msg['BaroVerticalSpeed']}")
         return True
     except ValueError as e:
         rlog.debug(f"NMEA: Error parsing POGNB fields: {fields} - {e}")
@@ -420,7 +408,6 @@ def parse_GNVTG(fields):
         if fields[5]:
             speed_knots = float(fields[5])
             situation_msg['GPSGroundSpeed'] = speed_knots
-        rlog.debug(f"NMEA: GNVTG parsed - Course: {situation_msg['GPSTrueCourse']}, Speed: {situation_msg['GPSGroundSpeed']}")
         return True
     except ValueError as e:
         rlog.debug(f"NMEA: Error parsing GNVTG fields: {fields} - {e}")
