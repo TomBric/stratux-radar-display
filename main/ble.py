@@ -89,7 +89,6 @@ def lookup_ogn_tail_number(ognid):
             if isinstance(device_id, str) and isinstance(registration, str):
                 ogn_tail_number_cache[device_id] = registration
         rlog.debug(f"Ble: {OGN_DDB_FILENAME} loaded with {len(ogn_tail_number_cache)} entries")
-        print(f"ogn_tail_number_cache: {ogn_tail_number_cache}")
     return ogn_tail_number_cache.get(ognid, "")
 
 
