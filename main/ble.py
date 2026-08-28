@@ -33,10 +33,13 @@
 
 from bleak import BleakClient, BleakScanner
 from globals import rlog
+from pathlib import Path
+import os
 import re
 import time
 import traceback
 import json
+import arguments
 
 
 SERVICE = "ffe0"
@@ -44,15 +47,49 @@ CHARACTERISTIC = "ffe1"
 BLE_BASE_UUID = "0000{0}-0000-1000-8000-00805f9b34fb"
 service_uuid = BLE_BASE_UUID.format(SERVICE.lower())
 characteristic_uuid = BLE_BASE_UUID.format(CHARACTERISTIC.lower())
+OGN_DDB_FILENAME = str(Path(arguments.FULL_CONFIG_DIR).joinpath("ddb.json"))
 
 global_situation = None    # global situation dictionary to hold the latest situation data
 traffic_func = None         # global function to handle new traffic messages
 situation_func = None       # global function to handle new situation messages
 ble_address = None             # global BLE address to connect to
+ogn_tail_number_cache = {}     # global cache for OGN tail numbers consisting of ognid -> tail number mappings
+ogn_device_db_loaded = False
+
 
 def is_valid_ble_address(address: str) -> bool:
     mac_regex = re.compile(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
     return bool(mac_regex.match(address))
+
+
+def lookup_ogn_tail_number(ognid):
+    # return the tail number for the given OGN ID from the cache, or load the OGN device database if not already loaded
+    # function like in stratux ogn.go
+    global ogn_device_db_loaded
+    if not ogn_device_db_loaded:
+        ogn_device_db_loaded = True
+        rlog.debug(f"Ble: Parsing OGN device db {OGN_DDB_FILENAME}")
+        try:
+            with Path(OGN_DDB_FILENAME).open("r", encoding="utf-8") as db_file:
+                data = json.load(db_file)
+        except (OSError, json.JSONDecodeError) as e:
+            rlog.debug(f"Ble: Failed to parse OGN device db {OGN_DDB_FILENAME}: {e}")
+            return ognid
+
+        devices = data.get("devices", [])
+        if not isinstance(devices, list):
+            rlog.debug(f"Ble: Failed to parse OGN device db {OGN_DDB_FILENAME}: invalid devices structure")
+            return ognid
+        for device in devices:
+            if not isinstance(device, dict):
+                continue
+            device_id = device.get("device_id")
+            registration = device.get("registration")
+            if isinstance(device_id, str) and isinstance(registration, str):
+                ogn_tail_number_cache[device_id] = registration
+        rlog.debug(f"Ble: {OGN_DDB_FILENAME} loaded with {len(ogn_tail_number_cache)} entries")
+        print(f"ogn_tail_number_cache: {ogn_tail_number_cache}")
+    return ogn_tail_number_cache.get(ognid, "")
 
 
 # declare an empty global situation message to hold the data
@@ -128,6 +165,7 @@ def coordinates_from_relative(rel_north, rel_east, lat_own, lon_own):
         dlon = (rel_east / (EARTH_RADIUS * abs(3.14159265359 * lat_rad / 180))) * (180 / 3.14159265359)
      return lat_own + dlat, lon_own + dlon
 
+
 def parse_PFLAA(fields):
     # Format: $PFLAA,<AlarmLevel>,<RelNorth_m>,<RelEast_m>,<RelVert_m>,<IDType>,<ID>,<Track>,<TurnRate>,<GS_ms>,<ClimbRate_ms>,<AcftType>*hh
     # Example: PFLAA,0,1234,-567,120,2,3D02A4,115,,25,1.5,3
@@ -147,7 +185,11 @@ def parse_PFLAA(fields):
     if len(fields) < 11:
         rlog.debug(f"NMEA: Incomplete PFLAA sentence: {fields}")
         return None
+    if global_situation is None:
+        rlog.debug(f"NMEA: Ignoring PFLAA without own situation: {fields}")
+        return None
     try:
+        own_situation = global_situation if isinstance(global_situation, dict) else {}
         rel_north = float(fields[2])                          # meters, north positive
         rel_east  = float(fields[3])                          # meters, east  positive
         rel_vertical = float(fields[4])                       # meters, above positive
@@ -160,15 +202,17 @@ def parse_PFLAA(fields):
         vspeed_ftmin = climb_mps  * 196.85    # m/s  → ft/min
 
         # Convert relative offsets to absolute WGS-84 coordinates
-        own_lat = float(global_situation['latitude'])
-        own_lon = float(global_situation['longitude'])
+        own_lat = float(own_situation['latitude'])
+        own_lon = float(own_situation['longitude'])
         lat, lon = coordinates_from_relative(rel_north, rel_east, own_lat, own_lon)
         lat = float(lat)
         lon = float(lon)
 
         # Absolute altitude in feet (own baro altitude + relative vertical converted to feet)
-        own_alt_ft   = float(global_situation['own_altitude'])
+        own_alt_ft = float(own_situation['own_altitude'])
         altitude_ft  = own_alt_ft + (rel_vertical * 3.28084)
+
+        identifier = lookup_ogn_tail_number(icao_addr_str) or icao_addr_str
 
         msg = parse_traffic_msg(
             icao_addr  = icao_addr,
@@ -178,9 +222,12 @@ def parse_PFLAA(fields):
             track      = track,
             speed      = speed_knots,
             vspeed     = vspeed_ftmin,
-            identifier = icao_addr_str
+            identifier = identifier
         )
         msg['Last_source'] = 4   # SOURCE_FLARM (as defined in radar.py)
+        altitude_ft = float(altitude_ft)
+        speed_knots = float(speed_knots)
+        vspeed_ftmin = float(vspeed_ftmin)
         rlog.debug(f"NMEA: PFLAA parsed - ID: {icao_addr_str}, Lat: {lat:.5f}, Lon: {lon:.5f}, "
                  f"Alt: {altitude_ft:.0f}ft, Track: {track}°, Speed: {speed_knots:.1f}kt, "
                  f"Vspeed: {vspeed_ftmin:.0f}fpm")
@@ -263,54 +310,53 @@ def parse_GNGGA(fields):
         return False
 
 
+def _parse_nmea_coordinate(value, hemisphere, degree_digits):
+    if not value or not hemisphere:
+        raise ValueError("Missing coordinate value or hemisphere")
+    degrees = int(value[:degree_digits])
+    minutes = float(value[degree_digits:])
+    coordinate = degrees + (minutes / 60.0)
+    if hemisphere.upper() in ('S', 'W'):
+        coordinate = -coordinate
+    return coordinate
+
+
+def _parse_rmc(fields, sentence_type):
+    # Common parser for GPRMC / GNRMC / GNMRC sentences
+    # Format: $--RMC,hhmmss.ss,A,lat,N,lon,E,speed,track,date,magvar,E/W*hh
+    global situation_msg
+    if len(fields) < 12:
+        rlog.debug(f"NMEA: Incomplete {sentence_type} sentence: {fields}")
+        return False
+    try:
+        if fields[1]:
+            situation_msg['GPSTime'] = fields[1]
+        if fields[2]:
+            situation_msg['GPSFixQuality'] = 1 if fields[2].upper() == 'A' else 0
+        if fields[3] and fields[4]:
+            situation_msg['GPSLatitude'] = _parse_nmea_coordinate(fields[3], fields[4], 2)
+        if fields[5] and fields[6]:
+            situation_msg['GPSLongitude'] = _parse_nmea_coordinate(fields[5], fields[6], 3)
+        if fields[7]:
+            situation_msg['GPSGroundSpeed'] = float(fields[7])
+        if fields[8]:
+            situation_msg['GPSTrueCourse'] = float(fields[8])
+        rlog.debug(
+            f"NMEA: {sentence_type} parsed - Lat: {situation_msg['GPSLatitude']}, "
+            f"Lon: {situation_msg['GPSLongitude']}, Speed: {situation_msg['GPSGroundSpeed']}, "
+            f"Course: {situation_msg['GPSTrueCourse']}"
+        )
+        return True
+    except (ValueError, IndexError) as e:
+        rlog.debug(f"NMEA: Error parsing {sentence_type} fields: {fields} - {e}")
+        traceback.print_exc()
+        return False
+
+
 def parse_GPRMC(fields):
     # Parse GPRMC NMEA sentence and update situation_msg
     # Format: $GPRMC,hhmmss.ss,A,lat,N,lon,E,speed,track,date,magvar,E/W*hh
-    global situation_msg
-    if len(fields) < 12:
-        rlog.debug(f"NMEA: Incomplete GPRMC sentence: {fields}")
-        return False
-    try:
-        # Parse UTC time (hhmmss.ss format)
-        if fields[1]:
-            situation_msg['GPSTime'] = fields[1]
-        # Parse fix status (A=valid, V=invalid)
-        if fields[2]:
-            is_valid = fields[2].upper() == 'A'
-            situation_msg['GPSFixQuality'] = 1 if is_valid else 0
-        # Parse latitude (DDMM.MMMMM format)
-        if fields[3] and fields[4]:
-            lat = float(fields[3])
-            lat_degrees = int(lat / 100)
-            lat_minutes = lat - (lat_degrees * 100)
-            latitude = lat_degrees + (lat_minutes / 60)
-            # Apply N/S direction
-            if fields[4].upper() == 'S':
-                latitude = -latitude
-            situation_msg['GPSLatitude'] = latitude
-        # Parse longitude (DDDMM.MMMMM format)
-        if fields[5] and fields[6]:
-            lon = float(fields[5])
-            lon_degrees = int(lon / 100)
-            lon_minutes = lon - (lon_degrees * 100)
-            longitude = lon_degrees + (lon_minutes / 60)
-            # Apply E/W direction
-            if fields[6].upper() == 'W':
-                longitude = -longitude
-            situation_msg['GPSLongitude'] = longitude
-        # Parse speed over ground in knots and convert to m/s
-        if fields[7]:
-            speed_knots = float(fields[7])
-            speed_mps = speed_knots * 0.514444  # Convert knots to m/s
-            situation_msg['GPSGroundSpeed'] = speed_mps
-        # Parse track angle in degrees
-        if fields[8]:
-            situation_msg['GPSTrueCourse'] = float(fields[8])
-        rlog.debug(f"NMEA: GPRMC parsed - Lat: {situation_msg['GPSLatitude']}, Lon: {situation_msg['GPSLongitude']}, Speed: {situation_msg['GPSGroundSpeed']}, Course: {situation_msg['GPSTrueCourse']}")
-        return True
-    except ValueError as e:
-        rlog.debug(f"NMEA: Error parsing GPRMC fields: {fields} - {e}")
-        return False
+    return _parse_rmc(fields, "GPRMC")
 
 def parse_GNGSA(fields):
     # Parse GNGSA NMEA sentence and update situation_msg
@@ -338,51 +384,13 @@ def parse_GNGSA(fields):
 def parse_GNRMC(fields):
     # Parse GNRMC NMEA sentence and update situation_msg
     # Format: $GNRMC,hhmmss.ss,A,lat,N,lon,E,speed,track,date,magvar,E/W*hh
-    global situation_msg
-    if len(fields) < 12:
-        rlog.debug(f"NMEA: Incomplete GNRMC sentence: {fields}")
-        return False
-    try:
-        # Parse UTC time (hhmmss.ss format)
-        if fields[1]:
-            situation_msg['GPSTime'] = fields[1]
-        # Parse fix status (A=valid, V=invalid)
-        if fields[2]:
-            is_valid = fields[2].upper() == 'A'
-            situation_msg['GPSFixQuality'] = 1 if is_valid else 0
-        # Parse latitude (DDMM.MMMMM format)
-        if fields[3] and fields[4]:
-            lat = float(fields[3])
-            lat_degrees = int(lat / 100)
-            lat_minutes = lat - (lat_degrees * 100)
-            latitude = lat_degrees + (lat_minutes / 60)
-            # Apply N/S direction
-            if fields[4].upper() == 'S':
-                latitude = -latitude
-            situation_msg['GPSLatitude'] = latitude
-        # Parse longitude (DDDMM.MMMMM format)
-        if fields[5] and fields[6]:
-            lon = float(fields[5])
-            lon_degrees = int(lon / 100)
-            lon_minutes = lon - (lon_degrees * 100)
-            longitude = lon_degrees + (lon_minutes / 60)
-            # Apply E/W direction
-            if fields[6].upper() == 'W':
-                longitude = -longitude
-            situation_msg['GPSLongitude'] = longitude
-        # Parse speed over ground in knots
-        if fields[7]:
-            speed_knots = float(fields[7])
-            situation_msg['GPSGroundSpeed'] = speed_knots
-        # Parse track angle in degrees
-        if fields[8]:
-            situation_msg['GPSTrueCourse'] = float(fields[8])
-        rlog.debug(f"NMEA: GNRMC parsed - Lat: {situation_msg['GPSLatitude']}, Lon: {situation_msg['GPSLongitude']}, Speed: {situation_msg['GPSGroundSpeed']}, Course: {situation_msg['GPSTrueCourse']}")
-        return True
-    except ValueError as e:
-        rlog.debug(f"NMEA: Error parsing GNRMC fields: {fields} - {e}")
-        traceback.print_exc()
-        return False
+    return _parse_rmc(fields, "GNRMC")
+
+
+def parse_GNMRC(fields):
+    # Some BLE/NMEA sources appear to emit the non-standard talker/type GNMRC.
+    # Parse it like a regular RMC sentence for compatibility.
+    return _parse_rmc(fields, "GNMRC")
 
 def parse_GNVTG(fields):
     # Parse GNVTG NMEA sentence and update situation_msg
@@ -406,7 +414,20 @@ def parse_GNVTG(fields):
         traceback.print_exc()
         return False
 
+
+def _emit_situation_update(callback):
+    if callback is not None:
+        callback(json.dumps(situation_msg))
+
+
+def _emit_traffic_update(callback, message):
+    if callback is not None:
+        callback(json.dumps(message))
+
+
 def handle_nmea_data(nmea_sentence):
+    traffic_callback = traffic_func
+    situation_callback = situation_func
     # Verify checksum before parsing
     if "*" not in nmea_sentence:
         rlog.debug(f"NMEA: Invalid NMEA sentence: Missing checksum")
@@ -424,44 +445,54 @@ def handle_nmea_data(nmea_sentence):
         return
     if fields[0] == "GNGLL":
         if parse_GNGLL(fields):
-            situation_func(json.dumps(situation_msg))
+            _emit_situation_update(situation_callback)
     elif fields[0] == "GPRMC":
         if parse_GPRMC(fields):
-            situation_func(json.dumps(situation_msg))
+            _emit_situation_update(situation_callback)
     elif fields[0] == "PFLAU":
         # ignore PFLAU for now, as it is not used in the current implementation
         pass
     elif fields[0] == "PFLAA":
         traffic_msg_parsed = parse_PFLAA(fields)
         if traffic_msg_parsed:
-            traffic_func(json.dumps(traffic_msg_parsed))
+            _emit_traffic_update(traffic_callback, traffic_msg_parsed)
     elif fields[0] == "GNGGA":
         if parse_GNGGA(fields):
-            situation_func(json.dumps(situation_msg))
+            _emit_situation_update(situation_callback)
     elif fields[0] == "GNGSA":
         if parse_GNGSA(fields):
-            situation_func(json.dumps(situation_msg))
+            _emit_situation_update(situation_callback)
     elif fields[0] == "GNRMC":
         if parse_GNRMC(fields):
-            situation_func(json.dumps(situation_msg))
+            _emit_situation_update(situation_callback)
+    elif fields[0] == "GNMRC":
+        if parse_GNMRC(fields):
+            _emit_situation_update(situation_callback)
     elif fields[0] == "GNVTG":
         if parse_GNVTG(fields):
-            situation_func(json.dumps(situation_msg))
+            _emit_situation_update(situation_callback)
     else:
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
 
 async def listen_to_ble():
-    if not is_valid_ble_address(ble_address):
-        rlog.debug(f"Ble: Invalid BLE address format: {ble_address}")
+    address = ble_address
+    if address is None:
+        rlog.debug("Ble: No BLE address configured")
         return
-    device= {'name': f"Unknown ({ble_address})", 'address': ble_address,'uuid': characteristic_uuid}
+    valid_address = str(address)
+    if not is_valid_ble_address(valid_address):
+        rlog.debug(f"Ble: Invalid BLE address format: {address}")
+        return
+    device_address = valid_address
+    device_uuid = characteristic_uuid
+    device= {'name': f"Unknown ({device_address})", 'address': device_address, 'uuid': device_uuid}
     try:
-        async with BleakClient(device['address']) as client:
+        async with BleakClient(device_address) as client:
             if client.is_connected:
                 rlog.debug(f"Ble: Connected to {device['address']}")
                 while True:
-                    data = await client.read_gatt_char(device['uuid'])
+                    data = await client.read_gatt_char(device_uuid)
                     # convert type of data to a string
                     data = data.decode('utf-8').strip()
                     rlog.debug(f"Ble: Received data: {data}")
@@ -513,3 +544,5 @@ def init(new_ble_address, new_traffic_func, new_situation_func, situation):
     situation_func = new_situation_func
     ble_address = new_ble_address
     rlog.debug("BLE initialized with address: {0}".format(ble_address))
+
+
