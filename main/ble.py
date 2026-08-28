@@ -378,31 +378,22 @@ def parse_POGNB(fields):
     # Parse POGNB NMEA sentence and update situation_msg
     # Format: $POGNB,<BaroAltitude>,<BaroVerticalSpeed>,<AHRSPitch>,<AHRSRoll>,<AHRSGyroHeading>,<AHRSSlipSkid>,<AHRSStatus>,<AHRSGLoad>,<AHRSGLoadMax>,<AHRSGLoadMin>*hh
     global situation_msg
-    if len(fields) < 11:
+    if len(fields) < 7:
         rlog.debug(f"NMEA: Incomplete POGNB sentence: {fields}")
         return False
     try:
-        if fields[1]:
-            situation_msg['BaroPressureAltitude'] = float(fields[1])
+        # OGN tracker uses metric units for baro altitude and vertical speed.
+        # Convert to Stratux-style units used in the rest of the application.
+        # POGNB, timestamp, temperature, pressure/pascal, sensor noise, baro height/meters, baro/gps corr.height/m,
+        # vertical velocity/m/s
         if fields[2]:
-            situation_msg['BaroVerticalSpeed'] = float(fields[2])
-        if fields[3]:
-            situation_msg['AHRSPitch'] = float(fields[3])
-        if fields[4]:
-            situation_msg['AHRSRoll'] = float(fields[4])
+            situation_msg['BaroTemperature'] = float(fields[2])
         if fields[5]:
-            situation_msg['AHRSGyroHeading'] = float(fields[5])
+            situation_msg['BaroPressureAltitude'] = float(fields[5]) * 3.28084  # meters -> feet
         if fields[6]:
-            situation_msg['AHRSSlipSkid'] = float(fields[6])
-        if fields[7]:
-            situation_msg['AHRSStatus'] = int(fields[7])
-        if fields[8]:
-            situation_msg['AHRSGLoad'] = float(fields[8])
-        if fields[9]:
-            situation_msg['AHRSGLoadMax'] = float(fields[9])
-        if fields[10]:
-            situation_msg['AHRSGLoadMin'] = float(fields[10])
-        rlog.debug(f"NMEA: POGNB parsed - Baro Altitude: {situation_msg['BaroPressureAltitude']}, Vertical Speed: {situation_msg['BaroVerticalSpeed']}, Pitch: {situation_msg['AHRSPitch']}, Roll: {situation_msg['AHRSRoll']}, Gyro Heading: {situation_msg['AHRSGyroHeading']}")
+            situation_msg['BaroVerticalSpeed'] = float(fields[4]) * 196.85      # m/s -> ft/min
+        situation_msg['BaroSourceType'] = 2  # Mark baro source as OGN device (see radar.py: 2 = OGN device)
+        rlog.debug(f"NMEA: POGNB parsed - Baro Altitude: {situation_msg['BaroPressureAltitude']}, Vertical Speed: {situation_msg['BaroVerticalSpeed']}")
         return True
     except ValueError as e:
         rlog.debug(f"NMEA: Error parsing POGNB fields: {fields} - {e}")
