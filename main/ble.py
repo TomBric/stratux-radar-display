@@ -313,8 +313,8 @@ def _parse_rmc(fields, sentence_type):
     try:
         if fields[1]:
             situation_msg['GPSTime'] = fields[1]
-        if fields[2]:
-            situation_msg['GPSFixQuality'] = 1 if fields[2].upper() == 'A' else 0
+        # if fields[2]:
+        #     situation_msg['GPSFixQuality'] = 1 if fields[2].upper() == 'A' else 0
         if fields[3] and fields[4]:
             situation_msg['GPSLatitude'] = _parse_nmea_coordinate(fields[3], fields[4], 2)
         if fields[5] and fields[6]:
