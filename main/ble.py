@@ -509,6 +509,21 @@ def handle_nmea_data(nmea_sentence):
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
 
+def _handle_ble_payload(data):
+    # Accept bytes from BLE notifications and parse one or multiple concatenated NMEA lines.
+    try:
+        text = data.decode('utf-8', errors='ignore').strip()
+    except Exception as e:
+        rlog.debug(f"Ble: Failed to decode BLE payload: {e}")
+        return
+    if not text:
+        return
+    rlog.debug(f"Ble: Received data: {text}")
+    for nmea_sentence in text.split("\r\n"):
+        if nmea_sentence:
+            handle_nmea_data(nmea_sentence)
+
+
 async def listen_to_ble():
     address = ble_address
     if address is None:
@@ -528,15 +543,19 @@ async def listen_to_ble():
             async with BleakClient(device_address) as client:
                 if client.is_connected:
                     rlog.debug(f"Ble: Connected to {device['address']}")
-                    while True:
-                        data = await client.read_gatt_char(device_uuid)
-                        # convert type of data to a string
-                        data = data.decode('utf-8').strip()
-                        rlog.debug(f"Ble: Received data: {data}")
-                        # accept also concatenated several NMEA sentences in one read,
-                        for nmea_sentence in data.split("\r\n"):
-                            if nmea_sentence:
-                                handle_nmea_data(nmea_sentence)
+                    def notification_handler(_, data):
+                        _handle_ble_payload(data)
+                    await client.start_notify(device_uuid, notification_handler)
+                    rlog.debug(f"Ble: Notifications enabled for {device_uuid}")
+
+                    try:
+                        while client.is_connected:
+                            await asyncio.sleep(0.5)
+                    finally:
+                        try:
+                            await client.stop_notify(device_uuid)
+                        except Exception as e:
+                            rlog.debug(f"Ble: Failed to stop notifications: {e}")
                 else:
                     rlog.debug(f"Ble: Failed to connect to {device['address']}")
         except asyncio.CancelledError:
@@ -545,7 +564,6 @@ async def listen_to_ble():
         except Exception as e:
             rlog.debug(f"Ble: Exception while listening to BLE device {ble_address}: {e}")
             traceback.print_exc()
-            global_situation['connected'] = False
             await asyncio.sleep(BLE_RETRY_TIMEOUT)
             continue
 
