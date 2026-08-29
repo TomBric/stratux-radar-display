@@ -443,6 +443,37 @@ def parse_GNVTG(fields):
         return False
 
 
+def parse_RPYL(fields):
+    # Parse RPYL NMEA sentence and update situation_msg
+    # Format: $RPYL,<Pitch>,<Roll>,<GyroHeading>,<SlipSkid>,<Status>,<GLoad>,<GLoadMax>,<GLoadMin>*hh
+    global situation_msg
+    if len(fields) < 9:
+        rlog.debug(f"NMEA: Incomplete RPYL sentence: {fields}")
+        return False
+    try:
+        if fields[1]:
+            situation_msg['AHRSPitch'] = float(fields[1])
+        if fields[2]:
+            situation_msg['AHRSRoll'] = float(fields[2])
+        if fields[3]:
+            situation_msg['AHRSGyroHeading'] = float(fields[3])
+        if fields[4]:
+            situation_msg['AHRSSlipSkid'] = float(fields[4])
+        if fields[5]:
+            situation_msg['AHRSStatus'] = int(fields[5])
+        if fields[6]:
+            situation_msg['AHRSGLoad'] = float(fields[6])
+        if fields[7]:
+            situation_msg['AHRSGLoadMax'] = float(fields[7])
+        if fields[8]:
+            situation_msg['AHRSGLoadMin'] = float(fields[8])
+        rlog.debug(f"NMEA: Parsed RPYL message: {situation_msg}")
+        return True
+    except ValueError as e:
+        rlog.debug(f"NMEA: Error parsing RPYL fields: {fields} - {e}")
+        traceback.print_exc()
+        return False
+
 def _emit_situation_update(callback):
     if callback is not None:
         callback(json.dumps(situation_msg))
@@ -506,6 +537,8 @@ def handle_nmea_data(nmea_sentence):
         pass  # ignore PGRMZ for now, we have GNGLL and GNGGA for altitude
     elif fields[0] == "LK8EX1":
         pass  # do nothing for LK8EX1 sentences
+    elif fields[0] == "RPYL":
+        parse_RPYL(fields)  # parse RPYL for AHRS data
     else:
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
