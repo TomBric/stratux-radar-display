@@ -50,6 +50,7 @@ service_uuid = BLE_BASE_UUID.format(SERVICE.lower())
 characteristic_uuid = BLE_BASE_UUID.format(CHARACTERISTIC.lower())
 OGN_DDB_FILENAME = str(Path(arguments.FULL_CONFIG_DIR).joinpath("ddb.json"))
 BLE_RETRY_TIMEOUT = 1 # seconds to wait before retrying BLE connection after failure
+GPS_RANGE_ERROR = 4.0  # UERE range error in meters, used for calculating GPS accuracy
 
 global_situation = None    # global situation dictionary to hold the latest situation data
 traffic_func = None         # global function to handle new traffic messages
@@ -299,7 +300,7 @@ def parse_GNGGA(fields):
             situation_msg['NumSatellites'] = int(fields[7])
         # Parse horizontal dilution of precision (HDOP)
         if fields[8]:
-            situation_msg['GPSHorizontalAccuracy'] = float(fields[8])
+            situation_msg['GPSHorizontalAccuracy'] = float(fields[8]) * GPS_RANGE_ERROR  # Convert HDOP to estimated horizontal accuracy in meters
         # Parse altitude above mean sea level (in meters)
         if fields[9]:
             situation_msg['GPSAltitudeMSL'] = float(fields[9]) * 3.28084  # Convert meters to feet
@@ -374,9 +375,9 @@ def parse_GNGSA(fields):
                 situation_msg['GPSFixQuality'] = 2
         # Parse HDOP, VDOP values
         if fields[16]:
-            situation_msg['GPSHorizontalAccuracy'] = float(fields[16])
+            situation_msg['GPSHorizontalAccuracy'] = float(fields[16]) * GPS_RANGE_ERROR  # Convert HDOP to estimated horizontal accuracy in meters
         if len(fields) > 17 and fields[17]:
-            situation_msg['GPSVerticalAccuracy'] = float(fields[17])
+            situation_msg['GPSVerticalAccuracy'] = float(fields[17]) * GPS_RANGE_ERROR  # Convert VDOP to estimated vertical accuracy in meters
         rlog.debug(f"NMEA: Parsed GNGSA message: {situation_msg}")
         return True
     except ValueError as e:
