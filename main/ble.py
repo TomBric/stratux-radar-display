@@ -380,22 +380,20 @@ def parse_GNRMC(fields):
 
 def parse_POGNB(fields):
     # Parse POGNB NMEA sentence and update situation_msg
-    # Format: $POGNB,<BaroAltitude>,<BaroVerticalSpeed>,<AHRSPitch>,<AHRSRoll>,<AHRSGyroHeading>,<AHRSSlipSkid>,<AHRSStatus>,<AHRSGLoad>,<AHRSGLoadMax>,<AHRSGLoadMin>*hh
+    # Format: $POGNB,battery_voltage, temperature, pressure/pascals, sensor_noise, pressure alt/m, gps_alt/m, vertical_velocity/m/s
     global situation_msg
     if len(fields) < 7:
         rlog.debug(f"NMEA: Incomplete POGNB sentence: {fields}")
         return False
     try:
-        # OGN tracker uses metric units for baro altitude and vertical speed.
-        # Convert to Stratux-style units used in the rest of the application.
-        # POGNB, timestamp, temperature, pressure/pascal, sensor noise, baro height/meters, baro/gps corr.height/m,
-        # vertical velocity/m/s
         if fields[2]:
             situation_msg['BaroTemperature'] = float(fields[2])
         if fields[5]:
             situation_msg['BaroPressureAltitude'] = float(fields[5]) * 3.28084  # meters -> feet
         if fields[6]:
-            situation_msg['BaroVerticalSpeed'] = float(fields[4]) * 196.85      # m/s -> ft/min
+            situation_msg['GPSAltitudeMSL'] = float(fields[6]) * 3.28084  # meters -> feet
+        if fields[7]:
+            situation_msg['BaroVerticalSpeed'] = float(fields[7]) * 196.85      # m/s -> ft/min
         situation_msg['BaroSourceType'] = 2  # Mark baro source as OGN device (see radar.py: 2 = OGN device)
         rlog.debug(f"NMEA: Parsed POGNB message: {situation_msg}")
         return True
