@@ -64,7 +64,6 @@ import logging
 import collisiondetect
 import airsimulation
 import ble
-from logging.handlers import RotatingFileHandler
 
 from datetime import datetime, timezone
 from pathlib import Path
