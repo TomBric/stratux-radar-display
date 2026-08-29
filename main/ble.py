@@ -545,15 +545,14 @@ async def listen_to_ble():
                     rlog.debug(f"Ble: Connected to {device['address']}")
                     def notification_handler(_, data):
                         _handle_ble_payload(data)
-                    await client.start_notify(device_uuid, notification_handler)
-                    rlog.debug(f"Ble: Notifications enabled for {device_uuid}")
+                    await client.start_notify(device_uuid, notification_handler) # starts handler from now
 
-                    try:
-                        while client.is_connected:
+                    try:    # # Keep the script running to receive asynchronous data
+                        while client.is_connected:   # keep the connection alive and listen for notifications
                             await asyncio.sleep(0.5)
                     finally:
                         try:
-                            await client.stop_notify(device_uuid)
+                            await client.stop_notify(device_uuid)   # clean stop of notifications when exiting
                         except Exception as e:
                             rlog.debug(f"Ble: Failed to stop notifications: {e}")
                 else:
