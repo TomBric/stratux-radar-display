@@ -58,6 +58,11 @@ ble_address = None             # global BLE address to connect to
 ogn_tail_number_cache = {}     # global cache for OGN tail numbers consisting of ognid -> tail number mappings
 ogn_device_db_loaded = False
 
+# definitions from stratux traffic.go for Last_source
+TRAFFIC_SOURCE_1090ES = 1
+TRAFFIC_SOURCE_UAT    = 2
+TRAFFIC_SOURCE_OGN    = 4
+TRAFFIC_SOURCE_AIS    = 8
 
 def is_valid_ble_address(address: str) -> bool:
     mac_regex = re.compile(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
@@ -137,6 +142,7 @@ def parse_traffic_msg(icao_addr, latitude, longitude, altitude, track, speed, vs
      """Create a traffic_msg dictionary with parsed aircraft data"""
      return {
          'Icao_addr': icao_addr,
+         'Addr_type': 1,  # 1 = ICAO address 0 = other
          'Lat': latitude,
          'Lng': longitude,
          'Alt': altitude,
@@ -147,7 +153,7 @@ def parse_traffic_msg(icao_addr, latitude, longitude, altitude, track, speed, vs
          'Position_valid': True,
          'Age': 0,
          'AgeLastAlt': 0,
-         'Last_source': 1,  # 1090ES
+         'Last_source': TRAFFIC_SOURCE_OGN,  # this ble module only handles OGN traffic, so we set the source to OGN
          'Tail': tail,
          'DistanceEstimated': 0
      }
