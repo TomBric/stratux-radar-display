@@ -237,7 +237,7 @@ def parse_GNGLL(fields):
         is_valid = False
         if fields[6]:   # check if fix status field is present
             if fields[6].upper() == 'A':
-                if global_situation['gps_fix_quality'] == 0:
+                if global_situation['gps_quality'] == 0:
                     situation_msg['GPSFixQuality'] = 1   # only set if not already set higher by GNGGA
             if fields[6].upper() == 'V':  # void fix, mark as invalid
                 situation_msg['GPSFixQuality'] = 0
