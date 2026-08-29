@@ -992,7 +992,10 @@ def main():
     # Initialize sensors and simulation
     initialize_sensors_and_simulation()
     rlog.debug(f"Initialization finished. Global config {global_config}")
-    display_control.startup(RADAR_VERSION, url_host_base, 4)
+    if ble_address is None:
+        display_control.startup(RADAR_VERSION, url_host_base, 4)
+    else:
+        display_control.startup(RADAR_VERSION, f"BLE-{ble_address}", 4)
     
     try:
         asyncio.run(coroutines())
