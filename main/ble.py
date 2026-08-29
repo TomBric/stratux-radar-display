@@ -561,6 +561,7 @@ def handle_nmea_data(nmea_sentence):
         if parse_RPYL(fields):
             _emit_situation_update(situation_callback)
     else:
+        print(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
 
