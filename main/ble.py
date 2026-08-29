@@ -234,33 +234,34 @@ def parse_GNGLL(fields):
         return False
 
     try:
-        # Parse latitude (DDMM.MMMMM format)
-        if fields[1] and fields[2]:
-            lat = float(fields[1])
-            lat_degrees = int(lat / 100)
-            lat_minutes = lat - (lat_degrees * 100)
-            latitude = lat_degrees + (lat_minutes / 60)
-            # Apply N/S direction
-            if fields[2].upper() == 'S':
-                latitude = -latitude
-            situation_msg['GPSLatitude'] = latitude
-        # Parse longitude (DDDMM.MMMMM format)
-        if fields[3] and fields[4]:
-            lon = float(fields[3])
-            lon_degrees = int(lon / 100)
-            lon_minutes = lon - (lon_degrees * 100)
-            longitude = lon_degrees + (lon_minutes / 60)
-            # Apply E/W direction
-            if fields[4].upper() == 'W':
-                longitude = -longitude
-            situation_msg['GPSLongitude'] = longitude
-        # Parse UTC time (hhmmss.ss format)
-        if fields[5]:
-            situation_msg['GPSTime'] = fields[5]
-        # Parse fix status (A=valid, V=invalid)
-        if fields[6]:
+        is_valid = False
+        if fields[6]:   # check if fix status field is present
             is_valid = fields[6].upper() == 'A'
-            situation_msg['GPSFixQuality'] = 1 if is_valid else 0
+        if is_valid:
+            situation_msg['GPSFixQuality'] = 1
+            # Parse latitude (DDMM.MMMMM format)
+            if fields[1] and fields[2]:
+                lat = float(fields[1])
+                lat_degrees = int(lat / 100)
+                lat_minutes = lat - (lat_degrees * 100)
+                latitude = lat_degrees + (lat_minutes / 60)
+                # Apply N/S direction
+                if fields[2].upper() == 'S':
+                    latitude = -latitude
+                situation_msg['GPSLatitude'] = latitude
+            # Parse longitude (DDDMM.MMMMM format)
+            if fields[3] and fields[4]:
+                lon = float(fields[3])
+                lon_degrees = int(lon / 100)
+                lon_minutes = lon - (lon_degrees * 100)
+                longitude = lon_degrees + (lon_minutes / 60)
+                # Apply E/W direction
+                if fields[4].upper() == 'W':
+                    longitude = -longitude
+                situation_msg['GPSLongitude'] = longitude
+            # Parse UTC time (hhmmss.ss format)
+            if fields[5]:
+                situation_msg['GPSTime'] = fields[5]
         rlog.debug(f"NMEA: Parsed GNGLL message: {situation_msg}")
         return True
     except ValueError as e:
