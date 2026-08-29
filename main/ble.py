@@ -30,6 +30,7 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+from lib2to3.fixes import fix_sys_exc
 
 from bleak import BleakClient, BleakScanner
 from globals import rlog
@@ -102,7 +103,7 @@ situation_msg = {
     'BaroVerticalSpeed': 0,
     'GPSHorizontalAccuracy': 0,
     'GPSVerticalAccuracy': 0,
-    'GPSFixQuality': 0,
+    'GPSFixQuality': 0,   # 0 = invalid, 1 = GPS fix, 2 = DGPS fix
     'GPSLastFixLocalTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
     'GPSLastGPSTimeStratuxTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
     'GPSTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -236,32 +237,34 @@ def parse_GNGLL(fields):
     try:
         is_valid = False
         if fields[6]:   # check if fix status field is present
-            is_valid = fields[6].upper() == 'A'
-        if is_valid:
-            situation_msg['GPSFixQuality'] = 1
-            # Parse latitude (DDMM.MMMMM format)
-            if fields[1] and fields[2]:
-                lat = float(fields[1])
-                lat_degrees = int(lat / 100)
-                lat_minutes = lat - (lat_degrees * 100)
-                latitude = lat_degrees + (lat_minutes / 60)
-                # Apply N/S direction
-                if fields[2].upper() == 'S':
-                    latitude = -latitude
-                situation_msg['GPSLatitude'] = latitude
-            # Parse longitude (DDDMM.MMMMM format)
-            if fields[3] and fields[4]:
-                lon = float(fields[3])
-                lon_degrees = int(lon / 100)
-                lon_minutes = lon - (lon_degrees * 100)
-                longitude = lon_degrees + (lon_minutes / 60)
-                # Apply E/W direction
-                if fields[4].upper() == 'W':
-                    longitude = -longitude
-                situation_msg['GPSLongitude'] = longitude
-            # Parse UTC time (hhmmss.ss format)
-            if fields[5]:
-                situation_msg['GPSTime'] = fields[5]
+            if fields[6].upper() == 'A':
+                if global_situation['gps_fix_quality'] == 0:
+                    situation_msg['GPSFixQuality'] = 1   # only set if not already set higher by GNGGA
+            if fields[6].upper() == 'V':  # void fix, mark as invalid
+                situation_msg['GPSFixQuality'] = 0
+        # Parse latitude (DDMM.MMMMM format)
+        if fields[1] and fields[2]:
+            lat = float(fields[1])
+            lat_degrees = int(lat / 100)
+            lat_minutes = lat - (lat_degrees * 100)
+            latitude = lat_degrees + (lat_minutes / 60)
+            # Apply N/S direction
+            if fields[2].upper() == 'S':
+                latitude = -latitude
+            situation_msg['GPSLatitude'] = latitude
+        # Parse longitude (DDDMM.MMMMM format)
+        if fields[3] and fields[4]:
+            lon = float(fields[3])
+            lon_degrees = int(lon / 100)
+            lon_minutes = lon - (lon_degrees * 100)
+            longitude = lon_degrees + (lon_minutes / 60)
+            # Apply E/W direction
+            if fields[4].upper() == 'W':
+                longitude = -longitude
+            situation_msg['GPSLongitude'] = longitude
+        # Parse UTC time (hhmmss.ss format)
+        if fields[5]:
+            situation_msg['GPSTime'] = fields[5]
         rlog.debug(f"NMEA: Parsed GNGLL message: {situation_msg}")
         return True
     except ValueError as e:
@@ -279,7 +282,7 @@ def parse_GNGGA(fields):
     try:
         # Parse fix quality (0=invalid, 1=GPS fix, 2=DGPS fix)
         if fields[6]:
-            situation_msg['GPSFixQuality'] = int(fields[6])
+            situation_msg['GPSFixQuality'] = int(fields[6])   # 0 = invalid, 1 = GPS fix, 2 = DGPS fix
         # Parse number of satellites
         if fields[7]:
             situation_msg['NumSatellites'] = int(fields[7])
@@ -351,7 +354,13 @@ def parse_GNGSA(fields):
     try:
         # Parse fix type (1=No fix, 2=2D fix, 3=3D fix)
         if fields[2]:
-            situation_msg['GPSFixQuality'] = int(fields[2])
+            fix_type = int(fields[2])
+            if fix_type == 1:   # No fix
+                situation_msg['GPSFixQuality'] = 0
+            elif fix_type == 2: # 2D fix
+                situation_msg['GPSFixQuality'] = 1
+            elif fix_type == 3: # 3D fix
+                situation_msg['GPSFixQuality'] = 2
         # Parse HDOP, VDOP values
         if fields[16]:
             situation_msg['GPSHorizontalAccuracy'] = float(fields[16])
@@ -514,7 +523,7 @@ async def listen_to_ble():
                         data = await client.read_gatt_char(device_uuid)
                         # convert type of data to a string
                         data = data.decode('utf-8').strip()
-                        # rlog.debug(f"Ble: Received data: {data}")
+                        rlog.debug(f"Ble: Received data: {data}")
                         # accept also concatenated several NMEA sentences in one read,
                         for nmea_sentence in data.split("\r\n"):
                             if nmea_sentence:
