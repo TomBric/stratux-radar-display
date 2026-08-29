@@ -281,7 +281,11 @@ def parse_GNGGA(fields):
     try:
         # Parse fix quality (0=invalid, 1=GPS fix, 2=DGPS fix)
         if fields[6]:
-            situation_msg['GPSFixQuality'] = int(fields[6])   # 0 = invalid, 1 = GPS fix, 2 = DGPS fix
+            if int(fields[6]) == 0:
+                situation_msg['GPSFixQuality'] = 0
+            else:
+                if global_situation['gps_quality'] == 0:
+                    situation_msg['GPSFixQuality'] = 1   # only set if not already set higher by GNGGA
         # Parse number of satellites
         if fields[7]:
             situation_msg['NumSatellites'] = int(fields[7])
