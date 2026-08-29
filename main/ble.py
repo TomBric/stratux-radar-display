@@ -65,6 +65,9 @@ TRAFFIC_SOURCE_UAT    = 2
 TRAFFIC_SOURCE_OGN    = 4
 TRAFFIC_SOURCE_AIS    = 8
 
+ICAO_ADDRESS_TYPE_ICAO = 0   # ICAO assigned address
+ICAO_ADDRESS_TYPE_SELF = 1   # self-assigned address (e.g. OGN, FLARM, etc.)
+
 def is_valid_ble_address(address: str) -> bool:
     mac_regex = re.compile(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
     return bool(mac_regex.match(address))
@@ -139,25 +142,27 @@ def check_nmea_checksum(data, provided_checksum):
     # Compare with the provided checksum (case-insensitive)
     return calculated_hex == provided_checksum.upper()
 
-def parse_traffic_msg(icao_addr, latitude, longitude, altitude, track, speed, vspeed, tail):
-     """Create a traffic_msg dictionary with parsed aircraft data"""
+
+def gen_traffic_msg(icao_addr, id_type, latitude, longitude, altitude, track, speed, vspeed, tail, position_valid, distance_estimated):
+     # Create a traffic_msg dictionary with parsed aircraft data
      return {
          'Icao_addr': icao_addr,
-         'Addr_type': 1,  # 1 = ICAO address 0 = other
+         'Addr_type': id_type,  # 0 = ICAO address 1=self-assigned address (e.g. OGN, FLARM, etc.)
          'Lat': latitude,
          'Lng': longitude,
          'Alt': altitude,
          'Track': track,
          'Speed': speed,
          'Vvel': vspeed,
-         'Speed_valid': True,
-         'Position_valid': True,
-         'Age': 0,
-         'AgeLastAlt': 0,
+         'Speed_valid': position_valid,      # if we have a valid position, we also have a valid speed in ogn
+         'Position_valid': position_valid,
+         'Age': 0,          # always set to 0, we are generating the traffic message right now
+         'AgeLastAlt': 0,   # always set to 0, we are generating the traffic message right now
          'Last_source': TRAFFIC_SOURCE_OGN,  # this ble module only handles OGN traffic, so we set the source to OGN
          'Tail': tail,
-         'DistanceEstimated': 0
+         'DistanceEstimated': distance_estimated
      }
+
 
 def coordinates_from_relative(rel_north, rel_east, lat_own, lon_own):
      # Convert relative North/East distances in meters to absolute lat/lon coordinates
@@ -201,7 +206,12 @@ def parse_PFLAA(fields):
         own_situation = global_situation if isinstance(global_situation, dict) else {}
         rel_north = float(fields[2])                          # meters, north positive
         rel_east  = float(fields[3])                          # meters, east  positive
-        rel_vertical = float(fields[4])                       # meters, above positive
+        rel_vertical = float(fields[4])
+        addr_type = int(fields[5])
+        if addr_type == 2:     # stratux uses GDL90 format for this, so only ICAO or self assigned addresses here
+            id_type = ICAO_ADDRESS_TYPE_ICAO
+        else:
+            id_type = ICAO_ADDRESS_TYPE_SELF
         icao_addr_str = fields[6]
         icao_addr = int(icao_addr_str, 16) if icao_addr_str else 0
         track       = float(fields[7]) if fields[7] else 0.0
@@ -209,6 +219,16 @@ def parse_PFLAA(fields):
         climb_mps   = float(fields[10]) if fields[10] else 0.0
         speed_knots  = float(speed_mps  * 1.94384)   # m/s  → knots
         vspeed_ftmin = float(climb_mps  * 196.85)    # m/s  → ft/min
+
+        # special case in new flarm interface: if relative_north is given and relative_east is empty
+        # it means mode-s target only and relative_north is the estimated distance
+        if rel_north != 0.0 and rel_east == 0.0:
+            rlog.debug(f"NMEA: PFLAA mode-s target only, ignoring: {fields}")
+            d_estimated = rel_north
+            p_valid = False
+        else:
+            p_valid = True
+            d_estimated = 0.0
 
         # Convert relative offsets to absolute WGS-84 coordinates
         own_lat = float(own_situation['latitude'])
@@ -222,9 +242,9 @@ def parse_PFLAA(fields):
         altitude_ft  = own_alt_ft + (rel_vertical * 3.28084)
 
         tail = lookup_ogn_tail_number(icao_addr_str) or icao_addr_str
-        msg = parse_traffic_msg(icao_addr= icao_addr, latitude=lat, longitude=lon, altitude=altitude_ft,
-            track=track, speed=speed_knots, vspeed=vspeed_ftmin,tail=tail)
-        msg['Last_source'] = 4   # SOURCE_FLARM (as defined in radar.py)
+        msg = gen_traffic_msg(icao_addr=icao_addr, id_type=id_type, latitude=lat, longitude=lon, altitude=altitude_ft,
+            track=track, speed=speed_knots, vspeed=vspeed_ftmin,tail=tail, position_valid=p_valid,
+            distance_estimated=d_estimated)
         rlog.debug(f"NMEA: Parsed PFLAA traffic message: {msg}")
         return msg
 
@@ -538,7 +558,8 @@ def handle_nmea_data(nmea_sentence):
     elif fields[0] == "LK8EX1":
         pass  # do nothing for LK8EX1 sentences
     elif fields[0] == "RPYL":
-        parse_RPYL(fields)  # parse RPYL for AHRS data
+        if parse_RPYL(fields):
+            _emit_situation_update(situation_callback)
     else:
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
