@@ -6,14 +6,27 @@
 {{ radar_form.csrf_token }}
 
 {% if on_stratux == False %}
-    <h4>Stratux Radar-Display Configuration</h4>
+    <h4>Radar-Display Configuration</h4>
 {% else %}
-    <h4>Stratux Radar-Display Configuration On Stratux</h4>
+    <h4>Radar-Display Configuration On Stratux</h4>
 {% endif %}
 
+
+
 <br>
+<h5>Connection</h5>
 {% if on_stratux == False %}
-    {{ render_field(radar_form.stratux_ip, form_type='horizontal') }}
+    <div class="row align-items-end">
+        <div class="col-md-3">
+            {{ render_field(radar_form.ble_connection) }}
+        </div>
+        <div class="col-md-4" id="ble-address-container" {% if radar_form.ble_connection.data != True %}style="display: none;"{% endif %}>
+            {{ render_field(radar_form.ble_address) }}
+        </div>
+    </div>
+    <div id="stratux-ip-container" {% if radar_form.ble_connection.data == True %}style="display: none;"{% endif %}>
+        {{ render_field(radar_form.stratux_ip, form_type='horizontal') }}
+    </div>
 {% endif %}
     {{ render_field(radar_form.display, form_type='horizontal') }}
 
@@ -66,5 +79,33 @@
 {{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart],
     button_map={'save_restart': 'success', 'save': 'primary', 'restart': 'secondary'}) }}
 </form>
+
+{% if on_stratux == False %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const bleSwitch = document.getElementById('ble_connection');
+    const bleAddressContainer = document.getElementById('ble-address-container');
+    const stratuxIpContainer = document.getElementById('stratux-ip-container');
+
+    function updateConnectionFields() {
+        if (!bleSwitch || !bleAddressContainer || !stratuxIpContainer) {
+            return;
+        }
+        if (bleSwitch.checked) {
+            bleAddressContainer.style.display = '';
+            stratuxIpContainer.style.display = 'none';
+        } else {
+            bleAddressContainer.style.display = 'none';
+            stratuxIpContainer.style.display = '';
+        }
+    }
+
+    if (bleSwitch) {
+        bleSwitch.addEventListener('change', updateConnectionFields);
+    }
+    updateConnectionFields();
+});
+</script>
+{% endif %}
 
 {% endblock %}

@@ -50,7 +50,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for, sen
 from markupsafe import Markup
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_wtf.file import FileField
-from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRange
+from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRange, ValidationError
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
@@ -137,7 +137,15 @@ class DisplayLogForm(FlaskForm):
     reload = SubmitField('Reload Log File')
 
 class RadarForm(FlaskForm):
+
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[IPAddress()])
+    ble_connection = SwitchField('FLARM NMEA via BLE', default=False,
+                                 description='Off = Stratux Wifi connection')
+    ble_address = StringField('BLE device address', default='', validators=[
+        Length(max=17),
+        Regexp(r'^$|^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$',
+               message='BLE address must look like 00:11:22:33:44:55')
+    ])
     display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'),
             ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'),
             ('Epaper_3in7', 'Epaper display 3.7 inch'), ('Epaper_3in7_Round', 'Epaper display 3.7 inch - Round front'),
@@ -223,6 +231,10 @@ class RadarForm(FlaskForm):
         self.all_mixers.choices += options
         if on_stratux:
             self.stratux_ip.data = DEFAULT_IP_DIRECT_ON_STRATUX
+
+    def validate_ble_address(self, field):
+        if self.ble_connection.data and len(field.data.strip()) == 0:
+            raise ValidationError('BLE device address is required when FLARM NMEA via BLE is enabled.')
 
 
 def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called from radar_app
@@ -323,6 +335,8 @@ def read_arguments(rf):
         return
     rf.display.data = args['device']
     rf.stratux_ip.data = args['connect']
+    rf.ble_connection.data = args['ble'] is not None
+    rf.ble_address.data = '' if args['ble'] is None else args['ble']
     rf.display.data = args['device']
 
     # radar options
@@ -403,6 +417,10 @@ def write_arguments(rf):
 
 def build_option_string(rf):
     out = f'-d {rf.display.data} -c {rf.stratux_ip.data}'
+    if rf.ble_connection.data is True:
+        ble_addr = rf.ble_address.data.strip()
+        if len(ble_addr) > 0:
+            out += f' -ble {ble_addr}'
     out += build_mode_string(rf)
     if rf.ground_mode.data is True:
         out += ' -n'
@@ -597,7 +615,7 @@ def display_log():
     return render_template('display_log.html', display_log_form=dlf, content=content)
 
 if __name__ == '__main__':
-    print("Stratux Radar Web Configuration Server " + RADAR_WEB_VERSION + " running ...")
+    print("Radar Display Web Configuration Server " + RADAR_WEB_VERSION + " running ...")
     logging_init()
     ap = argparse.ArgumentParser(description='Stratux radar web configuration')
     ap.add_argument("-t", "--timer", type=int, required=False,
