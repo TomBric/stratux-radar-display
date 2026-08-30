@@ -600,18 +600,21 @@ def _handle_ble_payload(data):
 
 async def _device_has_characteristic(device_address):
     try:
-        async with BleakClient(device_address) as client:
-            services = client.services
-            if services is None and hasattr(client, 'get_services'):
-                services = await client.get_services()
-            if services is None:
-                return False
-            for service in services:
-                if str(service.uuid).lower() != service_uuid:
-                    continue
-                for characteristic in service.characteristics:
-                    if str(characteristic.uuid).lower() == characteristic_uuid:
-                        return True
+        async with asyncio.timeout(BLE_CHARACTERISTIC_CHECK_TIMEOUT):
+            async with BleakClient(device_address) as client:
+                services = client.services
+                if services is None and hasattr(client, 'get_services'):
+                    services = await client.get_services()
+                if services is None:
+                    return False
+                for service in services:
+                    if str(service.uuid).lower() != service_uuid:
+                        continue
+                    for characteristic in service.characteristics:
+                        if str(characteristic.uuid).lower() == characteristic_uuid:
+                            return True
+    except asyncio.TimeoutError:
+        rlog.debug(f"Ble: Timeout checking characteristics for {device_address}")
     except Exception as e:
         rlog.debug(f"Ble: Failed to inspect characteristics for {device_address}: {e}")
     return False
@@ -668,23 +671,19 @@ async def search_ble():
     # that advertise service FFE0 and provide characteristic FFE1
     found_devices = []
     timed_out = False
-    loop = asyncio.get_running_loop()
-    deadline = loop.time() + BLE_SCAN_TOTAL_TIMEOUT
     try:
         async with BleakScanner(service_uuids=[service_uuid], timeout=BLE_SCAN_TOTAL_TIMEOUT) as scanner:
-            devices, advertisement_data = scanner.discovered_devices_and_advertisement_data.values()
+            discovered = scanner.discovered_devices_and_advertisement_data
+            devices = list(discovered.keys())
     except Exception as e:
         rlog.debug(f"Ble: Exception performing BLE-Scan: {e}")
         return {'devices': [], 'timed_out': False}
-    print(f"Ble: Found {len(devices)} BLE devices advertising service FFE0")
+    rlog.debug(f"Ble: Found {len(devices)} BLE devices advertising service FFE0")
     for device in devices:
-        '''
         if not await _device_has_characteristic(device.address):
             rlog.debug(f"Ble: Device {device.address} does not have characteristic {characteristic_uuid}, skipping")
             continue
-        rlog.debug(f"Identified devices: {devices}")
-        rlog.debug(f"Advertisement data: {advertisement_data}")
-        '''
+        rlog.debug(f"Identified device: {device.name} ({device.address})")
         device_info = {
             'name': device.name if device.name else f"Unknown ({device.address})",
             'address': device.address,
