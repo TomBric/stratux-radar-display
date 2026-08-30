@@ -290,7 +290,7 @@ def scan_ble_devices():
     global ble_scan_results
     global ble_scan_timed_out
     try:
-        scan_result = asyncio.run(ble.search_ble())
+        scan_result = ble.search_ble()
         ble_scan_results = scan_result.get('devices', [])
         ble_scan_timed_out = scan_result.get('timed_out', False)
         rlog.debug(f'BLE scan returned devices: {ble_scan_results}')
