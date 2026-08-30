@@ -672,21 +672,32 @@ async def search_ble():
     found_devices = []
     timed_out = False
     try:
-        async with BleakScanner(service_uuids=[service_uuid], timeout=BLE_SCAN_TOTAL_TIMEOUT) as scanner:
+        async with BleakScanner(service_uuids=[service_uuid]) as scanner:
+            # BleakScanner needs explicit wait time to actually scan for devices
+            await asyncio.sleep(BLE_SCAN_TOTAL_TIMEOUT)
+            # discovered_devices_and_advertisement_data is a dict: {BleakDeviceData: AdvertisementData}
             discovered = scanner.discovered_devices_and_advertisement_data
-            devices = list(discovered.keys())
+            devices = list(discovered.keys())  # Get the BleakDeviceData objects
+    except asyncio.TimeoutError:
+        timed_out = True
+        rlog.debug(f"Ble: BLE-Scan timed out after {BLE_SCAN_TOTAL_TIMEOUT} seconds")
+        return {'devices': [], 'timed_out': True}
     except Exception as e:
         rlog.debug(f"Ble: Exception performing BLE-Scan: {e}")
         return {'devices': [], 'timed_out': False}
     rlog.debug(f"Ble: Found {len(devices)} BLE devices advertising service FFE0")
     for device in devices:
-        if not await _device_has_characteristic(device.address):
-            rlog.debug(f"Ble: Device {device.address} does not have characteristic {characteristic_uuid}, skipping")
+        # device is a BleakDeviceData object with .address and .name attributes
+        device_address = device.address if hasattr(device, 'address') else str(device)
+        device_name = device.name if hasattr(device, 'name') and device.name else None
+
+        if not await _device_has_characteristic(device_address):
+            rlog.debug(f"Ble: Device {device_address} does not have characteristic {characteristic_uuid}, skipping")
             continue
-        rlog.debug(f"Identified device: {device.name} ({device.address})")
+        rlog.debug(f"Identified device: {device_name} ({device_address})")
         device_info = {
-            'name': device.name if device.name else f"Unknown ({device.address})",
-            'address': device.address,
+            'name': device_name if device_name else f"Unknown ({device_address})",
+            'address': device_address,
             'uuid': characteristic_uuid
         }
         found_devices.append(device_info)
