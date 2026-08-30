@@ -23,6 +23,7 @@
     <div id="ble-address-container" class="{% if radar_form.connection_mode.data != 'ble' %}d-none{% endif %}">
         {{ render_field(radar_form.ble_address, form_type='horizontal') }}
         {{ render_field(radar_form.scan_ble_devices, button_style='secondary') }}
+        <div id="ble-scan-status" class="text-secondary d-none">Scanning BLE ...</div>
         <div id="ble-device-choice-container" class="{% if radar_form.ble_device_choice.choices|length == 0 %}d-none{% endif %}">
             {{ render_field(radar_form.ble_device_choice, form_type='horizontal') }}
         </div>
@@ -87,11 +88,14 @@
 {% if on_stratux == False %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const radarFormElement = document.querySelector('form');
     const connectionRadios = document.querySelectorAll('input[name="connection_mode"]');
     const bleAddressContainer = document.getElementById('ble-address-container');
     const stratuxIpContainer = document.getElementById('stratux-ip-container');
     const stratuxIpInput = document.getElementById('stratux_ip');
     const bleAddressInput = document.getElementById('ble_address');
+    const bleScanButton = document.getElementById('scan_ble_devices');
+    const bleScanStatus = document.getElementById('ble-scan-status');
     const bleDeviceChoiceContainer = document.getElementById('ble-device-choice-container');
     const displayStatusRow = document.getElementById('display-status-mode-row');
     const stratuxStatusRow = document.getElementById('stratux-status-mode-row');
@@ -153,6 +157,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    if (bleScanButton && radarFormElement) {
+        bleScanButton.addEventListener('click', function () {
+            if (bleScanStatus) {
+                bleScanStatus.classList.remove('d-none');
+            }
+            bleScanButton.value = 'Scanning BLE ...';
+            bleScanButton.disabled = true;
+        });
+    }
 
     connectionRadios.forEach(function (radio) {
         radio.addEventListener('change', updateConnectionFields);
