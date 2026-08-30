@@ -16,16 +16,12 @@
 <br>
 <h5>Connection</h5>
 {% if on_stratux == False %}
-    <div class="row align-items-end">
-        <div class="col-md-3">
-            {{ render_field(radar_form.ble_connection) }}
-        </div>
-        <div class="col-md-4" id="ble-address-container" {% if radar_form.ble_connection.data != True %}style="display: none;"{% endif %}>
-            {{ render_field(radar_form.ble_address) }}
-        </div>
-    </div>
-    <div id="stratux-ip-container" {% if radar_form.ble_connection.data == True %}style="display: none;"{% endif %}>
+    {{ render_field(radar_form.connection_mode, form_type='horizontal') }}
+    <div id="stratux-ip-container" {% if radar_form.connection_mode.data != 'stratux' %}style="display: none;"{% endif %}>
         {{ render_field(radar_form.stratux_ip, form_type='horizontal') }}
+    </div>
+    <div id="ble-address-container" {% if radar_form.connection_mode.data != 'ble' %}style="display: none;"{% endif %}>
+        {{ render_field(radar_form.ble_address, form_type='horizontal') }}
     </div>
 {% endif %}
     {{ render_field(radar_form.display, form_type='horizontal') }}
@@ -83,26 +79,37 @@
 {% if on_stratux == False %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const bleSwitch = document.getElementById('ble_connection');
+    const connectionRadios = document.querySelectorAll('input[name="connection_mode"]');
     const bleAddressContainer = document.getElementById('ble-address-container');
     const stratuxIpContainer = document.getElementById('stratux-ip-container');
+    const stratuxIpInput = document.getElementById('stratux_ip');
+    const bleAddressInput = document.getElementById('ble_address');
+
+    function selectedConnectionMode() {
+        const checked = document.querySelector('input[name="connection_mode"]:checked');
+        return checked ? checked.value : 'stratux';
+    }
 
     function updateConnectionFields() {
-        if (!bleSwitch || !bleAddressContainer || !stratuxIpContainer) {
+        if (!bleAddressContainer || !stratuxIpContainer) {
             return;
         }
-        if (bleSwitch.checked) {
+        if (selectedConnectionMode() === 'ble') {
             bleAddressContainer.style.display = '';
             stratuxIpContainer.style.display = 'none';
+            if (bleAddressInput) bleAddressInput.disabled = false;
+            if (stratuxIpInput) stratuxIpInput.disabled = true;
         } else {
             bleAddressContainer.style.display = 'none';
             stratuxIpContainer.style.display = '';
+            if (bleAddressInput) bleAddressInput.disabled = true;
+            if (stratuxIpInput) stratuxIpInput.disabled = false;
         }
     }
 
-    if (bleSwitch) {
-        bleSwitch.addEventListener('change', updateConnectionFields);
-    }
+    connectionRadios.forEach(function (radio) {
+        radio.addEventListener('change', updateConnectionFields);
+    });
     updateConnectionFields();
 });
 </script>

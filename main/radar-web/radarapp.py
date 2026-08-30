@@ -43,6 +43,7 @@ import arguments
 import radarmodes
 import alsaaudio
 import subprocess
+import ipaddress
 from werkzeug.utils import secure_filename
 import xmltodict
 
@@ -50,7 +51,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for, sen
 from markupsafe import Markup
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_wtf.file import FileField
-from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRange, ValidationError
+from wtforms.validators import DataRequired, Length, Regexp, NumberRange, ValidationError
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
@@ -138,9 +139,10 @@ class DisplayLogForm(FlaskForm):
 
 class RadarForm(FlaskForm):
 
-    stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[IPAddress()])
-    ble_connection = SwitchField('FLARM NMEA via BLE', default=False,
-                                 description='Off = Stratux Wifi connection')
+    connection_mode = RadioField('Connection type',
+                                 choices=[('stratux', 'Stratux WiFi connection'), ('ble', 'FLARM NMEA via BLE')],
+                                 default='stratux')
+    stratux_ip = StringField('IP address of Stratux', default='192.168.10.1')
     ble_address = StringField('BLE device address', default='', validators=[
         Length(max=17),
         Regexp(r'^$|^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$',
@@ -233,8 +235,19 @@ class RadarForm(FlaskForm):
             self.stratux_ip.data = DEFAULT_IP_DIRECT_ON_STRATUX
 
     def validate_ble_address(self, field):
-        if self.ble_connection.data and len(field.data.strip()) == 0:
+        if self.connection_mode.data == 'ble' and len(field.data.strip()) == 0:
             raise ValidationError('BLE device address is required when FLARM NMEA via BLE is enabled.')
+
+    def validate_stratux_ip(self, field):
+        if self.connection_mode.data != 'stratux':
+            return
+        value = field.data.strip()
+        if len(value) == 0:
+            raise ValidationError('IP address of Stratux is required when Stratux Wifi connection is enabled.')
+        try:
+            ipaddress.ip_address(value)
+        except ValueError:
+            raise ValidationError('Please enter a valid IP address for Stratux.')
 
 
 def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called from radar_app
@@ -335,7 +348,7 @@ def read_arguments(rf):
         return
     rf.display.data = args['device']
     rf.stratux_ip.data = args['connect']
-    rf.ble_connection.data = args['ble'] is not None
+    rf.connection_mode.data = 'ble' if args['ble'] is not None else 'stratux'
     rf.ble_address.data = '' if args['ble'] is None else args['ble']
     rf.display.data = args['device']
 
@@ -416,8 +429,10 @@ def write_arguments(rf):
     return True
 
 def build_option_string(rf):
-    out = f'-d {rf.display.data} -c {rf.stratux_ip.data}'
-    if rf.ble_connection.data is True:
+    out = f'-d {rf.display.data}'
+    if rf.connection_mode.data == 'stratux':
+        out += f' -c {rf.stratux_ip.data}'
+    elif rf.connection_mode.data == 'ble':
         ble_addr = rf.ble_address.data.strip()
         if len(ble_addr) > 0:
             out += f' -ble {ble_addr}'
