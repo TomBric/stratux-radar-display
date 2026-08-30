@@ -677,6 +677,7 @@ async def search_ble():
     except Exception as e:
         rlog.debug(f"Ble: Exception performing BLE-Scan: {e}")
         return {'devices': [], 'timed_out': False}
+    print(f"Ble: Found {len(devices)} BLE devices advertising service FFE0")
     for device in devices:
         if not await _device_has_characteristic(device.address):
             rlog.debug(f"Ble: Device {device.address} does not have characteristic {characteristic_uuid}, skipping")
