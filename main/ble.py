@@ -678,11 +678,13 @@ async def search_ble():
         return {'devices': [], 'timed_out': False}
     print(f"Ble: Found {len(devices)} BLE devices advertising service FFE0")
     for device in devices:
+        '''
         if not await _device_has_characteristic(device.address):
             rlog.debug(f"Ble: Device {device.address} does not have characteristic {characteristic_uuid}, skipping")
             continue
         rlog.debug(f"Identified devices: {devices}")
         rlog.debug(f"Advertisement data: {advertisement_data}")
+        '''
         device_info = {
             'name': device.name if device.name else f"Unknown ({device.address})",
             'address': device.address,
