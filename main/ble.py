@@ -658,6 +658,9 @@ async def listen_to_ble():
             traceback.print_exc()
             await asyncio.sleep(BLE_RETRY_TIMEOUT)
             continue
+        finally:   # ensure we disconnect if the client is still connected
+            if client.is_connected:
+                await client.disconnect()
 
 
 async def search_ble():
