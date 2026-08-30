@@ -23,7 +23,10 @@
     <div id="ble-address-container" class="{% if radar_form.connection_mode.data != 'ble' %}d-none{% endif %}">
         {{ render_field(radar_form.ble_address, form_type='horizontal') }}
         {{ render_field(radar_form.scan_ble_devices, button_style='secondary') }}
-        <div id="ble-scan-status" class="text-secondary d-none">Scanning BLE ...</div>
+        <div id="ble-scan-status" class="text-secondary d-none mt-2" role="status" aria-live="polite">
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+            <span>Scanning BLE ...</span>
+        </div>
         <div id="ble-device-choice-container" class="{% if radar_form.ble_device_choice.choices|length == 0 %}d-none{% endif %}">
             {{ render_field(radar_form.ble_device_choice, form_type='horizontal') }}
         </div>
