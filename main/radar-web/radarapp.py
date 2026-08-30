@@ -560,9 +560,9 @@ def index():
         elif timed_out:
             flash(Markup('BLE scan timed out - no matching devices found before timeout.'), 'warning')
         elif len(found_devices) > 0:
-            flash(Markup(f'Found {len(found_devices)} BLE device(s) with service FFE0 and characteristic FFE1.'), 'success')
+            flash(Markup(f'Found {len(found_devices)} BLE device(s) with service FFE0.'), 'success')
         else:
-            flash(Markup('No BLE devices found with service FFE0 and characteristic FFE1.'), 'warning')
+            flash(Markup('No BLE devices found with service FFE0.'), 'warning')
         return render_template('index.html', radar_form=radar_form, on_stratux=stratux_mode)
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
