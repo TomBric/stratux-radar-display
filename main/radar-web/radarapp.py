@@ -274,7 +274,7 @@ def update_ble_device_choices(radar_form):
         address = device.get('address', '')
         name = device.get('name', f'Unknown ({address})')
         if len(address) > 0:
-            choices.append((address, f"{name} ({address})"))
+            choices.append((address, f"{name} - {address}"))
     radar_form.ble_device_choice.choices = choices
     ble_address = radar_form.ble_address.data or ''
     if ble_address in dict(choices):

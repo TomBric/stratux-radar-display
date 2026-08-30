@@ -1,7 +1,18 @@
 {% extends 'base.html' %}
 {% from 'bootstrap5/form.html' import render_form, render_field, render_form_row %}
 {% block content %}
-<style> .no-label { label{ display: None; } } </style>
+<style>
+    .no-label label { display: none; }
+    .ble-address-field input { max-width: 12rem; }
+    .ble-scan-button .btn { white-space: nowrap; }
+    .ble-address-row { --bs-gutter-x: 0.6rem; }
+    .ble-address-row .mb-3 { margin-bottom: 0.35rem !important; }
+    .ble-device-choice-field { font-size: 0.92rem; }
+    .ble-device-choice-field .form-label { display: none; }
+    .ble-device-choice-field .form-check { margin-bottom: 0.2rem; }
+    .ble-device-choice-field .form-check-label { line-height: 1.15; }
+    .ble-device-choice-field .form-check-input { margin-top: 0.2rem; }
+</style>
 <form method="post">
 {{ radar_form.csrf_token }}
 
@@ -21,14 +32,20 @@
         {{ render_field(radar_form.stratux_ip, form_type='horizontal') }}
     </div>
     <div id="ble-address-container" class="{% if radar_form.connection_mode.data != 'ble' %}d-none{% endif %}">
-        {{ render_field(radar_form.ble_address, form_type='horizontal') }}
-        {{ render_field(radar_form.scan_ble_devices, button_style='secondary') }}
+        <div class="row align-items-end ble-address-row">
+            <div class="col-md-2 ble-address-field">
+                {{ render_field(radar_form.ble_address) }}
+            </div>
+            <div class="col-md-auto ble-scan-button">
+                {{ render_field(radar_form.scan_ble_devices, button_style='success') }}
+            </div>
+            <div id="ble-device-choice-container" class="col-md ble-device-choice-field {% if radar_form.ble_device_choice.choices|length == 0 %}d-none{% endif %}">
+                {{ render_field(radar_form.ble_device_choice) }}
+            </div>
+        </div>
         <div id="ble-scan-status" class="text-secondary d-none mt-2" role="status" aria-live="polite">
             <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
             <span>Scanning BLE ...</span>
-        </div>
-        <div id="ble-device-choice-container" class="{% if radar_form.ble_device_choice.choices|length == 0 %}d-none{% endif %}">
-            {{ render_field(radar_form.ble_device_choice, form_type='horizontal') }}
         </div>
     </div>
 {% endif %}
