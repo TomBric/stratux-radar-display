@@ -934,11 +934,11 @@ async def coroutines():
         await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, sim_handler)
     elif ble_address is not None:
         rlog.debug("BLE mode, listening to FLARM/OGN via BLE")
-        ble_handler = asyncio.create_task(ble.listen_to_ble())
+        ble_handler = asyncio.create_task(ble.listen_to_ble(), name="ble_handler")
         await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, ble_handler)
     else:   # normal operation, listen to stratux websocket
         tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
-        sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+        sit_handler = asyncio.create_task(listen_forever(url_situation_ws   , "SituationHandler", new_situation, rlog))
 
         await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
         # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
@@ -1004,13 +1004,27 @@ def main():
 
 def quit_gracefully(*argus):
     print("Keyboard interrupt or shutdown. Quitting ...")
+
+    def terminate_ble_client():
+        try:
+            return ble.request_listener_shutdown()
+        except Exception as e:
+            if rlog is not None:
+                rlog.debug(f"BLE shutdown request failed: {e}")
+            return False
+
+    keep_ble_handler_running = terminate_ble_client()
     try:
         tasks = asyncio.all_tasks()
         for ta in tasks:
+            if ta.done():
+                continue
+            if keep_ble_handler_running and ta.get_name() == "ble_handler":
+                continue
             ta.cancel()
     except RuntimeError:
         pass
-    radarbluez.sound_terminate()
+        radarbluez.sound_terminate()
     rlog.debug("CleanUp Display ...")
     display_control.cleanup()
     return 0

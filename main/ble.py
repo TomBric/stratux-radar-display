@@ -59,6 +59,8 @@ global_situation = None    # global situation dictionary to hold the latest situ
 traffic_func = None         # global function to handle new traffic messages
 situation_func = None       # global function to handle new situation messages
 ble_address = None             # global BLE address to connect to
+active_ble_client = None       # currently connected bleak client, if any
+ble_shutdown_requested = False
 ogn_tail_number_cache = {}     # global cache for OGN tail numbers consisting of ognid -> tail number mappings
 ogn_device_db_loaded = False
 
@@ -598,7 +600,20 @@ def _handle_ble_payload(data):
             handle_nmea_data(nmea_sentence)
 
 
+def request_listener_shutdown():
+    global ble_shutdown_requested
+    ble_shutdown_requested = True
+    client = active_ble_client
+    if client is not None and getattr(client, 'is_connected', False):
+        rlog.debug("Ble: Shutdown requested for active BLE client")
+        return True
+    rlog.debug("Ble: Shutdown requested with no active BLE client")
+    return False
+
+
 async def listen_to_ble():
+    global active_ble_client
+    global ble_shutdown_requested
     address = ble_address
     if address is None:
         rlog.debug("Ble: No BLE address configured")
@@ -610,38 +625,51 @@ async def listen_to_ble():
     device_address = valid_address
     device_uuid = characteristic_uuid
     device= {'name': f"Unknown ({device_address})", 'address': device_address, 'uuid': device_uuid}
-    while True:
+    ble_shutdown_requested = False
+    while not ble_shutdown_requested:
         # outer loop restarted every time the connection fails
         rlog.debug("BLE listener active ...")
+        client = None
         try:
             async with BleakClient(device_address) as client:
+                active_ble_client = client
                 if client.is_connected:
                     rlog.debug(f"Ble: Connected to {device['address']}")
                     def notification_handler(_, data):
                         _handle_ble_payload(data)
                     await client.start_notify(device_uuid, notification_handler) # starts handler from now
 
-                    try:    # # Keep the script running to receive asynchronous data
-                        while client.is_connected:   # keep the connection alive and listen for notifications
-                            await asyncio.sleep(0.5)
-                    finally:
-                        try:
-                            await client.stop_notify(device_uuid)   # clean stop of notifications when exiting
-                        except Exception as e:
-                            rlog.debug(f"Ble: Failed to stop notifications: {e}")
+                    while client.is_connected and not ble_shutdown_requested:
+                        await asyncio.sleep(0.5)
+
+                    if ble_shutdown_requested:
+                        rlog.debug(f"Ble: Shutdown requested, disconnecting from {device['address']}")
                 else:
                     rlog.debug(f"Ble: Failed to connect to {device['address']}")
         except asyncio.CancelledError:
-            rlog.debug("Ble: Shutting down in connect ... ")
+            ble_shutdown_requested = True
+            rlog.debug("Ble: Listener cancelled, shutting down BLE connection")
             return
         except Exception as e:
             rlog.debug(f"Ble: Exception while listening to BLE device {ble_address}: {e}")
             traceback.print_exc()
+            if ble_shutdown_requested:
+                break
             await asyncio.sleep(BLE_RETRY_TIMEOUT)
             continue
         finally:   # ensure we disconnect if the client is still connected
-            if client.is_connected:
-                await client.disconnect()
+            if client is not None and getattr(client, 'is_connected', False):
+                try:
+                    await client.stop_notify(device_uuid)   # clean stop of notifications when exiting
+                except Exception as e:
+                    rlog.debug(f"Ble: Failed to stop notifications: {e}")
+                try:
+                    await client.disconnect()
+                except Exception as e:
+                    rlog.debug(f"Ble: Failed to disconnect BLE client: {e}")
+            if active_ble_client is client:
+                active_ble_client = None
+    rlog.debug("Ble: BLE listener terminated")
 
 async def search_ble():
     # search for ble devices, returns list of dictionaries with name and address of devices
@@ -680,11 +708,13 @@ def init(new_ble_address, new_traffic_func, new_situation_func, situation):
     global traffic_func
     global situation_func
     global ble_address
+    global ble_shutdown_requested
 
     global_situation = situation
     traffic_func = new_traffic_func
     situation_func = new_situation_func
     ble_address = new_ble_address
+    ble_shutdown_requested = False
     rlog.debug("BLE initialized with address: {0}".format(ble_address))
 
 
