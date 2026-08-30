@@ -49,8 +49,9 @@ BLE_BASE_UUID = "0000{0}-0000-1000-8000-00805f9b34fb"
 service_uuid = BLE_BASE_UUID.format(SERVICE.lower())
 characteristic_uuid = BLE_BASE_UUID.format(CHARACTERISTIC.lower())
 OGN_DDB_FILENAME = str(Path(arguments.FULL_CONFIG_DIR).joinpath("ddb.json"))
-BLE_RETRY_TIMEOUT = 1 # seconds to wait before retrying BLE connection after failure
+BLE_RETRY_TIMEOUT = 0.3 # seconds to wait before retrying BLE connection after failure
 GPS_RANGE_ERROR = 4.0  # UERE range error in meters, used for calculating GPS accuracy
+GPS_INVALID_ACCURACY = 999999.0  # value to use for invalid GPS accuracy
 
 global_situation = None    # global situation dictionary to hold the latest situation data
 traffic_func = None         # global function to handle new traffic messages
@@ -110,8 +111,8 @@ situation_msg = {
     'GPSTrueCourse': 0,
     'GPSGroundSpeed': 0,     # in knots
     'BaroVerticalSpeed': 0,
-    'GPSHorizontalAccuracy': 0,
-    'GPSVerticalAccuracy': 0,
+    'GPSHorizontalAccuracy': GPS_INVALID_ACCURACY,
+    'GPSVerticalAccuracy': GPS_INVALID_ACCURACY,
     'GPSFixQuality': 0,   # 0 = invalid, 1 = GPS fix, 2 = DGPS fix
     'GPSLastFixLocalTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
     'GPSLastGPSTimeStratuxTime': time.strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -309,21 +310,27 @@ def parse_GNGGA(fields):
         return False
     try:
         # Parse fix quality (0=invalid, 1=GPS fix, 2=DGPS fix)
+        gps_valid = False
         if fields[6]:
             if int(fields[6]) == 0:
                 situation_msg['GPSFixQuality'] = 0
             else:
+                gps_valid = True
                 if global_situation['gps_quality'] == 0:
                     situation_msg['GPSFixQuality'] = 1   # only set if not already set higher by GNGGA
         # Parse number of satellites
         if fields[7]:
             situation_msg['NumSatellites'] = int(fields[7])
         # Parse horizontal dilution of precision (HDOP)
-        if fields[8]:
+        if fields[8] and gps_valid:
             situation_msg['GPSHorizontalAccuracy'] = float(fields[8]) * GPS_RANGE_ERROR  # Convert HDOP to estimated horizontal accuracy in meters
+        else:
+            situation_msg['GPSHorizontalAccuracy'] = GPS_INVALID_ACCURACY
         # Parse altitude above mean sea level (in meters)
-        if fields[9]:
+        if fields[9] and gps_valid:
             situation_msg['GPSAltitudeMSL'] = float(fields[9]) * 3.28084  # Convert meters to feet
+        else:
+            situation_msg['GPSAltitudeMSL'] = GPS_INVALID_ACCURACY
         rlog.debug(f"NMEA: Parsed GNGGA message: {situation_msg}")
         return True
     except ValueError as e:
@@ -385,6 +392,7 @@ def parse_GNGSA(fields):
         return False
     try:
         # Parse fix type (1=No fix, 2=2D fix, 3=3D fix)
+        gps_valid = False
         if fields[2]:
             fix_type = int(fields[2])
             if fix_type == 1:   # No fix
@@ -394,10 +402,14 @@ def parse_GNGSA(fields):
             elif fix_type == 3: # 3D fix
                 situation_msg['GPSFixQuality'] = 2
         # Parse HDOP, VDOP values
-        if fields[16]:
+        if fields[16] and gps_valid:
             situation_msg['GPSHorizontalAccuracy'] = float(fields[16]) * GPS_RANGE_ERROR  # Convert HDOP to estimated horizontal accuracy in meters
-        if len(fields) > 17 and fields[17]:
+        else:
+            situation_msg['GPSHorizontalAccuracy'] = GPS_INVALID_ACCURACY
+        if len(fields) > 17 and fields[17] and gps_valid:
             situation_msg['GPSVerticalAccuracy'] = float(fields[17]) * GPS_RANGE_ERROR  # Convert VDOP to estimated vertical accuracy in meters
+        else:
+            situation_msg['GPSVerticalAccuracy']  = GPS_INVALID_ACCURACY
         rlog.debug(f"NMEA: Parsed GNGSA message: {situation_msg}")
         return True
     except ValueError as e:
