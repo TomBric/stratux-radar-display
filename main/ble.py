@@ -598,19 +598,6 @@ def _handle_ble_payload(data):
             handle_nmea_data(nmea_sentence)
 
 
-def _advertised_service_uuids(device):
-    uuids = []
-    metadata = getattr(device, 'metadata', None)
-    if isinstance(metadata, dict):
-        uuids.extend(metadata.get('uuids', []) or [])
-    details = getattr(device, 'details', None)
-    if hasattr(details, 'get'):
-        props = details.get('props')
-        if hasattr(props, 'get'):
-            uuids.extend(props.get('UUIDs', []) or [])
-    return [str(uuid).lower() for uuid in uuids]
-
-
 async def _device_has_characteristic(device_address):
     try:
         async with BleakClient(device_address) as client:
@@ -681,35 +668,18 @@ async def search_ble():
     loop = asyncio.get_running_loop()
     deadline = loop.time() + BLE_SCAN_TOTAL_TIMEOUT
     try:
-        scanner = BleakScanner()
-        devices = await scanner.discover(timeout=10)
+        async with BleakScanner(service_uuids=[service_uuid]) as scanner:
+            await asyncio.sleep(10.0)
+            devices, advertisement_data = scanner.discovered_devices_and_advertisement_data.values()
     except Exception as e:
         rlog.debug(f"Ble: Exception performing BLE-Scan: {e}")
         return {'devices': [], 'timed_out': False}
-    # accept only devices advertising the FFE0 service and actually offering the FFE1 characteristic
-    rlog.debug(f"Identified devices: {devices}")
     for device in devices:
-        remaining_total = deadline - loop.time()
-        if remaining_total <= 0:
-            timed_out = True
-            rlog.debug(f"Ble: BLE scan total timeout reached after finding {len(found_devices)} matching device(s)")
-            break
-        uuids = _advertised_service_uuids(device)
-        rlog.debug(f"Ble: Found device {device.name} ({device.address}) with UUIDs: {uuids}")
-        if service_uuid not in uuids:
+        if not await _device_has_characteristic(device.address):
+            rlog.debug(f"Ble: Device {device.address} does not have characteristic {characteristic_uuid}, skipping")
             continue
-        try:
-            per_device_timeout = min(BLE_CHARACTERISTIC_CHECK_TIMEOUT, max(0.1, remaining_total))
-            has_characteristic = await asyncio.wait_for(
-                _device_has_characteristic(device.address),
-                timeout=per_device_timeout
-            )
-        except asyncio.TimeoutError:
-            rlog.debug(f"Ble: Timeout inspecting characteristics for {device.address}")
-            continue
-        if not has_characteristic:
-            rlog.debug(f"Ble: Device {device.address} advertises {service_uuid} but lacks {characteristic_uuid}")
-            continue
+        rlog.debug(f"Identified devices: {devices}")
+        rlog.debug(f"Advertisement data: {advertisement_data}")
         device_info = {
             'name': device.name if device.name else f"Unknown ({device.address})",
             'address': device.address,
