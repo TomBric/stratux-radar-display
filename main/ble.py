@@ -671,8 +671,7 @@ async def search_ble():
     loop = asyncio.get_running_loop()
     deadline = loop.time() + BLE_SCAN_TOTAL_TIMEOUT
     try:
-        async with BleakScanner(service_uuids=[service_uuid]) as scanner:
-            await asyncio.sleep(10.0)
+        async with BleakScanner(service_uuids=[service_uuid], timeout=BLE_SCAN_TOTAL_TIMEOUT) as scanner:
             devices, advertisement_data = scanner.discovered_devices_and_advertisement_data.values()
     except Exception as e:
         rlog.debug(f"Ble: Exception performing BLE-Scan: {e}")
