@@ -50,6 +50,8 @@ service_uuid = BLE_BASE_UUID.format(SERVICE.lower())
 characteristic_uuid = BLE_BASE_UUID.format(CHARACTERISTIC.lower())
 OGN_DDB_FILENAME = str(Path(arguments.FULL_CONFIG_DIR).joinpath("ddb.json"))
 BLE_RETRY_TIMEOUT = 0.3 # seconds to wait before retrying BLE connection after failure
+BLE_CHARACTERISTIC_CHECK_TIMEOUT = 2.0  # max seconds to inspect a scanned device for the target characteristic
+BLE_SCAN_TOTAL_TIMEOUT = 15.0  # max seconds for the complete BLE search including characteristic checks
 GPS_RANGE_ERROR = 4.0  # UERE range error in meters, used for calculating GPS accuracy
 GPS_INVALID_ACCURACY = 999999.0  # value to use for invalid GPS accuracy
 
@@ -675,20 +677,37 @@ async def search_ble():
     # search for ble devices, returns list of dictionaries with name and address of devices
     # that advertise service FFE0 and provide characteristic FFE1
     found_devices = []
+    timed_out = False
+    loop = asyncio.get_running_loop()
+    deadline = loop.time() + BLE_SCAN_TOTAL_TIMEOUT
     try:
         scanner = BleakScanner()
         devices = await scanner.discover(timeout=10)
     except Exception as e:
         rlog.debug(f"Ble: Exception performing BLE-Scan: {e}")
-        return []
+        return {'devices': [], 'timed_out': False}
     # accept only devices advertising the FFE0 service and actually offering the FFE1 characteristic
     rlog.debug(f"Identified devices: {devices}")
     for device in devices:
+        remaining_total = deadline - loop.time()
+        if remaining_total <= 0:
+            timed_out = True
+            rlog.debug(f"Ble: BLE scan total timeout reached after finding {len(found_devices)} matching device(s)")
+            break
         uuids = _advertised_service_uuids(device)
         rlog.debug(f"Ble: Found device {device.name} ({device.address}) with UUIDs: {uuids}")
         if service_uuid not in uuids:
             continue
-        if not await _device_has_characteristic(device.address):
+        try:
+            per_device_timeout = min(BLE_CHARACTERISTIC_CHECK_TIMEOUT, max(0.1, remaining_total))
+            has_characteristic = await asyncio.wait_for(
+                _device_has_characteristic(device.address),
+                timeout=per_device_timeout
+            )
+        except asyncio.TimeoutError:
+            rlog.debug(f"Ble: Timeout inspecting characteristics for {device.address}")
+            continue
+        if not has_characteristic:
             rlog.debug(f"Ble: Device {device.address} advertises {service_uuid} but lacks {characteristic_uuid}")
             continue
         device_info = {
@@ -698,7 +717,7 @@ async def search_ble():
         }
         found_devices.append(device_info)
     rlog.debug(f"Ble: Following BLE devices with service FFE0 and characteristic FFE1 found: {found_devices}")
-    return found_devices
+    return {'devices': found_devices, 'timed_out': timed_out}
 
 
 def init(new_ble_address, new_traffic_func, new_situation_func, situation):

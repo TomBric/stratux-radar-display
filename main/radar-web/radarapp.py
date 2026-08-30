@@ -87,6 +87,7 @@ csrf = CSRFProtect(app)
 rlog = None  # radar specific logger
 watchdog = None  # watchdog to shut dow
 ble_scan_results = []
+ble_scan_timed_out = False
 
 class Watchdog:
     def __init__(self, timeout=180):
@@ -287,14 +288,18 @@ def update_ble_device_choices(radar_form):
 
 def scan_ble_devices():
     global ble_scan_results
+    global ble_scan_timed_out
     try:
-        ble_scan_results = asyncio.run(ble.search_ble())
+        scan_result = asyncio.run(ble.search_ble())
+        ble_scan_results = scan_result.get('devices', [])
+        ble_scan_timed_out = scan_result.get('timed_out', False)
         rlog.debug(f'BLE scan returned devices: {ble_scan_results}')
-        return ble_scan_results
+        return ble_scan_results, ble_scan_timed_out
     except Exception as e:
         rlog.debug(f'BLE scan failed: {e}')
         ble_scan_results = []
-        return []
+        ble_scan_timed_out = False
+        return [], False
 
 
 def read_options_in_file(file_path, word):
@@ -540,6 +545,7 @@ local_checklist_filename = ""
 def index():
     global result_message
     global local_checklist_filename
+    global ble_scan_timed_out
 
     watchdog.refresh()
     radar_form = RadarForm(cards_and_mixers(), stratux_mode)
@@ -547,9 +553,13 @@ def index():
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     rlog.debug(f'index(): stratux-ip is {radar_form.stratux_ip.data}')
     if request.method == 'POST' and radar_form.scan_ble_devices.data is True:
-        found_devices = scan_ble_devices()
+        found_devices, timed_out = scan_ble_devices()
         update_ble_device_choices(radar_form)
-        if len(found_devices) > 0:
+        if timed_out and len(found_devices) > 0:
+            flash(Markup(f'BLE scan timed out - showing {len(found_devices)} partial result(s).'), 'warning')
+        elif timed_out:
+            flash(Markup('BLE scan timed out - no matching devices found before timeout.'), 'warning')
+        elif len(found_devices) > 0:
             flash(Markup(f'Found {len(found_devices)} BLE device(s) with service FFE0 and characteristic FFE1.'), 'success')
         else:
             flash(Markup('No BLE devices found with service FFE0 and characteristic FFE1.'), 'warning')
