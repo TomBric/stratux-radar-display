@@ -14,14 +14,18 @@
 
 
 <br>
-<h5>Connection</h5>
+<h5>Radar source connection</h5>
 {% if on_stratux == False %}
     {{ render_field(radar_form.connection_mode, form_type='horizontal') }}
-    <div id="stratux-ip-container" {% if radar_form.connection_mode.data != 'stratux' %}style="display: none;"{% endif %}>
+    <div id="stratux-ip-container" class="{% if radar_form.connection_mode.data != 'stratux' %}d-none{% endif %}">
         {{ render_field(radar_form.stratux_ip, form_type='horizontal') }}
     </div>
-    <div id="ble-address-container" {% if radar_form.connection_mode.data != 'ble' %}style="display: none;"{% endif %}>
+    <div id="ble-address-container" class="{% if radar_form.connection_mode.data != 'ble' %}d-none{% endif %}">
         {{ render_field(radar_form.ble_address, form_type='horizontal') }}
+        {{ render_field(radar_form.scan_ble_devices, button_style='secondary') }}
+        <div id="ble-device-choice-container" class="{% if radar_form.ble_device_choice.choices|length == 0 %}d-none{% endif %}">
+            {{ render_field(radar_form.ble_device_choice, form_type='horizontal') }}
+        </div>
     </div>
 {% endif %}
     {{ render_field(radar_form.display, form_type='horizontal') }}
@@ -38,10 +42,10 @@
 {{ render_form_row([radar_form.flogs, radar_form.flogs_seq], col_map={'flogs': 'col-md-3', 'flogs_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.cowarner, radar_form.cowarner_seq], col_map={'cowarner': 'col-md-3', 'cowarner_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.gps_dist, radar_form.gps_dist_seq], col_map={'gps_dist': 'col-md-3', 'gps_dist_seq': 'no-label col-md-1'}) }}
-<div id="display-status-mode-row" {% if not on_stratux and radar_form.connection_mode.data == 'ble' %}style="display: none;"{% endif %}>
+<div id="display-status-mode-row" class="{% if not on_stratux and radar_form.connection_mode.data == 'ble' %}d-none{% endif %}">
 {{ render_form_row([radar_form.status, radar_form.status_seq], col_map={'status': 'col-md-3', 'status_seq': 'no-label col-md-1'}) }}
 </div>
-<div id="stratux-status-mode-row" {% if not on_stratux and radar_form.connection_mode.data == 'ble' %}style="display: none;"{% endif %}>
+<div id="stratux-status-mode-row" class="{% if not on_stratux and radar_form.connection_mode.data == 'ble' %}d-none{% endif %}">
 {{ render_form_row([radar_form.stratux, radar_form.stratux_seq], col_map={'stratux': 'col-md-3', 'stratux_seq': 'no-label col-md-1'}) }}
 </div>
 {{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist_filename, radar_form.download_checklist, radar_form.upload_checklist],
@@ -88,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const stratuxIpContainer = document.getElementById('stratux-ip-container');
     const stratuxIpInput = document.getElementById('stratux_ip');
     const bleAddressInput = document.getElementById('ble_address');
+    const bleDeviceChoiceContainer = document.getElementById('ble-device-choice-container');
     const displayStatusRow = document.getElementById('display-status-mode-row');
     const stratuxStatusRow = document.getElementById('stratux-status-mode-row');
 
@@ -114,6 +119,9 @@ document.addEventListener('DOMContentLoaded', function () {
             stratuxIpContainer.style.display = 'none';
             if (bleAddressInput) bleAddressInput.disabled = false;
             if (stratuxIpInput) stratuxIpInput.disabled = true;
+            if (bleDeviceChoiceContainer && bleDeviceChoiceContainer.querySelectorAll('input[type="radio"]').length > 0) {
+                bleDeviceChoiceContainer.style.display = '';
+            }
             if (displayStatusRow) displayStatusRow.style.display = 'none';
             if (stratuxStatusRow) stratuxStatusRow.style.display = 'none';
             setDisabledForContainer(displayStatusRow, true);
@@ -123,12 +131,21 @@ document.addEventListener('DOMContentLoaded', function () {
             stratuxIpContainer.style.display = '';
             if (bleAddressInput) bleAddressInput.disabled = true;
             if (stratuxIpInput) stratuxIpInput.disabled = false;
+            if (bleDeviceChoiceContainer) bleDeviceChoiceContainer.style.display = 'none';
             if (displayStatusRow) displayStatusRow.style.display = '';
             if (stratuxStatusRow) stratuxStatusRow.style.display = '';
             setDisabledForContainer(displayStatusRow, false);
             setDisabledForContainer(stratuxStatusRow, false);
         }
     }
+
+    document.querySelectorAll('input[name="ble_device_choice"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            if (bleAddressInput && radio.checked) {
+                bleAddressInput.value = radio.value;
+            }
+        });
+    });
 
     connectionRadios.forEach(function (radio) {
         radio.addEventListener('change', updateConnectionFields);

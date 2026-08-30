@@ -596,6 +596,38 @@ def _handle_ble_payload(data):
             handle_nmea_data(nmea_sentence)
 
 
+def _advertised_service_uuids(device):
+    uuids = []
+    metadata = getattr(device, 'metadata', None)
+    if isinstance(metadata, dict):
+        uuids.extend(metadata.get('uuids', []) or [])
+    details = getattr(device, 'details', None)
+    if hasattr(details, 'get'):
+        props = details.get('props')
+        if hasattr(props, 'get'):
+            uuids.extend(props.get('UUIDs', []) or [])
+    return [str(uuid).lower() for uuid in uuids]
+
+
+async def _device_has_characteristic(device_address):
+    try:
+        async with BleakClient(device_address) as client:
+            services = client.services
+            if services is None and hasattr(client, 'get_services'):
+                services = await client.get_services()
+            if services is None:
+                return False
+            for service in services:
+                if str(service.uuid).lower() != service_uuid:
+                    continue
+                for characteristic in service.characteristics:
+                    if str(characteristic.uuid).lower() == characteristic_uuid:
+                        return True
+    except Exception as e:
+        rlog.debug(f"Ble: Failed to inspect characteristics for {device_address}: {e}")
+    return False
+
+
 async def listen_to_ble():
     address = ble_address
     if address is None:
@@ -640,7 +672,8 @@ async def listen_to_ble():
 
 
 async def search_ble():
-    # search for ble devices, returns list of dictionaries with name and address of devices that offer the service FFE0
+    # search for ble devices, returns list of dictionaries with name and address of devices
+    # that advertise service FFE0 and provide characteristic FFE1
     found_devices = []
     try:
         scanner = BleakScanner()
@@ -648,20 +681,23 @@ async def search_ble():
     except Exception as e:
         rlog.debug(f"Ble: Exception performing BLE-Scan: {e}")
         return []
-    # accept only devices with device id FFE0
+    # accept only devices advertising the FFE0 service and actually offering the FFE1 characteristic
     rlog.debug(f"Identified devices: {devices}")
     for device in devices:
-        uuids = device.details.get("props").get("UUIDs")
+        uuids = _advertised_service_uuids(device)
         rlog.debug(f"Ble: Found device {device.name} ({device.address}) with UUIDs: {uuids}")
-        for uuid in uuids:
-            if  uuid == service_uuid:
-                device_info = {
-                    'name': device.name if device.name else f"Unknown ({device.address})",
-                    'address': device.address,
-                    'uuid': characteristic_uuid
-                }
-                found_devices.append(device_info)
-        rlog.debug(f"Ble: Following BLE devices with service FFE0 found: {found_devices}")
+        if service_uuid not in uuids:
+            continue
+        if not await _device_has_characteristic(device.address):
+            rlog.debug(f"Ble: Device {device.address} advertises {service_uuid} but lacks {characteristic_uuid}")
+            continue
+        device_info = {
+            'name': device.name if device.name else f"Unknown ({device.address})",
+            'address': device.address,
+            'uuid': characteristic_uuid
+        }
+        found_devices.append(device_info)
+    rlog.debug(f"Ble: Following BLE devices with service FFE0 and characteristic FFE1 found: {found_devices}")
     return found_devices
 
 

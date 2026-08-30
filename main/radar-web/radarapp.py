@@ -44,8 +44,10 @@ import radarmodes
 import alsaaudio
 import subprocess
 import ipaddress
+import asyncio
 from werkzeug.utils import secure_filename
 import xmltodict
+import ble
 
 from flask import Flask, render_template, request, flash, redirect, url_for, send_from_directory
 from markupsafe import Markup
@@ -84,6 +86,7 @@ csrf = CSRFProtect(app)
 
 rlog = None  # radar specific logger
 watchdog = None  # watchdog to shut dow
+ble_scan_results = []
 
 class Watchdog:
     def __init__(self, timeout=180):
@@ -148,6 +151,8 @@ class RadarForm(FlaskForm):
         Regexp(r'^$|^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$',
                message='BLE address must look like 00:11:22:33:44:55')
     ])
+    scan_ble_devices = SubmitField('Search BLE devices')
+    ble_device_choice = RadioField('Found BLE devices', choices=[])
     display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'),
             ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'),
             ('Epaper_3in7', 'Epaper display 3.7 inch'), ('Epaper_3in7_Round', 'Epaper display 3.7 inch - Round front'),
@@ -261,6 +266,35 @@ def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called fr
         rlog.debug(f"ALSAAudioError retrieving cards and mixers ")
     rlog.debug(f"Available Mixers: {retvalue} ")
     return retvalue
+
+
+def update_ble_device_choices(radar_form):
+    choices = []
+    for device in ble_scan_results:
+        address = device.get('address', '')
+        name = device.get('name', f'Unknown ({address})')
+        if len(address) > 0:
+            choices.append((address, f"{name} ({address})"))
+    radar_form.ble_device_choice.choices = choices
+    ble_address = radar_form.ble_address.data or ''
+    if ble_address in dict(choices):
+        radar_form.ble_device_choice.data = ble_address
+    elif len(choices) > 0:
+        radar_form.ble_device_choice.data = choices[0][0]
+        if len(ble_address.strip()) == 0:
+            radar_form.ble_address.data = choices[0][0]
+
+
+def scan_ble_devices():
+    global ble_scan_results
+    try:
+        ble_scan_results = asyncio.run(ble.search_ble())
+        rlog.debug(f'BLE scan returned devices: {ble_scan_results}')
+        return ble_scan_results
+    except Exception as e:
+        rlog.debug(f'BLE scan failed: {e}')
+        ble_scan_results = []
+        return []
 
 
 def read_options_in_file(file_path, word):
@@ -509,14 +543,26 @@ def index():
 
     watchdog.refresh()
     radar_form = RadarForm(cards_and_mixers(), stratux_mode)
+    update_ble_device_choices(radar_form)
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     rlog.debug(f'index(): stratux-ip is {radar_form.stratux_ip.data}')
+    if request.method == 'POST' and radar_form.scan_ble_devices.data is True:
+        found_devices = scan_ble_devices()
+        update_ble_device_choices(radar_form)
+        if len(found_devices) > 0:
+            flash(Markup(f'Found {len(found_devices)} BLE device(s) with service FFE0 and characteristic FFE1.'), 'success')
+        else:
+            flash(Markup('No BLE devices found with service FFE0 and characteristic FFE1.'), 'warning')
+        return render_template('index.html', radar_form=radar_form, on_stratux=stratux_mode)
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
         read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
+        update_ble_device_choices(radar_form)
         rlog.debug(f'index() after read_arguments: stratux-ip is {radar_form.stratux_ip.data}')
     else:
         rlog.debug(f'index() in else for POST: stratux-ip is {radar_form.stratux_ip.data}')
+        if radar_form.connection_mode.data == 'ble' and len((radar_form.ble_address.data or '').strip()) == 0:
+            radar_form.ble_address.data = radar_form.ble_device_choice.data or ''
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'error')
