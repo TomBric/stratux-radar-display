@@ -140,7 +140,7 @@ class DisplayLogForm(FlaskForm):
 class RadarForm(FlaskForm):
 
     connection_mode = RadioField('Connection type',
-                                 choices=[('stratux', 'Stratux WiFi connection'), ('ble', 'FLARM NMEA via BLE')],
+                                 choices=[('stratux', 'Stratux WiFi connection'), ('ble', 'Flarm NMEA via BLE')],
                                  default='stratux')
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1')
     ble_address = StringField('BLE device address', default='', validators=[
@@ -409,8 +409,13 @@ def app_option_string(radarform):
 def build_mode_string(radarform):
     res = ''
     modestring = ''
+    skip_modes = set()
+    if radarform.connection_mode.data == 'ble':
+        skip_modes = {'D', 'S'}
     for i in range(1, MAX_SEQUENCE+1):    # this is a simple enumeration, no sorting
         for (key, value) in modes.items():
+            if key in skip_modes:
+                continue
             if getattr(radarform, value + '_seq').data == i and getattr(radarform, value).data is True:
                 modestring += key
     if len(modestring) > 0:
