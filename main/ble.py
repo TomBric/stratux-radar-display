@@ -271,6 +271,8 @@ def parse_GNGLL(fields):
                     situation_msg['GPSFixQuality'] = 1   # only set if not already set higher by GNGGA
             if fields[6].upper() == 'V':  # void fix, mark as invalid
                 situation_msg['GPSFixQuality'] = 0
+                situation_msg['GPSHorizontalAccuracy'] = GPS_INVALID_ACCURACY
+                situation_msg['GPSVerticalAccuracy'] = GPS_INVALID_ACCURACY
         # Parse latitude (DDMM.MMMMM format)
         if fields[1] and fields[2]:
             lat = float(fields[1])
@@ -399,8 +401,10 @@ def parse_GNGSA(fields):
                 situation_msg['GPSFixQuality'] = 0
             elif fix_type == 2: # 2D fix
                 situation_msg['GPSFixQuality'] = 1
+                gps_valid = True
             elif fix_type == 3: # 3D fix
                 situation_msg['GPSFixQuality'] = 2
+                gps_valid = True
         # Parse HDOP, VDOP values
         if fields[16] and gps_valid:
             situation_msg['GPSHorizontalAccuracy'] = float(fields[16]) * GPS_RANGE_ERROR  # Convert HDOP to estimated horizontal accuracy in meters
