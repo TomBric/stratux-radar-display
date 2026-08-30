@@ -105,6 +105,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function setVisible(container, visible) {
+        if (!container) {
+            return;
+        }
+        container.classList.toggle('d-none', !visible);
+    }
+
     function selectedConnectionMode() {
         const checked = document.querySelector('input[name="connection_mode"]:checked');
         return checked ? checked.value : 'stratux';
@@ -115,25 +122,25 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         if (selectedConnectionMode() === 'ble') {
-            bleAddressContainer.style.display = '';
-            stratuxIpContainer.style.display = 'none';
+            setVisible(bleAddressContainer, true);
+            setVisible(stratuxIpContainer, false);
             if (bleAddressInput) bleAddressInput.disabled = false;
             if (stratuxIpInput) stratuxIpInput.disabled = true;
-            if (bleDeviceChoiceContainer && bleDeviceChoiceContainer.querySelectorAll('input[type="radio"]').length > 0) {
-                bleDeviceChoiceContainer.style.display = '';
+            if (bleDeviceChoiceContainer) {
+                setVisible(bleDeviceChoiceContainer, bleDeviceChoiceContainer.querySelectorAll('input[type="radio"]').length > 0);
             }
-            if (displayStatusRow) displayStatusRow.style.display = 'none';
-            if (stratuxStatusRow) stratuxStatusRow.style.display = 'none';
+            setVisible(displayStatusRow, false);
+            setVisible(stratuxStatusRow, false);
             setDisabledForContainer(displayStatusRow, true);
             setDisabledForContainer(stratuxStatusRow, true);
         } else {
-            bleAddressContainer.style.display = 'none';
-            stratuxIpContainer.style.display = '';
+            setVisible(bleAddressContainer, false);
+            setVisible(stratuxIpContainer, true);
             if (bleAddressInput) bleAddressInput.disabled = true;
             if (stratuxIpInput) stratuxIpInput.disabled = false;
-            if (bleDeviceChoiceContainer) bleDeviceChoiceContainer.style.display = 'none';
-            if (displayStatusRow) displayStatusRow.style.display = '';
-            if (stratuxStatusRow) stratuxStatusRow.style.display = '';
+            setVisible(bleDeviceChoiceContainer, false);
+            setVisible(displayStatusRow, true);
+            setVisible(stratuxStatusRow, true);
             setDisabledForContainer(displayStatusRow, false);
             setDisabledForContainer(stratuxStatusRow, false);
         }
