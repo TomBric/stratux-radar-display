@@ -598,28 +598,6 @@ def _handle_ble_payload(data):
             handle_nmea_data(nmea_sentence)
 
 
-async def _device_has_characteristic(device_address):
-    try:
-        async with asyncio.timeout(BLE_CHARACTERISTIC_CHECK_TIMEOUT):
-            async with BleakClient(device_address) as client:
-                services = client.services
-                if services is None and hasattr(client, 'get_services'):
-                    services = await client.get_services()
-                if services is None:
-                    return False
-                for service in services:
-                    if str(service.uuid).lower() != service_uuid:
-                        continue
-                    for characteristic in service.characteristics:
-                        if str(characteristic.uuid).lower() == characteristic_uuid:
-                            return True
-    except asyncio.TimeoutError:
-        rlog.debug(f"Ble: Timeout checking characteristics for {device_address}")
-    except Exception as e:
-        rlog.debug(f"Ble: Failed to inspect characteristics for {device_address}: {e}")
-    return False
-
-
 async def listen_to_ble():
     address = ble_address
     if address is None:
@@ -665,7 +643,6 @@ async def listen_to_ble():
             if client.is_connected:
                 await client.disconnect()
 
-
 async def search_ble():
     # search for ble devices, returns list of dictionaries with name and address of devices
     # that advertise service FFE0 and provide characteristic FFE1
@@ -676,33 +653,26 @@ async def search_ble():
             # BleakScanner needs explicit wait time to actually scan for devices
             await asyncio.sleep(BLE_SCAN_TOTAL_TIMEOUT)
             # discovered_devices_and_advertisement_data is a dict: {BleakDeviceData: AdvertisementData}
-            discovered = scanner.discovered_devices_and_advertisement_data
-            devices = list(discovered.keys())  # Get the BleakDeviceData objects
+            devices = scanner.discovered_devices
     except asyncio.TimeoutError:
         timed_out = True
-        rlog.debug(f"Ble: BLE-Scan timed out after {BLE_SCAN_TOTAL_TIMEOUT} seconds")
         return {'devices': [], 'timed_out': True}
     except Exception as e:
         rlog.debug(f"Ble: Exception performing BLE-Scan: {e}")
         return {'devices': [], 'timed_out': False}
-    rlog.debug(f"Ble: Found {len(devices)} BLE devices advertising service FFE0")
     for device in devices:
         # device is a BleakDeviceData object with .address and .name attributes
         device_address = device.address if hasattr(device, 'address') else str(device)
-        device_name = device.name if hasattr(device, 'name') and device.name else None
-
-        if not await _device_has_characteristic(device_address):
-            rlog.debug(f"Ble: Device {device_address} does not have characteristic {characteristic_uuid}, skipping")
-            continue
-        rlog.debug(f"Identified device: {device_name} ({device_address})")
+        device_name = device.name
+        print(f"Identified device: {device_name} ({device_address})")
         device_info = {
             'name': device_name if device_name else f"Unknown ({device_address})",
             'address': device_address,
             'uuid': characteristic_uuid
         }
         found_devices.append(device_info)
-    rlog.debug(f"Ble: Following BLE devices with service FFE0 and characteristic FFE1 found: {found_devices}")
-    return {'devices': found_devices, 'timed_out': timed_out}
+        rlog.debug(f"Ble: Following BLE devices with service FFE0 and characteristic FFE1 found: {found_devices}")
+        return {'devices': found_devices, 'timed_out': timed_out}
 
 
 def init(new_ble_address, new_traffic_func, new_situation_func, situation):
