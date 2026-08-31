@@ -1006,6 +1006,16 @@ def initialize_sensors_and_simulation():
     simulation.init(simulation_mode)
 
 
+def request_ble_disconnect():
+    """Request BLE listener shutdown if a client may be active."""
+    try:
+        return ble.request_listener_shutdown()
+    except Exception as e:
+        if rlog is not None:
+            rlog.debug(f"BLE shutdown request failed: {e}")
+        return False
+
+
 def main():
     global max_pixel, zerox, zeroy, display_refresh_time
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
@@ -1029,20 +1039,15 @@ def main():
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
         quit_gracefully()
+    finally:
+        # Also request BLE shutdown on any main-loop termination path.
+        request_ble_disconnect()
 
 
 def quit_gracefully(*argus):
     print("Keyboard interrupt or shutdown. Quitting ...")
 
-    def terminate_ble_client():
-        try:
-            return ble.request_listener_shutdown()
-        except Exception as e:
-            if rlog is not None:
-                rlog.debug(f"BLE shutdown request failed: {e}")
-            return False
-
-    keep_ble_handler_running = terminate_ble_client()
+    keep_ble_handler_running = request_ble_disconnect()
     try:
         tasks = asyncio.all_tasks()
         for ta in tasks:
@@ -1170,4 +1175,4 @@ if __name__ == "__main__":
         signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown
         main()
     except KeyboardInterrupt:
-        pass
+        quit_gracefully()
