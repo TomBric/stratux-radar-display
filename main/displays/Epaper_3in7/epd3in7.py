@@ -494,7 +494,7 @@ class EPD:
         self.send_data(0xA5)
 
     def Dev_exit(self):
-        epdconfig.module_exit()
+        epdconfig.module_exit(cleanup=True)   # release GPIO pins
 
 ### END OF FILE ###
 
