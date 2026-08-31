@@ -1181,7 +1181,6 @@ if __name__ == "__main__":
     url_calibrate = "http://" + url_host_base + "/calibrateAHRS"
 
     try:
-        signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
         signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown
         main()
     except KeyboardInterrupt:
