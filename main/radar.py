@@ -1056,7 +1056,7 @@ def quit_gracefully(*argus):
             ta.cancel()
     except RuntimeError:
         pass
-        radarbluez.sound_terminate()
+    radarbluez.sound_terminate()
     rlog.debug("CleanUp Display ...")
     display_control.cleanup()
     return 0
