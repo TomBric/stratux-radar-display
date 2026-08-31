@@ -974,7 +974,7 @@ async def display_and_cutoff():
     finally:
         rlog.debug("CleanUp Display ...")
         display_control.cleanup()  # cleanup display on exit
-        rlog.debug("CleanUp Display finished...")
+
         
 
 

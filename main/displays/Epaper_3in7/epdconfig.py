@@ -154,7 +154,6 @@ class RaspberryPi:
         logger.debug("close 5V, Module enters 0 power consumption ...")
 
         if cleanup:
-            print("Epaper Controller closing pins")
             self.GPIO_RST_PIN.close()
             self.GPIO_DC_PIN.close()
             # self.GPIO_CS_PIN.close()
