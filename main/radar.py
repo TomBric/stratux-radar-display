@@ -1055,7 +1055,7 @@ def main():
         rlog.debug("Main cancelled")
 
 
-async def quit_gracefully(*argus):
+def quit_gracefully(*argus):
     print("Keyboard interrupt or shutdown. Quitting ...")
     try:
         tasks = asyncio.all_tasks()
@@ -1063,7 +1063,10 @@ async def quit_gracefully(*argus):
             if ta.done():
                 continue
             ta.cancel()
-            await ta     # wait for task to finish
+            try:
+                asyncio.get_event_loop().run_until_complete(ta)  # wait for task to finish
+            except (RuntimeError, asyncio.CancelledError):
+                pass
     except (RuntimeError, asyncio.CancelledError):
         pass
     radarbluez.sound_terminate()
