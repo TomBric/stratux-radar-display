@@ -384,4 +384,4 @@ async def read_sensors():
             rlog.debug("CO sensor reader terminating ...")
         finally:
             GPIO.cleanup(IOPIN)
-            rlog.debug("Cowarner-sensor reader: GPIO state cleaned up safely.")
+            rlog.debug(f"Cowarner-sensor reader: GPIO state of PIN {IOPIN} cleaned up safely.")
