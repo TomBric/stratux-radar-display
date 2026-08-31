@@ -1002,7 +1002,7 @@ def initialize_ui_components():
         rlog.debug("GPIO Error, is  another radar process running? Terminating.")
         return False
     
-    shutdownui.init(url_shutdown, url_reboot)
+    shutdownui.init(url_shutdown, url_reboot, quit_gracefully)
     timerui.init(global_config)
     ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
@@ -1068,7 +1068,6 @@ def quit_gracefully(*argus):
     radarbluez.sound_terminate()
     radarui.shutdown()   # release gpiozero
     cowarner.shutdown()    # release GPIO
-    sys.exit(0)
 
 
 def radar_excepthook(exc_type, exc_value, exc_traceback):
@@ -1182,3 +1181,4 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         quit_gracefully()
+        sys.exit(0)

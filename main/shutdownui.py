@@ -49,12 +49,14 @@ url_reboot = ""
 url_shutdown = ""
 
 
-def init(shutdown, reboot):
+def init(shutdown, reboot, quit_gracefully):
     global url_reboot
     global url_shutdown
+    global quit_gracefully_func
 
     url_reboot = reboot
     url_shutdown = shutdown
+    quit_gracefully_func = quit_gracefully
     rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
 
 
@@ -91,6 +93,9 @@ def draw_shutdown(display_control):
         display_control.display()
     if clear_before_shutoff:   # this is signal for display driver to initiate shutdown/reboot
         # display_control.cleanup()
+        quit_gracefully_func()
+        # cleanup all ressources, running task is not immediately terminated
+        # so that display driver can finish cleanup and shutdown
         if shutdown_mode == 0:   # shutdown display and stratux
             rlog.debug("Posting shutdown.")
             try:
