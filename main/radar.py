@@ -360,7 +360,7 @@ def audio_output(ac, mode_s=False):
         if audio_info:
             ac.pop("audio", None)   # remove audio info, if aircraft comes back, speak it again
     else:  # should not happen, but if it does, do not speak
-        rlog.log(AIRCRAFT_DEBUG, "ErrorNo audio in message.")
+        rlog.log(AIRCRAFT_DEBUG, f"Error: Unsupported prio {ac['prio']}.")
 
     if should_speak:
         rlog.log(COLLISION_DEBUG, f"Speaking: {ac.get('tail','')} prio: {ac['prio']} hdiff: {ac['hdiff']} gps_angle {ac.get('gps_angle','unknown')} "
