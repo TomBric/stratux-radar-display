@@ -83,6 +83,8 @@ def add(ap):
                     action="store_true", default=False)
     ap.add_argument("-gi", "--gearindicate", required=False, help="Indicate gear warning",
                     action="store_true", default=False)
+    ap.add_argument("-acd", "--advanced_collision_detection", required=False, help="Use advanced collision detection algorithms",
+                    action="store_true", default=False)
     ap.add_argument("-sim", "--simulation", required=False, help="Simulation mode for testing",
                     action="store_true", default=False)
     ap.add_argument("-cosim", "--cosimulation", required=False, help="CO simulation mode for testing",

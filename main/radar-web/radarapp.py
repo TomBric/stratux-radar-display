@@ -215,6 +215,7 @@ class RadarForm(FlaskForm):
     coindicate = SwitchField('Indicate CO warning on GPIO16', default = False)
     coi2c0 = SwitchField('Use I2C bus 0 for CO sensor (GPIO 0 and GPIO 1)', default = False)
     no_flighttime = SwitchField('Suppress detection and display of flighttime', default=False)
+    advanced_collision_detection = SwitchField('Advanced collision detection', default=False)
     autorefresh = RadioField('E-paper display autorefresh cycle',
                             choices=[('0', 'no automatic refresh (recommended)'), ('300', 'after 5 mins'),
                                      ('600', 'after 10 mins'),
@@ -416,6 +417,7 @@ def read_arguments(rf):
     rf.coindicate.data = args['coindicate']
     rf.coi2c0.data = args['coi2c0']
     rf.no_flighttime.data = args['noflighttime']
+    rf.advanced_collision_detection.data = args['advanced_collision_detection']
     rf.checklist_filename.data = args['checklist']
     if args['refresh'] is not None:
         rf.autorefresh.data = str(args['refresh'])
@@ -517,6 +519,8 @@ def build_option_string(rf):
         out += ' -cb0'
     if rf.no_flighttime.data is True:
         out += ' -nf'
+    if rf.advanced_collision_detection.data is True:
+        out += ' -acd'
     if rf.checklist.data is True and len(rf.checklist_filename.data) > 0:
         out += f' -chl {secure_filename(rf.checklist_filename.data)}'
     if rf.autorefresh.data != '0':
