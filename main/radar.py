@@ -1071,7 +1071,7 @@ def quit_gracefully(*argus):
     radarbluez.sound_terminate()
     radarui.shutdown()   # release gpiozero
     cowarner.shutdown()    # release GPIO
-    return 0
+    sys.exit(0)
 
 
 def radar_excepthook(exc_type, exc_value, exc_traceback):
