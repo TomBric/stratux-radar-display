@@ -172,6 +172,8 @@ AUDIO_TIMEOUTS ={0: 30, 1: 10, 2:30, 3:60, 4:0}   # time in seconds to repeat au
 # E.g. Prio 1 (RA) traffic will be repeated after 10 secondes, Prio 2 (TA) after 30 secs
 # Unclear traffic (prio 0) will also be repeated after 30 seconds
 # prio0=unclear, prio1=RA, prio2=TA, prio3=collision, prio4=no collision
+MAX_NUMBER_OF_SPEAKS = 3   # maximum number of times a traffic is spoken
+# if it is still present after that in the same or lower prio, it will not be spoken again
 
 def dump_ac(ac):    # debug function, produces one line for aircraft in a readable manner
     ret=""
@@ -344,23 +346,31 @@ def audio_output(ac, mode_s=False):
     # 'no_of_speaks' is the number of times it was consecutively spoken
     audio_info = ac.get('audio')
     timeout = AUDIO_TIMEOUTS[ac['prio']]
-    should_speak = False
-    if ac['prio'] in [0, 3]:  # unclear or collision traffic
-        should_speak = not audio_info or audio_info['speak_time'] + timeout <= time.time()
-    elif ac['prio'] == 1:  # RA
-        should_speak = (not audio_info or audio_info['was_prio'] != 1 or
-                       (audio_info['speak_time'] + timeout <= time.time()))
-    elif ac['prio'] == 2:  # TA
-        if not audio_info:
-            should_speak = True
-        else:
-            was_high_prio = audio_info['was_prio'] in [1, 2]
-            should_speak = (was_high_prio and audio_info['speak_time'] + timeout <= time.time()) or not was_high_prio
-    elif ac['prio'] == 4: # no collision, reset audio info, if present
-        if audio_info:
-            ac.pop("audio", None)   # remove audio info, if aircraft comes back, speak it again
-    else:  # should not happen, but if it does, do not speak
-        rlog.log(AIRCRAFT_DEBUG, f"Error: Unsupported prio {ac['prio']}.")
+    if not audio_info:   # not yet spoken, speak it
+        should_speak = True
+    else: # we have on audio info
+        if ac['prio'] <= 3:
+            if audio_info['was_prio'] >= ac['prio']:
+                # if it was spoken before with same or a higher prio, only repeat it to number of speaks, but not more often
+                do_repeat = audio_info['no_of_speaks'] <= MAX_NUMBER_OF_SPEAKS
+            else: # prio is now higher than before, speak it anyhow, but reset number of speaks
+                do_repeat = True
+                audio_info['no_of_speaks'] = 0
+
+        if ac['prio'] in [0, 3]:  # unclear or collision traffic
+            should_speak = audio_info['speak_time'] + timeout <= time.time() and do_repeat
+        elif ac['prio'] == 1:  # RA, speak if it was lower before anyhow
+            should_speak = audio_info['was_prio'] != 1 or (audio_info['speak_time'] + timeout <= time.time() and do_repeat)
+        elif ac['prio'] == 2:  # TA
+            was_high_prio = audio_info['was_prio'] in [1, 2]   # repeat TA only if it was lower prio before
+            should_speak = not was_high_prio or (was_high_prio and audio_info['speak_time'] + timeout <= time.time() and do_repeat)
+        elif ac['prio'] == 4: # no collision, reset audio info, if present
+            should_speak = False
+            if audio_info:
+                ac.pop("audio", None)   # remove audio info, if aircraft comes back, speak it again
+        else:  # should not happen, but if it does, do not speak
+            should_speak = False
+            rlog.log(AIRCRAFT_DEBUG, f"Error: Unsupported prio {ac['prio']}.")
 
     if should_speak:
         rlog.log(COLLISION_DEBUG, f"Speaking: {ac.get('tail','')} prio: {ac['prio']} hdiff: {ac['hdiff']} gps_angle {ac.get('gps_angle','unknown')} "
@@ -373,7 +383,7 @@ def audio_output(ac, mode_s=False):
             ac['audio'] = {}
         ac['audio']['speak_time'] = time.time()
         ac['audio']['was_prio'] = ac['prio']
-        ac['no_of_speaks'] = ac.get('no_of_speaks', 0) + 1
+        ac['audio']['no_of_speaks'] = ac['audio'].get('no_of_speaks', 0) + 1
         speak_func = radarbluez.priority_speak if ac['prio'] == 1 else radarbluez.speak
         speak_func(message, 130)
 
