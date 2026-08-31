@@ -33,6 +33,7 @@
 
 import os
 import subprocess
+import signal
 import radarbuttons
 import time
 import requests
@@ -71,7 +72,7 @@ def clear_lingering_radar():     # remove other radar.py processes, necessary si
         if int(proc) != current_pid:
             try:
                 print("Terminating other process {0}".format(int(proc)))
-                os.kill(int(proc), 9)   # Kill signal
+                os.kill(int(proc), signal.SIGTERM)   # SIGTERM signal
                 time.sleep(2)   # give him some time to terminate
             except OSError :
                 pass
@@ -95,17 +96,26 @@ def draw_shutdown(display_control):
             try:
                 requests.post(url_shutdown)
             except requests.exceptions.RequestException as e:
-                rlog.debug("Posting shutdown exception: ", e)
-            os.popen("sudo shutdown --poweroff now").read()
+                rlog.debug(f"Exception posting shutdown: {e}")
+            try:
+                subprocess.run(["sudo", "shutdown", "--poweroff", "now"], check=False)
+            except OSError as e:
+                rlog.debug(f"Shutdown command failed: {e}")
         elif shutdown_mode == 1:   # only display shutdown
-            os.popen("sudo shutdown --poweroff now").read()
+            try:
+                subprocess.run(["sudo", "shutdown", "--poweroff", "now"], check=False)
+            except OSError as e:
+                rlog.debug(f"Shutdown command failed: {e}")
         elif shutdown_mode == 2:   # reboot display and stratux
             rlog.debug("Posting reboot.")
             try:
                 requests.post(url_reboot)
             except requests.exceptions.RequestException as e:
-                rlog.debug("Posting shutdown exception: ", e)
-            os.popen("sudo shutdown --reboot now").read()
+                rlog.debug(f"Exception posting reboot: {e}")
+            try:
+                subprocess.run(["sudo", "shutdown", "--reboot", "now"], check=False)
+            except OSError as e:
+                rlog.debug(f"Shutdown command failed: {e}")
         clear_before_shutoff = False
         return True
     else:
