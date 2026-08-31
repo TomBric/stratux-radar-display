@@ -159,6 +159,9 @@ class RadarButton:
             return 1
         return 0
 
+    def close(self):
+        self.btn.close()
+
 
 def init(button_api):
     global btn
@@ -205,8 +208,8 @@ def init_gear_indicator():
 
 
 def explicit_release_on_exit():
-    default_factory = Device.pin_factory
-    pin_list = list(default_factory.pins.keys())
-    for pin_number in pin_list:
-        default_factory.pins[pin_number].close()
-    rlog.debug(f"Radarbuttons: Buttons {pin_list} successfully released.")
+    # release all acquired gpios
+    for but in btn:
+        but.close()
+    if gear_down_btn:
+        gear_down_btn.close()
