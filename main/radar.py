@@ -338,22 +338,30 @@ def is_steering_message(traffic):  # checks if traffic is a steering message and
 
 
 def audio_output(ac, mode_s=False):
+    # audio_info give info about audio output for this aircraft, if it was already spoken.
+    # If not present, it will be created once audio is spoken. It contains the following keys:
+    # 'speak_time' is the last time it was spoken, 'was_prio' is the priority of the last time it was spoken
+    # 'no_of_speaks' is the number of times it was consecutively spoken
     audio_info = ac.get('audio')
     timeout = AUDIO_TIMEOUTS[ac['prio']]
     should_speak = False
     if ac['prio'] in [0, 3]:  # unclear or collision traffic
-        should_speak = not audio_info or audio_info['speak_time'] == 0 or audio_info['speak_time'] + timeout <= time.time()
+        should_speak = not audio_info or audio_info['speak_time'] + timeout <= time.time()
     elif ac['prio'] == 1:  # RA
-        should_speak = (not audio_info or audio_info['speak_time'] == 0 or 
-                       audio_info['was_prio'] != 1 or 
+        should_speak = (not audio_info or audio_info['was_prio'] != 1 or
                        (audio_info['speak_time'] + timeout <= time.time()))
     elif ac['prio'] == 2:  # TA
-        if not audio_info or audio_info['speak_time'] == 0:
+        if not audio_info:
             should_speak = True
         else:
             was_high_prio = audio_info['was_prio'] in [1, 2]
             should_speak = (was_high_prio and audio_info['speak_time'] + timeout <= time.time()) or not was_high_prio
-    
+    elif ac['prio'] == 4: # no collision, reset audio info, if present
+        if audio_info:
+            ac.pop("audio", None)   # remove audio info, if aircraft comes back, speak it again
+    else:  # should not happen, but if it does, do not speak
+        rlog.log(AIRCRAFT_DEBUG, "ErrorNo audio in message.")
+
     if should_speak:
         rlog.log(COLLISION_DEBUG, f"Speaking: {ac.get('tail','')} prio: {ac['prio']} hdiff: {ac['hdiff']} gps_angle {ac.get('gps_angle','unknown')} "
                                   f"audio: {ac.get('audio')}")
@@ -361,7 +369,11 @@ def audio_output(ac, mode_s=False):
             message = gen_traffic_message(ac)
         else:
             message = gen_modes_traffic_message(ac)
-        ac['audio'] = {'speak_time': time.time(), 'was_prio': ac['prio']}
+        if 'audio' not in ac:
+            ac['audio'] = {}
+        ac['audio']['speak_time'] = time.time()
+        ac['audio']['was_prio'] = ac['prio']
+        ac['no_of_speaks'] = ac.get('no_of_speaks', 0) + 1
         speak_func = radarbluez.priority_speak if ac['prio'] == 1 else radarbluez.speak
         speak_func(message, 130)
 

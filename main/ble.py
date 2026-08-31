@@ -638,10 +638,8 @@ async def listen_to_ble():
                     def notification_handler(_, data):
                         _handle_ble_payload(data)
                     await client.start_notify(device_uuid, notification_handler) # starts handler from now
-
                     while client.is_connected and not ble_shutdown_requested:
                         await asyncio.sleep(0.5)
-
                     if ble_shutdown_requested:
                         rlog.debug(f"Ble: Shutdown requested, disconnecting from {device['address']}")
                 else:
