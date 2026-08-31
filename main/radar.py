@@ -168,9 +168,8 @@ aircraft_simulation = None   # if a string is provided read simulation data from
 radar_sound_off_sound = None   # prepared sound output for "sound off"
 radar_sound_on_sound = None    # prepared send output for "sound on"
 
-AUDIO_TIMEOUTS ={0: 30, 1: 10, 2:30, 3:60, 4:0}   # time in seconds to repeat audio of prio x traffic, if zero do not repeat
+AUDIO_TIMEOUTS ={0: 0, 1: 10, 2:30, 3:0, 4:0}   # time in seconds to repeat audio of prio x traffic, if zero do not repeat
 # E.g. Prio 1 (RA) traffic will be repeated after 10 secondes, Prio 2 (TA) after 30 secs
-# Unclear traffic (prio 0) will also be repeated after 30 seconds
 # prio0=unclear, prio1=RA, prio2=TA, prio3=collision, prio4=no collision
 MAX_NUMBER_OF_SPEAKS = 3   # maximum number of times a traffic is spoken
 # if it is still present after that in the same or lower prio, it will not be spoken again
@@ -290,10 +289,10 @@ def gen_traffic_message(ac):
     # Priority-based message templates
     priority_messages = {
         1: f"Alarm: traffic {oclock} o'clock, {sign}{abs(feet)} feet",      # RA
-        2: f"Advise: traffic {oclock} o'clock, {sign}{abs(feet)} feet",  # TA
-        3: f"traffic {oclock} o'clock, {sign}{abs(feet)} feet",      # Collision
+        2: f"traffic {oclock} o'clock, {sign}{abs(feet)} feet",  # TA
+        3: None,       # Collision
         4: None,                                                          # No Collision
-        0: f"traffic {oclock} o'clock, {sign}{abs(feet)} feet"           # Unclear
+        0: None          # Unclear
     }
     txt = priority_messages.get(ac['prio'], None)
     if txt and global_config['distance_warnings']:
@@ -309,10 +308,10 @@ def gen_modes_traffic_message(ac):
     # Priority-based message templates
     priority_messages = {
         1: f"Alarm: traffic {sign}{abs(feet)} feet",  # RA
-        2: f"Advise: traffic {sign}{abs(feet)} feet",  # TA
-        3: f"traffic {sign}{abs(feet)} feet",  # Collision
+        2: f"traffic {sign}{abs(feet)} feet",  # TA
+        3: None,  # Collision
         4: None,  # No Collision
-        0: f"traffic {sign}{abs(feet)} feet"  # Unclear
+        0: None  # Unclear
     }
     txt = priority_messages.get(ac['prio'], None)
     return txt
@@ -354,7 +353,7 @@ def audio_output(ac, mode_s=False):
     if not audio_info:   # not yet spoken, speak only collision-related priorities
         should_speak = prio <= 3
     else:  # we have audio info
-        if prio <= 3:
+        if prio <= 2:
             prev_prio = audio_info.get('was_prio', prio)
             no_of_speaks = audio_info.get('no_of_speaks', 0)
             last_speak_time = audio_info.get('speak_time', 0)
@@ -366,15 +365,14 @@ def audio_output(ac, mode_s=False):
                 do_repeat = True
                 audio_info['no_of_speaks'] = 0
 
-            if prio in [0, 3]:  # unclear or collision traffic
-                should_speak = last_speak_time + timeout <= time.time() and do_repeat
-            elif prio == 1:  # RA, speak if it was lower before anyhow
+            if prio == 1:  # RA, speak if it was lower before anyhow
                 should_speak = prev_prio != 1 or (last_speak_time + timeout <= time.time() and do_repeat)
             elif prio == 2:  # TA
                 was_high_prio = prev_prio in [1, 2]   # repeat TA only if it was lower prio before
                 should_speak = not was_high_prio or (was_high_prio and last_speak_time + timeout <= time.time() and do_repeat)
-        elif prio == 4:  # no collision, reset audio
-            ac.pop("audio", None)   # remove audio info, if aircraft comes back, speak it again
+        elif prio in [0, 3, 4]:  # no audio for this traffic, reset audio
+            ac.pop('audio', None)  # remove audio info, if aircraft comes back, speak it again for traffic with gps
+
 
     if should_speak:
         rlog.log(COLLISION_DEBUG, f"Speaking: {ac.get('tail','')} prio: {ac['prio']} hdiff: {ac['hdiff']} gps_angle {ac.get('gps_angle','unknown')} "

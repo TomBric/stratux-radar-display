@@ -45,13 +45,13 @@ COLLISION_ALT_THRESHOLD = 2000   # aircraft more alt diff than this will not be 
 COLLISION_DIST_CURRENT_THRESHOLD = 0.3  # 0.3 nm  (500 meters) as threshold for minimum separation on current position without projection
 COLLISION_ALT_CURRENT_THRESHOLD = 200  # 200 ft as threshold for minimum separation on current position without projection
 # TA thresholds, warning level ADVISORY
-TA_THRESHOLD = 30  # TA at 40 seconds
+TA_THRESHOLD = 30  # TA at 30 seconds
 TA_DIST_THRESHOLD = 0.3  # 0.3 mile as threshold for minimum separation on current course
 TA_ALT_THRESHOLD = 500  # 1000 ft threshold for minimal vertical separation currently
 TA_DIST_CURRENT_THRESHOLD = 0.1  # 0.1 nm (180 meters) as threshold for minimum separation on current position without projection
 TA_ALT_CURRENT_THRESHOLD = 100  # 100 ft as threshold for minimum separation on current position without projection
 # RA_THRESHOLDS, warning level ALARM
-RA_THRESHOLD = 20  # RA at 25 seconds
+RA_THRESHOLD = 20  # RA at 20 seconds
 RA_ALT_THRESHOLD = 300 # 300 ft threshold for minimal vertical currently
 RA_DIST_THRESHOLD = 0.1 # 0.1 nm (180 meters)as threshold for minimum  separation on current course
 RA_DIST_CURRENT_THRESHOLD = 0.1 # 0.1 nm (180 meters) as threshold for minimum separation on current position without projection
