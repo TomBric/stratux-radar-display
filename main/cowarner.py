@@ -174,7 +174,7 @@ def init(activate, config, debug_level, co_indication, simulation_mode=False, co
 
 
 def shutdown():
-    GPIO.cleanup()
+    GPIO.cleanup(IOPIN)   # do not cleanup all pins, because this would also release the buttons
     rlog.debug("Cowarner-sensor reader: GPIO state cleaned up safely.")
 
 
