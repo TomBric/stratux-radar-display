@@ -1185,4 +1185,4 @@ if __name__ == "__main__":
         signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown
         main()
     except KeyboardInterrupt:
-        pass
+        quit_gracefully()
