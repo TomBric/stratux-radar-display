@@ -612,7 +612,7 @@ async def listen_to_ble():
     device_uuid = characteristic_uuid
     device= {'name': f"Unknown ({device_address})", 'address': device_address, 'uuid': device_uuid}
     # outer loop restarted every time the connection fails
-    rlog.debug("BLE listener active ..."
+    rlog.debug("BLE listener active ...")
     while True:
         try:
             async with BleakClient(device_address, timeout=BLE_CONNECTION_TIMEOUT) as client:
