@@ -400,7 +400,15 @@ def check_clear_of_traffic():   # check if there is still a RA or TA situation i
             return False
     return True
 
-def collision_detection(ac, traffic, mode_s=False):
+
+def collission_detection(ac, traffic, mode_s=False):
+    if args[advanced_collision_detection]:
+        advanced_collision_detection(ac, traffic, mode_s)
+    else:
+        simple_collision_detection(ac, traffic, mode_s)
+
+
+def advanced_collision_detection(ac, traffic, mode_s=False):
     # check collisiondetection for adsb and mode s, update priority and audio
     old_prio = 0
     if 'prio' in ac:
@@ -418,6 +426,16 @@ def collision_detection(ac, traffic, mode_s=False):
             rlog.log(COLLISION_DEBUG, f"Clear of conflict: {ac.get('tail','unknown')} oldprio {old_prio} newprio {ac['prio']} ")
             ac.pop("audio", None)   # remove audio info, if aircraft comes back, speak it again
             radarbluez.priority_speak("Clear of conflict", 130)
+
+
+def simple_collision_detection(ac, traffic, mode_s=False):
+    # only check if an aircraft is inside a cylinder denoted by the radar range and radar limits
+    # if yes, set prio to 2 (TA), else 4 (no collision)
+    # Within the inner circle (RadarRange/2) and RadarLimits/100, alarm traffic with the TA logic
+    if ac['gps_distance'] <= situation['RadarRange/2'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
+        ac['prio'] = 2
+    else:
+        ac['prio'] = 4
 
 
 def new_traffic(json_str):
