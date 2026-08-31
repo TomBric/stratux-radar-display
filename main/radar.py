@@ -436,6 +436,8 @@ def simple_collision_detection(ac, traffic, mode_s=False):
         ac['prio'] = 2
     else:
         ac['prio'] = 4
+    audio_output(ac, mode_s)
+    # no clear of traffic spoken
 
 
 def new_traffic(json_str):
