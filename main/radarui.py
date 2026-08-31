@@ -60,6 +60,11 @@ def init(url, button_api, ble_address_param, traffic_func_param):
     rlog.debug("Radar UI: Initialized POST settings to " + url_settings_set)
     return True
 
+
+def shutdown():
+    radarbuttons.explicit_release_on_exit()
+
+
 def communicate_limits(radarrange, threshold):
     if ble_address is None:
         rlog.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
