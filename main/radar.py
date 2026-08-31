@@ -402,7 +402,7 @@ def check_clear_of_traffic():   # check if there is still a RA or TA situation i
 
 
 def collision_detection(ac, traffic, mode_s=False):
-    if args[advanced_collision_detection]:
+    if args['advanced_collision_detection']:
         advanced_collision_detection(ac, traffic, mode_s)
     else:
         simple_collision_detection(ac, traffic, mode_s)
