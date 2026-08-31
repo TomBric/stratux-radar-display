@@ -432,7 +432,7 @@ def simple_collision_detection(ac, traffic, mode_s=False):
     # only check if an aircraft is inside a cylinder denoted by the radar range and radar limits
     # if yes, set prio to 2 (TA), else 4 (no collision)
     # Within the inner circle (RadarRange/2) and RadarLimits/100, alarm traffic with the TA logic
-    if ac['gps_distance'] <= situation['RadarRange/2'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
+    if ac['gps_distance'] <= situation['RadarRange']/2 and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
         ac['prio'] = 2
     else:
         ac['prio'] = 4
