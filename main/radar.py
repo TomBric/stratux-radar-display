@@ -969,6 +969,11 @@ async def display_and_cutoff():
                     rlog.debug(f"WATCHDOG: No situation update received in {WATCHDOG_TIMER} seconds")
     except (asyncio.CancelledError, RuntimeError):
         rlog.debug("Display task terminating ...")
+    except KeyboardInterrupt:
+        rlog.debug("Display task cancelled via KeyboardInterrupt")
+    finally:
+        rlog.debug("CleanUp Display ...")
+        display_control.cleanup()  # cleanup display on exit
 
 
 async def coroutines():
@@ -1062,8 +1067,6 @@ def quit_gracefully(*argus):
     except RuntimeError:
         pass
     radarbluez.sound_terminate()
-    rlog.debug("CleanUp Display ...")
-    display_control.cleanup()
     radarui.shutdown()   # release gpiozero
     cowarner.shutdown()    # release GPIO
     return 0
