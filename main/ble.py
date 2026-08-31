@@ -49,6 +49,7 @@ BLE_BASE_UUID = "0000{0}-0000-1000-8000-00805f9b34fb"
 service_uuid = BLE_BASE_UUID.format(SERVICE.lower())
 characteristic_uuid = BLE_BASE_UUID.format(CHARACTERISTIC.lower())
 OGN_DDB_FILENAME = str(Path(arguments.FULL_CONFIG_DIR).joinpath("ddb.json"))
+BLE_CONNECTION_TIMEOUT = 5.0  # seconds to wait for BLE connection to be established
 BLE_RETRY_TIMEOUT = 0.3 # seconds to wait before retrying BLE connection after failure
 BLE_CHARACTERISTIC_CHECK_TIMEOUT = 2.0  # max seconds to inspect a scanned device for the target characteristic
 BLE_SCAN_TOTAL_TIMEOUT = 15.0  # max seconds for the complete BLE search including characteristic checks
@@ -631,7 +632,7 @@ async def listen_to_ble():
         rlog.debug("BLE listener active ...")
         client = None
         try:
-            async with BleakClient(device_address) as client:
+            async with BleakClient(device_address, timeout=BLE_CONNECTION_TIMEOUT) as client:
                 active_ble_client = client
                 if client.is_connected:
                     rlog.debug(f"Ble: Connected to {device['address']}")
