@@ -612,7 +612,7 @@ async def listen_to_ble():
     device_uuid = characteristic_uuid
     device= {'name': f"Unknown ({device_address})", 'address': device_address, 'uuid': device_uuid}
     # outer loop restarted every time the connection fails
-    rlog.debug("BLE listener active ...")
+    rlog.debug("BLE listener active ..."
     while True:
         try:
             async with BleakClient(device_address, timeout=BLE_CONNECTION_TIMEOUT) as client:
@@ -635,6 +635,12 @@ async def listen_to_ble():
             await asyncio.sleep(BLE_RETRY_TIMEOUT)
             continue
         finally:   # ensure we disconnect if the client is still connected
+            if client.is_connected:
+                try:
+                    await asyncio.wait_for(client.disconnect(), timeout=3.0)
+                    rlog.debug(f"Ble: Disconnect succeeded from BLE device {device['address']}")
+                except Exception as e:
+                    rlog.debug(f"Ble: Error while disconnecting from BLE device {device['address']}: {e}")
             rlog.debug("Ble: BLE listener terminating")
 
 
