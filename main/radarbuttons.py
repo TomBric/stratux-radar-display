@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from globals import rlog
-from gpiozero import Button
+from gpiozero import Button, Device
 import threading   # for flask server in case of button api
 from flask import Flask, jsonify, render_template
 from flask_wtf import FlaskForm, CSRFProtect
@@ -202,3 +202,9 @@ def init_gear_indicator():
         return False
     rlog.debug("Radarbuttons: Gear down indicator on GPIO{0} initialized.".format(GEAR_DOWN))
     return True
+
+
+def explicit_release_on_exit():
+    for device in list(Device._all_devices):
+        device.close()
+    rlog.debug("Radarbuttons: GPIO pins successfully released.")

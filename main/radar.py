@@ -814,6 +814,9 @@ async def user_interface():
                     Globals.refresh = True
     except asyncio.CancelledError:
         rlog.debug("UI task terminating ...")
+    finally:
+        # Loop through and safely close every active gpiozero device
+        radarui.shutdown()   # release GPIO
 
 
 def refresh_display(manual = False):
@@ -1061,6 +1064,8 @@ def quit_gracefully(*argus):
     radarbluez.sound_terminate()
     rlog.debug("CleanUp Display ...")
     display_control.cleanup()
+    radarui.shutdown()   # release gpiozero
+    cowarner.shutdown()    # release GPIO
     return 0
 
 
