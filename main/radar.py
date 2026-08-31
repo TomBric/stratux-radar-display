@@ -167,6 +167,7 @@ aircraft_simulation = None   # if a string is provided read simulation data from
 
 radar_sound_off_sound = None   # prepared sound output for "sound off"
 radar_sound_on_sound = None    # prepared send output for "sound on"
+shutdown_in_progress = False
 
 AUDIO_TIMEOUTS ={0: 30, 1: 10, 2:30, 3:60, 4:0}   # time in seconds to repeat audio of prio x traffic, if zero do not repeat
 # E.g. Prio 1 (RA) traffic will be repeated after 10 secondes, Prio 2 (TA) after 30 secs
@@ -1045,8 +1046,13 @@ def main():
 
 
 def quit_gracefully(*argus):
+    global shutdown_in_progress
+    if shutdown_in_progress:
+        if rlog is not None:
+            rlog.debug("Shutdown already in progress, ignoring duplicate cleanup request.")
+        return 0
+    shutdown_in_progress = True
     print("Keyboard interrupt or shutdown. Quitting ...")
-
     keep_ble_handler_running = request_ble_disconnect()
     try:
         tasks = asyncio.all_tasks()
