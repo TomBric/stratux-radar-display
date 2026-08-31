@@ -206,6 +206,7 @@ def init_gear_indicator():
 
 def explicit_release_on_exit():
     default_factory = Device.pin_factory
-    for pin_number in list(default_factory.pins.keys()):
+    pin_list = list(default_factory.pins.keys())
+    for pin_number in pin_list:
         default_factory.pins[pin_number].close()
-    rlog.debug("Radarbuttons: Buttons successfully released.")
+    rlog.debug(f"Radarbuttons: Buttons {pin_list} successfully released.")
