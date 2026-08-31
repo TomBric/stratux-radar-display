@@ -1055,7 +1055,7 @@ def main():
         rlog.debug("Main cancelled")
 
 
-def quit_gracefully(*argus):
+async def quit_gracefully(*argus):
     print("Keyboard interrupt or shutdown. Quitting ...")
     try:
         tasks = asyncio.all_tasks()
@@ -1063,7 +1063,8 @@ def quit_gracefully(*argus):
             if ta.done():
                 continue
             ta.cancel()
-    except RuntimeError:
+            await ta     # wait for task to finish
+    except (RuntimeError, asyncio.CancelledError):
         pass
     radarbluez.sound_terminate()
     radarui.shutdown()   # release gpiozero
