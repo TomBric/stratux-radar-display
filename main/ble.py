@@ -627,8 +627,10 @@ async def listen_to_ble():
                     rlog.debug(f"Ble: Failed to connect to {device['address']}")
         except asyncio.CancelledError:
             rlog.debug("Ble: Listener cancelled, shutting down BLE connection")
+            break
         except KeyboardInterrupt:
             rlog.debug("Ble: Listener via KeyboardInterrupt cancelled, shutting down BLE connection")
+            break
         except Exception as e:
             rlog.debug(f"Ble: Exception while listening to BLE device {ble_address}: {e}")
             traceback.print_exc()
