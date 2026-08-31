@@ -162,7 +162,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             exclude_from=Epaper3in7().ARCPOSITION_EXCLUDE_FROM, exclude_to=Epaper3in7().ARCPOSITION_EXCLUDE_TO)
 
     def cleanup(self):
-        self.device.init(0)
+        # self.device.init(0)
         self.device.Clear(0xFF, 0)
         self.device.sleep()
         self.device.Dev_exit()
