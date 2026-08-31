@@ -90,7 +90,7 @@ def draw_shutdown(display_control):
         display_control.shutdown(rest_time, shutdown_mode)
         display_control.display()
     if clear_before_shutoff:   # this is signal for display driver to initiate shutdown/reboot
-        display_control.cleanup()
+        # display_control.cleanup()
         if shutdown_mode == 0:   # shutdown display and stratux
             rlog.debug("Posting shutdown.")
             try:
