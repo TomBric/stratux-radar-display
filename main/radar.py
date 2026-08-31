@@ -855,9 +855,6 @@ async def display_and_cutoff():
                     timerui.draw_timer(display_control, display_refresh_time)
                 elif Globals.mode == Modes.SHUTDOWN:  # shutdown
                     final_shutdown = shutdownui.draw_shutdown(display_control)
-                    if final_shutdown:
-                        rlog.debug("Shutdown triggered: Display task terminating ...")
-                        return
                 elif Globals.mode == Modes.REFRESH_RADAR:  # refresh display, only relevant for epaper, mode was radar
                     rlog.debug("Radar: Display driver - Refreshing")
                     refresh_display(manual=True)
