@@ -1028,6 +1028,7 @@ def main():
         asyncio.run(coroutines())
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
+        quit_gracefully()
 
 
 def quit_gracefully(*argus):
