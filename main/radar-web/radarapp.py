@@ -46,6 +46,7 @@ import globals
 import subprocess
 import ipaddress
 import asyncio
+import re
 from werkzeug.utils import secure_filename
 import xmltodict
 import ble
@@ -65,6 +66,8 @@ RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
 MAX_SEQUENCE = 99   # maximum value accepted as sequence of modes
 MAX_CHECKLIST_SIZE = 256 * 1024  # max size of checklist, set to 256K
+BLE_ADDRESS_PATTERN = r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
+BLE_ADDRESS_RE = re.compile(BLE_ADDRESS_PATTERN)
 DEFAULT_IP_DIRECT_ON_STRATUX = "127.0.0.1"
 # IP address of stratux when running on stratux. The field is not rendered in stratux-mode,
 # so it has to be set explicitly after each request
@@ -150,11 +153,11 @@ class RadarForm(FlaskForm):
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1')
     ble_address = StringField('BLE device address', default='', validators=[
         Length(max=17),
-        Regexp(r'^$|^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$',
+        Regexp(r'^$|' + BLE_ADDRESS_PATTERN,
                message='BLE address must look like 00:11:22:33:44:55')
     ])
     scan_ble_devices = SubmitField('Search BLE devices')
-    ble_device_choice = RadioField('Found BLE devices', choices=[])
+    ble_device_choice = RadioField('Found BLE devices', choices=[], validate_choice=False)
     display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'),
             ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'),
             ('Epaper_3in7', 'Epaper display 3.7 inch'), ('Epaper_3in7_Round', 'Epaper display 3.7 inch - Round front'),
@@ -247,8 +250,11 @@ class RadarForm(FlaskForm):
             return
         ble_address = (field.data or '').strip()
         if len(ble_address) == 0:
-            ble_address = (self.ble_device_choice.data or '').strip()
-            if len(ble_address) > 0:
+            selected_choice = (self.ble_device_choice.data or '').strip()
+            known_choices = self.ble_device_choice.choices or []
+            is_known_choice = any(len(choice) > 0 and choice[0] == selected_choice for choice in known_choices)
+            if is_known_choice and BLE_ADDRESS_RE.fullmatch(selected_choice):
+                ble_address = selected_choice
                 field.data = ble_address
                 return
             raise ValidationError('BLE device address is required when FLARM NMEA via BLE is enabled.')
@@ -580,7 +586,11 @@ def index():
     if request.method == 'POST' and radar_form.connection_mode.data == 'ble':
         ble_address = (radar_form.ble_address.data or '').strip()
         if len(ble_address) == 0:
-            radar_form.ble_address.data = (radar_form.ble_device_choice.data or '').strip()
+            selected_choice = (radar_form.ble_device_choice.data or '').strip()
+            known_choices = radar_form.ble_device_choice.choices or []
+            is_known_choice = any(len(choice) > 0 and choice[0] == selected_choice for choice in known_choices)
+            if is_known_choice and BLE_ADDRESS_RE.fullmatch(selected_choice):
+                radar_form.ble_address.data = selected_choice
         # In BLE mode these fields are disabled in the browser and therefore not posted.
         # Keep deterministic values so NumberRange validators do not fail on None.
         if radar_form.status_seq.data is None:

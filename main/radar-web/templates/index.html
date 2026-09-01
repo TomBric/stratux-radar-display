@@ -122,6 +122,32 @@ document.addEventListener('DOMContentLoaded', function () {
     const bleDeviceChoiceContainer = document.getElementById('ble-device-choice-container');
     const displayStatusRow = document.getElementById('display-status-mode-row');
     const stratuxStatusRow = document.getElementById('stratux-status-mode-row');
+    const statusSeqInput = document.getElementById('status_seq');
+    const stratuxSeqInput = document.getElementById('stratux_seq');
+
+    function setHiddenMirror(name, value) {
+        if (!radarFormElement) {
+            return;
+        }
+        let hidden = radarFormElement.querySelector('input[type="hidden"][name="' + name + '"]');
+        if (!hidden) {
+            hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = name;
+            radarFormElement.appendChild(hidden);
+        }
+        hidden.value = value;
+    }
+
+    function removeHiddenMirror(name) {
+        if (!radarFormElement) {
+            return;
+        }
+        const hidden = radarFormElement.querySelector('input[type="hidden"][name="' + name + '"]');
+        if (hidden) {
+            hidden.remove();
+        }
+    }
 
     function setDisabledForContainer(container, disabled) {
         if (!container) {
@@ -160,6 +186,12 @@ document.addEventListener('DOMContentLoaded', function () {
             setVisible(stratuxStatusRow, false);
             setDisabledForContainer(displayStatusRow, true);
             setDisabledForContainer(stratuxStatusRow, true);
+            if (statusSeqInput) {
+                setHiddenMirror('status_seq', statusSeqInput.value || '1');
+            }
+            if (stratuxSeqInput) {
+                setHiddenMirror('stratux_seq', stratuxSeqInput.value || '1');
+            }
         } else {
             setVisible(bleAddressContainer, false);
             setVisible(stratuxIpContainer, true);
@@ -170,6 +202,8 @@ document.addEventListener('DOMContentLoaded', function () {
             setVisible(stratuxStatusRow, true);
             setDisabledForContainer(displayStatusRow, false);
             setDisabledForContainer(stratuxStatusRow, false);
+            removeHiddenMirror('status_seq');
+            removeHiddenMirror('stratux_seq');
         }
     }
 
