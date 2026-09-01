@@ -42,6 +42,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import arguments
 import radarmodes
 import alsaaudio
+import globals
 import subprocess
 import ipaddress
 import asyncio
@@ -564,6 +565,7 @@ def index():
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     rlog.debug(f'index(): stratux-ip is {radar_form.stratux_ip.data}')
     if request.method == 'POST' and radar_form.scan_ble_devices.data is True:
+        rlog.debug('BLE scan requested by user')
         found_devices, timed_out = scan_ble_devices()
         update_ble_device_choices(radar_form)
         if timed_out and len(found_devices) > 0:
@@ -579,7 +581,16 @@ def index():
         ble_address = (radar_form.ble_address.data or '').strip()
         if len(ble_address) == 0:
             radar_form.ble_address.data = (radar_form.ble_device_choice.data or '').strip()
-    if radar_form.validate_on_submit() is not True:   # no POST request
+        # In BLE mode these fields are disabled in the browser and therefore not posted.
+        # Keep deterministic values so NumberRange validators do not fail on None.
+        if radar_form.status_seq.data is None:
+            radar_form.status_seq.data = 1
+        if radar_form.stratux_seq.data is None:
+            radar_form.stratux_seq.data = 1
+    is_valid_submit = radar_form.validate_on_submit()
+    if is_valid_submit is not True:   # GET request or validation errors
+        if request.method == 'POST':
+            rlog.debug(f'index(): form validation failed: {radar_form.errors}')
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
         read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
         update_ble_device_choices(radar_form)
