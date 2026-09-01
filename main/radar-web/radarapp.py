@@ -242,13 +242,20 @@ class RadarForm(FlaskForm):
             self.stratux_ip.data = DEFAULT_IP_DIRECT_ON_STRATUX
 
     def validate_ble_address(self, field):
-        if self.connection_mode.data == 'ble' and len(field.data.strip()) == 0:
+        if self.connection_mode.data != 'ble':
+            return
+        ble_address = (field.data or '').strip()
+        if len(ble_address) == 0:
+            ble_address = (self.ble_device_choice.data or '').strip()
+            if len(ble_address) > 0:
+                field.data = ble_address
+                return
             raise ValidationError('BLE device address is required when FLARM NMEA via BLE is enabled.')
 
     def validate_stratux_ip(self, field):
         if self.connection_mode.data != 'stratux':
             return
-        value = field.data.strip()
+        value = (field.data or '').strip()
         if len(value) == 0:
             raise ValidationError('IP address of Stratux is required when Stratux Wifi connection is enabled.')
         try:
@@ -479,7 +486,7 @@ def build_option_string(rf):
     if rf.connection_mode.data == 'stratux':
         out += f' -c {rf.stratux_ip.data}'
     elif rf.connection_mode.data == 'ble':
-        ble_addr = rf.ble_address.data.strip()
+        ble_addr = (rf.ble_address.data or '').strip()
         if len(ble_addr) > 0:
             out += f' -ble {ble_addr}'
     out += build_mode_string(rf)
@@ -568,6 +575,10 @@ def index():
         else:
             flash(Markup('No BLE devices found with service FFE0.'), 'warning')
         return render_template('index.html', radar_form=radar_form, on_stratux=stratux_mode)
+    if request.method == 'POST' and radar_form.connection_mode.data == 'ble':
+        ble_address = (radar_form.ble_address.data or '').strip()
+        if len(ble_address) == 0:
+            radar_form.ble_address.data = (radar_form.ble_device_choice.data or '').strip()
     if radar_form.validate_on_submit() is not True:   # no POST request
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
         read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
@@ -575,8 +586,6 @@ def index():
         rlog.debug(f'index() after read_arguments: stratux-ip is {radar_form.stratux_ip.data}')
     else:
         rlog.debug(f'index() in else for POST: stratux-ip is {radar_form.stratux_ip.data}')
-        if radar_form.connection_mode.data == 'ble' and len((radar_form.ble_address.data or '').strip()) == 0:
-            radar_form.ble_address.data = radar_form.ble_device_choice.data or ''
         if radar_form.save_restart.data is True:
             if write_arguments(radar_form) is False:
                 flash(Markup('File error saving configuration'), 'error')
