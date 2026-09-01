@@ -972,8 +972,6 @@ async def display_and_cutoff():
         rlog.debug("CleanUp Display ...")
         display_control.cleanup()  # cleanup display on exit
 
-        
-
 
 async def coroutines():
     dis_cutoff = asyncio.create_task(display_and_cutoff())
@@ -1055,23 +1053,57 @@ def main():
         rlog.debug("Main cancelled")
 
 
+def radar_excepthook(exc_type, exc_value, exc_traceback):
+    syslog.openlog("stratux-radar-display", syslog.LOG_PID, syslog.LOG_USER)
+    # log file will be stored under /var/log/user.log
+    syslog.syslog(syslog.LOG_ERR, f"Uncaught exception: {exc_type.__name__}: {exc_value}")
+    stack_trace = traceback.format_exception(exc_type, exc_value, exc_traceback)
+    for line in stack_trace:
+        syslog.syslog(syslog.LOG_ERR, line.strip())
+    syslog.closelog()
+    # for interactive mode give some output
+    print(f"Uncaught exception: {exc_type.__name__}: {exc_value}")
+    for line in stack_trace:
+        print(line.strip())
+
+
+def main():
+    global max_pixel, zerox, zeroy, display_refresh_time
+    print("Stratux Radar Display " + RADAR_VERSION + " running ...")
+    # Initialize UI components
+    if not initialize_ui_components():
+        return 1
+    # Initialize audio system
+    initialize_audio_system()
+    # Initialize display
+    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
+    # Initialize sensors and simulation
+    initialize_sensors_and_simulation()
+    rlog.debug(f"Initialization finished. Global config {global_config}")
+    if ble_address is None:
+        display_control.startup(RADAR_VERSION, url_host_base, 4)
+    else:
+        display_control.startup(RADAR_VERSION, f"BLE-{ble_address}", 4)
+
+    try:
+        asyncio.run(coroutines())
+    except asyncio.CancelledError:
+        rlog.debug("Main cancelled")
+
+
 def quit_gracefully(*argus):
-    print("Keyboard interrupt or shutdown. Quitting ...")
+    print("Keyboard interrupt or shutdown. Quit gracefully ...")
     try:
         tasks = asyncio.all_tasks()
         for ta in tasks:
             if ta.done():
                 continue
             ta.cancel()
-            try:
-                asyncio.get_event_loop().run_until_complete(ta)  # wait for task to finish
-            except (RuntimeError, asyncio.CancelledError):
-                pass
     except (RuntimeError, asyncio.CancelledError):
         pass
     radarbluez.sound_terminate()
-    radarui.shutdown()   # release gpiozero
-    cowarner.shutdown()    # release GPIO
+    radarui.shutdown()  # release gpiozero
+    cowarner.shutdown()  # release GPIO
 
 
 def radar_excepthook(exc_type, exc_value, exc_traceback):
@@ -1107,11 +1139,11 @@ if __name__ == "__main__":
         rlog.setLevel(AIRCRAFT_DEBUG)  # log including situation messages
     else:
         rlog.setLevel(SITUATION_DEBUG)  # log including situation messages
-    if args['logfile']:   # set a log file
+    if args['logfile']:  # set a log file
         log_dir = Path(arguments.FULL_LOG_DIR)
         log_dir.mkdir(parents=True, exist_ok=True)  # Create directory and parents for log file if they don't exist
         loghandler = logging.handlers.RotatingFileHandler(filename=arguments.FULL_LOG_FILE, mode='a', encoding="utf-8",
-                                                 maxBytes=10*1024*1024, backupCount=5)
+                                                          maxBytes=10 * 1024 * 1024, backupCount=5)
         formatter = logging.Formatter('%(asctime)-15s > %(message)s')
         loghandler.setFormatter(formatter)
         rlog.addHandler(loghandler)
@@ -1136,7 +1168,7 @@ if __name__ == "__main__":
     grounddistance_activated = args['grounddistance']
     groundbeep = args['groundbeep']
     countdown = args['countdown']
-    gear_indication = args ['gearindicate']
+    gear_indication = args['gearindicate']
     simulation_mode = args['simulation']
     co_simulation_mode = args['cosimulation']
     button_api_active = args['buttonapi']
@@ -1150,7 +1182,7 @@ if __name__ == "__main__":
     global_config['sound_volume'] = args['extsound']  # 0 if not enabled
     if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
         global_config['sound_volume'] = 50  # set to a medium value if strange number used
-    aircraft_simulation = args['aircraftsim']   # set to None if parameter is not set
+    aircraft_simulation = args['aircraftsim']  # set to None if parameter is not set
     ble_address = args['ble']
 
     # check config file, if existent use config from there
@@ -1184,5 +1216,6 @@ if __name__ == "__main__":
         signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown
         main()
     except KeyboardInterrupt:
+        print("Keyboard interrupt in main received. Quitting ...")
         quit_gracefully()
         sys.exit(0)

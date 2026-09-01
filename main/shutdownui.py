@@ -96,6 +96,9 @@ def draw_shutdown(display_control):
         quit_gracefully_func()
         # cleanup all ressources, running task is not immediately terminated
         # so that display driver can finish cleanup and shutdown
+        rlog.debug("ShutdownUI: Cleanup all tasks done.")
+        display_control.cleanup()
+        rlog.debug("ShutdownUI: Display control cleanup done, now shutdown/reboot")
         if shutdown_mode == 0:   # shutdown display and stratux
             rlog.debug("Posting shutdown.")
             try:
