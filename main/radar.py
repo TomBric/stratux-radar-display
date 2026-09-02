@@ -976,8 +976,8 @@ async def display_and_cutoff():
 
 
 async def coroutines():
-    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
-    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, new_traffic, name="TrafficHandler", rlog))
+    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, new_situation, name="SituationHandler", rlog))
     dis_cutoff = asyncio.create_task(display_and_cutoff(), name="DisplayHandler")
     sensor_reader = asyncio.create_task(cowarner.read_sensors(), name="SensorReader")
     ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor(), name="GroundDistanceReader")
