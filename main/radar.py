@@ -36,6 +36,8 @@ import argparse
 import json
 import asyncio
 import socket
+from asyncio import CancelledError
+
 import websockets
 import math
 import time
@@ -1189,7 +1191,7 @@ if __name__ == "__main__":
     try:
         signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown
         main()
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, CancelledError):
         print("Keyboard interrupt in main received. Quitting ...")
         quit_gracefully()
         sys.exit(0)
