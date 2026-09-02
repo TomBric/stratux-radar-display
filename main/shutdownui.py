@@ -60,7 +60,6 @@ def init(shutdown, reboot, quit_gracefully):
     rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
 
 
-
 def clear_lingering_radar():     # remove other radar.py processes, necessary since lingering is enabled for bluetooth
     current_pid = os.getpid()   # my processid
     pid_list = []
