@@ -233,6 +233,11 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Se
         else:
               rlog.debug(f"Lidar-Sensor: Error less bytes read than expected")
 
+    def close(self):
+        if self.ser is not None:
+            self.ser.close()
+            rlog.debug("Lidar-Sensor: Serial port closed")
+
 
 def reset_values():
     global runup_situation
@@ -750,5 +755,10 @@ async def read_ground_sensor():
                 store_statistics(global_situation)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
+            raise
+        finally:
+            distance_sensor.close()
+            radarbuttons.release_gear_indicator()  # free GPIO ressource
+            rlog.debug("Ground distance reader terminated.")
 
 

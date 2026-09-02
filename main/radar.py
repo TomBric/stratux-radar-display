@@ -694,15 +694,15 @@ def new_situation(json_str):
         rlog.log(SITUATION_DEBUG, "KeyError decoding situation:" + json_str)
 
 
-async def listen_forever(path, name, callback, logger):
-    logger.debug(name + " waiting for " + path)
+async def listen_forever(path, name, callback):
+    rlog.debug(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
-        logger.debug(name + " active ...")
+        rlog.debug(name + " active ...")
         try:
             async with websockets.connect(path, ping_timeout=None, ping_interval=None, close_timeout=2) as ws:
                 # stratux does not respond to pings! close timeout set down to get earlier disconnect
-                logger.debug(name + " connected on " + path)
+                rlog.debug(name + " connected on " + path)
                 while True:
                     # listener loop
                     try:
@@ -712,24 +712,24 @@ async def listen_forever(path, name, callback, logger):
                         # No situation received or traffic in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
                         # rlog.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
-                            logger.debug(name + ': Watchdog detected connection loss.' +
+                            rlog.debug(name + ': Watchdog detected connection loss.' +
                                          ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                             break
                     except websockets.exceptions.ConnectionClosed:
-                        logger.debug(
+                        rlog.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                         await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                         break
                     except asyncio.CancelledError:
-                        logger.debug(name + " shutting down ... ")
-                        return
+                        rlog.debug(name + " shutting down ... ")
+                        raise
                     else:
                         callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
         except (socket.error, websockets.exceptions.WebSocketException, asyncio.TimeoutError):
-            logger.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
+            rlog.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
                 situation['connected'] = False
                 ahrs['was_changed'] = True
@@ -738,8 +738,10 @@ async def listen_forever(path, name, callback, logger):
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
         except asyncio.CancelledError:
-            logger.debug(name + " shutting down in connect ... ")
-            return
+            rlog.debug(name + " shutting down in connect ... ")
+            raise
+        finally:
+            pass   # no ressource to free, websockets are closed automatically on exit of the context manager
 
 
 async def user_interface():
@@ -814,6 +816,7 @@ async def user_interface():
                     Globals.refresh = True
     except asyncio.CancelledError:
         rlog.debug("UI task terminating ...")
+        raise
     finally:
         # Loop through and safely close every active gpiozero device
         radarui.shutdown()   # release GPIO
@@ -966,33 +969,21 @@ async def display_and_cutoff():
                     rlog.debug(f"WATCHDOG: No situation update received in {WATCHDOG_TIMER} seconds")
     except (asyncio.CancelledError, RuntimeError):
         rlog.debug("Display task terminating ...")
-    except KeyboardInterrupt:
-        rlog.debug("Display task cancelled via KeyboardInterrupt")
+        raise
     finally:
         rlog.debug("CleanUp Display ...")
         display_control.cleanup()  # cleanup display on exit
 
 
 async def coroutines():
-    dis_cutoff = asyncio.create_task(display_and_cutoff())
-    sensor_reader = asyncio.create_task(cowarner.read_sensors())
-    ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
-    u_interface = asyncio.create_task(user_interface())
-    if aircraft_simulation is not None:
-        rlog.debug("AIRCRAFT SIMULATION MODE, ONLY DEMO OR TEST!")
-        sim_handler = asyncio.create_task(airsimulation.sim_handler(aircraft_simulation, new_traffic, new_situation))
-        # sim handler needs callbacks to new_traffic and new_situation
-        await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, sim_handler)
-    elif ble_address is not None:
-        rlog.debug("BLE mode, listening to FLARM/OGN via BLE")
-        ble_handler = asyncio.create_task(ble.listen_to_ble(), name="ble_handler")
-        await asyncio.gather(dis_cutoff, u_interface, sensor_reader, ground_sensor_reader, ble_handler)
-    else:   # normal operation, listen to stratux websocket
-        tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
-        sit_handler = asyncio.create_task(listen_forever(url_situation_ws   , "SituationHandler", new_situation, rlog))
-
-        await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
-        # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
+    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
+    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
+    dis_cutoff = asyncio.create_task(display_and_cutoff(), name="DisplayHandler")
+    sensor_reader = asyncio.create_task(cowarner.read_sensors(), name="SensorReader")
+    ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor(), name="GroundDistanceReader")
+    u_interface = asyncio.create_task(user_interface(), name="UserInterface")
+    await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
+    # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
 
 def initialize_ui_components():
     """Initialize UI components and related services."""
@@ -1051,6 +1042,10 @@ def main():
         asyncio.run(coroutines())
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
+        raise
+    finally:
+        rlog.debug("Main exiting ...")
+
 
 
 def radar_excepthook(exc_type, exc_value, exc_traceback):
@@ -1067,42 +1062,15 @@ def radar_excepthook(exc_type, exc_value, exc_traceback):
         print(line.strip())
 
 
-def main():
-    global max_pixel, zerox, zeroy, display_refresh_time
-    print("Stratux Radar Display " + RADAR_VERSION + " running ...")
-    # Initialize UI components
-    if not initialize_ui_components():
-        return 1
-    # Initialize audio system
-    initialize_audio_system()
-    # Initialize display
-    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
-    # Initialize sensors and simulation
-    initialize_sensors_and_simulation()
-    rlog.debug(f"Initialization finished. Global config {global_config}")
-    if ble_address is None:
-        display_control.startup(RADAR_VERSION, url_host_base, 4)
-    else:
-        display_control.startup(RADAR_VERSION, f"BLE-{ble_address}", 4)
-
-    try:
-        asyncio.run(coroutines())
-    except asyncio.CancelledError:
-        rlog.debug("Main cancelled")
-
-
 def quit_gracefully(*argus):
     print("Keyboard interrupt or shutdown. Quit gracefully ...")
     try:
         tasks = asyncio.all_tasks()
         for ta in tasks:
-            if ta.done():
-                continue
             ta.cancel()
-    except (RuntimeError, asyncio.CancelledError):
+    except (RuntimeError, AttributeError, asyncio.CancelledError):
         pass
     radarbluez.sound_terminate()
-    radarui.shutdown()  # release gpiozero
     cowarner.shutdown()  # release GPIO
 
 

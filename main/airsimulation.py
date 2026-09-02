@@ -255,9 +255,11 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                 
     except asyncio.CancelledError:
         rlog.debug("Simulation handler cancelled")
-        return
+        raise
     except Exception as e:
         rlog.debug(f"Error in simulation handler: {e}")
-        return
+    finally:
+        pass   # no ressource to free here
+
 
 

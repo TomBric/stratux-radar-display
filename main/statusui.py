@@ -56,6 +56,9 @@ DEFAULT_WIFI = "stratux         "
 DEFAULT_PASS = "                "
 MAX_WIFI_LENGTH = 16
 
+# global
+bt_scan_task = None  # asyncio task for bluetooth scan
+
 # globals
 g_config_file = "undefined"   # filename of config file, set in init
 global_config = {}
@@ -294,18 +297,27 @@ async def bt_scan():
     proc = await asyncio.create_subprocess_exec("bluetoothctl", "--timeout", str(BLUETOOTH_SCAN_TIME),
                                                 "scan", "on", stdout=asyncio.subprocess.PIPE)
     while True:
-        stdout_line, stderr_line = await proc.communicate()
-        if proc is not None:   # finished
+        try:
+            stdout_line, stderr_line = await proc.communicate()
+            if proc is not None:   # finished
+                scan_result(stdout_line.decode("UTF-8"))
+                rlog.debug("Blueotooth Scan done")
+                return   # subprocess done
             scan_result(stdout_line.decode("UTF-8"))
-            rlog.debug("Blueotooth Scan done")
-            return   # subprocess done
-        scan_result(stdout_line.decode("UTF-8"))
-        await asyncio.sleep(BT_SCAN_WAIT)
+            await asyncio.sleep(BT_SCAN_WAIT)
+        except asyncio.CancelledError:
+            rlog.debug("Bluetooth scan sleep cancelled")
+            raise
 
 
 def start_async_bt_scan():   # started by ui-coroutine
+    global bt_scan_task
     loop = asyncio.get_event_loop()
-    loop.create_task(bt_scan())
+    bt_scan_task = loop.create_task(bt_scan(), name="BT-Scan")
+
+def stop_async_bt_scan():   # started by ui-coroutine
+    if bt_scan_task is not None:
+        bt_scan_task.cancel()
 
 
 def read_network():

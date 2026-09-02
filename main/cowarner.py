@@ -381,6 +381,7 @@ async def read_sensors():
                     await asyncio.sleep(MIN_SENSOR_CALIBRATION_WAIT_TIME)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("CO sensor reader terminating ...")
+            raise
         finally:
             GPIO.cleanup(IOPIN)
             rlog.debug(f"Cowarner-sensor reader: GPIO state of PIN {IOPIN} cleaned up safely.")

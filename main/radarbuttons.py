@@ -206,10 +206,16 @@ def init_gear_indicator():
     rlog.debug("Radarbuttons: Gear down indicator on GPIO{0} initialized.".format(GEAR_DOWN))
     return True
 
+def release_gear_indicator():
+    global gear_down_btn
+
+    if gear_down_btn:
+        gear_down_btn.close()
+        gear_down_btn = None
+        rlog.debug("Radarbuttons: Gear down indicator released.")
+
 
 def explicit_release_on_exit():
     # release all acquired gpios
     for but in btn:
         but.close()
-    if gear_down_btn:
-        gear_down_btn.close()
