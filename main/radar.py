@@ -976,14 +976,20 @@ async def display_and_cutoff():
 
 
 async def coroutines():
-    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic), name="TrafficHandler")
-    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation), name="SituationHandler")
-    dis_cutoff = asyncio.create_task(display_and_cutoff(), name="DisplayHandler")
-    sensor_reader = asyncio.create_task(cowarner.read_sensors(), name="SensorReader")
-    ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor(), name="GroundDistanceReader")
-    u_interface = asyncio.create_task(user_interface(), name="UserInterface")
-    await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
-    # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
+    try:
+        tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic), name="TrafficHandler")
+        sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation), name="SituationHandler")
+        dis_cutoff = asyncio.create_task(display_and_cutoff(), name="DisplayHandler")
+        sensor_reader = asyncio.create_task(cowarner.read_sensors(), name="SensorReader")
+        ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor(), name="GroundDistanceReader")
+        u_interface = asyncio.create_task(user_interface(), name="UserInterface")
+        await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
+        # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
+    except asyncio.CancelledError:
+        rlog.debug("Coroutines cancelled")
+        raise
+    finally:
+        pass   # no special cleanup necessary, all tasks are cancelled in quit_gracefully
 
 def initialize_ui_components():
     """Initialize UI components and related services."""
