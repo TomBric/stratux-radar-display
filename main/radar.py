@@ -1194,6 +1194,5 @@ if __name__ == "__main__":
         signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown
         main()
     except (KeyboardInterrupt, CancelledError):
-        print("Keyboard interrupt in main received. Quitting ...")
         quit_gracefully()
         sys.exit(0)
