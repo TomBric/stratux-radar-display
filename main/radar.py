@@ -600,7 +600,7 @@ def new_situation(json_str):
             situation['was_changed'] = True
             ahrs['was_changed'] = True  # connection also relevant for ahrs
             gmeter['was_changed'] = True  # connection also relevant for ahrs
-        gps_active = sit['GPSHorizontalAccuracy'] < 19999
+        gps_active = sit['GPSHorizontalAccuracy'] < 999999.00
         if situation['gps_active'] != gps_active:
             situation['gps_active'] = gps_active
             situation['was_changed'] = True
@@ -1076,6 +1076,8 @@ def quit_gracefully(*argus):
         tasks = asyncio.all_tasks()
         for ta in tasks:
             ta.cancel()
+        # wait for all tasks to finish to make sure all resources are released properly
+        asyncio.get_event_loop().run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
     except (RuntimeError, AttributeError, asyncio.CancelledError):
         pass
     radarbluez.sound_terminate()
