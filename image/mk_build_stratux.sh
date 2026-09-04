@@ -81,9 +81,9 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 
 # install git for cloning repo (if not already installed) and pip
 echo "Updating and full upgrade for image"
-chroot mnt apt install git -y
-chroot mnt apt update
-chroot mnt apt full-upgrade -y
+unshare -mpfu chroot mnt apt install git -y
+unshare -mpfu chroot mnt apt update
+unshare -mpfu chroot mnt apt full-upgrade -y
 
 # download and use Virus Pilot build script
-chroot mnt bash -c "$(wget -nv -O - https://raw.githubusercontent.com/VirusPilot/stratux-pi4/master/setup-pi4-latest.sh)""
+unshare -mpfu chroot mnt bash -c "$(wget -nv -O - https://raw.githubusercontent.com/VirusPilot/stratux-pi4/master/setup-pi4-latest.sh)""
