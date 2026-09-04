@@ -8,6 +8,7 @@
 # call example:
 #   sudo /bin/bash mk_build_stratux.sh
 
+set -x
 
 RASPIOS_VERSION="2025-05-07"
 FILENAME="2025-05-06-raspios-bookworm-arm64-lite.img.xz"
