@@ -37,7 +37,7 @@ RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/image
 
 echo "Building stratux image based on Raspios Trixie Lite ARM64 version ${RASPIOS_VERSION}"
 
-ZIPNAME="${RASPIOS_VERSION}-raspios-trixie-arm-lite.img.xz"
+ZIPNAME="${RASPIOS_VERSION}-raspios-trixie-arm64-lite.img.xz"
 IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
