@@ -14,7 +14,7 @@ RASPIOS_VERSION="2025-05-07"
 FILENAME="2025-05-06-raspios-bookworm-arm64-lite.img.xz"
 RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-${RASPIOS_VERSION}/${FILENAME}"
 TMPDIR="/home/pi/image-tmp"
-IMAGEDIR="/home/pi/stratux-radar-display/image"
+IMAGEDIR=$(dirname "$(readlink -f "$0")")
 OUTPREFIX="stratux-bookworm"
 
 die() {
@@ -109,7 +109,7 @@ cd $TMPDIR || die "cd failed"
 # Rename and zip with xz
 echo "Starting xz of $IMGNAME to out/${OUTPREFIX}${outname}. This may take a while..."
 mv $IMGNAME out/${OUTPREFIX}"${outname}"
-xz -v -k out/${OUTPREFIX}"${outname}"
+xz -v out/${OUTPREFIX}"${outname}"
 
 
 echo "Stratux image build complete. Image is located in $TMPDIR/out"
