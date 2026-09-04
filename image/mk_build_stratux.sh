@@ -15,6 +15,7 @@ FILENAME="2025-05-06-raspios-bookworm-arm64-lite.img.xz"
 RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-${RASPIOS_VERSION}/${FILENAME}"
 TMPDIR="/home/pi/image-tmp"
 IMAGEDIR=$(dirname "$(readlink -f "$0")")
+# directory were this script is located, typically /home/pi/stratux-radar-display/image
 OUTPREFIX="stratux-bookworm"
 
 die() {
