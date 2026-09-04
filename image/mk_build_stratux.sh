@@ -40,11 +40,14 @@ unxz -kf "$ZIPNAME" || die "Extracting base Bookworm image failed"
 
 echo "Bookworm arm64 lite image prepared at $IMGNAME"
 # Check where in the image the root partition begins:
-bootoffset=$(parted "$IMGNAME" unit B p | awk '$5 == "fat32" { print substr($2, 1, length($2) - 1); exit }')
-partoffset=$(parted "$IMGNAME" unit B p | awk '$5 == "ext4" { print substr($2, 1, length($2) - 1); exit }')
+bootoffset=$(parted $IMGNAME unit B p | grep fat32 | awk -F ' ' '{print $2}')
+partoffset=$(parted $IMGNAME unit B p | grep ext4 | awk -F ' ' '{print $2}')
 
 [ -n "$bootoffset" ] || die "Boot partition offset not found in $IMGNAME"
 [ -n "$partoffset" ] || die "Root partition offset not found in $IMGNAME"
+
+bootoffset=${bootoffset::-1}
+partoffset=${partoffset::-1}
 
 echo "Boot partition starts at $bootoffset bytes, root partition starts at $partoffset bytes"
 
