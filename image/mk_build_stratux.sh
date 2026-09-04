@@ -50,7 +50,12 @@ mkdir -p $TMPDIR/out
 
 # Download/extract image
 wget -c $RASPIOS_DOWNLOAD_URL || die "Download failed"
-unxz -k $ZIPNAME || die "Extracting base Trixie image failed"
+# Nur entpacken, wenn die IMG-Datei noch nicht existiert
+if [ ! -f "$IMGNAME" ]; then
+    unxz -k "$ZIPNAME" || die "Extracting base Trixie image failed"
+else
+    echo "Image already exists, skipping extract: $IMGNAME"
+fi
 
 echo "Trixie arm64 lite image downloaded and extracted to $IMGNAME"
 # Check where in the image the root partition begins:
