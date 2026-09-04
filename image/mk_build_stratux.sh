@@ -21,16 +21,10 @@ die() {
     exit 1
 }
 
-# set defaults
-BRANCH=main
-V32=false
-USB_NAME=""
-
 echo "Building stratux image based on Raspios Bookworm Lite ARM64 version ${RASPIOS_VERSION}"
 
 ZIPNAME="${FILENAME}"
-BASE_IMGNAME="${ZIPNAME%.*}"
-IMGNAME="work-${BASE_IMGNAME}"
+IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
@@ -41,15 +35,8 @@ mkdir -p $TMPDIR/out
 
 # Download/extract image
 wget -c $RASPIOS_DOWNLOAD_URL || die "Download failed"
-# xz only if the base image does not already exist, otherwise we would overwrite it with a new version
-if [ ! -f "$BASE_IMGNAME" ]; then
-    unxz -k "$ZIPNAME" || die "Extracting base Bookworm image failed"
-else
-    echo "Base image already exists, skipping extract: $BASE_IMGNAME"
-fi
-
-# start with a copy of the base image, so we don't modify the original
-cp -vf "$BASE_IMGNAME" "$IMGNAME" || die "Creating working image copy failed"
+# xz anyhow to get a fresh the .img file
+unxz -k "$ZIPNAME" || die "Extracting base Bookworm image failed"
 
 echo "Bookworm arm64 lite image prepared at $IMGNAME"
 # Check where in the image the root partition begins:
