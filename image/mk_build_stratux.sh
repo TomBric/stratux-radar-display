@@ -41,14 +41,14 @@ mkdir -p $TMPDIR/out
 
 # Download/extract image
 wget -c $RASPIOS_DOWNLOAD_URL || die "Download failed"
-# Nur entpacken, wenn das unveraenderte Basis-Image noch nicht existiert
+# xz only if the base image does not already exist, otherwise we would overwrite it with a new version
 if [ ! -f "$BASE_IMGNAME" ]; then
     unxz -k "$ZIPNAME" || die "Extracting base Bookworm image failed"
 else
     echo "Base image already exists, skipping extract: $BASE_IMGNAME"
 fi
 
-# Immer mit einer frischen Arbeitskopie starten, damit Folge-Laeufe reproduzierbar sind
+# start with a copy of the base image, so we don't modify the original
 cp -f "$BASE_IMGNAME" "$IMGNAME" || die "Creating working image copy failed"
 
 echo "Bookworm arm64 lite image prepared at $IMGNAME"
