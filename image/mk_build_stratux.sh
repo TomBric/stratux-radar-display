@@ -93,4 +93,4 @@ echo "Installing git for cloning repo (if not already installed) and pip"
 unshare -mpfu chroot mnt apt install git -y
 
 # download and use Virus Pilot build script
-unshare -mpfu chroot mnt bash -c "$(wget -nv -O - https://raw.githubusercontent.com/VirusPilot/stratux-pi4/master/setup-pi4-latest.sh)""
+unshare -mpfu chroot mnt bash -c "$(wget -nv -O - https://raw.githubusercontent.com/VirusPilot/stratux-pi4/master/setup-pi4-latest.sh)"
