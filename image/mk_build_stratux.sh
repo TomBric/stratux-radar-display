@@ -14,6 +14,7 @@ RASPIOS_VERSION="2025-05-07"
 FILENAME="2025-05-06-raspios-bookworm-arm64-lite.img.xz"
 RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-${RASPIOS_VERSION}/${FILENAME}"
 TMPDIR="/home/pi/image-tmp"
+IMAGEDIR="/home/pi/stratux-radar-display/image"
 OUTPREFIX="stratux-bookworm"
 
 die() {
@@ -77,8 +78,8 @@ unshare -mpfu chroot mnt apt full-upgrade -y
 echo "Installing git for cloning repo (if not already installed) and pip"
 unshare -mpfu chroot mnt apt install git -y
 
-# download and use Virus Pilot build script
-cp -f "$(dirname "$0")/mk_build_stratux_sub.sh" mnt/root/mk_build_stratux_sub.sh || die "Copying sub build script failed"
+# use Virus Pilot modified build script under /home/pi/stratux-radar-display/image/mk_build_stratux_sub.sh to build stratux in the image
+cp -f "$IMAGEDIR/mk_build_stratux_sub.sh" mnt/root/mk_build_stratux_sub.sh || die "Copying sub build script failed"
 unshare -mpfu chroot mnt /bin/bash /root/mk_build_stratux_sub.sh || die "sub build script failed"
 
 # mkdir -p out
