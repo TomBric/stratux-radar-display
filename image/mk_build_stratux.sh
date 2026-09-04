@@ -10,7 +10,7 @@
 
 
 RASPIOS_VERSION="2025-05-07"
-RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_armhf-${RASPIOS_VERSION}/2025-05-07-raspios-bookworm-arm64-lite.img.xz"
+RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-${RASPIOS_VERSION}/2025-05-06-raspios-bookworm-arm64-lite.img.xz"
 TMPDIR="/home/pi/image-tmp"
 OUTPREFIX="stratux-bookworm"
 
