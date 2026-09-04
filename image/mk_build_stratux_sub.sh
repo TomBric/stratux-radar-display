@@ -157,46 +157,6 @@ systemctl disable dphys-swapfile
 apt purge dphys-swapfile -y
 
 # purge list from stratux image_build/stage2/10-stratux/files/purge-list.txt
-apt purge -y \
-  cifs-utils \
-  eject \
-  gcc \
-  g++ \
-  git \
-  git-man \
-  libfontconfig1 \
-  libfreetype6 \
-  gdb \
-  ntfs-3g \
-  xauth \
-  cpp \
-  cpp-12 \
-  ed \
-  libqt5core5a \
-  libsource-highlight-common \
-  libsource-highlight4v5 \
-  libtiff6 \
-  strace \
-  v4l-utils \
-  apparmor \
-  ncdu \
-  libc6-dev \
-  pkgconf \
-  python3-apt \
-  python3-colorzero \
-  udisks2 \
-  xkb-data \
-  m4 \
-  make \
-  nfs-common \
-  ppp \
-  fbset \
-  manpages \
-  manpages-dev \
-  man-db
-
-#
-
 
 apt autoremove -y
 apt clean
