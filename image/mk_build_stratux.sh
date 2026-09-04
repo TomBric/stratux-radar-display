@@ -1,20 +1,13 @@
 #!/bin/bash
 
-# Thomas Breitbach 2021 for stratux-radar-display, modified, but mainly based on work for stratux europe by b3nn0
+# Thomas Breitbach 2026 for stratux-radar-display, modified, but mainly based on work for stratux europe by b3nn0
 # To run this, make sure that this is installed:
-# sudo apt install --yes parted zip unzip zerofree
-# If you want to build on x86 with aarch64 emulation, additionally install qemu-user-static qemu-system-arm
-# Run this script as root.
-#  sudo /bin/bash mk_stratux_display.sh [-b <branch>] [-k v32] [-u <USB-stick-name>]
-# Run with argument "-b dev" to get the dev branch from github, otherwise with main
-# Run with optional argument "-k v32" to create 32 bit based images for zero 1
-# Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
-# call examples:
-#   sudo /bin/bash mk_stratux_display.sh
-#   sudo /bin/bash mk_stratux_display.sh -b dev
-#   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
 
-set -x
+# Run this script as root.
+
+# call example:
+#   sudo /bin/bash mk_build_stratux.sh
+
 
 RASPIOS_VERSION="2026-06-19"
 RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_armhf-${RASPIOS_VERSION}/2026-06-18-raspios-trixie-arm64-lite.img.xz"
@@ -94,3 +87,35 @@ unshare -mpfu chroot mnt apt install git -y
 
 # download and use Virus Pilot build script
 unshare -mpfu chroot mnt bash -c "$(wget -nv -O - https://raw.githubusercontent.com/VirusPilot/stratux-pi4/master/setup-pi4-latest.sh)"
+
+# mkdir -p out
+umount mnt/boot
+umount mnt
+
+# Shrink the image to minimum size.. it's still larger than it really needs to be, but whatever
+minsize=$(resize2fs -P ${lo}p2 | rev | cut -d' ' -f 1 | rev)
+minsizeBytes=$(($minsize * 4096))
+e2fsck -f ${lo}p2
+resize2fs -p ${lo}p2 $minsize
+zerofree ${lo}p2 # for smaller zip
+bytesEnd=$(($partoffset + $minsizeBytes))
+losetup -d ${lo}
+# parted --script $IMGNAME resizepart 2 ${bytesEnd}B Yes doesn't seem tow rok any more... echo yes | parted .. neither. So we re-create partition with proper size
+parted --script $IMGNAME rm 2
+parted --script $IMGNAME unit B mkpart primary ext4 ${partoffset}B ${bytesEnd}B
+truncate -s $(($bytesEnd + 4096)) $IMGNAME
+
+cd "$SRCDIR" || die "cd failed"
+# make sure the local version is also on current status
+sudo -u pi git pull --rebase
+release=$(git describe --tags --abbrev=0)
+outname="-$release-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
+cd $TMPDIR || die "cd failed"
+
+# Rename and zip with xz
+echo "Starting xz of $IMAGENAME to out/${outprefix}${outname}. This may take a while..."
+mv $IMGNAME out/${outprefix}"${outname}"
+xz -v -k out/${outprefix}"${outname}"
+
+
+echo "Stratux image build complete. Image is located in $TMPDIR/out"
