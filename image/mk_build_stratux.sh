@@ -9,10 +9,10 @@
 #   sudo /bin/bash mk_build_stratux.sh
 
 
-RASPIOS_VERSION="2026-06-19"
-RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_armhf-${RASPIOS_VERSION}/2026-06-18-raspios-trixie-arm64-lite.img.xz"
+RASPIOS_VERSION="2025-05-07"
+RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_armhf-${RASPIOS_VERSION}/2025-05-07-raspios-bookworm-arm64-lite.img.xz"
 TMPDIR="/home/pi/image-tmp"
-DISPLAY_SRC="home/pi"
+OUTPREFIX="stratux-bookworm"
 
 die() {
     echo "$1"
@@ -24,19 +24,14 @@ BRANCH=main
 V32=false
 USB_NAME=""
 
-
-RASPIOS_VERSION="2026-06-19"
-RASPIOS_FILE="2026-06-18-raspios-trixie-arm64-lite.img.xz"
-RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-${RASPIOS_VERSION}/${RASPIOS_FILE}"
-
-echo "Building stratux image based on Raspios Trixie Lite ARM64 version ${RASPIOS_VERSION}"
+echo "Building stratux image based on Raspios Bookworm Lite ARM64 version ${RASPIOS_VERSION}"
 
 ZIPNAME="${RASPIOS_FILE}"
 IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
-SRCDIR="$(realpath "$(pwd)"/..)"
+SRCDIR="/root/stratux"
 mkdir -p $TMPDIR
 cd $TMPDIR || die "cd failed"
 mkdir -p $TMPDIR/out
@@ -113,9 +108,9 @@ outname="-$release-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
 
 # Rename and zip with xz
-echo "Starting xz of $IMAGENAME to out/${outprefix}${outname}. This may take a while..."
-mv $IMGNAME out/${outprefix}"${outname}"
-xz -v -k out/${outprefix}"${outname}"
+echo "Starting xz of $IMAGENAME to out/${OUTPREFIX}${outname}. This may take a while..."
+mv $IMGNAME out/${OUTPREFIX}"${outname}"
+xz -v -k out/${OUTPREFIX}"${outname}"
 
 
 echo "Stratux image build complete. Image is located in $TMPDIR/out"
