@@ -33,11 +33,12 @@ USB_NAME=""
 
 
 RASPIOS_VERSION="2026-06-19"
-RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-${RASPIOS_VERSION}/2026-06-18-raspios-trixie-arm64-lite.img.xz"
+RASPIOS_FILE="2026-06-18-raspios-trixie-arm64-lite.img.xz"
+RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-${RASPIOS_VERSION}/${RASPIOS_FILE}"
 
 echo "Building stratux image based on Raspios Trixie Lite ARM64 version ${RASPIOS_VERSION}"
 
-ZIPNAME="${RASPIOS_VERSION}-raspios-trixie-arm64-lite.img.xz"
+ZIPNAME="${RASPIOS_FILE}"
 IMGNAME="${ZIPNAME%.*}"
 
 # cd to script directory
