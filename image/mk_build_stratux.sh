@@ -33,7 +33,7 @@ USB_NAME=""
 
 
 RASPIOS_VERSION="2026-06-19"
-RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_armhf-${RASPIOS_VERSION}/2026-06-18-raspios-trixie-arm64-lite.img.xz"
+RASPIOS_DOWNLOAD_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-${RASPIOS_VERSION}/2026-06-18-raspios-trixie-arm64-lite.img.xz"
 
 echo "Building stratux image based on Raspios Trixie Lite ARM64 version ${RASPIOS_VERSION}"
 
