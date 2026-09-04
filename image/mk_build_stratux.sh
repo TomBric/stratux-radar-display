@@ -28,7 +28,8 @@ USB_NAME=""
 echo "Building stratux image based on Raspios Bookworm Lite ARM64 version ${RASPIOS_VERSION}"
 
 ZIPNAME="${FILENAME}"
-IMGNAME="${ZIPNAME%.*}"
+BASE_IMGNAME="${ZIPNAME%.*}"
+IMGNAME="work-${BASE_IMGNAME}"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
@@ -39,14 +40,17 @@ mkdir -p $TMPDIR/out
 
 # Download/extract image
 wget -c $RASPIOS_DOWNLOAD_URL || die "Download failed"
-# Nur entpacken, wenn die IMG-Datei noch nicht existiert
-if [ ! -f "$IMGNAME" ]; then
-    unxz -k "$ZIPNAME" || die "Extracting base Trixie image failed"
+# Nur entpacken, wenn das unveraenderte Basis-Image noch nicht existiert
+if [ ! -f "$BASE_IMGNAME" ]; then
+    unxz -k "$ZIPNAME" || die "Extracting base Bookworm image failed"
 else
-    echo "Image already exists, skipping extract: $IMGNAME"
+    echo "Base image already exists, skipping extract: $BASE_IMGNAME"
 fi
 
-echo "Trixie arm64 lite image downloaded and extracted to $IMGNAME"
+# Immer mit einer frischen Arbeitskopie starten, damit Folge-Laeufe reproduzierbar sind
+cp -f "$BASE_IMGNAME" "$IMGNAME" || die "Creating working image copy failed"
+
+echo "Bookworm arm64 lite image prepared at $IMGNAME"
 # Check where in the image the root partition begins:
 bootoffset=$(parted $IMGNAME unit B p | grep fat32 | awk -F ' ' '{print $2}')
 bootoffset=${bootoffset::-1}
@@ -82,7 +86,8 @@ echo "Installing git for cloning repo (if not already installed) and pip"
 unshare -mpfu chroot mnt apt install git -y
 
 # download and use Virus Pilot build script
-unshare -mpfu chroot mnt bash -c "$(wget -nv -O - https://raw.githubusercontent.com/VirusPilot/stratux-pi4/master/setup-pi4-latest.sh)"
+cp -f "$(dirname "$0")/mk_build_stratux_sub.sh" mnt/root/mk_build_stratux_sub.sh || die "Copying sub build script failed"
+unshare -mpfu chroot mnt /bin/bash /root/mk_build_stratux_sub.sh || die "sub build script failed"
 
 # mkdir -p out
 umount mnt/boot
@@ -109,7 +114,7 @@ outname="-$release-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
 
 # Rename and zip with xz
-echo "Starting xz of $IMAGENAME to out/${OUTPREFIX}${outname}. This may take a while..."
+echo "Starting xz of $IMGNAME to out/${OUTPREFIX}${outname}. This may take a while..."
 mv $IMGNAME out/${OUTPREFIX}"${outname}"
 xz -v -k out/${OUTPREFIX}"${outname}"
 
