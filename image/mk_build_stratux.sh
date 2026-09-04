@@ -106,7 +106,7 @@ parted --script $IMGNAME rm 2
 parted --script $IMGNAME unit B mkpart primary ext4 ${partoffset}B ${bytesEnd}B
 truncate -s $(($bytesEnd + 4096)) $IMGNAME
 
-cd "$SRCDIR" || die "cd failed"
+cd "$SRCDIR" || die "cd failed - $SRCDIR does not exist, install stratux in $SRCDIR"
 # make sure the local version is also on current status
 sudo -u pi git pull --rebase
 release=$(git describe --tags --abbrev=0)
