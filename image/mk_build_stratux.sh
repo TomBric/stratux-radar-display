@@ -36,7 +36,7 @@ mkdir -p $TMPDIR/out
 # Download/extract image
 wget -c $RASPIOS_DOWNLOAD_URL || die "Download failed"
 # xz anyhow to get a fresh the .img file
-unxz -k "$ZIPNAME" || die "Extracting base Bookworm image failed"
+unxz -kf "$ZIPNAME" || die "Extracting base Bookworm image failed"
 
 echo "Bookworm arm64 lite image prepared at $IMGNAME"
 # Check where in the image the root partition begins:
