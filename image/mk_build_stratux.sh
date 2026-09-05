@@ -84,11 +84,11 @@ cp -f "$IMAGEDIR/mk_build_stratux_sub.sh" mnt/root/mk_build_stratux_sub.sh || di
 unshare -mpfu chroot mnt /bin/bash /root/mk_build_stratux_sub.sh || die "sub build script failed"
 
 # do all things that need access to mnt/boot, like copying config.txt and cmdline.txt modifications
-cp mnt/stratux/image_build/stage2/10-stratux-files/config.txt mnt/boot/config.txt  || die "Copying config.txt failed"
+cp mnt/root/stratux/image_build/stage2/10-stratux/files/config.txt mnt/boot/config.txt  || die "Copying config.txt failed"
 touch mnt/boot/.stratux-first-boot   || die "Creating .stratux-first-boot failed"
 #disable serial console, disable rfkill state restore, enable wifi on boot
 sed -i mnt/boot/cmdline.txt -e "s/console=serial0,[0-9]\+ /systemd.restore_state=0 rfkill.default_state=1 /" || die "Modifying cmdline.txt failed"
-cp -f config.txt mnt/boot/config.txt  || die "Copying config.txt failed"
+
 
 # mkdir -p out
 umount mnt/boot
