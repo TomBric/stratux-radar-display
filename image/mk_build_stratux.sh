@@ -110,7 +110,7 @@ cd $TMPDIR || die "cd failed"
 # Rename and zip with xz
 echo "Starting xz of $IMGNAME to out/${OUTPREFIX}${outname}. This may take a while..."
 mv $IMGNAME out/${OUTPREFIX}"${outname}"
-xz -v out/${OUTPREFIX}"${outname}"
+xz -vf out/${OUTPREFIX}"${outname}"
 
 
 echo "Stratux image build complete. Image is located in $TMPDIR/out"
