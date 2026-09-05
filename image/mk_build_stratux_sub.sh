@@ -98,7 +98,7 @@ cd /root/stratux/dump1090 && git pull origin master
 # copy various files
 # cd /root/stratux/image (for v1.6)
 cd /root/stratux/image_build/stage2/10-stratux/files
-cp -f config.txt /boot/firmware/config.txt
+# cp -f config.txt /boot/firmware/config.txt
 cp -f bashrc.txt /root/.bashrc
 cp -f rc.local /etc/rc.local
 cp -f modules.txt /etc/modules
@@ -118,13 +118,13 @@ overlayctl install
 mkdir -p /overlay/robase # prepare so we can bind-mount root even if overlay is disabled
 
 # So we can import network settings if needed
-touch /boot/firmware/.stratux-first-boot
+# touch /boot/firmware/.stratux-first-boot
 
 # Optionally mount /dev/sda1 as /var/log - for logging to USB stick
 #echo -e "\n/dev/sda1             /var/log        auto    defaults,nofail,noatime,x-systemd.device-timeout=1ms  0       2" >> /etc/fstab
 
 #disable serial console, disable rfkill state restore, enable wifi on boot
-sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ /systemd.restore_state=0 rfkill.default_state=1 /"
+# sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ /systemd.restore_state=0 rfkill.default_state=1 /"
 
 # prepare services
 systemctl enable ssh
