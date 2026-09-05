@@ -6,7 +6,7 @@
 #   sudo /bin/bash mk_build_stratux_sub.sh
 
 #!/bin/bash
-#set -x
+set -x
 
 # prepare libs
 apt install \
