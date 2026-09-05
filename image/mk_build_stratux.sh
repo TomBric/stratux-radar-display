@@ -74,7 +74,7 @@ mount -t vfat "${lo}"p1 mnt/boot || die "boot-mount failed"
 # install git for cloning repo (if not already installed) and pip
 echo "Updating and full upgrade for image"
 unshare -mpfu chroot mnt apt update
-unshare -mpfu chroot mnt apt full-upgrade -y
+# unshare -mpfu chroot mnt apt full-upgrade -y
 
 echo "Installing git for cloning repo (if not already installed) and pip"
 unshare -mpfu chroot mnt apt install git -y
