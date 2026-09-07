@@ -54,7 +54,7 @@ partoffset=${partoffset::-1}
 echo "Boot partition starts at $bootoffset bytes, root partition starts at $partoffset bytes"
 
 # Original image partition is too small to hold our stuff.. resize it to 5gb
-truncate -s 5120M $IMGNAME || die "Image resize failed"
+truncate -s 6144M $IMGNAME || die "Image resize failed"
 lo=$(losetup -f)
 losetup $lo $IMGNAME
 partprobe $lo
@@ -63,7 +63,7 @@ parted --script ${lo} resizepart 2 100%
 partprobe $lo || die "Partprobe failed failed"
 resize2fs -p ${lo}p2 || die "FS resize failed"
 
-echo "Image resized to 5GB, root partition resized to maximum size"
+echo "Image resized to 6GB, root partition resized to maximum size"
 
 
 # Mount image locally, clone our repo, install packages..
@@ -109,7 +109,7 @@ truncate -s $(($bytesEnd + 4096)) $IMGNAME
 
 cd "$SRCDIR" || die "cd failed - $SRCDIR does not exist, install stratux in $SRCDIR"
 # make sure the local version is also on current status
-sudo -u pi git pull --rebase
+git pull --rebase
 release=$(git describe --tags --abbrev=0)
 outname="-$release-$(git log -n 1 --pretty=%H | cut -c 1-8).img"
 cd $TMPDIR || die "cd failed"
