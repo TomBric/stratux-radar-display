@@ -76,14 +76,15 @@ if [ "$VERSION" = "1.6r1" ]; then
   ZIPNAME="stratux-v1.6r1-eu032-ff1f01dc.img.zip"
   BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu032/${ZIPNAME}"
   outprefix="stratux-eu32-radar"
-  PRE_IMGNAME="${ZIPNAME%.*}"
 else
-  ZIPNAME="image_stratux-lite.zip"
+  ZIPNAME="2026-09-08-stratux-lite.img.zip"
   BASE_IMAGE_DIR="/home/pi/stratux-image"
   outprefix="stratux-2.0pre-radar"
-  PRE_IMGNAME="image_stratux-lite.img"
 fi
 
+PRE_IMGNAME="${ZIPNAME%.*}"
+IMGNAME="tmp-stratux.img"
+mv "$PRE_IMGNAME" "$IMGNAME" || die "Moving image failed"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
