@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Thomas Breitbach 2024 configures an stratux image with radar-display-software installed
+# Thomas Breitbach 2026 configures an stratux image with radar-display-software installed
 # modified, but mainly based on work for stratux europe by b3nn0
 # To run this, make sure that this is installed:
 # sudo apt install --yes parted zip unzip zerofree
@@ -20,6 +20,11 @@
 # Enable sound output and UART Ground Sensor
 #   sudo /bin/bash mk_radar_on_stratux.sh -s
 
+
+# REMARK: How to build a stratux image on your raspberry pi:
+# git clone --recursive github.com/stratux/stratux.git
+# install docker:curl -fsSL https://get.docker.com -o get-docker.sh
+# run:   stratux/image_build/build.sh
 
 set -x
 TMPDIR="/home/pi/image-tmp"
@@ -59,22 +64,26 @@ while getopts ":b:v:d:u:f:s" opt; do
 
 REPONAME="Stratux $VERSION with Radar Display preinstalled(64-bit)"
 
+
 echo "Building stratux image '$VERSION' for branch '$BRANCH' and display '$DISPLAY_NAME'"
 if [ "$UART" = true ]; then
   echo "Enabling UART Ground Sensor support"
 fi
 
+IMGNAME="stratux-lite.img"
+
 if [ "$VERSION" = "1.6r1" ]; then
   ZIPNAME="stratux-v1.6r1-eu032-ff1f01dc.img.zip"
   BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu032/${ZIPNAME}"
   outprefix="stratux-eu32-radar"
-  IMGNAME="${ZIPNAME%.*}"
+  PRE_IMGNAME="${ZIPNAME%.*}"
 else
-  ZIPNAME="image_2026-03-02-stratux-lite.zip"
-  BASE_IMAGE_URL="https://github.com/stratux/stratux/releases/download/v2.0-pre5/${ZIPNAME}"
+  ZIPNAME="image_stratux-lite.zip"
+  BASE_IMAGE_DIR="/home/pi/stratux-image/${ZIPNAME}"
   outprefix="stratux-2.0pre-radar"
-  IMGNAME="2026-03-02-stratux-lite.img"
+  PRE_IMGNAME="image_stratux-lite.img"
 fi
+
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
@@ -83,8 +92,16 @@ mkdir -p $TMPDIR
 cd $TMPDIR || die "cd failed"
 
 # Download/extract image
-wget -c "$BASE_IMAGE_URL" || die "Download failed"
-unzip "$ZIPNAME" || die "Extracting image failed"
+if [ "$VERSION" = "1.6r1" ]; then
+  wget -c "$BASE_IMAGE_URL" || die "Download failed"
+  unzip "$ZIPNAME" || die "Extracting image failed"
+  mv "$PRE_IMGNAME" "$TMPDIR"/"$IMGNAME" || die "Moving image failed"
+else
+  unzip "$BASE_IMAGE_DIR"/"$ZIPNAME" || die "Extracting image failed"
+fi
+
+mv "$PRE_IMGNAME" "$IMGNAME" || die "Renaming image failed"
+
 
 # Check where in the image the root partition begins:
 bootoffset=$(parted $IMGNAME unit B p | grep fat32 | awk -F ' ' '{print $2}')
