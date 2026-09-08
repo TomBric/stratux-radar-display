@@ -26,7 +26,7 @@
 # install docker:curl -fsSL https://get.docker.com -o get-docker.sh
 # run:   stratux/image_build/build.sh
 
-set -x
+# set -x
 TMPDIR="/home/pi/image-tmp"
 DISPLAY_SRC="home/pi"
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

@@ -103,7 +103,7 @@ cp wireplumber-bluetooth.conf /etc/wireplumber/wireplumber.conf.d/bluetooth.conf
 sed -i 's/#ReconnectAttempts = 7/ReconnectAttempts = 3/' /etc/bluetooth/main.conf
 
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-scipy python3-pygame -y
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-scipy python3-pygame python3-gpiozero -y
 su pi -c "pip3 install ADS1x15-ADC --break-system-packages"
 su pi -c "pip3 install bayesian-filters --break-system-packages"
 su pi -c "pip3 install bleak --break-system-packages"
