@@ -79,7 +79,7 @@ if [ "$VERSION" = "1.6r1" ]; then
   PRE_IMGNAME="${ZIPNAME%.*}"
 else
   ZIPNAME="image_stratux-lite.zip"
-  BASE_IMAGE_DIR="/home/pi/stratux-image/"
+  BASE_IMAGE_DIR="/home/pi/stratux-image"
   outprefix="stratux-2.0pre-radar"
   PRE_IMGNAME="image_stratux-lite.img"
 fi
