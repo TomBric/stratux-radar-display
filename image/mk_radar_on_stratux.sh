@@ -82,9 +82,8 @@ else
   outprefix="stratux-2.0pre-radar"
 fi
 
-PRE_IMGNAME="${ZIPNAME%.*}"
+
 IMGNAME="tmp-stratux.img"
-mv "$PRE_IMGNAME" "$IMGNAME" || die "Moving image failed"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
@@ -95,14 +94,10 @@ cd $TMPDIR || die "cd failed"
 # Download/extract image
 if [ "$VERSION" = "1.6r1" ]; then
   wget -c "$BASE_IMAGE_URL" || die "Download failed"
-  unzip "$ZIPNAME" || die "Extracting image failed"
-  mv "$PRE_IMGNAME" "$TMPDIR"/"$IMGNAME" || die "Moving image failed"
+  unzip -p "$ZIPNAME" > "$IMGNAME" || die "Extracting image failed"
 else
-  unzip "$BASE_IMAGE_DIR"/"$ZIPNAME" || die "Extracting image failed"
+  unzip -p "$BASE_IMAGE_DIR"/"$ZIPNAME" > "$IMGNAME" || die "Extracting image failed"
 fi
-
-mv "$PRE_IMGNAME" "$IMGNAME" || die "Renaming image failed"
-
 
 # Check where in the image the root partition begins:
 bootoffset=$(parted $IMGNAME unit B p | grep fat32 | awk -F ' ' '{print $2}')
