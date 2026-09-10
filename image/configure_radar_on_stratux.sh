@@ -29,7 +29,7 @@ apt install git python3-pip -y
 # no sound or bluetooth on stratux
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio libttspico-utils -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-numpy python3-pygame python3-numpy python3-scipy python3-gpiozero -y
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-pygame python3-numpy python3-scipy python3-gpiozero -y
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 su pi -c "pip3 install bayesian-filters --break-system-packages"
 su pi -c "pip3 install bleak --break-system-packages"
