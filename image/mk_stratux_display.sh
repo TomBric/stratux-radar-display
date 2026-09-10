@@ -80,8 +80,8 @@ else
   reponame="$V64_REPONAME"
 fi
 
-ZIPNAME="2026-04-21-raspios-trixie-${IMAGE_VERSION}-lite.img.xz"
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2026-04-21/${ZIPNAME}"
+ZIPNAME="2026-06-18-raspios-trixie-${IMAGE_VERSION}-lite.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2026-06-19/${ZIPNAME}"
 
 IMGNAME="${ZIPNAME%.*}"
 

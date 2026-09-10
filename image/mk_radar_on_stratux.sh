@@ -11,14 +11,14 @@
 # Run with argument "-v 20" to create an image based on stratux 2.0
 # Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
 # call examples:
-#   sudo /bin/bash ../stratux_image/image_2026_09_09 mk_radar_on_stratux.sh
-#   sudo /bin/bash ../stratux_image/image_2026_09_09 mk_radar_on_stratux.sh -b dev
-#   sudo /bin/bash ../stratux_image/image_2026_09_09 mk_radar_on_stratux.sh -v 20
-#   sudo /bin/bash ../stratux_image/image_2026_09_09 mk_radar_on_stratux.sh -d Epaper_1in54
+#   sudo /bin/bash -i ../stratux_image/image_2026_09_09 mk_radar_on_stratux.sh
+#   sudo /bin/bash -i ../stratux_image/image_2026_09_09 mk_radar_on_stratux.sh -b dev
+#   sudo /bin/bash -i ../stratux_image/image_2026_09_09 mk_radar_on_stratux.sh -v 20
+#   sudo /bin/bash -i ../stratux_image/image_2026_09_09 mk_radar_on_stratux.sh -d Epaper_1in54
 # install a first time flashing of the t-beam, copies the content of the specified directory to /home/pi/stratux-radar-display/to_flash
-#   sudo /bin/bash mk_radar_on_stratux.sh ../stratux_image/image_2026_09_09 -flash /home/pi/GxAirCom81
+#   sudo /bin/bash -i mk_radar_on_stratux.sh ../stratux_image/image_2026_09_09 -flash /home/pi/GxAirCom81
 # Enable sound output and UART Ground Sensor
-#   sudo /bin/bash mk_radar_on_stratux.sh ../stratux_image/image_2026_09_09 -s
+#   sudo /bin/bash -i mk_radar_on_stratux.sh ../stratux_image/image_2026_09_09 -s
 
 
 # REMARK: How to build a stratux image on your raspberry pi:
