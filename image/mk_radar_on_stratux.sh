@@ -50,20 +50,17 @@ DEVICE_LIST="pi3-64bit, pi4-64bit"
 
 # check stratux image parameter, if it exists, use it as base image for radar display installation
 if [ -z "$1" ]; then
-  echo "Usage: $0 <stratux_image> [-b <branch>] [-v <version>] [-d <display>] [-u <USB-stick-name>] [-f <flash_dir>] [-s]"
+  echo "Usage: $0 <stratux_image> -i <image> [-b <branch>] [-v <version>] [-d <display>] [-u <USB-stick-name>] [-f <flash_dir>] [-s]"
   exit 1
 fi
-# check if file exists
-if [ ! -f "$1" ]; then
-  echo "Error: stratux image '$1' not found not exist."
-  exit 1
-fi
-STRATUX_IMAGE="$1"
-shift
 
 # check parameters
-while getopts ":b:d:u:f:s" opt; do
+while getopts ":i:b:d:u:f:s" opt; do
       case $opt in
+        i)
+          BASE_IMAGE_DIR="$(dirname "$OPTARG")"
+          ZIPNAME="$(basename "$OPTARG")"
+          ;;
         b) BRANCH="$OPTARG" ;;
         u) USB_NAME="$OPTARG" ;;
         d) DISPLAY_NAME="$OPTARG" ;;
