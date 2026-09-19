@@ -969,7 +969,7 @@ async def display_and_cutoff():
                     ahrs['was_changed'] = True
                     gmeter['was_changed'] = True
                     rlog.debug(f"WATCHDOG: No situation update received in {WATCHDOG_TIMER} seconds")
-    except (asyncio.CancelledError, RuntimeError):
+    except asyncio.CancelledError:
         rlog.debug("Display task terminating ...")
         raise
     finally:
@@ -1053,21 +1053,6 @@ def main():
         raise
     finally:
         rlog.debug("Main exiting ...")
-
-
-
-def radar_excepthook(exc_type, exc_value, exc_traceback):
-    syslog.openlog("stratux-radar-display", syslog.LOG_PID, syslog.LOG_USER)
-    # log file will be stored under /var/log/user.log
-    syslog.syslog(syslog.LOG_ERR, f"Uncaught exception: {exc_type.__name__}: {exc_value}")
-    stack_trace = traceback.format_exception(exc_type, exc_value, exc_traceback)
-    for line in stack_trace:
-        syslog.syslog(syslog.LOG_ERR, line.strip())
-    syslog.closelog()
-    # for interactive mode give some output
-    print(f"Uncaught exception: {exc_type.__name__}: {exc_value}")
-    for line in stack_trace:
-        print(line.strip())
 
 
 def quit_gracefully(*argus):

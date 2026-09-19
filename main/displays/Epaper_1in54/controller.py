@@ -287,7 +287,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         gps = f"{round(stat['GPS_position_accuracy'], 1)}m" if stat['GPS_position_accuracy'] < 19999 else "NoFix"
         self.right_text(starty, gps, self.VERYSMALL)
         starty += self.VERYSMALL + 2
-        self.draw.text((0, starty), f"P-Alt {altitude:.0f}ft", font=self.fonts[self.VERYSMALL])
+        self.draw.text((0, starty), f"P-Alt {altitude:.0f}ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.right_text(starty, f"Corr {stat['AltitudeOffset']:+}ft", self.VERYSMALL)
         starty += self.VERYSMALL + 6
         x = self.round_text(0, starty, "IMU", yesno=stat['IMUConnected'], out_color =self.TEXT_COLOR)
@@ -333,7 +333,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             starty = self.dashboard(0, starty, self.sizex, lines)
         if ground_distance_valid:
             lines = (
-                ("GrdDist [cm]", f"{grounddistance / 10:+3.1f}"),
+                ("GrdDist [cm]", f"{float(grounddistance) / 10:+3.1f}"),
             )
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
@@ -341,7 +341,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.bottom_line("Act", "His/Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
-                            current_stats=True, next_stat=False, prev_stat=False, index=-1):
+                            current_stats=True, prev_stat=False, next_stat=False, index=-1):
         if current_stats:  # current data, still flying
             self.centered_text(0, "Act Start-/Landing", self.SMALL)
         else:
