@@ -231,4 +231,32 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 {% endif %}
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const fallbackLabel = document.querySelector('label[for="fallback_ground_distance"]');
+    if (!fallbackLabel) {
+        return;
+    }
+    const infoText = 'Ground distance of sensor position is measured, when display is started. This fallback value is used, when a meaurement was not possible (e.g. if display is booted in the air). To get the fallback value measure the distance to the ground from the front of the sensor';
+    const infoButton = document.createElement('button');
+    infoButton.type = 'button';
+    infoButton.className = 'btn btn-link btn-sm p-0 ms-1 align-baseline text-decoration-none';
+    infoButton.textContent = 'i';
+    infoButton.setAttribute('aria-label', 'Info for fallback ground distance');
+    infoButton.setAttribute('data-bs-toggle', 'popover');
+    infoButton.setAttribute('data-bs-trigger', 'focus');
+    infoButton.setAttribute('data-bs-placement', 'right');
+    infoButton.setAttribute('data-bs-content', infoText);
+    fallbackLabel.appendChild(infoButton);
+
+    if (window.bootstrap && typeof window.bootstrap.Popover === 'function') {
+        new window.bootstrap.Popover(infoButton);
+    } else {
+        infoButton.addEventListener('click', function () {
+            window.alert(infoText);
+        });
+    }
+});
+</script>
+
 {% endblock %}
