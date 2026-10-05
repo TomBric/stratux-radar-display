@@ -72,6 +72,7 @@ from pathlib import Path
 import sys
 import traceback
 import syslog
+from typing import Optional
 
 from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG, COLLISION_DEBUG
 
@@ -119,7 +120,7 @@ extsound_active = False
 measure_flighttime = False
 co_warner_activated = False
 grounddistance_activated = False
-grounddistance_fallback_cm = None
+grounddistance_fallback_cm: Optional[float] = None
 
 url_host_base = arguments.DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
@@ -1132,7 +1133,7 @@ if __name__ == "__main__":
     co_i2c_0 = args['coi2c0']
     gd_option = args['grounddistance']
     grounddistance_activated = gd_option is not None
-    grounddistance_fallback_cm = gd_option if isinstance(gd_option, int) and gd_option > 0 else None
+    grounddistance_fallback_cm = float(gd_option) if isinstance(gd_option, (int, float)) and gd_option > 0 else None
     groundbeep = args['groundbeep']
     countdown = args['countdown']
     gear_indication = args['gearindicate']

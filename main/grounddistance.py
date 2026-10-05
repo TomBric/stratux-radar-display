@@ -50,7 +50,7 @@ import simulation
 import radarbluez
 import radarbuttons
 import binascii
-from typing import Any
+from typing import Any, Optional
 from globals import rlog, Globals, Modes
 import os      # for deleting statistics file
 
@@ -90,8 +90,8 @@ indicate_distance = False  # True if indication for sound ground indication is a
 countdown_screen = False  # True if countdown screen is to be shown (option -cd)
 gear_indication = False  # True if gear indication is active (option -gi) and GPIO could be activated
 distance_sensor = None
-zero_distance = 0.0  # distance of sensor when aircraft is on ground
-fallback_zero_distance_mm = None  # optional fallback distance in mm provided via -gd <cm>
+zero_distance: float = 0.0  # distance of sensor when aircraft is on ground
+fallback_zero_distance_mm: Optional[float] = None  # optional fallback distance in mm provided via -gd <cm>
 value_debug_level = 0  # set during init
 simulation_mode = False  # set during init
 # statistics for calculating values
@@ -262,22 +262,23 @@ def reset_values():
 
     if ground_distance_active:
         if simulation_mode:
-            zero_distance = 0
+            zero_distance = 0.0
             rlog.debug('Simulation Mode: Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:
             new_zero_distance = distance_sensor.last_distance()   # take last value, don't wait (no async function)
             if new_zero_distance > 0:
-                zero_distance = new_zero_distance
+                zero_distance = float(new_zero_distance)
                 rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
             elif fallback_zero_distance_mm is not None:
-                zero_distance = fallback_zero_distance_mm
+                fallback_value_mm = float(fallback_zero_distance_mm)
+                zero_distance = fallback_value_mm
                 rlog.debug('Ground Zero Distance reset fallback from -gd: {0:5.2f} cm'.format(zero_distance / 10))
             else:
                 rlog.debug('Error resetting gound zero distance')
 
 
 def init(activate, stat_file, debug_level, distance_indication, countdown, gear_ind, situation, sim_mode,
-         fallback_distance_cm=None):
+         fallback_distance_cm: Optional[float] = None):
     global ground_distance_active
     global indicate_distance
     global countdown_screen
@@ -300,8 +301,8 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, gear_
     value_debug_level = debug_level
     saved_statistics = stat_file
     global_situation = situation  # to be able to read and store situation info
-    if isinstance(fallback_distance_cm, int) and fallback_distance_cm > 0:
-        fallback_zero_distance_mm = fallback_distance_cm * 10
+    if isinstance(fallback_distance_cm, (int, float)) and fallback_distance_cm > 0:
+        fallback_zero_distance_mm = float(fallback_distance_cm) * 10.0
     else:
         fallback_zero_distance_mm = None
 
@@ -730,12 +731,13 @@ async def read_ground_sensor():
             distance_sensor.calc_distance()
             new_zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
         else:
-            new_zero_distance = 1     # just take one mm as zero distance for simulation
+            new_zero_distance = 1.0     # just take one mm as zero distance for simulation
         if new_zero_distance > 0:
-            zero_distance = new_zero_distance  # distance in mm this is zero
+            zero_distance = float(new_zero_distance)  # distance in mm this is zero
             rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
         elif fallback_zero_distance_mm is not None:
-            zero_distance = fallback_zero_distance_mm
+            fallback_value_mm = float(fallback_zero_distance_mm)
+            zero_distance = fallback_value_mm
             rlog.debug('Ground Zero Distance fallback from -gd: {0:5.2f} cm'.format(zero_distance / 10))
         else:
             rlog.debug('Ground Zero Distance: Error reading ground distance, not set')

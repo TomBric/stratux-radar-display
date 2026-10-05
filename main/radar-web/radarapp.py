@@ -228,8 +228,8 @@ class RadarForm(FlaskForm):
 
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
-    fallback_ground_distance = IntegerField('Fallback ground distance [cm]', default=100,
-                                            validators=[NumberRange(min=1, max=1000)])
+    fallback_ground_distance = FloatField('Fallback ground distance [cm]', default=100.0,
+                                          validators=[NumberRange(min=1.0, max=1000.0)])
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     countdown = SwitchField('Indicate ground distance via countdown screen', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
@@ -424,8 +424,8 @@ def read_arguments(rf):
     # ground-options
     grounddistance_option = args['grounddistance']
     rf.groundsensor.data = grounddistance_option is not None
-    if isinstance(grounddistance_option, int) and grounddistance_option > 1:
-        rf.fallback_ground_distance.data = grounddistance_option
+    if isinstance(grounddistance_option, (int, float)) and grounddistance_option > 1.0:
+        rf.fallback_ground_distance.data = float(grounddistance_option)
     rf.groundbeep.data = args['groundbeep']
     rf.countdown.data = args['countdown']
     rf.gearindicate.data = args['gearindicate']
@@ -522,8 +522,9 @@ def build_option_string(rf):
         out += ' -sd'
     if rf.groundsensor.data is True:
         fallback_distance = rf.fallback_ground_distance.data
-        if fallback_distance is None or fallback_distance < 1:
-            fallback_distance = 100
+        if fallback_distance is None or fallback_distance < 1.0:
+            fallback_distance = 100.0
+        fallback_distance = float(fallback_distance)
         out += f' -gd {fallback_distance}'
     if rf.groundbeep.data is True:
         out += ' -gb'
