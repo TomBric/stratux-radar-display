@@ -228,6 +228,8 @@ class RadarForm(FlaskForm):
 
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
+    fallback_ground_distance = IntegerField('Fallback Ground Distance [cm]', default=100,
+                                            validators=[NumberRange(min=1, max=2000)])
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     countdown = SwitchField('Indicate ground distance via countdown screen', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
@@ -420,7 +422,10 @@ def read_arguments(rf):
     rf.mixername.data = args['mixer']
     rf.speakdistance.data = args['speakdistance']
     # ground-options
-    rf.groundsensor.data = args['grounddistance']
+    grounddistance_option = args['grounddistance']
+    rf.groundsensor.data = grounddistance_option is not None
+    if isinstance(grounddistance_option, int) and grounddistance_option > 1:
+        rf.fallback_ground_distance.data = grounddistance_option
     rf.groundbeep.data = args['groundbeep']
     rf.countdown.data = args['countdown']
     rf.gearindicate.data = args['gearindicate']
@@ -516,7 +521,10 @@ def build_option_string(rf):
     if rf.speakdistance.data is True:
         out += ' -sd'
     if rf.groundsensor.data is True:
-        out += ' -gd'
+        fallback_distance = rf.fallback_ground_distance.data
+        if fallback_distance is None or fallback_distance < 1:
+            fallback_distance = 100
+        out += f' -gd {fallback_distance}'
     if rf.groundbeep.data is True:
         out += ' -gb'
     if rf.countdown.data is True:

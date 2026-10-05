@@ -75,8 +75,9 @@ def add(ap):
                     action="store_true", default=False)
     ap.add_argument("-cb0", "--coi2c0", required=False, help="Use I2C bus 0 for CO",
                     action="store_true", default=False)
-    ap.add_argument("-gd", "--grounddistance", required=False, help="Activate ground distance sensor",
-                    action="store_true", default=False)
+    ap.add_argument("-gd", "--grounddistance", type=int, nargs='?', const=1, required=False,
+                    help="Activate ground distance sensor with optional fallback distance in cm",
+                    default=None)
     ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
                     action="store_true", default=False)
     ap.add_argument("-cd", "--countdown", required=False, help="Show ground distance ground down screen",
