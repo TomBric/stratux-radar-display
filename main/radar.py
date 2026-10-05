@@ -119,6 +119,7 @@ extsound_active = False
 measure_flighttime = False
 co_warner_activated = False
 grounddistance_activated = False
+grounddistance_fallback_cm = None
 
 url_host_base = arguments.DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
@@ -1024,7 +1025,8 @@ def initialize_sensors_and_simulation():
     """Initialize sensor systems and simulation."""
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication, co_simulation_mode, co_i2c_0)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
-                        groundbeep, countdown, gear_indication, situation, simulation_mode)
+                        groundbeep, countdown, gear_indication, situation, simulation_mode,
+                        grounddistance_fallback_cm)
     simulation.init(simulation_mode)
 
 
@@ -1128,7 +1130,9 @@ if __name__ == "__main__":
     co_warner_activated = not args['nocowarner']
     co_indication = args['coindicate']
     co_i2c_0 = args['coi2c0']
-    grounddistance_activated = args['grounddistance']
+    gd_option = args['grounddistance']
+    grounddistance_activated = gd_option is not None
+    grounddistance_fallback_cm = gd_option if isinstance(gd_option, int) and gd_option > 0 else None
     groundbeep = args['groundbeep']
     countdown = args['countdown']
     gear_indication = args['gearindicate']
