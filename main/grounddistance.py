@@ -50,7 +50,7 @@ import simulation
 import radarbluez
 import radarbuttons
 import binascii
-from typing import Any, Optional
+from typing import Any
 from globals import rlog, Globals, Modes
 import os      # for deleting statistics file
 
@@ -91,7 +91,7 @@ countdown_screen = False  # True if countdown screen is to be shown (option -cd)
 gear_indication = False  # True if gear indication is active (option -gi) and GPIO could be activated
 distance_sensor = None
 zero_distance: float = 0.0  # distance of sensor when aircraft is on ground
-fallback_zero_distance_mm: Optional[float] = None  # optional fallback distance in mm provided via -gd <cm>
+fallback_zero_distance_mm: float = 0.0  # fallback distance in mm provided via -fb <cm>; 0.0 means disabled
 value_debug_level = 0  # set during init
 simulation_mode = False  # set during init
 # statistics for calculating values
@@ -269,7 +269,7 @@ def reset_values():
             if new_zero_distance > 0:
                 zero_distance = float(new_zero_distance)
                 rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
-            elif fallback_zero_distance_mm is not None:
+            elif fallback_zero_distance_mm > 0.0:
                 fallback_value_mm = float(fallback_zero_distance_mm)
                 zero_distance = fallback_value_mm
                 rlog.debug('Ground Zero Distance reset fallback from -gd: {0:5.2f} cm'.format(zero_distance / 10))
@@ -278,7 +278,7 @@ def reset_values():
 
 
 def init(activate, stat_file, debug_level, distance_indication, countdown, gear_ind, situation, sim_mode,
-         fallback_distance_cm: Optional[float] = None):
+         fallback_distance_cm: float = 0.0):
     global ground_distance_active
     global indicate_distance
     global countdown_screen
@@ -301,10 +301,10 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, gear_
     value_debug_level = debug_level
     saved_statistics = stat_file
     global_situation = situation  # to be able to read and store situation info
-    if isinstance(fallback_distance_cm, (int, float)) and fallback_distance_cm > 0:
+    if isinstance(fallback_distance_cm, (int, float)) and fallback_distance_cm > 0.0:
         fallback_zero_distance_mm = float(fallback_distance_cm) * 10.0
     else:
-        fallback_zero_distance_mm = None
+        fallback_zero_distance_mm = 0.0
 
     if gear_ind:
         gear_indication = radarbuttons.init_gear_indicator()
@@ -735,7 +735,7 @@ async def read_ground_sensor():
         if new_zero_distance > 0:
             zero_distance = float(new_zero_distance)  # distance in mm this is zero
             rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
-        elif fallback_zero_distance_mm is not None:
+        elif fallback_zero_distance_mm > 0.0:
             fallback_value_mm = float(fallback_zero_distance_mm)
             zero_distance = fallback_value_mm
             rlog.debug('Ground Zero Distance fallback from -gd: {0:5.2f} cm'.format(zero_distance / 10))

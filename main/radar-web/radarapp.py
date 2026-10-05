@@ -422,10 +422,10 @@ def read_arguments(rf):
     rf.mixername.data = args['mixer']
     rf.speakdistance.data = args['speakdistance']
     # ground-options
-    grounddistance_option = args['grounddistance']
-    rf.groundsensor.data = grounddistance_option is not None
-    if isinstance(grounddistance_option, (int, float)) and grounddistance_option > 1.0:
-        rf.fallback_ground_distance.data = float(grounddistance_option)
+    rf.groundsensor.data = args['grounddistance']
+    fallback_option = args['fallback_distance']
+    if isinstance(fallback_option, (int, float)) and fallback_option > 0.0:
+        rf.fallback_ground_distance.data = float(fallback_option)
     rf.groundbeep.data = args['groundbeep']
     rf.countdown.data = args['countdown']
     rf.gearindicate.data = args['gearindicate']
@@ -521,11 +521,12 @@ def build_option_string(rf):
     if rf.speakdistance.data is True:
         out += ' -sd'
     if rf.groundsensor.data is True:
+        out += ' -gd'
         fallback_distance = rf.fallback_ground_distance.data
         if fallback_distance is None or fallback_distance < 1.0:
             fallback_distance = 100.0
         fallback_distance = float(fallback_distance)
-        out += f' -gd {fallback_distance}'
+        out += f' -fb {fallback_distance}'
     if rf.groundbeep.data is True:
         out += ' -gb'
     if rf.countdown.data is True:
