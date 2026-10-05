@@ -12,6 +12,30 @@
     .ble-device-choice-field .form-check { margin-bottom: 0.2rem; }
     .ble-device-choice-field .form-check-label { line-height: 1.15; }
     .ble-device-choice-field .form-check-input { margin-top: 0.2rem; }
+    .info-circle-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.15rem;
+        height: 1.15rem;
+        margin-left: 0.35rem;
+        border: 1px solid #0d6efd;
+        border-radius: 50%;
+        background-color: #0d6efd;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1;
+        text-decoration: none;
+        vertical-align: middle;
+    }
+    .info-circle-icon:focus,
+    .info-circle-icon:hover {
+        background-color: #0a58ca;
+        border-color: #0a58ca;
+        color: #fff;
+        text-decoration: none;
+    }
 </style>
 <form method="post">
 {{ radar_form.csrf_token }}
@@ -237,10 +261,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!fallbackLabel) {
         return;
     }
-    const infoText = 'Ground distance of sensor position is measured, when display is started. This fallback value is used, when a meaurement was not possible (e.g. if display is booted in the air). To get the fallback value measure the distance to the ground from the front of the sensor';
+    const infoText = 'Ground distance of sensor position is every time measured, when display is started. This fallback value is used, when a meaurement was not possible (e.g. if display is booted in the air). To get the fallback value measure the distance to the ground from the front of the sensor';
     const infoButton = document.createElement('button');
     infoButton.type = 'button';
-    infoButton.className = 'btn btn-link btn-sm p-0 ms-1 align-baseline text-decoration-none';
+    infoButton.className = 'info-circle-icon';
     infoButton.textContent = 'i';
     infoButton.setAttribute('aria-label', 'Info for fallback ground distance');
     infoButton.setAttribute('data-bs-toggle', 'popover');

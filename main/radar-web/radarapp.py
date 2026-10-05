@@ -228,8 +228,8 @@ class RadarForm(FlaskForm):
 
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
-    fallback_ground_distance = IntegerField('Fallback Ground Distance [cm]', default=100,
-                                            validators=[NumberRange(min=1, max=2000)])
+    fallback_ground_distance = IntegerField('Fallback ground distance [cm]', default=100,
+                                            validators=[NumberRange(min=1, max=1000)])
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     countdown = SwitchField('Indicate ground distance via countdown screen', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
