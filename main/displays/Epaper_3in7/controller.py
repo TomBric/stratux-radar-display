@@ -35,6 +35,7 @@ from . import epd3in7
 from .. import dcommon
 from PIL import Image, ImageDraw
 import time
+import datetime
 from pathlib import Path
 
 
@@ -426,7 +427,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = 5
-        if 'start_time' in values:
+        if 'start_time' in values and isinstance(values['start_time'], datetime.datetime):
             st = values['start_time'].strftime("%d.%m %H:%M")
         else:
             st = '---'
@@ -437,7 +438,7 @@ class Epaper3in7(dcommon.GenericDisplay):
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         self.dashboard(offset, 35, self.zerox - offset, lines, headline="Takeoff", rounding=True)
-        if 'landing_time' in values:
+        if 'landing_time' in values and isinstance(values['landing_time'], datetime.datetime):
             lt = values['landing_time'].strftime("%d.%m %H:%M")
         else:
             lt = '---'
