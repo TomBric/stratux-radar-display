@@ -243,7 +243,10 @@ def draw_display():
         # display is only triggered if there was a change
         optical_alive = new_alive
         display_control.clear()
-        nspeed_rad = situation['gps_speed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
+        if situation['gps_active']:
+            nspeed_rad = situation['gps_speed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
+        else:
+            nspeed_rad = 0
         gps_speed_length = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])   # length for own speed arrow
         display_control.situation(situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
