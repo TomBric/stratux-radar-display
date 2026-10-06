@@ -42,6 +42,7 @@ USB_NAME=""
 DISPLAY_NAME="NoDisplay"
 UART=false
 VERSION="2.0pre"
+outprefix=""
 
 # pi imager settings
 GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
@@ -146,9 +147,11 @@ umount mnt
 
 
 # Shrink the image to minimum size.. it's still larger than it really needs to be, but whatever
-minsize=$(resize2fs -P ${lo}p2 | rev | cut -d' ' -f 1 | rev)
-minsizeBytes=$(($minsize * 4096))
 e2fsck -f ${lo}p2
+minsize=$(resize2fs -P ${lo}p2 | awk -F': ' '{print $2}')
+blocksize=$(tune2fs -l ${lo}p2 | awk -F': *' '/Block size:/ {print $2; exit}')
+blocksize=${blocksize:-4096}
+minsizeBytes=$(($minsize * $blocksize))
 resize2fs -p ${lo}p2 $minsize
 zerofree ${lo}p2 # for smaller zip
 bytesEnd=$(($partoffset + $minsizeBytes))
