@@ -64,7 +64,7 @@
       "name": "Stratux Radar Display (64-bit) v3.0",
       "description": "Radar Display based on 64bit Trixie kernel (Raspberry Pi3, Pi4)",
       "icon": "https://raw.githubusercontent.com/TomBric/stratux-radar-display/main/pi-imager/stratux-logo-white192x192.png",
-      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v3.0/stratux-display-v3.0-06df7b96.img",
+      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v3.0/stratux-display-v3.0-06df7b96.img.xz",
       "release_date": "2026-10-06",
       "extract_size": 4506443776,
       "extract_sha256": "3e768ecca7caaab7ef4d3a455432f408277f2c857291b6c9e0d88a048877b780",
