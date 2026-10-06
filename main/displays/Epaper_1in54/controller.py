@@ -55,25 +55,40 @@ class Epaper1in54(dcommon.GenericDisplay):
     # colors will be initialized in __init__
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
     # attributes later defined in explicit init
+    PRIORITY_MAPPING_LIGHT = {
+        0: ("white", "black", 3, 1),  # unclear
+        1: ("black", "black", 2, 2),  # RA (Resolution Advisory)
+        2: ("black", "black", 4, 1.5),  # TA (Traffic Advisory)
+        3: ("white", "black", 2, 1),  # potential_collision
+        4: ("white", "black", 1, 1)  # no_collision
+    }
+    PRIORITY_MAPPING_DARK = {
+        0: ("black", "white", 3, 1),  # unclear
+        1: ("white", "white", 2, 2),  # RA (Resolution Advisory)
+        2: ("white", "white", 4, 1.5),  # TA (Traffic Advisory)
+        3: ("black", "white", 2, 1),  # potential_collision
+        4: ("black", "white", 1, 1)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_LIGHT = {
+        0: ("black", 0.8),  # unclear
+        1: ("black", 3),  # RA (Resolution Advisory)
+        2: ("black", 2),  # TA (Traffic Advisory)
+        3: ("black", 1),  # potential_collision
+        4: ("black", 0.5)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_DARK = {
+        0: ("white", 0.8),  # unclear
+        1: ("white", 3),  # RA (Resolution Advisory)
+        2: ("white", 2),  # TA (Traffic Advisory)
+        3: ("white", 1),  # potential_collision
+        4: ("white", 0.5)  # no_collision
+    }
+
+
     def __init__(self):
         super().__init__()
-        # Initialize color attributes
-        self.BG_COLOR = "white"
-        self.TEXT_COLOR = "black"
-        self.HIGHLIGHT_COLOR = "black"
-        self.AIRCRAFT_COLOR = "black"
-        self.AIRCRAFT_OUTLINE = "black"
-        self.MODE_S_COLOR = "black"
-        # AHRS colors
-        self.AHRS_EARTH_COLOR = "white"
-        self.AHRS_SKY_COLOR = "white"
-        self.AHRS_HORIZON_COLOR = "black"
-        self.AHRS_MARKS_COLOR = "black"
-        # Other attributes
-        self.device = None
-        self.image = None
-        self.mask = None
-        self.dark_mode = False
+
+
 
     def set_dark_mode(self, dark_mode):
         """Set dark mode and update color constants accordingly"""
@@ -82,9 +97,6 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
             self.HIGHLIGHT_COLOR = "white"
-            self.AIRCRAFT_COLOR = "white"
-            self.AIRCRAFT_OUTLINE = "white"
-            self.MODE_S_COLOR = "white"
             self.AHRS_EARTH_COLOR = "black"
             self.AHRS_SKY_COLOR = "black"
             self.AHRS_HORIZON_COLOR = "white"
@@ -93,9 +105,6 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
             self.HIGHLIGHT_COLOR = "black"
-            self.AIRCRAFT_COLOR = "black"
-            self.AIRCRAFT_OUTLINE = "black"
-            self.MODE_S_COLOR = "black"
             self.AHRS_EARTH_COLOR = "white"
             self.AHRS_SKY_COLOR = "white"
             self.AHRS_HORIZON_COLOR = "black"
@@ -114,8 +123,8 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.set_dark_mode(dark_mode)
         self.sizex = self.device.height
         self.sizey = self.device.width
-        self.zerox = self.sizex / 2
-        self.zeroy = self.sizey / 2
+        self.zerox = self.sizex // 2
+        self.zeroy = self.sizey // 2
         self.max_pixel = self.sizey
         self.ah_zeroy = self.sizey // 2  # zero line for ahrs
         self.ah_zerox = self.sizex // 2
@@ -167,11 +176,23 @@ class Epaper1in54(dcommon.GenericDisplay):
         time.sleep(seconds)
 
     def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
-                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
+                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound,
+                  co_alarmlevel, co_alarmstring, gps_speed_length):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
                            self.zerox + self.max_pixel // 2 - 1, self.zeroy + self.max_pixel // 2 - 1), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
                            self.zerox + self.max_pixel // 4 - 1, self.zeroy + self.max_pixel // 4 - 1), outline=self.TEXT_COLOR)
+        # cross in the middle
+        self.draw.line((self.zerox - self.max_pixel // 2, self.zeroy, self.zerox + self.max_pixel // 2, self.zeroy),
+                       fill=self.TEXT_COLOR)
+        self.draw.line((self.zerox, self.zeroy - self.max_pixel // 2, self.zerox, self.zeroy + self.max_pixel // 2),
+                       fill=self.TEXT_COLOR)
+
+        if gpsconnected and gps_speed_length > 0:  # draw own speed vector
+            velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
+            self.draw.line((self.zerox, self.zeroy - gps_speed_length, self.zerox,
+                            self.zeroy), fill=self.TEXT_COLOR, width=velocity_width * 2)
+
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
         self.draw.text((0, 0), f"{rrange}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.draw.text((0, self.SMALL), "nm", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
@@ -266,7 +287,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         gps = f"{round(stat['GPS_position_accuracy'], 1)}m" if stat['GPS_position_accuracy'] < 19999 else "NoFix"
         self.right_text(starty, gps, self.VERYSMALL)
         starty += self.VERYSMALL + 2
-        self.draw.text((0, starty), f"P-Alt {altitude:.0f}ft", font=self.fonts[self.VERYSMALL])
+        self.draw.text((0, starty), f"P-Alt {altitude:.0f}ft", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.right_text(starty, f"Corr {stat['AltitudeOffset']:+}ft", self.VERYSMALL)
         starty += self.VERYSMALL + 6
         x = self.round_text(0, starty, "IMU", yesno=stat['IMUConnected'], out_color =self.TEXT_COLOR)
@@ -312,7 +333,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             starty = self.dashboard(0, starty, self.sizex, lines)
         if ground_distance_valid:
             lines = (
-                ("GrdDist [cm]", f"{grounddistance / 10:+3.1f}"),
+                ("GrdDist [cm]", f"{float(grounddistance) / 10:+3.1f}"),
             )
             self.dashboard(0, starty, self.sizex, lines)
         if error_message is not None:
@@ -320,7 +341,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.bottom_line("Act", "His/Mode", "Start")
 
     def distance_statistics(self, values, gps_valid, gps_altitude, dest_altitude, dest_alt_valid, ground_warnings,
-                            current_stats=True, next_stat=False, prev_stat=False, index=-1):
+                            current_stats=True, prev_stat=False, next_stat=False, index=-1):
         if current_stats:  # current data, still flying
             self.centered_text(0, "Act Start-/Landing", self.SMALL)
         else:

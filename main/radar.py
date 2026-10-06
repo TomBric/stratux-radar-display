@@ -36,9 +36,12 @@ import argparse
 import json
 import asyncio
 import socket
+from asyncio import CancelledError
+
 import websockets
 import math
 import time
+
 import arguments
 import radarbluez
 import radarui
@@ -60,7 +63,9 @@ import radarmodes
 import simulation
 import checklist
 import logging
-from logging.handlers import RotatingFileHandler
+import collisiondetect
+import airsimulation
+import ble
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -68,23 +73,28 @@ import sys
 import traceback
 import syslog
 
-from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG
+from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG, COLLISION_DEBUG
 
 # constants
-RADAR_VERSION = "2.14"
+RADAR_VERSION = "3.0"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
-RADAR_CUTOFF = 29  # time after last message received from an aircraft is is no longer displayed
-POSITION_VALID_DELTA = 10.0   # time a received position is assumed valid, e.g. if message without position is received
+RADAR_CUTOFF = 29  # time after last message received from an aircraft is no longer displayed
+POSITION_VALID_DELTA = 15.0   # time a received position is assumed valid, e.g. if message without position is received
 # only after this POSITION_VALID_DELTA time a switch back to mode-s (circle) is done. May e.g. happen when
 # flarm is no more received, but only mode-s. Than switch back and display circle
+FLARM_POSITION_OVER_ADSB_TIMEOUT = 10  # time in seconds, FLARM position is only taken into account after this timeout
+# otherwise adsb_out position is taken, this prevents FLARM/OGN position taken into account when valid adsb-out signal
+# is received
+
+
 UI_REACTION_TIME = 0.1
 MINIMAL_WAIT_TIME = 0.01  # give other coroutines some time to do their jobs
 BLUEZ_CHECK_TIME = 3.0
-SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 WATCHDOG_TIMER = 3.0  # time after "no connection" is assumed, if no new situation is received
 CHECK_CONNECTION_TIMEOUT = 5.0
+SPEED_ARROW_TIME = 60  # time in seconds for the line that displays the speed
 # timeout used for regular status request, necessary towards stratux to keep the websockets open
 MIN_DISPLAY_REFRESH_TIME = 0.1
 # minimal time to wait for a display refresh, to give time for situation and traffic
@@ -94,7 +104,6 @@ OPTICAL_ALIVE_BARS = 10
 # number of bars for an optical alive
 OPTICAL_ALIVE_TIME = 3
 # time in secs after which the optical alive bar moves on
-SPEAK_SAME_TRAFFIC_DELTA = 2.0   # time in seconds after the same traffic is spoken again (if also hysteresis was true)
 SOURCE_1090 = 1    # source identifier from stratux
 SOURCE_FLARM = 4   # source identifier from stratux
 
@@ -110,6 +119,7 @@ extsound_active = False
 measure_flighttime = False
 co_warner_activated = False
 grounddistance_activated = False
+grounddistance_fallback_cm: float = 0.0
 
 url_host_base = arguments.DEFAULT_URL_HOST_BASE
 url_situation_ws = ""
@@ -156,27 +166,38 @@ gear_indication = False  # True if indication via GPIO Pin 19 is on for reading 
 groundbeep = False  # True if indication of ground distance via audio
 countdown = False # True if ground distance with countdown screen is shown
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
+aircraft_simulation = None   # if a string is provided read simulation data from file and simulate traffic
 
 radar_sound_off_sound = None   # prepared sound output for "sound off"
 radar_sound_on_sound = None    # prepared send output for "sound on"
+
+AUDIO_TIMEOUTS ={0: 0, 1: 10, 2:30, 3:0, 4:0}   # time in seconds to repeat audio of prio x traffic, if zero do not repeat
+# E.g. Prio 1 (RA) traffic will be repeated after 10 secondes, Prio 2 (TA) after 30 secs
+# prio0=unclear, prio1=RA, prio2=TA, prio3=collision, prio4=no collision
+MAX_NUMBER_OF_SPEAKS = 3   # maximum number of times a traffic is spoken
+# if it is still present after that in the same or lower prio, it will not be spoken again
 
 def dump_ac(ac):    # debug function, produces one line for aircraft in a readable manner
     ret=""
     ret += f" tail:{ac['tail']}" if 'tail' in ac else ""
     ret += f" gps_distance:{ac['gps_distance']:.1f}" if 'gps_distance' in ac else ""
     ret += f" last_contact_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_contact_timestamp']))}" if 'last_contact_timestamp' in ac else ""
-    ret += f" height:{ac['height']}" if 'height' in ac else ""
+    ret += f" hdiff:{ac['hdiff']}" if 'hdiff' in ac else ""
     ret += f" nspeed:{ac['nspeed']}" if 'nspeed' in ac else ""
     ret += f" vspeed:{ac['vspeed']}" if 'vspeed' in ac else ""
     ret += f" direction:{ac['direction']}" if 'direction' in ac else ""
     ret += f" x:{ac['x']}" if 'x' in ac else ""
     ret += f" y:{ac['y']}" if 'y' in ac else ""
     ret += f" last_position_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_position_timestamp']))}" if 'last_position_timestamp' in ac else ""
+    ret += f" last_position_source:{ac['last_position_source']}" if 'last_position_source' in ac else ""
     ret += f" nspeed_length:{ac['nspeed_length']}" if 'nspeed_length' in ac else ""
-    ret += f" was_spoken:{ac['was_spoken']}" if 'was_spoken' in ac else ""
+    ret += f" audio: speak_time {ac['audio']['speak_time']} was_prio {ac['audio']['was_prio']}" if 'audio' in ac else ""
     ret += f" last_speak_time:{time.strftime('%H:%M:%S', time.gmtime(ac['last_speak_time']))}" if 'last_speak_time' in ac else ""
     ret += f" arcposition:{ac['arcposition']}" if 'arcposition' in ac else ""
     ret += f" circradius:{ac['circradius']}" if 'circradius' in ac else ""
+    ret += f" prio:{ac['prio']}" if 'prio' in ac else ""
+    ret += f" age_last_alt:{ac['age_last_alt']}" if 'age_last_alt' in ac else ""
+    ret += f" alt:{ac['alt']}" if 'alt' in ac else ""
     return ret
 
 
@@ -188,32 +209,28 @@ def dump_all(all_aircraft):    # return string of all aircraft currently monitor
     return ret
 
 
+def get_tail_display(ac):
+    """Get tail display for aircraft if enabled and available."""
+    return ac['tail'] if global_config['display_tail'] and 'tail' in ac else None
+
+
 def draw_all_ac(allac):
     dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
     for icao, ac in dist_sorted:
         # first draw mode-s
         if 'circradius' in ac:
-            if global_config['display_tail'] and 'tail' in ac:
-                tail = ac['tail']
-            else:
-                tail = None
+            tail = get_tail_display(ac)
             if ac['circradius'] <= max_pixel / 2:
-                display_control.modesaircraft(ac['circradius'], ac['height'], ac['arcposition'], ac['vspeed'],
-                                              tail)
+                display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac['vspeed'],
+                                              tail, ac['prio'])
     for icao, ac in dist_sorted:
         # then draw adsb
         if 'x' in ac:
             if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
-                if 'nspeed_length' in ac:
-                    line_length = ac['nspeed_length']
-                else:
-                    line_length = 0
-                if global_config['display_tail'] and 'tail' in ac:
-                    tail = ac['tail']
-                else:
-                    tail = None
-                display_control.aircraft(ac['x'], ac['y'], ac['direction'], ac['height'], ac['vspeed'],
-                                         line_length, tail)
+                line_length = ac.get('nspeed_length', 0)
+                tail = get_tail_display(ac)
+                display_control.aircraft(ac['x'], ac['y'], ac['direction'], ac['hdiff'], ac['vspeed'],
+                                         line_length, tail, ac['prio'])
 
 
 def draw_display():
@@ -226,10 +243,16 @@ def draw_display():
         # display is only triggered if there was a change
         optical_alive = new_alive
         display_control.clear()
+        if situation['gps_active']:
+            nspeed_rad = situation['gps_speed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
+        else:
+            nspeed_rad = 0
+        gps_speed_length = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])   # length for own speed arrow
         display_control.situation(situation['connected'], situation['gps_active'], situation['own_altitude'],
                                   situation['course'], situation['RadarRange'], situation['RadarLimits'], bt_devices,
                                   radarui.sound_on, situation['gps_quality'], situation['gps_h_accuracy'], optical_alive,
-                                  basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1]) 
+                                  basemode, extsound_active, cowarner.alarm_level()[0], cowarner.alarm_level()[1],
+                                  gps_speed_length)
         draw_all_ac(all_ac)
         display_control.display()
         situation['was_changed'] = False
@@ -260,19 +283,45 @@ def calc_gps_distance(lat, lng):
     return distradius, angle
 
 
-def speaktraffic(hdiff, direction=None, dist=None):
-    if radarui.sound_on:
-        feet = hdiff * 100
-        sign = 'plus'
-        if hdiff < 0:
-            sign = 'minus'
-        txt = 'Traffic '
-        if direction:
-            txt += str(direction) + ' o\'clock '
-        txt += sign + ' ' + str(abs(feet)) + ' feet'
-        if global_config['distance_warnings'] and dist:
-            txt += f" {dist} miles "
-        radarbluez.speak(txt)
+def gen_traffic_message(ac):
+    res_angle = (ac['gps_angle'] - situation['course']) % 360
+    oclock = round(res_angle / 30) % 12
+    if oclock == 0:
+        oclock = 12
+    feet = ac['hdiff'] * 100
+    sign = '+'
+    if feet < 0:
+        sign = '-'
+    # Priority-based message templates
+    priority_messages = {
+        1: f"Alarm: traffic {oclock} o'clock, {sign}{abs(feet)} feet",      # RA
+        2: f"traffic {oclock} o'clock, {sign}{abs(feet)} feet",  # TA
+        3: None,       # Collision
+        4: None,                                                          # No Collision
+        0: None          # Unclear
+    }
+    txt = priority_messages.get(ac['prio'], None)
+    if txt and global_config['distance_warnings']:
+        txt += f" {ac['gps_distance']} miles "
+    return txt
+
+
+def gen_modes_traffic_message(ac):
+    feet = ac['hdiff'] * 100
+    sign = '+'
+    if feet < 0:
+        sign = '-'
+    # Priority-based message templates
+    priority_messages = {
+        1: f"Alarm: traffic {sign}{abs(feet)} feet",  # RA
+        2: f"traffic {sign}{abs(feet)} feet",  # TA
+        3: None,  # Collision
+        4: None,  # No Collision
+        0: None  # Unclear
+    }
+    txt = priority_messages.get(ac['prio'], None)
+    return txt
+
 
 def is_steering_message(traffic):  # checks if traffic is a steering message and returns true if yes
     changed = False
@@ -295,38 +344,104 @@ def is_steering_message(traffic):  # checks if traffic is a steering message and
     return False
 
 
-def speech_output_adsb(ac, res_angle):   # checks if aircraft with position has to be spoken and triggers speech
-    if ac['gps_distance'] <= situation['RadarRange'] / 2:
-        oclock = round(res_angle / 30)
-        if oclock <= 0:
-            oclock += 12
-        if oclock > 12:
-            oclock -= 12
-        if not ac['was_spoken']:  # only speak again, if never spoken or hysteresis reached
-            if 'last_speak_time' not in ac or time.time() - ac['last_speak_time'] > SPEAK_SAME_TRAFFIC_DELTA:
-                # has been spoken before, now check timeout, against "flickering position"
-                # so is only spoken if never spoken, hysteresis met and last speak is long enough ago
-                speaktraffic(ac['height'], oclock, round(ac['gps_distance']))
-                ac['was_spoken'] = True
-                ac['last_speak_time'] = time.time()
-    else:
-        # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
-        if ac['gps_distance'] >= situation['RadarRange'] * 0.75:
-            ac['was_spoken'] = False
+def audio_output(ac, mode_s=False):
+    # audio_info give info about audio output for this aircraft, if it was already spoken.
+    # If not present, it will be created once audio is spoken. It contains the following keys:
+    # 'speak_time' is the last time it was spoken, 'was_prio' is the priority of the last time it was spoken
+    # 'no_of_speaks' is the number of times it was consecutively spoken
+    prio = ac.get('prio')
+    timeout = AUDIO_TIMEOUTS.get(prio)
+    if timeout is None:
+        rlog.log(AIRCRAFT_DEBUG, f"Error: Unsupported prio {prio}.")
+        return
+    audio_info = ac.get('audio')
+    should_speak = False
+    if not audio_info:   # not yet spoken, speak only collision-related priorities
+        should_speak = prio <= 3
+    else:  # we have audio info
+        if prio <= 2:
+            prev_prio = audio_info.get('was_prio', prio)
+            no_of_speaks = audio_info.get('no_of_speaks', 0)
+            last_speak_time = audio_info.get('speak_time', 0)
+
+            if prev_prio >= prio:
+                # if it was spoken before with same or a higher prio, only repeat it to number of speaks, but not more often
+                do_repeat = no_of_speaks < MAX_NUMBER_OF_SPEAKS
+            else:  # prio is now higher than before, speak it anyhow, but reset number of speaks
+                do_repeat = True
+                audio_info['no_of_speaks'] = 0
+
+            if prio == 1:  # RA, speak if it was lower before anyhow
+                should_speak = prev_prio != 1 or (last_speak_time + timeout <= time.time() and do_repeat)
+            elif prio == 2:  # TA
+                was_high_prio = prev_prio in [1, 2]   # repeat TA only if it was lower prio before
+                should_speak = not was_high_prio or (was_high_prio and last_speak_time + timeout <= time.time() and do_repeat)
+        elif prio in [0, 3, 4]:  # no audio for this traffic, reset audio
+            ac.pop('audio', None)  # remove audio info, if aircraft comes back, speak it again for traffic with gps
 
 
-def speech_output_modes(ac):   # checks if modes aircraft has to be spoken
-    if ac['gps_distance'] <= situation['RadarRange'] / 2:
-        if not ac['was_spoken']:  # check hysteresis
-            if 'last_speak_time' not in ac or time.time() - ac['last_speak_time'] > SPEAK_SAME_TRAFFIC_DELTA:
-                # only speak after a minimal time again, necessary if traffic esp. Mode S "flickers"
-                speaktraffic(ac['height'], None, round(ac['gps_distance']))
-                ac['was_spoken'] = True
-                ac['last_speak_time'] = time.time()
+    if should_speak:
+        rlog.log(COLLISION_DEBUG, f"Speaking: {ac.get('tail','')} prio: {ac['prio']} hdiff: {ac['hdiff']} gps_angle {ac.get('gps_angle','unknown')} "
+                                  f"audio: {ac.get('audio')}")
+        if not mode_s:
+            message = gen_traffic_message(ac)
+        else:
+            message = gen_modes_traffic_message(ac)
+        if message is None:
+            return
+        if 'audio' not in ac:
+            ac['audio'] = {}
+        ac['audio']['speak_time'] = time.time()
+        ac['audio']['was_prio'] = ac['prio']
+        ac['audio']['no_of_speaks'] = ac['audio'].get('no_of_speaks', 0) + 1
+        speak_func = radarbluez.priority_speak if ac['prio'] == 1 else radarbluez.speak
+        speak_func(message, 130)
+
+
+def check_clear_of_traffic():   # check if there is still a RA or TA situation in any aircraft
+    for icao, ac in all_ac.items():
+        if 'prio' in ac and ac['prio'] in [1, 2]:
+            return False
+    return True
+
+
+def collision_detection(ac, traffic, mode_s=False):
+    if args['advanced_collision_detection']:
+        advanced_collision_detection(ac, traffic, mode_s)
     else:
-        # implement hysteresis, speak traffic again if aircraft was once outside 3/4 of display radius
-        if ac['gps_distance'] > situation['RadarRange'] * 0.75:
-            ac['was_spoken'] = False
+        simple_collision_detection(ac, traffic, mode_s)
+
+
+def advanced_collision_detection(ac, traffic, mode_s=False):
+    # check collisiondetection for adsb and mode s, update priority and audio
+    old_prio = 0
+    if 'prio' in ac:
+        old_prio = ac['prio']
+    if mode_s:
+        tcas_state = collisiondetect.calc_modes_tcas_state(ac, situation)
+    else:
+        tcas_state = collisiondetect.calc_tcas_state(traffic, situation, ac['gps_distance'])
+    rlog.log(AIRCRAFT_DEBUG, f"TCAS state classified as: {tcas_state}")
+    ac['prio'] = collisiondetect.tcas_to_prio(tcas_state)
+    audio_output(ac, mode_s)
+    if old_prio in [1, 2] and not ac['prio'] in [1, 2]:  # there was a RA or TA on this aircraft, now it's clear
+        # check if there is still another RA situation
+        if check_clear_of_traffic():
+            rlog.log(COLLISION_DEBUG, f"Clear of conflict: {ac.get('tail','unknown')} oldprio {old_prio} newprio {ac['prio']} ")
+            ac.pop("audio", None)   # remove audio info, if aircraft comes back, speak it again
+            radarbluez.priority_speak("Clear of conflict", 130)
+
+
+def simple_collision_detection(ac, traffic, mode_s=False):
+    # only check if an aircraft is inside a cylinder denoted by the radar range and radar limits
+    # if yes, set prio to 2 (TA), else 4 (no collision)
+    # Within the inner circle (RadarRange/2) and RadarLimits/100, alarm traffic with the TA logic
+    if ac['gps_distance'] <= situation['RadarRange']/2 and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
+        ac['prio'] = 2
+    else:
+        ac['prio'] = 4
+    audio_output(ac, mode_s)
+    # no clear of traffic spoken
 
 
 def new_traffic(json_str):
@@ -348,19 +463,24 @@ def new_traffic(json_str):
         is_new = False
         if traffic['Icao_addr'] not in all_ac.keys():
             # new traffic, insert
-            all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'was_spoken': False}
+            all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'prio':0}
             is_new = True
         ac = all_ac[traffic['Icao_addr']]
+        now = time.time()
         if traffic['Age'] <= traffic['AgeLastAlt']:
-            ac['last_contact_timestamp'] = time.time() - traffic['Age']
+            ac['last_contact_timestamp'] = now - traffic['Age']
         else:
-            ac['last_contact_timestamp'] = time.time() - traffic['AgeLastAlt']
-        ac['height'] = round((traffic['Alt'] - situation['own_altitude']) / 100)
+            ac['last_contact_timestamp'] = now - traffic['AgeLastAlt']
+        ac['hdiff'] = round((traffic['Alt'] - situation['own_altitude']) / 100)
+        ac['alt'] = traffic['Alt']
+        ac['last_alt_timestamp'] = now - traffic['AgeLastAlt']
 
         if traffic['Speed_valid']:
             ac['nspeed'] = traffic['Speed']
         ac['vspeed'] = traffic['Vvel']
-        if traffic['Tail']:
+        if traffic['Tail'] and traffic['Tail'] != '':
+            # do not give up registration, if it is once received and now is empty,
+            # happens e.g. when same ICAO hex comes from FLARM without ddb entry
             ac['tail'] = traffic['Tail']
 
         # Traffic in all_ac list is
@@ -373,30 +493,38 @@ def new_traffic(json_str):
 
         if traffic['Position_valid'] and situation['gps_active']:
             # adsb traffic and stratux has valid gps signal
-            rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at height {ac['height']}")
+            rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at hdiff {ac['hdiff']}")
+            rlog.log(AIRCRAFT_DEBUG, f"Traffic is: {traffic}")
             if 'circradius' in ac:
-                del ac['circradius']
-                # was mode-s target before, now invalidate mode-s info
-            gps_rad, gps_angle = calc_gps_distance(traffic['Lat'], traffic['Lng'])
-            ac['gps_distance'] = gps_rad
+                del ac['circradius']   # was mode-s target before, now invalidate mode-s info on radius
+            if 'kf' in ac:
+                del ac['kf'] # was mode-s target before, now invalidate mode-s info on kalman filter
+            if 'last_position_timestamp' in ac and 'last_position_source' in ac:
+                if source == "FLARM" and ac['last_position_source'] == "1090" and \
+                        time.time() - ac['last_position_timestamp'] < FLARM_POSITION_OVER_ADSB_TIMEOUT:
+                        # ADSB-out timestamp is still fresh, ignore FLARM/OGN position update, this gives
+                        # priority to adsb-out positions
+                    rlog.log(AIRCRAFT_DEBUG, f"FLARM position message of {traffic['Icao_addr']:X} ignored since ADSB position is still fresh")
+                    return
+            ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             ac['last_position_timestamp'] = time.time()
+            ac['last_position_source'] = source    # we need to know where the last position was recorded from
             if 'Track' in traffic:
                 ac['direction'] = traffic['Track'] - situation['course']
                 # sometimes track is missing, then leave it as it is
-            if gps_rad <= situation['RadarRange'] and abs(ac['height']) <= round(situation['RadarLimits'] / 100):
-                res_angle = (gps_angle - situation['course']) % 360
-                gpsx = math.sin(math.radians(res_angle)) * gps_rad
-                gpsy = - math.cos(math.radians(res_angle)) * gps_rad
+            collision_detection(ac, traffic, False)
+            if ac['gps_distance'] <= situation['RadarRange'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
+                res_angle = (ac['gps_angle'] - situation['course']) % 360
+                gpsx = math.sin(math.radians(res_angle)) * ac['gps_distance']
+                gpsy = - math.cos(math.radians(res_angle)) * ac['gps_distance']
                 ac['x'] = round(max_pixel / 2 * gpsx / situation['RadarRange'] + zerox)
                 ac['y'] = round(max_pixel / 2 * gpsy / situation['RadarRange'] + zeroy)
                 if 'nspeed' in ac:
                     nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
                     ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
-                speech_output_adsb(ac, gps_rad)
             else: # outside of display
                 ac['x'] = -1
                 ac['y'] = -1
-
         else:
             # mode-s traffic or no valid GPS position of stratux
             if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
@@ -422,9 +550,12 @@ def new_traffic(json_str):
                 del ac['y']
                 rlog.log(AIRCRAFT_DEBUG, f"Removing position of {traffic['Icao_addr']:X} since position "
                                          f"was older than {POSITION_VALID_DELTA}secs")
-            speech_output_modes(ac)
+            collision_detection(ac, traffic, True)
+
     except KeyError:  # to be safe in case keys are changed in Stratux
-        rlog.log(AIRCRAFT_DEBUG, "KeyError decoding:" + json_str)
+        rlog.debug(f"KeyError decoding {json_str}")
+        rlog.debug(f"Own situation was: {situation}")
+        rlog.debug(f"traceback: {traceback.format_exc()}")
 
 
 def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
@@ -450,6 +581,16 @@ def update_time(time_str):  # time_str has format "2021-04-18T15:58:58.1Z"
             last_bt_checktime = 0.0  # reset timer
 
 
+def update_field_if_changed(target_dict, field_name, new_value, changed_flag_dict=None):
+    """Update a field if the value changed and mark as changed."""
+    if target_dict[field_name] != new_value:
+        target_dict[field_name] = new_value
+        if changed_flag_dict:
+            changed_flag_dict['was_changed'] = True
+        return True
+    return False
+
+
 def new_situation(json_str):
     global vertical_max
     global vertical_min
@@ -463,38 +604,27 @@ def new_situation(json_str):
             situation['was_changed'] = True
             ahrs['was_changed'] = True  # connection also relevant for ahrs
             gmeter['was_changed'] = True  # connection also relevant for ahrs
-        gps_active = sit['GPSHorizontalAccuracy'] < 19999
+        gps_active = sit['GPSHorizontalAccuracy'] < 999999.00
         if situation['gps_active'] != gps_active:
             situation['gps_active'] = gps_active
             situation['was_changed'] = True
         if not basemode:
-            if situation['course'] != round(sit['GPSTrueCourse']):
-                situation['course'] = round(sit['GPSTrueCourse'])
-                situation['was_changed'] = True
-        if situation['own_altitude'] != sit['BaroPressureAltitude']:
-            situation['own_altitude'] = sit['BaroPressureAltitude']
-            situation['was_changed'] = True
-        if situation['latitude'] != sit['GPSLatitude']:
-            situation['latitude'] = sit['GPSLatitude']
-            situation['was_changed'] = True
-        if situation['longitude'] != sit['GPSLongitude']:
-            situation['longitude'] = sit['GPSLongitude']
-            situation['was_changed'] = True
-        if situation['gps_quality'] != sit['GPSFixQuality']:
-            situation['gps_quality'] = sit['GPSFixQuality']
-            situation['was_changed'] = True
-        if situation['gps_h_accuracy'] != sit['GPSHorizontalAccuracy']:
-            situation['gps_h_accuracy'] = sit['GPSHorizontalAccuracy']
-            situation['was_changed'] = True
-        if situation['gps_v_accuracy'] != sit['GPSVerticalAccuracy']:
-            situation['gps_v_accuracy'] = sit['GPSVerticalAccuracy']
-            situation['was_changed'] = True
-        if situation['gps_speed'] != sit['GPSGroundSpeed']:
-            situation['gps_speed'] = sit['GPSGroundSpeed']
-            situation['was_changed'] = True
-        if situation['gps_altitude'] != sit['GPSAltitudeMSL']:
-            situation['gps_altitude'] = sit['GPSAltitudeMSL']
-            situation['was_changed'] = True
+            update_field_if_changed(situation, 'course', round(sit['GPSTrueCourse']), situation)
+        
+        # Update situation fields
+        fields_to_update = [
+            ('own_altitude', sit['BaroPressureAltitude']),
+            ('latitude', sit['GPSLatitude']),
+            ('longitude', sit['GPSLongitude']),
+            ('gps_quality', sit['GPSFixQuality']),
+            ('gps_h_accuracy', sit['GPSHorizontalAccuracy']),
+            ('gps_v_accuracy', sit['GPSVerticalAccuracy']),
+            ('gps_speed', sit['GPSGroundSpeed']),
+            ('gps_altitude', sit['GPSAltitudeMSL'])
+        ]
+        
+        for field_name, new_value in fields_to_update:
+            update_field_if_changed(situation, field_name, new_value, situation)
 
         if sit['BaroSourceType'] == 1 or sit['BaroSourceType'] == 2 or sit['BaroSourceType'] == 3:
             # 1 = BMP280, 2 = OGN device, 3 = NMEA device
@@ -525,48 +655,31 @@ def new_situation(json_str):
                 # not yet an update time value from GPS, but the old one is transmitted by stratux
                 update_time(sit['GPSTime'])
         # ahrs
-        if ahrs['pitch'] != round(sit['AHRSPitch']):
-            ahrs['pitch'] = round(sit['AHRSPitch'])
-            ahrs['was_changed'] = True
-        if ahrs['roll'] != round(sit['AHRSRoll']):
-            ahrs['roll'] = round(sit['AHRSRoll'])
-            ahrs['was_changed'] = True
-        if ahrs['heading'] != round(sit['AHRSGyroHeading']):
-            ahrs['heading'] = round(sit['AHRSGyroHeading'])
-            ahrs['was_changed'] = True
-        if ahrs['slipskid'] != round(sit['AHRSSlipSkid']):
-            ahrs['slipskid'] = round(sit['AHRSSlipSkid'])
-            ahrs['was_changed'] = True
-        if ahrs['gps_hor_accuracy'] != round(sit['GPSHorizontalAccuracy']):
-            ahrs['gps_hor_accuracy'] = round(sit['GPSHorizontalAccuracy'])
-            ahrs['was_changed'] = True
-        if sit['AHRSStatus'] & 0x02:
-            ahrs_flag = True
-        else:
-            ahrs_flag = False
-        if sit['AHRSStatus'] & 0x08:
-            ahrs_caging = True
-        else:
-            ahrs_caging = False
-        if ahrs['is_caging'] != ahrs_caging:
-            ahrs['is_caging'] = ahrs_caging
-            ahrs['was_changed'] = True
-        if ahrs['ahrs_sensor'] != ahrs_flag:
-            ahrs['ahrs_sensor'] = ahrs_flag
-            ahrs['was_changed'] = True
+        ahrs_fields_to_update = [
+            ('pitch', round(sit['AHRSPitch'])),
+            ('roll', round(sit['AHRSRoll'])),
+            ('heading', round(sit['AHRSGyroHeading'])),
+            ('slipskid', round(sit['AHRSSlipSkid'])),
+            ('gps_hor_accuracy', round(sit['GPSHorizontalAccuracy']))
+        ]
+        
+        for field_name, new_value in ahrs_fields_to_update:
+            update_field_if_changed(ahrs, field_name, new_value, ahrs)
+        
+        ahrs_flag = bool(sit['AHRSStatus'] & 0x02)
+        ahrs_caging = bool(sit['AHRSStatus'] & 0x08)
+        update_field_if_changed(ahrs, 'is_caging', ahrs_caging, ahrs)
+        update_field_if_changed(ahrs, 'ahrs_sensor', ahrs_flag, ahrs)
 
-        current = round(sit['AHRSGLoad'], 2)
-        if gmeter['current'] != current:
-            gmeter['current'] = current
-            gmeter['was_changed'] = True
-        maxv = round(sit['AHRSGLoadMax'], 2)
-        if gmeter['max'] != maxv:
-            gmeter['max'] = maxv
-            gmeter['was_changed'] = True
-        minv = round(sit['AHRSGLoadMin'], 2)
-        if gmeter['min'] != minv:
-            gmeter['min'] = minv
-            gmeter['was_changed'] = True
+        # gmeter updates
+        gmeter_fields_to_update = [
+            ('current', round(sit['AHRSGLoad'], 2)),
+            ('max', round(sit['AHRSGLoadMax'], 2)),
+            ('min', round(sit['AHRSGLoadMin'], 2))
+        ]
+        
+        for field_name, new_value in gmeter_fields_to_update:
+            update_field_if_changed(gmeter, field_name, new_value, gmeter)
 
         if simulation_mode:
             sim_data = simulation.read_simulation_data()
@@ -587,15 +700,15 @@ def new_situation(json_str):
         rlog.log(SITUATION_DEBUG, "KeyError decoding situation:" + json_str)
 
 
-async def listen_forever(path, name, callback, logger):
-    logger.debug(name + " waiting for " + path)
+async def listen_forever(path, name, callback):
+    rlog.debug(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
-        logger.debug(name + " active ...")
+        rlog.debug(name + " active ...")
         try:
             async with websockets.connect(path, ping_timeout=None, ping_interval=None, close_timeout=2) as ws:
                 # stratux does not respond to pings! close timeout set down to get earlier disconnect
-                logger.debug(name + " connected on " + path)
+                rlog.debug(name + " connected on " + path)
                 while True:
                     # listener loop
                     try:
@@ -605,24 +718,24 @@ async def listen_forever(path, name, callback, logger):
                         # No situation received or traffic in CHECK_CONNECTION_TIMEOUT seconds, retry to connect
                         # rlog.debug(name + ': TimeOut received waiting for message.')
                         if situation['connected'] is False:  # Probably connection lost
-                            logger.debug(name + ': Watchdog detected connection loss.' +
+                            rlog.debug(name + ': Watchdog detected connection loss.' +
                                          ' Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                             await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                             break
                     except websockets.exceptions.ConnectionClosed:
-                        logger.debug(
+                        rlog.debug(
                             name + ' ConnectionClosed. Retrying connect in {} sec '.format(LOST_CONNECTION_TIMEOUT))
                         await asyncio.sleep(LOST_CONNECTION_TIMEOUT)
                         break
                     except asyncio.CancelledError:
-                        logger.debug(name + " shutting down ... ")
-                        return
+                        rlog.debug(name + " shutting down ... ")
+                        raise
                     else:
                         callback(message)
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
         except (socket.error, websockets.exceptions.WebSocketException, asyncio.TimeoutError):
-            logger.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
+            rlog.debug(name + ' WebSocketException. Retrying connection in {} sec '.format(RETRY_TIMEOUT))
             if name == 'SituationHandler' and situation['connected']:
                 situation['connected'] = False
                 ahrs['was_changed'] = True
@@ -631,8 +744,10 @@ async def listen_forever(path, name, callback, logger):
             await asyncio.sleep(RETRY_TIMEOUT)
             continue
         except asyncio.CancelledError:
-            logger.debug(name + " shutting down in connect ... ")
-            return
+            rlog.debug(name + " shutting down in connect ... ")
+            raise
+        finally:
+            pass   # no ressource to free, websockets are closed automatically on exit of the context manager
 
 
 async def user_interface():
@@ -707,6 +822,10 @@ async def user_interface():
                     Globals.refresh = True
     except asyncio.CancelledError:
         rlog.debug("UI task terminating ...")
+        raise
+    finally:
+        # Loop through and safely close every active gpiozero device
+        radarui.shutdown()   # release GPIO
 
 
 def refresh_display(manual = False):
@@ -730,7 +849,6 @@ def refresh_display(manual = False):
 async def display_and_cutoff():
     global aircraft_changed
     global display_control
-    global situation
 
     try:
         while True:
@@ -746,9 +864,6 @@ async def display_and_cutoff():
                     timerui.draw_timer(display_control, display_refresh_time)
                 elif Globals.mode == Modes.SHUTDOWN:  # shutdown
                     final_shutdown = shutdownui.draw_shutdown(display_control)
-                    if final_shutdown:
-                        rlog.debug("Shutdown triggered: Display task terminating ...")
-                        return
                 elif Globals.mode == Modes.REFRESH_RADAR:  # refresh display, only relevant for epaper, mode was radar
                     rlog.debug("Radar: Display driver - Refreshing")
                     refresh_display(manual=True)
@@ -858,72 +973,105 @@ async def display_and_cutoff():
                     ahrs['was_changed'] = True
                     gmeter['was_changed'] = True
                     rlog.debug(f"WATCHDOG: No situation update received in {WATCHDOG_TIMER} seconds")
-    except (asyncio.CancelledError, RuntimeError):
+    except asyncio.CancelledError:
         rlog.debug("Display task terminating ...")
+        raise
+    finally:
+        rlog.debug("CleanUp Display ...")
+        display_control.cleanup()  # cleanup display on exit
 
 
 async def coroutines():
-    tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic, rlog))
-    sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation, rlog))
-    dis_cutoff = asyncio.create_task(display_and_cutoff())
-    sensor_reader = asyncio.create_task(cowarner.read_sensors())
-    ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor())
-    u_interface = asyncio.create_task(user_interface())
-    await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
-    # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
+    try:
+        tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic), name="TrafficHandler")
+        sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation), name="SituationHandler")
+        dis_cutoff = asyncio.create_task(display_and_cutoff(), name="DisplayHandler")
+        sensor_reader = asyncio.create_task(cowarner.read_sensors(), name="SensorReader")
+        ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor(), name="GroundDistanceReader")
+        u_interface = asyncio.create_task(user_interface(), name="UserInterface")
+        await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
+        # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
+    except asyncio.CancelledError:
+        rlog.debug("Coroutines cancelled")
+        raise
+    finally:
+        pass   # no special cleanup necessary, all tasks are cancelled in quit_gracefully
 
-
-def main():
-    global max_pixel
-    global zerox
-    global zeroy
-    global display_refresh_time
-    global extsound_active
-    global bluetooth_active
-    global button_api_active
-    global radar_sound_on_sound
-    global radar_sound_off_sound
-
-    print("Stratux Radar Display " + RADAR_VERSION + " running ...")
-    if not radarui.init(url_settings_set, button_api_active):
-        print("GPIO Error, is  another radar process running? Terminating.")
-        return 1
-    shutdownui.init(url_shutdown, url_reboot)
+def initialize_ui_components():
+    """Initialize UI components and related services."""
+    if not radarui.init(url_settings_set, button_api_active, ble_address, new_traffic):
+        rlog.debug("GPIO Error, is  another radar process running? Terminating.")
+        return False
+    
+    shutdownui.init(url_shutdown, url_reboot, quit_gracefully)
     timerui.init(global_config)
-    extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
-    radar_sound_on_sound = radarbluez.prepare_sounds_string("Radar sound on")
-    radar_sound_off_sound = radarbluez.prepare_sounds_string("Radar sound off")
-    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
     ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
+    checklist.init(xml_checklist)
+    ble.init(ble_address, new_traffic, new_situation, situation)
+    return True
+
+
+def initialize_audio_system():
+    """Initialize audio system and prepare sounds."""
+    global extsound_active, bluetooth_active, radar_sound_on_sound, radar_sound_off_sound
+    
+    extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
+    radar_sound_on_sound = radarbluez.prepare_sounds_string("Radar sound on")
+    radar_sound_off_sound = radarbluez.prepare_sounds_string("Radar sound off")
+
+
+def initialize_sensors_and_simulation():
+    """Initialize sensor systems and simulation."""
     cowarner.init(co_warner_activated, global_config, SITUATION_DEBUG, co_indication, co_simulation_mode, co_i2c_0)
     grounddistance.init(grounddistance_activated, SAVED_STATISTICS, SITUATION_DEBUG,
-                        groundbeep, countdown, gear_indication, situation, simulation_mode)
+                        groundbeep, countdown, gear_indication, situation, simulation_mode,
+                        grounddistance_fallback_cm)
     simulation.init(simulation_mode)
-    checklist.init(xml_checklist)
+
+
+def main():
+    global max_pixel, zerox, zeroy, display_refresh_time
+    print("Stratux Radar Display " + RADAR_VERSION + " running ...")
+    # Initialize UI components
+    if not initialize_ui_components():
+        return 1
+    # Initialize audio system
+    initialize_audio_system()
+    # Initialize display
+    max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
+    # Initialize sensors and simulation
+    initialize_sensors_and_simulation()
     rlog.debug(f"Initialization finished. Global config {global_config}")
-    display_control.startup(RADAR_VERSION, url_host_base, 4)
+    if ble_address is None:
+        display_control.startup(RADAR_VERSION, url_host_base, 4)
+    else:
+        display_control.startup(RADAR_VERSION, f"BLE-{ble_address}", 4)
+    
     try:
         asyncio.run(coroutines())
     except asyncio.CancelledError:
         rlog.debug("Main cancelled")
+        raise
+    finally:
+        rlog.debug("Main exiting ...")
 
 
 def quit_gracefully(*argus):
-    print("Keyboard interrupt or shutdown. Quitting ...")
+    print("Keyboard interrupt or shutdown. Quit gracefully ...")
     try:
         tasks = asyncio.all_tasks()
         for ta in tasks:
             ta.cancel()
-    except RuntimeError:
+        # wait for all tasks to finish to make sure all resources are released properly
+        asyncio.get_event_loop().run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
+    except (RuntimeError, AttributeError, asyncio.CancelledError):
         pass
     radarbluez.sound_terminate()
-    rlog.debug("CleanUp Display ...")
-    display_control.cleanup()
-    return 0
+    cowarner.shutdown()  # release GPIO
 
 
 def radar_excepthook(exc_type, exc_value, exc_traceback):
@@ -954,14 +1102,16 @@ if __name__ == "__main__":
     elif args['verbose'] == 1:
         rlog.setLevel(logging.DEBUG)  # log events without situation and aircraft
     elif args['verbose'] == 2:
-        rlog.setLevel(AIRCRAFT_DEBUG)  # log including aircraft
+        rlog.setLevel(COLLISION_DEBUG)  # log collision detection
+    elif args['verbose'] == 3:
+        rlog.setLevel(AIRCRAFT_DEBUG)  # log including situation messages
     else:
         rlog.setLevel(SITUATION_DEBUG)  # log including situation messages
-    if args['logfile']:   # set a log file
+    if args['logfile']:  # set a log file
         log_dir = Path(arguments.FULL_LOG_DIR)
         log_dir.mkdir(parents=True, exist_ok=True)  # Create directory and parents for log file if they don't exist
         loghandler = logging.handlers.RotatingFileHandler(filename=arguments.FULL_LOG_FILE, mode='a', encoding="utf-8",
-                                                 maxBytes=10*1024*1024, backupCount=5)
+                                                          maxBytes=10 * 1024 * 1024, backupCount=5)
         formatter = logging.Formatter('%(asctime)-15s > %(message)s')
         loghandler.setFormatter(formatter)
         rlog.addHandler(loghandler)
@@ -984,9 +1134,11 @@ if __name__ == "__main__":
     co_indication = args['coindicate']
     co_i2c_0 = args['coi2c0']
     grounddistance_activated = args['grounddistance']
+    fallback_option = args['fallback_distance']
+    grounddistance_fallback_cm = float(fallback_option) if isinstance(fallback_option, (int, float)) and fallback_option > 0 else 0.0
     groundbeep = args['groundbeep']
     countdown = args['countdown']
-    gear_indication = args ['gearindicate']
+    gear_indication = args['gearindicate']
     simulation_mode = args['simulation']
     co_simulation_mode = args['cosimulation']
     button_api_active = args['buttonapi']
@@ -1000,6 +1152,8 @@ if __name__ == "__main__":
     global_config['sound_volume'] = args['extsound']  # 0 if not enabled
     if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
         global_config['sound_volume'] = 50  # set to a medium value if strange number used
+    aircraft_simulation = args['aircraftsim']  # set to None if parameter is not set
+    ble_address = args['ble']
 
     # check config file, if existent use config from there
     saved_config = statusui.read_config(CONFIG_FILE)
@@ -1015,7 +1169,6 @@ if __name__ == "__main__":
             global_config['sound_volume'] = saved_config['sound_volume']
         if 'CO_warner_R0' in saved_config:
             global_config['CO_warner_R0'] = saved_config['CO_warner_R0']
-
     url_situation_ws = "ws://" + url_host_base + "/situation"
     url_radar_ws = "ws://" + url_host_base + "/radar"
     url_status_ws = "ws://" + url_host_base + "/status"
@@ -1030,8 +1183,8 @@ if __name__ == "__main__":
     url_calibrate = "http://" + url_host_base + "/calibrateAHRS"
 
     try:
-        signal.signal(signal.SIGINT, quit_gracefully)  # to be able to receive sigint
         signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown
         main()
-    except KeyboardInterrupt:
-        pass
+    except (KeyboardInterrupt, CancelledError):
+        quit_gracefully()
+        sys.exit(0)

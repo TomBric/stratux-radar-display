@@ -42,25 +42,32 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import arguments
 import radarmodes
 import alsaaudio
+import globals
 import subprocess
+import ipaddress
+import asyncio
+import re
 from werkzeug.utils import secure_filename
 import xmltodict
+import ble
 
 from flask import Flask, render_template, request, flash, redirect, url_for, send_from_directory
 from markupsafe import Markup
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_wtf.file import FileField
-from wtforms.validators import DataRequired, Length, Regexp, IPAddress, NumberRange
+from wtforms.validators import DataRequired, Length, Regexp, NumberRange, ValidationError
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 
-RADAR_WEB_VERSION = "1.1"
+RADAR_WEB_VERSION = "1.2"
 START_RADAR_FILE = "../../image/stratux_radar.sh"
 RADAR_COMMAND = "radar.py"       # command line to search in start_radar.sh
 RADARAPP_COMMAND = "radarapp.py"  # command line to search in start_radar.sh
 REBOOT_TIMEOUT = 5    # time to wait till reboot is triggered after input
 MAX_SEQUENCE = 99   # maximum value accepted as sequence of modes
 MAX_CHECKLIST_SIZE = 256 * 1024  # max size of checklist, set to 256K
+BLE_ADDRESS_PATTERN = r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
+BLE_ADDRESS_RE = re.compile(BLE_ADDRESS_PATTERN)
 DEFAULT_IP_DIRECT_ON_STRATUX = "127.0.0.1"
 # IP address of stratux when running on stratux. The field is not rendered in stratux-mode,
 # so it has to be set explicitly after each request
@@ -83,6 +90,8 @@ csrf = CSRFProtect(app)
 
 rlog = None  # radar specific logger
 watchdog = None  # watchdog to shut dow
+ble_scan_results = []
+ble_scan_timed_out = False
 
 class Watchdog:
     def __init__(self, timeout=180):
@@ -137,7 +146,18 @@ class DisplayLogForm(FlaskForm):
     reload = SubmitField('Reload Log File')
 
 class RadarForm(FlaskForm):
-    stratux_ip = StringField('IP address of Stratux', default='192.168.10.1', validators=[IPAddress()])
+
+    connection_mode = RadioField('Connection type',
+                                 choices=[('stratux', 'Stratux WiFi connection'), ('ble', 'Flarm NMEA via BLE')],
+                                 default='stratux')
+    stratux_ip = StringField('IP address of Stratux', default='192.168.10.1')
+    ble_address = StringField('BLE device address', default='', validators=[
+        Length(max=17),
+        Regexp(r'^$|' + BLE_ADDRESS_PATTERN,
+               message='BLE address must look like 00:11:22:33:44:55')
+    ])
+    scan_ble_devices = SubmitField('Search BLE devices')
+    ble_device_choice = RadioField('Found BLE devices', choices=[], validate_choice=False)
     display = RadioField('Display type to use',choices=[('NoDisplay', 'No display'),
             ('Oled_1in5', 'Oled 1.5 inch'), ('Epaper_1in54', 'Epaper display 1.54 inch'),
             ('Epaper_3in7', 'Epaper display 3.7 inch'), ('Epaper_3in7_Round', 'Epaper display 3.7 inch - Round front'),
@@ -199,6 +219,7 @@ class RadarForm(FlaskForm):
     coindicate = SwitchField('Indicate CO warning on GPIO16', default = False)
     coi2c0 = SwitchField('Use I2C bus 0 for CO sensor (GPIO 0 and GPIO 1)', default = False)
     no_flighttime = SwitchField('Suppress detection and display of flighttime', default=False)
+    advanced_collision_detection = SwitchField('Advanced collision detection', default=False)
     autorefresh = RadioField('E-paper display autorefresh cycle',
                             choices=[('0', 'no automatic refresh (recommended)'), ('300', 'after 5 mins'),
                                      ('600', 'after 10 mins'),
@@ -207,6 +228,8 @@ class RadarForm(FlaskForm):
 
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
+    fallback_ground_distance = FloatField('Fallback ground distance [cm]', default=100.0,
+                                          validators=[NumberRange(min=10.0, max=500.0)])
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     countdown = SwitchField('Indicate ground distance via countdown screen', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
@@ -224,6 +247,31 @@ class RadarForm(FlaskForm):
         if on_stratux:
             self.stratux_ip.data = DEFAULT_IP_DIRECT_ON_STRATUX
 
+    def validate_ble_address(self, field):
+        if self.connection_mode.data != 'ble':
+            return
+        ble_address = (field.data or '').strip()
+        if len(ble_address) == 0:
+            selected_choice = (self.ble_device_choice.data or '').strip()
+            known_choices = self.ble_device_choice.choices or []
+            is_known_choice = any(len(choice) > 0 and choice[0] == selected_choice for choice in known_choices)
+            if is_known_choice and BLE_ADDRESS_RE.fullmatch(selected_choice):
+                ble_address = selected_choice
+                field.data = ble_address
+                return
+            raise ValidationError('BLE device address is required when FLARM NMEA via BLE is enabled.')
+
+    def validate_stratux_ip(self, field):
+        if self.connection_mode.data != 'stratux':
+            return
+        value = (field.data or '').strip()
+        if len(value) == 0:
+            raise ValidationError('IP address of Stratux is required when Stratux Wifi connection is enabled.')
+        try:
+            ipaddress.ip_address(value)
+        except ValueError:
+            raise ValidationError('Please enter a valid IP address for Stratux.')
+
 
 def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called from radar_app
     retvalue = []
@@ -236,6 +284,39 @@ def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called fr
         rlog.debug(f"ALSAAudioError retrieving cards and mixers ")
     rlog.debug(f"Available Mixers: {retvalue} ")
     return retvalue
+
+
+def update_ble_device_choices(radar_form):
+    choices = []
+    for device in ble_scan_results:
+        address = device.get('address', '')
+        name = device.get('name', f'Unknown ({address})')
+        if len(address) > 0:
+            choices.append((address, f"{name} - {address}"))
+    radar_form.ble_device_choice.choices = choices
+    ble_address = radar_form.ble_address.data or ''
+    if ble_address in dict(choices):
+        radar_form.ble_device_choice.data = ble_address
+    elif len(choices) > 0:
+        radar_form.ble_device_choice.data = choices[0][0]
+        if len(ble_address.strip()) == 0:
+            radar_form.ble_address.data = choices[0][0]
+
+
+def scan_ble_devices():
+    global ble_scan_results
+    global ble_scan_timed_out
+    try:
+        scan_result = asyncio.run(ble.search_ble())
+        ble_scan_results = scan_result.get('devices', [])
+        ble_scan_timed_out = scan_result.get('timed_out', False)
+        rlog.debug(f'BLE scan returned devices: {ble_scan_results}')
+        return ble_scan_results, ble_scan_timed_out
+    except Exception as e:
+        rlog.debug(f'BLE scan failed: {e}')
+        ble_scan_results = []
+        ble_scan_timed_out = False
+        return [], False
 
 
 def read_options_in_file(file_path, word):
@@ -269,13 +350,14 @@ def modify_line_in_file(file_path, word, new_text):    # search word in file and
                     file.write(new_line)
                 else:
                     file.write(line)
+            file.flush()  # Ensure data is written to disk immediately
+        return True
     except FileNotFoundError:
-        rlog.debug(f'Radar-app: {START_RADAR_FILE} not found!')
+        rlog.debug(f'Radar-app: {file_path} not found!')
         return False
     except Exception as e:
-        rlog.debug(f'Radar-app: Error {e} modifying {START_RADAR_FILE}')
+        rlog.debug(f'Radar-app: Error {e} modifying {file_path}')
         return False
-    return True
 
 
 def find_line_in_file(file_path, word):
@@ -283,9 +365,9 @@ def find_line_in_file(file_path, word):
         with open(file_path, 'r') as file:
             lines = file.readlines()
     except FileNotFoundError:
-        rlog.debug(f'Radar-app: {START_RADAR_FILE} not found!')
+        rlog.debug(f'Radar-app: {file_path} not found!')
     except Exception as e:
-        rlog.debug(f'Radar-app: Error {e} modifying {START_RADAR_FILE}')
+        rlog.debug(f'Radar-app: Error {e} modifying {file_path}')
     for line in lines:
         if word in line:
             return line
@@ -322,6 +404,8 @@ def read_arguments(rf):
         return
     rf.display.data = args['device']
     rf.stratux_ip.data = args['connect']
+    rf.connection_mode.data = 'ble' if args['ble'] is not None else 'stratux'
+    rf.ble_address.data = '' if args['ble'] is None else args['ble']
     rf.display.data = args['device']
 
     # radar options
@@ -339,6 +423,9 @@ def read_arguments(rf):
     rf.speakdistance.data = args['speakdistance']
     # ground-options
     rf.groundsensor.data = args['grounddistance']
+    fallback_option = args['fallback_distance']
+    if isinstance(fallback_option, (int, float)) and fallback_option > 0.0:
+        rf.fallback_ground_distance.data = float(fallback_option)
     rf.groundbeep.data = args['groundbeep']
     rf.countdown.data = args['countdown']
     rf.gearindicate.data = args['gearindicate']
@@ -349,6 +436,7 @@ def read_arguments(rf):
     rf.coindicate.data = args['coindicate']
     rf.coi2c0.data = args['coi2c0']
     rf.no_flighttime.data = args['noflighttime']
+    rf.advanced_collision_detection.data = args['advanced_collision_detection']
     rf.checklist_filename.data = args['checklist']
     if args['refresh'] is not None:
         rf.autorefresh.data = str(args['refresh'])
@@ -381,8 +469,13 @@ def app_option_string(radarform):
 def build_mode_string(radarform):
     res = ''
     modestring = ''
+    skip_modes = set()
+    if radarform.connection_mode.data == 'ble':
+        skip_modes = {'D', 'S'}
     for i in range(1, MAX_SEQUENCE+1):    # this is a simple enumeration, no sorting
         for (key, value) in modes.items():
+            if key in skip_modes:
+                continue
             if getattr(radarform, value + '_seq').data == i and getattr(radarform, value).data is True:
                 modestring += key
     if len(modestring) > 0:
@@ -401,7 +494,13 @@ def write_arguments(rf):
     return True
 
 def build_option_string(rf):
-    out = f'-d {rf.display.data} -c {rf.stratux_ip.data}'
+    out = f'-d {rf.display.data}'
+    if rf.connection_mode.data == 'stratux':
+        out += f' -c {rf.stratux_ip.data}'
+    elif rf.connection_mode.data == 'ble':
+        ble_addr = (rf.ble_address.data or '').strip()
+        if len(ble_addr) > 0:
+            out += f' -ble {ble_addr}'
     out += build_mode_string(rf)
     if rf.ground_mode.data is True:
         out += ' -n'
@@ -423,6 +522,11 @@ def build_option_string(rf):
         out += ' -sd'
     if rf.groundsensor.data is True:
         out += ' -gd'
+        fallback_distance = rf.fallback_ground_distance.data
+        if fallback_distance is None or fallback_distance < 10.0 or fallback_distance > 500.0:
+            fallback_distance = 100.0
+        fallback_distance = float(fallback_distance)
+        out += f' -fb {fallback_distance}'
     if rf.groundbeep.data is True:
         out += ' -gb'
     if rf.countdown.data is True:
@@ -439,6 +543,8 @@ def build_option_string(rf):
         out += ' -cb0'
     if rf.no_flighttime.data is True:
         out += ' -nf'
+    if rf.advanced_collision_detection.data is True:
+        out += ' -acd'
     if rf.checklist.data is True and len(rf.checklist_filename.data) > 0:
         out += f' -chl {secure_filename(rf.checklist_filename.data)}'
     if rf.autorefresh.data != '0':
@@ -467,14 +573,47 @@ local_checklist_filename = ""
 def index():
     global result_message
     global local_checklist_filename
+    global ble_scan_timed_out
 
     watchdog.refresh()
     radar_form = RadarForm(cards_and_mixers(), stratux_mode)
+    update_ble_device_choices(radar_form)
     rlog.debug(f'index(): webtimeout is {radar_form.webtimeout.data}')
     rlog.debug(f'index(): stratux-ip is {radar_form.stratux_ip.data}')
-    if radar_form.validate_on_submit() is not True:   # no POST request
+    if request.method == 'POST' and radar_form.scan_ble_devices.data is True:
+        rlog.debug('BLE scan requested by user')
+        found_devices, timed_out = scan_ble_devices()
+        update_ble_device_choices(radar_form)
+        if timed_out and len(found_devices) > 0:
+            flash(Markup(f'BLE scan timed out - showing {len(found_devices)} partial result(s).'), 'warning')
+        elif timed_out:
+            flash(Markup('BLE scan timed out - no matching devices found before timeout.'), 'warning')
+        elif len(found_devices) > 0:
+            flash(Markup(f'Found {len(found_devices)} BLE device(s) with service FFE0.'), 'success')
+        else:
+            flash(Markup('No BLE devices found with service FFE0.'), 'warning')
+        return render_template('index.html', radar_form=radar_form, on_stratux=stratux_mode)
+    if request.method == 'POST' and radar_form.connection_mode.data == 'ble':
+        ble_address = (radar_form.ble_address.data or '').strip()
+        if len(ble_address) == 0:
+            selected_choice = (radar_form.ble_device_choice.data or '').strip()
+            known_choices = radar_form.ble_device_choice.choices or []
+            is_known_choice = any(len(choice) > 0 and choice[0] == selected_choice for choice in known_choices)
+            if is_known_choice and BLE_ADDRESS_RE.fullmatch(selected_choice):
+                radar_form.ble_address.data = selected_choice
+        # In BLE mode these fields are disabled in the browser and therefore not posted.
+        # Keep deterministic values so NumberRange validators do not fail on None.
+        if radar_form.status_seq.data is None:
+            radar_form.status_seq.data = 1
+        if radar_form.stratux_seq.data is None:
+            radar_form.stratux_seq.data = 1
+    is_valid_submit = radar_form.validate_on_submit()
+    if is_valid_submit is not True:   # GET request or validation errors
+        if request.method == 'POST':
+            rlog.debug(f'index(): form validation failed: {radar_form.errors}')
         read_arguments(radar_form)  # in case of errors reading arguments, default is taken
         read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
+        update_ble_device_choices(radar_form)
         rlog.debug(f'index() after read_arguments: stratux-ip is {radar_form.stratux_ip.data}')
     else:
         rlog.debug(f'index() in else for POST: stratux-ip is {radar_form.stratux_ip.data}')
@@ -596,7 +735,7 @@ def display_log():
     return render_template('display_log.html', display_log_form=dlf, content=content)
 
 if __name__ == '__main__':
-    print("Stratux Radar Web Configuration Server " + RADAR_WEB_VERSION + " running ...")
+    print("Radar Display Web Configuration Server " + RADAR_WEB_VERSION + " running ...")
     logging_init()
     ap = argparse.ArgumentParser(description='Stratux radar web configuration')
     ap.add_argument("-t", "--timer", type=int, required=False,

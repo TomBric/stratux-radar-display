@@ -59,7 +59,7 @@ def add(ap):
     ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use",
                     default=DEFAULT_CHECKLIST)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP (deprecated, use --url instead)", default=DEFAULT_URL_HOST_BASE)
-    ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-3]",
+    ap.add_argument("-v", "--verbose", type=int, required=False, help="Debug output level [0-NoDebug 1-Debug 2-Collision 3-Aircraft 4-Situation]",
                     default=0)
     ap.add_argument("-r", "--registration", required=False, help="Display registration no",
                     action="store_true", default=False)
@@ -77,11 +77,15 @@ def add(ap):
                     action="store_true", default=False)
     ap.add_argument("-gd", "--grounddistance", required=False, help="Activate ground distance sensor",
                     action="store_true", default=False)
+    ap.add_argument("-fb", "--fallback_distance", type=float, required=False,
+                    help="Fallback ground distance in cm if startup sensor reading is invalid", default=None)
     ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
                     action="store_true", default=False)
     ap.add_argument("-cd", "--countdown", required=False, help="Show ground distance ground down screen",
                     action="store_true", default=False)
     ap.add_argument("-gi", "--gearindicate", required=False, help="Indicate gear warning",
+                    action="store_true", default=False)
+    ap.add_argument("-acd", "--advanced_collision_detection", required=False, help="Use advanced collision detection algorithms",
                     action="store_true", default=False)
     ap.add_argument("-sim", "--simulation", required=False, help="Simulation mode for testing",
                     action="store_true", default=False)
@@ -99,3 +103,5 @@ def add(ap):
                          "M=distance measurement L=checklist  Example: -modes RADCM", default="RTAGKVICMDSL")
     ap.add_argument("-log", "--logfile", required=False, help=f"Output log to logfile {FULL_LOG_FILE}",
                     action="store_true", default=False)
+    ap.add_argument("-airsim", "--aircraftsim", required=False, help="Read simulation data from file", default=None)
+    ap.add_argument("-ble", "--ble", required=False, help="Connect to BLE device with specified address (e.g., 00:11:22:33:44:55)   ", default=None)

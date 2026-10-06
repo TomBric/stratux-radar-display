@@ -35,6 +35,7 @@ from .. import dcommon
 from PIL import Image, ImageDraw
 import math
 import time
+import datetime
 from . import radar_opts
 from pathlib import Path
 
@@ -55,15 +56,41 @@ class Oled1in5(dcommon.GenericDisplay):
     UP_CHARACTER = '\u2191'  # character to show ascending aircraft
     DOWN_CHARACTER = '\u2193'  # character to show descending aircraft
 
+    # color and size scheme for prios (fillcolor, outline-color, outline-size, size-factor)
+    PRIORITY_MAPPING_LIGHT = {
+        0: ("white", "darkgray", 1, 1),  # unclear
+        1: ("red", "red", 2, 1.5),  # RA (Resolution Advisory)
+        2: ("yellow", "black", 2, 1),  # TA (Traffic Advisory)
+        3: ("black", "black", 1, 1),  # potential_collision
+        4: ("lightgreen", "lightgreen", 1, 1)  # no_collision
+    }
+    PRIORITY_MAPPING_DARK = {
+        0: ("gray", "lightgray", 1, 1),  # unclear
+        1: ("red", "red", 3, 1.5),  # RA (Resolution Advisory)
+        2: ("yellow", "yellow", 2, 1),  # TA (Traffic Advisory)
+        3: ("white", "white", 2, 1),  # potential_collision
+        4: ("lightgreen", "lightgreen", 1, 1)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_LIGHT = {
+        0: ("white", 0.8),  # unclear
+        1: ("red", 3),  # RA (Resolution Advisory)
+        2: ("yellow", 2),  # TA (Traffic Advisory)
+        3: ("black", 1),  # potential_collision
+        4: ("lightgreen", 1)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_DARK = {
+        0: ("gray", 0.8),  # unclear
+        1: ("red", 3),  # RA (Resolution Advisory)
+        2: ("yellow", 2),  # TA (Traffic Advisory)
+        3: ("white", 1),  # potential_collision
+        4: ("lightgreen", 1)  # no_collision
+    }
+
     def __init__(self):
         super().__init__()
-        # color attributes are later set in set_dark_mode
-        # Other attributes
-        self.device = None
-        self.image = None
-        self.draw = None
-        self.mask = None
-        self.dark_mode = False
+        # other color attributes are later set in set_dark_mode
+        self.WARNING_COLOR = "red"
+
 
     def init(self, fullcircle=False, dark_mode=False):   # dark mode without effect in Oled display
         config_path = str(Path(__file__).resolve().parent.joinpath('ssd1351.conf'))
@@ -103,10 +130,6 @@ class Oled1in5(dcommon.GenericDisplay):
         if dark_mode:
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
-            self.HIGHLIGHT_COLOR = "red"
-            self.AIRCRAFT_COLOR = "red"
-            self.AIRCRAFT_OUTLINE = "white"
-            self.MODE_S_COLOR = "white"
             # AHRS colors
             self.AHRS_EARTH_COLOR = "sandybrown"
             self.AHRS_SKY_COLOR = "skyblue"
@@ -116,10 +139,6 @@ class Oled1in5(dcommon.GenericDisplay):
         else:
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
-            self.HIGHLIGHT_COLOR = "red"
-            self.AIRCRAFT_COLOR = "red"
-            self.AIRCRAFT_OUTLINE = "black"
-            self.MODE_S_COLOR = "black"
             # AHRS colors
             self.AHRS_EARTH_COLOR = "sandybrown"
             self.AHRS_SKY_COLOR = "skyblue"
@@ -156,7 +175,7 @@ class Oled1in5(dcommon.GenericDisplay):
 
 
     def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
-                  gps_quality, gps_h_accuracy, optical_alive, basemode, extsound, co_alarmlevel, co_alarmstring):
+                  gps_quality, gps_h_accuracy, optical_alive, basemode, extsound, co_alarmlevel, co_alarmstring, gps_speed_length):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
                            self.zerox + self.max_pixel // 2 - 1, self.zeroy + self.max_pixel // 2 - 1),
                           outline=self.TEXT_COLOR)
@@ -164,6 +183,18 @@ class Oled1in5(dcommon.GenericDisplay):
                            self.zerox + self.max_pixel // 4 - 1, self.zeroy + self.max_pixel // 4 - 1),
                           outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
+        # cross in the middle
+        self.draw.line((self.zerox - self.max_pixel // 2, self.zeroy, self.zerox + self.max_pixel // 2, self.zeroy),
+                       fill=self.TEXT_COLOR)
+        self.draw.line((self.zerox, self.zeroy - self.max_pixel // 2, self.zerox, self.zeroy + self.max_pixel // 2),
+                       fill=self.TEXT_COLOR)
+
+        if gpsconnected and gps_speed_length > 0:  # draw own speed vector
+            velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
+            self.draw.line((self.zerox, self.zeroy - gps_speed_length, self.zerox,
+                            self.zeroy), fill=self.TEXT_COLOR, width=velocity_width * 2)
+
+
         self.draw.text((0, 0), f"{rrange}", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
         self.draw.text((0, self.SMALL), "nm", font=self.fonts[self.VERYSMALL], fill=self.TEXT_COLOR)
         self.draw.text((0, self.sizey - self.SMALL), f"FL{round(ownalt / 100)}", font=self.fonts[self.SMALL],
@@ -345,7 +376,7 @@ class Oled1in5(dcommon.GenericDisplay):
                 self.centered_text(0, f"Start-/Land #{index + 1}", self.SMALL)
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
-        if 'start_time' in values:
+        if 'start_time' in values and isinstance(values['start_time'], datetime.datetime):
             st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
         else:
             st = '---'
@@ -356,7 +387,7 @@ class Oled1in5(dcommon.GenericDisplay):
         )
         starty = self.dashboard(0, self.SMALL+2 , self.sizex, lines)
 
-        if 'landing_time' in values:
+        if 'landing_time' in values and isinstance(values['landing_time'], datetime.datetime):
             lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
         else:
             lt = '---'

@@ -35,6 +35,7 @@ from . import epd3in7
 from .. import dcommon
 from PIL import Image, ImageDraw
 import time
+import datetime
 from pathlib import Path
 
 
@@ -58,27 +59,38 @@ class Epaper3in7(dcommon.GenericDisplay):
     ARCPOSITION_EXCLUDE_TO = 250
     ANGLE_OFFSET = 270  # offset for calculating angles in displays
 
+    # color and size scheme for prios (fillcolor, outline-color, outline-size, size-factor)
+    PRIORITY_MAPPING_LIGHT = {
+        0: ("white", "black", 3, 1),  # unclear
+        1: ("black", "black", 1, 2),  # RA (Resolution Advisory)
+        2: ("black", "black", 1, 1.5),  # TA (Traffic Advisory)
+        3: ("white", "black", 4, 1),  # potential_collision
+        4: ("white", "black", 2, 1)  # no_collision
+    }
+    PRIORITY_MAPPING_DARK = {
+        0: ("black", "white", 3, 1),  # unclear
+        1: ("white", "white", 1, 2),  # RA (Resolution Advisory)
+        2: ("white", "white", 1, 1.5),  # TA (Traffic Advisory)
+        3: ("black", "white", 4, 1),  # potential_collision
+        4: ("black", "white", 2, 1)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_LIGHT = {
+        0: ("black", 0.8),  # unclear
+        1: ("black", 3),  # RA (Resolution Advisory)
+        2: ("black", 2),  # TA (Traffic Advisory)
+        3: ("black", 1),  # potential_collision
+        4: ("black", 0.5)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_DARK = {
+        0: ("white", 0.8),  # unclear
+        1: ("white", 3),  # RA (Resolution Advisory)
+        2: ("white", 2),  # TA (Traffic Advisory)
+        3: ("white", 1),  # potential_collision
+        4: ("white", 0.5)  # no_collision
+    }
 
     def __init__(self):
         super().__init__()
-        # Initialize color attributes
-        self.BG_COLOR = "white"
-        self.TEXT_COLOR = "black"
-        self.HIGHLIGHT_COLOR = "black"
-        self.AIRCRAFT_COLOR = "black"
-        self.AIRCRAFT_OUTLINE = "black"
-        self.MODE_S_COLOR = "black"
-        # AHRS colors
-        self.AHRS_EARTH_COLOR = "white"
-        self.AHRS_SKY_COLOR = "white"
-        self.AHRS_HORIZON_COLOR = "black"
-        self.AHRS_MARKS_COLOR = "black"
-        # Other attributes
-        self.device = None
-        self.image = None
-        self.draw = None
-        self.mask = None
-        self.dark_mode = False
     
     def set_dark_mode(self, dark_mode):
         """Set dark mode and update color constants accordingly"""
@@ -87,9 +99,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
             self.HIGHLIGHT_COLOR = "white"
-            self.AIRCRAFT_COLOR = "white"
-            self.AIRCRAFT_OUTLINE = "white"
-            self.MODE_S_COLOR = "white"
             self.AHRS_EARTH_COLOR = "black"
             self.AHRS_SKY_COLOR = "black"
             self.AHRS_HORIZON_COLOR = "white"
@@ -98,9 +107,6 @@ class Epaper3in7(dcommon.GenericDisplay):
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
             self.HIGHLIGHT_COLOR = "black"
-            self.AIRCRAFT_COLOR = "black"
-            self.AIRCRAFT_OUTLINE = "black"
-            self.MODE_S_COLOR = "black"
             self.AHRS_EARTH_COLOR = "white"
             self.AHRS_SKY_COLOR = "white"
             self.AHRS_HORIZON_COLOR = "black"
@@ -119,12 +125,12 @@ class Epaper3in7(dcommon.GenericDisplay):
         self.set_dark_mode(dark_mode)
         self.sizex = self.device.height
         self.sizey = self.device.width
-        self.zerox = self.sizex / 2
+        self.zerox = self.sizex // 2
         if not fullcircle:
             self.zeroy = 200  # not centered
             self.max_pixel = 400
         else:
-            self.zeroy = self.sizey / 2
+            self.zeroy = self.sizey // 2
             self.max_pixel = self.sizey
         self.ah_zeroy = self.sizey // 2 # zero line for ahrs
         self.ah_zerox = self.sizex // 2
@@ -176,12 +182,25 @@ class Epaper3in7(dcommon.GenericDisplay):
         time.sleep(seconds)
 
     def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
-                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
+                  gps_quality, gps_h_accuracy, optical_bar, basemode,
+                  extsound, co_alarmlevel, co_alarmstring, gps_speed_length):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
                            self.zerox + self.max_pixel // 2, self.zeroy + self.max_pixel // 2), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
                            self.zerox + self.max_pixel // 4, self.zeroy + self.max_pixel // 4), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
+        # cross in the middle
+        # cross in the middle
+        self.draw.line((self.zerox - self.max_pixel // 2, self.zeroy, self.zerox + self.max_pixel // 2, self.zeroy),
+                       fill=self.TEXT_COLOR)
+        self.draw.line((self.zerox, self.zeroy - self.max_pixel // 2, self.zerox, self.zeroy + self.max_pixel // 2),
+                       fill=self.TEXT_COLOR)
+
+        if gpsconnected and gps_speed_length > 0:  # draw own speed vector
+            velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
+            self.draw.line((self.zerox, self.zeroy - gps_speed_length, self.zerox,
+                            self.zeroy), fill=self.TEXT_COLOR, width=velocity_width * 2)
+
         self.draw.text((5, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
         if gps_quality == 0:
@@ -204,6 +223,9 @@ class Epaper3in7(dcommon.GenericDisplay):
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
         self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
+        tl = self.draw.textlength(f"{course}°", self.fonts[self.SMALL])
+        self.draw.rectangle((self.zerox - tl // 2, 2, self.zerox + tl // 2, 2 + self.LARGE),
+                            fill=self.BG_COLOR)  # LARGE to have more spaceb below
         self.centered_text(1, f"{course}°", self.SMALL)
 
         if not gpsconnected:
@@ -405,19 +427,19 @@ class Epaper3in7(dcommon.GenericDisplay):
             else:
                 self.centered_text(0, f"No Start-/Land Data", self.SMALL)
         offset = 5
-        if 'start_time' in values:
-            st = values['start_time'].strftime("%H:%M:%S,%f")[:-5]
+        if 'start_time' in values and isinstance(values['start_time'], datetime.datetime):
+            st = values['start_time'].strftime("%d.%m %H:%M")
         else:
             st = '---'
         lines = [
-            ("t-off time", st),
+            ("t-off", st),
             ("t-off alt [ft]", self.form_line(values, 'start_altitude', "{:5.1f}")),
             ("t-off dist [m]", self.form_line(values, 'takeoff_distance', "{:3.1f}")),
             ("obst dist [m]", self.form_line(values, 'obstacle_distance_start', "{:3.1f}")),
         ]
         self.dashboard(offset, 35, self.zerox - offset, lines, headline="Takeoff", rounding=True)
-        if 'landing_time' in values:
-            lt = values['landing_time'].strftime("%H:%M:%S,%f")[:-5]
+        if 'landing_time' in values and isinstance(values['landing_time'], datetime.datetime):
+            lt = values['landing_time'].strftime("%d.%m %H:%M")
         else:
             lt = '---'
         lines = [

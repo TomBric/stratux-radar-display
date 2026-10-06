@@ -1,21 +1,82 @@
 {% extends 'base.html' %}
 {% from 'bootstrap5/form.html' import render_form, render_field, render_form_row %}
 {% block content %}
-<style> .no-label { label{ display: None; } } </style>
+<style>
+    .no-label label { display: none; }
+    .ble-address-field input { max-width: 12rem; }
+    .ble-scan-button .btn { white-space: nowrap; }
+    .ble-address-row { --bs-gutter-x: 0.6rem; }
+    .ble-address-row .mb-3 { margin-bottom: 0.35rem !important; }
+    .ble-device-choice-field { font-size: 0.92rem; }
+    .ble-device-choice-field .form-label { display: none; }
+    .ble-device-choice-field .form-check { margin-bottom: 0.2rem; }
+    .ble-device-choice-field .form-check-label { line-height: 1.15; }
+    .ble-device-choice-field .form-check-input { margin-top: 0.2rem; }
+    .info-circle-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.15rem;
+        height: 1.15rem;
+        margin-left: 0.35rem;
+        border: 1px solid #0d6efd;
+        border-radius: 50%;
+        background-color: #0d6efd;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1;
+        text-decoration: none;
+        vertical-align: middle;
+    }
+    .info-circle-icon:focus,
+    .info-circle-icon:hover {
+        background-color: #0a58ca;
+        border-color: #0a58ca;
+        color: #fff;
+        text-decoration: none;
+    }
+</style>
 <form method="post">
 {{ radar_form.csrf_token }}
 
 {% if on_stratux == False %}
-    <h4>Stratux Radar-Display Configuration</h4>
+    <h4>Radar-Display Configuration</h4>
 {% else %}
-    <h4>Stratux Radar-Display Configuration On Stratux</h4>
+    <h4>Radar-Display Configuration On Stratux</h4>
 {% endif %}
 
+
+
 <br>
+<h5>Radar source connection</h5>
 {% if on_stratux == False %}
-    {{ render_field(radar_form.stratux_ip, form_type='horizontal') }}
+    {{ render_field(radar_form.connection_mode, form_type='horizontal') }}
+    <div id="stratux-ip-container" class="{% if radar_form.connection_mode.data != 'stratux' %}d-none{% endif %}">
+        {{ render_field(radar_form.stratux_ip, form_type='horizontal') }}
+    </div>
+    <div id="ble-address-container" class="{% if radar_form.connection_mode.data != 'ble' %}d-none{% endif %}">
+        <div class="row align-items-end ble-address-row">
+            <div class="col-md-2 ble-address-field">
+                {{ render_field(radar_form.ble_address) }}
+            </div>
+            <div class="col-md-auto ble-scan-button">
+                {{ render_field(radar_form.scan_ble_devices, button_style='success') }}
+            </div>
+            <div id="ble-device-choice-container" class="col-md ble-device-choice-field {% if radar_form.ble_device_choice.choices|length == 0 %}d-none{% endif %}">
+                {{ render_field(radar_form.ble_device_choice) }}
+            </div>
+        </div>
+        <div id="ble-scan-status" class="text-secondary d-none mt-2" role="status" aria-live="polite">
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+            <span>Scanning BLE ...</span>
+        </div>
+    </div>
 {% endif %}
-    {{ render_field(radar_form.display, form_type='horizontal') }}
+
+    <div class="mt-3">
+        {{ render_field(radar_form.display, form_type='horizontal') }}
+    </div>
 
 <br>
 <h5>Select screens and their sequence</h5>
@@ -29,8 +90,12 @@
 {{ render_form_row([radar_form.flogs, radar_form.flogs_seq], col_map={'flogs': 'col-md-3', 'flogs_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.cowarner, radar_form.cowarner_seq], col_map={'cowarner': 'col-md-3', 'cowarner_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.gps_dist, radar_form.gps_dist_seq], col_map={'gps_dist': 'col-md-3', 'gps_dist_seq': 'no-label col-md-1'}) }}
+<div id="display-status-mode-row" class="{% if not on_stratux and radar_form.connection_mode.data == 'ble' %}d-none{% endif %}">
 {{ render_form_row([radar_form.status, radar_form.status_seq], col_map={'status': 'col-md-3', 'status_seq': 'no-label col-md-1'}) }}
+</div>
+<div id="stratux-status-mode-row" class="{% if not on_stratux and radar_form.connection_mode.data == 'ble' %}d-none{% endif %}">
 {{ render_form_row([radar_form.stratux, radar_form.stratux_seq], col_map={'stratux': 'col-md-3', 'stratux_seq': 'no-label col-md-1'}) }}
+</div>
 {{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist_filename, radar_form.download_checklist, radar_form.upload_checklist],
     col_map={'checklist': 'col-md-3', 'checklist_seq': 'no-label col-md-1', 'checklist_filename': 'col-md-4'},
     button_map={'download_checklist': 'success', 'upload_checklist': 'primary'}) }}
@@ -49,16 +114,16 @@
 {{ render_form_row([radar_form.external_sound, radar_form.sound_volume, radar_form.all_mixers, radar_form.mixername],
     col_map={'external_sound': 'col-md-3', 'sound_volume': 'col-md-2', 'all_mixers': 'col-md-3', 'mixername': 'col-md-2'}) }}
 <h5>Special options</h5>
-{{ render_form_row([radar_form.coindicate, radar_form.no_cowarner, radar_form.coi2c0, radar_form.no_flighttime, radar_form.darkmode],
-    col_map={'coindicate': 'col-md-2', 'no_cowarner': 'col-md-2', 'coi2c0': 'col-md-3', 'no_flighttime': 'col-md-2', 'darkmode': 'col-md-3'}) }}
+{{ render_form_row([radar_form.coindicate, radar_form.no_cowarner, radar_form.coi2c0, radar_form.no_flighttime, radar_form.advanced_collision_detection, radar_form.darkmode],
+    col_map={'coindicate': 'col-md-2', 'no_cowarner': 'col-md-2', 'coi2c0': 'col-md-3', 'no_flighttime': 'col-md-2', 'advanced_collision_detection': 'col-md-3', 'darkmode': 'col-md-2'}) }}
 {{ render_form_row([radar_form.logging, radar_form.display_log],
     col_map={'logging': 'col-md-2'},
     button_map={'display_log': 'secondary'}) }}
 {{ render_field(radar_form.autorefresh, form_type='horizontal') }}
 
 <h5>Ground sensor (LIDAR) options</h5>
-{{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.countdown, radar_form.gearindicate],
-    col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-3', 'countdown': 'col-md-3', 'gearindicate': 'col-md-3'}) }}
+{{ render_form_row([radar_form.groundsensor, radar_form.fallback_ground_distance, radar_form.groundbeep, radar_form.countdown, radar_form.gearindicate],
+    col_map={'groundsensor': 'col-md-3', 'fallback_ground_distance': 'col-md-3', 'groundbeep': 'col-md-2', 'countdown': 'col-md-2', 'gearindicate': 'col-md-2'}) }}
 
 <h5>Configuration web server shutdown time</h5>
 {{ render_field(radar_form.webtimeout, form_type='horizontal') }}
@@ -66,5 +131,156 @@
 {{ render_form_row([radar_form.save_restart, radar_form.save, radar_form.restart],
     button_map={'save_restart': 'success', 'save': 'primary', 'restart': 'secondary'}) }}
 </form>
+
+{% if on_stratux == False %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const radarFormElement = document.querySelector('form');
+    const connectionRadios = document.querySelectorAll('input[name="connection_mode"]');
+    const bleAddressContainer = document.getElementById('ble-address-container');
+    const stratuxIpContainer = document.getElementById('stratux-ip-container');
+    const stratuxIpInput = document.getElementById('stratux_ip');
+    const bleAddressInput = document.getElementById('ble_address');
+    const bleScanButton = document.getElementById('scan_ble_devices');
+    const bleScanStatus = document.getElementById('ble-scan-status');
+    const bleDeviceChoiceContainer = document.getElementById('ble-device-choice-container');
+    const displayStatusRow = document.getElementById('display-status-mode-row');
+    const stratuxStatusRow = document.getElementById('stratux-status-mode-row');
+    const statusSeqInput = document.getElementById('status_seq');
+    const stratuxSeqInput = document.getElementById('stratux_seq');
+
+    function setHiddenMirror(name, value) {
+        if (!radarFormElement) {
+            return;
+        }
+        let hidden = radarFormElement.querySelector('input[type="hidden"][name="' + name + '"]');
+        if (!hidden) {
+            hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = name;
+            radarFormElement.appendChild(hidden);
+        }
+        hidden.value = value;
+    }
+
+    function removeHiddenMirror(name) {
+        if (!radarFormElement) {
+            return;
+        }
+        const hidden = radarFormElement.querySelector('input[type="hidden"][name="' + name + '"]');
+        if (hidden) {
+            hidden.remove();
+        }
+    }
+
+    function setDisabledForContainer(container, disabled) {
+        if (!container) {
+            return;
+        }
+        container.querySelectorAll('input, select, textarea, button').forEach(function (element) {
+            element.disabled = disabled;
+        });
+    }
+
+    function setVisible(container, visible) {
+        if (!container) {
+            return;
+        }
+        container.classList.toggle('d-none', !visible);
+    }
+
+    function selectedConnectionMode() {
+        const checked = document.querySelector('input[name="connection_mode"]:checked');
+        return checked ? checked.value : 'stratux';
+    }
+
+    function updateConnectionFields() {
+        if (!bleAddressContainer || !stratuxIpContainer) {
+            return;
+        }
+        if (selectedConnectionMode() === 'ble') {
+            setVisible(bleAddressContainer, true);
+            setVisible(stratuxIpContainer, false);
+            if (bleAddressInput) bleAddressInput.disabled = false;
+            if (stratuxIpInput) stratuxIpInput.disabled = true;
+            if (bleDeviceChoiceContainer) {
+                setVisible(bleDeviceChoiceContainer, bleDeviceChoiceContainer.querySelectorAll('input[type="radio"]').length > 0);
+            }
+            setVisible(displayStatusRow, false);
+            setVisible(stratuxStatusRow, false);
+            setDisabledForContainer(displayStatusRow, true);
+            setDisabledForContainer(stratuxStatusRow, true);
+            if (statusSeqInput) {
+                setHiddenMirror('status_seq', statusSeqInput.value || '1');
+            }
+            if (stratuxSeqInput) {
+                setHiddenMirror('stratux_seq', stratuxSeqInput.value || '1');
+            }
+        } else {
+            setVisible(bleAddressContainer, false);
+            setVisible(stratuxIpContainer, true);
+            if (bleAddressInput) bleAddressInput.disabled = true;
+            if (stratuxIpInput) stratuxIpInput.disabled = false;
+            setVisible(bleDeviceChoiceContainer, false);
+            setVisible(displayStatusRow, true);
+            setVisible(stratuxStatusRow, true);
+            setDisabledForContainer(displayStatusRow, false);
+            setDisabledForContainer(stratuxStatusRow, false);
+            removeHiddenMirror('status_seq');
+            removeHiddenMirror('stratux_seq');
+        }
+    }
+
+    document.querySelectorAll('input[name="ble_device_choice"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            if (bleAddressInput && radio.checked) {
+                bleAddressInput.value = radio.value;
+            }
+        });
+    });
+
+    if (bleScanButton && radarFormElement) {
+        bleScanButton.addEventListener('click', function () {
+            if (bleScanStatus) {
+                bleScanStatus.classList.remove('d-none');
+            }
+        });
+    }
+
+    connectionRadios.forEach(function (radio) {
+        radio.addEventListener('change', updateConnectionFields);
+    });
+    updateConnectionFields();
+});
+</script>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const fallbackLabel = document.querySelector('label[for="fallback_ground_distance"]');
+    if (!fallbackLabel) {
+        return;
+    }
+    const infoText = 'Ground distance of sensor position is every time measured when display starts. This fallback value is used, when a measurement was not possible (e.g. if display is booted in the air). To get the fallback value measure the distance to the ground from the front of the sensor';
+    const infoButton = document.createElement('button');
+    infoButton.type = 'button';
+    infoButton.className = 'info-circle-icon';
+    infoButton.textContent = 'i';
+    infoButton.setAttribute('aria-label', 'Info for fallback ground distance');
+    infoButton.setAttribute('data-bs-toggle', 'popover');
+    infoButton.setAttribute('data-bs-trigger', 'focus');
+    infoButton.setAttribute('data-bs-placement', 'right');
+    infoButton.setAttribute('data-bs-content', infoText);
+    fallbackLabel.appendChild(infoButton);
+
+    if (window.bootstrap && typeof window.bootstrap.Popover === 'function') {
+        new window.bootstrap.Popover(infoButton);
+    } else {
+        infoButton.addEventListener('click', function () {
+            window.alert(infoText);
+        });
+    }
+});
+</script>
 
 {% endblock %}

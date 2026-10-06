@@ -33,6 +33,7 @@
 
 import os
 import subprocess
+import signal
 import radarbuttons
 import time
 import requests
@@ -48,14 +49,15 @@ url_reboot = ""
 url_shutdown = ""
 
 
-def init(shutdown, reboot):
+def init(shutdown, reboot, quit_gracefully):
     global url_reboot
     global url_shutdown
+    global quit_gracefully_func
 
     url_reboot = reboot
     url_shutdown = shutdown
+    quit_gracefully_func = quit_gracefully
     rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
-
 
 
 def clear_lingering_radar():     # remove other radar.py processes, necessary since lingering is enabled for bluetooth
@@ -71,8 +73,8 @@ def clear_lingering_radar():     # remove other radar.py processes, necessary si
         if int(proc) != current_pid:
             try:
                 print("Terminating other process {0}".format(int(proc)))
-                os.kill(int(proc), 9)   # Kill signal
-                time.sleep(2)   # give him some time to terminate
+                os.kill(int(proc), signal.SIGTERM)   # SIGTERM signal
+                time.sleep(5)   # give him some time to terminate
             except OSError :
                 pass
 
@@ -89,23 +91,38 @@ def draw_shutdown(display_control):
         display_control.shutdown(rest_time, shutdown_mode)
         display_control.display()
     if clear_before_shutoff:   # this is signal for display driver to initiate shutdown/reboot
+        # display_control.cleanup()
+        quit_gracefully_func()
+        # cleanup all ressources, running task is not immediately terminated
+        # so that display driver can finish cleanup and shutdown
+        rlog.debug("ShutdownUI: Cleanup all tasks done.")
         display_control.cleanup()
+        rlog.debug("ShutdownUI: Display control cleanup done, now shutdown/reboot")
         if shutdown_mode == 0:   # shutdown display and stratux
             rlog.debug("Posting shutdown.")
             try:
                 requests.post(url_shutdown)
             except requests.exceptions.RequestException as e:
-                rlog.debug("Posting shutdown exception: ", e)
-            os.popen("sudo shutdown --poweroff now").read()
+                rlog.debug(f"Exception posting shutdown: {e}")
+            try:
+                subprocess.run(["sudo", "shutdown", "--poweroff", "now"], check=False)
+            except OSError as e:
+                rlog.debug(f"Shutdown command failed: {e}")
         elif shutdown_mode == 1:   # only display shutdown
-            os.popen("sudo shutdown --poweroff now").read()
+            try:
+                subprocess.run(["sudo", "shutdown", "--poweroff", "now"], check=False)
+            except OSError as e:
+                rlog.debug(f"Shutdown command failed: {e}")
         elif shutdown_mode == 2:   # reboot display and stratux
             rlog.debug("Posting reboot.")
             try:
                 requests.post(url_reboot)
             except requests.exceptions.RequestException as e:
-                rlog.debug("Posting shutdown exception: ", e)
-            os.popen("sudo shutdown --reboot now").read()
+                rlog.debug(f"Exception posting reboot: {e}")
+            try:
+                subprocess.run(["sudo", "shutdown", "--reboot", "now"], check=False)
+            except OSError as e:
+                rlog.debug(f"Shutdown command failed: {e}")
         clear_before_shutoff = False
         return True
     else:

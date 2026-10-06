@@ -33,6 +33,7 @@
 
 
 import logging
+import sys
 from enum import Enum
 
 class Modes(Enum):
@@ -66,15 +67,26 @@ class Modes(Enum):
 
 class Globals:     # global variables which need to be changed somehow from other modules
     mode = Modes.RADAR     # Global mode for radar display
-    update = True   # flag whether to update display
+    refresh = True   # flag whether to update display
 
 # Initialize logger
-SITUATION_DEBUG = logging.DEBUG - 2  # another low level for debugging, DEBUG is 10
-AIRCRAFT_DEBUG = logging.DEBUG - 1  # another low level for debugging below DEBUG
+SITUATION_DEBUG = logging.DEBUG - 3  # another low level for debugging, DEBUG is 10
+AIRCRAFT_DEBUG = logging.DEBUG - 2  # another low level for debugging below DEBUG
+COLLISION_DEBUG = logging.DEBUG -1 # level for debugging collision detection
 logging.addLevelName(SITUATION_DEBUG, 'SITUATION_DEBUG')
 logging.addLevelName(AIRCRAFT_DEBUG, 'AIRCRAFT_DEBUG')
+logging.addLevelName(COLLISION_DEBUG, 'COLLISION_DEBUG')
 logging.basicConfig(level=logging.INFO, format='%(asctime)-15s > %(message)s')
 rlog = logging.getLogger('stratux-radar-log')
+
+# Hook to log uncaught exceptions that cause program termination
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    rlog.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+
+sys.excepthook = handle_exception
 
 # Global configuration dictionary
 global_config = {}

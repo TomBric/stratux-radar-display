@@ -139,10 +139,13 @@ def write_flights():
     try:
         with open(g_saved_flights, 'wt') as out:
             json.dump(g_config, out, sort_keys=True, indent=4, default=default)
+            out.flush()  # Ensure data is written to disk immediately
+        rlog.debug("FlighttimeUI: Configuration saved to " + g_saved_flights + ": " +
+                   json.dumps(g_config, sort_keys=True, indent=4, default=default))
     except (OSError, IOError, ValueError) as e:
         rlog.debug("FlighttimeUI: Error " + str(e) + " writing " + g_saved_flights)
-    rlog.debug("FlighttimeUI: Configuration saved to " + g_saved_flights + ": " +
-               json.dumps(g_config, sort_keys=True, indent=4, default=default))
+    except Exception as e:
+        rlog.debug(f"FlighttimeUI: Unexpected error writing flights: {type(e).__name__}: {str(e)}")
 
 
 def current_starttime():

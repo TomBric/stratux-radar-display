@@ -43,6 +43,8 @@ raspi-config nonint do_ssh 0
 # enable spi and i2c (for cowarner)
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
+# disable password request for sudo in Trixie
+raspi-config nonint do_sudo_pass 1
 
 # Disable swap, for Trixie modify /etc/rpi/swap.conf ...
 if grep -q '^\[Main\]' /etc/rpi/swap.conf; then
@@ -101,8 +103,10 @@ cp wireplumber-bluetooth.conf /etc/wireplumber/wireplumber.conf.d/bluetooth.conf
 sed -i 's/#ReconnectAttempts = 7/ReconnectAttempts = 3/' /etc/bluetooth/main.conf
 
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-pygame -y
-su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-scipy python3-pygame python3-gpiozero -y
+su pi -c "pip3 install ADS1x15-ADC --break-system-packages"
+su pi -c "pip3 install bayesian-filters --break-system-packages"
+su pi -c "pip3 install bleak --break-system-packages"
 apt -y autoremove
 
 

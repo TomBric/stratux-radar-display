@@ -82,24 +82,51 @@ class GenericDisplay:
     # CO warner specific constants
     GRAPH_SPACE = 3  # space between scale figures and zero line
     GRAPH_X_AXIS_LINE_LENGTH = 5  # line length for values in graph
-    # end constant definitions
+
+    # Priority color mapping for aircraft with TCAS priorities 0-4
+    # Format: priority -> (aircraft_color, outline_color, outline_size)
+    PRIORITY_MAPPING_LIGHT = {
+        0: ("gray", "darkgray", 1, 1),  # unclear
+        1: ("red", "darkred", 3, 1.5),  # RA (Resolution Advisory)
+        2: ("orange", "darkorange", 2, 2),  # TA (Traffic Advisory)
+        3: ("yellow", "gold", 2, 1),  # potential_collision
+        4: ("white", "black", 1, 1)  # no_collision
+    }
+    PRIORITY_MAPPING_DARK = {
+        0: ("gray", "lightgray", 1, 1),  # unclear
+        1: ("red", "pink", 3, 1.5),  # RA (Resolution Advisory)
+        2: ("orange", "yellow", 2, 2),  # TA (Traffic Advisory)
+        3: ("yellow", "lightyellow", 2, 1),  # potential_collision
+        4: ("lightgreen", "white", 1, 1)  # no_collision
+    }
+
+    # Priority color mapping for mode-s aircraft with TCAS priorities 0-4
+    # Format: priority -> (circle_color, width_multiplier)
+    MODES_PRIORITY_MAPPING_LIGHT = {
+        0: ("gray", 0.8),  # unclear
+        1: ("red", 3),     # RA (Resolution Advisory)
+        2: ("orange", 2),  # TA (Traffic Advisory)
+        3: ("yellow", 1),  # potential_collision
+        4: ("gray",  0.5)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_DARK  = {
+        0: ("white", 0.8),  # unclear
+        1: ("red", 3),  # RA (Resolution Advisory)
+        2: ("orange", 2),  # TA (Traffic Advisory)
+        3: ("yellow", 1),  # potential_collision
+        4: ("white", 0.5)  # no_collision
+    }
 
     def __init__(self):
         self.rlog = logging.getLogger('stratux-radar-log')
-        # Initialize color attributes with default light mode
-        self.AIRCRAFT_COLOR = "red"
-        self.MODE_S_COLOR = "black"
-        self.AIRCRAFT_OUTLINE = "black"
-        self.BG_COLOR = "white"
-        self.TEXT_COLOR = "black"
-        self.HIGHLIGHT_COLOR = self.TEXT_COLOR
-        # AHRS colors
-        self.AHRS_EARTH_COLOR = "brown"
-        self.AHRS_SKY_COLOR = "lightblue"
-        self.AHRS_HORIZON_COLOR = "black"
-        self.AHRS_MARKS_COLOR = "black"
-        
         # these variables below need to be set for every display!
+        self.BG_COLOR = "black"
+        self.TEXT_COLOR = "white"
+        self.HIGHLIGHT_COLOR = "white"
+        self.AHRS_EARTH_COLOR = "black"
+        self.AHRS_SKY_COLOR = "black"
+        self.AHRS_HORIZON_COLOR = "white"
+        self.AHRS_MARKS_COLOR = "white"
         self.sizex = 0  # display size x axis in pixel
         self.sizey = 0  # display size y axis in pixel
         self.dark_mode = False
@@ -116,6 +143,7 @@ class GenericDisplay:
         self.cdraw = None  # pixel array to be used in compass to delete text
         self.image = None # pixel array to be used in compass to rotate text
         self.mask = None
+        self.device = None
         self.compass_aircraft = None    # image of the compass aircraft
         # fonts
         self.fonts= {
@@ -129,15 +157,24 @@ class GenericDisplay:
         self.awesomefont = self.make_font("fontawesome-webfont.ttf", self.AWESOME_FONTSIZE)
         self.top_index = 0   # checklist number
 
+    def get_color_mapping(self, priority):
+        # priority (int): TCAS priority (0=unclear, 1=RA, 2=TA, 3=collision, 4=no_collision)
+        # Returns:  tuple: (aircraft_color, outline_color, outline_size)
+        mapping = self.PRIORITY_MAPPING_DARK if self.dark_mode else self.PRIORITY_MAPPING_LIGHT
+        return mapping.get(priority, ("gray", "darkgray" if not self.dark_mode else "lightgray", 1))
+
+    def get_modes_color_mapping(self, priority):
+        # priority (int): TCAS priority (0=unclear, 1=RA, 2=TA, 3=collision, 4=no_collision)
+        # Returns:  tuple: (circle_color, circle_width_multiplier)
+        mapping = self.MODES_PRIORITY_MAPPING_DARK if self.dark_mode else self.MODES_PRIORITY_MAPPING_LIGHT
+        return mapping.get(priority, ("gray" if not self.dark_mode else "lightgray", 1))
+
     def set_dark_mode(self, dark_mode):
         self.dark_mode = dark_mode
         if dark_mode:
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
             self.HIGHLIGHT_COLOR = "white"
-            self.AIRCRAFT_COLOR = "white"
-            self.AIRCRAFT_OUTLINE = "white"
-            self.MODE_S_COLOR = "white"
             self.AHRS_EARTH_COLOR = "black"
             self.AHRS_SKY_COLOR = "black"
             self.AHRS_HORIZON_COLOR = "white"
@@ -146,9 +183,6 @@ class GenericDisplay:
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
             self.HIGHLIGHT_COLOR = "black"
-            self.AIRCRAFT_COLOR = "red"
-            self.AIRCRAFT_OUTLINE = "black"
-            self.MODE_S_COLOR = "black"
             self.AHRS_EARTH_COLOR = "brown"
             self.AHRS_SKY_COLOR = "lightblue"
             self.AHRS_HORIZON_COLOR = "black"
@@ -161,39 +195,43 @@ class GenericDisplay:
         self.rlog.debug("Running Radar with NoDisplay! ")
         return self.max_pixel, self.zerox, self.zeroy, self.display_refresh
 
-    def modesaircraft(self, radius, height, arcposition, vspeed, tail):
-        circle_width = max(2, 1 + self.max_pixel // 128)
+    def modesaircraft(self, radius, height, arcposition, vspeed, tail, prio=0):
+        circle_color, circle_width_multiplier = self.get_modes_color_mapping(prio)
+        circle_width = int(max(2, 1 + self.max_pixel * circle_width_multiplier // 128))
         if radius < self.MINIMAL_CIRCLE:
             radius = self.MINIMAL_CIRCLE
         self.draw.ellipse((self.zerox-radius, self.zeroy-radius, self.zerox+radius, self.zeroy+radius),
-                          width=circle_width, outline=self.MODE_S_COLOR)
+                          width=circle_width, outline=circle_color)
         arctext = posn(arcposition, radius, angle_offset=self.ANGLE_OFFSET)
         signchar = "+" if height > 0 else "-"
         t = signchar + str(abs(height))
         t += self.UP_CHARACTER if vspeed > 0 else self.DOWN_CHARACTER if vspeed < 0 else ""
         w = self.draw.textlength(t, self.fonts[self.LARGE])
         tposition = (int(self.zerox+arctext[0]-w//2), int(self.zeroy+arctext[1]-self.LARGE//2))
-        self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.LARGE)), fill=self.BG_COLOR)
-        self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.MODE_S_COLOR)
-        if tail is not None:
+        self.draw.rectangle((tposition, (tposition[0]+w, tposition[1]+self.MORELARGE)), fill=self.BG_COLOR)
+        self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=circle_color)
+        if tail is not None and tail != "":
             tl = self.draw.textlength(tail, self.fonts[self.VERYSMALL])
             self.draw.rectangle((tposition[0], tposition[1] + self.LARGE, tposition[0] + tl,
-                            tposition[1] + self.LARGE + self.VERYSMALL), fill=self.BG_COLOR)
+                            tposition[1] + self.LARGE + self.SMALL), fill=self.BG_COLOR)  # SMALL to have more space
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail,
-                           font=self.fonts[self.VERYSMALL], fill=self.MODE_S_COLOR)
+                           font=self.fonts[self.VERYSMALL], fill=circle_color)
 
-    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail):
-        velocity_width = max(2, 1 + self.AIRCRAFT_SIZE // 3)
-        p1 = posn(direction, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
-        p2 = posn(direction + 150, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
-        p3 = posn(direction + 180, 2 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
-        p4 = posn(direction + 210, 4 * self.AIRCRAFT_SIZE, self.ANGLE_OFFSET)
+    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, prio=0):
+        # Get colors and outline size based on priority
+        aircraft_color, outline_color, outline_width, size_factor = self.get_color_mapping(prio)
+        ac_size = int(self.AIRCRAFT_SIZE * size_factor)
+        velocity_width = max(2, 1 + ac_size // 3)
+        p1 = posn(direction, 2 * ac_size, self.ANGLE_OFFSET)
+        p2 = posn(direction + 150, 4 * ac_size, self.ANGLE_OFFSET)
+        p3 = posn(direction + 180, 2 * ac_size, self.ANGLE_OFFSET)
+        p4 = posn(direction + 210, 4 * ac_size, self.ANGLE_OFFSET)
         p5 = posn(direction, nspeed_length, self.ANGLE_OFFSET)  # line for speed
 
         self.draw.polygon(
             ((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
-            fill=self.AIRCRAFT_COLOR, outline=self.AIRCRAFT_OUTLINE)
-        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=self.AIRCRAFT_OUTLINE, width=velocity_width)
+            fill=aircraft_color, outline=outline_color, width=outline_width)
+        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=outline_color, width=velocity_width)
         if height >= 0:
             t = "+" + str(abs(height))
         else:
@@ -204,12 +242,12 @@ class GenericDisplay:
             t = t + self.DOWN_CHARACTER
         w = self.draw.textlength(t, self.fonts[self.LARGE])
         if w + x + 4 * self.AIRCRAFT_SIZE - 2 > self.sizex:
-            # would draw text outside, move to the left
+            # would draw text outside, move to the left and do not take size factor into consideration
             tposition = (x - 4 * self.AIRCRAFT_SIZE - w, int(y - self.LARGE / 2))
         else:
             tposition = (x + 4 * self.AIRCRAFT_SIZE + 1, int(y - self.LARGE / 2))
         self.draw.text(tposition, t, font=self.fonts[self.LARGE], fill=self.TEXT_COLOR)
-        if tail is not None:
+        if tail is not None and tail != "":
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail, font=self.fonts[self.VERYSMALL],
                            fill=self.TEXT_COLOR)
 
@@ -242,7 +280,7 @@ class GenericDisplay:
         pass
 
     def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
-                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring):
+                  gps_quality, gps_h_accuracy, optical_bar, basemode, extsound, co_alarmlevel, co_alarmstring, gps_speed_length):
         pass
 
     def timer(self, utctime, stoptime, laptime, laptime_head, left_text, middle_text, right_t, timer_runs,
@@ -358,8 +396,8 @@ class GenericDisplay:
         for m in range(0, 360, 10):
             s = math.sin(math.radians(m - heading + 90))
             c = math.cos(math.radians(m - heading + 90))
-            x1, y1 = self.czerox - (csize - 1) * c, self.czeroy - (csize - 1) * s
-            x2, y2 = self.czerox - (csize - cmsize) * c, self.czeroy - (csize - cmsize) * s
+            x1, y1 = int(self.czerox - (csize - 1) * c), int(self.czeroy - (csize - 1) * s)
+            x2, y2 = int(self.czerox - (csize - cmsize) * c), int(self.czeroy - (csize - cmsize) * s)
             width = line_width if m % 30 == 0 else line_width//2
             self.draw.line((x1, y1, x2, y2), fill=self.TEXT_COLOR, width=width)
 
@@ -393,10 +431,10 @@ class GenericDisplay:
         move = (dist * s, dist * c)
         s1 = math.sin(math.radians(-90 - roll))
         c1 = math.cos(math.radians(-90 - roll))
-        p1 = (self.ah_zerox - length * s1, self.ah_zeroy + length * c1)
-        p2 = (self.ah_zerox + length * s1, self.ah_zeroy - length * c1)
-        ps = (p1[0] + move[0], p1[1] + move[1])
-        pe = (p2[0] + move[0], p2[1] + move[1])
+        p1 = (int(self.ah_zerox - length * s1), int(self.ah_zeroy + length * c1))
+        p2 = (int(self.ah_zerox + length * s1), int(self.ah_zeroy - length * c1))
+        ps = (int(p1[0] + move[0]), int(p1[1] + move[1]))
+        pe = (int(p2[0] + move[0]), int(p2[1] + move[1]))
         return ps, pe
 
     def rollmarks(self, roll, marks_width, marks_length):
@@ -428,8 +466,8 @@ class GenericDisplay:
         self.draw.rectangle((self.ah_zerox - slipsize_x, self.sizey-1 - slipsize_y*2,
                              self.ah_zerox + slipsize_x, self.sizey-1), fill="black")
         # now draw ball
-        self.draw.ellipse((self.ah_zerox - slipskid * slipscale - slipsize_y, self.sizey-1 - slipsize_y*2,
-                      self.ah_zerox - slipskid * slipscale + slipsize_y, self.sizey-1), fill="white")
+        self.draw.ellipse((int(self.ah_zerox - slipskid * slipscale - slipsize_y), self.sizey-1 - slipsize_y*2,
+                      int(self.ah_zerox - slipskid * slipscale + slipsize_y), self.sizey-1), fill="white")
         # middle line with background
         self.draw.line((self.ah_zerox, self.sizey-1 - slipsize_y * 2, self.ah_zerox, self.sizey-1),
                        fill="black", width=centerline_width*3)
@@ -619,13 +657,12 @@ class GenericDisplay:
         text = f"{int(feet)}"  # round down
         arcw = self.sizex//32  # width of the arc outline
         radx = self.EXTREMELARGE  # x size of ellipse
-        rady = self.EXTREMELARGE * 0.8  # y size of ellipse
+        rady = int(self.EXTREMELARGE * 0.8)  # y size of ellipse
         if feet > 0:
             arc_angle = 360 if feet >= 10.0 else 360/10 * feet
         else:
             arc_angle = 0
-        self.draw.arc(
-            (self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady),
+        self.draw.arc((self.sizex // 2 - radx, self.sizey // 2 - rady, self.sizex // 2 + radx, self.sizey // 2 + rady),
             -90, arc_angle-90, fill=self.TEXT_COLOR, width=arcw)
         self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.EXTREMELARGE],
                        fill=self.TEXT_COLOR,

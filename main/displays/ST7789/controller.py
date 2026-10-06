@@ -31,6 +31,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
+
 from .. import dcommon
 from PIL import Image, ImageDraw
 import math
@@ -55,16 +56,41 @@ class ST7789(dcommon.GenericDisplay):
     UP_CHARACTER = '\u2191'  # character to show ascending aircraft
     DOWN_CHARACTER = '\u2193'  # character to show descending aircraft
 
+    # color and size scheme for prios (fillcolor, outline-color, outline-size, size-factor)
+    PRIORITY_MAPPING_LIGHT = {
+        0: ("white", "darkgray", 1, 1),  # unclear
+        1: ("red", "red", 2, 1.5),  # RA (Resolution Advisory)
+        2: ("yellow", "black", 2, 1),  # TA (Traffic Advisory)
+        3: ("black", "black", 1, 1),  # potential_collision
+        4: ("lightgreen", "lightgreen", 1, 1)  # no_collision
+    }
+    PRIORITY_MAPPING_DARK = {
+        0: ("gray", "lightgray", 1, 1),  # unclear
+        1: ("red", "red", 3, 1.5),  # RA (Resolution Advisory)
+        2: ("yellow", "yellow", 2, 1),  # TA (Traffic Advisory)
+        3: ("white", "white", 2, 1),  # potential_collision
+        4: ("lightgreen", "lightgreen", 1, 1)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_LIGHT = {
+        0: ("white", 0.8),  # unclear
+        1: ("red", 3),  # RA (Resolution Advisory)
+        2: ("yellow", 2),  # TA (Traffic Advisory)
+        3: ("black", 1),  # potential_collision
+        4: ("lightgreen", 1)  # no_collision
+    }
+    MODES_PRIORITY_MAPPING_DARK = {
+        0: ("gray", 0.8),  # unclear
+        1: ("red", 3),  # RA (Resolution Advisory)
+        2: ("yellow", 2),  # TA (Traffic Advisory)
+        3: ("white", 1),  # potential_collision
+        4: ("lightgreen", 1)  # no_collision
+    }
 
     def __init__(self):
         super().__init__()
         # color attributes are later set in set_dark_mode
-        # Other attributes
-        self.device = None
-        self.image = None
-        self.draw = None
-        self.mask = None
-        self.dark_mode = False
+        self.WARNING_COLOR = "red"
+
 
     def init(self, fullcircle=False, dark_mode=False):
         config_path = str(Path(__file__).resolve().parent.joinpath('st7789.conf'))
@@ -112,9 +138,6 @@ class ST7789(dcommon.GenericDisplay):
             self.BG_COLOR = "black"
             self.TEXT_COLOR = "white"
             self.HIGHLIGHT_COLOR = "red"
-            self.AIRCRAFT_COLOR = "red"
-            self.AIRCRAFT_OUTLINE = "white"
-            self.MODE_S_COLOR = "white"
             # AHRS colors
             self.AHRS_EARTH_COLOR = "sandybrown"
             self.AHRS_SKY_COLOR = "skyblue"
@@ -125,9 +148,6 @@ class ST7789(dcommon.GenericDisplay):
             self.BG_COLOR = "white"
             self.TEXT_COLOR = "black"
             self.HIGHLIGHT_COLOR = "red"
-            self.AIRCRAFT_COLOR = "red"
-            self.AIRCRAFT_OUTLINE = "black"
-            self.MODE_S_COLOR = "black"
             # AHRS colors
             self.AHRS_EARTH_COLOR = "sandybrown"
             self.AHRS_SKY_COLOR = "skyblue"
@@ -170,12 +190,23 @@ class ST7789(dcommon.GenericDisplay):
 
 
     def situation(self, connected, gpsconnected, ownalt, course, rrange, altdifference, bt_devices, sound_active,
-                  gps_quality, gps_h_accuracy, optical_alive, basemode, extsound, co_alarmlevel, co_alarmstring):
+                  gps_quality, gps_h_accuracy, optical_alive, basemode, extsound, co_alarmlevel, co_alarmstring, gps_speed_length):
         self.draw.ellipse((self.zerox - self.max_pixel // 2, self.zeroy - self.max_pixel // 2,
                            self.zerox + self.max_pixel // 2, self.zeroy + self.max_pixel // 2), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - self.max_pixel // 4, self.zeroy - self.max_pixel // 4,
                            self.zerox + self.max_pixel // 4, self.zeroy + self.max_pixel // 4), outline=self.TEXT_COLOR)
         self.draw.ellipse((self.zerox - 2, self.zeroy - 2, self.zerox + 2, self.zeroy + 2), outline=self.TEXT_COLOR)
+        # cross in the middle
+        self.draw.line((self.zerox - self.max_pixel // 2, self.zeroy, self.zerox + self.max_pixel // 2, self.zeroy),
+                       fill=self.TEXT_COLOR)
+        self.draw.line((self.zerox, self.zeroy - self.max_pixel // 2, self.zerox, self.zeroy + self.max_pixel // 2),
+                       fill=self.TEXT_COLOR)
+
+        if gpsconnected and gps_speed_length > 0:  # draw own speed vector
+            velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
+            self.draw.line((self.zerox, self.zeroy - gps_speed_length, self.zerox,
+                            self.zeroy), fill=self.TEXT_COLOR, width=velocity_width * 2)
+
 
         self.draw.text((5, 1), f"{rrange} nm", font=self.fonts[self.SMALL], fill=self.TEXT_COLOR)
 
@@ -199,6 +230,9 @@ class ST7789(dcommon.GenericDisplay):
         textlength = self.draw.textlength(t, self.fonts[self.SMALL])
         self.draw.text((self.sizex - textlength - 5, 1), t, font=self.fonts[self.SMALL], fill=self.TEXT_COLOR, align="right")
 
+        tl = self.draw.textlength(f"{course}°", self.fonts[self.SMALL])
+        self.draw.rectangle((self.zerox - tl // 2, 2, self.zerox + tl // 2, 2 + self.LARGE),
+                            fill=self.BG_COLOR)  # LARGE to have more space
         self.centered_text(5, f"{course}°", self.SMALL)
 
         if not gpsconnected:

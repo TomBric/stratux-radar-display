@@ -173,6 +173,10 @@ def init(activate, config, debug_level, co_indication, simulation_mode=False, co
     return cowarner_active
 
 
+def shutdown():
+    pass    # nothing to do, GPIO will be cleaned up by sensor reader thread
+
+
 def request_read():
     return ADS.requestADC(0)  # analog 0 input
 
@@ -377,5 +381,7 @@ async def read_sensors():
                     await asyncio.sleep(MIN_SENSOR_CALIBRATION_WAIT_TIME)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("CO sensor reader terminating ...")
-    else:
-        rlog.debug("No co-sensor active.")
+            raise
+        finally:
+            GPIO.cleanup(IOPIN)
+            rlog.debug(f"Cowarner-sensor reader: GPIO state of PIN {IOPIN} cleaned up safely.")

@@ -1,23 +1,30 @@
 #!/bin/bash
 
-# Thomas Breitbach 2024 configures an stratux image with radar-display-software installed
+# Thomas Breitbach 2026 configures an stratux image with radar-display-software installed
 # modified, but mainly based on work for stratux europe by b3nn0
 # To run this, make sure that this is installed:
 # sudo apt install --yes parted zip unzip zerofree
 # Run this script as root.
-#  sudo /bin/bash mk_radar_on_stratux.sh [-b <branch>][-u <USB-stick-name>]
+#  sudo /bin/bash mk_radar_on_stratux.sh stratux_image [-b <branch>][-u <USB-stick-name>]
 # Run with argument "-b dev" to get the dev branch from github, otherwise with main
 # Run with argument "-d <display>" to create an image for <display>, otherwise default is 'Epaper_3in7'
+# Run with argument "-v 20" to create an image based on stratux 2.0
 # Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
 # call examples:
-#   sudo /bin/bash mk_radar_on_stratux.sh
-#   sudo /bin/bash mk_radar_on_stratux.sh -b dev
-#   sudo /bin/bash mk_radar_on_stratux.sh -d Epaper_1in54
+#   sudo /bin/bash mk_radar_on_stratux.sh -i ../stratux_image/image_2026_09_09
+#   sudo /bin/bash mk_radar_on_stratux.sh -i ../stratux_image/image_2026_09_09 -b dev
+#   sudo /bin/bash mk_radar_on_stratux.sh -i ../stratux_image/image_2026_09_09 -v 20
+#   sudo /bin/bash mk_radar_on_stratux.sh -i ../stratux_image/image_2026_09_09 -d Epaper_1in54
 # install a first time flashing of the t-beam, copies the content of the specified directory to /home/pi/stratux-radar-display/to_flash
-#   sudo /bin/bash mk_radar_on_stratux.sh -flash /home/pi/GxAirCom81
+#   sudo /bin/bash mk_radar_on_stratux.sh -i ../stratux_image/image_2026_09_09 -f /home/pi/GxAirCom81
 # Enable sound output and UART Ground Sensor
-#   sudo /bin/bash mk_radar_on_stratux.sh -s
+#   sudo /bin/bash mk_radar_on_stratux.sh -i ../stratux_image/image_2026_09_09 -s
 
+
+# REMARK: How to build a stratux image on your raspberry pi:
+# git clone --recursive github.com/stratux/stratux.git
+# install docker:curl -fsSL https://get.docker.com -o get-docker.sh
+# run:   stratux/image_build/build.sh
 
 # set -x
 TMPDIR="/home/pi/image-tmp"
@@ -32,18 +39,29 @@ die() {
 # set defaults
 BRANCH=main
 USB_NAME=""
-DISPLAY_NAME="Epaper_3in7"
+DISPLAY_NAME="NoDisplay"
 UART=false
+VERSION="2.0pre"
+outprefix=""
 
 # pi imager settings
 GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
-REPONAME="Stratux EU032 with Radar Display preinstalled(64-bit)"
 ICON_URL="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
 DEVICE_LIST="pi3-64bit, pi4-64bit"
 
+# check stratux image parameter, if it exists, use it as base image for radar display installation
+if [ -z "$1" ]; then
+  echo "Usage: $0 <stratux_image> -i <image> [-b <branch>] [-v <version>] [-d <display>] [-u <USB-stick-name>] [-f <flash_dir>] [-s]"
+  exit 1
+fi
+
 # check parameters
-while getopts ":b:d:u:f:s" opt; do
+while getopts ":i:b:d:u:f:s" opt; do
       case $opt in
+        i)
+          BASE_IMAGE_DIR="$(dirname "$OPTARG")"
+          ZIPNAME="$(basename "$OPTARG")"
+          ;;
         b) BRANCH="$OPTARG" ;;
         u) USB_NAME="$OPTARG" ;;
         d) DISPLAY_NAME="$OPTARG" ;;
@@ -54,15 +72,15 @@ while getopts ":b:d:u:f:s" opt; do
       esac
     done
 
-echo "Building stratux image for branch '$BRANCH' and display '$DISPLAY_NAME'"
+REPONAME="Stratux $VERSION with Radar Display preinstalled(64-bit)"
+
+
+echo "Building stratux image '$VERSION' for branch '$BRANCH' and display '$DISPLAY_NAME'"
 if [ "$UART" = true ]; then
   echo "Enabling UART Ground Sensor support"
 fi
 
-ZIPNAME="stratux-v1.6r1-eu032-ff1f01dc.img.zip"
-BASE_IMAGE_URL="https://github.com/b3nn0/stratux/releases/download/v1.6r1-eu032/${ZIPNAME}"
-outprefix="stratux-eu32-radar"
-IMGNAME="${ZIPNAME%.*}"
+IMGNAME="tmp-stratux.img"
 
 # cd to script directory
 cd "$(dirname "$0")" || die "cd failed"
@@ -71,8 +89,7 @@ mkdir -p $TMPDIR
 cd $TMPDIR || die "cd failed"
 
 # Download/extract image
-wget -c "$BASE_IMAGE_URL" || die "Download failed"
-unzip "$ZIPNAME" || die "Extracting image failed"
+unzip -p "$BASE_IMAGE_DIR"/"$ZIPNAME" > "$IMGNAME" || die "Extracting image failed"
 
 # Check where in the image the root partition begins:
 bootoffset=$(parted $IMGNAME unit B p | grep fat32 | awk -F ' ' '{print $2}')
@@ -80,8 +97,8 @@ bootoffset=${bootoffset::-1}
 partoffset=$(parted $IMGNAME unit B p | grep ext4 | awk -F ' ' '{print $2}')
 partoffset=${partoffset::-1}
 
-# Original image partition is too small to hold our stuff.. resize it to 4gb
-truncate -s 4096M $IMGNAME || die "Image resize failed"
+# Original image partition is too small to hold our stuff.. resize it to 6gb
+truncate -s 6144M $IMGNAME || die "Image resize failed"
 lo=$(losetup -f)
 losetup $lo $IMGNAME
 partprobe $lo
@@ -115,7 +132,7 @@ if [ -n "$FLASH" ]; then
   sed -i "/\/bin\/bash/a\/bin\/bash \/$DISPLAY_SRC\/stratux-radar-display\/image\/flash-once.sh \/$DISPLAY_SRC\/stratux-radar-display\/to_flash" stratux-radar-display/image/stratux_radar.sh
 fi
 # set display
-sed -i "s/Oled_1in5/${DISPLAY_NAME}/g" stratux-radar-display/image/stratux_radar.sh
+sed -i "s/NoDisplay/${DISPLAY_NAME}/g" stratux-radar-display/image/stratux_radar.sh
 # back to root directory of stratux image
 cd ../../../
 # run stratux configuration skript
@@ -130,9 +147,11 @@ umount mnt
 
 
 # Shrink the image to minimum size.. it's still larger than it really needs to be, but whatever
-minsize=$(resize2fs -P ${lo}p2 | rev | cut -d' ' -f 1 | rev)
-minsizeBytes=$(($minsize * 4096))
 e2fsck -f ${lo}p2
+minsize=$(resize2fs -P ${lo}p2 | awk -F': ' '{print $2}')
+blocksize=$(tune2fs -l ${lo}p2 | awk -F': *' '/Block size:/ {print $2; exit}')
+blocksize=${blocksize:-4096}
+minsizeBytes=$(($minsize * $blocksize))
 resize2fs -p ${lo}p2 $minsize
 zerofree ${lo}p2 # for smaller zip
 bytesEnd=$(($partoffset + $minsizeBytes))

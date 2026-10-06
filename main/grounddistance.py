@@ -90,7 +90,8 @@ indicate_distance = False  # True if indication for sound ground indication is a
 countdown_screen = False  # True if countdown screen is to be shown (option -cd)
 gear_indication = False  # True if gear indication is active (option -gi) and GPIO could be activated
 distance_sensor = None
-zero_distance = 0.0  # distance of sensor when aircraft is on ground
+zero_distance: float = 0.0  # distance of sensor when aircraft is on ground
+fallback_zero_distance_mm: float = 0.0  # fallback distance in mm provided via -fb <cm>; 0.0 means disabled
 value_debug_level = 0  # set during init
 simulation_mode = False  # set during init
 # statistics for calculating values
@@ -171,11 +172,27 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Se
     celsius = 0
 
     def init(self):
-        self.ser = serial.Serial("/dev/ttyAMA0", 115200)     # Lidar module has 115200 baud
-        self.ser.flushInput()
-        if not self.ser.isOpen():
-            return False
-        return True
+        # Check /dev/ttyAMA5 first, then /dev/ttyAMA0
+        devices = ["/dev/ttyAMA5", "/dev/ttyAMA0"]
+        
+        for device in devices:
+            try:
+                # try to open the serial port to check if it's available
+                test_ser = serial.Serial(device, 115200, timeout=1)
+                test_ser.close()
+                # tf we can open it, use this device
+                self.ser = serial.Serial(device, 115200)     # Lidar module has 115200 baud
+                self.ser.flushInput()
+                if not self.ser.isOpen():
+                    return False
+                rlog.debug(f"LidarSensor: Using {device} for communication")
+                return True
+            except (OSError, serial.SerialException):
+                # device not available, try next one
+                continue
+        
+        rlog.debug(f"LidarSensor: No available AMA interface found (tried {', '.join(devices)})")
+        return False
 
     def last_distance(self):
         return self.distance
@@ -204,8 +221,10 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Se
                 checksum += result[index + i]
             if (checksum & 0xFF) == result[index + 8]:  # checksum check
                 # now calculate distance and strength
-                self.distance = 10 * (result[index + 2] + result[index + 3] * 256)
-                if self.distance > self.distance_max or self.distance < self.distance_min:
+                self.distance = 10 * (result[index + 2] + result[index + 3] * 256)   # raw distance in mm
+                # real distance is this value minus the blind spot of the sensor, which is 10 cm for TFMini-Plus and TF02 Pro Lidar
+                self.distance = self.distance - self.distance_min   #   to get the real distance, subtract the blind spot of the sensor
+                if self.distance > self.distance_max or self.distance < 0:
                     self.distance = 0
                 self.strength = result[index + 4] + result[index + 3] * 256
                 self.celsius = result[index + 6] + result[index + 7] * 256
@@ -216,6 +235,11 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Se
                  rlog.debug(f"Lidar-Sensor: Invalid checksum")
         else:
               rlog.debug(f"Lidar-Sensor: Error less bytes read than expected")
+
+    def close(self):
+        if self.ser is not None:
+            self.ser.close()
+            rlog.debug("Lidar-Sensor: Serial port closed")
 
 
 def reset_values():
@@ -238,18 +262,23 @@ def reset_values():
 
     if ground_distance_active:
         if simulation_mode:
-            zero_distance = 0
+            zero_distance = 0.0
             rlog.debug('Simulation Mode: Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:
             new_zero_distance = distance_sensor.last_distance()   # take last value, don't wait (no async function)
             if new_zero_distance > 0:
-                zero_distance = new_zero_distance
+                zero_distance = float(new_zero_distance)
                 rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
+            elif fallback_zero_distance_mm > 0.0:
+                fallback_value_mm = float(fallback_zero_distance_mm)
+                zero_distance = fallback_value_mm
+                rlog.debug('Ground Zero Distance reset fallback from -gd: {0:5.2f} cm'.format(zero_distance / 10))
             else:
                 rlog.debug('Error resetting gound zero distance')
 
 
-def init(activate, stat_file, debug_level, distance_indication, countdown, gear_ind, situation, sim_mode):
+def init(activate, stat_file, debug_level, distance_indication, countdown, gear_ind, situation, sim_mode,
+         fallback_distance_cm: float = 0.0):
     global ground_distance_active
     global indicate_distance
     global countdown_screen
@@ -260,6 +289,7 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, gear_
     global simulation_mode
     global saved_statistics
     global gear_indication
+    global fallback_zero_distance_mm
 
     # ground_distance_active: sensor is activated with -gd and is running
     # simulation_mode: simulation mode is activated with -sim
@@ -271,6 +301,10 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, gear_
     value_debug_level = debug_level
     saved_statistics = stat_file
     global_situation = situation  # to be able to read and store situation info
+    if isinstance(fallback_distance_cm, (int, float)) and fallback_distance_cm > 0.0:
+        fallback_zero_distance_mm = float(fallback_distance_cm) * 10.0
+    else:
+        fallback_zero_distance_mm = 0.0
 
     if gear_ind:
         gear_indication = radarbuttons.init_gear_indicator()
@@ -328,21 +362,32 @@ def _from_serializable(obj: Any) -> Any: # necessary to load datetime in json
 
 def delete_stats():
     try:
-        os.remove(saved_statistics)
-        rlog.debug("Grounddistance: Statistics deleted")
-    except (OSError, IOError, ValueError) as e:
+        if os.path.exists(saved_statistics):
+            os.remove(saved_statistics)
+            rlog.debug("Grounddistance: Statistics deleted")
+        else:
+            rlog.debug(f"Grounddistance: Statistics file {saved_statistics} does not exist")
+    except FileNotFoundError:
+        rlog.debug(f"Grounddistance: Statistics file {saved_statistics} not found")
+    except (OSError, IOError) as e:
         rlog.debug(f"Grounddistance: Error {e} deleting {saved_statistics}")
 
 
 def write_stats():
     try:
+        serial = _to_serializable(calculate_output_values())
+        outstr = json.dumps(serial)
         with open(saved_statistics, 'at') as out:
-            serial = _to_serializable(calculate_output_values())
-            outstr = json.dumps(serial)
             rlog.debug("Grounddistance: Writing statistics " + outstr)
             out.write(outstr + '\n')  # Add newline after each JSON object
+            out.flush()  # Ensure data is written to disk immediately
+            # File is automatically closed when exiting the with block
+        rlog.debug(f"Grounddistance: Statistics successfully written to {saved_statistics}")
     except (OSError, IOError, ValueError) as e:
         rlog.debug("Grounddistance: Error " + str(e) + " writing " + saved_statistics)
+    except Exception as e:
+        # Catch any other unexpected exceptions to prevent silent failures
+        rlog.debug(f"Grounddistance: Unexpected error writing statistics: {type(e).__name__}: {str(e)}")
 
 
 def read_stats(stats_file=None):   # returns a list of all written stats
@@ -597,7 +642,7 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                     runup_situation = stat
                     break
     elif fly_status == 1:  # start was detected
-        if obstacle_up_clear:  # do not search for if already set
+        if not obstacle_up_clear:  # do not search for if already set
             if latest_stat['baro_valid'] and start_situation['baro_valid'] and \
                     obstacle_is_clear(latest_stat['own_altitude'], start_situation['own_altitude'] + OBSTACLE_HEIGHT):
                 obstacle_up_clear = latest_stat
@@ -686,10 +731,14 @@ async def read_ground_sensor():
             distance_sensor.calc_distance()
             new_zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
         else:
-            new_zero_distance = 1     # just take one mm as zero distance for simulation
+            new_zero_distance = 1.0     # just take one mm as zero distance for simulation
         if new_zero_distance > 0:
-            zero_distance = new_zero_distance  # distance in mm this is zero
+            zero_distance = float(new_zero_distance)  # distance in mm this is zero
             rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
+        elif fallback_zero_distance_mm > 0.0:
+            fallback_value_mm = float(fallback_zero_distance_mm)
+            zero_distance = fallback_value_mm
+            rlog.debug('Ground Zero Distance fallback from -gd: {0:5.2f} cm'.format(zero_distance / 10))
         else:
             rlog.debug('Ground Zero Distance: Error reading ground distance, not set')
         try:
@@ -723,5 +772,10 @@ async def read_ground_sensor():
                 store_statistics(global_situation)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
+            raise
+        finally:
+            distance_sensor.close()
+            radarbuttons.release_gear_indicator()  # free GPIO ressource
+            rlog.debug("Ground distance reader terminated.")
 
 
