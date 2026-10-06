@@ -42,7 +42,7 @@ USB_NAME=""
 DISPLAY_NAME="NoDisplay"
 UART=false
 VERSION="2.0pre"
-outprefix=""
+outprefix="stratux-2.0pre-radar"
 
 # pi imager settings
 GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"

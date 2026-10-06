@@ -1,0 +1,97 @@
+
+{
+  "imager": {
+    "latest_version": "2.0.11",
+    "url": "https://www.raspberrypi.com/software/",
+    "devices": [
+      {
+        "name": "Raspberry Pi 4",
+        "tags": [
+          "pi4-64bit",
+          "pi4-32bit"
+        ],
+        "default": false,
+        "icon": "https://downloads.raspberrypi.com/imager/icons/RPi_4.png",
+        "description": "Raspberry Pi 4 Model B, 400, and Compute Module 4 / 4S",
+        "matching_type": "inclusive",
+        "capabilities": []
+      },
+      {
+        "name": "Raspberry Pi 3",
+        "tags": [
+          "pi3-64bit",
+          "pi3-32bit"
+        ],
+        "default": false,
+        "icon": "https://downloads.raspberrypi.com/imager/icons/RPi_3.png",
+        "description": "Raspberry Pi 3 Model A+ / B / B+ and Compute Module 3 / 3+",
+        "matching_type": "inclusive",
+        "capabilities": []
+      },
+      {
+        "name": "Raspberry Pi Zero 2 W",
+        "tags": [
+          "pi3-32bit"
+        ],
+        "default": false,
+        "icon": "https://downloads.raspberrypi.com/imager/icons/RPi_Zero_2_W.png",
+        "description": "Raspberry Pi Zero 2 W",
+        "matching_type": "inclusive",
+        "capabilities": []
+      },
+      {
+        "name": "Raspberry Pi Zero",
+        "tags": [
+          "pi3-32bit"
+        ],
+        "default": false,
+        "icon": "https://downloads.raspberrypi.com/imager/icons/RPi_Zero.png",
+        "description": "Raspberry Pi Zero, Zero W, and Zero WH",
+        "matching_type": "inclusive",
+        "capabilities": []
+      },
+      {
+        "name": "No filtering",
+        "tags": [],
+        "default": false,
+        "description": "Show every possible image",
+        "matching_type": "inclusive",
+        "capabilities": []
+      }
+    ]
+  },
+  "os_list": [
+    {
+      "name": "Stratux Radar Display (64-bit) v3.0",
+      "description": "Radar Display based on 64bit Trixie kernel (Raspberry Pi3, Pi4)",
+      "icon": "https://raw.githubusercontent.com/TomBric/stratux-radar-display/main/pi-imager/stratux-logo-white192x192.png",
+      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v3.0/stratux-display-v3.0-06df7b96.img",
+      "release_date": "2026-10-06",
+      "extract_size": 4506443776,
+      "extract_sha256": "3e768ecca7caaab7ef4d3a455432f408277f2c857291b6c9e0d88a048877b780",
+      "image_download_size": 911936936,
+      "init_format": "cloudinit-rpi",
+      "devices": [
+        "pi3-64bit",
+        "pi4-64bit"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "Stratux 2.0pre with radar v3.0 preinstalled (64-bit)",
+      "description": "Stratux version 2.0pre plus radar software preinstalled (Pi3, Pi4)",
+      "icon": "https://raw.githubusercontent.com/TomBric/stratux-radar-display/main/pi-imager/stratux-logo-black192x192.png",
+      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v3.0/stratux-pre2.0-radar-v3.0-06df7b96.img.xz",
+      "release_date": "2026-10-06",
+      "extract_size": 4625178624,
+      "extract_sha256": "6c2653fefd9e08980c9ee5ee08af69b8584b76c2b212f646204292911bee73aa",
+      "image_download_size": 1240981644,
+      "init_format": "none",
+      "devices": [
+        "pi3-64bit",
+        "pi4-64bit"
+      ],
+      "capabilities": []
+    }
+  ]
+}
