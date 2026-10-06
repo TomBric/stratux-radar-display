@@ -188,7 +188,7 @@ class Epaper1in54(dcommon.GenericDisplay):
         self.draw.line((self.zerox, self.zeroy - self.max_pixel // 2, self.zerox, self.zeroy + self.max_pixel // 2),
                        fill=self.TEXT_COLOR)
 
-        if gps_speed_length > 0:  # draw own speed vector
+        if gpsconnected and gps_speed_length > 0:  # draw own speed vector
             velocity_width = max(2, self.AIRCRAFT_SIZE // 3)
             self.draw.line((self.zerox, self.zeroy - gps_speed_length, self.zerox,
                             self.zeroy), fill=self.TEXT_COLOR, width=velocity_width * 2)
