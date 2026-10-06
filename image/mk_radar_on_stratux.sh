@@ -44,6 +44,7 @@ UART=false
 VERSION="2.0pre"
 outprefix="stratux-2.0pre-radar"
 
+
 # pi imager settings
 GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
 ICON_URL="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
