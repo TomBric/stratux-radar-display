@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "mk_configure_radar.sh called with arguments: $0 $@"
+echo "mk_configure_radar.sh called with arguments: $0 $*"
 
 # script configures basic libraries and settings necessary for stratux-radar
 # script to be run as root

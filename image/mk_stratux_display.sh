@@ -140,14 +140,30 @@ chroot mnt apt install git -y
 if ! chroot mnt id -u pi >/dev/null 2>&1; then
   chroot mnt useradd -m -s /bin/bash -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio pi || die "Creating user pi failed"
   chroot mnt bash -c "echo 'pi:raspberry' | chpasswd" || die "Setting password for pi failed"
-  echo "User pi created with password 'raspberry'"
 else
-  echo "User pi already exists"
+  chroot mnt usermod -s /bin/bash pi || die "Setting pi shell failed"
+  chroot mnt bash -c "echo 'pi:raspberry' | chpasswd" || die "Setting password for pi failed"
+  chroot mnt passwd -u pi >/dev/null 2>&1 || true
 fi
+
+# Sanity-check the pi user before any su pi calls.
+echo "Checking pi user configuration..."
+chroot mnt bash -c "getent passwd pi >/dev/null" || die "pi user is missing in the image"
+chroot mnt bash -c "test -d /home/pi" || die "pi home directory is missing"
+chroot mnt bash -c "test -x /bin/bash" || die "Missing /bin/bash in image"
+CHROOT_PI_SHELL=$(chroot mnt getent passwd pi | cut -d: -f7)
+if [ "$CHROOT_PI_SHELL" != "/bin/bash" ]; then
+  chroot mnt usermod -s /bin/bash pi || die "Could not fix pi login shell"
+fi
+CHROOT_PI_SHELL=$(chroot mnt getent passwd pi | cut -d: -f7)
+echo "pi user ok: shell=$CHROOT_PI_SHELL, home=/home/pi"
 
 # Allow pi to run sudo without password.
 chroot mnt bash -c "echo 'pi ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/010_pi-nopasswd" || die "Writing sudoers entry for pi failed"
 chroot mnt chmod 440 /etc/sudoers.d/010_pi-nopasswd || die "Setting sudoers file permissions failed"
+chroot mnt bash -c "chown root:root /etc/sudoers.d/010_pi-nopasswd" || die "Setting sudoers ownership failed"
+
+echo "User pi ready (shell=/bin/bash, password set to raspberry)"
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
 su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git" || die "git clone failed"
@@ -202,5 +218,4 @@ else
   mv $TMPDIR/out/${outprefix}* /media/pi/"$USB_NAME"; umount /media/pi/"$USB_NAME"
   echo "Final images have been moved to usb stick $USB_NAME and umounted. Please install and test the images."
 fi
-
 
