@@ -136,10 +136,13 @@ sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt install git -y
 
+die "STOP here for testing"
 # Newer Raspberry Pi OS images may not have a preconfigured 'pi' user.
 if ! chroot mnt id -u pi >/dev/null 2>&1; then
   chroot mnt useradd -m -s /bin/bash -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio pi || die "Creating user pi failed"
   chroot mnt bash -c "echo 'pi:raspberry' | chpasswd" || die "Setting password for pi failed"
+else
+  echo "User pi already exists"
 fi
 
 # Allow pi to run sudo without password.
