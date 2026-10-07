@@ -136,6 +136,16 @@ sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt install git -y
 
+# Newer Raspberry Pi OS images may not have a preconfigured 'pi' user.
+if ! chroot mnt id -u pi >/dev/null 2>&1; then
+  chroot mnt useradd -m -s /bin/bash -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio pi || die "Creating user pi failed"
+  chroot mnt bash -c "echo 'pi:raspberry' | chpasswd" || die "Setting password for pi failed"
+fi
+
+# Allow pi to run sudo without password.
+chroot mnt bash -c "echo 'pi ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/010_pi-nopasswd" || die "Writing sudoers entry for pi failed"
+chroot mnt chmod 440 /etc/sudoers.d/010_pi-nopasswd || die "Setting sudoers file permissions failed"
+
 cd mnt/$DISPLAY_SRC || die "cd failed"
 su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git"
 

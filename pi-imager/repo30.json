@@ -30,6 +30,7 @@
       {
         "name": "Raspberry Pi Zero 2 W",
         "tags": [
+          "pi3-64bit",
           "pi3-32bit"
         ],
         "default": false,
