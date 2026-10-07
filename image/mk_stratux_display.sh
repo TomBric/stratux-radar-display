@@ -147,7 +147,7 @@ chroot mnt bash -c "echo 'pi ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/010_pi-no
 chroot mnt chmod 440 /etc/sudoers.d/010_pi-nopasswd || die "Setting sudoers file permissions failed"
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
-su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git"
+su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git" | die "git clone failed"
 
 cd ../../../
 # run the configuration skript, that is also executed when setting up on target device
