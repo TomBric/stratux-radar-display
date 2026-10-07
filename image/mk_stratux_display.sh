@@ -136,11 +136,11 @@ sed -i mnt/boot/cmdline.txt -e "s/console=tty[0-9]\+ //"
 # install git for cloning repo (if not already installed) and pip
 chroot mnt apt install git -y
 
-die "STOP here for testing"
 # Newer Raspberry Pi OS images may not have a preconfigured 'pi' user.
 if ! chroot mnt id -u pi >/dev/null 2>&1; then
   chroot mnt useradd -m -s /bin/bash -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,spi,i2c,gpio pi || die "Creating user pi failed"
   chroot mnt bash -c "echo 'pi:raspberry' | chpasswd" || die "Setting password for pi failed"
+  echo "User pi created with password 'raspberry'"
 else
   echo "User pi already exists"
 fi
@@ -150,20 +150,20 @@ chroot mnt bash -c "echo 'pi ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/010_pi-no
 chroot mnt chmod 440 /etc/sudoers.d/010_pi-nopasswd || die "Setting sudoers file permissions failed"
 
 cd mnt/$DISPLAY_SRC || die "cd failed"
-su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git" | die "git clone failed"
+su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-radar-display.git" || die "git clone failed"
 
 cd ../../../
 # run the configuration skript, that is also executed when setting up on target device
 if [ "$V32" = true ]; then
-  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh -i pico2tts
+  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh -i pico2tts || die "mk_configure_radar.sh (v32) failed"
 else
-  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh
+  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh || die "mk_configure_radar.sh failed"
 fi
-unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_config_webapp.sh
+unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_config_webapp.sh || die "mk_config_webapp.sh failed"
 
 # mkdir -p out
-umount mnt/boot
-umount mnt
+umount mnt/boot || die "umount boot failed"
+umount mnt || die "umount root failed"
 
 # Shrink the image to minimum size.. it's still larger than it really needs to be, but whatever
 minsize=$(resize2fs -P ${lo}p2 | rev | cut -d' ' -f 1 | rev)
