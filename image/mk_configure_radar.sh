@@ -1,6 +1,11 @@
 #!/bin/bash
 
-echo "mk_configure_radar.sh called with arguments: $0 $@"
+die() {
+    echo "$1"
+    exit 1
+}
+
+echo "mk_configure_radar.sh called with arguments: $0 $*"
 
 # script configures basic libraries and settings necessary for stratux-radar
 # script to be run as root
@@ -31,6 +36,18 @@ while getopts ":i:" opt; do
       ;;
   esac
 done
+
+echo "Checking pi user configuration..."
+PI_PASSWD_ENTRY=$(getent passwd pi) || die "pi user is missing"
+PI_HOME=$(echo "$PI_PASSWD_ENTRY" | cut -d: -f6)
+PI_SHELL=$(echo "$PI_PASSWD_ENTRY" | cut -d: -f7)
+
+[ -n "$PI_HOME" ] || die "pi home directory is not configured"
+[ -d "$PI_HOME" ] || die "pi home directory '$PI_HOME' is missing"
+[ -x /bin/bash ] || die "Missing /bin/bash"
+[ "$PI_SHELL" = "/bin/bash" ] || die "pi login shell is '$PI_SHELL', expected /bin/bash"
+
+echo "pi user ok: shell=$PI_SHELL, home=$PI_HOME"
 
 
 apt update
@@ -104,6 +121,8 @@ sed -i 's/#ReconnectAttempts = 7/ReconnectAttempts = 3/' /etc/bluetooth/main.con
 
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-scipy python3-pygame python3-gpiozero -y
+
+
 su pi -c "pip3 install ADS1x15-ADC --break-system-packages"
 su pi -c "pip3 install bayesian-filters --break-system-packages"
 su pi -c "pip3 install bleak --break-system-packages"
