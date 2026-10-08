@@ -40,17 +40,6 @@
         "capabilities": []
       },
       {
-        "name": "Raspberry Pi Zero",
-        "tags": [
-          "pi3-32bit"
-        ],
-        "default": false,
-        "icon": "https://downloads.raspberrypi.com/imager/icons/RPi_Zero.png",
-        "description": "Raspberry Pi Zero, Zero W, and Zero WH",
-        "matching_type": "inclusive",
-        "capabilities": []
-      },
-      {
         "name": "No filtering",
         "tags": [],
         "default": false,
@@ -65,11 +54,11 @@
       "name": "Stratux Radar Display (64-bit) v3.0",
       "description": "Radar Display based on 64bit Trixie kernel (Raspberry Pi3, Pi4)",
       "icon": "https://raw.githubusercontent.com/TomBric/stratux-radar-display/main/pi-imager/stratux-logo-white192x192.png",
-      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v3.0/stratux-display-v3.0-06df7b96.img.xz",
+      "url": "https://github.com/TomBric/stratux-radar-display/releases/download/v3.0/stratux-display-v3.0-d5d30536.img.xz",
       "release_date": "2026-10-06",
-      "extract_size": 4506443776,
-      "extract_sha256": "3e768ecca7caaab7ef4d3a455432f408277f2c857291b6c9e0d88a048877b780",
-      "image_download_size": 911936936,
+      "extract_size": 4482109440,
+      "extract_sha256": "f4095dc6641383cc325f473a5b612c579944b641e48f479089185475e0f6da75",
+      "image_download_size": 949728132,
       "init_format": "cloudinit-rpi",
       "devices": [
         "pi3-64bit",
