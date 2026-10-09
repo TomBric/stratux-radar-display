@@ -476,8 +476,9 @@ def new_traffic(json_str):
         ac['last_alt_timestamp'] = now - traffic['AgeLastAlt']
 
         if traffic['Speed_valid']:
-            ac['nspeed'] = traffic['Speed']
-        ac['vspeed'] = traffic['Vvel']
+            ac['nspeed'] = traffic.get('Speed', 0)
+        # Vvel should only be set if Speed_valid or if explicitly present
+        ac['vspeed'] = traffic.get('Vvel', 0)  # Safe access with default value 0
         if traffic['Tail'] and traffic['Tail'] != '':
             # do not give up registration, if it is once received and now is empty,
             # happens e.g. when same ICAO hex comes from FLARM without ddb entry
