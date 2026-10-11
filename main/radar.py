@@ -526,10 +526,12 @@ def new_traffic(json_str):
             # happens e.g. when same ICAO hex comes from FLARM without ddb entry
 
         if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
-            # unspecified altitude, nothing displayed for now, ignore this traffic, leave it as it is
+            # unspecified altitude, nothing displayed for now, ignore this message, leave it as it is
             rlog.log(AIRCRAFT_DEBUG, f"Traffic {traffic['Icao_addr']:X} from source {source} has no altitude or distance estimation, ignoring it")
             return
         distcirc = traffic['DistanceEstimated'] / 1852.0
+        ac['gps_distance'] = distcirc
+        ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
 
         # Traffic in all_ac list is
         # - ADSB or FLARM:   ac['position_valid'] = True
@@ -561,13 +563,12 @@ def new_traffic(json_str):
             # mode-s traffic or no valid GPS position of stratux
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: No position traffic {traffic['Icao_addr']:X} from source {source} "
                                      f"in {distcirc:.1f} nm")
-            # check age of last position, if age is < POSITION_VALID_DELTA, leave position valid and do not calculate circradius
-            if is_new or 'circradius' not in ac:
+            ac['position_valid'] = False
+            if is_new:
                 # calc argposition if new or adsb before
                 last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
                 ac['arcposition'] = last_arcposition
-            ac['gps_distance'] = distcirc
-            ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
+
         modes_only = ac['position_valid'] is False
         collision_detection(ac, traffic, modes_only)
     except json.JSONDecodeError:
