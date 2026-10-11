@@ -453,6 +453,7 @@ def simple_collision_detection(ac, traffic, mode_s=False):
 def clear_aircraft_list():
     global all_ac
     global aircraft_changed
+    global last_arcposition
 
     now = time.time()
     to_remove = []
@@ -471,9 +472,11 @@ def clear_aircraft_list():
             # now give a new arcposition to this aircraft without position
             last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
             ac['arcposition'] = last_arcposition
+            aircraft_changed = True
         if 'last_speed_timestamp' in ac and now - ac['last_speed_timestamp'] > SPEED_VALID_DELTA:
             rlog.log(AIRCRAFT_DEBUG, f"Invalidating speed of {hex(icao)} due to age {now - ac['last_speed_timestamp']:.1f} seconds")
             ac['speed_valid'] = False
+            aircraft_changed = True
 
 def new_traffic(json_str):
     global last_arcposition
