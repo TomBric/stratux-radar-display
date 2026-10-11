@@ -923,9 +923,10 @@ async def display_and_cutoff():
                     refresh_display(manual=True)
                     Globals.mode = Modes.GMETER
                 elif Globals.mode == Modes.COMPASS:  # compass display
-                    compassui.draw_compass(display_control, situation['was_changed'], situation['connected'],
+                    compassui.draw_compass(display_control, situation['was_changed'] or Globals.refresh, situation['connected'],
                                            situation['course'])
                     situation['was_changed'] = False
+                    Globals.refresh = False
                 elif Globals.mode == Modes.REFRESH_COMPASS:  # refresh display, only relevant for epaper, mode was compass
                     rlog.debug("Compass: Display driver - Refreshing")
                     refresh_display(manual=True)

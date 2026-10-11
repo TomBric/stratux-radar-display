@@ -38,6 +38,7 @@ import radarmodes
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
+REQUEST_TIMEOUT = 5.0
 # globals
 url_gmeter_reset = ""
 gmeterui_changed = True
@@ -53,9 +54,9 @@ def init(url):
 def reset_gmeter():
     rlog.debug("GMeterUI: Reset gmeter triggered")
     try:
-        requests.post(url_gmeter_reset)
+        requests.post(url_gmeter_reset, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.RequestException as e:
-        rlog.debug("Posting gmeter-reset exception: ", e)
+        rlog.debug(f"Posting gmeter-reset exception: {e}")
 
 
 def draw_gmeter(display_control, ui_changed, connected, gmeter):

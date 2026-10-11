@@ -89,7 +89,7 @@ ground_distance_active = False    # True if started with option -gd and sensor i
 indicate_distance = False  # True if indication for sound ground indication is active (option -gb)
 countdown_screen = False  # True if countdown screen is to be shown (option -cd)
 gear_indication = False  # True if gear indication is active (option -gi) and GPIO could be activated
-distance_sensor = None
+distance_sensor: Any = None
 zero_distance: float = 0.0  # distance of sensor when aircraft is on ground
 fallback_zero_distance_mm: float = 0.0  # fallback distance in mm provided via -fb <cm>; 0.0 means disabled
 value_debug_level = 0  # set during init
@@ -141,7 +141,7 @@ go_around_warning_sound = None
 # variables for countdown switchback
 TRIGGER_COUNTDOWN_SWITCHBACK = 0.5   # seconds with invalid readings (above sensor range) to switch back from countdown
 countdown_switch_delta = timedelta(seconds=TRIGGER_COUNTDOWN_SWITCHBACK)
-trigger_timestamp = None
+trigger_timestamp: datetime | None = None
 switch_back_from_distance = Modes.NO_CHANGE
 
 
@@ -265,7 +265,11 @@ def reset_values():
             zero_distance = 0.0
             rlog.debug('Simulation Mode: Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:
-            new_zero_distance = distance_sensor.last_distance()   # take last value, don't wait (no async function)
+            sensor = distance_sensor
+            if sensor is None:
+                rlog.debug('Grounddistance: Sensor not initialized, cannot reset zero distance')
+                return
+            new_zero_distance = sensor.last_distance()   # take last value, don't wait (no async function)
             if new_zero_distance > 0:
                 zero_distance = float(new_zero_distance)
                 rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
@@ -728,11 +732,15 @@ async def read_ground_sensor():
 
     if ground_distance_active:
         rlog.debug("Ground distance reader active ...")
-        if not simulation_mode:
-            distance_sensor.calc_distance()
-            new_zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
-        else:
+        sensor = distance_sensor
+        if not simulation_mode and sensor is not None:
+            sensor.calc_distance()
+            new_zero_distance = sensor.last_distance()  # distance in mm this is zero
+        elif simulation_mode:
             new_zero_distance = 1.0     # just take one mm as zero distance for simulation
+        else:
+            rlog.debug('Grounddistance: Sensor not initialized, cannot determine zero distance')
+            new_zero_distance = 0.0
         if new_zero_distance > 0:
             zero_distance = float(new_zero_distance)  # distance in mm this is zero
             rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
@@ -748,9 +756,10 @@ async def read_ground_sensor():
                 now = time.perf_counter()
                 await asyncio.sleep(next_read - now)  # wait for next time of measurement
                 next_read = next_read + (1 / MEASUREMENTS_PER_SECOND)
-                if not simulation_mode:  # read sensor
-                    distance_sensor.calc_distance()
-                    distance = distance_sensor.last_distance()  # distance in mm
+                sensor = distance_sensor
+                if not simulation_mode and sensor is not None:  # read sensor
+                    sensor.calc_distance()
+                    distance = sensor.last_distance()  # distance in mm
                     if distance > 0:    # distance==0 is invalid distance
                         global_situation['g_distance_valid'] = True
                         global_situation['g_distance'] = distance - zero_distance
@@ -766,16 +775,20 @@ async def read_ground_sensor():
                                  'Ground Distance: gear-down: {0}'.format(global_situation['gear_down']))
                     else:
                         global_situation['gear_down'] = False   # must be set to make sure key is present
-                else: # simulation mode
+                elif simulation_mode: # simulation mode
                     sim_data = simulation.read_simulation_data()
                     eval_simulation_data(sim_data, global_situation)
+                else:
+                    rlog.debug('Grounddistance: Sensor not initialized, skipping measurement cycle')
 
                 store_statistics(global_situation)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
             raise
         finally:
-            distance_sensor.close()
+            sensor = distance_sensor
+            if sensor is not None:
+                sensor.close()
             radarbuttons.release_gear_indicator()  # free GPIO ressource
             rlog.debug("Ground distance reader terminated.")
 

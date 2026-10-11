@@ -42,7 +42,6 @@ import subprocess
 import string
 import ipaddress
 import json
-import os
 import datetime
 from radarmodes import Modes, next_mode_sequence
 
@@ -131,7 +130,12 @@ def init(config_file, url, target_ip, refresh, config):   # prepare everything
     refresh_time = refresh
     global_config = config
     new_pass = DEFAULT_PASS
-    new_stratux_ip = ipv4_to_string(string_to_ipv4(stratux_ip))  # to normalize and have leading zeros
+    try:
+        new_stratux_ip = ipv4_to_string(int(ipaddress.IPv4Address(stratux_ip)))  # normalize and keep leading zeros
+    except ipaddress.AddressValueError:
+        rlog.debug(f"Status UI: Invalid Stratux IP '{stratux_ip}', falling back to 0.0.0.0")
+        stratux_ip = "0.0.0.0"
+        new_stratux_ip = ipv4_to_string(0)
     new_wifi = DEFAULT_WIFI
 
 
@@ -351,15 +355,21 @@ def read_wlanip():
 def set_network(wifi, passw, new_stratux):
     global global_config
 
+    wifi = wifi.strip()
+    passw = passw.strip()
+    new_stratux = new_stratux.strip()
     global_config['stratux_ip'] = new_stratux
     write_config(global_config)
-    res = os.system('sudo raspi-config nonint do_wifi_ssid_passphrase ' + wifi + ' ' + passw)
-    if res != 0:
+    res = subprocess.run(
+        ["sudo", "raspi-config", "nonint", "do_wifi_ssid_passphrase", wifi, passw],
+        check=False,
+    )
+    if res.returncode != 0:
         rlog.debug("STATUSUI: Setting Wifi network failed.")
         return
     rlog.debug("STATUSUI: Rebooting!")
-    os.system('sudo reboot')
-    if res != 0:
+    res = subprocess.run(["sudo", "reboot"], check=False)
+    if res.returncode != 0:
         rlog.debug("STATUSUI: Reboot attempt failed.")
 
 
@@ -392,9 +402,18 @@ def ipv4_to_string(ip):   # generate string with leading zeros
 
 
 def string_to_ipv4(ipv4str):
-    parts = ipv4str.split('.')
-    ipaddr = (int(parts[0]) << 24) + (int(parts[1]) << 16) + (int(parts[2]) << 8) + int(parts[3])
-    return ipaddr
+    parts = ipv4str.strip().split('.')
+    if len(parts) != 4:
+        raise ValueError(f"Invalid IPv4 address: '{ipv4str}'")
+    octets = []
+    for part in parts:
+        if part == "":
+            raise ValueError(f"Invalid IPv4 address: '{ipv4str}'")
+        octet = int(part)
+        if octet < 0 or octet > 255:
+            raise ValueError(f"Invalid IPv4 address: '{ipv4str}'")
+        octets.append(octet)
+    return (octets[0] << 24) + (octets[1] << 16) + (octets[2] << 8) + octets[3]
 
 
 def user_input(extsound_active, bluetooth_active):

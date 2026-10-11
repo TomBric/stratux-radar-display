@@ -63,24 +63,26 @@ def mode_codes(c):
 
 
 def parse_modes(modes):
+    mode_sequence.clear()
     for c in modes:
         mode_no = mode_codes(c)
-        if mode_no is not Modes.NO_CHANGE:
+        if mode_no != Modes.NO_CHANGE:
             mode_sequence.append(mode_no)
     if len(mode_sequence) == 0:
         mode_sequence.append(Modes.RADAR) # default mode is radar if no valid mode is given
 
 def next_mode_sequence(current_mode):
-    iterator = iter(mode_sequence)
-    next_mode = mode_sequence[0]   # return to first mode, if old mode not found, error proof
-    for value in iterator:
-        if value == current_mode:
-            next_mode = next(iterator, mode_sequence[0])
-    return next_mode
+    if not mode_sequence:
+        return Modes.RADAR
+    try:
+        idx = mode_sequence.index(current_mode)
+    except ValueError:
+        return mode_sequence[0]
+    return mode_sequence[(idx + 1) % len(mode_sequence)]
 
 
 def first_mode_sequence():
-    return mode_sequence[0]  # return to first mode
+    return mode_sequence[0] if mode_sequence else Modes.RADAR  # return to first mode
 
 
 def is_mode_contained(mode):

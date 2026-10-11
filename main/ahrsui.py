@@ -37,6 +37,8 @@ import radarmodes
 import requests
 from globals import rlog
 
+REQUEST_TIMEOUT = 5.0
+
 # constants
 # globals
 ahrs_ui_changed = True
@@ -84,7 +86,7 @@ def draw_ahrs(display_control, connected, was_changed, pitch, roll, heading, sli
 def zero_drift():
     rlog.debug("Zero drift calibration initiated by button press!")
     try:
-        requests.post(calibrate_url)
+        requests.post(calibrate_url, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.RequestException as e:
         rlog.debug("Error posting calibration request: {0}".format(e))
 
@@ -92,7 +94,7 @@ def zero_drift():
 def set_level():
     rlog.debug("Levelling initiated by button press!")
     try:
-        requests.post(cage_url)
+        requests.post(cage_url, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.RequestException as e:
         rlog.debug("Error posting levelling request: {0}".format(e))
 
