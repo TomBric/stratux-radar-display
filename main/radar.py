@@ -82,16 +82,13 @@ RADAR_VERSION = "3.0"
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
 RADAR_CUTOFF = 29  # time after last message received from an aircraft is no longer displayed
-POSITION_VALID_DELTA = 15.0   # time a received position is assumed valid, e.g. if message without position is received
+POSITION_VALID_DELTA = RADAR_CUTOFF   # time a received position is assumed valid, e.g. if message without position is received
 # only after this POSITION_VALID_DELTA time a switch back to mode-s (circle) is done. May e.g. happen when
 # flarm is no more received, but only mode-s. Than switch back and display circle
-SPEED_VALID_DELTA = 15.0   # time a received speed is assumed valid, e.g. if message without speed is received
+SPEED_VALID_DELTA = RADAR_CUTOFF   # time a received speed is assumed valid, e.g. if message without speed is received
 # only after this SPEED_VALID_DELTA Speed, Track and Vertical Speed are no more displayed.
 # May e.g. happen when flarm is no more received, but only ADSB without  airborne velocity message
 # e.g. older FUNKE transponders do not send airborne velocity messages, so no speed is available, they only send position and altitude
-FLARM_POSITION_OVER_ADSB_TIMEOUT = 10  # time in seconds, FLARM position is only taken into account after this timeout
-# otherwise adsb_out position is taken, this prevents FLARM/OGN position taken into account when valid adsb-out signal
-# is received
 
 
 UI_REACTION_TIME = 0.1
@@ -466,14 +463,14 @@ def clear_aircraft_list():
         all_ac.pop(icao, None)
     # remove position and speed of aircraft that have not been updated for a while, but keep them in the list
     for icao, ac in all_ac.items():
-        if 'last_position_timestamp' in ac and now - ac['last_position_timestamp'] > POSITION_VALID_DELTA:
+        if ac.get('position_valid', False) and 'last_position_timestamp' in ac and now - ac['last_position_timestamp'] > POSITION_VALID_DELTA:
             rlog.log(AIRCRAFT_DEBUG, f"Invalidating position of {hex(icao)} due to age {now - ac['last_position_timestamp']:.1f} seconds")
             ac['position_valid'] = False
             # now give a new arcposition to this aircraft without position
             last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
             ac['arcposition'] = last_arcposition
             aircraft_changed = True
-        if 'last_speed_timestamp' in ac and now - ac['last_speed_timestamp'] > SPEED_VALID_DELTA:
+        if ac.get('speed_valid', False) and 'last_speed_timestamp' in ac and now - ac['last_speed_timestamp'] > SPEED_VALID_DELTA:
             rlog.log(AIRCRAFT_DEBUG, f"Invalidating speed of {hex(icao)} due to age {now - ac['last_speed_timestamp']:.1f} seconds")
             ac['speed_valid'] = False
             aircraft_changed = True
