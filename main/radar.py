@@ -225,14 +225,14 @@ def draw_all_ac(allac):
     dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
     for icao, ac in dist_sorted:
         # first draw mode-s
-        if 'circradius' in ac:
+        if not ac['position_valid']:
             tail = get_tail_display(ac)
             if ac['circradius'] <= max_pixel / 2:
                 display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac['vspeed'],
                                               tail, ac['prio'])
     for icao, ac in dist_sorted:
         # then draw adsb
-        if 'x' in ac:
+        if ac['position_valid']:
             if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
                 tail = get_tail_display(ac)
                 display_control.aircraft(ac['x'], ac['y'], ac['hdiff'], tail, ac['prio'], ac.get('speed_valid', False),
@@ -450,14 +450,36 @@ def simple_collision_detection(ac, traffic, mode_s=False):
     # no clear of traffic spoken
 
 
+def clear_aircraft_list():
+    global all_ac
+    global aircraft_changed
+
+    now = time.time()
+    to_remove = []
+    for icao, ac in all_ac.items():
+        if now - ac.get('last_contact_timestamp', now) > RADAR_CUTOFF:  # remove aircraft not updated for a while
+            to_remove.append(icao)
+            rlog.log(AIRCRAFT_DEBUG, "Cutting of " + hex(icao))
+            aircraft_changed = True
+    for icao in to_remove:
+        all_ac.pop(icao, None)
+    # remove position and speed of aircraft that have not been updated for a while, but keep them in the list
+    for icao, ac in all_ac.items():
+        if 'last_position_timestamp' in ac and now - ac['last_position_timestamp'] > POSITION_VALID_DELTA:
+            rlog.log(AIRCRAFT_DEBUG, f"Invalidating position of {hex(icao)} due to age {now - ac['last_position_timestamp']:.1f} seconds")
+            ac['position_valid'] = False
+        if 'last_speed_timestamp' in ac and now - ac['last_speed_timestamp'] > SPEED_VALID_DELTA:
+            rlog.log(AIRCRAFT_DEBUG, f"Invalidating speed of {hex(icao)} due to age {now - ac['last_speed_timestamp']:.1f} seconds")
+            ac['speed_valid'] = False
+
 def new_traffic(json_str):
     global last_arcposition
     global aircraft_changed
 
     aircraft_changed = True
     rlog.log(AIRCRAFT_DEBUG, "New Traffic" + json_str)
-    traffic = json.loads(json_str)
     try:
+        traffic = json.loads(json_str)
         if is_steering_message(traffic):
             return    # was message without aircraft content
         if traffic.get('Last_source') == SOURCE_1090:
@@ -467,19 +489,17 @@ def new_traffic(json_str):
         else:
             source = "Unknown source"
         is_new = False
+        now = time.time()
         if traffic['Icao_addr'] not in all_ac.keys():
             # new traffic, insert
             all_ac[traffic['Icao_addr']] = {
                 'gps_distance': 0,
                 'prio': 0,
-                'nspeed': 0,
-                'vspeed': 0,
-                'direction': 0,
                 'speed_valid': False,
+                'position_valid': False,
             }
             is_new = True
         ac = all_ac[traffic['Icao_addr']]
-        now = time.time()
         if traffic['Age'] <= traffic['AgeLastAlt']:
             ac['last_contact_timestamp'] = now - traffic['Age']
         else:
@@ -489,23 +509,13 @@ def new_traffic(json_str):
         ac['last_alt_timestamp'] = now - traffic['AgeLastAlt']
         if traffic['Speed_valid']:    # Airborne velocity message is valid, update speed, track and vertical speed
             ac['nspeed'] = traffic.get('Speed', 0)
+            ac['vspeed'] = traffic.get('Vvel', 0)
+            ac['direction'] = traffic.get('Track', 0) - situation['course']
             # Vvel and track should only be set if Speed_valid is true
-            if 'Vvel' in traffic:
-                ac['vspeed'] = traffic['Vvel']
-            if 'Track' in traffic and situation['gps_active']:
-                ac['direction'] = traffic['Track'] - situation['course']
             ac['last_speed_timestamp'] = now
             ac['speed_valid'] = True
-        else:
-            # check age of last "airborne velocity message", if age is >= SPEED_VALID_DELTA,
-            # set speed_valid to false and reset speed, track and vertical speed to zero
-            if ('speed_valid' in ac and ac['speed_valid'] and
-                    'last_speed_timestamp' in ac and time.time() - ac['last_speed_timestamp'] >= SPEED_VALID_DELTA):
-                ac['nspeed'] = 0
-                ac['vspeed'] = 0
-                ac['direction'] = 0
-                ac['speed_valid'] = False
-                rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} speed data is no longer valid")
+            nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
+            ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
 
         tail = traffic.get('Tail')
         if isinstance(tail, str):
@@ -515,67 +525,53 @@ def new_traffic(json_str):
             # do not give up registration, if it is once received and now is not present or empty string,
             # happens e.g. when same ICAO hex comes from FLARM without ddb entry
 
+        if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
+            # unspecified altitude, nothing displayed for now, ignore this traffic, leave it as it is
+            rlog.debug(AIRCRAFT_DEBUG, f"Traffic {traffic['Icao_addr']:X} from source {source} has no altitude or distance estimation, ignoring it")
+            return
+        distcirc = traffic['DistanceEstimated'] / 1852.0
 
         # Traffic in all_ac list is
-        # - ADSB or FLARM:   if 'x' is in ac   (andy 'y' also, but check for x is ok).
-        # - Mode-S only: if 'circradius' is in ac
+        # - ADSB or FLARM:   ac['position_valid'] = True
+        # - Mode-S only:     ac['position_valid'] = False
         # when switching, make sure other keys ('circradius' or 'x') are deleted.
         # When position is received this immediately overrides Mode-S. The other way round may also happen
         # e.g if FLARM of an aircraft was received, but afterwards only mode-s. So invalidate position also if
-        # no new position was received after some time
+        # no new position was received after some time. This is done in clear_aircraft_list() function, which is
+        # called regularly from display task. It will invalidate position and speed if no new position or speed was received for a while.
 
         if traffic['Position_valid'] and situation['gps_active']:
             # adsb traffic and stratux has valid gps signal
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at hdiff {ac['hdiff']}")
             rlog.log(AIRCRAFT_DEBUG, f"Traffic is: {traffic}")
-            if 'circradius' in ac:
-                del ac['circradius']   # was mode-s target before, now invalidate mode-s info on radius
-            if 'kf' in ac:
-                del ac['kf'] # was mode-s target before, now invalidate mode-s info on kalman filter
-            ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
+            ac['position_valid'] = True
             ac['last_position_timestamp'] = time.time()
-            ac['last_position_source'] = source    # we need to know where the last position was recorded from
-
-            collision_detection(ac, traffic, False)
+            ac['last_position_source'] = source  # we need to know where the last position was recorded from
+            ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             if ac['gps_distance'] <= situation['RadarRange'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
                 res_angle = (ac['gps_angle'] - situation['course']) % 360
                 gpsx = math.sin(math.radians(res_angle)) * ac['gps_distance']
                 gpsy = - math.cos(math.radians(res_angle)) * ac['gps_distance']
                 ac['x'] = round(max_pixel / 2 * gpsx / situation['RadarRange'] + zerox)
                 ac['y'] = round(max_pixel / 2 * gpsy / situation['RadarRange'] + zeroy)
-                if 'nspeed' in ac:
-                    nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
-                    ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
             else: # outside of display
                 ac['x'] = -1
                 ac['y'] = -1
         else:
             # mode-s traffic or no valid GPS position of stratux
-            if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
-                # unspecified altitude, nothing displayed for now, leave it as it is
-                return
-            distcirc = traffic['DistanceEstimated'] / 1852.0
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: No position traffic {traffic['Icao_addr']:X} from source {source} "
                                      f"in {distcirc:.1f} nm")
             # check age of last position, if age is < POSITION_VALID_DELTA, leave position valid and do not calculate circradius
-            if 'last_position_timestamp' in ac and time.time() - ac['last_position_timestamp'] < POSITION_VALID_DELTA:
-                rlog.log(AIRCRAFT_DEBUG, f"Ignoring mode s distance estimation of "
-                    f"{traffic['Icao_addr']:X} since, position is still younger than {POSITION_VALID_DELTA}secs")
-                # this may e.g. happen if FLARM message is received and mode-s
-                return
             if is_new or 'circradius' not in ac:
                 # calc argposition if new or adsb before
                 last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
                 ac['arcposition'] = last_arcposition
             ac['gps_distance'] = distcirc
             ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
-            if 'x' in ac and 'y' in ac:   # remove keys for display position, traffic is now only estimated again
-                del ac['x']
-                del ac['y']
-                rlog.log(AIRCRAFT_DEBUG, f"Removing position of {traffic['Icao_addr']:X} since position "
-                                         f"was older than {POSITION_VALID_DELTA}secs")
-            collision_detection(ac, traffic, True)
-
+        modes_only = ac['position_valid'] is False
+        collision_detection(ac, traffic, modes_only)
+    except json.JSONDecodeError:
+        rlog.debug(f"JSONDecodeError decoding traffic payload: {json_str}")
     except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.debug(f"KeyError decoding {json_str}")
         rlog.debug(f"Own situation was: {situation}")
@@ -985,6 +981,9 @@ async def display_and_cutoff():
                 elif Globals.mode == Modes.COUNTDOWN_DISTANCE:  # Full screen distance
                     distance.draw_countdown_distance(display_control, situation)
                     Globals.refresh = False
+
+            clear_aircraft_list()
+            # remove aircraft not updated for a while as well as position and speed data of aircraft
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
