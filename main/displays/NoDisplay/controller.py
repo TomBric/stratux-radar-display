@@ -45,7 +45,7 @@ class NoDisplay(dcommon.GenericDisplay):
     def modesaircraft(self, radius, height, arcposition, vspeed, tail, prio=0):
         pass
 
-    def aircraft(self, x, y, height, tail, prio, speed_valid, direction, vspeed, nspeed_length):
+    def aircraft(self, x, y, height, tail, prio, speed_valid, nspeed, direction, vspeed, nspeed_length):
         pass
 
 

@@ -63,6 +63,7 @@ import radarmodes
 import simulation
 import checklist
 import logging
+from logging.handlers import RotatingFileHandler
 import collisiondetect
 import airsimulation
 import ble
@@ -233,10 +234,9 @@ def draw_all_ac(allac):
         # then draw adsb
         if 'x' in ac:
             if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
-                line_length = ac.get('nspeed_length', 0)
                 tail = get_tail_display(ac)
-                display_control.aircraft(ac['x'], ac['y'], ac['hdiff'], tail, ac['prio'], ac.get('speed_valid', False), ac.get('direction', 0), ac.get('vspeed', 0),
-                                         line_length)
+                display_control.aircraft(ac['x'], ac['y'], ac['hdiff'], tail, ac['prio'], ac.get('speed_valid', False),
+                                         ac.get('nspeed', 0), ac.get('direction', 0), ac.get('vspeed', 0), ac.get('nspeed_length',0))
 
 
 def draw_display():
@@ -332,7 +332,7 @@ def gen_modes_traffic_message(ac):
 def is_steering_message(traffic):  # checks if traffic is a steering message and returns true if yes
     changed = False
     if 'RadarRange' in traffic and 'RadarLimits' in traffic:
-        if situation['RadarRange'] != traffic['RadarRange']:
+        if situation['RadarRange'] != traffic['RadarRange'] and traffic['RadarRange'] > 0: #prevent division by zero
             situation['RadarRange'] = traffic['RadarRange']
             changed = True
         if situation['RadarLimits'] != traffic['RadarLimits']:
@@ -762,7 +762,13 @@ async def listen_forever(path, name, callback):
                         rlog.debug(name + " shutting down ... ")
                         raise
                     else:
-                        callback(message)
+                        try:
+                            callback(message)
+                        except asyncio.CancelledError:
+                            raise
+                        except Exception:
+                            rlog.debug(name + ': Callback error while processing message. Keeping listener alive.')
+                            rlog.debug(f"traceback: {traceback.format_exc()}")
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
         except (socket.error, websockets.exceptions.WebSocketException, asyncio.TimeoutError):
@@ -1141,7 +1147,7 @@ if __name__ == "__main__":
     if args['logfile']:  # set a log file
         log_dir = Path(arguments.FULL_LOG_DIR)
         log_dir.mkdir(parents=True, exist_ok=True)  # Create directory and parents for log file if they don't exist
-        loghandler = logging.handlers.RotatingFileHandler(filename=arguments.FULL_LOG_FILE, mode='a', encoding="utf-8",
+        loghandler = RotatingFileHandler(filename=arguments.FULL_LOG_FILE, mode='a', encoding="utf-8",
                                                           maxBytes=10 * 1024 * 1024, backupCount=5)
         formatter = logging.Formatter('%(asctime)-15s > %(message)s')
         loghandler.setFormatter(formatter)

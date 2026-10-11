@@ -217,7 +217,7 @@ class GenericDisplay:
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail,
                            font=self.fonts[self.VERYSMALL], fill=circle_color)
 
-    def aircraft(self, x, y, height, tail, prio, speed_valid, direction, vspeed, nspeed_length):
+    def aircraft(self, x, y, height, tail, prio, speed_valid, nspeed, direction, vspeed, nspeed_length):
         # Get colors and outline size based on priority
         aircraft_color, outline_color, outline_width, size_factor = self.get_color_mapping(prio)
         ac_size = int(self.AIRCRAFT_SIZE * size_factor)

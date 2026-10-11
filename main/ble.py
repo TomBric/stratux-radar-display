@@ -208,6 +208,10 @@ def parse_PFLAA(fields):
         return None
     try:
         own_situation = global_situation if isinstance(global_situation, dict) else {}
+        required_keys = ("latitude", "longitude", "own_altitude")
+        if any(key not in own_situation or own_situation[key] is None for key in required_keys):
+            rlog.debug(f"NMEA: Incomplete own situation for PFLAA parsing: {own_situation}")
+            return None
         rel_north = float(fields[2])                          # meters, north positive
         rel_east  = float(fields[3])                          # meters, east  positive
         rel_vertical = float(fields[4])
@@ -267,10 +271,11 @@ def parse_GNGLL(fields):
         return False
 
     try:
+        current_gps_quality = global_situation.get('gps_quality', 0) if isinstance(global_situation, dict) else 0
         is_valid = False
         if fields[6]:   # check if fix status field is present
             if fields[6].upper() == 'A':
-                if global_situation['gps_quality'] == 0:
+                if current_gps_quality == 0:
                     situation_msg['GPSFixQuality'] = 1   # only set if not already set higher by GNGGA
             if fields[6].upper() == 'V':  # void fix, mark as invalid
                 situation_msg['GPSFixQuality'] = 0
@@ -314,6 +319,7 @@ def parse_GNGGA(fields):
         rlog.debug(f"NMEA: Incomplete GNGGA sentence: {fields}")
         return False
     try:
+        current_gps_quality = global_situation.get('gps_quality', 0) if isinstance(global_situation, dict) else 0
         # Parse fix quality (0=invalid, 1=GPS fix, 2=DGPS fix)
         gps_valid = False
         if fields[6]:
@@ -321,7 +327,7 @@ def parse_GNGGA(fields):
                 situation_msg['GPSFixQuality'] = 0
             else:
                 gps_valid = True
-                if global_situation['gps_quality'] == 0:
+                if current_gps_quality == 0:
                     situation_msg['GPSFixQuality'] = 1   # only set if not already set higher by GNGGA
         # Parse number of satellites
         if fields[7]:
@@ -530,7 +536,11 @@ def handle_nmea_data(nmea_sentence):
     if "*" not in nmea_sentence:
         rlog.debug(f"NMEA: Invalid NMEA sentence: Missing checksum")
         return
-    data, checksum = nmea_sentence.strip().split("*")
+    split_sentence = nmea_sentence.strip().split("*", 1)
+    if len(split_sentence) != 2 or not split_sentence[1]:
+        rlog.debug(f"NMEA: Invalid NMEA sentence: malformed checksum separator")
+        return
+    data, checksum = split_sentence
     # Remove leading '$' if present
     if data.startswith("$"):
         data = data[1:]
@@ -580,7 +590,6 @@ def handle_nmea_data(nmea_sentence):
         if parse_RPYL(fields):
             _emit_situation_update(situation_callback)
     else:
-        print(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
 
@@ -614,6 +623,7 @@ async def listen_to_ble():
     # outer loop restarted every time the connection fails
     rlog.debug("BLE listener active ...")
     while True:
+        client = None
         try:
             async with BleakClient(device_address, timeout=BLE_CONNECTION_TIMEOUT) as client:
                 if client.is_connected:
@@ -637,7 +647,7 @@ async def listen_to_ble():
             await asyncio.sleep(BLE_RETRY_TIMEOUT)
             continue
         finally:   # ensure we disconnect if the client is still connected
-            if client.is_connected:
+            if client is not None and client.is_connected:
                 try:
                     await asyncio.wait_for(client.disconnect(), timeout=3.0)
                     rlog.debug(f"Ble: Disconnect succeeded from BLE device {device['address']}")
@@ -667,15 +677,15 @@ async def search_ble():
         # device is a BleakDeviceData object with .address and .name attributes
         device_address = device.address if hasattr(device, 'address') else str(device)
         device_name = device.name
-        print(f"Identified device: {device_name} ({device_address})")
+        rlog.debug(f"Ble: Identified device: {device_name} ({device_address})")
         device_info = {
             'name': device_name if device_name else f"Unknown ({device_address})",
             'address': device_address,
             'uuid': characteristic_uuid
         }
         found_devices.append(device_info)
-        rlog.debug(f"Ble: Following BLE devices with service FFE0 and characteristic FFE1 found: {found_devices}")
-        return {'devices': found_devices, 'timed_out': timed_out}
+    rlog.debug(f"Ble: Following BLE devices with service FFE0 and characteristic FFE1 found: {found_devices}")
+    return {'devices': found_devices, 'timed_out': timed_out}
 
 
 def init(new_ble_address, new_traffic_func, new_situation_func, situation):
