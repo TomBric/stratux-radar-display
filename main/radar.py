@@ -563,7 +563,6 @@ def new_traffic(json_str):
             # mode-s traffic or no valid GPS position of stratux
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: No position traffic {traffic['Icao_addr']:X} from source {source} "
                                      f"in {distcirc:.1f} nm")
-            ac['position_valid'] = False
             if is_new:
                 # calc argposition if new or adsb before
                 last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
