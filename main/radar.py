@@ -468,6 +468,9 @@ def clear_aircraft_list():
         if 'last_position_timestamp' in ac and now - ac['last_position_timestamp'] > POSITION_VALID_DELTA:
             rlog.log(AIRCRAFT_DEBUG, f"Invalidating position of {hex(icao)} due to age {now - ac['last_position_timestamp']:.1f} seconds")
             ac['position_valid'] = False
+            # now give a new arcposition to this aircraft without position
+            last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
+            ac['arcposition'] = last_arcposition
         if 'last_speed_timestamp' in ac and now - ac['last_speed_timestamp'] > SPEED_VALID_DELTA:
             rlog.log(AIRCRAFT_DEBUG, f"Invalidating speed of {hex(icao)} due to age {now - ac['last_speed_timestamp']:.1f} seconds")
             ac['speed_valid'] = False
@@ -563,7 +566,7 @@ def new_traffic(json_str):
                 return
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: No position traffic {traffic['Icao_addr']:X} from source {source} "
                                      f"in {distcirc:.1f} nm")
-            if is_new:
+            if 'arcposition' not in ac:
                 # calc argposition if new or adsb before
                 last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
                 ac['arcposition'] = last_arcposition
