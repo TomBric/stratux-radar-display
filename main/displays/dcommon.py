@@ -159,9 +159,9 @@ class GenericDisplay:
 
     def get_color_mapping(self, priority):
         # priority (int): TCAS priority (0=unclear, 1=RA, 2=TA, 3=collision, 4=no_collision)
-        # Returns:  tuple: (aircraft_color, outline_color, outline_size)
+        # Returns:  tuple: (aircraft_color, outline_color, outline_size, size_factor)
         mapping = self.PRIORITY_MAPPING_DARK if self.dark_mode else self.PRIORITY_MAPPING_LIGHT
-        return mapping.get(priority, ("gray", "darkgray" if not self.dark_mode else "lightgray", 1))
+        return mapping.get(priority, ("gray", "darkgray" if not self.dark_mode else "lightgray", 1, 1))
 
     def get_modes_color_mapping(self, priority):
         # priority (int): TCAS priority (0=unclear, 1=RA, 2=TA, 3=collision, 4=no_collision)
@@ -217,29 +217,34 @@ class GenericDisplay:
             self.draw.text((tposition[0], tposition[1] + self.LARGE), tail,
                            font=self.fonts[self.VERYSMALL], fill=circle_color)
 
-    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, prio=0):
+    def aircraft(self, x, y, height, tail, prio, speed_valid, direction, vspeed, nspeed_length):
         # Get colors and outline size based on priority
         aircraft_color, outline_color, outline_width, size_factor = self.get_color_mapping(prio)
         ac_size = int(self.AIRCRAFT_SIZE * size_factor)
-        velocity_width = max(2, 1 + ac_size // 3)
-        p1 = posn(direction, 2 * ac_size, self.ANGLE_OFFSET)
-        p2 = posn(direction + 150, 4 * ac_size, self.ANGLE_OFFSET)
-        p3 = posn(direction + 180, 2 * ac_size, self.ANGLE_OFFSET)
-        p4 = posn(direction + 210, 4 * ac_size, self.ANGLE_OFFSET)
-        p5 = posn(direction, nspeed_length, self.ANGLE_OFFSET)  # line for speed
-
-        self.draw.polygon(
-            ((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
-            fill=aircraft_color, outline=outline_color, width=outline_width)
-        self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=outline_color, width=velocity_width)
         if height >= 0:
             t = "+" + str(abs(height))
         else:
             t = "-" + str(abs(height))
-        if vspeed > 0:
-            t = t + self.UP_CHARACTER
-        if vspeed < 0:
-            t = t + self.DOWN_CHARACTER
+        if speed_valid:  # only display directed aircraft if speed is valid
+            if vspeed > 0:
+                t = t + self.UP_CHARACTER
+            if vspeed < 0:
+                t = t + self.DOWN_CHARACTER
+            velocity_width = max(2, 1 + ac_size // 3)
+            p1 = posn(direction, 2 * ac_size, self.ANGLE_OFFSET)
+            p2 = posn(direction + 150, 4 * ac_size, self.ANGLE_OFFSET)
+            p3 = posn(direction + 180, 2 * ac_size, self.ANGLE_OFFSET)
+            p4 = posn(direction + 210, 4 * ac_size, self.ANGLE_OFFSET)
+            p5 = posn(direction, nspeed_length, self.ANGLE_OFFSET)  # line for speed
+
+            self.draw.polygon(
+                ((x + p1[0], y + p1[1]), (x + p2[0], y + p2[1]), (x + p3[0], y + p3[1]), (x + p4[0], y + p4[1])),
+                fill=aircraft_color, outline=outline_color, width=outline_width)
+            self.draw.line((x + p1[0], y + p1[1], x + p5[0], y + p5[1]), fill=outline_color, width=velocity_width)
+        else: # draw aircraft as a square if speed is not valid
+            self.draw.rectangle((x - ac_size, y - ac_size, x + ac_size, y + ac_size), fill=aircraft_color,
+                                outline=outline_color, width=outline_width)
+
         w = self.draw.textlength(t, self.fonts[self.LARGE])
         if w + x + 4 * self.AIRCRAFT_SIZE - 2 > self.sizex:
             # would draw text outside, move to the left and do not take size factor into consideration
@@ -832,9 +837,13 @@ class GenericDisplay:
         xsize = size[0] - tl - x_val_space
         ypos = pos[1] + self.VERYSMALL // 2
         ysize = size[1] - self.VERYSMALL
+        value_span = maxvalue - minvalue
+        if value_span == 0:
+            # Avoid division by zero and draw a flat graph for constant ranges.
+            value_span = 1
 
         def draw_value_line(value, y_off):
-            ly = ypos + ysize - 1 - ysize * (value - minvalue) // (maxvalue - minvalue)
+            ly = ypos + ysize - 1 - ysize * (value - minvalue) // value_span
             ltl = self.draw.textlength(str(value), self.fonts[self.VERYSMALL])
             self.draw.text((xpos - ltl - x_val_space, ly - y_off), str(value),
                            font=self.fonts[self.VERYSMALL], fill=textcolor)
@@ -873,7 +882,7 @@ class GenericDisplay:
         # Draw graph lines
         lastpoint = None
         for i in range(0, len(data)):
-            y = math.floor(ypos - 1 + ysize - ysize * (data[i] - minvalue) / (maxvalue - minvalue))
+            y = math.floor(ypos - 1 + ysize - ysize * (data[i] - minvalue) / value_span)
             y = max(min(y, ypos + ysize - 1), ypos)
             if i >= 1:  # we need at least two points before we draw
                 x = math.floor(xpos + i * xsize / (len(data) - 1))

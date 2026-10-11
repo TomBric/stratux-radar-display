@@ -84,6 +84,10 @@ RADAR_CUTOFF = 29  # time after last message received from an aircraft is no lon
 POSITION_VALID_DELTA = 15.0   # time a received position is assumed valid, e.g. if message without position is received
 # only after this POSITION_VALID_DELTA time a switch back to mode-s (circle) is done. May e.g. happen when
 # flarm is no more received, but only mode-s. Than switch back and display circle
+SPEED_VALID_DELTA = 15.0   # time a received speed is assumed valid, e.g. if message without speed is received
+# only after this SPEED_VALID_DELTA Speed, Track and Vertical Speed are no more displayed.
+# May e.g. happen when flarm is no more received, but only ADSB without  airborne velocity message
+# e.g. older FUNKE transponders do not send airborne velocity messages, so no speed is available, they only send position and altitude
 FLARM_POSITION_OVER_ADSB_TIMEOUT = 10  # time in seconds, FLARM position is only taken into account after this timeout
 # otherwise adsb_out position is taken, this prevents FLARM/OGN position taken into account when valid adsb-out signal
 # is received
@@ -189,6 +193,8 @@ def dump_ac(ac):    # debug function, produces one line for aircraft in a readab
     ret += f" x:{ac['x']}" if 'x' in ac else ""
     ret += f" y:{ac['y']}" if 'y' in ac else ""
     ret += f" last_position_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_position_timestamp']))}" if 'last_position_timestamp' in ac else ""
+    ret += f" speed_valid:{ac['speed_valid']}" if 'speed_valid' in ac else ""
+    ret += f" last_speed_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_speed_timestamp']))}" if 'last_speed_timestamp' in ac else ""
     ret += f" last_position_source:{ac['last_position_source']}" if 'last_position_source' in ac else ""
     ret += f" nspeed_length:{ac['nspeed_length']}" if 'nspeed_length' in ac else ""
     ret += f" audio: speak_time {ac['audio']['speak_time']} was_prio {ac['audio']['was_prio']}" if 'audio' in ac else ""
@@ -229,8 +235,8 @@ def draw_all_ac(allac):
             if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
                 line_length = ac.get('nspeed_length', 0)
                 tail = get_tail_display(ac)
-                display_control.aircraft(ac['x'], ac['y'], ac['direction'], ac['hdiff'], ac['vspeed'],
-                                         line_length, tail, ac['prio'])
+                display_control.aircraft(ac['x'], ac['y'], ac['hdiff'], tail, ac['prio'], ac.get('speed_valid', False), ac.get('direction', 0), ac.get('vspeed', 0),
+                                         line_length)
 
 
 def draw_display():
@@ -325,7 +331,7 @@ def gen_modes_traffic_message(ac):
 
 def is_steering_message(traffic):  # checks if traffic is a steering message and returns true if yes
     changed = False
-    if 'RadarRange' in traffic or 'RadarLimits' in traffic:
+    if 'RadarRange' in traffic and 'RadarLimits' in traffic:
         if situation['RadarRange'] != traffic['RadarRange']:
             situation['RadarRange'] = traffic['RadarRange']
             changed = True
@@ -463,7 +469,14 @@ def new_traffic(json_str):
         is_new = False
         if traffic['Icao_addr'] not in all_ac.keys():
             # new traffic, insert
-            all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'prio':0}
+            all_ac[traffic['Icao_addr']] = {
+                'gps_distance': 0,
+                'prio': 0,
+                'nspeed': 0,
+                'vspeed': 0,
+                'direction': 0,
+                'speed_valid': False,
+            }
             is_new = True
         ac = all_ac[traffic['Icao_addr']]
         now = time.time()
@@ -474,15 +487,34 @@ def new_traffic(json_str):
         ac['hdiff'] = round((traffic['Alt'] - situation['own_altitude']) / 100)
         ac['alt'] = traffic['Alt']
         ac['last_alt_timestamp'] = now - traffic['AgeLastAlt']
-
-        if traffic['Speed_valid']:
+        if traffic['Speed_valid']:    # Airborne velocity message is valid, update speed, track and vertical speed
             ac['nspeed'] = traffic.get('Speed', 0)
-        # Vvel should only be set if Speed_valid or if explicitly present
-        ac['vspeed'] = traffic.get('Vvel', 0)  # Safe access with default value 0
-        if traffic['Tail'] and traffic['Tail'] != '':
-            # do not give up registration, if it is once received and now is empty,
+            # Vvel and track should only be set if Speed_valid is true
+            if 'Vvel' in traffic:
+                ac['vspeed'] = traffic['Vvel']
+            if 'Track' in traffic and situation['gps_active']:
+                ac['direction'] = traffic['Track'] - situation['course']
+            ac['last_speed_timestamp'] = now
+            ac['speed_valid'] = True
+        else:
+            # check age of last "airborne velocity message", if age is >= SPEED_VALID_DELTA,
+            # set speed_valid to false and reset speed, track and vertical speed to zero
+            if ('speed_valid' in ac and ac['speed_valid'] and
+                    'last_speed_timestamp' in ac and time.time() - ac['last_speed_timestamp'] >= SPEED_VALID_DELTA):
+                ac['nspeed'] = 0
+                ac['vspeed'] = 0
+                ac['direction'] = 0
+                ac['speed_valid'] = False
+                rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} speed data is no longer valid")
+
+        tail = traffic.get('Tail')
+        if isinstance(tail, str):
+            tail = tail.strip()
+            if tail:
+                ac['tail'] = tail
+            # do not give up registration, if it is once received and now is not present or empty string,
             # happens e.g. when same ICAO hex comes from FLARM without ddb entry
-            ac['tail'] = traffic['Tail']
+
 
         # Traffic in all_ac list is
         # - ADSB or FLARM:   if 'x' is in ac   (andy 'y' also, but check for x is ok).
@@ -510,9 +542,7 @@ def new_traffic(json_str):
             ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             ac['last_position_timestamp'] = time.time()
             ac['last_position_source'] = source    # we need to know where the last position was recorded from
-            if 'Track' in traffic:
-                ac['direction'] = traffic['Track'] - situation['course']
-                # sometimes track is missing, then leave it as it is
+
             collision_detection(ac, traffic, False)
             if ac['gps_distance'] <= situation['RadarRange'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
                 res_angle = (ac['gps_angle'] - situation['course']) % 360

@@ -42,10 +42,10 @@ class NoDisplay(dcommon.GenericDisplay):
     def clear(self):
         pass
 
-    def modesaircraft(self, radius, height, arcposition, vspeed, tail, width=3):
+    def modesaircraft(self, radius, height, arcposition, vspeed, tail, prio=0):
         pass
 
-    def aircraft(self, x, y, direction, height, vspeed, nspeed_length, tail, prio = 0):
+    def aircraft(self, x, y, height, tail, prio, speed_valid, direction, vspeed, nspeed_length):
         pass
 
 
