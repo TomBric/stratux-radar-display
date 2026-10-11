@@ -525,13 +525,6 @@ def new_traffic(json_str):
             # do not give up registration, if it is once received and now is not present or empty string,
             # happens e.g. when same ICAO hex comes from FLARM without ddb entry
 
-        if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
-            # unspecified altitude, nothing displayed for now, ignore this message, leave it as it is
-            rlog.log(AIRCRAFT_DEBUG, f"Traffic {traffic['Icao_addr']:X} from source {source} has no altitude or distance estimation, ignoring it")
-            return
-        distcirc = traffic['DistanceEstimated'] / 1852.0
-        ac['gps_distance'] = distcirc
-        ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
 
         # Traffic in all_ac list is
         # - ADSB or FLARM:   ac['position_valid'] = True
@@ -561,6 +554,14 @@ def new_traffic(json_str):
                 ac['y'] = -1
         else:
             # mode-s traffic or no valid GPS position of stratux
+            if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
+                # unspecified altitude, nothing displayed for now, ignore this message, leave it as it is
+                rlog.log(AIRCRAFT_DEBUG,
+                         f"Traffic {traffic['Icao_addr']:X} from source {source} has no altitude or distance estimation, ignoring it")
+                return
+            distcirc = traffic['DistanceEstimated'] / 1852.0
+            ac['gps_distance'] = distcirc
+            ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: No position traffic {traffic['Icao_addr']:X} from source {source} "
                                      f"in {distcirc:.1f} nm")
             if is_new:
