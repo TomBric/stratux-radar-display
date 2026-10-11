@@ -694,7 +694,8 @@ def eval_simulation_data(sim_data, sit):
     if 'gps_altitude' in sim_data:
         sit['gps_altitude'] = sim_data['gps_altitude']
         sit['gps_active'] = True
-        sit['gps_hor_accuracy'] = 50  # just any nice value
+        sit['gps_h_accuracy'] = 50  # just any nice value
+        sit['gps_v_accuracy'] = 50  # just any nice value
     if 'own_altitude' in sim_data:
         sit['own_altitude'] = sim_data['own_altitude']
         sit['baro_valid'] = True

@@ -37,6 +37,7 @@ import radarbuttons
 import ADS1x15       # https://github.com/chandrawi/ADS1x15-ADC
 import time
 import asyncio
+from typing import Any, cast
 import statusui
 import radarbluez
 from RPi import GPIO
@@ -178,11 +179,17 @@ def shutdown():
 
 
 def request_read():
-    return ADS.requestADC(0)  # analog 0 input
+    adc = cast(Any, ADS)
+    if adc is None:
+        raise RuntimeError("CO-Warner ADC not initialized")
+    return adc.requestADC(0)  # analog 0 input
 
 
 def ready():
-    return ADS.isReady()
+    adc = cast(Any, ADS)
+    if adc is None:
+        return False
+    return adc.isReady()
 
 
 def alarm_level():   # to be called from outside, returns 0 if no alarm, 1-5 depending on ALARMLEVEL and alarmstring
@@ -215,8 +222,14 @@ def read_co_value():     # called by sensor_read thread
     global co_max
 
     cowarner_changed = True  # to display new value
-    value = ADS.getValue()
+    adc = cast(Any, ADS)
+    if adc is None:
+        raise RuntimeError("CO-Warner ADC not initialized")
+    value = adc.getValue()
     sensor_volt = value * voltage_factor
+    if sensor_volt <= 0:
+        rlog.debug("CO-Warner: Invalid sensor voltage read, skipping sample")
+        return False
     rs_gas = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate resistor of sensor
     ppm_value = round(ppm(rs_gas / r0))
     rlog.log(value_debug_level,
@@ -277,18 +290,27 @@ def calibration():   # called by co-reader thread, performs calibration and ends
     countdown = calibration_end - math.floor(time.time())
     if not co_simulation:
         if countdown > 0:   # continue sensor reading
-            value = ADS.getValue()
+            adc = cast(Any, ADS)
+            if adc is None:
+                raise RuntimeError("CO-Warner ADC not initialized")
+            value = adc.getValue()
             sensor_volt = value * voltage_factor
+            if sensor_volt <= 0:
+                rlog.debug("CO-Warner: Invalid sensor voltage during calibration, skipping sample")
+                return
             rs_air = ((SENSOR_VOLTAGE * R_DIVIDER) / sensor_volt) - R_DIVIDER  # calculate RS in fresh air
             r0_act = rs_air / RSR0_CLEAN  # r0, based on clean air measurement
             sample_sum += r0_act
             no_samples += 1
         else:
-            r0 = sample_sum / no_samples
-            rlog.debug("CO-Warner: Calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
-                       .format(no_samples, r0))
-            global_config['CO_warner_R0'] = r0
-            statusui.write_config(global_config)
+            if no_samples > 0:
+                r0 = sample_sum / no_samples
+                rlog.debug("CO-Warner: Calibration finished. # samples: {0:d} r0: {1:.1f} ppm"
+                           .format(no_samples, r0))
+                global_config['CO_warner_R0'] = r0
+                statusui.write_config(global_config)
+            else:
+                rlog.debug("CO-Warner: Calibration finished without valid samples; keeping previous R0")
             co_warner_status = 0
     else:  # simulation mode
         if countdown > 0:  # continue sensor reading
@@ -363,21 +385,33 @@ async def read_sensors():
                 GPIO.output(IOPIN, GPIO.LOW)
             while True:
                 if co_warner_status == 0:   # normal read
-                    if not co_simulation:
-                        request_read()
-                        while not ready():
-                            await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
-                        changed = read_co_value()
-                        speak_co_warning(changed)
-                        set_co_indication(changed)
-                        await asyncio.sleep(MIN_SENSOR_READ_TIME)
-                    else: # simulation mode
-                        changed = read_co_value_simulated()
-                        speak_co_warning(changed)
-                        set_co_indication(changed)
-                        await asyncio.sleep(MIN_SENSOR_READ_TIME)
+                    try:
+                        if not co_simulation:
+                            request_read()
+                            while not ready():
+                                await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
+                            changed = read_co_value()
+                            speak_co_warning(changed)
+                            set_co_indication(changed)
+                            await asyncio.sleep(MIN_SENSOR_READ_TIME)
+                        else: # simulation mode
+                            changed = read_co_value_simulated()
+                            speak_co_warning(changed)
+                            set_co_indication(changed)
+                            await asyncio.sleep(MIN_SENSOR_READ_TIME)
+                    except ZeroDivisionError as e:
+                        rlog.debug(f"CO-Warner: Sensor calculation error: {e}")
+                        await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
+                    except (OSError, RuntimeError, AttributeError) as e:
+                        rlog.debug(f"CO-Warner: Sensor access error: {e}")
+                        await asyncio.sleep(MIN_SENSOR_WAIT_TIME)
                 else:  # calibration mode
-                    calibration()
+                    try:
+                        calibration()
+                    except ZeroDivisionError as e:
+                        rlog.debug(f"CO-Warner: Calibration error: {e}")
+                    except (OSError, RuntimeError, AttributeError) as e:
+                        rlog.debug(f"CO-Warner: Calibration access error: {e}")
                     await asyncio.sleep(MIN_SENSOR_CALIBRATION_WAIT_TIME)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("CO sensor reader terminating ...")
