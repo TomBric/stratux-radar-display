@@ -532,13 +532,6 @@ def new_traffic(json_str):
                 del ac['circradius']   # was mode-s target before, now invalidate mode-s info on radius
             if 'kf' in ac:
                 del ac['kf'] # was mode-s target before, now invalidate mode-s info on kalman filter
-            if 'last_position_timestamp' in ac and 'last_position_source' in ac:
-                if source == "FLARM" and ac['last_position_source'] == "1090" and \
-                        time.time() - ac['last_position_timestamp'] < FLARM_POSITION_OVER_ADSB_TIMEOUT:
-                        # ADSB-out timestamp is still fresh, ignore FLARM/OGN position update, this gives
-                        # priority to adsb-out positions
-                    rlog.log(AIRCRAFT_DEBUG, f"FLARM position message of {traffic['Icao_addr']:X} ignored since ADSB position is still fresh")
-                    return
             ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             ac['last_position_timestamp'] = time.time()
             ac['last_position_source'] = source    # we need to know where the last position was recorded from
