@@ -527,7 +527,7 @@ def new_traffic(json_str):
 
         if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
             # unspecified altitude, nothing displayed for now, ignore this traffic, leave it as it is
-            rlog.debug(AIRCRAFT_DEBUG, f"Traffic {traffic['Icao_addr']:X} from source {source} has no altitude or distance estimation, ignoring it")
+            rlog.log(AIRCRAFT_DEBUG, f"Traffic {traffic['Icao_addr']:X} from source {source} has no altitude or distance estimation, ignoring it")
             return
         distcirc = traffic['DistanceEstimated'] / 1852.0
 
