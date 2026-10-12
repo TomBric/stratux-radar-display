@@ -56,6 +56,8 @@ def add(ap):
                     default=False)
     ap.add_argument("-da", "--dark", required=False, help="Enable dark mode", action='store_true',
                     default=False)
+    ap.add_argument("-rst16", "--reset16", required=False,
+                    help="Epaper: use Pin 16 for RST instead of Pin 11", action='store_true', default=False)
     ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use",
                     default=DEFAULT_CHECKLIST)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP (deprecated, use --url instead)", default=DEFAULT_URL_HOST_BASE)

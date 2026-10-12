@@ -234,6 +234,7 @@ class RadarForm(FlaskForm):
     countdown = SwitchField('Indicate ground distance via countdown screen', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
     darkmode = SwitchField('Enable dark mode', default=False)
+    reset16pin = SwitchField('Epaper: Use Pin 16 for RST instead of Pin 11', default=False)
     all_mixers = RadioField('Select detected devices/mixers', choices=[('other', 'Other')], default='other')
     # logging options
     logging=SwitchField('Enable logging of radar for debugging', default=False)
@@ -431,6 +432,8 @@ def read_arguments(rf):
     rf.gearindicate.data = args['gearindicate']
     if args['dark'] is True:
         rf.darkmode.data = True
+    if args['reset16'] is True:
+        rf.reset16pin.data = True
     # special options
     rf.no_cowarner.data = args['nocowarner']
     rf.coindicate.data = args['coindicate']
@@ -535,6 +538,8 @@ def build_option_string(rf):
         out += ' -gi'
     if rf.darkmode.data is True:
         out += ' --dark'
+    if rf.reset16pin.data is True:
+        out += ' --reset16'
     if rf.no_cowarner.data is True:
         out += ' -nc'
     if rf.coindicate.data is True:

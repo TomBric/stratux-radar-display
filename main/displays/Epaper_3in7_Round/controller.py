@@ -117,7 +117,7 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
             self.AHRS_MARKS_COLOR = "black"
 
     def init(self, fullcircle=False, dark_mode=False):
-        self.device = epd3in7.EPD()
+        self.device = epd3in7.EPD(reset16=getattr(self, 'reset16', False))
         self.device.init(0)
         self.device.Clear(0xFF, 0)  # necessary to overwrite everything
         # Initialize dark mode before creating the image

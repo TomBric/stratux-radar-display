@@ -1089,6 +1089,7 @@ def main():
     # Initialize audio system
     initialize_audio_system()
     # Initialize display
+    display_control.reset16 = args.get('reset16', False)
     max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
     # Initialize sensors and simulation
     initialize_sensors_and_simulation()
