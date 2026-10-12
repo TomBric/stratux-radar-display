@@ -219,21 +219,27 @@ def get_tail_display(ac):
 
 
 def draw_all_ac(allac):
-    dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
+    dist_sorted = sorted(allac.items(), key=lambda el: el[1].get('gps_distance', 0), reverse=True)
     for icao, ac in dist_sorted:
-        # first draw mode-s
-        if not ac['position_valid']:
-            tail = get_tail_display(ac)
-            if ac['circradius'] <= max_pixel / 2:
-                display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac['vspeed'],
-                                              tail, ac['prio'])
-    for icao, ac in dist_sorted:
-        # then draw adsb
-        if ac['position_valid']:
-            if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
+        try:
+            # first draw mode-s, so that later the more precise adsb position is drawn on top of it
+            if not ac['x'] and 'circradius' in ac:
                 tail = get_tail_display(ac)
-                display_control.aircraft(ac['x'], ac['y'], ac['hdiff'], tail, ac['prio'], ac.get('speed_valid', False),
-                                         ac.get('nspeed', 0), ac.get('direction', 0), ac.get('vspeed', 0), ac.get('nspeed_length',0))
+                if ac['circradius'] <= max_pixel / 2:
+                    display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac['vspeed'],
+                                                  tail, ac['prio'])
+        except KeyError:
+            rlog.debug(f"draw_all_ac: Missing key for mode-s aircraft {icao:X}: {traceback.format_exc()}")
+    for icao, ac in dist_sorted:
+        try:
+            # then draw adsb
+            if 'x' in ac and 'y' in ac:
+                if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
+                    tail = get_tail_display(ac)
+                    display_control.aircraft(ac['x'], ac['y'], ac['hdiff'], tail, ac['prio'], ac.get('speed_valid', False),
+                                             ac.get('nspeed', 0), ac.get('direction', 0), ac.get('vspeed', 0), ac.get('nspeed_length',0))
+        except KeyError:
+            rlog.debug(f"draw_all_ac: Missing key for ADS-B or OGN aircraft {icao:X}: {traceback.format_exc()}")
 
 
 def draw_display():
@@ -466,14 +472,36 @@ def clear_aircraft_list():
         if ac.get('position_valid', False) and 'last_position_timestamp' in ac and now - ac['last_position_timestamp'] > POSITION_VALID_DELTA:
             rlog.log(AIRCRAFT_DEBUG, f"Invalidating position of {hex(icao)} due to age {now - ac['last_position_timestamp']:.1f} seconds")
             ac['position_valid'] = False
-            # now give a new arcposition to this aircraft without position
-            last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
-            ac['arcposition'] = last_arcposition
+            # now remove display coordinates give a new arcposition to this aircraft for circle
+            del ac['x']
+            del ac['y']
+            if 'arcposition' not in ac:
+                # calc arcposition if not present
+                last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
+                ac['arcposition'] = last_arcposition
             aircraft_changed = True
         if ac.get('speed_valid', False) and 'last_speed_timestamp' in ac and now - ac['last_speed_timestamp'] > SPEED_VALID_DELTA:
             rlog.log(AIRCRAFT_DEBUG, f"Invalidating speed of {hex(icao)} due to age {now - ac['last_speed_timestamp']:.1f} seconds")
             ac['speed_valid'] = False
             aircraft_changed = True
+
+# remarks to the all_ac list: aircraft are stored with their ICAO address as key
+# cases:
+# - 1090 traffic always comes with an estimated distance, this creates distcirc, independent of a valid position
+# - OGN traffic has no estimated distance, but always a valid position
+# if we receive a valid position and at this time our own position is valid, we can calculate the distance and angle.
+# For display driver:
+#   if ac['x'] is set display the aircraft at this position
+#   if ac['circradius'] is set, display the circle for the aircraft
+#
+# use cases:
+#    1. mode-s traffic: ac['position_valid'] = False, ac['circradius'] is set
+#    2. adsb traffic: ac['position_valid'] = True, ac['circradius'] is set
+#    3- OGN traffic: ac['position_valid'] = True, ac['circradius'] is not set
+# if ac['position_valid'] and at this time our own position is valid, x and y are set
+# position_valid is invalidated after POSITION_VALID_DELTA seconds by the display_driver,
+# also x and y are invalidated, but the aircraft remains in the list,
+# so that it can be displayed as mode-s traffic (circle) if we have a circradius
 
 def new_traffic(json_str):
     global last_arcposition
@@ -527,21 +555,13 @@ def new_traffic(json_str):
                 ac['tail'] = tail
             # do not give up registration, if it is once received and now is not present or empty string,
             # happens e.g. when same ICAO hex comes from FLARM without ddb entry
-        distcirc = traffic.get('DistanceEstimated', 0) / 1852.0
-        ac['gps_distance'] = distcirc
-        ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
-
-        # Traffic in all_ac list is
-        # - ADSB or FLARM:   ac['position_valid'] = True
-        # - Mode-S only:     ac['position_valid'] = False
-        # when switching, make sure other keys ('circradius' or 'x') are deleted.
-        # When position is received this immediately overrides Mode-S. The other way round may also happen
-        # e.g if FLARM of an aircraft was received, but afterwards only mode-s. So invalidate position also if
-        # no new position was received after some time. This is done in clear_aircraft_list() function, which is
-        # called regularly from display task. It will invalidate position and speed if no new position or speed was received for a while.
+        if traffic.get('Last_source') == SOURCE_1090:
+            distcirc = traffic.get('DistanceEstimated', 0) / 1852.0
+            ac['gps_distance'] = distcirc     # estimated, but used for audio output and for sorting the display
+            ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
 
         if traffic['Position_valid'] and situation['gps_active']:
-            # adsb traffic and stratux has valid gps signal
+            # adsb or ogn traffic and stratux has valid gps signal
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at hdiff {ac['hdiff']}")
             rlog.log(AIRCRAFT_DEBUG, f"Traffic is: {traffic}")
             ac['position_valid'] = True
@@ -557,22 +577,15 @@ def new_traffic(json_str):
             else: # outside of display
                 ac['x'] = -1
                 ac['y'] = -1
-        else:
-            # mode-s traffic or no valid GPS position of stratux
-            if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
-                # unspecified altitude, nothing displayed for now, ignore this message, leave it as it is
-                rlog.log(AIRCRAFT_DEBUG,
-                         f"Traffic {traffic['Icao_addr']:X} from source {source} has no altitude or distance estimation, ignoring it")
-                return
+            collision_detection(ac, traffic, False)
+        elif traffic.get('Last_source') == SOURCE_1090:   # only modes traffic comes with an estimated distance
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: No position traffic {traffic['Icao_addr']:X} from source {source} "
                                      f"in {distcirc:.1f} nm")
             if 'arcposition' not in ac:
                 # calc argposition if new or adsb before
                 last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
                 ac['arcposition'] = last_arcposition
-
-        modes_only = ac['position_valid'] is False
-        collision_detection(ac, traffic, modes_only)
+            collision_detection(ac, traffic, True)
     except json.JSONDecodeError:
         rlog.debug(f"JSONDecodeError decoding traffic payload: {json_str}")
     except KeyError:  # to be safe in case keys are changed in Stratux
