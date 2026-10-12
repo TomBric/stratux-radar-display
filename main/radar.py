@@ -223,7 +223,7 @@ def draw_all_ac(allac):
     for icao, ac in dist_sorted:
         try:
             # first draw mode-s, so that later the more precise adsb position is drawn on top of it
-            if not ac['x'] and 'circradius' in ac:
+            if 'x' not in ac and 'circradius' in ac:
                 tail = get_tail_display(ac)
                 if ac['circradius'] <= max_pixel / 2:
                     display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac['vspeed'],
