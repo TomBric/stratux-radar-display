@@ -226,8 +226,9 @@ def draw_all_ac(allac):
             if 'x' not in ac and 'circradius' in ac:
                 tail = get_tail_display(ac)
                 if ac['circradius'] <= max_pixel / 2:
-                    display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac['vspeed'],
+                    display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac.get('vspeed', 0),
                                                   tail, ac['prio'])
+                    # vspeed may be valid for aircraft without position, if we have no gps position
         except KeyError:
             rlog.debug(f"draw_all_ac: Missing key for mode-s aircraft {icao:X}: {traceback.format_exc()}")
     for icao, ac in dist_sorted:
