@@ -520,7 +520,6 @@ def new_traffic(json_str):
             source = "FLARM"
         else:
             source = "Unknown source"
-        is_new = False
         now = time.time()
         if traffic['Icao_addr'] not in all_ac.keys():
             # new traffic, insert
@@ -530,7 +529,6 @@ def new_traffic(json_str):
                 'speed_valid': False,
                 'position_valid': False,
             }
-            is_new = True
         ac = all_ac[traffic['Icao_addr']]
         if traffic['Age'] <= traffic['AgeLastAlt']:
             ac['last_contact_timestamp'] = now - traffic['Age']
