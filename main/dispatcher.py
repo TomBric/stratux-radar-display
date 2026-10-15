@@ -35,43 +35,54 @@
 # dispatcher module for radar callbacks,
 # it holds callbacks in global variables to prevent circular imports
 
-_traffic_handler = None
-_situation_handler = None
-_shutdown_handler = None
+def _noop_traffic(_message):
+    return None
+
+
+def _noop_situation(_message):
+    return None
+
+
+def _noop_shutdown():
+    return None
+
+
+_traffic_handler = _noop_traffic
+_situation_handler = _noop_situation
+_shutdown_handler = _noop_shutdown
 
 
 def register_traffic_handler(handler):
     global _traffic_handler
-    _traffic_handler = handler
+    _traffic_handler = handler if handler is not None else _noop_traffic
 
 
 def register_situation_handler(handler):
     global _situation_handler
-    _situation_handler = handler
+    _situation_handler = handler if handler is not None else _noop_situation
 
 
 def register_shutdown_handler(handler):
     global _shutdown_handler
-    _shutdown_handler = handler
+    _shutdown_handler = handler if handler is not None else _noop_shutdown
 
 
-def emit_traffic(message):
-    handler = _traffic_handler
-    if handler is None:
-        return
-    handler(message)
+def clear_handlers():
+    """Release registered callbacks during shutdown to break module reference chains."""
+    global _traffic_handler, _situation_handler, _shutdown_handler
+    _traffic_handler = _noop_traffic
+    _situation_handler = _noop_situation
+    _shutdown_handler = _noop_shutdown
 
 
-def emit_situation(message):
-    handler = _situation_handler
-    if handler is None:
-        return
-    handler(message)
+def emit_traffic(message: str):
+    _traffic_handler(message)
+
+
+def emit_situation(message: str):
+    _situation_handler(message)
 
 
 def emit_shutdown():
-    handler = _shutdown_handler
-    if handler is None:
-        return
-    handler()
+    _shutdown_handler()
 

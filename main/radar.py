@@ -1116,6 +1116,7 @@ def main():
 
 def quit_gracefully(*argus):
     print("Keyboard interrupt or shutdown. Quit gracefully ...")
+    dispatcher.clear_handlers()
     try:
         tasks = asyncio.all_tasks()
         for ta in tasks:
