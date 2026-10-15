@@ -104,7 +104,7 @@ async def sim_handler(aircraft_sim_file, new_traffic_func, new_situation_func):
                 parts = line.split(',')
                 
                 # Check for Mode-S format (5-6 parts) vs regular aircraft format (9+ parts)
-                if len(parts) >= 5 and len(parts) < 9:
+                if 5 <= len(parts) < 9:
                     # Mode-S format: event_number, delay, identifier, alt, distance, comment
                     try:
                         event_number = int(parts[0].strip())

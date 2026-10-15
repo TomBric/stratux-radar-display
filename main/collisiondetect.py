@@ -67,8 +67,8 @@ def latlon_to_xy_nm(lat_deg, lon_deg, lat_ref_deg, lon_ref_deg):   # calc lat/lo
     dlon = math.radians(lon_deg - lon_ref_deg)
     lat_ref_rad = math.radians(lat_ref_deg)
     nm_per_rad = 60.0 * 180.0 / math.pi # 1 rad lat ~ 60 * 180/pi NM
-    y = dlat * nm_per_rad
-    x = dlon * nm_per_rad * math.cos(lat_ref_rad)
+    y = float(dlat * nm_per_rad)
+    x = float(dlon * nm_per_rad * math.cos(lat_ref_rad))
     return x, y
 
 
@@ -89,7 +89,7 @@ def vertical_tau(alt_ft_own, vs_fpm_own, alt_ft_intr, vs_fpm_intr):
     if abs(v_rel_z) > 1e-3:
         # dot_z < 0 means they are converging vertically
         # dot_z = z_rel * v_rel_z. If opposite signs, they converge.
-        if (z_rel > 0 and v_rel_z < 0) or (z_rel < 0 and v_rel_z > 0):
+        if (z_rel > 0 > v_rel_z) or (z_rel < 0 < v_rel_z):
             tau_v_min = - z_rel / v_rel_z
             if tau_v_min > 0.0:
                 tau_vert_sec = tau_v_min * 60.0
@@ -98,9 +98,9 @@ def vertical_tau(alt_ft_own, vs_fpm_own, alt_ft_intr, vs_fpm_intr):
 
 def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_deg, vs_fpm
     # find a reference point in the middle
-    lat_ref = (own["lat"] + intr["lat"]) / 2.0
-    lon_ref = (own["lon"] + intr["lon"]) / 2.0
-    rlog.log(AIRCRAFT_DEBUG, f"Reference position: lat = {lat_ref:.3f} lon = {lon_ref:.3f}")
+    lat_ref = float((own["lat"] + intr["lat"]) / 2.0)
+    lon_ref = float((own["lon"] + intr["lon"]) / 2.0)
+    rlog.log(AIRCRAFT_DEBUG, f"Reference position: lat = {float(lat_ref):.3f} lon = {float(lon_ref):.3f}")
     # calc cartesian coordinates, x means movement North/South, y means movement West/East
     xA, yA = latlon_to_xy_nm(own["lat"], own["lon"], lat_ref, lon_ref)
     xB, yB = latlon_to_xy_nm(intr["lat"], intr["lon"], lat_ref, lon_ref)
@@ -108,13 +108,13 @@ def tcas_tau(own, intr): # own / intr: dict mit lat, lon, alt_ft, gs_kt, track_d
     # movement vectors horizontally
     vAx, vAy = track_gs_to_vxy(own["track_deg"], own["gs_kt"])
     vBx, vBy = track_gs_to_vxy(intr["track_deg"], intr["gs_kt"])
-    rlog.log(AIRCRAFT_DEBUG, f"Horizontal movement vectors: own ({vAx:.1f}/{vAy:.1f}), traffic ({vBx:.1f}/{vBy:.1f})")
+    rlog.log(AIRCRAFT_DEBUG, f"Horizontal movement vectors: own ({float(vAx):.1f}/{float(vAy):.1f}), traffic ({float(vBx):.1f}/{float(vBy):.1f})")
     # relative horizontal
     rx = xB - xA
     ry = yB - yA
     vx = vBx - vAx
     vy = vBy - vAy
-    rlog.log(AIRCRAFT_DEBUG, f"Distance horizontal: ({rx:.1f}/{ry:.1f}), Velocity ({vx:.1f}/{vy:.1f})")
+    rlog.log(AIRCRAFT_DEBUG, f"Distance horizontal: ({float(rx):.1f}/{float(ry):.1f}), Velocity ({float(vx):.1f}/{float(vy):.1f})")
     v2 = vx*vx + vy*vy
 
     # horizontal tau and proximity
@@ -162,7 +162,7 @@ def assess_threat_modes(tau_h, tau_v, h_diff, dist):
     # threat classification for aircraft with modes signal only (distance estimated and vertical velocity)
     # Horizontal threats
     if abs(h_diff) > MODE_S_OUTLIER_ALT_THRESHOLD or dist > MODE_S_OUTLIER_DIST_THRESHOLD:
-        rlog.log(AIRCRAFT_DEBUG, f"Mode-S: Outside outlier thresholds = {h_diff:.1f} ft dist = {dist:.1f} nm")
+        rlog.log(AIRCRAFT_DEBUG, f"Mode-S: Outside outlier thresholds = {float(h_diff):.1f} ft dist = {float(dist):.1f} nm")
         return 'no_collision'
 
     h_ra = (0 < tau_h <= RA_THRESHOLD)
@@ -227,8 +227,8 @@ def calc_tcas_state(traffic, situation, gps_distance):
     h_diff_ft = abs(own['alt_ft'] - traffic['alt_ft'])
     tau_hor_sec, d_cpa_nm, tau_vert_sec = tcas_tau(own, traffic)
 
-    rlog.log(AIRCRAFT_DEBUG, f"tau_h {tau_hor_sec:.1f}s, d_cpa {d_cpa_nm:.2f}nm, "
-                             f"tau_v {tau_vert_sec:.1f}s, h_diff {h_diff_ft:.0f}ft gps_distance {gps_distance:.2f}nm")
+    rlog.log(AIRCRAFT_DEBUG, f"tau_h {float(tau_hor_sec):.1f}s, d_cpa {float(d_cpa_nm):.2f}nm, "
+                             f"tau_v {float(tau_vert_sec):.1f}s, h_diff {float(h_diff_ft):.0f}ft gps_distance {float(gps_distance):.2f}nm")
 
     return assess_threat(tau_hor_sec, d_cpa_nm, tau_vert_sec, h_diff_ft, gps_distance)
 
@@ -369,5 +369,5 @@ def calc_modes_tcas_state(ac, situation):
     tau_h = -dist / v_close if v_close < -1e-6 else float('inf')
     tau_v = vertical_tau(situation['own_altitude'], situation['vertical_speed'], ac['alt'], v_fpm)
     h_diff = ac['hdiff'] * 100.0
-    rlog.log(AIRCRAFT_DEBUG, f"MODES: dist {dist:.2f}nm, v_close {v_close:.2f}nm/s, tau_h {tau_h:.1f}s, tau_v {tau_v:.1f}s, vspeed {v_fpm:.0f}fpm, h_diff {h_diff:.0f}ft")
+    rlog.log(AIRCRAFT_DEBUG, f"MODES: dist {float(dist):.2f}nm, v_close {float(v_close):.2f}nm/s, tau_h {float(tau_h):.1f}s, tau_v {float(tau_v):.1f}s, vspeed {float(v_fpm):.0f}fpm, h_diff {float(h_diff):.0f}ft")
     return assess_threat_modes(tau_h, tau_v, h_diff, dist)

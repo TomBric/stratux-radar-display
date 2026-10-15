@@ -103,7 +103,7 @@ def user_input():
     global ahrs_ui_changed
 
     btime, button = radarbuttons.check_buttons()
-    # start of ahrs global behaviour
+    # start of ahrs global behavior
     if btime == 0:
         return Modes.NO_CHANGE  # stay in timer mode
     ahrs_ui_changed = True

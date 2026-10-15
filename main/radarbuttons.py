@@ -32,10 +32,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from globals import rlog
-from gpiozero import Button, Device
+from gpiozero import Button
 import threading   # for flask server in case of button api
-from flask import Flask, jsonify, render_template
-from flask_wtf import FlaskForm, CSRFProtect
+from flask import Flask, render_template
+from flask_wtf import FlaskForm
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 import subprocess
@@ -62,8 +62,6 @@ app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 app.config['BOOTSTRAP_BTN_SIZE'] = 'sm'
 app.config['WTF_CSRF_ENABLED'] = False    # to enable api call without csrf token
 bootstrap = Bootstrap5(app)
-# csrf = CSRFProtect(app)
-
 
 button_api_active = False
 last_api_input = 0, 0

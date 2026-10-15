@@ -271,7 +271,6 @@ def parse_GNGLL(fields):
 
     try:
         current_gps_quality = global_situation.get('gps_quality', 0) if isinstance(global_situation, dict) else 0
-        is_valid = False
         if fields[6]:   # check if fix status field is present
             if fields[6].upper() == 'A':
                 if current_gps_quality == 0:
@@ -573,17 +572,17 @@ def handle_nmea_data(nmea_sentence):
             _emit_situation_update()
     elif fields[0] == "GNVTG":
         if parse_GNVTG(fields):
-            _emit_situation_update(situation_callback)
+            _emit_situation_update()
     elif fields[0] == "POGNB":
         if parse_POGNB(fields):
-            _emit_situation_update(situation_callback)
+            _emit_situation_update()
     elif fields[0] == "PGRMZ":
         pass  # ignore PGRMZ for now, we have GNGLL and GNGGA for altitude
     elif fields[0] == "LK8EX1":
         pass  # do nothing for LK8EX1 sentences
     elif fields[0] == "RPYL":
         if parse_RPYL(fields):
-            _emit_situation_update(situation_callback)
+            _emit_situation_update()
     else:
         rlog.debug(f"NMEA: Unhandled NMEA sentence type: {fields[0]}")
 
@@ -663,7 +662,6 @@ async def search_ble():
             # discovered_devices_and_advertisement_data is a dict: {BleakDeviceData: AdvertisementData}
             devices = scanner.discovered_devices
     except asyncio.TimeoutError:
-        timed_out = True
         return {'devices': [], 'timed_out': True}
     except Exception as e:
         rlog.debug(f"Ble: Exception performing BLE-Scan: {e}")

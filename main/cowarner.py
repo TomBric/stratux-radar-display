@@ -81,7 +81,8 @@ WARNLEVEL = (   # ppmvalue, time after level is reached, alarmstring, time betwe
 alarmlevel = 0   # see above level for warnlevel 0-5
 # time when this alarmlevel was first reached or underrun
 r0 = 900.0 * 1000   # value for R0 in clean air. Calculated during calibration, 900k is a good starting point
-cowarner_active = False
+cowarner_active = False         # True if activated and sensor found
+co_warner_activated = False     # True if activated via parameter, False if not activated via parameter
 voltage_factor = 1.0
 ADS = None
 value_debug_level = 0   # debug level for printing ad-values
