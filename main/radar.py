@@ -65,8 +65,8 @@ import checklist
 import logging
 from logging.handlers import RotatingFileHandler
 import collisiondetect
-import airsimulation
 import ble
+import dispatcher
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -1044,11 +1044,11 @@ async def coroutines():
 
 def initialize_ui_components():
     """Initialize UI components and related services."""
-    if not radarui.init(url_settings_set, button_api_active, ble_address, new_traffic):
+    if not radarui.init(url_settings_set, button_api_active, ble_address):
         rlog.debug("GPIO Error, is  another radar process running? Terminating.")
         return False
     
-    shutdownui.init(url_shutdown, url_reboot, quit_gracefully)
+    shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
     ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
@@ -1056,8 +1056,15 @@ def initialize_ui_components():
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     checklist.init(xml_checklist)
-    ble.init(ble_address, new_traffic, new_situation, situation)
+    ble.init(ble_address, situation)
     return True
+
+
+def setup_event_handlers():
+    """Register radar callbacks in the neutral dispatcher."""
+    dispatcher.register_traffic_handler(new_traffic)
+    dispatcher.register_situation_handler(new_situation)
+    dispatcher.register_shutdown_handler(quit_gracefully)
 
 
 def initialize_audio_system():
@@ -1081,6 +1088,7 @@ def initialize_sensors_and_simulation():
 def main():
     global max_pixel, zerox, zeroy, display_refresh_time
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
+    setup_event_handlers()
     # Initialize UI components
     if not initialize_ui_components():
         return 1

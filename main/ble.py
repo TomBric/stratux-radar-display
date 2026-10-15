@@ -41,6 +41,7 @@ import traceback
 import json
 import arguments
 import asyncio
+import dispatcher
 
 
 SERVICE = "ffe0"
@@ -57,8 +58,6 @@ GPS_RANGE_ERROR = 4.0  # UERE range error in meters, used for calculating GPS ac
 GPS_INVALID_ACCURACY = 999999.0  # value to use for invalid GPS accuracy
 
 global_situation = None    # global situation dictionary to hold the latest situation data
-traffic_func = None         # global function to handle new traffic messages
-situation_func = None       # global function to handle new situation messages
 ble_address = None             # global BLE address to connect to
 ogn_tail_number_cache = {}     # global cache for OGN tail numbers consisting of ognid -> tail number mappings
 ogn_device_db_loaded = False
@@ -519,19 +518,15 @@ def parse_RPYL(fields):
         traceback.print_exc()
         return False
 
-def _emit_situation_update(callback):
-    if callback is not None:
-        callback(json.dumps(situation_msg))
+def _emit_situation_update():
+    dispatcher.emit_situation(json.dumps(situation_msg))
 
 
-def _emit_traffic_update(callback, message):
-    if callback is not None:
-        callback(json.dumps(message))
+def _emit_traffic_update(message):
+    dispatcher.emit_traffic(json.dumps(message))
 
 
 def handle_nmea_data(nmea_sentence):
-    traffic_callback = traffic_func
-    situation_callback = situation_func
     # Verify checksum before parsing
     if "*" not in nmea_sentence:
         rlog.debug(f"NMEA: Invalid NMEA sentence: Missing checksum")
@@ -553,29 +548,29 @@ def handle_nmea_data(nmea_sentence):
         return
     if fields[0] == "GNGLL":
         if parse_GNGLL(fields):
-            _emit_situation_update(situation_callback)
+            _emit_situation_update()
     elif fields[0] == "GPRMC":
         if parse_GPRMC(fields):
-            _emit_situation_update(situation_callback)
+            _emit_situation_update()
     elif fields[0] == "PFLAU":
         # ignore PFLAU for now, as it is not used in the current implementation
         pass
     elif fields[0] == "PFLAA":
         traffic_msg_parsed = parse_PFLAA(fields)
         if traffic_msg_parsed:
-            _emit_traffic_update(traffic_callback, traffic_msg_parsed)
+            _emit_traffic_update(traffic_msg_parsed)
     elif fields[0] == "GNGGA":
         if parse_GNGGA(fields):
-            _emit_situation_update(situation_callback)
+            _emit_situation_update()
     elif fields[0] == "GNGSA":
         if parse_GNGSA(fields):
-            _emit_situation_update(situation_callback)
+            _emit_situation_update()
     elif fields[0] == "GNRMC":
         if parse_GNRMC(fields):
-            _emit_situation_update(situation_callback)
+            _emit_situation_update()
     elif fields[0] == "GNMRC":
         if parse_GNMRC(fields):
-            _emit_situation_update(situation_callback)
+            _emit_situation_update()
     elif fields[0] == "GNVTG":
         if parse_GNVTG(fields):
             _emit_situation_update(situation_callback)
@@ -688,15 +683,11 @@ async def search_ble():
     return {'devices': found_devices, 'timed_out': timed_out}
 
 
-def init(new_ble_address, new_traffic_func, new_situation_func, situation):
+def init(new_ble_address, situation):
     global global_situation
-    global traffic_func
-    global situation_func
     global ble_address
 
     global_situation = situation
-    traffic_func = new_traffic_func
-    situation_func = new_situation_func
     ble_address = new_ble_address
     rlog.debug("BLE initialized with address: {0}".format(ble_address))
 

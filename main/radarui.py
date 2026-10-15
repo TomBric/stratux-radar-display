@@ -35,8 +35,8 @@ from globals import rlog, Modes
 import requests
 import radarbuttons
 import radarmodes
-from flask_bootstrap import Bootstrap5, SwitchField
 import json
+import dispatcher
 
 # status variables for state machine
 display_radius = (2, 3, 5, 10, 20, 40)
@@ -46,17 +46,15 @@ button_api_active = False
 
 url_settings_set = ""
 ble_address = None
-traffic_func = None
 
 
-def init(url, button_api, ble_address_param, traffic_func_param):
-    global url_settings_set, ble_address, traffic_func
+def init(url, button_api, ble_address_param):
+    global url_settings_set, ble_address
 
     if not radarbuttons.init(button_api):   # error occured, e.g. gpio pins are buse
         return False
     url_settings_set = url
     ble_address = ble_address_param
-    traffic_func = traffic_func_param
     rlog.debug("Radar UI: Initialized POST settings to " + url_settings_set)
     return True
 
@@ -75,7 +73,7 @@ def communicate_limits(radarrange, threshold):
     else:  # ble mode communicate via traffic msg
         traffic_msg = json.dumps({ 'RadarLimits': threshold, 'RadarRange': radarrange })
         rlog.debug(f"BLE COMMUNICATE LIMITS: {traffic_msg}")
-        traffic_func(traffic_msg)
+        dispatcher.emit_traffic(traffic_msg)
 
 
 def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)

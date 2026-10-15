@@ -300,6 +300,10 @@ def update_traffic_adaptive(ac):
             rlog.log(AIRCRAFT_DEBUG, f"Mode-S: Resetting filter after {ac['outlier_count']} outliers")
             ac['kf'].x[0][0] = ac['gps_distance']
             ac['outlier_count'] = 0
+        # Ensure vertical filter exists for the early outlier return path.
+        if 'kf_v' not in ac:
+            ac['kf_v'] = setup_vertical_filter(ac['alt'])
+            ac['last_used_alt_time'] = ac.get('last_alt_timestamp', now)
         return ac['kf'].x[0][0], ac['kf'].x[1][0], ac['kf_v'].x[1][0] * 60.0    # leave it as it was
 
     # value is plausible
