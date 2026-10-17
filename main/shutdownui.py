@@ -34,12 +34,12 @@
 import os
 import subprocess
 import signal
-import radarbuttons
 import time
 import requests
 from globals import rlog, Modes
 import radarmodes
 from button_input import get_button_event, is_left, is_middle, is_right
+import dispatcher
 
 SHUTDOWN_WAIT_TIME = 6.0
 shutdown_time = 0.0

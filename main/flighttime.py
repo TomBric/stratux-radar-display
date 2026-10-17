@@ -54,8 +54,6 @@
 
 import datetime
 import json
-import radarbuttons
-import radarmodes
 from globals import rlog, Modes
 import radarmodes
 from button_input import get_button_event, is_middle, is_left_long, is_right_long, is_right_short

@@ -33,7 +33,6 @@
 
 from globals import rlog
 import requests
-import radarbuttons
 import time
 import radarbluez
 import math
