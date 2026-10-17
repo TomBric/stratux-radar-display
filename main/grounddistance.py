@@ -55,7 +55,7 @@ from globals import rlog, Globals, Modes
 import os      # for deleting statistics file
 
 FEET_TO_MM = 304.8
-MM_TO_FEET = 1 / FEET_TO_MM     # one feet in mm
+MM_TO_FEET = 1 / FEET_TO_MM     # one foot in mm
 
 # constants
 MEASUREMENTS_PER_SECOND = 10     # number of distance ranging meaurements per second
@@ -379,8 +379,8 @@ def delete_stats():
 
 def write_stats():
     try:
-        serial = _to_serializable(calculate_output_values())
-        outstr = json.dumps(serial)
+        ser = _to_serializable(calculate_output_values())
+        outstr = json.dumps(ser)
         with open(saved_statistics, 'at') as out:
             rlog.debug("Grounddistance: Writing statistics " + outstr)
             out.write(outstr + '\n')  # Add newline after each JSON object

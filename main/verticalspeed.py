@@ -34,6 +34,7 @@
 import radarbuttons
 import radarmodes
 from globals import Modes
+from button_input import get_button_event, is_middle, is_left_long, is_right_short, is_right_long
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -65,16 +66,15 @@ def draw_vsi(display_control, was_changed, connected, vertical_speed, flight_lev
 
 
 def user_input():
-    btime, button = radarbuttons.check_buttons()
-    # start of vsi global behaviour
-    if btime == 0:
-        return Modes.NO_CHANGE, False  # stay in current mode
-    if button == 1 and (btime == 2 or btime == 1):  # middle
-        return radarmodes.next_mode_sequence(Modes.VSI), False  # next mode
-    if button == 0 and btime == 2:  # left and long
-        return Modes.SHUTDOWN, False  # start next mode shutdown!
-    if button == 2 and btime == 1:  # right and short: reset values
+    event = get_button_event()
+    if event is None:
+        return Modes.NO_CHANGE, False
+    if is_middle(event):
+        return radarmodes.next_mode_sequence(Modes.VSI), False
+    if is_left_long(event):
+        return Modes.SHUTDOWN, False
+    if is_right_short(event):
         return Modes.VSI, True
-    if button == 2 and btime == 2:  # right and long: refresh
-        return Modes.REFRESH_VSI, False  # start next mode for display driver: refresh called from vsi
+    if is_right_long(event):
+        return Modes.REFRESH_VSI, False
     return Modes.VSI, False  # no mode change for any other interaction

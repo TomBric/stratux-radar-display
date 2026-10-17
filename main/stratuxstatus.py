@@ -33,12 +33,12 @@
 
 import logging
 import radar
-import radarbuttons
 import asyncio
 import json
 from globals import rlog, Modes
 import radarmodes
 import requests
+from button_input import get_button_event, is_left_short, is_left_long, is_middle_short, is_middle_long, is_right_short, is_right_long
 
 # constants
 SITUATION_DEBUG = logging.DEBUG-2
@@ -224,17 +224,22 @@ def change_value(difference):
 
 
 def user_input():
-    btime, button = radarbuttons.check_buttons()
-    if btime == 0:
-        return Modes.NO_CHANGE  # stay in current mode
-    if button == 0 and btime == 1:  # left and short
+    event = get_button_event()
+    if event is None:
+        return Modes.NO_CHANGE
+
+    if is_left_short(event):
         change_value(10)
-    elif button == 0 and btime == 2:  # left and long
+        return Modes.STRATUX_STATUS
+    if is_left_long(event):
         change_value(100)
-    elif button == 2 and btime == 1:  # right and short
+        return Modes.STRATUX_STATUS
+    if is_right_short(event):
         change_value(-10)
-    elif button == 2 and btime == 2:  # right and long, refresh
+        return Modes.STRATUX_STATUS
+    if is_right_long(event):
         change_value(-100)
-    elif button == 1 and (btime == 2 or btime == 1):  # middle
+        return Modes.STRATUX_STATUS
+    if is_middle_short(event) or is_middle_long(event):
         return radarmodes.next_mode_sequence(Modes.STRATUX_STATUS)
     return Modes.STRATUX_STATUS  # no mode change

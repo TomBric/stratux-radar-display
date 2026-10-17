@@ -36,6 +36,7 @@ from globals import Modes
 import radarmodes
 import requests
 from globals import rlog
+from button_input import get_button_event, is_middle, is_left_long, is_right_long, is_right_short, is_left_short
 
 REQUEST_TIMEOUT = 5.0
 
@@ -102,21 +103,20 @@ def set_level():
 def user_input():
     global ahrs_ui_changed
 
-    btime, button = radarbuttons.check_buttons()
-    # start of ahrs global behavior
-    if btime == 0:
-        return Modes.NO_CHANGE  # stay in timer mode
+    event = get_button_event()
+    if event is None:
+        return Modes.NO_CHANGE
     ahrs_ui_changed = True
-    if button == 1 and (btime == 2 or btime == 1):  # middle in any case
-        return radarmodes.next_mode_sequence(Modes.AHRS)  # next mode
-    if button == 0 and btime == 2:  # left and long
-        return Modes.SHUTDOWN  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long: refresh
-        return Modes.REFRESH_AHRS  # start next mode for display driver: refresh called from ahrs
-    if button == 2 and btime == 1:  # right and short, set zero_drift
+    if is_middle(event):
+        return radarmodes.next_mode_sequence(Modes.AHRS)
+    if is_left_long(event):
+        return Modes.SHUTDOWN
+    if is_right_long(event):
+        return Modes.REFRESH_AHRS
+    if is_right_short(event):
         zero_drift()
         return Modes.AHRS
-    if button == 0 and btime == 1:  # left and short: set level
+    if is_left_short(event):
         set_level()
         return Modes.AHRS
-    return Modes.AHRS  # no mode change
+    return Modes.AHRS

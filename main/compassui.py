@@ -34,6 +34,7 @@
 import radarbuttons
 import radarmodes
 from globals import Modes
+from button_input import get_button_event, is_middle, is_left_long, is_right_long
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -61,15 +62,14 @@ def draw_compass(display_control, changed, connected, heading):
 def user_input():
     global compassui_changed
 
-    btime, button = radarbuttons.check_buttons()
-    # start of ahrs global behaviour
-    if btime == 0:
-        return Modes.NO_CHANGE  # stay in current mode
+    event = get_button_event()
+    if event is None:
+        return Modes.NO_CHANGE
     compassui_changed = True
-    if button == 1 and (btime == 1 or btime == 2):  # middle in any case
-        return radarmodes.next_mode_sequence(Modes.COMPASS)    # next mode
-    if button == 0 and btime == 2:  # left and long
-        return Modes.SHUTDOWN  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long: refresh
-        return Modes.REFRESH_COMPASS  # start next mode for display driver: refresh called
-    return Modes.COMPASS  # no mode change
+    if is_middle(event):
+        return radarmodes.next_mode_sequence(Modes.COMPASS)
+    if is_left_long(event):
+        return Modes.SHUTDOWN
+    if is_right_long(event):
+        return Modes.REFRESH_COMPASS
+    return Modes.COMPASS

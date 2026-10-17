@@ -44,6 +44,7 @@ from RPi import GPIO
 import numpy
 import radarmodes
 from globals import rlog, global_config, Modes
+from button_input import get_button_event, is_middle, is_left_short, is_left_long, is_right_short, is_right_long
 
 
 # constants
@@ -336,23 +337,23 @@ def user_input():
     if not cowarner_active:
         rlog.debug("CO-Warner: not active, switching to next mode")
         return radarmodes.next_mode_sequence(Modes.COWARNER)     # immediately go to next mode, if warner is not activated
-    btime, button = radarbuttons.check_buttons()
-    if btime == 0 or co_warner_status == 1:   # in calibration mode, do not react
+    event = get_button_event()
+    if event is None or co_warner_status == 1:   # in calibration mode, do not react
         return Modes.NO_CHANGE  # stay in current mode
     cowarner_changed = True
-    if button == 1 and (btime == 1 or btime == 2):  # middle in any case
+    if is_middle(event):
         return radarmodes.next_mode_sequence(Modes.COWARNER)    # next mode
-    if button == 0 and btime == 1:  # left and short
+    if is_left_short(event):
         calibration_end = math.floor(time.time() + CALIBRATION_TIME)
         sample_sum = 0.0
         no_samples = 0
         co_warner_status = 1   # start calibration mode, co reader will do this end mode
-    if button == 0 and btime == 2:  # left and long
+    if is_left_long(event):
         return Modes.SHUTDOWN  # start next mode shutdown!
-    if button == 2 and btime == 1:  # right and short, reset max value
+    if is_right_short(event):
         co_max = 0
         co_values.clear()  # clear all history
-    if button == 2 and btime == 2:  # right and long: refresh
+    if is_right_long(event):
         return Modes.REFRESH_CO_WARNER  # start next mode for display driver: refresh called
     return Modes.COWARNER  # no mode change
 

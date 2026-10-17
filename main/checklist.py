@@ -33,11 +33,19 @@
 
 
 import radarmodes
-import radarbuttons
 import xmltodict
 from pathlib import Path
 import arguments
 from globals import rlog, Modes
+from button_input import (
+    get_button_event,
+    is_left_short,
+    is_left_long,
+    is_middle_short,
+    is_middle_long,
+    is_right_short,
+    is_right_long,
+)
 # constants
 
 # globals
@@ -160,35 +168,35 @@ def user_input():
     global g_iterator
     global g_checklist_changed
 
-    btime, button = radarbuttons.check_buttons()
-    if btime == 0:
+    event = get_button_event()
+    if event is None:
         return Modes.NO_CHANGE  # stay in current mode
     g_checklist_changed = True
     if g_checklist is None:    # xml reading failed
         return radarmodes.next_mode_sequence(Modes.CHECKLIST)  # next mode after any press
-    if button == 0 and btime == 1:  # left and short, previous item
+    if is_left_short(event):  # left and short, previous item
         if g_iterator[1] == 0:  # first item, goto next list
             g_iterator = previous_list(g_iterator)
         else:
             g_iterator = previous_item(g_iterator)
         return Modes.CHECKLIST
-    if button == 0 and btime == 2:  # left and long
+    if is_left_long(event):  # left and long
         return Modes.SHUTDOWN  # start next mode shutdown!
-    if button == 1 and btime == 1:  # middle and short
+    if is_middle_short(event):  # middle and short
         if g_iterator[0] == len(g_checklist)-1:   # last list
             return radarmodes.next_mode_sequence(Modes.CHECKLIST)  # next mode
         else:
             g_iterator = next_list(g_iterator)
             return Modes.CHECKLIST
-    if button == 1 and btime == 2:  # middle long
+    if is_middle_long(event):  # middle long
         return radarmodes.next_mode_sequence(Modes.CHECKLIST)  # next mode
-    if button == 2 and btime == 1:  # right and short, next item
+    if is_right_short(event):  # right and short, next item
         last_item = (g_iterator == [len(g_checklist) - 1, len(g_checklist[g_iterator[0]]['ITEM']) - 1])
         if not last_item:
             g_iterator = next_item(g_iterator)
         else:
             g_iterator = [0, 0]  # reset checklist, start in checklist 0 at item 0
         return Modes.CHECKLIST
-    if button == 2 and btime == 2:  # right and long, refresh
+    if is_right_long(event):  # right and long, refresh
         return Modes.REFRESH_CHECKLIST  # start next mode for display driver: refresh called
     return Modes.CHECKLIST  # no mode change

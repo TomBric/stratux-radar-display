@@ -35,6 +35,7 @@ import radarbuttons
 from globals import rlog, Modes
 import requests
 import radarmodes
+from button_input import get_button_event, is_middle, is_left_long, is_right_long, is_right_short
 
 # constants
 MSG_NO_CONNECTION = "No Connection!"
@@ -75,19 +76,18 @@ def draw_gmeter(display_control, ui_changed, connected, gmeter):
 def user_input():
     global gmeterui_changed
 
-    btime, button = radarbuttons.check_buttons()
-    # start of gmeter global behaviour
-    if btime == 0:
-        return Modes.NO_CHANGE  # stay in current mode
+    event = get_button_event()
+    if event is None:
+        return Modes.NO_CHANGE
     rlog.debug("GMeter UI: button pressed")
     gmeterui_changed = True
-    if button == 1 and (btime == 1 or btime == 2):  # middle in any case
+    if is_middle(event):
         return radarmodes.next_mode_sequence(Modes.GMETER)
-    if button == 0 and btime == 2:  # left and long
-        return Modes.SHUTDOWN  # start next mode shutdown!
-    if button == 2 and btime == 2:  # right and long, refresh
-        return Modes.REFRESH_GMETER  # start next mode for display driver: refresh called from gmeter
-    if button == 2 and btime == 1:  # right and short - reset
+    if is_left_long(event):
+        return Modes.SHUTDOWN
+    if is_right_long(event):
+        return Modes.REFRESH_GMETER
+    if is_right_short(event):
         reset_gmeter()
         return Modes.GMETER
-    return Modes.GMETER  # no mode change
+    return Modes.GMETER

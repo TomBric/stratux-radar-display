@@ -39,7 +39,7 @@ import time
 import requests
 from globals import rlog, Modes
 import radarmodes
-import dispatcher
+from button_input import get_button_event, is_left, is_middle, is_right
 
 SHUTDOWN_WAIT_TIME = 6.0
 shutdown_time = 0.0
@@ -133,24 +133,25 @@ def user_input():
     global shutdown_mode
     global clear_before_shutoff
 
-    if shutdown_time == 0.0:     # first time or after stopped shutdwon
+    if shutdown_time == 0.0:
         shutdown_time = time.time() + SHUTDOWN_WAIT_TIME
-    btime, button = radarbuttons.check_buttons()
-    if btime == 0:   # nothing pressed
+
+    event = get_button_event()
+    if event is None:
         if time.time() > shutdown_time:
             rlog.debug("Shutdown now")
-            clear_before_shutoff = True  # enable display driver to trigger shutdown
-        return Modes.NO_CHANGE  # stay in current mode
-    if button == 0:  # left
+            clear_before_shutoff = True
+        return Modes.NO_CHANGE
+    if is_left(event):
         shutdown_mode = 0
         shutdown_time = 0.0
-        return radarmodes.first_mode_sequence()  # go back to first mode selected
-    if button == 1:  # middle, display only shutdown
+        return radarmodes.first_mode_sequence()
+    if is_middle(event):
         shutdown_mode = 1
         shutdown_time = 0.0
-        return Modes.SHUTDOWN  # stay in shutdown mode
-    if button == 2:  # right, reboot all
+        return Modes.SHUTDOWN
+    if is_right(event):
         shutdown_mode = 2
         shutdown_time = 0.0
-        return Modes.SHUTDOWN  # stay in shutdown mode
-    return Modes.SHUTDOWN  # no mode change
+        return Modes.SHUTDOWN
+    return Modes.SHUTDOWN
