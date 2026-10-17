@@ -39,7 +39,6 @@ import flighttime
 import datetime
 from globals import rlog, Modes
 import radarmodes
-from button_input import get_button_event, is_middle, is_middle_short, is_middle_long, is_left, is_left_short, is_left_long, is_right_short, is_right_long
 
 # constants
 MAX_COUNTDOWN_TIME = 2 * 60 * 60   # maximum time for setting countdown in seconds
@@ -167,51 +166,56 @@ def user_input():
     global timer_mode
     global cdown_spoken
 
-    event = get_button_event()
-    if event is None:
-        return Modes.NO_CHANGE
+    btime, button = radarbuttons.check_buttons()
+    # start of timer global behaviour
+    if btime == 0:
+        return Modes.NO_CHANGE  # stay in timer mode
     timer_ui_changed = True
-    if is_middle_long(event):
-        return radarmodes.next_mode_sequence(Modes.TIMER)
-    if is_left_long(event):
-        return Modes.SHUTDOWN
+    if button == 1 and btime == 2:  # middle and long
+        return radarmodes.next_mode_sequence(Modes.TIMER)  # Timer mode was 2
+    if button == 0 and btime == 2:  # left and long
+        return Modes.SHUTDOWN  # start next mode shutdown!
 
-    if timer_mode == 0:
-        if is_middle_short(event):
-            laptime = 0.0
+    # situation dependent behavior
+    if timer_mode == 0:   # normal timer mode
+        if button == 1 and btime == 1:   # middle and short
+            laptime = 0.0  # cdown-time is set, forget old laptime
             timer_mode = 1
-            if timer_running and cdown_time <= math.floor(time.time()):
+            if timer_running and cdown_time <= math.floor(time.time()):    # Countdown was finished
                 cdown_time = 0.0
-        if is_right_short(event):
-            if timer_running:
+        if button == 2 and btime == 1:   # short right
+            if timer_running:   # timer already running
                 stoptime = math.floor(time.time()) - stoptime
                 if cdown_time >= math.floor(time.time()):
                     cdown_time = cdown_time - math.floor(time.time())
                 else:
                     cdown_time = 0.0
-                laptime = 0
+                laptime = 0    # also stop lap time
                 timer_running = False
             else:
-                stoptime = math.floor(time.time()) - stoptime
+                stoptime = math.floor(time.time()) - stoptime   # add time already on clock
                 if cdown_time > 0:
                     cdown_time = math.floor(time.time()) + cdown_time
                 laptime = 0
                 timer_running = True
-        if is_left(event):
-            if timer_running:
-                laptime = math.floor(time.time())
-                cdown_time = 0.0
+        if button == 0:   # left
+            if btime == 2:  # left and long
+                return Modes.SHUTDOWN    # start next mode shutdown!
             else:
-                stoptime = 0
-                laptime = 0
-                cdown_time = 0.0
-    elif timer_mode == 1:
+                if timer_running:
+                    laptime = math.floor(time.time())
+                    cdown_time = 0.0     # now lap mode
+                else:
+                    stoptime = 0
+                    laptime = 0
+                    cdown_time = 0.0
+    elif timer_mode == 1:   # countdown set mode
         if timer_running and cdown_time == 0.0:
             cdown_time = math.floor(time.time())
-        if is_middle_short(event):
+        if button == 1 and btime == 1:   # middle and short
             timer_mode = 0
-        elif is_left_short(event):
-            cdown_time = cdown_time + 600
+        elif button == 0 and btime == 1:  # left short
+            cdown_time = cdown_time + 600  # ten more minutes
             cdown_spoken = False
             if timer_running:
                 if cdown_time >= math.floor(time.time()) + MAX_COUNTDOWN_TIME:
@@ -219,7 +223,7 @@ def user_input():
             else:
                 if cdown_time >= MAX_COUNTDOWN_TIME:
                     cdown_time = 0
-        elif is_right_short(event):
+        elif button == 2 and btime == 1:  # right short
             cdown_time = cdown_time + 60
             cdown_spoken = False
             if timer_running:
@@ -229,25 +233,30 @@ def user_input():
                 if cdown_time >= MAX_COUNTDOWN_TIME:
                     cdown_time = 0.0
 
-    if timer_mode == 1:
+    # prepare display for next round
+    if timer_mode == 1:  # next will be countdown-set
         lap_head = "Set Countdown"
         right_text = "+1m"
         middle_text = "Back"
         left_text = "+10m"
-    else:
+    else:  # next will be normal mode
         if cdown_time > 0:
-            laptime = 0
+            laptime = 0  # stop laptimer and do countdown
             lap_head = "Countdown"
         else:
             lap_head = "Laptimer"
         if timer_running:
             right_text = "Stop"
+            middle_text = "Mode"
+            left_text = "Lap"
         else:
-            right_text = "Start"
-        if timer_running:
-            middle_text = "Set"
-        else:
-            middle_text = "Lap"
-        left_text = "Reset"
-
-    return Modes.TIMER
+            if stoptime == 0.0:
+                right_text = "Start"
+                middle_text = "Mode"
+                left_text = ""
+            else:
+                right_text = "Cont"
+                middle_text = "Mode"
+                left_text = "Reset"
+    timer_ui_changed = True
+    return Modes.TIMER   # no mode change, but update display
