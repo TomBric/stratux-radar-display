@@ -39,6 +39,7 @@ import flighttime
 import datetime
 from globals import rlog, Modes
 import radarmodes
+import button_input
 
 # constants
 MAX_COUNTDOWN_TIME = 2 * 60 * 60   # maximum time for setting countdown in seconds
@@ -166,24 +167,24 @@ def user_input():
     global timer_mode
     global cdown_spoken
 
-    btime, button = radarbuttons.check_buttons()
+    event = button_input.get_button_event()
     # start of timer global behaviour
-    if btime == 0:
+    if event is None:
         return Modes.NO_CHANGE  # stay in timer mode
     timer_ui_changed = True
-    if button == 1 and btime == 2:  # middle and long
+    if button_input.is_middle_long(event):  # middle and long
         return radarmodes.next_mode_sequence(Modes.TIMER)  # Timer mode was 2
-    if button == 0 and btime == 2:  # left and long
+    if button_input.is_left_long(event):  # left and long
         return Modes.SHUTDOWN  # start next mode shutdown!
 
     # situation dependent behavior
     if timer_mode == 0:   # normal timer mode
-        if button == 1 and btime == 1:   # middle and short
+        if button_input.is_middle_short(event):   # middle and short
             laptime = 0.0  # cdown-time is set, forget old laptime
             timer_mode = 1
             if timer_running and cdown_time <= math.floor(time.time()):    # Countdown was finished
                 cdown_time = 0.0
-        if button == 2 and btime == 1:   # short right
+        if button_input.is_right_short(event):   # short right
             if timer_running:   # timer already running
                 stoptime = math.floor(time.time()) - stoptime
                 if cdown_time >= math.floor(time.time()):
@@ -198,8 +199,8 @@ def user_input():
                     cdown_time = math.floor(time.time()) + cdown_time
                 laptime = 0
                 timer_running = True
-        if button == 0:   # left
-            if btime == 2:  # left and long
+        if button_input.is_left(event):   # left
+            if button_input.is_left_long(event):  # left and long
                 return Modes.SHUTDOWN    # start next mode shutdown!
             else:
                 if timer_running:
@@ -212,9 +213,9 @@ def user_input():
     elif timer_mode == 1:   # countdown set mode
         if timer_running and cdown_time == 0.0:
             cdown_time = math.floor(time.time())
-        if button == 1 and btime == 1:   # middle and short
+        if button_input.is_middle_short(event):   # middle and short
             timer_mode = 0
-        elif button == 0 and btime == 1:  # left short
+        elif button_input.is_left_short(event):  # left short
             cdown_time = cdown_time + 600  # ten more minutes
             cdown_spoken = False
             if timer_running:
@@ -223,7 +224,7 @@ def user_input():
             else:
                 if cdown_time >= MAX_COUNTDOWN_TIME:
                     cdown_time = 0
-        elif button == 2 and btime == 1:  # right short
+        elif button_input.is_right_short(event):  # right short
             cdown_time = cdown_time + 60
             cdown_spoken = False
             if timer_running:

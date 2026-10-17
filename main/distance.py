@@ -38,10 +38,8 @@
 # along with the display
 
 import math
-import radarbuttons
 import grounddistance
 import datetime
-import radarmodes
 from globals import Modes
 import radarmodes
 from button_input import get_button_event, is_middle, is_middle_short, is_middle_long, is_left, is_left_short, is_left_long, is_right, is_right_short, is_right_long
