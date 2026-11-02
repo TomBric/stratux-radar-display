@@ -845,7 +845,7 @@ async def user_interface():
             elif Globals.mode == Modes.COUNTDOWN_DISTANCE:  # display countdown distance
                 next_mode, reset_countdown = grounddistance.user_input()
                 if reset_countdown:
-                    grounddistance.reset_values(situation)
+                    grounddistance.reset_values()
             else:
                 next_mode = Modes.NO_CHANGE   # fallback, should never happen
 
