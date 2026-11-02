@@ -664,7 +664,7 @@ class GenericDisplay:
         self.centered_text(0, "Ground Distance", self.SMALL)
         if not ground_distance_active:
             self.centered_text(3*self.SMALL, "Groundsensor", self.VERYLARGE)
-            self.centered_text(4*self.SMALL, "not active", self.VERYLARGE)
+            self.centered_text(3*self.SMALL + self.VERYLARGE, "not active", self.VERYLARGE)
             return
         if not ground_distance_valid:   # no valid distance value available, that means measurement out of range
             text = f"No contact"
