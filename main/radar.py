@@ -842,6 +842,10 @@ async def user_interface():
                     distance.reset_values(situation)
             elif Globals.mode == Modes.CHECKLIST:  # display checklist
                 next_mode = checklist.user_input()
+            elif Globals.mode == Modes.COUNTDOWN_DISTANCE:  # display countdown distance
+                next_mode, reset_countdown = grounddistance.user_input()
+                if reset_countdown:
+                    grounddistance.reset_values(situation)
             else:
                 next_mode = Modes.NO_CHANGE   # fallback, should never happen
 
