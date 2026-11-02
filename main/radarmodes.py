@@ -57,7 +57,8 @@ def mode_codes(c):
         "I": Modes.FLIGHTTIME,
         "C": Modes.COWARNER,
         "M": Modes.SITUATION,
-        "L": Modes.CHECKLIST
+        "L": Modes.CHECKLIST,
+        "W": Modes.COUNTDOWN_DISTANCE
     }
     return modes.get(c, Modes.NO_CHANGE)
 

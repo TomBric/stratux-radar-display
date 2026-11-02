@@ -99,6 +99,7 @@
 {{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist_filename, radar_form.download_checklist, radar_form.upload_checklist],
     col_map={'checklist': 'col-md-3', 'checklist_seq': 'no-label col-md-1', 'checklist_filename': 'col-md-4'},
     button_map={'download_checklist': 'success', 'upload_checklist': 'primary'}) }}
+{{ render_form_row([radar_form.grounddistance, radar_form.grounddistance_seq], col_map={'grounddistance': 'col-md-3', 'grounddistance_seq': 'no-label col-md-1'}) }}
 </div>
 
 <h5>Radar traffic display options</h5>

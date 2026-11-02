@@ -48,7 +48,9 @@ import math
 import serial
 import simulation
 import radarbluez
+from button_input import get_button_event, is_middle, is_left_long, is_right_short, is_right_long
 import radarbuttons
+import radarmodes
 import binascii
 from typing import Any
 from globals import rlog, Globals, Modes
@@ -791,5 +793,20 @@ async def read_ground_sensor():
                 sensor.close()
             radarbuttons.release_gear_indicator()  # free GPIO ressource
             rlog.debug("Ground distance reader terminated.")
+
+
+def user_input():
+    event = get_button_event()
+    if event is None:
+        return Modes.NO_CHANGE, False
+    if is_middle(event):
+        return radarmodes.next_mode_sequence(Modes.COUNTDOWN_DISTANCE), False
+    if is_left_long(event):
+        return Modes.SHUTDOWN, False
+    if is_right_short(event):
+        return Modes.VSI, True
+    if is_right_long(event):
+        return Modes.REFRESH_COUNTDOWN_DISTANCE, False
+    return Modes.COUNTDOWN_DISTANCE, False  # no mode change for any other interaction
 
 

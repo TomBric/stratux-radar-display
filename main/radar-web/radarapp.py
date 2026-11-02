@@ -187,6 +187,8 @@ class RadarForm(FlaskForm):
     stratux_seq = IntegerField('', default=11, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist = SwitchField('Checklists', default=False)
     checklist_seq = IntegerField('', default=12, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
+    grounddistance = SwitchField('Grounddistance', default=False)
+    grounddistance_seq = IntegerField('', default=13, validators=[NumberRange(min=1, max=MAX_SEQUENCE)])
     checklist_filename = StringField(f'Local checklist file (in "{arguments.FULL_CONFIG_DIR}")',
                                      default=arguments.DEFAULT_CHECKLIST)
     download_checklist = SubmitField('Download checklist')
@@ -375,7 +377,7 @@ def find_line_in_file(file_path, word):
     return None
 
 modes = { 'R': 'radar', 'T': 'timer', 'A': 'ahrs', 'D': 'status', 'G': 'gmeter','K': 'compass','V': 'vspeed',
-        'S': 'stratux', 'I': 'flogs', 'C': 'cowarner', 'M': 'gps_dist', 'L': 'checklist'}
+        'S': 'stratux', 'I': 'flogs', 'C': 'cowarner', 'M': 'gps_dist', 'L': 'checklist', 'W': 'grounddistance'}
 
 def parsemodes(options, radarform):
     rlog.debug(f'parsing options: {options}')
