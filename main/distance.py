@@ -56,9 +56,6 @@ statistic_list = []
 baro_diff_zero = {}
 # height starting point based on baro in feet for situation and flight testing
 
-FEET_TO_MM = 304.8
-MM_TO_FEET = 1 / FEET_TO_MM     # one foot in mm
-
 def radians_rel(angle):
     if angle > 180:
         angle = angle - 360

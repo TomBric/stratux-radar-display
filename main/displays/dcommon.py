@@ -38,6 +38,9 @@ import datetime
 from pathlib import Path
 from PIL import ImageFont
 
+FEET_TO_MM = 304.8
+MM_TO_FEET = 1 / FEET_TO_MM     # one foot in mm
+
 # helper functions
 def posn(angle, arm_length, angle_offset=0):
     dx = round(math.cos(math.radians(angle_offset + angle)) * arm_length)
@@ -669,7 +672,7 @@ class GenericDisplay:
                            fill=self.TEXT_COLOR,
                            anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
             return
-        feet = g_distance * grounddistance.MM_TO_FEET  # round down
+        feet = g_distance * MM_TO_FEET  # round down
         text = f"{int(feet)}"  # round down
         arcw = self.sizex//32  # width of the arc outline
         radx = self.EXTREMELARGE  # x size of ellipse
