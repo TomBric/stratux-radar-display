@@ -656,9 +656,20 @@ class GenericDisplay:
         # if not: values displayed are stored stats
         pass
 
-    def countdown_distance(self, feet):
+    def countdown_distance(self, ground_distance_active, ground_distance_valid, g_distance):
         # display countdown distance on a full screen, distance value is in feet
         self.centered_text(0, "Ground Distance", self.SMALL)
+        if not ground_distance_active:
+            self.centered_text(3*self.SMALL, "Groundsensor", self.SMALL)
+            self.centered_text(4*self.SMALL, "not active", self.SMALL)
+            return
+        if not ground_distance_valid:   # no valid distance value available, that means measurement out of range
+            text = f"No contact"
+            self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.LARGE],
+                           fill=self.TEXT_COLOR,
+                           anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
+            return
+        feet = g_distance * grounddistance.MM_TO_FEET  # round down
         text = f"{int(feet)}"  # round down
         arcw = self.sizex//32  # width of the arc outline
         radx = self.EXTREMELARGE  # x size of ellipse

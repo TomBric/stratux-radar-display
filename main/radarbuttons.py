@@ -186,7 +186,7 @@ def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns
     for index, but in enumerate(btn):
         stat = but.check_button()
         if stat > 0:
-            rlog.debug("Button press: button {0} presstime {1} (1=short, 2=long)".format(index, stat))
+            rlog.debug(f"Button pressed: {'LEFT' if index==0 else 'MIDDLE' if index==1 else 'RIGHT'} {'SHORT' if stat==1 else 'LONG'}")
             return stat, index
     # nothing pressed, now also check button_api
     return read_api_input()

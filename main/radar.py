@@ -996,6 +996,10 @@ async def display_and_cutoff():
                 elif Globals.mode == Modes.COUNTDOWN_DISTANCE:  # Full screen distance
                     distance.draw_countdown_distance(display_control, situation)
                     Globals.refresh = False
+                elif Globals.mode == Modes.REFRESH_COUNTDOWN_DISTANCE:  # refresh display, only relevant for epaper, mode was countdown distance
+                    rlog.debug("Countdown Distance: Display driver - Refreshing")
+                    refresh_display(manual=True)
+                    Globals.mode = Modes.COUNTDOWN_DISTANCE
 
             clear_aircraft_list()
             # remove aircraft not updated for a while as well as position and speed data of aircraft

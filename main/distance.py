@@ -56,6 +56,8 @@ statistic_list = []
 baro_diff_zero = {}
 # height starting point based on baro in feet for situation and flight testing
 
+FEET_TO_MM = 304.8
+MM_TO_FEET = 1 / FEET_TO_MM     # one foot in mm
 
 def radians_rel(angle):
     if angle > 180:
@@ -153,9 +155,7 @@ def draw_distance(display_control, was_changed, connected, situation, ahrs):
 def draw_countdown_distance(display_control, situation):
     # display in any case, even if there is no change, since values are constantly changing
     display_control.clear()
-    if situation['g_distance_valid']:
-        feet = situation['g_distance'] * grounddistance.MM_TO_FEET   # round down
-        display_control.countdown_distance(feet)    # switch back is done by ground sensor reader
+    display_control.countdown_distance(grounddistance.ground_distance_active, situation['g_distance_valid'], situation['g_distance'])    # switch back is done by ground sensor reader
     display_control.display()
 
 
@@ -184,7 +184,7 @@ def user_input():
             dist_user_mode = 1
             return Modes.SITUATION, False
         if is_right_short(event):
-            return Modes.SITUATION, True
+            return Modes.SITUATION, True   # reset values in radar.py, which will reset values in grounddistance.py as well
         if is_right_long(event):
             return Modes.REFRESH_SITUATION, False
         return Modes.SITUATION, False
