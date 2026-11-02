@@ -663,12 +663,12 @@ class GenericDisplay:
         # display countdown distance on a full screen, distance value is in feet
         self.centered_text(0, "Ground Distance", self.SMALL)
         if not ground_distance_active:
-            self.centered_text(3*self.SMALL, "Groundsensor", self.SMALL)
-            self.centered_text(4*self.SMALL, "not active", self.SMALL)
+            self.centered_text(3*self.SMALL, "Groundsensor", self.VERYLARGE)
+            self.centered_text(4*self.SMALL, "not active", self.VERYLARGE)
             return
         if not ground_distance_valid:   # no valid distance value available, that means measurement out of range
             text = f"No contact"
-            self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.LARGE],
+            self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.VERYLARGE],
                            fill=self.TEXT_COLOR, anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
             return
         feet = g_distance * MM_TO_FEET
