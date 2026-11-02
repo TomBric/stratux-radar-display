@@ -668,9 +668,7 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                         break
     elif fly_status == 2:  # landing detected, waiting for stop to calculate distance
-        if Globals.mode == Modes.COUNTDOWN_DISTANCE and switch_back_from_distance is not Modes.NO_CHANGE:  # switch back to normal mode
-            Globals.mode = switch_back_from_distance
-            rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.value}")
+        stop_countdown_screen()
         if has_stopped():
             fly_status = 0
             stop_situation = latest_stat
