@@ -669,10 +669,9 @@ class GenericDisplay:
         if not ground_distance_valid:   # no valid distance value available, that means measurement out of range
             text = f"No contact"
             self.draw.text((self.sizex // 2, self.sizey // 2), text, font=self.fonts[self.LARGE],
-                           fill=self.TEXT_COLOR,
-                           anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
+                           fill=self.TEXT_COLOR, anchor='mm')  # anchor 'mm' sets the middle of the text to the middle of the position
             return
-        feet = g_distance * MM_TO_FEET  # round down
+        feet = g_distance * MM_TO_FEET
         text = f"{int(feet)}"  # round down
         arcw = self.sizex//32  # width of the arc outline
         radx = self.EXTREMELARGE  # x size of ellipse
@@ -689,7 +688,7 @@ class GenericDisplay:
         self.draw.text((self.sizex // 2 + radx + arcw, self.sizey // 2 - self.LARGE // 2), "ft",
                        font=self.fonts[self.LARGE],
                        fill=self.TEXT_COLOR)
-
+        self.bottom_line("", "Mode", "Zero")
 
     def gmeter(self, current, maxg, ming, error_message):
         pass

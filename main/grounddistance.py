@@ -804,7 +804,7 @@ def user_input():
     if is_left_long(event):
         return Modes.SHUTDOWN, False
     if is_right_short(event):
-        return Modes.VSI, True
+        return Modes.COUNTDOWN_DISTANCE, True
     if is_right_long(event):
         return Modes.REFRESH_COUNTDOWN_DISTANCE, False
     return Modes.COUNTDOWN_DISTANCE, False  # no mode change for any other interaction
