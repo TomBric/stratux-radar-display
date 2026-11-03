@@ -114,7 +114,7 @@ sed -i 's/#ReconnectAttempts = 7/ReconnectAttempts = 3/' /etc/bluetooth/main.con
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-scipy python3-pygame python3-gpiozero -y
 
 su pi -c "pip3 install ADS1x15-ADC --break-system-packages"
-su pi -c "pip3 install bayesian-filters --break-system-packages --root-user-action=ignore"
+su pi -c "pip3 install bayesian-filters --break-system-packages --root-user-action=ignore --no-warn-script-location"
 su pi -c "pip3 install bleak --break-system-packages --root-user-action=ignore"
 apt -y autoremove
 
