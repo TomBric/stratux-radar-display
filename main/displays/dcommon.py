@@ -662,6 +662,7 @@ class GenericDisplay:
     def countdown_distance(self, ground_distance_active, ground_distance_valid, g_distance):
         # display countdown distance on a full screen, distance value is in feet
         self.centered_text(0, "Ground Distance", self.SMALL)
+        self.bottom_line("", "Mode", "Zero")
         if not ground_distance_active:
             self.centered_text(3*self.SMALL, "Groundsensor", self.VERYLARGE)
             self.centered_text(3*self.SMALL + self.VERYLARGE, "not active", self.VERYLARGE)
@@ -688,7 +689,6 @@ class GenericDisplay:
         self.draw.text((self.sizex // 2 + radx + arcw, self.sizey // 2 - self.LARGE // 2), "ft",
                        font=self.fonts[self.LARGE],
                        fill=self.TEXT_COLOR)
-        self.bottom_line("", "Mode", "Zero")
 
     def gmeter(self, current, maxg, ming, error_message):
         pass
