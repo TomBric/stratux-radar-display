@@ -11,31 +11,10 @@ echo "mk_configure_radar.sh called with arguments: $0 $*"
 # script to be run as root
 # called via configure_radar as sudo
 # usage /bin/bash mk_configure_radar.sh
-# use option -i pico2tts to install pico2tts from debian source (necessary for armhf 32 bit version)
-# exmple: /bin/bash mk_configure_radar.sh -i pico2tts
-
-DEBIAN=false
 
 
-set -x
+# set -x
 
-while getopts ":i:" opt; do
-  case $opt in
-    i)
-      if [ "$OPTARG" = "pico2tts" ]; then
-        DEBIAN=true
-      fi
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG"
-      exit 1
-      ;;
-    :)
-      echo "option -$OPTARG requires a value."
-      exit 1
-      ;;
-  esac
-done
 
 echo "Checking pi user configuration..."
 PI_PASSWD_ENTRY=$(getent passwd pi) || die "pi user is missing"
@@ -94,19 +73,7 @@ systemctl mask serial-getty@ttyAMA0.service
 } | tee -a /boot/firmware/config.txt
 
 
-if [ "$DEBIAN" = false ]; then
-  apt install libttspico-utils -y
-else
-  # pico2wave is not installable in trixie armhf (why so ever), so include debian source to install
-  {
-    echo "deb [arch=armhf, trusted=yes] http://deb.debian.org/debian trixie main contrib non-free"
-  } | tee -a /etc/apt/sources.list
-  apt update
-  apt install libttspico-utils -y
-  # remove the last line in sources.list now again
-  sudo sed -i /etc/apt/sources.list -e '$d'
-fi
-
+apt install libttspico-utils -y
 # trixie lite:
 apt install git python3-pip -y
 
@@ -120,12 +87,13 @@ cp wireplumber-bluetooth.conf /etc/wireplumber/wireplumber.conf.d/bluetooth.conf
 sed -i 's/#ReconnectAttempts = 7/ReconnectAttempts = 3/' /etc/bluetooth/main.conf
 
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-scipy python3-pygame python3-gpiozero -y
+apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-scipy python3-pygame python3-gpiozero --no-warn-script-location -y
 
 
 su pi -c "pip3 install ADS1x15-ADC --break-system-packages"
-su pi -c "pip3 install bayesian-filters --break-system-packages"
-su pi -c "pip3 install bleak --break-system-packages"
+su pi -c "pip3 uninstall types-seaborn --break-system-packages --root-user-action=ignore -y"
+su pi -c "pip3 install bayesian-filters --break-system-packages --root-user-action=ignore"
+su pi -c "pip3 install bleak --break-system-packages --root-user-action=ignore"
 apt -y autoremove
 
 

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -Eeuo pipefail
+trap 'status=$?; echo "Command failed at line ${LINENO}: ${BASH_COMMAND}" >&2; exit "$status"' ERR
+
 # script configures libraries and settings necessary for stratux-radar web configuration
 # script to be run as root
 # called via configure_radar as sudo with target image mounted
@@ -10,6 +13,7 @@
 # set -x
 
 ON_STRATUX=false
+SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
 
 while getopts ":s" opt; do
   case $opt in
@@ -26,23 +30,27 @@ while getopts ":s" opt; do
       ;;
   esac
 done
+shift $((OPTIND - 1))
+[ "$#" -eq 0 ] || { echo "Unexpected argument: $1" >&2; exit 1; }
 
 
 apt update
 # apt upgrade -y
 apt install nginx -y
-apt install python3-psutil
+apt install python3-psutil -y
 pip cache purge
 # necessary to match new hashes
-pip3 install bootstrap-flask flask-wtf werkzeug --break-system-packages --no-cache-dir
+# uninstall types-flask-migrate to avoid warnings, because it is not needed
+pip3 uninstall types-flask-migrate --break-system-packages --root-user-action=ignore -y
+pip3 install bootstrap-flask flask-wtf werkzeug --break-system-packages --no-cache-dir --root-user-action=ignore
 # generate reverse proxy config
-rm -f /etc/nginx/sites-enabled/default || true
-cp "$(dirname "$0")"/radar_reverse.conf /etc/nginx/sites-available/
+rm -f /etc/nginx/sites-enabled/default
+cp "$SCRIPT_DIR/radar_reverse.conf" /etc/nginx/sites-available/radar_reverse.conf
 if [ "$ON_STRATUX" = true ]; then
   # change port 80 to 81 for nginx, since stratux already offers web on 80
   sed -i 's/listen 80/listen 81/g' /etc/nginx/sites-available/radar_reverse.conf
 fi
 ln -f /etc/nginx/sites-available/radar_reverse.conf /etc/nginx/sites-enabled/
-# restart to read new configuration
+# validate configuration before restarting
+nginx -t
 systemctl restart nginx
-

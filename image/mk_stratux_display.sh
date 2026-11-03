@@ -5,14 +5,13 @@
 # sudo apt install --yes parted zip unzip zerofree
 # If you want to build on x86 with aarch64 emulation, additionally install qemu-user-static qemu-system-arm
 # Run this script as root.
-#  sudo /bin/bash mk_stratux_display.sh [-b <branch>] [-k v32] [-u <USB-stick-name>]
+#  sudo /bin/bash mk_stratux_display.sh [-b <branch>] [-u <USB-stick-name>]
 # Run with argument "-b dev" to get the dev branch from github, otherwise with main
-# Run with optional argument "-k v32" to create 32 bit based images for zero 1
 # Run with optional argument "-u <USB-stick-name>" to move created images on the usb stick and then umount this
 # call examples:
 #   sudo /bin/bash mk_stratux_display.sh
 #   sudo /bin/bash mk_stratux_display.sh -b dev
-#   sudo /bin/bash mk_stratux_display.sh -b dev -k v32
+
 
 # cd .
 # set -x
@@ -27,27 +26,20 @@ die() {
 
 # set defaults
 BRANCH=main
-V32=false
 USB_NAME=""
 
 # variables for pi imager repo.json
 GITHUB_BASE_URL="https://github.com/TomBric/stratux-radar-display"
 V64_REPONAME="Stratux Radar Display (64-bit)"
-V32_REPONAME="Stratux Radar Display (32-bit)"
 ICON_URL_BLACK="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-black192x192.png"
 ICON_URL_WHITE="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-white192x192.png"
 ICON_URL_BLUE="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-blue192x192.png"
 
 # check parameters
-while getopts ":b:k:u" opt; do
+while getopts ":b:u:" opt; do
   case $opt in
     b)
       BRANCH="$OPTARG"
-      ;;
-    k)
-      if [ "$OPTARG" = "v32" ]; then
-        V32=true
-      fi
       ;;
     u)
       USB_NAME=$OPTARG
@@ -63,22 +55,14 @@ while getopts ":b:k:u" opt; do
   esac
 done
 
-echo "Building images for branch '$BRANCH' V32=$V32 based on Trixie"
+echo "Building images for branch '$BRANCH' based on Trixie"
 
 icon_url="$ICON_URL_BLACK"
-if [ "$V32" = true ]; then
-  IMAGE_VERSION="armhf"
-  outprefix="v32-stratux-display"
-  icon_url="$ICON_URL_BLUE"
-  device_list="pi3-32bit, pi4-32bit"
-  reponame="$V32_REPONAME"
-else
-  IMAGE_VERSION="arm64"
-  outprefix="stratux-display"
-  icon_url="$ICON_URL_WHITE"
-  device_list="pi3-64bit, pi4-64bit"
-  reponame="$V64_REPONAME"
-fi
+IMAGE_VERSION="arm64"
+outprefix="stratux-display"
+icon_url="$ICON_URL_WHITE"
+device_list="pi3-64bit, pi4-64bit"
+reponame="$V64_REPONAME"
 
 ZIPNAME="2026-06-18-raspios-trixie-${IMAGE_VERSION}-lite.img.xz"
 BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2026-06-19/${ZIPNAME}"
@@ -170,11 +154,7 @@ su pi -c "git clone --recursive -b $BRANCH https://github.com/TomBric/stratux-ra
 
 cd ../../../
 # run the configuration skript, that is also executed when setting up on target device
-if [ "$V32" = true ]; then
-  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh -i pico2tts || die "mk_configure_radar.sh (v32) failed"
-else
-  unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh || die "mk_configure_radar.sh failed"
-fi
+unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_configure_radar.sh || die "mk_configure_radar.sh failed"
 unshare -mpfu chroot mnt /bin/bash "$DISPLAY_SRC"/stratux-radar-display/image/mk_config_webapp.sh || die "mk_config_webapp.sh failed"
 
 # mkdir -p out
@@ -209,7 +189,7 @@ xz -v -k out/${outprefix}"${outname}"
 # create os-list entry for pi imager
 /bin/bash $SRCDIR/image/create-repo-list.sh out/"$outprefix""${outname}" out/${outprefix}"${outname}".xz "$reponame ${release}" "Description" "$icon_url" "$GITHUB_BASE_URL/releases/download/${release}/$outprefix${outname}".xz "${device_list}" "out/$outprefix${outname}.json"
 # example for path of a release on github:
-# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v32-stratux-display-v2.12-000d4f4b.img.xz
+# https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v64-stratux-display-v2.12-000d4f4b.img.xz
 rm out/"${outprefix}""${outname}"
 
 if [ "${#USB_NAME}" -eq 0 ]; then
