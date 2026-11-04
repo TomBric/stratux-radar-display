@@ -72,8 +72,8 @@ icon_url="$GITHUB_BASE_URL/raw/$BRANCH/pi-imager/stratux-logo-white192x192.png"
 device_list="pi3-64bit, pi4-64bit"
 reponame="$V64_REPONAME"
 
-ZIPNAME="2026-06-18-raspios-trixie-${IMAGE_VERSION}-lite.img.xz"
-BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2026-06-19/${ZIPNAME}"
+ZIPNAME="2026-10-06-raspios-trixie-${IMAGE_VERSION}-lite.img.xz"
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_${IMAGE_VERSION}/images/raspios_lite_${IMAGE_VERSION}-2026-10-06/${ZIPNAME}"
 
 IMGNAME="${ZIPNAME%.*}"
 
