@@ -86,7 +86,7 @@ mkdir -p "$TMPDIR/out"
 
 # Download/extract image
 wget -c "$BASE_IMAGE_URL" || die "Download failed"
-unxz -k "$ZIPNAME" || die "Extracting image failed"
+unxz -k -f "$ZIPNAME" || die "Extracting image failed"
 
 # Check where in the image the root partition begins:
 partoffset=$(parted "$IMGNAME" unit B p | grep ext4 | awk -F ' ' '{print $2}')
