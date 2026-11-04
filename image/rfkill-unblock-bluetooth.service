@@ -1,0 +1,11 @@
+[Unit]
+Description=Unblock bluetooth via rfkill
+After=systemd-rfkill.service bluetooth.service
+Wants=systemd-rfkill.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/rfkill unblock bluetooth
+
+[Install]
+WantedBy=multi-user.target
