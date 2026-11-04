@@ -1,4 +1,8 @@
 #!/bin/bash
+# script configures basic libraries and settings necessary for stratux-radar
+# script to be run as root
+# called via configure_radar as sudo
+# usage sudo /bin/bash mk_configure_radar.sh
 
 set -Eeuo pipefail
 
@@ -9,13 +13,7 @@ die() {
 
 trap 'status=$?; echo "Command failed at line ${LINENO}: ${BASH_COMMAND}" >&2; exit "$status"' ERR
 
-echo "mk_configure_radar.sh called with arguments: $0 $*"
-
-# script configures basic libraries and settings necessary for stratux-radar
-# script to be run as root
-# called via configure_radar as sudo
-# usage /bin/bash mk_configure_radar.sh
-
+# echo "mk_configure_radar.sh called with arguments: $0 $*"
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
 
@@ -114,7 +112,7 @@ sed -i 's/#ReconnectAttempts = 7/ReconnectAttempts = 3/' /etc/bluetooth/main.con
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-scipy python3-pygame python3-gpiozero -y
 
 su pi -c "pip3 install ADS1x15-ADC --break-system-packages"
-su pi -c "pip3 install bayesian-filters --break-system-packages --root-user-action=ignore --no-warn-script-location"
+su pi -c "pip3 install pandas-stubs bayesian-filters --break-system-packages --root-user-action=ignore --no-warn-script-location"
 su pi -c "pip3 install bleak --break-system-packages --root-user-action=ignore"
 apt -y autoremove
 
