@@ -40,8 +40,10 @@ apt install nginx -y
 apt install python3-psutil -y
 pip cache purge
 # necessary to match new hashes
-# uninstall types-flask-migrate to avoid warnings, because it is not needed
-pip3 uninstall types-flask-migrate --break-system-packages --root-user-action=ignore -y
+# uninstall types-flask-migrate if present, because it is not needed
+if pip3 show types-flask-migrate >/dev/null 2>&1; then
+  pip3 uninstall types-flask-migrate --break-system-packages --root-user-action=ignore -y
+fi
 pip3 install bootstrap-flask flask-wtf werkzeug --break-system-packages --no-cache-dir --root-user-action=ignore
 # generate reverse proxy config
 rm -f /etc/nginx/sites-enabled/default
