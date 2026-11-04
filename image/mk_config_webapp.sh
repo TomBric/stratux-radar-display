@@ -55,4 +55,9 @@ fi
 ln -f /etc/nginx/sites-available/radar_reverse.conf /etc/nginx/sites-enabled/
 # validate configuration before restarting
 nginx -t
-systemctl restart nginx
+# systemd is not running when called in a chroot (image build), nginx is started on first boot then
+if [ -d /run/systemd/system ]; then
+  systemctl restart nginx
+else
+  echo "systemd not running (chroot?), skipping nginx restart"
+fi
