@@ -101,7 +101,16 @@ apt install git python3-pip -y
 
 # bluetooth and sound installation
 apt install pipewire libspa-0.2-bluetooth pulseaudio-module-bluetooth python3-alsaaudio -y
-rfkill unblock bluetooth    # enable bluetooth which is otherwise disabled on lite image
+# enable bluetooth which is otherwise disabled on lite image
+# /dev/rfkill does not exist in the chroot of mk_stratux_display.sh, so unblock it on every boot via a service instead
+if [ -e /dev/rfkill ] && rfkill unblock bluetooth; then
+    echo "bluetooth unblocked via rfkill"
+else
+    # /dev/rfkill does not exist in the chroot of mk_stratux_display.sh, so unblock it on every boot via a service instead
+    echo "rfkill unblock bluetooth not possible, installing service to unblock on boot"
+    cp "$SCRIPT_DIR/rfkill-unblock-bluetooth.service" /etc/systemd/system/rfkill-unblock-bluetooth.service
+    systemctl enable rfkill-unblock-bluetooth.service
+fi
 mkdir -p /etc/wireplumber/wireplumber.conf.d
 # rules for wireplumber to accept bluetooth sinks and headless connect
 cp "$SCRIPT_DIR/wireplumber-bluetooth.conf" /etc/wireplumber/wireplumber.conf.d/bluetooth.conf     # rules for wireplumber to accept bluetooth sinks
