@@ -51,6 +51,17 @@ su pi -c "mkdir -p /home/pi/.config/systemd/user/default.target.wants"
 su pi -c "ln -f -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
 
 if [ "$UART" = true ]; then
+  # modify config.txt to enable UART5 for GroundSensor if running on a pi4, so TX is on PIN #33 on pi4, see wiki
+  [ -f "$BOOT_CONFIG" ] || BOOT_CONFIG=/boot/config.txt
+  [ -f "$BOOT_CONFIG" ] || { echo "Could not find config.txt under /boot/firmware or /boot" >&2; exit 1; }
+  if ! grep -Fxq '# stratux-radar UART5 overlay' "$BOOT_CONFIG"; then
+    grep -Fxq '[all]' "$BOOT_CONFIG" || { echo "Could not find [all] section in $BOOT_CONFIG" >&2; exit 1; }
+    sed -i '/^\[all\]$/i\
+# stratux-radar UART5 overlay\
+[pi4]\
+dtoverlay=uart5' "$BOOT_CONFIG"
+  fi
+
   # enable sensor UART output
   # for groundsensor, disable ssh over serial cause it is needed for the sensor
   # disable ssh over serial otherwise
