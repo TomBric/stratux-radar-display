@@ -35,8 +35,9 @@ from globals import rlog, Modes
 import requests
 import radarbuttons
 import radarmodes
-from flask_bootstrap import Bootstrap5, SwitchField
 import json
+import dispatcher
+from button_input import get_button_event, is_left_long, is_left_short, is_right_long, is_right_short, is_middle_long, is_middle_short
 
 # status variables for state machine
 display_radius = (2, 3, 5, 10, 20, 40)
@@ -46,17 +47,15 @@ button_api_active = False
 
 url_settings_set = ""
 ble_address = None
-traffic_func = None
 
 
-def init(url, button_api, ble_address_param, traffic_func_param):
-    global url_settings_set, ble_address, traffic_func
+def init(url, button_api, ble_address_param):
+    global url_settings_set, ble_address
 
     if not radarbuttons.init(button_api):   # error occured, e.g. gpio pins are buse
         return False
     url_settings_set = url
     ble_address = ble_address_param
-    traffic_func = traffic_func_param
     rlog.debug("Radar UI: Initialized POST settings to " + url_settings_set)
     return True
 
@@ -75,40 +74,37 @@ def communicate_limits(radarrange, threshold):
     else:  # ble mode communicate via traffic msg
         traffic_msg = json.dumps({ 'RadarLimits': threshold, 'RadarRange': radarrange })
         rlog.debug(f"BLE COMMUNICATE LIMITS: {traffic_msg}")
-        traffic_func(traffic_msg)
+        dispatcher.emit_traffic(traffic_msg)
 
 
 def user_input(rrange, rlimits):   # return Nextmode, toogleSound  (Bool)
     try:
         radius = display_radius.index(rrange)
         height = height_diff.index(rlimits)
-    except ValueError:   # should not occure
-        radius = 2   # set standard to 5nm, if error
-        height = 0   # set standard to 1000ft, if error
+    except ValueError:
+        radius = 2
+        height = 0
 
-    btime, button = radarbuttons.check_buttons()
-    if btime == 0:
+    event = get_button_event()
+    if event is None:
         return Modes.NO_CHANGE, False
-    if button == 0:
-        if btime == 2:    # left and long
-            return Modes.SHUTDOWN, False  # start next mode shutdown!
-        else:          # left and short
-            radius += 1
-            if radius >= len(display_radius):
-                radius = 0
-            communicate_limits(display_radius[radius], height_diff[height])
-    elif button == 2:
-        if btime == 2:   # right and long, refresh
-            return Modes.REFRESH_RADAR, False   # start next mode for display driver: refresh
-        else:
-            height += 1
-            if height >= len(height_diff):
-                height = 0
-            communicate_limits(display_radius[radius], height_diff[height])
-    elif button == 1:
-        if btime == 2:    # middle and long
-            return radarmodes.next_mode_sequence(Modes.RADAR), False  # start next mode
-        else:          # middle and short
-            rlog.debug("Sound  toggled by UI")
-            return Modes.RADAR, True
+    if is_left_long(event):
+        return Modes.SHUTDOWN, False
+    if is_left_short(event):
+        radius += 1
+        if radius >= len(display_radius):
+            radius = 0
+        communicate_limits(display_radius[radius], height_diff[height])
+    elif is_right_long(event):
+        return Modes.REFRESH_RADAR, False
+    elif is_right_short(event):
+        height += 1
+        if height >= len(height_diff):
+            height = 0
+        communicate_limits(display_radius[radius], height_diff[height])
+    elif is_middle_long(event):
+        return radarmodes.next_mode_sequence(Modes.RADAR), False
+    elif is_middle_short(event):
+        rlog.debug("Sound toggled by UI")
+        return Modes.RADAR, True
     return Modes.RADAR, False

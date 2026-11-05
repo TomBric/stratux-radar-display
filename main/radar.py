@@ -63,9 +63,10 @@ import radarmodes
 import simulation
 import checklist
 import logging
+from logging.handlers import RotatingFileHandler
 import collisiondetect
-import airsimulation
 import ble
+import dispatcher
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -76,17 +77,18 @@ import syslog
 from globals import rlog, Globals, Modes, global_config, SITUATION_DEBUG, AIRCRAFT_DEBUG, COLLISION_DEBUG
 
 # constants
-RADAR_VERSION = "3.0"
+RADAR_VERSION = "3.1"
 
 RETRY_TIMEOUT = 1
 LOST_CONNECTION_TIMEOUT = 0.3
 RADAR_CUTOFF = 29  # time after last message received from an aircraft is no longer displayed
-POSITION_VALID_DELTA = 15.0   # time a received position is assumed valid, e.g. if message without position is received
+POSITION_VALID_DELTA = RADAR_CUTOFF   # time a received position is assumed valid, e.g. if message without position is received
 # only after this POSITION_VALID_DELTA time a switch back to mode-s (circle) is done. May e.g. happen when
 # flarm is no more received, but only mode-s. Than switch back and display circle
-FLARM_POSITION_OVER_ADSB_TIMEOUT = 10  # time in seconds, FLARM position is only taken into account after this timeout
-# otherwise adsb_out position is taken, this prevents FLARM/OGN position taken into account when valid adsb-out signal
-# is received
+SPEED_VALID_DELTA = RADAR_CUTOFF   # time a received speed is assumed valid, e.g. if message without speed is received
+# only after this SPEED_VALID_DELTA Speed, Track and Vertical Speed are no more displayed.
+# May e.g. happen when flarm is no more received, but only ADSB without  airborne velocity message
+# e.g. older FUNKE transponders do not send airborne velocity messages, so no speed is available, they only send position and altitude
 
 
 UI_REACTION_TIME = 0.1
@@ -189,6 +191,8 @@ def dump_ac(ac):    # debug function, produces one line for aircraft in a readab
     ret += f" x:{ac['x']}" if 'x' in ac else ""
     ret += f" y:{ac['y']}" if 'y' in ac else ""
     ret += f" last_position_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_position_timestamp']))}" if 'last_position_timestamp' in ac else ""
+    ret += f" speed_valid:{ac['speed_valid']}" if 'speed_valid' in ac else ""
+    ret += f" last_speed_timestamp:{time.strftime('%H:%M:%S', time.gmtime(ac['last_speed_timestamp']))}" if 'last_speed_timestamp' in ac else ""
     ret += f" last_position_source:{ac['last_position_source']}" if 'last_position_source' in ac else ""
     ret += f" nspeed_length:{ac['nspeed_length']}" if 'nspeed_length' in ac else ""
     ret += f" audio: speak_time {ac['audio']['speak_time']} was_prio {ac['audio']['was_prio']}" if 'audio' in ac else ""
@@ -215,22 +219,28 @@ def get_tail_display(ac):
 
 
 def draw_all_ac(allac):
-    dist_sorted = sorted(allac.items(), key=lambda el: el[1]['gps_distance'], reverse=True)
+    dist_sorted = sorted(allac.items(), key=lambda el: el[1].get('gps_distance', 0), reverse=True)
     for icao, ac in dist_sorted:
-        # first draw mode-s
-        if 'circradius' in ac:
-            tail = get_tail_display(ac)
-            if ac['circradius'] <= max_pixel / 2:
-                display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac['vspeed'],
-                                              tail, ac['prio'])
-    for icao, ac in dist_sorted:
-        # then draw adsb
-        if 'x' in ac:
-            if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
-                line_length = ac.get('nspeed_length', 0)
+        try:
+            # first draw mode-s, so that later the more precise adsb position is drawn on top of it
+            if 'x' not in ac and 'circradius' in ac:
                 tail = get_tail_display(ac)
-                display_control.aircraft(ac['x'], ac['y'], ac['direction'], ac['hdiff'], ac['vspeed'],
-                                         line_length, tail, ac['prio'])
+                if ac['circradius'] <= max_pixel / 2:
+                    display_control.modesaircraft(ac['circradius'], ac['hdiff'], ac['arcposition'], ac.get('vspeed', 0),
+                                                  tail, ac['prio'])
+                    # vspeed may be valid for aircraft without position, if we have no gps position
+        except KeyError:
+            rlog.debug(f"draw_all_ac: Missing key for mode-s aircraft {icao:X}: {traceback.format_exc()}")
+    for icao, ac in dist_sorted:
+        try:
+            # then draw adsb
+            if 'x' in ac and 'y' in ac:
+                if 0 < ac['x'] <= max_pixel and ac['y'] <= max_pixel:
+                    tail = get_tail_display(ac)
+                    display_control.aircraft(ac['x'], ac['y'], ac['hdiff'], tail, ac['prio'], ac.get('speed_valid', False),
+                                             ac.get('nspeed', 0), ac.get('direction', 0), ac.get('vspeed', 0), ac.get('nspeed_length',0))
+        except KeyError:
+            rlog.debug(f"draw_all_ac: Missing key for ADS-B or OGN aircraft {icao:X}: {traceback.format_exc()}")
 
 
 def draw_display():
@@ -325,8 +335,8 @@ def gen_modes_traffic_message(ac):
 
 def is_steering_message(traffic):  # checks if traffic is a steering message and returns true if yes
     changed = False
-    if 'RadarRange' in traffic or 'RadarLimits' in traffic:
-        if situation['RadarRange'] != traffic['RadarRange']:
+    if 'RadarRange' in traffic and 'RadarLimits' in traffic:
+        if situation['RadarRange'] != traffic['RadarRange'] and traffic['RadarRange'] > 0: #prevent division by zero
             situation['RadarRange'] = traffic['RadarRange']
             changed = True
         if situation['RadarLimits'] != traffic['RadarLimits']:
@@ -444,14 +454,64 @@ def simple_collision_detection(ac, traffic, mode_s=False):
     # no clear of traffic spoken
 
 
+def clear_aircraft_list():
+    global all_ac
+    global aircraft_changed
+    global last_arcposition
+
+    now = time.time()
+    to_remove = []
+    for icao, ac in all_ac.items():
+        if now - ac.get('last_contact_timestamp', now) > RADAR_CUTOFF:  # remove aircraft not updated for a while
+            to_remove.append(icao)
+            rlog.log(AIRCRAFT_DEBUG, "Cutting of " + hex(icao))
+            aircraft_changed = True
+    for icao in to_remove:
+        all_ac.pop(icao, None)
+    # remove position and speed of aircraft that have not been updated for a while, but keep them in the list
+    for icao, ac in all_ac.items():
+        if ac.get('position_valid', False) and 'last_position_timestamp' in ac and now - ac['last_position_timestamp'] > POSITION_VALID_DELTA:
+            rlog.log(AIRCRAFT_DEBUG, f"Invalidating position of {hex(icao)} due to age {now - ac['last_position_timestamp']:.1f} seconds")
+            ac['position_valid'] = False
+            # now remove display coordinates give a new arcposition to this aircraft for circle
+            del ac['x']
+            del ac['y']
+            if 'arcposition' not in ac:
+                # calc arcposition if not present
+                last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
+                ac['arcposition'] = last_arcposition
+            aircraft_changed = True
+        if ac.get('speed_valid', False) and 'last_speed_timestamp' in ac and now - ac['last_speed_timestamp'] > SPEED_VALID_DELTA:
+            rlog.log(AIRCRAFT_DEBUG, f"Invalidating speed of {hex(icao)} due to age {now - ac['last_speed_timestamp']:.1f} seconds")
+            ac['speed_valid'] = False
+            aircraft_changed = True
+
+# remarks to the all_ac list: aircraft are stored with their ICAO address as key
+# cases:
+# - 1090 traffic always comes with an estimated distance, this creates distcirc, independent of a valid position
+# - OGN traffic has no estimated distance, but always a valid position
+# if we receive a valid position and at this time our own position is valid, we can calculate the distance and angle.
+# For display driver:
+#   if ac['x'] is set display the aircraft at this position
+#   if ac['circradius'] is set, display the circle for the aircraft
+#
+# use cases:
+#    1. mode-s traffic: ac['position_valid'] = False, ac['circradius'] is set
+#    2. adsb traffic: ac['position_valid'] = True, ac['circradius'] is set
+#    3- OGN traffic: ac['position_valid'] = True, ac['circradius'] is not set
+# if ac['position_valid'] and at this time our own position is valid, x and y are set
+# position_valid is invalidated after POSITION_VALID_DELTA seconds by the display_driver,
+# also x and y are invalidated, but the aircraft remains in the list,
+# so that it can be displayed as mode-s traffic (circle) if we have a circradius
+
 def new_traffic(json_str):
     global last_arcposition
     global aircraft_changed
 
     aircraft_changed = True
     rlog.log(AIRCRAFT_DEBUG, "New Traffic" + json_str)
-    traffic = json.loads(json_str)
     try:
+        traffic = json.loads(json_str)
         if is_steering_message(traffic):
             return    # was message without aircraft content
         if traffic.get('Last_source') == SOURCE_1090:
@@ -460,13 +520,16 @@ def new_traffic(json_str):
             source = "FLARM"
         else:
             source = "Unknown source"
-        is_new = False
+        now = time.time()
         if traffic['Icao_addr'] not in all_ac.keys():
             # new traffic, insert
-            all_ac[traffic['Icao_addr']] = {'gps_distance': 0, 'prio':0}
-            is_new = True
+            all_ac[traffic['Icao_addr']] = {
+                'gps_distance': 0,
+                'prio': 0,
+                'speed_valid': False,
+                'position_valid': False,
+            }
         ac = all_ac[traffic['Icao_addr']]
-        now = time.time()
         if traffic['Age'] <= traffic['AgeLastAlt']:
             ac['last_contact_timestamp'] = now - traffic['Age']
         else:
@@ -474,84 +537,56 @@ def new_traffic(json_str):
         ac['hdiff'] = round((traffic['Alt'] - situation['own_altitude']) / 100)
         ac['alt'] = traffic['Alt']
         ac['last_alt_timestamp'] = now - traffic['AgeLastAlt']
+        if traffic['Speed_valid']:    # Airborne velocity message is valid, update speed, track and vertical speed
+            ac['nspeed'] = traffic.get('Speed', 0)
+            ac['vspeed'] = traffic.get('Vvel', 0)
+            ac['direction'] = traffic.get('Track', 0) - situation['course']
+            # Vvel and track should only be set if Speed_valid is true
+            ac['last_speed_timestamp'] = now
+            ac['speed_valid'] = True
+            nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
+            ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
 
-        if traffic['Speed_valid']:
-            ac['nspeed'] = traffic['Speed']
-        ac['vspeed'] = traffic['Vvel']
-        if traffic['Tail'] and traffic['Tail'] != '':
-            # do not give up registration, if it is once received and now is empty,
+        tail = traffic.get('Tail')
+        if isinstance(tail, str):
+            tail = tail.strip()
+            if tail:
+                ac['tail'] = tail
+            # do not give up registration, if it is once received and now is not present or empty string,
             # happens e.g. when same ICAO hex comes from FLARM without ddb entry
-            ac['tail'] = traffic['Tail']
-
-        # Traffic in all_ac list is
-        # - ADSB or FLARM:   if 'x' is in ac   (andy 'y' also, but check for x is ok).
-        # - Mode-S only: if 'circradius' is in ac
-        # when switching, make sure other keys ('circradius' or 'x') are deleted.
-        # When position is received this immediately overrides Mode-S. The other way round may also happen
-        # e.g if FLARM of an aircraft was received, but afterwards only mode-s. So invalidate position also if
-        # no new position was received after some time
+        if traffic.get('Last_source') == SOURCE_1090:
+            distcirc = traffic.get('DistanceEstimated', 0) / 1852.0
+            ac['gps_distance'] = distcirc     # estimated, but used for audio output and for sorting the display
+            ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
 
         if traffic['Position_valid'] and situation['gps_active']:
-            # adsb traffic and stratux has valid gps signal
+            # adsb or ogn traffic and stratux has valid gps signal
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: {source} traffic {traffic['Icao_addr']:X} at hdiff {ac['hdiff']}")
             rlog.log(AIRCRAFT_DEBUG, f"Traffic is: {traffic}")
-            if 'circradius' in ac:
-                del ac['circradius']   # was mode-s target before, now invalidate mode-s info on radius
-            if 'kf' in ac:
-                del ac['kf'] # was mode-s target before, now invalidate mode-s info on kalman filter
-            if 'last_position_timestamp' in ac and 'last_position_source' in ac:
-                if source == "FLARM" and ac['last_position_source'] == "1090" and \
-                        time.time() - ac['last_position_timestamp'] < FLARM_POSITION_OVER_ADSB_TIMEOUT:
-                        # ADSB-out timestamp is still fresh, ignore FLARM/OGN position update, this gives
-                        # priority to adsb-out positions
-                    rlog.log(AIRCRAFT_DEBUG, f"FLARM position message of {traffic['Icao_addr']:X} ignored since ADSB position is still fresh")
-                    return
-            ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
+            ac['position_valid'] = True
             ac['last_position_timestamp'] = time.time()
-            ac['last_position_source'] = source    # we need to know where the last position was recorded from
-            if 'Track' in traffic:
-                ac['direction'] = traffic['Track'] - situation['course']
-                # sometimes track is missing, then leave it as it is
-            collision_detection(ac, traffic, False)
+            ac['last_position_source'] = source  # we need to know where the last position was recorded from
+            ac['gps_distance'], ac['gps_angle'] = calc_gps_distance(traffic['Lat'], traffic['Lng'])
             if ac['gps_distance'] <= situation['RadarRange'] and abs(ac['hdiff']) <= round(situation['RadarLimits'] / 100):
                 res_angle = (ac['gps_angle'] - situation['course']) % 360
                 gpsx = math.sin(math.radians(res_angle)) * ac['gps_distance']
                 gpsy = - math.cos(math.radians(res_angle)) * ac['gps_distance']
                 ac['x'] = round(max_pixel / 2 * gpsx / situation['RadarRange'] + zerox)
                 ac['y'] = round(max_pixel / 2 * gpsy / situation['RadarRange'] + zeroy)
-                if 'nspeed' in ac:
-                    nspeed_rad = ac['nspeed'] * SPEED_ARROW_TIME / 3600  # distance in nm in that time
-                    ac['nspeed_length'] = round(max_pixel / 2 * nspeed_rad / situation['RadarRange'])
             else: # outside of display
                 ac['x'] = -1
                 ac['y'] = -1
-        else:
-            # mode-s traffic or no valid GPS position of stratux
-            if traffic['DistanceEstimated'] == 0 or traffic['Alt'] == 0:
-                # unspecified altitude, nothing displayed for now, leave it as it is
-                return
-            distcirc = traffic['DistanceEstimated'] / 1852.0
+            collision_detection(ac, traffic, False)
+        elif traffic.get('Last_source') == SOURCE_1090:   # only modes traffic comes with an estimated distance
             rlog.log(AIRCRAFT_DEBUG, f"RADAR: No position traffic {traffic['Icao_addr']:X} from source {source} "
                                      f"in {distcirc:.1f} nm")
-            # check age of last position, if age is < POSITION_VALID_DELTA, leave position valid and do not calculate circradius
-            if 'last_position_timestamp' in ac and time.time() - ac['last_position_timestamp'] < POSITION_VALID_DELTA:
-                rlog.log(AIRCRAFT_DEBUG, f"Ignoring mode s distance estimation of "
-                    f"{traffic['Icao_addr']:X} since, position is still younger than {POSITION_VALID_DELTA}secs")
-                # this may e.g. happen if FLARM message is received and mode-s
-                return
-            if is_new or 'circradius' not in ac:
+            if 'arcposition' not in ac:
                 # calc argposition if new or adsb before
                 last_arcposition = display_control.next_arcposition(last_arcposition)  # display specific
                 ac['arcposition'] = last_arcposition
-            ac['gps_distance'] = distcirc
-            ac['circradius'] = round(max_pixel / 2 * distcirc / situation['RadarRange'])
-            if 'x' in ac and 'y' in ac:   # remove keys for display position, traffic is now only estimated again
-                del ac['x']
-                del ac['y']
-                rlog.log(AIRCRAFT_DEBUG, f"Removing position of {traffic['Icao_addr']:X} since position "
-                                         f"was older than {POSITION_VALID_DELTA}secs")
             collision_detection(ac, traffic, True)
-
+    except json.JSONDecodeError:
+        rlog.debug(f"JSONDecodeError decoding traffic payload: {json_str}")
     except KeyError:  # to be safe in case keys are changed in Stratux
         rlog.debug(f"KeyError decoding {json_str}")
         rlog.debug(f"Own situation was: {situation}")
@@ -731,7 +766,13 @@ async def listen_forever(path, name, callback):
                         rlog.debug(name + " shutting down ... ")
                         raise
                     else:
-                        callback(message)
+                        try:
+                            callback(message)
+                        except asyncio.CancelledError:
+                            raise
+                        except Exception:
+                            rlog.debug(name + ': Callback error while processing message. Keeping listener alive.')
+                            rlog.debug(f"traceback: {traceback.format_exc()}")
                     await asyncio.sleep(MINIMAL_WAIT_TIME)  # do a minimal wait to let others do their jobs
 
         except (socket.error, websockets.exceptions.WebSocketException, asyncio.TimeoutError):
@@ -801,6 +842,10 @@ async def user_interface():
                     distance.reset_values(situation)
             elif Globals.mode == Modes.CHECKLIST:  # display checklist
                 next_mode = checklist.user_input()
+            elif Globals.mode == Modes.COUNTDOWN_DISTANCE:  # display countdown distance
+                next_mode, reset_countdown = grounddistance.user_input()
+                if reset_countdown:
+                    grounddistance.reset_values()
             else:
                 next_mode = Modes.NO_CHANGE   # fallback, should never happen
 
@@ -893,9 +938,10 @@ async def display_and_cutoff():
                     refresh_display(manual=True)
                     Globals.mode = Modes.GMETER
                 elif Globals.mode == Modes.COMPASS:  # compass display
-                    compassui.draw_compass(display_control, situation['was_changed'], situation['connected'],
+                    compassui.draw_compass(display_control, situation['was_changed'] or Globals.refresh, situation['connected'],
                                            situation['course'])
                     situation['was_changed'] = False
+                    Globals.refresh = False
                 elif Globals.mode == Modes.REFRESH_COMPASS:  # refresh display, only relevant for epaper, mode was compass
                     rlog.debug("Compass: Display driver - Refreshing")
                     refresh_display(manual=True)
@@ -954,6 +1000,13 @@ async def display_and_cutoff():
                 elif Globals.mode == Modes.COUNTDOWN_DISTANCE:  # Full screen distance
                     distance.draw_countdown_distance(display_control, situation)
                     Globals.refresh = False
+                elif Globals.mode == Modes.REFRESH_COUNTDOWN_DISTANCE:  # refresh display, only relevant for epaper, mode was countdown distance
+                    rlog.debug("Countdown Distance: Display driver - Refreshing")
+                    refresh_display(manual=True)
+                    Globals.mode = Modes.COUNTDOWN_DISTANCE
+
+            clear_aircraft_list()
+            # remove aircraft not updated for a while as well as position and speed data of aircraft
 
             to_delete = []
             cutoff = time.time() - RADAR_CUTOFF
@@ -999,11 +1052,11 @@ async def coroutines():
 
 def initialize_ui_components():
     """Initialize UI components and related services."""
-    if not radarui.init(url_settings_set, button_api_active, ble_address, new_traffic):
+    if not radarui.init(url_settings_set, button_api_active, ble_address):
         rlog.debug("GPIO Error, is  another radar process running? Terminating.")
         return False
     
-    shutdownui.init(url_shutdown, url_reboot, quit_gracefully)
+    shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
     ahrsui.init(url_calibrate, url_caging)
     statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
@@ -1011,8 +1064,15 @@ def initialize_ui_components():
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     checklist.init(xml_checklist)
-    ble.init(ble_address, new_traffic, new_situation, situation)
+    ble.init(ble_address, situation)
     return True
+
+
+def setup_event_handlers():
+    """Register radar callbacks in the neutral dispatcher."""
+    dispatcher.register_traffic_handler(new_traffic)
+    dispatcher.register_situation_handler(new_situation)
+    dispatcher.register_shutdown_handler(quit_gracefully)
 
 
 def initialize_audio_system():
@@ -1036,12 +1096,14 @@ def initialize_sensors_and_simulation():
 def main():
     global max_pixel, zerox, zeroy, display_refresh_time
     print("Stratux Radar Display " + RADAR_VERSION + " running ...")
+    setup_event_handlers()
     # Initialize UI components
     if not initialize_ui_components():
         return 1
     # Initialize audio system
     initialize_audio_system()
     # Initialize display
+    display_control.reset16 = args.get('reset16', False)
     max_pixel, zerox, zeroy, display_refresh_time = display_control.init(fullcircle, args.get('dark', False))
     # Initialize sensors and simulation
     initialize_sensors_and_simulation()
@@ -1062,6 +1124,7 @@ def main():
 
 def quit_gracefully(*argus):
     print("Keyboard interrupt or shutdown. Quit gracefully ...")
+    dispatcher.clear_handlers()
     try:
         tasks = asyncio.all_tasks()
         for ta in tasks:
@@ -1110,7 +1173,7 @@ if __name__ == "__main__":
     if args['logfile']:  # set a log file
         log_dir = Path(arguments.FULL_LOG_DIR)
         log_dir.mkdir(parents=True, exist_ok=True)  # Create directory and parents for log file if they don't exist
-        loghandler = logging.handlers.RotatingFileHandler(filename=arguments.FULL_LOG_FILE, mode='a', encoding="utf-8",
+        loghandler = RotatingFileHandler(filename=arguments.FULL_LOG_FILE, mode='a', encoding="utf-8",
                                                           maxBytes=10 * 1024 * 1024, backupCount=5)
         formatter = logging.Formatter('%(asctime)-15s > %(message)s')
         loghandler.setFormatter(formatter)

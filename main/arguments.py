@@ -56,6 +56,8 @@ def add(ap):
                     default=False)
     ap.add_argument("-da", "--dark", required=False, help="Enable dark mode", action='store_true',
                     default=False)
+    ap.add_argument("-rst16", "--reset16", required=False,
+                    help="Epaper: use Pin 16 for RST instead of Pin 11", action='store_true', default=False)
     ap.add_argument("-chl", "--checklist", required=False, help="Checklist file name to use",
                     default=DEFAULT_CHECKLIST)
     ap.add_argument("-c", "--connect", required=False, help="Connect to Stratux-IP (deprecated, use --url instead)", default=DEFAULT_URL_HOST_BASE)
@@ -100,7 +102,7 @@ def add(ap):
     ap.add_argument("-modes", "--displaymodes", required=False,
                     help="Select display modes that you want to see ""R=radar T=timer A=ahrs D=display-status "
                          "G=g-meter K=compass V=vsi I=flighttime S=stratux-status C=co-sensor "
-                         "M=distance measurement L=checklist  Example: -modes RADCM", default="RTAGKVICMDSL")
+                         "M=distance measurement L=checklist W=grounddistance  Example: -modes RADCMW", default="RTAGKVICMDSLW")
     ap.add_argument("-log", "--logfile", required=False, help=f"Output log to logfile {FULL_LOG_FILE}",
                     action="store_true", default=False)
     ap.add_argument("-airsim", "--aircraftsim", required=False, help="Read simulation data from file", default=None)

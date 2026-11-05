@@ -1,41 +1,25 @@
 #!/bin/bash
-
-die() {
-    echo "$1"
-    exit 1
-}
-
-echo "mk_configure_radar.sh called with arguments: $0 $*"
-
 # script configures basic libraries and settings necessary for stratux-radar
 # script to be run as root
 # called via configure_radar as sudo
-# usage /bin/bash mk_configure_radar.sh
-# use option -i pico2tts to install pico2tts from debian source (necessary for armhf 32 bit version)
-# exmple: /bin/bash mk_configure_radar.sh -i pico2tts
+# usage sudo /bin/bash mk_configure_radar.sh
 
-DEBIAN=false
+set -Eeuo pipefail
 
+die() {
+    echo "$1" >&2
+    exit 1
+}
 
-# set -x
+trap 'status=$?; echo "Command failed at line ${LINENO}: ${BASH_COMMAND}" >&2; exit "$status"' ERR
 
-while getopts ":i:" opt; do
-  case $opt in
-    i)
-      if [ "$OPTARG" = "pico2tts" ]; then
-        DEBIAN=true
-      fi
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG"
-      exit 1
-      ;;
-    :)
-      echo "option -$OPTARG requires a value."
-      exit 1
-      ;;
-  esac
-done
+# echo "mk_configure_radar.sh called with arguments: $0 $*"
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
+
+if [ "$(id -u)" -ne 0 ]; then
+    die "This script must be run as root"
+fi
 
 echo "Checking pi user configuration..."
 PI_PASSWD_ENTRY=$(getent passwd pi) || die "pi user is missing"
@@ -64,14 +48,16 @@ raspi-config nonint do_i2c 0
 raspi-config nonint do_sudo_pass 1
 
 # Disable swap, for Trixie modify /etc/rpi/swap.conf ...
-if grep -q '^\[Main\]' /etc/rpi/swap.conf; then
-    if ! grep -q '^Mechanism=' /etc/rpi/swap.conf; then
-        sudo sed -i '/^\[Main\]/a Mechanism=none  # modified by mk_configure_radar' /etc/rpi/swap.conf
+if [ -f /etc/rpi/swap.conf ]; then
+    if grep -q '^\[Main\]' /etc/rpi/swap.conf; then
+        if ! grep -q '^Mechanism=' /etc/rpi/swap.conf; then
+            sed -i '/^\[Main\]/a Mechanism=none  # modified by mk_configure_radar' /etc/rpi/swap.conf
+        else
+            sed -i 's/^Mechanism=.*/Mechanism=none  # modified by mk_configure_radar/' /etc/rpi/swap.conf
+        fi
     else
-        sudo sed -i 's/^Mechanism=.*/Mechanism=none  # modified by mk_configure_radar/' /etc/rpi/swap.conf
+        printf '\n[Main]\nMechanism=none  # modified by mk_configure_radar\n' >> /etc/rpi/swap.conf
     fi
-else
-    echo -e "[Main]\nMechanism=none  # modified by mk_configure_radar" | sudo tee /etc/rpi/swap.conf >/dev/null
 fi
 # Generate ssh key for all installs. Otherwise it would have to be done on each boot, which takes a couple of seconds
 ssh-keygen -A -v
@@ -80,52 +66,63 @@ systemctl disable regenerate_ssh_host_keys
 
 # for groundsensor, disable ssh over serial cause it is needed for the sensor
 # disable ssh over serial otherwise
-sed -i /boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
-sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
+if [ -f /boot/firmware/cmdline.txt ]; then
+    BOOT_CMDLINE=/boot/firmware/cmdline.txt
+elif [ -f /boot/cmdline.txt ]; then
+    BOOT_CMDLINE=/boot/cmdline.txt
+else
+    die "Could not find Raspberry Pi cmdline.txt under /boot or /boot/firmware"
+fi
+sed -i -e "s/console=ttyAMA0,[0-9]\+ //" "$BOOT_CMDLINE"
+sed -i -e "s/console=serial0,[0-9]\+ //" "$BOOT_CMDLINE"
+sed -i -e "s/console=tty[0-9]\+ //" "$BOOT_CMDLINE"
 # for bookworm and trixie disable serial-getty, it is whatsoever started by bookworm even if cmdline is changed
 systemctl mask serial-getty@ttyAMA0.service
 
-# modify /boot/firmware/config.text for groundsensor
-{
-  echo "# modification for ultrasonic ground sensor"
-  echo "enable_uart=1"
-  echo "dtoverlay=miniuart-bt"
-} | tee -a /boot/firmware/config.txt
-
-
-if [ "$DEBIAN" = false ]; then
-  apt install libttspico-utils -y
+# modify the boot config for the ultrasonic ground sensor
+if [ -f /boot/firmware/config.txt ]; then
+    BOOT_CONFIG=/boot/firmware/config.txt
+elif [ -f /boot/config.txt ]; then
+    BOOT_CONFIG=/boot/config.txt
 else
-  # pico2wave is not installable in trixie armhf (why so ever), so include debian source to install
-  {
-    echo "deb [arch=armhf, trusted=yes] http://deb.debian.org/debian trixie main contrib non-free"
-  } | tee -a /etc/apt/sources.list
-  apt update
-  apt install libttspico-utils -y
-  # remove the last line in sources.list now again
-  sudo sed -i /etc/apt/sources.list -e '$d'
+    die "Could not find Raspberry Pi config.txt under /boot or /boot/firmware"
 fi
+grep -Fxq '# modification for ultrasonic ground sensor' "$BOOT_CONFIG" ||
+    printf '%s\n' '# modification for ultrasonic ground sensor' >> "$BOOT_CONFIG"
+grep -Fxq 'enable_uart=1' "$BOOT_CONFIG" ||
+    printf '%s\n' 'enable_uart=1' >> "$BOOT_CONFIG"
+grep -Fxq 'dtoverlay=miniuart-bt' "$BOOT_CONFIG" ||
+    printf '%s\n' 'dtoverlay=miniuart-bt' >> "$BOOT_CONFIG"
 
+
+apt install libttspico-utils -y
 # trixie lite:
 apt install git python3-pip -y
 
 # bluetooth and sound installation
 apt install pipewire libspa-0.2-bluetooth pulseaudio-module-bluetooth python3-alsaaudio -y
-rfkill unblock bluetooth    # enable bluetooth which is otherwise disabled on lite image
+# enable bluetooth which is otherwise disabled on lite image
+# /dev/rfkill does not exist in the chroot of mk_stratux_display.sh, so unblock it on every boot via a service instead
+if [ -e /dev/rfkill ] && rfkill unblock bluetooth; then
+    echo "bluetooth unblocked via rfkill"
+else
+    # /dev/rfkill does not exist in the chroot of mk_stratux_display.sh, so unblock it on every boot via a service instead
+    echo "rfkill unblock bluetooth not possible, installing service to unblock on boot"
+    cp "$SCRIPT_DIR/rfkill-unblock-bluetooth.service" /etc/systemd/system/rfkill-unblock-bluetooth.service
+    systemctl enable rfkill-unblock-bluetooth.service
+fi
 mkdir -p /etc/wireplumber/wireplumber.conf.d
 # rules for wireplumber to accept bluetooth sinks and headless connect
-cp wireplumber-bluetooth.conf /etc/wireplumber/wireplumber.conf.d/bluetooth.conf     # rules for wireplumber to accept bluetooth sinks
+cp "$SCRIPT_DIR/wireplumber-bluetooth.conf" /etc/wireplumber/wireplumber.conf.d/bluetooth.conf     # rules for wireplumber to accept bluetooth sinks
 # limit reconnect attempts after loss of Bluetooth connection, since this leads to network outages
 sed -i 's/#ReconnectAttempts = 7/ReconnectAttempts = 3/' /etc/bluetooth/main.conf
 
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio -y
 apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-luma.lcd python3-numpy python3-scipy python3-pygame python3-gpiozero -y
 
-
 su pi -c "pip3 install ADS1x15-ADC --break-system-packages"
-su pi -c "pip3 install bayesian-filters --break-system-packages"
-su pi -c "pip3 install bleak --break-system-packages"
+su pi -c "pip3 install pandas-stubs bayesian-filters --break-system-packages --root-user-action=ignore --no-warn-script-location"
+su pi -c "pip3 install bleak --break-system-packages --root-user-action=ignore"
 apt -y autoremove
 
 
@@ -135,19 +132,20 @@ touch /var/lib/systemd/linger/pi
 
 
 # install and start service to start radar
-su pi -c "mkdir -p /home/pi/.config/systemd/user/"
-cp "$(dirname "$0")"/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service
-chown pi /home/pi/.config/systemd/user/autostart-radar.service ; chgrp pi /home/pi/.config/systemd/user/autostart-radar.service
+PI_USER_SERVICE_DIR="$PI_HOME/.config/systemd/user"
+PI_USER_WANTS_DIR="$PI_USER_SERVICE_DIR/default.target.wants"
+install -d -o pi -g pi "$PI_USER_WANTS_DIR"
+cp "$SCRIPT_DIR/systemctl-autostart-radar.service" "$PI_USER_SERVICE_DIR/autostart-radar.service"
+chown pi:pi "$PI_USER_SERVICE_DIR/autostart-radar.service"
 
 # create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
-su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
-su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
+ln -sfn "$PI_USER_SERVICE_DIR/autostart-radar.service" "$PI_USER_WANTS_DIR/autostart-radar.service"
 
 # change log level of rtkit, otherwise this fills journal with tons of useless info
 sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
 
 # copy simple checklist once, can be changed later
-cp "$(dirname "$0")"/../config/checklist.example_small.xml "$(dirname "$0")"/../config/checklist.xml
-chown pi "$(dirname "$0")"/../config/checklist.xml; chgrp pi "$(dirname "$0")"/../config/checklist.xml
+cp "$SCRIPT_DIR/../config/checklist.example_small.xml" "$SCRIPT_DIR/../config/checklist.xml"
+chown pi:pi "$SCRIPT_DIR/../config/checklist.xml"
 
 echo "Radar configuration finished. Reboot to start"

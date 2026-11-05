@@ -33,7 +33,6 @@
 
 from globals import rlog
 import requests
-import radarbuttons
 import time
 import radarbluez
 import math
@@ -42,9 +41,9 @@ import subprocess
 import string
 import ipaddress
 import json
-import os
 import datetime
 from radarmodes import Modes, next_mode_sequence
+from button_input import get_button_event, is_left, is_left_short, is_left_long, is_middle, is_middle_short, is_middle_long, is_right, is_right_short, is_right_long
 
 # constants
 STATUS_TIMEOUT = 0.3
@@ -131,7 +130,12 @@ def init(config_file, url, target_ip, refresh, config):   # prepare everything
     refresh_time = refresh
     global_config = config
     new_pass = DEFAULT_PASS
-    new_stratux_ip = ipv4_to_string(string_to_ipv4(stratux_ip))  # to normalize and have leading zeros
+    try:
+        new_stratux_ip = ipv4_to_string(int(ipaddress.IPv4Address(stratux_ip)))  # normalize and keep leading zeros
+    except ipaddress.AddressValueError:
+        rlog.debug(f"Status UI: Invalid Stratux IP '{stratux_ip}', falling back to 0.0.0.0")
+        stratux_ip = "0.0.0.0"
+        new_stratux_ip = ipv4_to_string(0)
     new_wifi = DEFAULT_WIFI
 
 
@@ -351,15 +355,21 @@ def read_wlanip():
 def set_network(wifi, passw, new_stratux):
     global global_config
 
+    wifi = wifi.strip()
+    passw = passw.strip()
+    new_stratux = new_stratux.strip()
     global_config['stratux_ip'] = new_stratux
     write_config(global_config)
-    res = os.system('sudo raspi-config nonint do_wifi_ssid_passphrase ' + wifi + ' ' + passw)
-    if res != 0:
+    res = subprocess.run(
+        ["sudo", "raspi-config", "nonint", "do_wifi_ssid_passphrase", wifi, passw],
+        check=False,
+    )
+    if res.returncode != 0:
         rlog.debug("STATUSUI: Setting Wifi network failed.")
         return
     rlog.debug("STATUSUI: Rebooting!")
-    os.system('sudo reboot')
-    if res != 0:
+    res = subprocess.run(["sudo", "reboot"], check=False)
+    if res.returncode != 0:
         rlog.debug("STATUSUI: Reboot attempt failed.")
 
 
@@ -392,9 +402,18 @@ def ipv4_to_string(ip):   # generate string with leading zeros
 
 
 def string_to_ipv4(ipv4str):
-    parts = ipv4str.split('.')
-    ipaddr = (int(parts[0]) << 24) + (int(parts[1]) << 16) + (int(parts[2]) << 8) + int(parts[3])
-    return ipaddr
+    parts = ipv4str.strip().split('.')
+    if len(parts) != 4:
+        raise ValueError(f"Invalid IPv4 address: '{ipv4str}'")
+    octets = []
+    for part in parts:
+        if part == "":
+            raise ValueError(f"Invalid IPv4 address: '{ipv4str}'")
+        octet = int(part)
+        if octet < 0 or octet > 255:
+            raise ValueError(f"Invalid IPv4 address: '{ipv4str}'")
+        octets.append(octet)
+    return (octets[0] << 24) + (octets[1] << 16) + (octets[2] << 8) + octets[3]
 
 
 def user_input(extsound_active, bluetooth_active):
@@ -419,98 +438,97 @@ def user_input(extsound_active, bluetooth_active):
             right = "Scan"
         else:
             right = ""
-    btime, button = radarbuttons.check_buttons()
-    # start of ahrs global behaviour
-    if btime == 0 and status_mode != 11:   # for 11 do reboot
-        return Modes.NO_CHANGE  # stay in current mode
-    if button == 0 and btime == 2:  # left and long
-        return Modes.SHUTDOWN  # start next mode shutdown!
-    if status_mode == 0:   # normal status display
-        if button == 1 and (btime == 2 or btime == 1):  # middle
-            return next_mode_sequence(Modes.STATUS)  # next mode
-        if bluetooth_active and button == 2 and btime == 1:  # right and short
+
+    event = get_button_event()
+    if event is None and status_mode != 11:
+        return Modes.NO_CHANGE
+    if event is not None and is_left_long(event):
+        return Modes.SHUTDOWN
+
+    if status_mode == 0:
+        if event is not None and is_middle(event):
+            return next_mode_sequence(Modes.STATUS)
+        if event is not None and bluetooth_active and is_right_short(event):
             status_mode = 1
             start_async_bt_scan()
             scan_end = time.time() + BLUETOOTH_SCAN_TIME
-        if button == 0 and btime == 1:  # left and short, network config
+        if event is not None and is_left_short(event):
             status_mode = 3
             wifi_ssid = read_network()
             wifi_ip = read_wlanip()
             if wifi_ssid != "":
                 new_wifi = wifi_ssid.ljust(MAX_WIFI_LENGTH)
-    elif status_mode == 1:   # active scanning, no interface options, just wait
+    elif status_mode == 1:
         pass
-    elif status_mode == 2:  # scanning finished, evaluating
-        if len(new_devices) == 0:   # device mgmt finished
-            if bluetooth_active and button == 2 and btime == 1:  # right and short
+    elif status_mode == 2:
+        if len(new_devices) == 0:
+            if event is not None and bluetooth_active and is_right_short(event):
                 status_mode = 1
                 start_async_bt_scan()
                 scan_end = time.time() + BLUETOOTH_SCAN_TIME
                 return Modes.STATUS
         if len(new_devices) > 0:
-            if button == 0 and btime == 1:  # left short, YES
+            if event is not None and is_left_short(event):
                 rlog.debug("Connecting: " + new_devices[0][1])
                 radarbluez.trust_pair_connect(new_devices[0][0])
                 del new_devices[0]
-            if button == 2 and btime == 1:  # right short, NO
+            if event is not None and is_right_short(event):
                 rlog.debug("Not Connecting: " + new_devices[0][1])
                 remove_device(new_devices[0][0])
                 del new_devices[0]
-        if len(new_devices) == 0 or (button == 1 and btime == 1):   # middle short, Cancel
+        if len(new_devices) == 0 or (event is not None and is_middle_short(event)):
             new_devices = []
             status_mode = 0
-    elif status_mode == 3:  # network display
-        if button == 2 and btime == 1:  # right and short, change network config
+    elif status_mode == 3:
+        if event is not None and is_right_short(event):
             charpos = 0
             status_mode = 4
-        if button == 1 and btime == 1:  # middle and short, go back to normal status
+        if event is not None and is_middle_short(event):
             status_mode = 0
-        if button == 0 and btime == 1:  # left and short, go to options
+        if event is not None and is_left_short(event):
             status_mode = 12
-    elif status_mode == 4:  # change network
-        if button == 0 and btime == 1:  # left and short, +
+    elif status_mode == 4:
+        if event is not None and is_left_short(event):
             new_wifi = new_wifi[:charpos] + next_char(new_wifi[charpos]) + new_wifi[charpos+1:]
-        if button == 1 and btime == 1:  # middle and short, next charpos
+        if event is not None and is_middle_short(event):
             charpos += 1
             if charpos >= len(new_wifi):
                 charpos = 0
                 status_mode = 5
-        if button == 1 and btime == 2:  # middle and long finish
+        if event is not None and is_middle_long(event):
             charpos = 0
             status_mode = 5
-        if button == 2 and btime == 1:  # right and short, -
+        if event is not None and is_right_short(event):
             new_wifi = new_wifi[:charpos] + prev_char(new_wifi[charpos]) + new_wifi[charpos+1:]
-    elif status_mode == 5:  # change wifi PSK
-        if button == 0 and btime == 1:  # left and short, +
+    elif status_mode == 5:
+        if event is not None and is_left_short(event):
             new_pass = new_pass[:charpos] + next_char(new_pass[charpos]) + new_pass[charpos+1:]
-        if button == 1 and btime == 1:  # middle and short, next charpos
+        if event is not None and is_middle_short(event):
             charpos += 1
             if charpos >= len(new_pass):
                 charpos = 0
                 status_mode = 7
-        if button == 1 and btime == 2:  # middle and long finish
+        if event is not None and is_middle_long(event):
             check_wifi = new_wifi.strip()
             check_new_pass = new_pass.strip()
             if len(check_wifi) > 0 and (len(check_new_pass) == 0 or len(check_new_pass) >= 8):
                 charpos = 0
                 status_mode = 7
             else:
-                status_mode = 10   # invalid input, go back to error display
-        if button == 2 and btime == 1:  # right and short, -
+                status_mode = 10
+        if event is not None and is_right_short(event):
             new_pass = new_pass[:charpos] + prev_char(new_pass[charpos]) + new_pass[charpos+1:]
-    elif status_mode == 6:  # check yes/no
-        if button == 2 and btime == 1:  # right and short, "No"
+    elif status_mode == 6:
+        if event is not None and is_right_short(event):
             status_mode = 3
-        elif button == 0 and btime == 1:  # left and short, "yes"
+        elif event is not None and is_left_short(event):
             status_mode = 11
-    elif status_mode == 7:   # input stratux_ip
-        if button == 0 and btime == 1:  # left and short, +
-            new_stratux_ip = new_stratux_ip[:charpos] + next_number(new_stratux_ip[charpos]) \
-                             + new_stratux_ip[charpos+1:]
-        if button == 2 and btime == 1:  # left and short, -
-            new_stratux_ip = new_stratux_ip[:charpos] + prev_number(new_stratux_ip[charpos]) \
-                             + new_stratux_ip[charpos+1:]
-        if button == 1 and btime == 1:  # middle and short, next charpos
+    elif status_mode == 7:
+        if event is not None and is_left_short(event):
+            new_stratux_ip = new_stratux_ip[:charpos] + next_number(new_stratux_ip[charpos]) + new_stratux_ip[charpos+1:]
+        if event is not None and is_right_short(event):
+            new_stratux_ip = new_stratux_ip[:charpos] + prev_number(new_stratux_ip[charpos]) + new_stratux_ip[charpos+1:]
+        if event is not None and is_middle_short(event):
             charpos += 1
             if charpos >= len(new_stratux_ip):
                 ip_is_invalid = False
@@ -524,8 +542,8 @@ def user_input(extsound_active, bluetooth_active):
                 else:
                     status_mode = 10
             elif charpos == 3 or charpos == 7 or charpos == 11:
-                charpos += 1   # skip "."
-        if button == 1 and btime == 2:  # middle and long finish
+                charpos += 1
+        if event is not None and is_middle_long(event):
             ip_is_invalid = False
             try:
                 ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip))
@@ -536,58 +554,58 @@ def user_input(extsound_active, bluetooth_active):
                 status_mode = 6
             else:
                 status_mode = 10
-    elif status_mode == 10:     # display error
-        if button == 2 and btime == 1:  # right and short, "redo"
+    elif status_mode == 10:
+        if event is not None and is_right_short(event):
             charpos = 0
-            status_mode = 4   # change network
-        if button == 0 and btime == 1:  # left and short, "cancel"
-            status_mode = 3  # display network
-    elif status_mode == 11:  # reboot
+            status_mode = 4
+        if event is not None and is_left_short(event):
+            status_mode = 3
+    elif status_mode == 11:
         new_wifi = new_wifi.strip()
         new_pass = new_pass.strip()
-        stratux_ip = str(ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip)))   # to eliminate zeros
+        stratux_ip = str(ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip)))
         set_network(new_wifi, new_pass, stratux_ip)
-    elif status_mode == 12:  # Set Options Display Registration
-        if button == 2 and btime == 1:  # No, do not display registration
+    elif status_mode == 12:
+        if event is not None and is_right_short(event):
             global_config['display_tail'] = False
             write_config(global_config)
             status_mode = 13
-        if button == 0 and btime == 1:  # yes, do  display registration
+        if event is not None and is_left_short(event):
             global_config['display_tail'] = True
             write_config(global_config)
             status_mode = 13
-        if button == 1 and btime == 1:  # cancel
+        if event is not None and is_middle_short(event):
             status_mode = 13
-    elif status_mode == 13:  # Set Options Speak Distance
-        if button == 2 and btime == 1:  # No, do not display registration
+    elif status_mode == 13:
+        if event is not None and is_right_short(event):
             global_config['distance_warnings'] = False
             write_config(global_config)
-        if button == 0 and btime == 1:  # yes, do  display registration
+        if event is not None and is_left_short(event):
             global_config['distance_warnings'] = True
             write_config(global_config)
-        if button == 1 and btime == 1:  # cancel
+        if event is not None and is_middle_short(event):
             pass
         if extsound_active:
             status_mode = 14
         else:
             status_mode = 3
-    elif status_mode == 14:  # External Sound Volume
-        if button == 2 and btime == 1:  # +, increase
+    elif status_mode == 14:
+        if event is not None and is_right_short(event):
             global_config['sound_volume'] += 5
             if global_config['sound_volume'] > 100:
                 global_config['sound_volume'] = 100
             radarbluez.setvolume(global_config['sound_volume'])
             radarbluez.speak("Test")
             status_mode = 14
-        if button == 0 and btime == 1:  # -, decrease
+        if event is not None and is_left_short(event):
             global_config['sound_volume'] -= 5
             if global_config['sound_volume'] < 0:
                 global_config['sound_volume'] = 0
             radarbluez.setvolume(global_config['sound_volume'])
             radarbluez.speak("Test")
             status_mode = 14
-        if button == 1 and btime == 1:  # set
+        if event is not None and is_middle_short(event):
             write_config(global_config)
             status_mode = 3
 
-    return Modes.STATUS  # no mode change
+    return Modes.STATUS

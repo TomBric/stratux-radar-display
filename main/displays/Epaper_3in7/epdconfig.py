@@ -31,7 +31,6 @@ import os
 import logging
 import sys
 import time
-import subprocess
 
 from ctypes import *
 
