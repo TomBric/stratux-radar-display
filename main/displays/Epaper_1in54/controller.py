@@ -111,7 +111,7 @@ class Epaper1in54(dcommon.GenericDisplay):
             self.AHRS_MARKS_COLOR = "black"
 
     def init(self, fullcircle=False, dark_mode=False):
-        self.device = epd1in54_V2.EPD()
+        self.device = epd1in54_V2.EPD(reset16=getattr(self, 'reset16', False))
         self.device.init(0)
         self.device.Clear(0xFF)  # necessary to overwrite everything
         self.image = Image.new('1', (self.device.height, self.device.width), 0xFF)

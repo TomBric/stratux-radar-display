@@ -32,13 +32,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from globals import rlog
-from gpiozero import Button, Device
+from gpiozero import Button
 import threading   # for flask server in case of button api
-from flask import Flask, jsonify, render_template
-from flask_wtf import FlaskForm, CSRFProtect
+from flask import Flask, render_template
+from flask_wtf import FlaskForm
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
-import os
+import subprocess
 
 btn = None   # will be set in init
 gear_down_btn = None   # will be set ini int
@@ -62,8 +62,6 @@ app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 app.config['BOOTSTRAP_BTN_SIZE'] = 'sm'
 app.config['WTF_CSRF_ENABLED'] = False    # to enable api call without csrf token
 bootstrap = Bootstrap5(app)
-# csrf = CSRFProtect(app)
-
 
 button_api_active = False
 last_api_input = 0, 0
@@ -122,9 +120,9 @@ def run_flask():
 
     button_api_active = True
     rlog.debug(f"radar-buttons: sudo systemctl start nginx")
-    ret = os.system('sudo systemctl start nginx') # just in case it has been stopped before
-    if ret != 0:
-        rlog.error(f"radarbuttons: Failed to start nginx, return code: {ret}")
+    res = subprocess.run(["sudo", "systemctl", "start", "nginx"], check=False)
+    if res.returncode != 0:
+        rlog.error(f"radarbuttons: Failed to start nginx, return code: {res.returncode}")
     else:
         rlog.debug(f"radarbuttons: starting flask app")
     app.run(debug=False, use_reloader=False)
@@ -169,8 +167,8 @@ def init(button_api):
 
     try:
         btn = [RadarButton(LEFT), RadarButton(MIDDLE), RadarButton(RIGHT)]
-    except:
-        rlog.debug("ERROR: GPIO-Pins busy! No input possible. Please clarify!")
+    except Exception as e:
+        rlog.debug(f"ERROR: GPIO-Pins busy! No input possible. Please clarify! ({e})")
         return False  # indicate errors
     rlog.debug("Radarbuttons: Initialized.")
     if button_api: # start an api for the buttons
@@ -183,25 +181,27 @@ def init(button_api):
 
 
 def check_buttons():  # returns 0=nothing 1=short press 2=long press and returns Button (0,1,2)
+    if btn is None:
+        return read_api_input()
     for index, but in enumerate(btn):
         stat = but.check_button()
         if stat > 0:
-            rlog.debug("Button press: button {0} presstime {1} (1=short, 2=long)".format(index, stat))
+            rlog.debug(f"Button pressed: {'LEFT' if index==0 else 'MIDDLE' if index==1 else 'RIGHT'} {'SHORT' if stat==1 else 'LONG'}")
             return stat, index
     # nothing pressed, now also check button_api
     return read_api_input()
 
 
 def gear_is_down():
-    return gear_down_btn.is_held
+    return gear_down_btn.is_held if gear_down_btn is not None else False
 
 def init_gear_indicator():
     global gear_down_btn
 
     try:
         gear_down_btn = Button(GEAR_DOWN, bounce_time=BOUNCE_TIME, hold_time=GEAR_HOLD_TIME)
-    except:
-        rlog.debug("Radarbuttons ERROR: GPIO-Pin {0} for gear down indication busy! Please clarify!".format(GEAR_DOWN))
+    except Exception as e:
+        rlog.debug("Radarbuttons ERROR: GPIO-Pin {0} for gear down indication busy! Please clarify! ({1})".format(GEAR_DOWN, e))
         return False
     rlog.debug("Radarbuttons: Gear down indicator on GPIO{0} initialized.".format(GEAR_DOWN))
     return True
@@ -209,7 +209,7 @@ def init_gear_indicator():
 def release_gear_indicator():
     global gear_down_btn
 
-    if gear_down_btn:
+    if gear_down_btn is not None:
         gear_down_btn.close()
         gear_down_btn = None
         rlog.debug("Radarbuttons: Gear down indicator released.")
@@ -217,5 +217,7 @@ def release_gear_indicator():
 
 def explicit_release_on_exit():
     # release all acquired gpios
+    if btn is None:
+        return
     for but in btn:
         but.close()

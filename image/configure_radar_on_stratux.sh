@@ -8,6 +8,8 @@
 #  example: /bin/bash configure_radar_on_stratux.sh -u
 
 # set -x
+set -Eeuo pipefail
+trap 'status=$?; echo "Command failed at line ${LINENO}: ${BASH_COMMAND}" >&2; exit "$status"' ERR
 UART=false
 
 # check parameters
@@ -52,9 +54,12 @@ if [ "$UART" = true ]; then
   # enable sensor UART output
   # for groundsensor, disable ssh over serial cause it is needed for the sensor
   # disable ssh over serial otherwise
-  sed -i /boot/firmware/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-  sed -i /boot/firmware/cmdline.txt -e "s/console=serial0,[0-9]\+ //"
-  sed -i /boot/firmware/cmdline.txt -e "s/console=tty[0-9]\+ //"
+  CMDLINE=/boot/firmware/cmdline.txt
+  [ -f "$CMDLINE" ] || CMDLINE=/boot/cmdline.txt
+  [ -f "$CMDLINE" ] || { echo "Could not find cmdline.txt under /boot/firmware or /boot" >&2; exit 1; }
+  sed -i "$CMDLINE" -e "s/console=ttyAMA0,[0-9]\+ //"
+  sed -i "$CMDLINE" -e "s/console=serial0,[0-9]\+ //"
+  sed -i "$CMDLINE" -e "s/console=tty[0-9]\+ //"
   # for bookworm disable serial-getty, it is whatsoever started by bookworm even if cmdline is changed
   systemctl mask serial-getty@ttyAMA0.service
 fi
@@ -63,25 +68,11 @@ fi
 sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
 # ---------------
 
-# check to get sound running on stratux
-# this is the same effect as loginctl enable-linger pi
-mkdir -p /var/lib/systemd/linger
-touch /var/lib/systemd/linger/pi
-
-# install and start service to start radar
-su pi -c "mkdir -p /home/pi/.config/systemd/user/"
-su pi -c "cp /home/pi/stratux-radar-display/image/systemctl-autostart-radar.service /home/pi/.config/systemd/user/autostart-radar.service"
-# create a symlink, do do the same as: systemctl --user -M pi@ enable autostart-radar
-su pi -c "mkdir /home/pi/.config/systemd/user/default.target.wants"
-su pi -c "ln -s /home/pi/.config/systemd/user/autostart-radar.service /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service"
 # configure pipewire with a increased buffer
 su pi -c "mkdir -p /home/pi/.config/pipewire/pipewire.conf.d/"
 cp "$(dirname "$0")"/stratux-pipewire.conf /home/pi/.config/pipewire/pipewire.conf.d/10-buffer.conf
+chown -R pi:pi /home/pi/.config/pipewire
 
-
-# change log level of rtkit, otherwise this fills journal with tons of useless info
-sed -i '/\[Service\]/a LogLevelMax=notice' /usr/lib/systemd/system/rtkit-daemon.service
-# ---------------
 
 # copy simple checklist once, can be changed later
 cp "$(dirname "$0")"/../config/checklist.example_small.xml "$(dirname "$0")"/../config/checklist.xml

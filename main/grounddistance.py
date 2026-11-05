@@ -48,14 +48,16 @@ import math
 import serial
 import simulation
 import radarbluez
+from button_input import get_button_event, is_middle, is_left_long, is_right_short, is_right_long
 import radarbuttons
+import radarmodes
 import binascii
 from typing import Any
 from globals import rlog, Globals, Modes
 import os      # for deleting statistics file
 
 FEET_TO_MM = 304.8
-MM_TO_FEET = 1 / FEET_TO_MM     # one feet in mm
+MM_TO_FEET = 1 / FEET_TO_MM     # one foot in mm
 
 # constants
 MEASUREMENTS_PER_SECOND = 10     # number of distance ranging meaurements per second
@@ -89,7 +91,7 @@ ground_distance_active = False    # True if started with option -gd and sensor i
 indicate_distance = False  # True if indication for sound ground indication is active (option -gb)
 countdown_screen = False  # True if countdown screen is to be shown (option -cd)
 gear_indication = False  # True if gear indication is active (option -gi) and GPIO could be activated
-distance_sensor = None
+distance_sensor: Any = None
 zero_distance: float = 0.0  # distance of sensor when aircraft is on ground
 fallback_zero_distance_mm: float = 0.0  # fallback distance in mm provided via -fb <cm>; 0.0 means disabled
 value_debug_level = 0  # set during init
@@ -141,7 +143,7 @@ go_around_warning_sound = None
 # variables for countdown switchback
 TRIGGER_COUNTDOWN_SWITCHBACK = 0.5   # seconds with invalid readings (above sensor range) to switch back from countdown
 countdown_switch_delta = timedelta(seconds=TRIGGER_COUNTDOWN_SWITCHBACK)
-trigger_timestamp = None
+trigger_timestamp: datetime | None = None
 switch_back_from_distance = Modes.NO_CHANGE
 
 
@@ -265,7 +267,11 @@ def reset_values():
             zero_distance = 0.0
             rlog.debug('Simulation Mode: Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:
-            new_zero_distance = distance_sensor.last_distance()   # take last value, don't wait (no async function)
+            sensor = distance_sensor
+            if sensor is None:
+                rlog.debug('Grounddistance: Sensor not initialized, cannot reset zero distance')
+                return
+            new_zero_distance = sensor.last_distance()   # take last value, don't wait (no async function)
             if new_zero_distance > 0:
                 zero_distance = float(new_zero_distance)
                 rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
@@ -375,8 +381,8 @@ def delete_stats():
 
 def write_stats():
     try:
-        serial = _to_serializable(calculate_output_values())
-        outstr = json.dumps(serial)
+        ser = _to_serializable(calculate_output_values())
+        outstr = json.dumps(ser)
         with open(saved_statistics, 'at') as out:
             rlog.debug("Grounddistance: Writing statistics " + outstr)
             out.write(outstr + '\n')  # Add newline after each JSON object
@@ -530,10 +536,12 @@ def start_countdown_screen():    # starts to show distance countdown
 
 
 def stop_countdown_screen():   # end countdown screen
-    if Globals.mode == Modes.COUNTDOWN_DISTANCE:  # only when no landing was detected before
+    global switch_back_from_distance
+    if Globals.mode == Modes.COUNTDOWN_DISTANCE and switch_back_from_distance is not Modes.NO_CHANGE:  # only when no landing was detected before
         Globals.mode = switch_back_from_distance
         Globals.refresh = True
         rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.name}")
+        switch_back_from_distance = Modes.NO_CHANGE
 
 
 def check_countdown_screen():   # check whether countdown screen is to be displayed further
@@ -662,9 +670,7 @@ def evaluate_statistics(latest_stat):   # called via store_statistics by ground 
                                    json.dumps(obstacle_down_clear, indent=4, sort_keys=True, default=str))
                         break
     elif fly_status == 2:  # landing detected, waiting for stop to calculate distance
-        if Globals.mode == Modes.COUNTDOWN_DISTANCE:  # switch back to normal mode
-            Globals.mode = switch_back_from_distance
-            rlog.debug(f"Back switching from COUNTDOWN_DISTANCE to {switch_back_from_distance.value}")
+        stop_countdown_screen()
         if has_stopped():
             fly_status = 0
             stop_situation = latest_stat
@@ -694,7 +700,8 @@ def eval_simulation_data(sim_data, sit):
     if 'gps_altitude' in sim_data:
         sit['gps_altitude'] = sim_data['gps_altitude']
         sit['gps_active'] = True
-        sit['gps_hor_accuracy'] = 50  # just any nice value
+        sit['gps_h_accuracy'] = 50  # just any nice value
+        sit['gps_v_accuracy'] = 50  # just any nice value
     if 'own_altitude' in sim_data:
         sit['own_altitude'] = sim_data['own_altitude']
         sit['baro_valid'] = True
@@ -727,11 +734,15 @@ async def read_ground_sensor():
 
     if ground_distance_active:
         rlog.debug("Ground distance reader active ...")
-        if not simulation_mode:
-            distance_sensor.calc_distance()
-            new_zero_distance = distance_sensor.last_distance()  # distance in mm this is zero
-        else:
+        sensor = distance_sensor
+        if not simulation_mode and sensor is not None:
+            sensor.calc_distance()
+            new_zero_distance = sensor.last_distance()  # distance in mm this is zero
+        elif simulation_mode:
             new_zero_distance = 1.0     # just take one mm as zero distance for simulation
+        else:
+            rlog.debug('Grounddistance: Sensor not initialized, cannot determine zero distance')
+            new_zero_distance = 0.0
         if new_zero_distance > 0:
             zero_distance = float(new_zero_distance)  # distance in mm this is zero
             rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
@@ -747,9 +758,10 @@ async def read_ground_sensor():
                 now = time.perf_counter()
                 await asyncio.sleep(next_read - now)  # wait for next time of measurement
                 next_read = next_read + (1 / MEASUREMENTS_PER_SECOND)
-                if not simulation_mode:  # read sensor
-                    distance_sensor.calc_distance()
-                    distance = distance_sensor.last_distance()  # distance in mm
+                sensor = distance_sensor
+                if not simulation_mode and sensor is not None:  # read sensor
+                    sensor.calc_distance()
+                    distance = sensor.last_distance()  # distance in mm
                     if distance > 0:    # distance==0 is invalid distance
                         global_situation['g_distance_valid'] = True
                         global_situation['g_distance'] = distance - zero_distance
@@ -765,17 +777,36 @@ async def read_ground_sensor():
                                  'Ground Distance: gear-down: {0}'.format(global_situation['gear_down']))
                     else:
                         global_situation['gear_down'] = False   # must be set to make sure key is present
-                else: # simulation mode
+                elif simulation_mode: # simulation mode
                     sim_data = simulation.read_simulation_data()
                     eval_simulation_data(sim_data, global_situation)
+                else:
+                    rlog.debug('Grounddistance: Sensor not initialized, skipping measurement cycle')
 
                 store_statistics(global_situation)
         except (asyncio.CancelledError, RuntimeError):
             rlog.debug("Ground distance reader terminating ...")
             raise
         finally:
-            distance_sensor.close()
+            sensor = distance_sensor
+            if sensor is not None:
+                sensor.close()
             radarbuttons.release_gear_indicator()  # free GPIO ressource
             rlog.debug("Ground distance reader terminated.")
+
+
+def user_input():
+    event = get_button_event()
+    if event is None:
+        return Modes.NO_CHANGE, False
+    if is_middle(event):
+        return radarmodes.next_mode_sequence(Modes.COUNTDOWN_DISTANCE), False
+    if is_left_long(event):
+        return Modes.SHUTDOWN, False
+    if is_right_short(event):
+        return Modes.COUNTDOWN_DISTANCE, True
+    if is_right_long(event):
+        return Modes.REFRESH_COUNTDOWN_DISTANCE, False
+    return Modes.COUNTDOWN_DISTANCE, False  # no mode change for any other interaction
 
 

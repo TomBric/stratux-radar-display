@@ -63,6 +63,7 @@ class Modes(Enum):
     CHECKLIST = 23
     REFRESH_CHECKLIST = 24
     COUNTDOWN_DISTANCE = 25    # full screen with large numbers if ground sensor has contact
+    REFRESH_COUNTDOWN_DISTANCE = 26
 
 
 class Globals:     # global variables which need to be changed somehow from other modules

@@ -99,6 +99,7 @@
 {{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist_filename, radar_form.download_checklist, radar_form.upload_checklist],
     col_map={'checklist': 'col-md-3', 'checklist_seq': 'no-label col-md-1', 'checklist_filename': 'col-md-4'},
     button_map={'download_checklist': 'success', 'upload_checklist': 'primary'}) }}
+{{ render_form_row([radar_form.grounddistance, radar_form.grounddistance_seq], col_map={'grounddistance': 'col-md-3', 'grounddistance_seq': 'no-label col-md-1'}) }}
 </div>
 
 <h5>Radar traffic display options</h5>
@@ -114,8 +115,8 @@
 {{ render_form_row([radar_form.external_sound, radar_form.sound_volume, radar_form.all_mixers, radar_form.mixername],
     col_map={'external_sound': 'col-md-3', 'sound_volume': 'col-md-2', 'all_mixers': 'col-md-3', 'mixername': 'col-md-2'}) }}
 <h5>Special options</h5>
-{{ render_form_row([radar_form.coindicate, radar_form.no_cowarner, radar_form.coi2c0, radar_form.no_flighttime, radar_form.advanced_collision_detection, radar_form.darkmode],
-    col_map={'coindicate': 'col-md-2', 'no_cowarner': 'col-md-2', 'coi2c0': 'col-md-3', 'no_flighttime': 'col-md-2', 'advanced_collision_detection': 'col-md-3', 'darkmode': 'col-md-2'}) }}
+{{ render_form_row([radar_form.coindicate, radar_form.no_cowarner, radar_form.coi2c0, radar_form.no_flighttime, radar_form.advanced_collision_detection, radar_form.darkmode, radar_form.reset16pin],
+    col_map={'coindicate': 'col-md-2', 'no_cowarner': 'col-md-2', 'coi2c0': 'col-md-3', 'no_flighttime': 'col-md-2', 'advanced_collision_detection': 'col-md-3', 'darkmode': 'col-md-2', 'reset16pin': 'col-md-4'}) }}
 {{ render_form_row([radar_form.logging, radar_form.display_log],
     col_map={'logging': 'col-md-2'},
     button_map={'display_log': 'secondary'}) }}

@@ -34,11 +34,12 @@
 import os
 import subprocess
 import signal
-import radarbuttons
 import time
 import requests
 from globals import rlog, Modes
 import radarmodes
+from button_input import get_button_event, is_left, is_middle, is_right
+import dispatcher
 
 SHUTDOWN_WAIT_TIME = 6.0
 shutdown_time = 0.0
@@ -49,14 +50,12 @@ url_reboot = ""
 url_shutdown = ""
 
 
-def init(shutdown, reboot, quit_gracefully):
+def init(shutdown, reboot):
     global url_reboot
     global url_shutdown
-    global quit_gracefully_func
 
     url_reboot = reboot
     url_shutdown = shutdown
-    quit_gracefully_func = quit_gracefully
     rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
 
 
@@ -92,7 +91,7 @@ def draw_shutdown(display_control):
         display_control.display()
     if clear_before_shutoff:   # this is signal for display driver to initiate shutdown/reboot
         # display_control.cleanup()
-        quit_gracefully_func()
+        dispatcher.emit_shutdown()
         # cleanup all ressources, running task is not immediately terminated
         # so that display driver can finish cleanup and shutdown
         rlog.debug("ShutdownUI: Cleanup all tasks done.")
@@ -134,24 +133,25 @@ def user_input():
     global shutdown_mode
     global clear_before_shutoff
 
-    if shutdown_time == 0.0:     # first time or after stopped shutdwon
+    if shutdown_time == 0.0:
         shutdown_time = time.time() + SHUTDOWN_WAIT_TIME
-    btime, button = radarbuttons.check_buttons()
-    if btime == 0:   # nothing pressed
+
+    event = get_button_event()
+    if event is None:
         if time.time() > shutdown_time:
             rlog.debug("Shutdown now")
-            clear_before_shutoff = True  # enable display driver to trigger shutdown
-        return Modes.NO_CHANGE  # stay in current mode
-    if button == 0:  # left
+            clear_before_shutoff = True
+        return Modes.NO_CHANGE
+    if is_left(event):
         shutdown_mode = 0
         shutdown_time = 0.0
-        return radarmodes.first_mode_sequence()  # go back to first mode selected
-    if button == 1:  # middle, display only shutdown
+        return radarmodes.first_mode_sequence()
+    if is_middle(event):
         shutdown_mode = 1
         shutdown_time = 0.0
-        return Modes.SHUTDOWN  # stay in shutdown mode
-    if button == 2:  # right, reboot all
+        return Modes.SHUTDOWN
+    if is_right(event):
         shutdown_mode = 2
         shutdown_time = 0.0
-        return Modes.SHUTDOWN  # stay in shutdown mode
-    return Modes.SHUTDOWN  # no mode change
+        return Modes.SHUTDOWN
+    return Modes.SHUTDOWN
