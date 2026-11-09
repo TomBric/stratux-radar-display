@@ -148,7 +148,9 @@ class DisplayLogForm(FlaskForm):
 class RadarForm(FlaskForm):
 
     connection_mode = RadioField('Connection type',
-                                 choices=[('stratux', 'Stratux WiFi connection'), ('ble', 'Flarm NMEA via BLE')],
+                                 choices=[('stratux', 'Stratux WiFi connection'),
+                                          ('ble', 'Flarm NMEA via BLE'),
+                                          ('standalone', 'standalone with out stratux connection')],
                                  default='stratux')
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1')
     ble_address = StringField('BLE device address', default='', validators=[
@@ -407,7 +409,12 @@ def read_arguments(rf):
         return
     rf.display.data = args['device']
     rf.stratux_ip.data = args['connect']
-    rf.connection_mode.data = 'ble' if args['ble'] is not None else 'stratux'
+    if args['nostratux']:
+        rf.connection_mode.data = 'standalone'
+    elif args['ble'] is not None:
+        rf.connection_mode.data = 'ble'
+    else:
+        rf.connection_mode.data = 'stratux'
     rf.ble_address.data = '' if args['ble'] is None else args['ble']
     rf.display.data = args['device']
 
@@ -475,7 +482,7 @@ def build_mode_string(radarform):
     res = ''
     modestring = ''
     skip_modes = set()
-    if radarform.connection_mode.data == 'ble':
+    if radarform.connection_mode.data != 'stratux':
         skip_modes = {'D', 'S'}
     for i in range(1, MAX_SEQUENCE+1):    # this is a simple enumeration, no sorting
         for (key, value) in modes.items():
@@ -506,6 +513,8 @@ def build_option_string(rf):
         ble_addr = (rf.ble_address.data or '').strip()
         if len(ble_addr) > 0:
             out += f' -ble {ble_addr}'
+    elif rf.connection_mode.data == 'standalone':
+        out += ' --nostratux'
     out += build_mode_string(rf)
     if rf.ground_mode.data is True:
         out += ' -n'
@@ -600,15 +609,16 @@ def index():
         else:
             flash(Markup('No BLE devices found with service FFE0.'), 'warning')
         return render_template('index.html', radar_form=radar_form, on_stratux=stratux_mode)
-    if request.method == 'POST' and radar_form.connection_mode.data == 'ble':
-        ble_address = (radar_form.ble_address.data or '').strip()
-        if len(ble_address) == 0:
-            selected_choice = (radar_form.ble_device_choice.data or '').strip()
-            known_choices = radar_form.ble_device_choice.choices or []
-            is_known_choice = any(len(choice) > 0 and choice[0] == selected_choice for choice in known_choices)
-            if is_known_choice and BLE_ADDRESS_RE.fullmatch(selected_choice):
-                radar_form.ble_address.data = selected_choice
-        # In BLE mode these fields are disabled in the browser and therefore not posted.
+    if request.method == 'POST' and radar_form.connection_mode.data != 'stratux':
+        if radar_form.connection_mode.data == 'ble':
+            ble_address = (radar_form.ble_address.data or '').strip()
+            if len(ble_address) == 0:
+                selected_choice = (radar_form.ble_device_choice.data or '').strip()
+                known_choices = radar_form.ble_device_choice.choices or []
+                is_known_choice = any(len(choice) > 0 and choice[0] == selected_choice for choice in known_choices)
+                if is_known_choice and BLE_ADDRESS_RE.fullmatch(selected_choice):
+                    radar_form.ble_address.data = selected_choice
+        # These fields are disabled in the browser for non-Stratux modes.
         # Keep deterministic values so NumberRange validators do not fail on None.
         if radar_form.status_seq.data is None:
             radar_form.status_seq.data = 1
@@ -772,4 +782,3 @@ if __name__ == '__main__':
     os.system('sudo systemctl start nginx')  # just in case it has been stopped before
     rlog.debug(f"radar-web: starting flask app")
     app.run(debug=False)
-

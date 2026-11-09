@@ -90,10 +90,10 @@
 {{ render_form_row([radar_form.flogs, radar_form.flogs_seq], col_map={'flogs': 'col-md-3', 'flogs_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.cowarner, radar_form.cowarner_seq], col_map={'cowarner': 'col-md-3', 'cowarner_seq': 'no-label col-md-1'}) }}
 {{ render_form_row([radar_form.gps_dist, radar_form.gps_dist_seq], col_map={'gps_dist': 'col-md-3', 'gps_dist_seq': 'no-label col-md-1'}) }}
-<div id="display-status-mode-row" class="{% if not on_stratux and radar_form.connection_mode.data == 'ble' %}d-none{% endif %}">
+<div id="display-status-mode-row" class="{% if not on_stratux and radar_form.connection_mode.data != 'stratux' %}d-none{% endif %}">
 {{ render_form_row([radar_form.status, radar_form.status_seq], col_map={'status': 'col-md-3', 'status_seq': 'no-label col-md-1'}) }}
 </div>
-<div id="stratux-status-mode-row" class="{% if not on_stratux and radar_form.connection_mode.data == 'ble' %}d-none{% endif %}">
+<div id="stratux-status-mode-row" class="{% if not on_stratux and radar_form.connection_mode.data != 'stratux' %}d-none{% endif %}">
 {{ render_form_row([radar_form.stratux, radar_form.stratux_seq], col_map={'stratux': 'col-md-3', 'stratux_seq': 'no-label col-md-1'}) }}
 </div>
 {{ render_form_row([radar_form.checklist, radar_form.checklist_seq, radar_form.checklist_filename, radar_form.download_checklist, radar_form.upload_checklist],
@@ -199,7 +199,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!bleAddressContainer || !stratuxIpContainer) {
             return;
         }
-        if (selectedConnectionMode() === 'ble') {
+        const mode = selectedConnectionMode();
+        if (mode === 'ble') {
             setVisible(bleAddressContainer, true);
             setVisible(stratuxIpContainer, false);
             if (bleAddressInput) bleAddressInput.disabled = false;
@@ -219,14 +220,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } else {
             setVisible(bleAddressContainer, false);
-            setVisible(stratuxIpContainer, true);
+            setVisible(stratuxIpContainer, mode === 'stratux');
             if (bleAddressInput) bleAddressInput.disabled = true;
-            if (stratuxIpInput) stratuxIpInput.disabled = false;
+            if (stratuxIpInput) stratuxIpInput.disabled = mode !== 'stratux';
             setVisible(bleDeviceChoiceContainer, false);
-            setVisible(displayStatusRow, true);
-            setVisible(stratuxStatusRow, true);
-            setDisabledForContainer(displayStatusRow, false);
-            setDisabledForContainer(stratuxStatusRow, false);
+            const hasStratux = mode === 'stratux';
+            setVisible(displayStatusRow, hasStratux);
+            setVisible(stratuxStatusRow, hasStratux);
+            setDisabledForContainer(displayStatusRow, !hasStratux);
+            setDisabledForContainer(stratuxStatusRow, !hasStratux);
             removeHiddenMirror('status_seq');
             removeHiddenMirror('stratux_seq');
         }
