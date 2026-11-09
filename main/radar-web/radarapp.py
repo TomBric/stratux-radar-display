@@ -150,7 +150,7 @@ class RadarForm(FlaskForm):
     connection_mode = RadioField('Connection type',
                                  choices=[('stratux', 'Stratux WiFi connection'),
                                           ('ble', 'Flarm NMEA via BLE'),
-                                          ('standalone', 'standalone with out stratux connection')],
+                                          ('standalone', 'standalone without stratux connection')],
                                  default='stratux')
     stratux_ip = StringField('IP address of Stratux', default='192.168.10.1')
     ble_address = StringField('BLE device address', default='', validators=[
