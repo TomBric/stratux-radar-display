@@ -78,5 +78,8 @@ class NoDisplay(dcommon.GenericDisplay):
     def text_screen(self, headline, subline, text, left_text, middle_text, r_text, offset=0):
         pass
 
+    def countdown_distance(self, ground_distance_active, ground_distance_valid, g_distance):
+        pass
+
 # instantiate a single object in the file, needs to be done and inherited in every display module
 radar_display = NoDisplay()
