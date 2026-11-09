@@ -98,11 +98,12 @@ def draw_shutdown(display_control):
         display_control.cleanup()
         rlog.debug("ShutdownUI: Display control cleanup done, now shutdown/reboot")
         if shutdown_mode == 0:   # shutdown display and stratux
-            rlog.debug("Posting shutdown.")
-            try:
-                requests.post(url_shutdown)
-            except requests.exceptions.RequestException as e:
-                rlog.debug(f"Exception posting shutdown: {e}")
+            if url_shutdown:
+                rlog.debug("Posting shutdown.")
+                try:
+                    requests.post(url_shutdown)
+                except requests.exceptions.RequestException as e:
+                    rlog.debug(f"Exception posting shutdown: {e}")
             try:
                 subprocess.run(["sudo", "shutdown", "--poweroff", "now"], check=False)
             except OSError as e:
@@ -113,11 +114,12 @@ def draw_shutdown(display_control):
             except OSError as e:
                 rlog.debug(f"Shutdown command failed: {e}")
         elif shutdown_mode == 2:   # reboot display and stratux
-            rlog.debug("Posting reboot.")
-            try:
-                requests.post(url_reboot)
-            except requests.exceptions.RequestException as e:
-                rlog.debug(f"Exception posting reboot: {e}")
+            if url_reboot:
+                rlog.debug("Posting reboot.")
+                try:
+                    requests.post(url_reboot)
+                except requests.exceptions.RequestException as e:
+                    rlog.debug(f"Exception posting reboot: {e}")
             try:
                 subprocess.run(["sudo", "shutdown", "--reboot", "now"], check=False)
             except OSError as e:

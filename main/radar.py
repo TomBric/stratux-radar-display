@@ -124,6 +124,7 @@ grounddistance_activated = False
 grounddistance_fallback_cm: float = 0.0
 
 url_host_base = arguments.DEFAULT_URL_HOST_BASE
+no_stratux = False
 url_situation_ws = ""
 url_radar_ws = ""
 url_status_ws = ""
@@ -828,7 +829,8 @@ async def user_interface():
                     vertical_max = 0.0
                     vertical_min = 0.0
             elif Globals.mode == Modes.STRATUX_STATUS:  # stratux status
-                stratuxstatus.start()  # starts status_listener couroutine if not yet running
+                if not no_stratux:
+                    stratuxstatus.start()  # starts status_listener couroutine if not yet running
                 next_mode = stratuxstatus.user_input()
                 if next_mode != Modes.NO_CHANGE and next_mode != Modes.STRATUX_STATUS:
                     stratuxstatus.stop()  # stops status_listener
@@ -1036,13 +1038,18 @@ async def display_and_cutoff():
 
 async def coroutines():
     try:
-        tr_handler = asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic), name="TrafficHandler")
-        sit_handler = asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation), name="SituationHandler")
+        tasks = []
+        if not no_stratux:
+            tasks.extend([
+                asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic), name="TrafficHandler"),
+                asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation), name="SituationHandler"),
+            ])
         dis_cutoff = asyncio.create_task(display_and_cutoff(), name="DisplayHandler")
         sensor_reader = asyncio.create_task(cowarner.read_sensors(), name="SensorReader")
         ground_sensor_reader = asyncio.create_task(grounddistance.read_ground_sensor(), name="GroundDistanceReader")
         u_interface = asyncio.create_task(user_interface(), name="UserInterface")
-        await asyncio.gather(tr_handler, sit_handler, dis_cutoff, u_interface, sensor_reader, ground_sensor_reader)
+        tasks.extend([dis_cutoff, u_interface, sensor_reader, ground_sensor_reader])
+        await asyncio.gather(*tasks)
         # With python 3.11 a TaskGroup could be used to ensure theat coroutine exceptions are propagated to main task
     except asyncio.CancelledError:
         rlog.debug("Coroutines cancelled")
@@ -1070,8 +1077,9 @@ def initialize_ui_components():
 
 def setup_event_handlers():
     """Register radar callbacks in the neutral dispatcher."""
-    dispatcher.register_traffic_handler(new_traffic)
-    dispatcher.register_situation_handler(new_situation)
+    if not no_stratux:
+        dispatcher.register_traffic_handler(new_traffic)
+        dispatcher.register_situation_handler(new_situation)
     dispatcher.register_shutdown_handler(quit_gracefully)
 
 
@@ -1109,7 +1117,8 @@ def main():
     initialize_sensors_and_simulation()
     rlog.debug(f"Initialization finished. Global config {global_config}")
     if ble_address is None:
-        display_control.startup(RADAR_VERSION, url_host_base, 4)
+        startup_host = "No Stratux" if no_stratux else url_host_base
+        display_control.startup(RADAR_VERSION, startup_host, 4)
     else:
         display_control.startup(RADAR_VERSION, f"BLE-{ble_address}", 4)
     
@@ -1182,6 +1191,7 @@ if __name__ == "__main__":
     rlog.debug("\n\n")
     rlog.debug(f"Stratux-Radar-Display started.\nArgs: {args}")
     url_host_base = args['connect']
+    no_stratux = args['nostratux']
     try:
         display_control_module = importlib.import_module('displays.' + args['device'] + '.controller')
         display_control = display_control_module.radar_display  # inherited instance of GenericDisplay in imported module
@@ -1232,18 +1242,19 @@ if __name__ == "__main__":
             global_config['sound_volume'] = saved_config['sound_volume']
         if 'CO_warner_R0' in saved_config:
             global_config['CO_warner_R0'] = saved_config['CO_warner_R0']
-    url_situation_ws = "ws://" + url_host_base + "/situation"
-    url_radar_ws = "ws://" + url_host_base + "/radar"
-    url_status_ws = "ws://" + url_host_base + "/status"
-    url_shutdown = "http://" + url_host_base + "/shutdown"
-    url_reboot = "http://" + url_host_base + "/reboot"
-    url_settings_set = "http://" + url_host_base + "/setSettings"
-    url_settings_get = "http://" + url_host_base + "/getSettings"
-    url_gmeter_reset = "http://" + url_host_base + "/resetGMeter"
-    url_status_get = "http://" + url_host_base + "/getStatus"
-    url_status_set = "http://" + url_host_base + "/setStatus"
-    url_caging = "http://" + url_host_base + "/cageAHRS"
-    url_calibrate = "http://" + url_host_base + "/calibrateAHRS"
+    if not no_stratux:
+        url_situation_ws = "ws://" + url_host_base + "/situation"
+        url_radar_ws = "ws://" + url_host_base + "/radar"
+        url_status_ws = "ws://" + url_host_base + "/status"
+        url_shutdown = "http://" + url_host_base + "/shutdown"
+        url_reboot = "http://" + url_host_base + "/reboot"
+        url_settings_set = "http://" + url_host_base + "/setSettings"
+        url_settings_get = "http://" + url_host_base + "/getSettings"
+        url_gmeter_reset = "http://" + url_host_base + "/resetGMeter"
+        url_status_get = "http://" + url_host_base + "/getStatus"
+        url_status_set = "http://" + url_host_base + "/setStatus"
+        url_caging = "http://" + url_host_base + "/cageAHRS"
+        url_calibrate = "http://" + url_host_base + "/calibrateAHRS"
 
     try:
         signal.signal(signal.SIGTERM, quit_gracefully)  # shutdown initiated e.g. by stratux shutdown

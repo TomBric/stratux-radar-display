@@ -53,6 +53,8 @@ def init(url):
 
 def reset_gmeter():
     rlog.debug("GMeterUI: Reset gmeter triggered")
+    if not url_gmeter_reset:
+        return
     try:
         requests.post(url_gmeter_reset, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.RequestException as e:

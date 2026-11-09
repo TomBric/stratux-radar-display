@@ -85,6 +85,8 @@ def draw_ahrs(display_control, connected, was_changed, pitch, roll, heading, sli
 
 def zero_drift():
     rlog.debug("Zero drift calibration initiated by button press!")
+    if not calibrate_url:
+        return
     try:
         requests.post(calibrate_url, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.RequestException as e:
@@ -93,6 +95,8 @@ def zero_drift():
 
 def set_level():
     rlog.debug("Levelling initiated by button press!")
+    if not cage_url:
+        return
     try:
         requests.post(cage_url, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.RequestException as e:

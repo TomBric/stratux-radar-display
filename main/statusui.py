@@ -142,6 +142,8 @@ def init(config_file, url, target_ip, refresh, config):   # prepare everything
 def get_status():
     global status_url
 
+    if not status_url:
+        return None
     try:
         answer = requests.get(status_url)
         status_answer = answer.json()

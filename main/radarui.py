@@ -66,6 +66,8 @@ def shutdown():
 
 def communicate_limits(radarrange, threshold):
     if ble_address is None:
+        if not url_settings_set:
+            return
         rlog.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
         try:
             requests.post(url_settings_set, json={'RadarLimits': threshold, 'RadarRange': radarrange})
