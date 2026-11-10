@@ -174,9 +174,6 @@ countdown = False # True if ground distance with countdown screen is shown
 simulation_mode = False  # if true, do simulation mode for grounddistance (for testing purposes)
 aircraft_simulation = None   # if a string is provided read simulation data from file and simulate traffic
 
-radar_sound_off_sound = None   # prepared sound output for "sound off"
-radar_sound_on_sound = None    # prepared send output for "sound on"
-
 AUDIO_TIMEOUTS ={0: 0, 1: 10, 2:30, 3:0, 4:0}   # time in seconds to repeat audio of prio x traffic, if zero do not repeat
 # E.g. Prio 1 (RA) traffic will be repeated after 10 secondes, Prio 2 (TA) after 30 secs
 # prio0=unclear, prio1=RA, prio2=TA, prio3=collision, prio4=no collision
@@ -810,10 +807,10 @@ async def user_interface():
                 if toggle_sound:
                     radarui.sound_on = not radarui.sound_on
                     if radarui.sound_on:
-                        radarbluez.speak_sound(radar_sound_on_sound, "Radar sound on")
+                        radarbluez.speak_sound(radarbluez.radar_sound_on_sound, "Radar sound on")
                     else:
                         radarbluez.stop_sounds()  # immediately stop all sound output and thread clears queue
-                        radarbluez.speak_sound(radar_sound_off_sound, "Radar sound off")
+                        radarbluez.speak_sound(radarbluez.radar_sound_off_sound, "Radar sound off")
                     Globals.refresh = True
             elif Globals.mode == Modes.TIMER:  # Timer mode
                 next_mode = timerui.user_input()
@@ -1094,11 +1091,9 @@ def setup_event_handlers():
 
 def initialize_audio_system():
     """Initialize audio system and prepare sounds."""
-    global extsound_active, bluetooth_active, radar_sound_on_sound, radar_sound_off_sound
+    global extsound_active, bluetooth_active
     
     extsound_active, bluetooth_active = radarbluez.sound_init(global_config, bluetooth, sound_mixer)
-    radar_sound_on_sound = radarbluez.prepare_sounds_string("Radar sound on")
-    radar_sound_off_sound = radarbluez.prepare_sounds_string("Radar sound off")
 
 
 def initialize_sensors_and_simulation():
