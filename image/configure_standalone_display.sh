@@ -11,6 +11,10 @@
 set -Eeuo pipefail
 trap 'status=$?; echo "Command failed at line ${LINENO}: ${BASH_COMMAND}" >&2; exit "$status"' ERR
 
+
+
+
+
 # Set these build-time values before creating the standalone image.
 STANDALONE_AP_SSID="Radar-Display"
 AP_CONNECTION_NAME="radar-display"
