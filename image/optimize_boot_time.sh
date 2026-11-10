@@ -22,7 +22,7 @@ cat > /etc/systemd/system/autostart-radar-early.service <<EOF
 [Unit]
 Description=Autostart Stratux-Radar (early)
 DefaultDependencies=no
-After=local-fs.target systemd-udevd.service systemd-tmpfiles-setup.service
+After=systemd-remount-fs.service systemd-udevd.service
 Before=shutdown.target
 Conflicts=shutdown.target
 
@@ -41,6 +41,17 @@ systemctl enable autostart-radar-early.service
 
 # remove the late-starting user service, otherwise radar would be started twice
 rm -f /home/pi/.config/systemd/user/default.target.wants/autostart-radar.service
+
+# no user session needed any more: linger would create run-user-1000.mount and user@1000.service at boot
+rm -f /var/lib/systemd/linger/pi
+
+# swap/zram delays swap.target, which local-fs.target (and everything behind it) waited for
+systemctl mask systemd-zram-setup@zram0.service dev-zram0.swap >/dev/null 2>&1 || true
+systemctl disable rpi-zram-writeback.timer rpi-resize-swap-file.service >/dev/null 2>&1 || true
+if [ -f /etc/rpi/swap.conf ]; then
+  mkdir -p /etc/rpi/swap.conf.d
+  printf '[Main]\nMechanism=none\n' > /etc/rpi/swap.conf.d/10-noswap.conf
+fi
 
 # Services not needed on a standalone display, they only delay boot
 for svc in NetworkManager-wait-online.service systemd-networkd-wait-online.service \
