@@ -33,12 +33,6 @@
 
 from globals import rlog
 from gpiozero import Button
-import threading   # for flask server in case of button api
-from flask import Flask, render_template
-from flask_wtf import FlaskForm
-from wtforms.fields import *
-from flask_bootstrap import Bootstrap5, SwitchField
-import subprocess
 
 btn = None   # will be set in init
 gear_down_btn = None   # will be set ini int
@@ -52,28 +46,9 @@ MIDDLE = 20
 RIGHT = 21
 GEAR_DOWN = 19
 
-# Flask server for button api
-app = Flask(__name__, template_folder='radar-web/templates')
-app.secret_key = 'radar-api'
-# Bootstrap configuration
-app.config['BOOTSTRAP_SERVE_LOCAL'] = True      # use local instances of css etc.
-app.config['BOOTSTRAP_USE_MINIFIED'] = True
-app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
-app.config['BOOTSTRAP_BTN_SIZE'] = 'sm'
-app.config['WTF_CSRF_ENABLED'] = False    # to enable api call without csrf token
-bootstrap = Bootstrap5(app)
-
 button_api_active = False
 last_api_input = 0, 0
 
-
-class ApiForm(FlaskForm):
-    left_short =   SubmitField('  Left Short ')
-    left_long =    SubmitField('  Left Long  ')
-    middle_short = SubmitField(' Middle Short')
-    middle_long =  SubmitField(' Middle Long ')
-    right_short =  SubmitField(' Right Short ')
-    right_long =   SubmitField(' Right Long  ')
 
 # section for button api, only used when option "-api" is set
 # to trigger interactively you can use CURL
@@ -81,28 +56,55 @@ class ApiForm(FlaskForm):
 # curl -s -o /dev/null -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "middle_long=Middle Long" http://192.168.10.15/api
 # e.g. to trigger right-short:
 # curl -s -o /dev/null -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "right_short=Right Short" http://192.168.10.15/api
-@app.route('/api', methods=['GET', 'POST'])
-def api():
-    global last_api_input
+def create_api_app():
+    # all api related imports and definitions are done here, so nothing is loaded without option "-api"
+    from flask import Flask, render_template
+    from flask_wtf import FlaskForm
+    from wtforms.fields import SubmitField
+    from flask_bootstrap import Bootstrap5
 
-    api_form = ApiForm()
-    if api_form.validate_on_submit() is True:  # POST request
-        if api_form.left_short.data is True:
-            last_api_input = 1, 0
-        elif api_form.left_long.data is True:
-            last_api_input = 2, 0
-        elif api_form.middle_short.data is True:
-            last_api_input = 1, 1
-        elif api_form.middle_long.data is True:
-            last_api_input = 2, 1
-        elif api_form.right_short.data is True:
-            last_api_input = 1, 2
-        elif api_form.right_long.data is True:
-            last_api_input = 2, 2
-        else:
-            last_api_input = 0, 0
-    rlog.debug(f"API: api_input={last_api_input}")
-    return render_template('api.html', api_form=api_form)
+    app = Flask(__name__, template_folder='radar-web/templates')
+    app.secret_key = 'radar-api'
+    # Bootstrap configuration
+    app.config['BOOTSTRAP_SERVE_LOCAL'] = True      # use local instances of css etc.
+    app.config['BOOTSTRAP_USE_MINIFIED'] = True
+    app.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
+    app.config['BOOTSTRAP_BTN_SIZE'] = 'sm'
+    app.config['WTF_CSRF_ENABLED'] = False    # to enable api call without csrf token
+    Bootstrap5(app)
+
+    class ApiForm(FlaskForm):
+        left_short =   SubmitField('  Left Short ')
+        left_long =    SubmitField('  Left Long  ')
+        middle_short = SubmitField(' Middle Short')
+        middle_long =  SubmitField(' Middle Long ')
+        right_short =  SubmitField(' Right Short ')
+        right_long =   SubmitField(' Right Long  ')
+
+    @app.route('/api', methods=['GET', 'POST'])
+    def api():
+        global last_api_input
+
+        api_form = ApiForm()
+        if api_form.validate_on_submit() is True:  # POST request
+            if api_form.left_short.data is True:
+                last_api_input = 1, 0
+            elif api_form.left_long.data is True:
+                last_api_input = 2, 0
+            elif api_form.middle_short.data is True:
+                last_api_input = 1, 1
+            elif api_form.middle_long.data is True:
+                last_api_input = 2, 1
+            elif api_form.right_short.data is True:
+                last_api_input = 1, 2
+            elif api_form.right_long.data is True:
+                last_api_input = 2, 2
+            else:
+                last_api_input = 0, 0
+        rlog.debug(f"API: api_input={last_api_input}")
+        return render_template('api.html', api_form=api_form)
+
+    return app
 
 
 def read_api_input():
@@ -115,19 +117,17 @@ def read_api_input():
         last_api_input = 0, 0
         return ret
 
-def run_flask():
-    global button_api_active
 
-    button_api_active = True
+def run_flask():
+    import subprocess
+
     rlog.debug(f"radar-buttons: sudo systemctl start nginx")
     res = subprocess.run(["sudo", "systemctl", "start", "nginx"], check=False)
     if res.returncode != 0:
         rlog.error(f"radarbuttons: Failed to start nginx, return code: {res.returncode}")
     else:
         rlog.debug(f"radarbuttons: starting flask app")
-    app.run(debug=False, use_reloader=False)
-
-
+    create_api_app().run(debug=False, use_reloader=False)
 
 class RadarButton:
     def __init__(self,gpio_number):
@@ -173,6 +173,7 @@ def init(button_api):
     rlog.debug("Radarbuttons: Initialized.")
     if button_api: # start an api for the buttons
         button_api_active = True
+        import threading   # for flask server in case of button api
         rlog.debug("Radarbuttons UI: Starting button API via flask")
         flask_thread = threading.Thread(target=run_flask)
         flask_thread.daemon = True # to stop the thread when the main program stops
