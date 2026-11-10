@@ -38,7 +38,6 @@ import asyncio
 import socket
 from asyncio import CancelledError
 
-import websockets
 import math
 import time
 
@@ -65,7 +64,6 @@ import checklist
 import logging
 from logging.handlers import RotatingFileHandler
 import collisiondetect
-import ble
 import dispatcher
 
 from datetime import datetime, timezone
@@ -742,6 +740,7 @@ def new_situation(json_str):
 
 
 async def listen_forever(path, name, callback):
+    import websockets   # imported lazily, not needed without stratux connection
     rlog.debug(name + " waiting for " + path)
     while True:
         # outer loop restarted every time the connection fails
@@ -1076,7 +1075,9 @@ def initialize_ui_components():
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
     checklist.init(xml_checklist)
-    ble.init(ble_address, situation)
+    if ble_address is not None:
+        import ble   # imported lazily, only needed with option -ble
+        ble.init(ble_address, situation)
     return True
 
 

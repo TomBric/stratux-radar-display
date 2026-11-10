@@ -31,7 +31,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from bleak import BleakClient, BleakScanner
 from globals import rlog
 from pathlib import Path
 import math
@@ -603,6 +602,7 @@ def _handle_ble_payload(data):
 
 
 async def listen_to_ble():
+    from bleak import BleakClient   # imported lazily, bleak is slow to load
     address = ble_address
     if address is None:
         rlog.debug("Ble: No BLE address configured")
@@ -653,6 +653,7 @@ async def listen_to_ble():
 async def search_ble():
     # search for ble devices, returns list of dictionaries with name and address of devices
     # that advertise service FFE0 and provide characteristic FFE1
+    from bleak import BleakScanner   # imported lazily, bleak is slow to load
     found_devices = []
     timed_out = False
     try:

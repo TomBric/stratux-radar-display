@@ -59,24 +59,39 @@ def init(shutdown, reboot):
     rlog.debug("ShutdownUI: Initialized settings to: reboot url " + url_reboot + " shutdown url " + url_shutdown)
 
 
+def _find_radar_pids():   # scan /proc instead of starting pgrep, finds python processes running radar.py
+    pids = []
+    for entry in os.listdir('/proc'):
+        if not entry.isdigit():
+            continue
+        try:
+            with open(f'/proc/{entry}/cmdline', 'rb') as f:
+                args = f.read().decode('utf-8', errors='ignore').split('\0')
+        except OSError:
+            continue
+        if len(args) > 1 and 'python' in os.path.basename(args[0]) and \
+                any(os.path.basename(a) == 'radar.py' for a in args[1:3]):
+            pids.append(int(entry))
+    return pids
+
+
 def clear_lingering_radar():     # remove other radar.py processes, necessary since lingering is enabled for bluetooth
     current_pid = os.getpid()   # my processid
-    pid_list = []
-    pname = "radar.py"
-    try:
-        output = subprocess.check_output(['pgrep', '-f', pname]).decode('utf-8').strip()
-        pid_list = output.split('\n')   # generate a list of strings
-    except subprocess.CalledProcessError:
-        pass
-    for proc in pid_list:
-        if int(proc) != current_pid:
+    for pid in _find_radar_pids():
+        if pid == current_pid:
+            continue
+        try:
+            print("Terminating other process {0}".format(pid))
+            os.kill(pid, signal.SIGTERM)   # SIGTERM signal
+        except OSError:
+            continue
+        deadline = time.time() + 5   # give him some time to terminate, but continue as soon as he is gone
+        while time.time() < deadline:
             try:
-                print("Terminating other process {0}".format(int(proc)))
-                os.kill(int(proc), signal.SIGTERM)   # SIGTERM signal
-                time.sleep(5)   # give him some time to terminate
-            except OSError :
-                pass
-
+                os.kill(pid, 0)
+            except OSError:
+                break
+            time.sleep(0.05)
 
 def draw_shutdown(display_control):
     global clear_before_shutoff

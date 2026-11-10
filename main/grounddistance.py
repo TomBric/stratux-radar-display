@@ -179,10 +179,7 @@ class LidarSensor:   # Implementation for TFMini-Plus Lidar or TF02 Pro Lidar Se
         
         for device in devices:
             try:
-                # try to open the serial port to check if it's available
-                test_ser = serial.Serial(device, 115200, timeout=1)
-                test_ser.close()
-                # tf we can open it, use this device
+                # if we can open it, use this device
                 self.ser = serial.Serial(device, 115200)     # Lidar module has 115200 baud
                 self.ser.flushInput()
                 if not self.ser.isOpen():
@@ -729,6 +726,10 @@ def store_statistics(sit):   # called from read_ground_sensor
         evaluate_statistics(stat_value)
 
 
+FIRST_FRAME_WAIT_STEPS = 50    # wait max. 50 * 20 ms = 1 s for the first lidar frame
+FIRST_FRAME_STEP_TIME = 0.02
+
+
 async def read_ground_sensor():
     global zero_distance
 
@@ -736,6 +737,10 @@ async def read_ground_sensor():
         rlog.debug("Ground distance reader active ...")
         sensor = distance_sensor
         if not simulation_mode and sensor is not None:
+            for _ in range(FIRST_FRAME_WAIT_STEPS):   # wait for the first sensor frame instead of failing instantly
+                if sensor.ser.inWaiting() >= sensor.lidar_bytes:
+                    break
+                await asyncio.sleep(FIRST_FRAME_STEP_TIME)
             sensor.calc_distance()
             new_zero_distance = sensor.last_distance()  # distance in mm this is zero
         elif simulation_mode:
