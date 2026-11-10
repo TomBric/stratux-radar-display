@@ -55,6 +55,16 @@ for svc in NetworkManager-wait-online.service systemd-networkd-wait-online.servi
   fi
 done
 
+# cloud-init is not needed after first boot and costs several seconds on every boot
+if dpkg -s cloud-init >/dev/null 2>&1; then
+  echo "[INFO] Purging cloud-init..."
+  touch /etc/cloud/cloud-init.disabled
+  DEBIAN_FRONTEND=noninteractive apt-get purge -y cloud-init
+  apt-get autoremove -y --purge
+  rm -rf /etc/cloud /var/lib/cloud
+  echo "[OK] cloud-init purged."
+fi
+
 # Boot config: no splash, no boot delay, quiet console (console output slows down boot)
 if [ -f /boot/firmware/config.txt ]; then BOOT_CONFIG=/boot/firmware/config.txt; else BOOT_CONFIG=/boot/config.txt; fi
 if [ -f /boot/firmware/cmdline.txt ]; then BOOT_CMDLINE=/boot/firmware/cmdline.txt; else BOOT_CMDLINE=/boot/cmdline.txt; fi
