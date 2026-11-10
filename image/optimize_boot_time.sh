@@ -32,6 +32,8 @@ Group=pi
 WorkingDirectory=/home/pi/stratux-radar-display/image
 ExecStart=/bin/bash /home/pi/stratux-radar-display/image/stratux_radar.sh
 Restart=no
+Nice=-5
+CPUWeight=1000
 
 [Install]
 WantedBy=sysinit.target
@@ -79,7 +81,7 @@ fi
 # Boot config: no splash, no boot delay, quiet console (console output slows down boot)
 if [ -f /boot/firmware/config.txt ]; then BOOT_CONFIG=/boot/firmware/config.txt; else BOOT_CONFIG=/boot/config.txt; fi
 if [ -f /boot/firmware/cmdline.txt ]; then BOOT_CMDLINE=/boot/firmware/cmdline.txt; else BOOT_CMDLINE=/boot/cmdline.txt; fi
-for line in 'disable_splash=1' 'boot_delay=0'; do
+for line in 'disable_splash=1' 'boot_delay=0' 'camera_auto_detect=0'; do
   grep -Fxq "$line" "$BOOT_CONFIG" || printf '%s\n' "$line" >> "$BOOT_CONFIG"
 done
 grep -qw quiet "$BOOT_CMDLINE" || sed -i '1 s/$/ quiet loglevel=3/' "$BOOT_CMDLINE"
