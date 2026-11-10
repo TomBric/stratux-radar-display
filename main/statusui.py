@@ -32,6 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from globals import rlog
+import os
 import requests
 import time
 import radarbluez
@@ -39,9 +40,9 @@ import math
 import asyncio
 import subprocess
 import string
-import ipaddress
 import json
 import datetime
+import tempfile
 from radarmodes import Modes, next_mode_sequence
 from button_input import get_button_event, is_left, is_left_short, is_left_long, is_middle, is_middle_short, is_middle_long, is_right, is_right_short, is_right_long
 
@@ -50,7 +51,6 @@ STATUS_TIMEOUT = 0.3
 BLUETOOTH_SCAN_TIME = 30.0
 BT_SCAN_WAIT = 0.2
 CHARSET = " " + string.ascii_uppercase + string.ascii_lowercase + string.digits + string.punctuation
-NUMBERS = string.digits
 DEFAULT_WIFI = "stratux         "
 DEFAULT_PASS = "                "
 MAX_WIFI_LENGTH = 16
@@ -60,7 +60,6 @@ bt_scan_task = None  # asyncio task for bluetooth scan
 
 # globals
 g_config_file = "undefined"   # filename of config file, set in init
-global_config = {}
 status_url = ""
 stratux_ip = "0.0.0.0"
 last_status_get = 0.0  # time stamp of the last status request
@@ -76,8 +75,9 @@ wifi_ip = ""
 refresh_time = 0.0
 new_wifi = DEFAULT_WIFI
 new_pass = DEFAULT_PASS
-new_stratux_ip = stratux_ip
 charpos = 0         # position of current input char
+
+REMOVED_CONFIG_KEYS = frozenset({'stratux_ip', 'display_tail', 'distance_warnings', 'sound_volume'})
 
 
 def default(obj):
@@ -93,32 +93,49 @@ def read_config(config_file):
     except (OSError, IOError, ValueError) as e:
         rlog.debug("StatusUI: Error " + str(e) + " reading " + config_file)
         return None
+    if not isinstance(config, dict):
+        rlog.error("StatusUI: Configuration in %s is not a JSON object", config_file)
+        return None
+    if REMOVED_CONFIG_KEYS.intersection(config):
+        config = {key: value for key, value in config.items() if key not in REMOVED_CONFIG_KEYS}
+        try:
+            save_config_file(config_file, config)
+        except (OSError, ValueError, TypeError) as e:
+            rlog.error("StatusUI: Could not remove obsolete settings from %s: %s", config_file, e)
     rlog.debug("StatusUI: Configuration read from " + config_file + ": " +
                json.dumps(config, sort_keys=True, indent=4, default=default))
     return config
 
 
-def write_config(config):
-    global g_config_file
-
+def save_config_file(config_file, config):
+    directory = os.path.dirname(os.path.abspath(config_file))
+    temp_name = None
     try:
-        with open(g_config_file, 'wt') as out:
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=directory, delete=False) as out:
+            temp_name = out.name
             json.dump(config, out, sort_keys=True, indent=4, default=default)
-            out.flush()  # Ensure data is written to disk immediately
-        rlog.debug("StatusUI: Configuration saved to " + g_config_file + ": " + json.dumps(config, sort_keys=True, indent=4,
+        if os.path.exists(config_file):
+            os.chmod(temp_name, os.stat(config_file).st_mode & 0o777)
+        os.replace(temp_name, config_file)
+    finally:
+        if temp_name is not None and os.path.exists(temp_name):
+            os.unlink(temp_name)
+
+
+def write_config(config):
+    saved_config = {key: value for key, value in config.items() if key not in REMOVED_CONFIG_KEYS}
+    try:
+        save_config_file(g_config_file, saved_config)
+        rlog.debug("StatusUI: Configuration saved to " + g_config_file + ": " + json.dumps(saved_config, sort_keys=True, indent=4,
                                                                                             default=default))
-    except (OSError, IOError, ValueError) as e:
-        rlog.debug("StatusUI: Error " + str(e) + " writing " + g_config_file)
-    except Exception as e:
-        rlog.debug(f"StatusUI: Unexpected error writing config: {type(e).__name__}: {str(e)}")
+    except (OSError, ValueError, TypeError) as e:
+        rlog.error("StatusUI: Error %s writing %s", e, g_config_file)
 
 
-def init(config_file, url, target_ip, refresh, config):   # prepare everything
+def init(config_file, url, target_ip, refresh):   # prepare everything
     global status_url
     global stratux_ip
     global refresh_time
-    global global_config
-    global new_stratux_ip
     global new_pass
     global new_wifi
     global g_config_file
@@ -128,14 +145,7 @@ def init(config_file, url, target_ip, refresh, config):   # prepare everything
     stratux_ip = target_ip
     rlog.debug("Status UI: Initialized GET settings to " + status_url)
     refresh_time = refresh
-    global_config = config
     new_pass = DEFAULT_PASS
-    try:
-        new_stratux_ip = ipv4_to_string(int(ipaddress.IPv4Address(stratux_ip)))  # normalize and keep leading zeros
-    except ipaddress.AddressValueError:
-        rlog.debug(f"Status UI: Invalid Stratux IP '{stratux_ip}', falling back to 0.0.0.0")
-        stratux_ip = "0.0.0.0"
-        new_stratux_ip = ipv4_to_string(0)
     new_wifi = DEFAULT_WIFI
 
 
@@ -179,7 +189,7 @@ def draw_status(display_control, bluetooth_active, extsound_active):
             right = "Scan"
         else:
             right = ""
-        display_control.text_screen("Display Status", None, status_text, "Net/Opt", " Mode", right)
+        display_control.text_screen("Display Status", None, status_text, "Net", " Mode", right)
     elif status_mode == 1:   # scan running
         countdown = math.floor(scan_end - now)
         if countdown > 0:
@@ -205,7 +215,7 @@ def draw_status(display_control, bluetooth_active, extsound_active):
         display_control.text_screen(headline, subline, text, left, middle, right)
     elif status_mode == 3:  # display network information
         display_control.text_screen("WIFI Info", "", "WIFI SSID:\n" + wifi_ssid + "\nStratux-IP:\n" + stratux_ip
-                                    + "\nMyIP:" + wifi_ip, "Opt", "Cont", "Chg")
+                                    + "\nMyIP:" + wifi_ip, "", "Cont", "Chg")
     elif status_mode == 4:  # change network settings
         headline = "Change WIFI"
         subline = "WIFI SSID"
@@ -225,31 +235,15 @@ def draw_status(display_control, bluetooth_active, extsound_active):
     elif status_mode == 6:   # "yes" or "no"
         headline = "Change WIFI"
         subline = "Confirm & reboot"
-        text = "SSID: " + new_wifi + "\nPass: " + new_pass \
-               + "\nStrx: " + new_stratux_ip
+        text = "SSID: " + new_wifi + "\nPass: " + new_pass
         display_control.text_screen(headline, subline, text, "YES", "", "NO")
-    elif status_mode == 7:   # input of stratux-ip
-        headline = "Change WIFI"
-        subline = "Stratux IP Addr"
-        text = "Enter IP of Stratux:\n"
-        prefix = new_stratux_ip[0:charpos]
-        char = new_stratux_ip[charpos]
-        suffix = new_stratux_ip[charpos + 1:len(new_stratux_ip)]
-        display_control.screen_input(headline, subline, text, "+", "Next/Fin", "-", prefix, char, suffix)
     elif status_mode == 10:   # Error display
         headline = "Change WIFI"
         subline = "Input Error!"
-        ip_is_invalid = False
-        try:
-            ipaddress.ip_address(new_stratux_ip)
-        except ValueError:
-            ip_is_invalid = True
-        if len(new_wifi) == 0:
+        if len(new_wifi.strip()) == 0:
             text = "SSID invalid"
-        elif 0 < len(new_pass) <= 8:
+        elif 0 < len(new_pass.strip()) < 8:
             text = "Passphrase too\nshort (none\nor min 8 char)"
-        elif ip_is_invalid:
-            text = "Stratux IP invalid"
         else:
             text = "unspecified error"
         display_control.text_screen(headline, subline, text, "Canc", "", "Redo")
@@ -258,21 +252,6 @@ def draw_status(display_control, bluetooth_active, extsound_active):
         subline = "Please wait ..."
         text = "New network\nconfig applied."
         display_control.text_screen(headline, subline, text, "", "", "")
-    elif status_mode == 12:   # Options Registration
-        headline = "Options"
-        subline = "Please select ..."
-        text = "\nShow registration?"
-        display_control.text_screen(headline, subline, text, "Yes", "Canc", "No")
-    elif status_mode == 13:   # Options speak distance warning
-        headline = "Options"
-        subline = "Please select ..."
-        text = "\nSpeak distance?"
-        display_control.text_screen(headline, subline, text, "Yes", "Canc", "No")
-    elif status_mode == 14:   # set sound warnings
-        headline = "Options"
-        subline = "Please select ..."
-        text = "\nExternal volume?   " + str(global_config['sound_volume'])
-        display_control.text_screen(headline, subline, text, "-5", "Set", "+5")
     display_control.display()
 
 
@@ -354,14 +333,9 @@ def read_wlanip():
         return ""
 
 
-def set_network(wifi, passw, new_stratux):
-    global global_config
-
+def set_network(wifi, passw):
     wifi = wifi.strip()
     passw = passw.strip()
-    new_stratux = new_stratux.strip()
-    global_config['stratux_ip'] = new_stratux
-    write_config(global_config)
     res = subprocess.run(
         ["sudo", "raspi-config", "nonint", "do_wifi_ssid_passphrase", wifi, passw],
         check=False,
@@ -386,38 +360,6 @@ def prev_char(current):
     return CHARSET[pos]
 
 
-def next_number(current):
-    return NUMBERS[(NUMBERS.find(current) + 1) % len(NUMBERS)]
-
-
-def prev_number(current):
-    pos = NUMBERS.find(current) - 1
-    if pos < 0:
-        pos = len(NUMBERS)-1
-    return NUMBERS[pos]
-
-
-def ipv4_to_string(ip):   # generate string with leading zeros
-    s = str((int(ip) >> 24) % 256,).zfill(3) + "." + str((int(ip) >> 16) % 256).zfill(3) + "." \
-        + str((int(ip) >> 8) % 256).zfill(3) + "." + str(int(ip) % 256).zfill(3)
-    return s
-
-
-def string_to_ipv4(ipv4str):
-    parts = ipv4str.strip().split('.')
-    if len(parts) != 4:
-        raise ValueError(f"Invalid IPv4 address: '{ipv4str}'")
-    octets = []
-    for part in parts:
-        if part == "":
-            raise ValueError(f"Invalid IPv4 address: '{ipv4str}'")
-        octet = int(part)
-        if octet < 0 or octet > 255:
-            raise ValueError(f"Invalid IPv4 address: '{ipv4str}'")
-        octets.append(octet)
-    return (octets[0] << 24) + (octets[1] << 16) + (octets[2] << 8) + octets[3]
-
-
 def user_input(extsound_active, bluetooth_active):
     global left
     global middle
@@ -430,8 +372,6 @@ def user_input(extsound_active, bluetooth_active):
     global new_wifi
     global new_pass
     global charpos
-    global new_stratux_ip
-    global stratux_ip
 
     if status_mode == 0:
         middle = "Mode"
@@ -487,8 +427,6 @@ def user_input(extsound_active, bluetooth_active):
             status_mode = 4
         if event is not None and is_middle_short(event):
             status_mode = 0
-        if event is not None and is_left_short(event):
-            status_mode = 12
     elif status_mode == 4:
         if event is not None and is_left_short(event):
             new_wifi = new_wifi[:charpos] + next_char(new_wifi[charpos]) + new_wifi[charpos+1:]
@@ -509,13 +447,15 @@ def user_input(extsound_active, bluetooth_active):
             charpos += 1
             if charpos >= len(new_pass):
                 charpos = 0
-                status_mode = 7
+                check_wifi = new_wifi.strip()
+                check_new_pass = new_pass.strip()
+                status_mode = 6 if check_wifi and (not check_new_pass or len(check_new_pass) >= 8) else 10
         if event is not None and is_middle_long(event):
             check_wifi = new_wifi.strip()
             check_new_pass = new_pass.strip()
             if len(check_wifi) > 0 and (len(check_new_pass) == 0 or len(check_new_pass) >= 8):
                 charpos = 0
-                status_mode = 7
+                status_mode = 6
             else:
                 status_mode = 10
         if event is not None and is_right_short(event):
@@ -525,37 +465,6 @@ def user_input(extsound_active, bluetooth_active):
             status_mode = 3
         elif event is not None and is_left_short(event):
             status_mode = 11
-    elif status_mode == 7:
-        if event is not None and is_left_short(event):
-            new_stratux_ip = new_stratux_ip[:charpos] + next_number(new_stratux_ip[charpos]) + new_stratux_ip[charpos+1:]
-        if event is not None and is_right_short(event):
-            new_stratux_ip = new_stratux_ip[:charpos] + prev_number(new_stratux_ip[charpos]) + new_stratux_ip[charpos+1:]
-        if event is not None and is_middle_short(event):
-            charpos += 1
-            if charpos >= len(new_stratux_ip):
-                ip_is_invalid = False
-                try:
-                    ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip))
-                except ValueError:
-                    ip_is_invalid = True
-                charpos = 0
-                if not ip_is_invalid:
-                    status_mode = 6
-                else:
-                    status_mode = 10
-            elif charpos == 3 or charpos == 7 or charpos == 11:
-                charpos += 1
-        if event is not None and is_middle_long(event):
-            ip_is_invalid = False
-            try:
-                ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip))
-            except ValueError:
-                ip_is_invalid = True
-            charpos = 0
-            if not ip_is_invalid:
-                status_mode = 6
-            else:
-                status_mode = 10
     elif status_mode == 10:
         if event is not None and is_right_short(event):
             charpos = 0
@@ -565,49 +474,6 @@ def user_input(extsound_active, bluetooth_active):
     elif status_mode == 11:
         new_wifi = new_wifi.strip()
         new_pass = new_pass.strip()
-        stratux_ip = str(ipaddress.IPv4Address(string_to_ipv4(new_stratux_ip)))
-        set_network(new_wifi, new_pass, stratux_ip)
-    elif status_mode == 12:
-        if event is not None and is_right_short(event):
-            global_config['display_tail'] = False
-            write_config(global_config)
-            status_mode = 13
-        if event is not None and is_left_short(event):
-            global_config['display_tail'] = True
-            write_config(global_config)
-            status_mode = 13
-        if event is not None and is_middle_short(event):
-            status_mode = 13
-    elif status_mode == 13:
-        if event is not None and is_right_short(event):
-            global_config['distance_warnings'] = False
-            write_config(global_config)
-        if event is not None and is_left_short(event):
-            global_config['distance_warnings'] = True
-            write_config(global_config)
-        if event is not None and is_middle_short(event):
-            pass
-        if extsound_active:
-            status_mode = 14
-        else:
-            status_mode = 3
-    elif status_mode == 14:
-        if event is not None and is_right_short(event):
-            global_config['sound_volume'] += 5
-            if global_config['sound_volume'] > 100:
-                global_config['sound_volume'] = 100
-            radarbluez.setvolume(global_config['sound_volume'])
-            radarbluez.speak("Test")
-            status_mode = 14
-        if event is not None and is_left_short(event):
-            global_config['sound_volume'] -= 5
-            if global_config['sound_volume'] < 0:
-                global_config['sound_volume'] = 0
-            radarbluez.setvolume(global_config['sound_volume'])
-            radarbluez.speak("Test")
-            status_mode = 14
-        if event is not None and is_middle_short(event):
-            write_config(global_config)
-            status_mode = 3
+        set_network(new_wifi, new_pass)
 
     return Modes.STATUS

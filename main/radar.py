@@ -1043,7 +1043,10 @@ async def display_and_cutoff():
 async def coroutines():
     try:
         tasks = []
-        if not no_stratux:
+        if ble_address is not None:
+            import ble
+            tasks.append(asyncio.create_task(ble.listen_to_ble(), name="BLEHandler"))
+        elif not no_stratux:
             tasks.extend([
                 asyncio.create_task(listen_forever(url_radar_ws, "TrafficHandler", new_traffic), name="TrafficHandler"),
                 asyncio.create_task(listen_forever(url_situation_ws, "SituationHandler", new_situation), name="SituationHandler"),
@@ -1070,7 +1073,7 @@ def initialize_ui_components():
     shutdownui.init(url_shutdown, url_reboot)
     timerui.init(global_config)
     ahrsui.init(url_calibrate, url_caging)
-    statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time, global_config)
+    statusui.init(CONFIG_FILE, url_status_get, url_host_base, display_refresh_time)
     gmeterui.init(url_gmeter_reset)
     stratuxstatus.init(url_status_ws, url_settings_get, url_settings_set)
     flighttime.init(measure_flighttime, SAVED_FLIGHTS)
@@ -1083,7 +1086,7 @@ def initialize_ui_components():
 
 def setup_event_handlers():
     """Register radar callbacks in the neutral dispatcher."""
-    if not no_stratux:
+    if not no_stratux or ble_address is not None:
         dispatcher.register_traffic_handler(new_traffic)
         dispatcher.register_situation_handler(new_situation)
     dispatcher.register_shutdown_handler(quit_gracefully)
@@ -1197,7 +1200,7 @@ if __name__ == "__main__":
     rlog.debug("\n\n")
     rlog.debug(f"Stratux-Radar-Display started.\nArgs: {args}")
     url_host_base = args['connect']
-    no_stratux = args['nostratux']
+    no_stratux = args['nostratux'] or args['ble'] is not None
     try:
         display_control_module = importlib.import_module('displays.' + args['device'] + '.controller')
         display_control = display_control_module.radar_display  # inherited instance of GenericDisplay in imported module
@@ -1238,14 +1241,6 @@ if __name__ == "__main__":
     saved_config = statusui.read_config(CONFIG_FILE)
     rlog.debug(f"Saved config read: {saved_config}")
     if saved_config is not None:
-        if 'stratux_ip' in saved_config:
-            url_host_base = saved_config['stratux_ip']  # set stratux ip if interactively changed one time
-        if 'display_tail' in saved_config:
-            global_config['display_tail'] = saved_config['display_tail']
-        if 'distance_warnings' in saved_config:
-            global_config['distance_warnings'] = saved_config['distance_warnings']
-        if 'sound_volume' in saved_config:
-            global_config['sound_volume'] = saved_config['sound_volume']
         if 'CO_warner_R0' in saved_config:
             global_config['CO_warner_R0'] = saved_config['CO_warner_R0']
     if not no_stratux:

@@ -91,10 +91,4 @@ sys.excepthook = handle_exception
 
 # Global configuration dictionary
 global_config = {}
-# stores all configuration data that is also be settable by user interface or calculated
-# - display tail
-# - distance warnings
-# - sound volume
-# - R0 of co warner
-# Is not used for general global settings like display mode or display sequence
-
+# Runtime settings include command-line options and the CO warner calibration.

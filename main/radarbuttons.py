@@ -127,7 +127,7 @@ def run_flask():
         rlog.error(f"radarbuttons: Failed to start nginx, return code: {res.returncode}")
     else:
         rlog.debug(f"radarbuttons: starting flask app")
-    create_api_app().run(debug=False, use_reloader=False)
+    create_api_app().run(port=5001, debug=False, use_reloader=False)
 
 class RadarButton:
     def __init__(self,gpio_number):

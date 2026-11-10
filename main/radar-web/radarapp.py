@@ -47,6 +47,7 @@ import subprocess
 import ipaddress
 import asyncio
 import re
+import shlex
 from werkzeug.utils import secure_filename
 import xmltodict
 import ble
@@ -100,8 +101,6 @@ class Watchdog:
 
     @staticmethod
     def do_expire():
-        rlog.debug(f'radar-web: watchdog timeout expired! Stopping nginx proxy. ')
-        os.system('sudo systemctl stop nginx')
         rlog.debug('radar-web: watchdog timeout expired! Stopping flask-app. ')
         os.kill(os.getpid(),signal.SIGINT)
 
@@ -325,16 +324,18 @@ def scan_ble_devices():
 
 
 def read_options_in_file(file_path, word):
-    radar_arguments = ''
     try:
         with open(file_path, 'r') as fp:
             for line in fp:
-                if word in line:
+                if not line.lstrip().startswith('#') and word in line:
                     w_index = line.find(word)
                     radar_arguments = line[w_index + len(word):].strip()
-                    if '&' in radar_arguments:
-                        radar_arguments = radar_arguments.split('&')[0].strip()  # ignore & at the end
+                    if radar_arguments.endswith('&'):
+                        radar_arguments = radar_arguments[:-1].rstrip()
                     break
+            else:
+                rlog.error(f'Radar-app: {word} not found in {file_path}')
+                return None
     except FileNotFoundError:
         rlog.debug(f'Radar-app: {file_path} not found!')
         return
@@ -347,11 +348,15 @@ def modify_line_in_file(file_path, word, new_text):    # search word in file and
     try:
         with open(file_path, 'r') as file:
             lines = file.readlines()
+        if not any(not line.lstrip().startswith('#') and word in line for line in lines):
+            rlog.error(f'Radar-app: {word} not found in {file_path}')
+            return False
         with open(file_path, 'w') as file:
             for line in lines:
-                if word in line:
+                if not line.lstrip().startswith('#') and word in line:
                     word_index = line.find(word)
-                    new_line = line[:word_index + len(word)] + " " + new_text + "\n"
+                    suffix = " &" if line.rstrip().endswith('&') else ""
+                    new_line = line[:word_index + len(word)] + " " + new_text + suffix + "\n"
                     file.write(new_line)
                 else:
                     file.write(line)
@@ -403,16 +408,16 @@ def read_arguments(rf):
     radar_ap = argparse.ArgumentParser(description='Stratux options', exit_on_error=False)
     arguments.add(radar_ap)
     try:
-        args = vars(radar_ap.parse_args(options.split()))
-    except (SystemExit, argparse.ArgumentError, argparse.ArgumentTypeError) as e:
+        args = vars(radar_ap.parse_args(shlex.split(options)))
+    except (SystemExit, argparse.ArgumentError, argparse.ArgumentTypeError, ValueError) as e:
         rlog.debug(f'Error parsing radar arguments in "{START_RADAR_FILE}": {type(e)}')
         return
     rf.display.data = args['device']
     rf.stratux_ip.data = args['connect']
-    if args['nostratux']:
-        rf.connection_mode.data = 'standalone'
-    elif args['ble'] is not None:
+    if args['ble'] is not None:
         rf.connection_mode.data = 'ble'
+    elif args['nostratux']:
+        rf.connection_mode.data = 'standalone'
     else:
         rf.connection_mode.data = 'stratux'
     rf.ble_address.data = '' if args['ble'] is None else args['ble']
@@ -467,8 +472,8 @@ def read_app_arguments(rf):
         return
     rlog.debug(f'radarapp_arguments read from "{START_RADAR_FILE}": {options}')
     try:
-        app_args = vars(ap.parse_args(options.split()))
-    except (SystemExit, argparse.ArgumentError, argparse.ArgumentTypeError) as e:
+        app_args = vars(ap.parse_args(shlex.split(options)))
+    except (SystemExit, argparse.ArgumentError, argparse.ArgumentTypeError, ValueError) as e:
         rlog.debug(f'Error parsing radar-app arguments in "{START_RADAR_FILE}": {type(e)}')
         return
     rf.webtimeout.data = str(app_args['timer'])
@@ -476,7 +481,7 @@ def read_app_arguments(rf):
 
 def app_option_string(radarform):
         option = '--stratux' if stratux_mode else ''
-        return f'{option} -t {radarform.webtimeout.data} &'
+        return f'{option} -t {radarform.webtimeout.data}'
 
 def build_mode_string(radarform):
     res = ''
@@ -494,12 +499,48 @@ def build_mode_string(radarform):
         res = f' -modes {modestring}'
     return res
 
+def preserved_radar_options(options):
+    parser = argparse.ArgumentParser(exit_on_error=False)
+    arguments.add(parser)
+    tokens = shlex.split(options)
+    parser.parse_args(tokens)
+    unmanaged = {'simulation', 'cosimulation', 'buttonapi', 'aircraftsim'}
+    result = []
+    i = 0
+    while i < len(tokens):
+        option = tokens[i].split('=', 1)[0]
+        action = parser._option_string_actions.get(option)
+        if action is None:
+            raise ValueError(f'Unsupported radar argument: {tokens[i]}')
+        takes_value = action.nargs != 0 and '=' not in tokens[i]
+        end = i + 1 + int(takes_value)
+        if action.dest in unmanaged:
+            result.extend(tokens[i:end])
+        i = end
+    return shlex.join(result)
+
+
 def write_arguments(rf):
+    options = read_options_in_file(START_RADAR_FILE, RADAR_COMMAND)
+    app_options = read_options_in_file(START_RADAR_FILE, RADARAPP_COMMAND)
+    if options is None or app_options is None:
+        return False
+    try:
+        preserved = preserved_radar_options(options)
+        app_tokens = shlex.split(app_options)
+        app_args = ap.parse_args(app_tokens)
+    except (SystemExit, argparse.ArgumentError, ValueError) as e:
+        rlog.error(f'Radar-app: Cannot preserve radar options: {e}')
+        return False
     new_options_app = app_option_string(rf)
+    if any(token.split('=', 1)[0] in ('-v', '--verbose') for token in app_tokens):
+        new_options_app += f' -v {app_args.verbose}'
     rlog.debug(f'New option string for radar web: "{new_options_app}"')
     if modify_line_in_file(START_RADAR_FILE, RADARAPP_COMMAND, new_options_app) is False:
         return False
     new_options = build_option_string(rf)
+    if preserved:
+        new_options += ' ' + preserved
     rlog.debug(f'New option string for radar: "{new_options}"')
     if modify_line_in_file(START_RADAR_FILE, RADAR_COMMAND, new_options) is False:
         return False
@@ -529,9 +570,9 @@ def build_option_string(rf):
             rf.sound_volume.data = 50
         out += f' -y {rf.sound_volume.data}'
         if rf.all_mixers.data != 'other':
-            out += f' -mx {rf.all_mixers.data}'
+            out += f' -mx {shlex.quote(rf.all_mixers.data)}'
         elif len(rf.mixername.data) > 0:
-            out += f' -mx {rf.mixername.data}'
+            out += f' -mx {shlex.quote(rf.mixername.data)}'
     if rf.speakdistance.data is True:
         out += ' -sd'
     if rf.groundsensor.data is True:
@@ -628,9 +669,10 @@ def index():
     if is_valid_submit is not True:   # GET request or validation errors
         if request.method == 'POST':
             rlog.debug(f'index(): form validation failed: {radar_form.errors}')
-        read_arguments(radar_form)  # in case of errors reading arguments, default is taken
-        read_app_arguments(radar_form)  # in case of errors reading arguments, default is taken
-        update_ble_device_choices(radar_form)
+        else:
+            read_arguments(radar_form)
+            read_app_arguments(radar_form)
+            update_ble_device_choices(radar_form)
         rlog.debug(f'index() after read_arguments: stratux-ip is {radar_form.stratux_ip.data}')
     else:
         rlog.debug(f'index() in else for POST: stratux-ip is {radar_form.stratux_ip.data}')
