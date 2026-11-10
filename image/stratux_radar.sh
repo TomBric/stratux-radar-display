@@ -2,8 +2,11 @@
 # startup script for your radar
 # This is called as pi user via autostart-radar.service or on stratux via crontab on every boot
 
+# Start the configuration webserver after a delay, without blocking radar.
+(
+    sleep 30
+    cd /home/pi/stratux-radar-display/main/radar-web && python3 radarapp.py -t 10
+) &
+
 # start radar. This line will be configured via the configuration webserver
 cd /home/pi/stratux-radar-display/main && python3 radar.py -r -d NoDisplay -c 192.168.10.1
-
-# start configuration webserver
-cd /home/pi/stratux-radar-display/main/radar-web && python3 radarapp.py -t 10 &
