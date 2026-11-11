@@ -46,6 +46,7 @@ import globals
 import subprocess
 import ipaddress
 import asyncio
+import math
 import re
 import shlex
 from werkzeug.utils import secure_filename
@@ -231,8 +232,13 @@ class RadarForm(FlaskForm):
 
     #ground-distance options
     groundsensor = SwitchField('Activate ground sensor via UART', default=False)
-    fallback_ground_distance = FloatField('Fallback ground distance [cm]', default=100.0,
-                                          validators=[NumberRange(min=10.0, max=500.0)])
+    ground_distance_mode = RadioField('Ground distance calibration',
+                                      choices=[('measure', 'Measure distance at boot with fallback distance'),
+                                               ('fixed', 'Fixed distance')], default='measure')
+    fallback_ground_distance = FloatField('Fallback ground distance [cm]', default=50.0,
+                                          render_kw={'min': 0, 'max': 500, 'step': 'any'})
+    fixed_ground_distance = FloatField('Fixed ground distance [cm]', default=50.0,
+                                       render_kw={'min': 0, 'max': 500, 'step': 'any'})
     groundbeep = SwitchField('Indicate ground distance via sound', default=False)
     countdown = SwitchField('Indicate ground distance via countdown screen', default=False)
     gearindicate = SwitchField('Speak gear warning (GPIO19)', default=False)
@@ -275,6 +281,19 @@ class RadarForm(FlaskForm):
             ipaddress.ip_address(value)
         except ValueError:
             raise ValidationError('Please enter a valid IP address for Stratux.')
+
+    def validate_fallback_ground_distance(self, field):
+        if self.groundsensor.data and self.ground_distance_mode.data == 'measure':
+            self.validate_ground_distance(field)
+
+    def validate_fixed_ground_distance(self, field):
+        if self.groundsensor.data and self.ground_distance_mode.data == 'fixed':
+            self.validate_ground_distance(field)
+
+    @staticmethod
+    def validate_ground_distance(field):
+        if field.data is None or not math.isfinite(field.data) or not 0 <= field.data <= 500:
+            raise ValidationError('Enter a ground distance between 0 and 500 cm.')
 
 
 def cards_and_mixers():  # returns a list of (cardname, mixer) tuples, called from radar_app
@@ -438,8 +457,14 @@ def read_arguments(rf):
     rf.speakdistance.data = args['speakdistance']
     # ground-options
     rf.groundsensor.data = args['grounddistance']
+    fixed_option = args['fixeddistance']
     fallback_option = args['fallback_distance']
-    if isinstance(fallback_option, (int, float)) and fallback_option > 0.0:
+    if fixed_option is not None:
+        rf.ground_distance_mode.data = 'fixed'
+        rf.fixed_ground_distance.data = fixed_option
+    else:
+        rf.ground_distance_mode.data = 'measure'
+    if isinstance(fallback_option, (int, float)) and fallback_option >= 0.0:
         rf.fallback_ground_distance.data = float(fallback_option)
     rf.groundbeep.data = args['groundbeep']
     rf.countdown.data = args['countdown']
@@ -577,11 +602,10 @@ def build_option_string(rf):
         out += ' -sd'
     if rf.groundsensor.data is True:
         out += ' -gd'
-        fallback_distance = rf.fallback_ground_distance.data
-        if fallback_distance is None or fallback_distance < 10.0 or fallback_distance > 500.0:
-            fallback_distance = 100.0
-        fallback_distance = float(fallback_distance)
-        out += f' -fb {fallback_distance}'
+        if rf.ground_distance_mode.data == 'fixed':
+            out += f' -fd {rf.fixed_ground_distance.data}'
+        else:
+            out += f' -fb {rf.fallback_ground_distance.data}'
     if rf.groundbeep.data is True:
         out += ' -gb'
     if rf.countdown.data is True:

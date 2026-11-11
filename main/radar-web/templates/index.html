@@ -46,11 +46,9 @@
     <h4>Radar-Display Configuration On Stratux</h4>
 {% endif %}
 
-
-
 <br>
-<h5>Radar source connection</h5>
 {% if on_stratux == False %}
+    <h5>Radar source connection</h5>
     {{ render_field(radar_form.connection_mode, form_type='horizontal') }}
     <div id="stratux-ip-container" class="{% if radar_form.connection_mode.data != 'stratux' %}d-none{% endif %}">
         {{ render_field(radar_form.stratux_ip, form_type='horizontal') }}
@@ -123,8 +121,19 @@
 {{ render_field(radar_form.autorefresh, form_type='horizontal') }}
 
 <h5>Ground sensor (LIDAR) options</h5>
-{{ render_form_row([radar_form.groundsensor, radar_form.fallback_ground_distance, radar_form.groundbeep, radar_form.countdown, radar_form.gearindicate],
-    col_map={'groundsensor': 'col-md-3', 'fallback_ground_distance': 'col-md-3', 'groundbeep': 'col-md-2', 'countdown': 'col-md-2', 'gearindicate': 'col-md-2'}) }}
+{{ render_form_row([radar_form.groundsensor, radar_form.groundbeep, radar_form.countdown, radar_form.gearindicate],
+    col_map={'groundsensor': 'col-md-3', 'groundbeep': 'col-md-2', 'countdown': 'col-md-2', 'gearindicate': 'col-md-2'}) }}
+<div id="ground-calibration-container" class="{% if not radar_form.groundsensor.data %}d-none{% endif %}">
+    <div class="row align-items-start">
+        <div class="col-md-5">{{ render_field(radar_form.ground_distance_mode) }}</div>
+        <div id="fallback-ground-distance-container" class="col-md-3 {% if radar_form.ground_distance_mode.data != 'measure' %}d-none{% endif %}">
+            {{ render_field(radar_form.fallback_ground_distance) }}
+        </div>
+        <div id="fixed-ground-distance-container" class="col-md-3 {% if radar_form.ground_distance_mode.data != 'fixed' %}d-none{% endif %}">
+            {{ render_field(radar_form.fixed_ground_distance) }}
+        </div>
+    </div>
+</div>
 
 <h5>Configuration web server shutdown time</h5>
 {{ render_field(radar_form.webtimeout, form_type='horizontal') }}
@@ -260,6 +269,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const groundSensor = document.getElementById('groundsensor');
+    const calibrationContainer = document.getElementById('ground-calibration-container');
+    const fallbackContainer = document.getElementById('fallback-ground-distance-container');
+    const fixedContainer = document.getElementById('fixed-ground-distance-container');
+    const fallbackInput = document.getElementById('fallback_ground_distance');
+    const fixedInput = document.getElementById('fixed_ground_distance');
+    const modeRadios = document.querySelectorAll('input[name="ground_distance_mode"]');
+
+    function updateGroundCalibration() {
+        const enabled = groundSensor.checked;
+        const selected = document.querySelector('input[name="ground_distance_mode"]:checked');
+        const fixed = selected && selected.value === 'fixed';
+        calibrationContainer.classList.toggle('d-none', !enabled);
+        fallbackContainer.classList.toggle('d-none', fixed);
+        fixedContainer.classList.toggle('d-none', !fixed);
+        fallbackInput.disabled = !enabled || fixed;
+        fixedInput.disabled = !enabled || !fixed;
+    }
+
+    groundSensor.addEventListener('change', updateGroundCalibration);
+    modeRadios.forEach(function (radio) {
+        radio.addEventListener('change', updateGroundCalibration);
+    });
+    updateGroundCalibration();
+
     const fallbackLabel = document.querySelector('label[for="fallback_ground_distance"]');
     if (!fallbackLabel) {
         return;

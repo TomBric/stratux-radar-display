@@ -32,7 +32,7 @@ apt install git python3-pip -y
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio libttspico-utils -y
 
-# handle initram error during build
+# handle initram error during build, can be removed late, if stratux image is ok
 python_packages=(python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-pygame python3-numpy python3-scipy python3-gpiozero)
 apt_log=$(mktemp)
 trap 'rm -f -- "$apt_log"' EXIT

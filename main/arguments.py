@@ -35,6 +35,7 @@
 
 from pathlib import Path
 
+
 CONFIG_DIR = "config"
 FULL_CONFIG_DIR = str(Path(__file__).resolve().parent.parent.joinpath(CONFIG_DIR))
 DEFAULT_URL_HOST_BASE = "192.168.10.1"
@@ -83,6 +84,8 @@ def add(ap):
                     action="store_true", default=False)
     ap.add_argument("-fb", "--fallback_distance", type=float, required=False,
                     help="Fallback ground distance in cm if startup sensor reading is invalid", default=None)
+    ap.add_argument("-fd", "--fixeddistance", type=float, required=False,
+                    help="Fixed ground distance in cm, instead of measuring at startup", default=None)
     ap.add_argument("-gb", "--groundbeep", required=False, help="Indicate ground distance via sound",
                     action="store_true", default=False)
     ap.add_argument("-cd", "--countdown", required=False, help="Show ground distance ground down screen",

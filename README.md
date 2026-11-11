@@ -36,6 +36,7 @@ The best user experience is with the epaper-display. They are perfectly readable
 - [Bluetooth and external sound](https://github.com/TomBric/stratux-radar-display/wiki/Bluetooth-and-external-sound)
 - [Manual for user interface with 3 pushbuttons](https://github.com/TomBric/stratux-radar-display/wiki/Manual-for-user-interface-with-3-pushbuttons)
 
+For the UART ground sensor, the web configuration can either measure the sensor-to-ground distance at boot with a fallback, or use a fixed distance. Both values are in centimeters (0–500, default 50). For manual configuration, use `-gd -fb 50` for the fallback mode or `-gd -fd 50` for a fixed distance. The fixed distance remains unchanged when ground statistics are reset; measure it from the sensor to the ground with the aircraft on the ground.
 
 You can find instructions how to build the full instruments in the wiki. 
 The Oled-case is designed for a 2 1/4 inch mounting hole, the E-paper case is designed for a 3 1/8 inch (80 mm) mounting hole. Instructions e.g. how to build an [all-in one 2 1/4 Oled case](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-(Stratux-with-oled-display) "wiki 2 1/4"), or [all-in-one 3 1/8 Epaper instrument](https://github.com/TomBric/stratux-radar-display/wiki/All-in-one-aluminum-case-for-80-mm-instrument-hole-with-Epaper-display-and-Bluetooth "wiki 3 1/8"), or [Epaper 3 1/8 display only](https://github.com/TomBric/stratux-radar-display/wiki/Epaper-Display-for-80-mm-instrument-hole) can be found in the wiki.

@@ -93,7 +93,8 @@ countdown_screen = False  # True if countdown screen is to be shown (option -cd)
 gear_indication = False  # True if gear indication is active (option -gi) and GPIO could be activated
 distance_sensor: Any = None
 zero_distance: float = 0.0  # distance of sensor when aircraft is on ground
-fallback_zero_distance_mm: float = 0.0  # fallback distance in mm provided via -fb <cm>; 0.0 means disabled
+fallback_zero_distance_mm: float | None = None  # fallback distance in mm provided via -fb <cm>
+fixed_zero_distance_mm: float | None = None  # fixed distance in mm provided via -fd <cm>
 value_debug_level = 0  # set during init
 simulation_mode = False  # set during init
 # statistics for calculating values
@@ -260,7 +261,10 @@ def reset_values():
     fly_status = 0
 
     if ground_distance_active:
-        if simulation_mode:
+        if fixed_zero_distance_mm is not None:
+            zero_distance = fixed_zero_distance_mm
+            rlog.debug('Ground Zero Distance remains fixed at: {0:5.2f} cm'.format(zero_distance / 10))
+        elif simulation_mode:
             zero_distance = 0.0
             rlog.debug('Simulation Mode: Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
         else:
@@ -272,16 +276,15 @@ def reset_values():
             if new_zero_distance > 0:
                 zero_distance = float(new_zero_distance)
                 rlog.debug('Ground Zero Distance reset to: {0:5.2f} cm'.format(zero_distance / 10))
-            elif fallback_zero_distance_mm > 0.0:
-                fallback_value_mm = float(fallback_zero_distance_mm)
-                zero_distance = fallback_value_mm
-                rlog.debug('Ground Zero Distance reset fallback from -gd: {0:5.2f} cm'.format(zero_distance / 10))
+            elif fallback_zero_distance_mm is not None:
+                zero_distance = fallback_zero_distance_mm
+                rlog.debug('Ground Zero Distance reset fallback from -fb: {0:5.2f} cm'.format(zero_distance / 10))
             else:
                 rlog.debug('Error resetting gound zero distance')
 
 
 def init(activate, stat_file, debug_level, distance_indication, countdown, gear_ind, situation, sim_mode,
-         fallback_distance_cm: float = 0.0):
+         fallback_distance_cm: float | None = None, fixed_distance_cm: float | None = None):
     global ground_distance_active
     global indicate_distance
     global countdown_screen
@@ -293,6 +296,7 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, gear_
     global saved_statistics
     global gear_indication
     global fallback_zero_distance_mm
+    global fixed_zero_distance_mm
 
     # ground_distance_active: sensor is activated with -gd and is running
     # simulation_mode: simulation mode is activated with -sim
@@ -304,10 +308,13 @@ def init(activate, stat_file, debug_level, distance_indication, countdown, gear_
     value_debug_level = debug_level
     saved_statistics = stat_file
     global_situation = situation  # to be able to read and store situation info
-    if isinstance(fallback_distance_cm, (int, float)) and fallback_distance_cm > 0.0:
+    if fallback_distance_cm is not None and fallback_distance_cm >= 0.0:
         fallback_zero_distance_mm = float(fallback_distance_cm) * 10.0
     else:
-        fallback_zero_distance_mm = 0.0
+        fallback_zero_distance_mm = None
+    fixed_zero_distance_mm = float(fixed_distance_cm) * 10.0 if fixed_distance_cm is not None else None
+    if fixed_zero_distance_mm is not None:
+        zero_distance = fixed_zero_distance_mm
 
     if gear_ind:
         gear_indication = radarbuttons.init_gear_indicator()
@@ -736,7 +743,9 @@ async def read_ground_sensor():
     if ground_distance_active:
         rlog.debug("Ground distance reader active ...")
         sensor = distance_sensor
-        if not simulation_mode and sensor is not None:
+        if fixed_zero_distance_mm is not None:
+            new_zero_distance = fixed_zero_distance_mm
+        elif not simulation_mode and sensor is not None:
             for _ in range(FIRST_FRAME_WAIT_STEPS):   # wait for the first sensor frame instead of failing instantly
                 if sensor.ser.inWaiting() >= sensor.lidar_bytes:
                     break
@@ -748,13 +757,15 @@ async def read_ground_sensor():
         else:
             rlog.debug('Grounddistance: Sensor not initialized, cannot determine zero distance')
             new_zero_distance = 0.0
-        if new_zero_distance > 0:
+        if fixed_zero_distance_mm is not None or new_zero_distance > 0:
             zero_distance = float(new_zero_distance)  # distance in mm this is zero
-            rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
-        elif fallback_zero_distance_mm > 0.0:
-            fallback_value_mm = float(fallback_zero_distance_mm)
-            zero_distance = fallback_value_mm
-            rlog.debug('Ground Zero Distance fallback from -gd: {0:5.2f} cm'.format(zero_distance / 10))
+            if fixed_zero_distance_mm is not None:
+                rlog.debug('Fixed Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
+            else:
+                rlog.debug('Ground Zero Distance: {0:5.2f} cm'.format(zero_distance / 10))
+        elif fallback_zero_distance_mm is not None:
+            zero_distance = fallback_zero_distance_mm
+            rlog.debug('Ground Zero Distance fallback from -fb: {0:5.2f} cm'.format(zero_distance / 10))
         else:
             rlog.debug('Ground Zero Distance: Error reading ground distance, not set')
         try:
@@ -813,5 +824,3 @@ def user_input():
     if is_right_long(event):
         return Modes.REFRESH_COUNTDOWN_DISTANCE, False
     return Modes.COUNTDOWN_DISTANCE, False  # no mode change for any other interaction
-
-
