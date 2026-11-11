@@ -32,7 +32,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import logging
-import radar
 import asyncio
 import json
 from globals import rlog, Modes
@@ -74,11 +73,11 @@ def init(url_ws, url_settings_get, url_settings_set):  # prepare everything
 def start():  # start listening on status websocket
     global status_listener
 
+    import radar   # lazy import
     if status_listener is None:
         loop = asyncio.get_event_loop()
         status_listener = loop.create_task(radar.listen_forever(status_url, name="StatusListener",
                 callback=status_callback), name="StatusListener")
-
 
 
 def stop():  # stop listening on status websocket
