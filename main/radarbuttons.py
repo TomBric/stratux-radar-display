@@ -129,6 +129,7 @@ def run_flask():
         rlog.debug(f"radarbuttons: starting flask app")
     create_api_app().run(port=5001, debug=False, use_reloader=False)
 
+
 class RadarButton:
     def __init__(self,gpio_number):
         self.btn = Button(gpio_number, bounce_time=BOUNCE_TIME, hold_time=HOLD_TIME)
