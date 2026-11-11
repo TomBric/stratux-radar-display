@@ -35,7 +35,6 @@ import math
 from globals import rlog, AIRCRAFT_DEBUG
 import numpy as np
 import time
-from bayesian_filters.kalman import KalmanFilter
 
 
 # Threshold to calculate potential collision, warning level low, INFO
@@ -249,6 +248,8 @@ def tcas_to_prio(tcas_state):
 # horizontal distance estimation uses a time based kalman filter. Additionally it is "gated" to ignore outliers
 
 def setup_distance_filter(initial_dist):
+    from bayesian_filters.kalman import KalmanFilter
+
     # kalman filter state x is: [distance, velocity], measurements z are: [distance], all values in nm
     f = KalmanFilter(dim_x=2, dim_z=1)
     f.x = np.array([[initial_dist], [0.]])
@@ -259,6 +260,8 @@ def setup_distance_filter(initial_dist):
 
 
 def setup_vertical_filter(initial_alt):
+    from bayesian_filters.kalman import KalmanFilter
+
     # kalman filter state x is: [altitude, vertical_velocity], measurements z are: [altitude], all values in ft
     f = KalmanFilter(dim_x=2, dim_z=1)
     f.x = np.array([[initial_alt], [0.]])
