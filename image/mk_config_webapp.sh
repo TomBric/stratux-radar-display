@@ -38,13 +38,13 @@ apt update
 # apt upgrade -y
 apt install nginx -y
 apt install python3-psutil -y
+apt install bootstrap-flask python3-flaskext.wtf werkzeug -y
 pip cache purge
 # necessary to match new hashes
 # uninstall types-flask-migrate if present, because it is not needed
 if pip3 show types-flask-migrate >/dev/null 2>&1; then
   pip3 uninstall types-flask-migrate --break-system-packages --root-user-action=ignore -y
 fi
-pip3 install bootstrap-flask flask-wtf werkzeug --break-system-packages --no-cache-dir --root-user-action=ignore
 # generate reverse proxy config
 rm -f /etc/nginx/sites-enabled/default
 cp "$SCRIPT_DIR/radar_reverse.conf" /etc/nginx/sites-available/radar_reverse.conf

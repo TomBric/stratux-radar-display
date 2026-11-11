@@ -3,7 +3,7 @@
 # script configures a stratux-radar-display image for standalone display usage
 # that means it can be used on a pi with a display and without stratux
 # useful e.g. if only groundsensor is used
-# script to be run as root on a stratux-display image
+# script to be run as root on a already existing stratux-display image
 # usage sudo /bin/bash configure_standalone_display.sh
 
 
@@ -40,6 +40,7 @@ fi
 echo "[OK] Using Wi-Fi device $WIFI_DEVICE."
 
 echo "[INFO] Disabling saved Wi-Fi connections..."
+echo "[INFO] I will come back with SSID $STANDALONE_AP_SSID and IP $STANDALONE_AP_IP"
 while IFS=: read -r uuid type; do
   if [ "$type" = "802-11-wireless" ]; then
     nmcli connection modify uuid "$uuid" connection.autoconnect no
