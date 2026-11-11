@@ -2,7 +2,7 @@
 
 # Thomas Breitbach 2021 for stratux-radar-display, modified, but mainly based on work for stratux europe by b3nn0
 # To run this, make sure that this is installed:
-# sudo apt install --yes parted zip unzip zerofree
+# sudo apt install --yes parted zip unzip zerofree xz-utils jq python3
 # If you want to build on x86 with aarch64 emulation, additionally install qemu-user-static qemu-system-arm
 # Run this script as root.
 #  sudo /bin/bash mk_stratux_display.sh [-b <branch>] [-u <USB-stick-name>]
@@ -199,10 +199,25 @@ xz -v -k "out/${outprefix}${outname}"
 # https://github.com/TomBric/stratux-radar-display/releases/download/v2.12/v64-stratux-display-v2.12-000d4f4b.img.xz
 rm "out/${outprefix}${outname}"
 
+create_local_imager_manifest() {
+  local output_dir="$1"
+  local image_path="$output_dir/${outprefix}${outname}.xz"
+  local manifest_path="$output_dir/${outprefix}${outname}.rpi-imager-manifest"
+  local image_url
+
+  image_url=$(python3 -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve(strict=True).as_uri())' "$image_path")
+  jq --arg url "$image_url" --slurpfile repo "$SRCDIR/pi-imager/repo.json" \
+    '{imager: $repo[0].imager, os_list: [(.os_list[-1] | .url = $url | .init_format = "cloudinit-rpi")]}' \
+    "$output_dir/${outprefix}${outname}.json" > "$manifest_path"
+  echo "Local Raspberry Pi Imager manifest: $manifest_path"
+}
+
 if [ "${#USB_NAME}" -eq 0 ]; then
+  create_local_imager_manifest "$TMPDIR/out"
   echo "Final images have been placed into $TMPDIR/out. Please install and test the images."
 else
   mv "$TMPDIR"/out/"${outprefix}"* "/media/pi/$USB_NAME"
+  create_local_imager_manifest "/media/pi/$USB_NAME"
   umount "/media/pi/$USB_NAME"
   echo "Final images have been moved to usb stick $USB_NAME and umounted. Please install and test the images."
 fi
