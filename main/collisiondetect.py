@@ -33,7 +33,6 @@
 
 import math
 from globals import rlog, AIRCRAFT_DEBUG
-import numpy as np
 import time
 
 
@@ -248,6 +247,7 @@ def tcas_to_prio(tcas_state):
 # horizontal distance estimation uses a time based kalman filter. Additionally it is "gated" to ignore outliers
 
 def setup_distance_filter(initial_dist):
+    import numpy as np
     from bayesian_filters.kalman import KalmanFilter
 
     # kalman filter state x is: [distance, velocity], measurements z are: [distance], all values in nm
@@ -260,6 +260,7 @@ def setup_distance_filter(initial_dist):
 
 
 def setup_vertical_filter(initial_alt):
+    import numpy as np
     from bayesian_filters.kalman import KalmanFilter
 
     # kalman filter state x is: [altitude, vertical_velocity], measurements z are: [altitude], all values in ft
@@ -272,6 +273,8 @@ def setup_vertical_filter(initial_alt):
 
 
 def update_traffic_adaptive(ac):
+    import numpy as np
+
     # used for mode-s only targets, returns distance, velocity, vertical velocity  by using kalman filters for distance and altitude
     # first horizontal distance estimation
     now = time.time()
