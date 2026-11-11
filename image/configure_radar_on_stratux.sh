@@ -31,7 +31,34 @@ apt install git python3-pip -y
 # no sound or bluetooth on stratux
 # apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth libttspico-utils
 apt install pipewire pipewire-audio pipewire-alsa libspa-0.2-bluetooth python3-alsaaudio libttspico-utils -y
-apt install python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-pygame python3-numpy python3-scipy python3-gpiozero -y
+
+# handle initram error during build
+python_packages=(python3-websockets python3-xmltodict python3-pydbus python3-luma.oled python3-pip python3-pygame python3-numpy python3-scipy python3-gpiozero)
+apt_log=$(mktemp)
+trap 'rm -f -- "$apt_log"' EXIT
+if apt install "${python_packages[@]}" -y 2>&1 | tee "$apt_log"; then
+  rm -f -- "$apt_log"
+  trap - EXIT
+else
+  pipeline_status=("${PIPESTATUS[@]}")
+  if [ "${pipeline_status[1]}" -ne 0 ] || ! grep -Fq 'mkinitramfs: failed to determine device for /' "$apt_log"; then
+    echo "Package installation failed; no applicable initramfs workaround found." >&2
+    exit 1
+  fi
+
+  initramfs_config=/etc/initramfs-tools/conf.d/zz-stratux-radar-modules.conf
+  if [ -e "$initramfs_config" ]; then
+    echo "Refusing to overwrite existing $initramfs_config." >&2
+    exit 1
+  fi
+  echo "Root device detection failed; retrying with MODULES=most." >&2
+  printf 'MODULES=most\n' > "$initramfs_config"
+  dpkg --configure -a
+  apt install "${python_packages[@]}" -y
+  rm -f -- "$apt_log"
+  trap - EXIT
+fi
+
 su pi -c "pip3 install  ADS1x15-ADC --break-system-packages"
 su pi -c "pip3 install bayesian-filters --break-system-packages"
 su pi -c "pip3 install bleak --break-system-packages"
