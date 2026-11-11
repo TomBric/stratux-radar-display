@@ -38,7 +38,7 @@ apt update
 # apt upgrade -y
 apt install nginx -y
 apt install python3-psutil -y
-apt install bootstrap-flask python3-flaskext.wtf werkzeug -y
+apt install python3-flask-bootstrap python3-flaskext.wtf python3-werkzeug -y
 pip cache purge
 # necessary to match new hashes
 # uninstall types-flask-migrate if present, because it is not needed
