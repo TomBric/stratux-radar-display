@@ -37,7 +37,6 @@ import asyncio
 import json
 from globals import rlog, Modes
 import radarmodes
-import requests
 from button_input import get_button_event, is_left_short, is_left_long, is_middle_short, is_middle_long, is_right_short, is_right_long
 
 # constants
@@ -141,6 +140,8 @@ def draw_status(display_control, ui_changed, connected, altitude, gps_alt, gps_q
 def get_current_altoffset():
     if not settings_url_get:
         return None
+    import requests
+
     try:
         response = requests.get(settings_url_get)
         if response.status_code == 200:   # Check if the request was successful (status code 200)
@@ -161,6 +162,8 @@ def get_current_altoffset():
 def set_altitude_offset(new_value):
     if not settings_url_set:
         return
+    import requests
+
     try:
         # Send a POST request to update the AltitudeOffset
         response = requests.post(settings_url_set, json={'AltitudeOffset': new_value})

@@ -35,7 +35,6 @@ import os
 import subprocess
 import signal
 import time
-import requests
 from globals import rlog, Modes
 import radarmodes
 from button_input import get_button_event, is_left, is_middle, is_right
@@ -115,6 +114,8 @@ def draw_shutdown(display_control):
         if shutdown_mode == 0:   # shutdown display and stratux
             if url_shutdown:
                 rlog.debug("Posting shutdown.")
+                import requests
+
                 try:
                     requests.post(url_shutdown)
                 except requests.exceptions.RequestException as e:
@@ -131,6 +132,8 @@ def draw_shutdown(display_control):
         elif shutdown_mode == 2:   # reboot display and stratux
             if url_reboot:
                 rlog.debug("Posting reboot.")
+                import requests
+
                 try:
                     requests.post(url_reboot)
                 except requests.exceptions.RequestException as e:

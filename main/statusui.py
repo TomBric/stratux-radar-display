@@ -33,7 +33,6 @@
 
 from globals import rlog
 import os
-import requests
 import time
 import radarbluez
 import math
@@ -154,6 +153,8 @@ def get_status():
 
     if not status_url:
         return None
+    import requests
+
     try:
         answer = requests.get(status_url)
         status_answer = answer.json()

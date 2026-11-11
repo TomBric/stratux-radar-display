@@ -33,7 +33,6 @@
 
 from globals import Modes
 import radarmodes
-import requests
 from globals import rlog
 from button_input import get_button_event, is_middle, is_left_long, is_right_long, is_right_short, is_left_short
 
@@ -87,6 +86,8 @@ def zero_drift():
     rlog.debug("Zero drift calibration initiated by button press!")
     if not calibrate_url:
         return
+    import requests
+
     try:
         requests.post(calibrate_url, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.RequestException as e:
@@ -97,6 +98,8 @@ def set_level():
     rlog.debug("Levelling initiated by button press!")
     if not cage_url:
         return
+    import requests
+
     try:
         requests.post(cage_url, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.RequestException as e:

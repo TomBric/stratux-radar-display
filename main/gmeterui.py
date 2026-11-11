@@ -32,7 +32,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from globals import rlog, Modes
-import requests
 import radarmodes
 from button_input import get_button_event, is_middle, is_left_long, is_right_long, is_right_short
 
@@ -55,6 +54,8 @@ def reset_gmeter():
     rlog.debug("GMeterUI: Reset gmeter triggered")
     if not url_gmeter_reset:
         return
+    import requests
+
     try:
         requests.post(url_gmeter_reset, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.RequestException as e:

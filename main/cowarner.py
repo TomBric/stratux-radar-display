@@ -41,7 +41,6 @@ from typing import Any, cast
 import statusui
 import radarbluez
 from RPi import GPIO
-import numpy
 import radarmodes
 from globals import rlog, global_config, Modes
 from button_input import get_button_event, is_middle, is_left_short, is_left_long, is_right_short, is_right_long
@@ -128,6 +127,7 @@ def init(activate, config, debug_level, co_indication, simulation_mode=False, co
     global indicate_co_warning
     global co_simulation
     global co_warner_activated
+    global numpy_average
 
     if not activate and not simulation_mode:
         rlog.debug("CO-Warner - not activated")
@@ -164,6 +164,7 @@ def init(activate, config, debug_level, co_indication, simulation_mode=False, co
         rlog.debug("CO-Warner: simulation mode active.")
         co_simulation = True
         
+    from numpy import average as numpy_average
     cowarner_active = True
     co_warner_activated = True
     
@@ -204,7 +205,7 @@ def check_alarm_level():   # check wether new alarm level should be reached, cal
     for i in range(len(WARNLEVEL)-1, 0, -1):    # check all warnleves starting high e.g. (50, 3*30, "No CO alarm", None)
         num_values = math.floor(WARNLEVEL[i][1] / MIN_SENSOR_READ_TIME)   # number of values to take into account
         if len(co_values) >= num_values:   # if less values available, do not alarm
-            average = numpy.average(co_values[len(co_values)-num_values: len(co_values)])
+            average = numpy_average(co_values[len(co_values)-num_values: len(co_values)])
             # print("Average " + str(WARNLEVEL[i]) + ": " + str(num_values) + " values " + str(average) + " ppm")
             if average >= WARNLEVEL[i][0]:
                 if alarmlevel != i:

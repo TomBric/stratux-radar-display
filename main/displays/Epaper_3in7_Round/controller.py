@@ -118,21 +118,13 @@ class Epaper3in7_Round(dcommon.GenericDisplay):
 
     def init(self, fullcircle=False, dark_mode=False):
         self.device = epd3in7.EPD(reset16=getattr(self, 'reset16', False))
-        start = time.perf_counter()
         self.device.init(0)
-        self.rlog.debug("Epaper_3in7_Round: init(0) took %.3f s", time.perf_counter() - start)
-        start = time.perf_counter()
         self.device.Clear(0xFF, 0)  # necessary to overwrite everything
-        self.rlog.debug("Epaper_3in7_Round: Clear(0) took %.3f s", time.perf_counter() - start)
         # Initialize dark mode before creating the image
         self.image = Image.new('1', (self.device.height, self.device.width), 0xFF)
         self.draw = ImageDraw.Draw(self.image)
-        start = time.perf_counter()
         self.device.init(1)
-        self.rlog.debug("Epaper_3in7_Round: init(1) took %.3f s", time.perf_counter() - start)
-        start = time.perf_counter()
         self.device.Clear(0xFF, 1)
-        self.rlog.debug("Epaper_3in7_Round: Clear(1) took %.3f s", time.perf_counter() - start)
         self.dark_mode = dark_mode
         self.set_dark_mode(dark_mode)
         self.sizex = self.device.height

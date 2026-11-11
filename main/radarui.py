@@ -32,7 +32,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from globals import rlog, Modes
-import requests
 import radarbuttons
 import radarmodes
 import json
@@ -69,6 +68,8 @@ def communicate_limits(radarrange, threshold):
         if not url_settings_set:
             return
         rlog.debug("COMMUNICATE LIMITS: Radius " + str(radarrange) + " Height " + str(threshold))
+        import requests
+
         try:
             requests.post(url_settings_set, json={'RadarLimits': threshold, 'RadarRange': radarrange})
         except requests.exceptions.RequestException as e:
