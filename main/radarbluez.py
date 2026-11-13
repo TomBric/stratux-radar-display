@@ -234,7 +234,7 @@ def prepare_sounds_tuple(int_tuple):  # done during init without parallel corout
             if wav is not None:
                 out.append(pygame.mixer.Sound(str(wav)))
             else:
-                rlog.debug("Radarbluez: Error creating sound for tuple.")
+                rlog.debug(f"Radarbluez: Error creating sound for tuple element '{i}'.")
     return out
 
 
