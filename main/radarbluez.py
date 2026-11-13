@@ -140,7 +140,12 @@ def sound_init(config, bluetooth, mixer_name):
         sound_queue = PriorityQueue()
         sound_thread = threading.Thread(target=audio_speaker, args=(sound_queue,))  # external thread that speaks
         sound_thread.start()
-        speak("Stratux Radar connected")
+        if not global_config.get('nostratux', False):
+            welcome_message = "Stratux Radar connected"
+        else:
+            welcome_message = "Groundsensor ready"  # only ground sensor working without stratux
+        welcome_sound = prepare_sounds_string(welcome_message)  # prepare sound for welcome message, so that it is cached
+        speak_sound(welcome_sound, welcome_message)
         radar_sound_on_sound = prepare_sounds_string("Radar sound on")
         radar_sound_off_sound = prepare_sounds_string("Radar sound off")
     rlog.debug(f"SoundInit: Bluetooth active: {bluetooth_active} ExtSound active: {extsound_active} "

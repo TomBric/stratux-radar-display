@@ -1230,6 +1230,7 @@ if __name__ == "__main__":
     global_config['sound_volume'] = args['extsound']  # 0 if not enabled
     if global_config['sound_volume'] < 0 or global_config['sound_volume'] > 100:
         global_config['sound_volume'] = 50  # set to a medium value if strange number used
+    global_config['nostratux'] = no_stratux  # set to True if no stratux connection is used, used for welcome screen
     aircraft_simulation = args['aircraftsim']  # set to None if parameter is not set
     ble_address = args['ble']
 
