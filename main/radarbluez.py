@@ -216,11 +216,11 @@ def tts_cached_file(text):   # returns the path of a wave file for text, generat
         cache_dir = Path(tempfile.gettempdir())
     wav = cache_dir / f"radar_{key}.wav"
     if wav.exists() and wav.stat().st_size > 0:
-        rlog.debug(f"Radarbluez: Using cached sound file: {wav}")
+        rlog.debug(f"Radarbluez: Using cached sound file for '{text}': {wav}")
         return wav
     pico_result = subprocess.run(["pico2wave", "-w", str(wav), text])  # generate wave
     if pico_result.returncode == 0:
-        rlog.debug(f"Radarbluez: Generated sound file: {wav}")
+        rlog.debug(f"Radarbluez: Generated sound file for '{text}': {wav}")
         return wav
     wav.unlink(missing_ok=True)
     return None
