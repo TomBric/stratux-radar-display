@@ -7,7 +7,7 @@
 # To make persistent changes later, run configure_writable.sh and follow its
 # reboot instructions. Re-run this script after making changes.
 
-set -x
+# set -x
 set -Eeuo pipefail
 trap 'status=$?; echo "[ERROR] Command failed at line ${LINENO}: ${BASH_COMMAND}" >&2; exit "$status"' ERR
 
