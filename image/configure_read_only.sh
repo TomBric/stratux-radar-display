@@ -7,6 +7,7 @@
 # To make persistent changes later, run configure_writable.sh and follow its
 # reboot instructions. Re-run this script after making changes.
 
+set -x
 set -Eeuo pipefail
 trap 'status=$?; echo "[ERROR] Command failed at line ${LINENO}: ${BASH_COMMAND}" >&2; exit "$status"' ERR
 
@@ -56,8 +57,9 @@ if [ "$(findmnt -rn -o FSTYPE --mountpoint /)" = "overlay" ]; then
   exit 1
 fi
 
-echo "[INFO] Enabling the Trixie RAM overlay and boot partition write protection..."
+echo "[INFO] Enabling the Trixie RAM overlay for root and boot partition write protection..."
 raspi-config nonint do_overlayfs 0
+echo "[DONE] The root overlay for root as well as boot protection have been enabled."
 
 # raspi-config can report success even when enabling an overlay or boot protection fails.
 if [ "$(dpkg-query -W -f='${db:Status-Status}' overlayroot 2>/dev/null)" != "installed" ]; then
